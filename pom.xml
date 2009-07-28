@@ -3,17 +3,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auscope.portal</groupId>
-    <artifactId>AuScope-Portal</artifactId>
+    <artifactId>GeodesyWorkflow</artifactId>
     <packaging>war</packaging>
-    <version>2.1.1</version>
-    <name>AuScope-Portal Maven Webapp</name>
+    <version>0.0.1</version>
+    <name>GeodesyWorkflow Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <scm>
-        <connection>scm:svn:https://svn.auscope.org/subversion/AuScopePortal/AuScope-Portal/trunk</connection>
-        <developerConnection>scm:svn:https://svn.auscope.org/subversion/AuScopePortal/AuScope-Portal/trunk</developerConnection>
+        <connection>scm:svn:https://svn.auscope.org/subversion/AuScopePortal/GeodesyWorkflow/trunk</connection>
+        <developerConnection>scm:svn:https://svn.auscope.org/subversion/AuScopePortal/GeodesyWorkflow/trunk</developerConnection>
     </scm>
     <build>
-        <finalName>AuScope-Portal</finalName>
+        <finalName>GeodesyWorkflow</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
