@@ -70,13 +70,9 @@ public class GetDataSourcesJSONController {
     public static final String MINES              = "Mines";
     
     //create some identifiers for each of the themes to be displayed in the portal
-    public static final String[] THEMES = { BOREHOLE,
-                                            GNSS,
-                                            GEODESY,
-                                            GEOLOGIC_UNIT,
-                                            MINERAL_OCCURENCES,
-                                            MINING_ACTIVITY,
-                                            MINES};
+    public static final String[] THEMES = { 
+                                            GEODESY
+                                            };
 
     //create a map to hold the CSW query contraints for each theme
     // TODO can filterAPI be used for CSW as well? 
@@ -204,13 +200,13 @@ public class GetDataSourcesJSONController {
      */
     public JSONArray getThemes() {
         JSONArray jsonArray = new JSONArray();
-
+/*
         Map<String, Serializable> hyperspectral = new HashMap<String, Serializable>();
         hyperspectral.put("id", THEME + WEPMAPSERVICE);
         hyperspectral.put("text", WEPMAPSERVICE);
         //hyperspectral.put("checked", Boolean.FALSE);
         hyperspectral.put("leaf", Boolean.FALSE);
-        jsonArray.add(hyperspectral);
+        jsonArray.add(hyperspectral);*/
 
         for(String themeName : THEMES) {
             Map<String, Serializable> theme = new HashMap<String, Serializable>();
