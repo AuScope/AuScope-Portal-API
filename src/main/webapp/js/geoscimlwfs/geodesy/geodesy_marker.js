@@ -21,7 +21,8 @@ function GeodesyMarker (pWfsUrl, pDataLayerName, stationId, marker, description)
     this.moMarker = marker;
     
   // Initiaize all the members
-  this.msWfsUrl = pWfsUrl;
+  //cut off this from the URL "%26request=GetFeature%26typeName=geodesy:stations"  
+  this.msWfsUrl = pWfsUrl.substring(0,pWfsUrl.indexOf('?')+1);
   this.msDataLayerName = pDataLayerName;
   this.maStationDataForDate = new Array();
   this.maYearMonthWfsUrlQueried = new Array();
@@ -335,6 +336,7 @@ function GeodesyMarker_getWfsYearUrl(pYear) {
 */ 
 function GeodesyMarker_getYearMonthWfsUrl(pYear, pMonth) {
 
+	//"http://auscope-services-test.arrc.csiro.au/geodesy/wfs?"
   var station = this.stationId;//this.moGeodesyStation.msId;
   var sUrl = this.msWfsUrl + "&request=GetFeature&outputFormat=GML2&typeName=" + encodeURI(this.msDataLayerName);
   sUrl= sUrl + "&PropertyName=geodesy:date,geodesy:url";
@@ -518,7 +520,7 @@ function GeodesyMarker_updateInfoWindow() {
 * @see #createDataArraysForMonth
 */
 function GeodesyMarker_createDataArraysForYear(pYear) {
-  // Check if arrays don't already exist for this year
+  // Check if arrays do not already exist for this year
   if (this.maStationDataForDate[pYear] == undefined) {
     this.maStationDataForDate[pYear] = new Array();
     for(var m=1; m<=12; m++) {
@@ -663,13 +665,13 @@ function GeodesyMarker_yearChecked (pYear, pYearChkId, pYearHrefId, pMonthsDivId
     this.setCheckedStateForYear(year, yearChkObj.checked);
   }
   
-  var sStationDataUrl = this.msWfsYearDataUrl[year];
+  var sStationDataUrl = "/restproxy?"+this.msWfsYearDataUrl[year];
   sStationDataUrl= sStationDataUrl + "AND(id='" + station + "')";  
   
   // Download renix files for this year
   GDownloadUrl(sStationDataUrl, function(xmlData, pResponseCode) {
-    var xmlDoc = GXml.parse(xmlData);
-
+	var xmlDoc = GXml.parse(xmlData);
+    
     if (g_IsIE)
       xmlDoc.setProperty("SelectionLanguage", "XPath");
       
@@ -677,7 +679,7 @@ function GeodesyMarker_yearChecked (pYear, pYearChkId, pYearHrefId, pMonthsDivId
     if (!rootNode) {
       return;
     }
-    
+
     var geodesyMarker = oGeodesyMarker;
     
     // The checked state of the year should be propogated to all the dates belonging to the month
@@ -688,7 +690,7 @@ function GeodesyMarker_yearChecked (pYear, pYearChkId, pYearHrefId, pMonthsDivId
     
     // Parse the XML for "stations" or "geodesy:stations"
     var featureMembers = rootNode.selectNodes(".//*[local-name() = 'featureMember']");
-    
+
   	for(var i=0; i < featureMembers.length; i++) {
   	  // Extract date and url from each featureMember
       var fullDate = GXml.value(featureMembers[i].selectSingleNode(".//*[local-name() = 'date']"));
@@ -1020,7 +1022,7 @@ function GeodesyMarker_setDataForSelectedMonth(pYear, pMonth, pDatesDivObj) {
   var datesDivObj = pDatesDivObj;
   
   // Create the wfs call that will get the data
-  var sStationDataUrl = this.msYearMonthWfsUrl[year][month];
+  var sStationDataUrl = "/restproxy?"+this.msYearMonthWfsUrl[year][month];
   sStationDataUrl= sStationDataUrl + "AND(id='" + station + "')";
   
   if (this.maYearMonthWfsUrlQueried[year][month]) {
