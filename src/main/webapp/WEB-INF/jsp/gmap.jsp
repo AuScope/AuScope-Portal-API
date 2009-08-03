@@ -3,17 +3,20 @@
 
 <html>
    <head>
-      <title>AuScope Discovery Portal</title>
+      <title>Geodesy Workflow Portal</title>
       
       <meta name="description" content="Access geoscientific information from around Australia, via AuScopes national e-Research infrastructure."/>
-      <meta name="keywords" content="AuScope, Discovery, Resources, GeoSciML, Mineral Occurrence, Geologic Unit, Australia"/>
+      <meta name="keywords" content="AuScope, Discovery, Resources, GeoSciML, Mineral Occurrence, Geologic Unit, Geodesy Workflow, Australia"/>
       <meta name="author" content="AuScope"/>
       
       <!-- Page Style -->
+      <link rel="stylesheet" type="text/css" href="css/menu.css"> 
       <link rel="stylesheet" type="text/css" href="css/styles.css">
+      <link rel="stylesheet" type="text/css" href="css/grid-examples.css">
+
       <STYLE type="text/css">
         #nav-example-02 a {
-            background: url("/img/navigation.gif") -100px -38px no-repeat;
+            background: url("../img/navigation.gif") -100px -38px no-repeat;
         }
       </STYLE>
       
@@ -28,14 +31,14 @@
       </script>     
       
       <jsp:include page="/jsimports.htm"/>
-
+      
       <!-- for IE -->
       <style type="text/css">v\:* {
         behavior: url(#default#VML);
       }</style>
    </head>
 
-   <body onunload="GUnload()" >
+   <body onunload="GUnload()">
       <!-- Include Navigation Header -->
       <%@ include file="page_header.jsp" %>
       

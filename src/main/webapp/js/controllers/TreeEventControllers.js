@@ -221,6 +221,7 @@ var addKmlLayer = function(node, kml, viewport, map, statusBar) {
     var exml;
     var icon = new GIcon(G_DEFAULT_ICON, node.attributes.icon);
     icon.iconSize = new GSize(32, 32);
+    alert(pResponseCode);
     exml = new GeoXml("theglobalexml", map, null, {baseicon:icon, markeroptions:{markerHandler:function(marker) {
         marker.featureType = node.attributes.featureType;
         marker.wfsUrl = node.attributes.kmlUrl;
