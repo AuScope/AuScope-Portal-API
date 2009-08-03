@@ -140,4 +140,19 @@ public class MenuController {
    public ModelAndView access_error() {
       return new ModelAndView("access_error");
    }
+   
+   @RequestMapping("/place_holder_DST.html")
+   public ModelAndView place_holder_DST() {
+      return new ModelAndView("place_holder_DST");
+   }
+   
+   @RequestMapping("/place_holder_JS.html")
+   public ModelAndView place_holder_JS() {
+      return new ModelAndView("place_holder_JS");
+   }
+   
+   @RequestMapping("/place_holder_MJ.html")
+   public ModelAndView place_holder_MJ() {
+      return new ModelAndView("place_holder_MJ");
+   }
 }

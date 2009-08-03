@@ -54,7 +54,7 @@ public class GmlToKml {
          // However, we prefer Saxon...
          TransformerFactory tFactory = new net.sf.saxon.TransformerFactoryImpl();
          log.debug ("XSLT implementation in use: " + tFactory.getClass()); 
-         
+
          // Use the TransformerFactory to instantiate a transformer that will 
          // work with the style sheet we specify. This method call also processes 
          // the style sheet into a compiled Templates object.        

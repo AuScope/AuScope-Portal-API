@@ -58,7 +58,7 @@ public class GetDataSourcesJSONController {
 
     public static final String WEPMAPSERVICE = "Web Map Service Layers";
 
-    public static final String XSLT_PROXY_URL = "/xsltRestProxy?url=";
+    public static final String XSLT_PROXY_URL = "/GeodesyWorkflow/xsltRestProxy?url=";
     public static final String PROXY_URL      = "/restproxy?";
 
     public static final String BOREHOLE           = "Borehole";
@@ -128,7 +128,8 @@ public class GetDataSourcesJSONController {
     public static final Map<String, String> wfsQueryParams = new HashMap<String, String>() {{
         put(BOREHOLE, "%26request=GetFeature%26typeName=gsml:Borehole");
         put(GNSS, "%26request=GetFeature%26typeName=sa:SamplingPoint");
-        put(GEODESY, "%26request=GetFeature%26typeName=geodesy:stations");
+        //put(GEODESY, "%26request=GetFeature%26typeName=geodesy:stations");
+        put(GEODESY, "request=GetFeature%26typeName=ngcp:GnssStation");
         //put(GEOLOGIC_UNIT, "%26request=GetFeature%26typeName=gsml:MappedFeature%26maxFeatures=10");
         put(GEOLOGIC_UNIT, "%26request=GetFeature%26typeName=gsml:ShearDisplacementStructure%26maxFeatures=2");
         //put(MINERAL_OCCURENCES, "%26request=GetFeature%26typeName=mo:MiningFeatureOccurrence%26namespace=xmlns(mo=urn:cgi:xmlns:GGIC:MineralOccurrence:1.0)%26maxFeatures=1000");//outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.1.1%26maxFeatures=200");
@@ -152,7 +153,8 @@ public class GetDataSourcesJSONController {
     public static final Map<String, String> featureTypes = new HashMap<String, String>() {{
         put(BOREHOLE, "gsml:Borehole");
         put(GNSS, "http://maps.google.com/mapfiles/kml/paddle/grn-blank.png");
-        put(GEODESY, "geodesy:stations");
+        //put(GEODESY, "geodesy:stations");
+        put(GEODESY, "ngcp:GnssStation");
         //put(GEOLOGIC_UNIT, "gsml:GeologicUnit");
         put(GEOLOGIC_UNIT, "gsml:ShearDisplacementStructure");
         put(MINERAL_OCCURENCES, "er:MineralOccurrence");
