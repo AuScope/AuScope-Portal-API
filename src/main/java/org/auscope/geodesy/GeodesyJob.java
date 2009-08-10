@@ -3,7 +3,7 @@ package org.auscope.geodesy;
 import org.auscope.gridtools.GridJob;
 
 	/**
-	 * Simple class that stores information about a VRL job which can be submitted
+	 * Simple class that stores information about a Geodesy job which can be submitted
 	 * to the grid by a user.
 	 * An instance of this class represents the state of a VRL job at some point in
 	 * time. It can be treated as a simple data structure (e.g. in an array).
