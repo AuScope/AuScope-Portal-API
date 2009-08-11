@@ -9,6 +9,14 @@
       <security:authorize ifAllGranted="ROLE_ADMINISTRATOR">
          <a href="admin.html"><span>Administration</span></a>
       </security:authorize>
+      
+            <STYLE type="text/css">
+        H2 { text-align: center}
+        #nav-example-02 a {
+            background: url("../img/navigation.gif") -100px -38px no-repeat;
+        }
+      </STYLE>
+      
       <div id="menu">
          <ul >
             <li class="current"><a href="gmap.html">Map Client<span></span></a></li>

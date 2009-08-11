@@ -2,13 +2,14 @@
    "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-   <title>Place holder</title>
+   <title>Job Monitoring</title>
    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
    <!-- Page Style -->
    <link rel="stylesheet" type="text/css" href="css/menu.css"> 
    <link rel="stylesheet" type="text/css" href="css/styles.css">
    <link rel="stylesheet" type="text/css" href="css/grid-examples.css">
+   <link rel="stylesheet" type="text/css" href="js/external/ext-2.2/resources/css/ext-all.css">
    
       <STYLE type="text/css">
         H2 { text-align: center}
@@ -35,6 +36,9 @@
       <security:authorize ifAllGranted="ROLE_ADMINISTRATOR">
          <a href="admin.html"><span>Administration</span></a>
       </security:authorize>
+      
+      
+      
       <div id="menu">
          <ul >
             <li ><a href="gmap.html">Map Client<span></span></a></li>

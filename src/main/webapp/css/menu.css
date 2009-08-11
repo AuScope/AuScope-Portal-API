@@ -4,8 +4,6 @@
 	list-style:none;
     top: 0px;
     right: 0px;
-	/*background:url(images/articles/menu.png) 0 0 repeat-x;*/
-/*	font:bold 16px/45px sans-serif;*/
 	font:bold 14px/40px sans-serif;
     float: right;
     padding-right: 30px;
@@ -42,12 +40,12 @@
 
 #menu .current a span {
 	background-position:-295px -40px;
+
 }
 
 #menu a:active,
 #menu a:focus,
 #menu a:hover {
-
 	background-position:0px -40px;
 	background-color:#FF0;
 }
