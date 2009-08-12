@@ -146,13 +146,13 @@ public class MenuController {
       return new ModelAndView("place_holder_DST");
    }
    
-   @RequestMapping("/place_holder_JS.html")
-   public ModelAndView place_holder_JS() {
-      return new ModelAndView("place_holder_JS");
+   @RequestMapping("/gridsubmit.html")
+   public ModelAndView gridsubmit() {
+      return new ModelAndView("gridsubmit");
    }
    
-   @RequestMapping("/place_holder_MJ.html")
-   public ModelAndView place_holder_MJ() {
-      return new ModelAndView("place_holder_MJ");
+   @RequestMapping("/joblist.html")
+   public ModelAndView joblist() {
+      return new ModelAndView("joblist");
    }
 }
