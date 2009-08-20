@@ -1,0 +1,178 @@
+body {
+    font-family:'lucida grande',tahoma,arial,sans-serif;
+    font-size: 11px;
+    margin: 0px;
+    padding: 0px;
+}
+
+a {
+    color:#15428B;
+}
+
+a:link, a:visited {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+img {
+    border: 0 none;
+}
+
+#header-container {
+    width: 100%;
+    height: 100px;
+    background-color: #ffffff;
+}
+
+#header {
+    background-image: url("/img/img-auscope-banner.gif");
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100px;
+}
+
+#logo {
+    float: left;
+    width: 531px;
+    height: 100px;
+}
+
+#sitenav {
+    background: url("/img/navigation.gif") no-repeat;
+    width: 300px;
+    height: 38px;
+    margin: 0;
+    padding: 0;
+    float: right;
+    padding-right: 40px;
+}
+
+#sitenav span {
+    display: none;
+}
+
+#sitenav li, #sitenav a {
+    height: 38px;
+    display: block;
+}
+
+#sitenav li {
+    float: left;
+    list-style: none;
+    display: inline;
+}
+
+#sitenav-01 {
+    width: 100px;
+}
+
+#sitenav-02 {
+    width: 100px;
+}
+
+#sitenav-03 {
+    width: 100px;
+}
+
+#sitenav-01 a:hover {
+    background: url("/img/navigation.gif") 0px -38px no-repeat;
+}
+
+#sitenav-02 a:hover {
+    background: url("/img/navigation.gif") -100px -38px no-repeat;
+}
+
+#sitenav-03 a:hover {
+    background: url("/img/navigation.gif") -200px -38px no-repeat;
+}
+
+#start-div h2 {
+    font-size: 12px;
+    color: #555;
+    padding-bottom:5px;
+    border-bottom:1px solid #C3D0DF;
+}
+
+#start-div p {
+    margin: 10px 0;
+}
+
+#sb-description-panel h2 {
+    padding:10px 10px 0;
+    font-size:12px;
+    color:#15428B;
+}
+
+#sb-description-panel p {
+    padding:10px 10px 0;
+}
+
+#sb-description-panel pre {
+    border-top:1px dotted #ddd;
+    border-bottom:1px dotted #ddd;
+    margin-top:10px;
+    padding:0 5px;
+    background:#f5f5f5;
+}
+
+#sb-description-panel .desc-info {
+    margin:12px;
+    padding:12px;
+    border:1px dotted #999;
+    color:#555;
+    font-style: italic;
+    background: #f9f9f9;
+}
+
+#source-text {
+    padding-top:10px;
+    font-family:'lucida console';
+    font-size:11px;
+}
+
+.x-form-check-group .x-form-check-wrap, 
+.x-form-radio-group .x-form-radio-wrap {
+    white-space: nowrap;
+}
+
+.jobdesc-title {
+    font-weight: bold;
+    font-size: medium;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.jobdesc-key {
+    font-weight: bold;
+}
+
+.jobdesc-content {
+}
+
+.disk-icon {
+    background-image: url("/img/disk.png") !important
+}
+
+.folder-icon {
+    background-image: url("/img/folder.png") !important
+}
+
+.grid-icon {
+    background-image: url("/img/grid.png") !important
+}
+
+.refresh-icon {
+    background-image: url("/img/refresh.png") !important
+}
+
+.find-icon {
+    background-image: url("/img/find.png") !important
+}
+
+.cross-icon {
+    background-image: url("/img/cross.png") !important
+}
+

@@ -21,8 +21,8 @@
          <ul >
             <li class="current"><a href="gmap.html">Map Client<span></span></a></li>
             <li ><a href="place_holder_DST.html">Data Service<span></span></a></li>
-            <li ><a href="place_holder_JS.html">Submit Jobs<span></span></a></li>
-            <li ><a href="place_holder_MJ.html">Monitor Jobs<span></span></a></li>
+            <li ><a href="gridsubmit.html">Submit Jobs<span></span></a></li>
+            <li ><a href="joblist.html">Monitor Jobs<span></span></a></li>
             <li ><a href="http://apacsrv1.arrc.csiro.au/wms_v0.9dev/">GPS View<span></span></a></li>
          </ul>
       </div>

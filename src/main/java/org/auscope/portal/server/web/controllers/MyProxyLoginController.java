@@ -1,3 +1,9 @@
+/*
+ * This file is part of the AuScope Virtual Rock Lab (VRL) project.
+ * Copyright (c) 2009 ESSCC, The University of Queensland
+ *
+ * Licensed under the terms of the GNU Lesser General Public License.
+ */
 package org.auscope.portal.server.web.controllers;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,11 +20,13 @@ import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * Controller that handles MyProxy logins.
+ *
+ * @author Cihan Altinay
  */
 public class MyProxyLoginController implements Controller {
 
     protected final Log logger = LogFactory.getLog(getClass());
-    private static final int PROXY_LIFETIME = 6*60*60;
+    private static final int PROXY_LIFETIME = 10*24*60*60; // 10 days
     private GridAccessController gridAccess;
 
     /**
@@ -53,12 +61,15 @@ public class MyProxyLoginController implements Controller {
             }
 
             logger.info("Trying to initialize proxy with MyProxy details");
-            if (gridAccess.initProxy(user, pass, PROXY_LIFETIME)) {
+            Object credential = gridAccess.initProxy(user, pass, PROXY_LIFETIME);
+            if (credential != null) {
+                logger.info("Storing credentials in session.");
+                request.getSession().setAttribute("userCred", credential);
                 return new ModelAndView(
                         new RedirectView("joblist.html", true, false, false));
             } else {
                 logger.info("Proxy initialisation failed.");
-                error = new String("Could not initialize grid proxy with entered MyProxy details!");
+                error = new String("Could not initialise grid proxy with entered MyProxy details!");
             }
 
         }

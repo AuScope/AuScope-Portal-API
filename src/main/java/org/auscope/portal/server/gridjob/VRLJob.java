@@ -1,3 +1,9 @@
+/*
+ * This file is part of the AuScope Virtual Rock Lab (VRL) project.
+ * Copyright (c) 2009 ESSCC, The University of Queensland
+ *
+ * Licensed under the terms of the GNU Lesser General Public License.
+ */
 package org.auscope.portal.server.gridjob;
 
 import org.auscope.gridtools.GridJob;
@@ -10,7 +16,6 @@ import org.auscope.gridtools.GridJob;
  * <p>
  * Assertions should be enabled when using this class to prevent others from
  * setting values to <code>null</code>.
- *
  *
  * @author Cihan Altinay
  */

@@ -1,3 +1,9 @@
+/*
+ * This file is part of the AuScope Virtual Rock Lab (VRL) project.
+ * Copyright (c) 2009 ESSCC, The University of Queensland
+ *
+ * Licensed under the terms of the GNU Lesser General Public License.
+ */
 package org.auscope.portal.server.web.controllers;
 
 import java.io.BufferedReader;
@@ -50,6 +56,8 @@ import org.xml.sax.InputSource;
 /**
  * Controller that forwards shibboleth token to SLCS to retrieve a certificate
  * which can subsequently be used to access grid resources.
+ *
+ * @author Cihan Altinay
  */
 public class LoginController implements Controller {
 
@@ -57,11 +65,14 @@ public class LoginController implements Controller {
 
     private static final String SLCS_URL = "https://slcs1.arcs.org.au/SLCS/";
     private static final String HOST_KEY_FILE = "/etc/shibboleth/hostkey.pem";
-    private static final int PROXY_LIFETIME = 6*60*60;
+    private static final int PROXY_LIFETIME = 10*24*60*60; // 10 days
     private GridAccessController gridAccess;
-    private String authToken;
-    private String certDN;
-    private List certExtensions;
+
+    private class RequestData {
+        public String authToken;
+        public String certDN;
+        public List certExtensions;
+    }
 
     /**
      * Sets the <code>GridAccessController</code> to be used for proxy checking
@@ -95,7 +106,8 @@ public class LoginController implements Controller {
 
         if (request.getMethod().equalsIgnoreCase("GET")) {
             logger.debug("Handling GET request.");
-            if (gridAccess.isProxyValid()) {
+            Object credential = request.getSession().getAttribute("userCred");
+            if (gridAccess.isProxyValid(credential)) {
                 logger.debug("Valid proxy found.");
                 return redirectToTarget(request);
             }
@@ -107,17 +119,14 @@ public class LoginController implements Controller {
                 processSlcsResponse(request);
                 return redirectToTarget(request);
 
-            } catch (GeneralSecurityException e) {
-                logger.error(e.getMessage(), e);
-                logger.info("Trying to get a new certificate.");
-                return redirectToSlcs(serviceUrl);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
         }
 
-        //FIXME: proxy is not valid so redirect to a page showing what
-        //happened, maybe giving option of MyProxy details entry
+        // proxy is not valid so redirect to a page showing what
+        // happened, maybe giving option of MyProxy details entry.
+        // Simple solution: logout
         return new ModelAndView(new RedirectView(
                     "/Shibboleth.sso/Logout", false, false, false));
     }
@@ -156,35 +165,38 @@ public class LoginController implements Controller {
     /**
      * Parses the request data and sets attributes accordingly.
      *
+     * @param requestData the data to parse
      */
-    private void parseRequestData(final String requestData) {
+    private RequestData parseRequestData(final String requestData) {
         InputSource is = new InputSource();
         is.setCharacterStream(new StringReader(
                     URLDecoder.decode(requestData).trim()));
 
+        RequestData rd = new RequestData();
         try {
             DocumentBuilder builder =
                 DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = builder.parse(is);
-            authToken = doc.getElementsByTagName("AuthorizationToken")
+            rd.authToken = doc.getElementsByTagName("AuthorizationToken")
                 .item(0).getFirstChild().getNodeValue();
-            certDN = doc.getElementsByTagName("Subject")
+            rd.certDN = doc.getElementsByTagName("Subject")
                 .item(0).getFirstChild().getNodeValue();
 
             // parse and add extensions
-            certExtensions = new ArrayList<CertificateExtension>();
+            rd.certExtensions = new ArrayList<CertificateExtension>();
             NodeList certExt = doc.getElementsByTagName("CertificateExtension");
             for (int i=0; i < certExt.getLength(); i++) {
                 String name = ((Element) certExt.item(i)).getAttribute("name");
                 String value = certExt.item(i).getFirstChild().getNodeValue();
                 CertificateExtension ext = CertificateExtensionFactory
                     .createCertificateExtension(name, value);
-                certExtensions.add(ext);
+                rd.certExtensions.add(ext);
             }
 
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
+        return rd;
     }
 
     /**
@@ -229,6 +241,9 @@ public class LoginController implements Controller {
         return output.toString();
     }
 
+    /**
+     * Extracts and decrypts the XML response received from the SLCS server
+     */
     private String extractSlcsResponse(HttpServletRequest request)
             throws GeneralSecurityException, IOException {
         String responseXML = null;
@@ -256,14 +271,18 @@ public class LoginController implements Controller {
         return responseXML;
     }
  
+    /**
+     * Processes the SLCS response and tries to generate a grid proxy from
+     * the extracted certificate and key.
+     */
     private void processSlcsResponse(HttpServletRequest request)
             throws GeneralSecurityException, Exception {
             
         String slcsResponse = extractSlcsResponse(request);
         logger.debug("SLCSResponse:\n"+slcsResponse);
-        parseRequestData(slcsResponse);
+        RequestData rd = parseRequestData(slcsResponse);
 
-        String certCN = certDN.split("CN=")[1];
+        String certCN = rd.certDN.split("CN=")[1];
         String shibCN = request.getHeader("Shib-Person-commonName") + " "
                 + request.getHeader("Shib-AuEduPerson-SharedToken");
         if (!certCN.equals(shibCN)) {
@@ -274,11 +293,11 @@ public class LoginController implements Controller {
  
         CertificateKeys certKeys = new CertificateKeys(2048, new char[0]);
         CertificateRequest req = new CertificateRequest(
-                certKeys, certDN, certExtensions);
+                certKeys, rd.certDN, rd.certExtensions);
 
         logger.info("Requesting signed certificate...");
         URL certRespURL = new URL(SLCS_URL +
-                "certificate?AuthorizationToken=" + authToken +
+                "certificate?AuthorizationToken=" + rd.authToken +
                 "&CertificateSigningRequest=" +
                 URLEncoder.encode(req.getPEMEncoded(), "UTF-8"));
         BufferedReader certRespReader = new BufferedReader(
@@ -307,9 +326,13 @@ public class LoginController implements Controller {
             InputStream in = new ByteArrayInputStream(certStr.getBytes());
             X509Certificate certificate = CertUtil.loadCertificate(in);
 
-            if (!gridAccess.initProxy(certKeys.getPrivate(), certificate,
-                        PROXY_LIFETIME)) {
+            Object credential = gridAccess.initProxy(
+                    certKeys.getPrivate(), certificate, PROXY_LIFETIME);
+            if (credential == null) {
                 throw new Exception("Proxy generation failed");
+            } else {
+                logger.info("Storing credentials in session.");
+                request.getSession().setAttribute("userCred", credential);
             }
         }
     }

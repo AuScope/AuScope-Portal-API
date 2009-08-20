@@ -1,3 +1,9 @@
+/*
+ * This file is part of the AuScope Virtual Rock Lab (VRL) project.
+ * Copyright (c) 2009 ESSCC, The University of Queensland
+ *
+ * Licensed under the terms of the GNU Lesser General Public License.
+ */
 package org.auscope.portal.server.gridjob;
 
 import java.security.PrivateKey;
@@ -34,27 +40,27 @@ import org.ietf.jgss.GSSManager;
  * @author Ryan Fraser
  * @author Terry Rankine
  * @author Darren Kidd
+ * @author Cihan Altinay
  */
 public class GridAccessController {
     /** The handle to the <code>RegistryQueryClient</code> model. */
     private final RegistryQueryClient RQC = new RegistryQueryClient();
 
     /** The logger for this class */
-    private Log logger = LogFactory.getLog(getClass());
+    private static Log logger = LogFactory.getLog(GridAccessController.class);
 
     private String gridFtpServer = "";
     private String gridFtpStageInDir = "";
     private String gridFtpStageOutDir = "";
 
-    // MyProxy settings
-    private String myProxyServer = "myproxy.arcs.org.au";
-    private int myProxyPort = 7512;
+    /** MyProxy server to connect to */
+    private static final String myProxyServer = "myproxy.arcs.org.au";
+
+    /** MyProxy port to use */
+    private static final int myProxyPort = 7512;
 
     /** Minimum lifetime for a proxy to be considered valid */
-    private final int MIN_LIFETIME = 5*60;
-
-    /** Current grid credential object */
-    private GSSCredential credential = null;
+    private static final int MIN_LIFETIME = 5*60;
 
     /**
      * Sets the server name of the GridFTP server to be used for file staging.
@@ -133,7 +139,7 @@ public class GridAccessController {
      *             information required to run a job
      * @return The submitted job's endpoint reference (EPR)
      */
-    public String submitJob(GridJob job) {
+    public String submitJob(GridJob job, Object credential) {
         String siteAddr = RQC.getJobManagerAtSite(job.getSite());
         String moduleName = RQC.getModuleNameOfCodeAtSite(
                 job.getSite(), job.getCode(), job.getVersion());
@@ -145,7 +151,7 @@ public class GridAccessController {
         job.setModules(new String[] { moduleName });
         job.setExeName(exeName);
         job.setSiteGridFTPServer(gridFtpServer);
-        GramJobControl gjc = new GramJobControl(credential);
+        GramJobControl gjc = new GramJobControl((GSSCredential) credential);
         String EPR = gjc.submitJob(job, siteAddr);
 
         if (EPR == null) {
@@ -164,9 +170,9 @@ public class GridAccessController {
      * @return The status of the job after killing (a
      *         <code>StateEnumeration</code> string)
      */
-    public String killJob(String reference) {
-        GramJobControl ggj = new GramJobControl(credential);
-        return ggj.killJob(reference);
+    public String killJob(String reference, Object credential) {
+        GramJobControl gjc = new GramJobControl((GSSCredential) credential);
+        return gjc.killJob(reference);
     }
 
     /**
@@ -176,9 +182,9 @@ public class GridAccessController {
      *
      * @return The status of the job (a <code>StateEnumeration</code> string)
      */
-    public String retrieveJobStatus(String reference) {
-        GramJobControl ggj = new GramJobControl(credential);
-        return ggj.getJobStatus(reference);
+    public String retrieveJobStatus(String reference, Object credential) {
+        GramJobControl gjc = new GramJobControl((GSSCredential) credential);
+        return gjc.getJobStatus(reference);
     }
 
     /**
@@ -189,9 +195,9 @@ public class GridAccessController {
      *
      * @return true if successful, false otherwise
      */
-    public boolean retrieveJobResults(String reference) {
-        GramJobControl ggj = new GramJobControl(credential);
-        return (ggj.getJobResults(reference) != null);
+    public boolean retrieveJobResults(String reference, Object credential) {
+        GramJobControl gjc = new GramJobControl((GSSCredential) credential);
+        return (gjc.getJobResults(reference) != null);
     }
 
     /**
@@ -383,31 +389,29 @@ public class GridAccessController {
      * @param certificate The certificate
      * @param lifetime Desired lifetime in seconds of the new proxy
      *
-     * @return true if credentials were successfully created, false otherwise
+     * @return the grid credential object (which can be null)
      */
-    public boolean initProxy(PrivateKey key, X509Certificate certificate,
-                             int lifetime) {
-        boolean retval = false;
-        GlobusCredential proxy = null;
+    public static Object initProxy(PrivateKey key, X509Certificate certificate,
+                                   int lifetime) {
+        GSSCredential credential = null;
         int bits = 512;
         int proxyType = GSIConstants.DELEGATION_FULL;
         X509ExtensionSet extSet = null;
         BouncyCastleCertProcessingFactory factory =
             BouncyCastleCertProcessingFactory.getDefault();
         try {
-            proxy = factory.createCredential(
+            GlobusCredential proxy = factory.createCredential(
                     new X509Certificate[] { certificate },
                     key, bits, lifetime, proxyType, extSet);
             credential = new GlobusGSSCredentialImpl(
                     proxy, GSSCredential.INITIATE_AND_ACCEPT);
-            if (isProxyValid()) {
+            if (isProxyValid(credential)) {
                 logger.info("Acquired valid credentials.");
-                retval = true;
             }
         } catch (Exception e) {
             logger.error("create user proxy error: "+e.toString(), e);
         }
-        return retval;
+        return credential;
     }
 
     /**
@@ -419,25 +423,25 @@ public class GridAccessController {
      * @param proxyPass MyProxy password
      * @param lifetime  Desired lifetime in seconds of the new proxy
      * 
-     * @return true if credentials were successfully created, false otherwise
+     * @return the grid credential object (which can be null)
      */
-    public boolean initProxy(String proxyUser, String proxyPass, int lifetime) {
-        boolean retval = false;
+    public static Object initProxy(String proxyUser, String proxyPass,
+                                   int lifetime) {
+        GSSCredential credential = null;
         try {
             credential = MyProxyManager.getDelegation(
                     myProxyServer, myProxyPort,
                     proxyUser, proxyPass.toCharArray(),
                     lifetime);
 
-            if (isProxyValid()) {
+            if (isProxyValid(credential)) {
                 logger.info("Got credential from "+myProxyServer);
-                retval = true;
             }
         } catch (Exception e) {
             logger.error("Could not get delegated proxy from server: " +
                     e.getMessage());
         }
-        return retval;
+        return credential;
     }
 
     /**
@@ -445,22 +449,22 @@ public class GridAccessController {
      * for all grid activities. This method requires an existing proxy file of
      * the current user.
      *
-     * @return true if credentials were successfully created, false otherwise
+     * @return the grid credential object (which can be null)
      */
-    public boolean initProxy() {
-        boolean retval = false;
+    public static Object initProxy() {
+        GSSCredential credential = null;
         try {
             GSSManager manager = ExtendedGSSManager.getInstance();
             credential = manager.createCredential(
                     GSSCredential.INITIATE_AND_ACCEPT);
 
-            if (isProxyValid()) {
-                retval = true;
+            if (isProxyValid(credential)) {
+                logger.info("Created credential from file.");
             }
         } catch (GSSException e) {
             logger.error(FaultHelper.getMessage(e));
         }
-        return retval;
+        return credential;
     }
 
     /**
@@ -470,11 +474,12 @@ public class GridAccessController {
      *
      * @return true if and only if the current credentials are valid
      */
-    public boolean isProxyValid() {
+    public static boolean isProxyValid(Object credential) {
         if (credential != null) {
             try {
-                int lifetime = credential.getRemainingLifetime();
-                logger.debug("Name: " + credential.getName().toString() +
+                GSSCredential cred = (GSSCredential) credential;
+                int lifetime = cred.getRemainingLifetime();
+                logger.debug("Name: " + cred.getName().toString() +
                         ", Lifetime: " + lifetime + " seconds");
                 if (lifetime > MIN_LIFETIME) {
                     return true;

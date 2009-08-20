@@ -1,3 +1,10 @@
+/*
+ * This file is part of the AuScope Virtual Rock Lab (VRL) project.
+ * Copyright (c) 2009 ESSCC, The University of Queensland
+ *
+ * Licensed under the terms of the GNU Lesser General Public License.
+ */
+
 package org.auscope.gridtools;
 
 import java.net.URL;
@@ -42,8 +49,9 @@ public class GramJobControl implements JobControlInterface {
     /** Reference to the Controller's Log4J logger. */
     private Log logger = LogFactory.getLog(getClass());
 
+    // allow a job to run a maximum of 10 days (in milliseconds) by default
+    private static final long JOB_LIFETIME_MILLIS = 864000000l;
     private GramJobListener listener = null;
-    private Date resourceDate = null;
     private GSSCredential credential = null;
 
     /**
@@ -93,13 +101,6 @@ public class GramJobControl implements JobControlInterface {
             cred = manager.createCredential(GSSCredential.INITIATE_AND_ACCEPT);
         }
         return cred;
-    }
-
-    public void setResourceDate(int walltime) {
-        Date date1 = new Date();
-        // set the resource lifetime to the amount of milliseconds from
-        // 1/1/1970 + walltime x 60 x 1000 x 7
-        resourceDate = new Date(date1.getTime() + (walltime * 60 * 1000 * 7));
     }
 
     /**
@@ -244,9 +245,6 @@ public class GramJobControl implements JobControlInterface {
         finalJobString = finalJobString.replaceAll("> <", ">\n <");
         finalJobString = finalJobString.replaceAll(">  <", ">\n  <");
         finalJobString = finalJobString.replaceAll(">   <", ">\n   <");
-
-        // set the resource Date object
-        setResourceDate(Integer.valueOf(job.getMaxWallTime()));
 
         return finalJobString;
     }
@@ -414,9 +412,6 @@ public class GramJobControl implements JobControlInterface {
             logger.error(e.getMessage());
         }
         */
-        
-        // set the resource Date object
-        setResourceDate(Integer.valueOf(job.getMaxWallTime()));
 
         return jobs;
     }
@@ -486,11 +481,14 @@ public class GramJobControl implements JobControlInterface {
             // Auth stuff, and setting the credentials.
             job.setDelegationEnabled(true);
             job.setCredentials(getCredential());
-            job.setTerminationTime(resourceDate);
+            // this is weird but see here:
+            // http://lists.globus.org/pipermail/gram-user/2007-November/000633.html
+            job.setDuration(new Date(
+                        System.currentTimeMillis()+JOB_LIFETIME_MILLIS));
+            //job.setTerminationTime(XXX);
             HostAuthorization iA = new HostAuthorization();
 
             job.setAuthorization(iA);
-            job.setDuration(null);
             // Listen for Job state changes if requested.
             if (listener != null)
                 job.addListener(listener);
@@ -544,11 +542,14 @@ public class GramJobControl implements JobControlInterface {
             // Auth stuff, and setting the credentials.
             job.setDelegationEnabled(true);
             job.setCredentials(getCredential());
-            job.setTerminationTime(resourceDate);
+            // this is weird but see here:
+            // http://lists.globus.org/pipermail/gram-user/2007-November/000633.html
+            job.setDuration(new Date(
+                        System.currentTimeMillis()+JOB_LIFETIME_MILLIS));
+            //job.setTerminationTime(XXX);
             HostAuthorization iA = new HostAuthorization();
 
             job.setAuthorization(iA);
-            job.setDuration(null);
             // Listen for Job state changes if requested.
             if (listener != null)
                 job.addListener(listener);

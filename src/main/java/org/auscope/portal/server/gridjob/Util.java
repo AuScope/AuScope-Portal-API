@@ -1,3 +1,9 @@
+/*
+ * This file is part of the AuScope Virtual Rock Lab (VRL) project.
+ * Copyright (c) 2009 ESSCC, The University of Queensland
+ *
+ * Licensed under the terms of the GNU Lesser General Public License.
+ */
 package org.auscope.portal.server.gridjob;
 
 import java.io.File;
@@ -26,6 +32,9 @@ public class Util
 
     /**
      * Copies a file from source to destination.
+     *
+     * @param source Source file to copy
+     * @param destination File to copy to
      *
      * @return true if file was successfully copied, false otherwise
      */
@@ -65,7 +74,11 @@ public class Util
     }
 
     /**
-     * Moves a file from source to destination.
+     * Moves a file from source to destination. Uses copyFile to create a copy
+     * then deletes the source.
+     *
+     * @param source Source file
+     * @param destination Destination file
      *
      * @return true if file was successfully moved, false otherwise
      */
@@ -80,6 +93,13 @@ public class Util
     /**
      * Recursively copies the contents of a directory into the destination
      * directory.
+     * Source and destination must represent the same type (file or directory).
+     * In the case of files this method does the same as copyFile. If they
+     * are directories then source is recursively copied into destination.
+     * Destination may not exist in this case and will be created.
+     *
+     * @param source Source file or directory to be copied
+     * @param destination Destination file or directory
      *
      * @return true if contents were successfully copied, false otherwise
      */
@@ -110,5 +130,39 @@ public class Util
         return success;
     }
 
+    /**
+     * Recursively deletes a directory.
+     * If path represents a file it is deleted. If it represents a directory
+     * then its contents are deleted before the directory itself is removed.
+     *
+     * @param path File or directory to delete.
+     *
+     * @return true if deletion was successful, false otherwise
+     */
+    public static boolean deleteFilesRecursive(File path) {
+        boolean success = true;
+        if (path.isDirectory()) {
+            String files[] = path.list();
+
+            // delete contents first
+            for (int i=0; i<files.length; i++) {
+                File newPath = new File(path, files[i]);
+                success = deleteFilesRecursive(newPath);
+                if (!success) {
+                    break;
+                }
+            }
+        }
+
+        if (success) {
+            // delete path (whether it is a file or directory)
+            success = path.delete();
+            if (!success) {
+                logger.warn("Unable to delete "+path.getPath());
+            }
+        }
+
+        return success;
+    }
 }
 

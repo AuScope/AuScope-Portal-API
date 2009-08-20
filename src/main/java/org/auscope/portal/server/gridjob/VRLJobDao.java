@@ -1,3 +1,9 @@
+/*
+ * This file is part of the AuScope Virtual Rock Lab (VRL) project.
+ * Copyright (c) 2009 ESSCC, The University of Queensland
+ *
+ * Licensed under the terms of the GNU Lesser General Public License.
+ */
 package org.auscope.portal.server.gridjob;
 
 import java.sql.SQLException;
@@ -10,6 +16,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * A Hibernate-backed VRLJob data object
+ *
+ * @author Cihan Altinay
  */
 public class VRLJobDao extends HibernateDaoSupport {
 

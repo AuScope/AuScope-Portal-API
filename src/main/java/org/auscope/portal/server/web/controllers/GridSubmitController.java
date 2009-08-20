@@ -1,3 +1,9 @@
+/*
+ * This file is part of the AuScope Virtual Rock Lab (VRL) project.
+ * Copyright (c) 2009 ESSCC, The University of Queensland
+ *
+ * Licensed under the terms of the GNU Lesser General Public License.
+ */
 package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
@@ -10,6 +16,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONArray;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,23 +36,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-//import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
-//import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
-//import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
+import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * Controller for the job submission view.
+ *
+ * @author Cihan Altinay
  */
 @Controller
 public class GridSubmitController {
 
-    
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
-
     @Autowired
     private GridAccessController gridAccess;
-
     @Autowired
     private VRLJobManager jobManager;
 
@@ -53,8 +59,8 @@ public class GridSubmitController {
      * activities.
      *
      * @param gridAccess the GridAccessController to use
-     
-    public void setGridAccess(GridAccessController gridAccess) {
+     */
+    /*public void setGridAccess(GridAccessController gridAccess) {
         this.gridAccess = gridAccess;
     }*/
 
@@ -63,18 +69,19 @@ public class GridSubmitController {
      * series and job details.
      *
      * @param jobManager the JobManager to use
-
-    public void setJobManager(VRLJobManager jobManager) {
+     */
+   /* public void setJobManager(VRLJobManager jobManager) {
         this.jobManager = jobManager;
     }*/
-    
-    /*
-    protected ModelAndView handleNoSuchRequestHandlingMethod(
+
+  /*  protected ModelAndView handleNoSuchRequestHandlingMethod(
             NoSuchRequestHandlingMethodException ex,
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        if (gridAccess.isProxyValid()) {
+        // Ensure user has valid grid credentials
+        if (gridAccess.isProxyValid(
+                    request.getSession().getAttribute("userCred"))) {
             logger.debug("No/invalid action parameter; returning gridsubmit view.");
             return new ModelAndView("gridsubmit");
         } else {
@@ -126,7 +133,7 @@ public class GridSubmitController {
      * @return A JSON object with a sites attribute which is an array of
      *         sites on the grid that have an installation of ESyS-particle.
      */
-    @RequestMapping("/listSites.do")
+    @RequestMapping("/listSites.do")    
     public ModelAndView listSites(HttpServletRequest request,
                                   HttpServletResponse response) {
 
@@ -153,7 +160,7 @@ public class GridSubmitController {
      * @return A JSON object with a queues attribute which is an array of
      *         job queues available at requested site.
      */
-    @RequestMapping("/listSiteQueues.do")
+    @RequestMapping("/listSiteQueues.do")    
     public ModelAndView listSiteQueues(HttpServletRequest request,
                                        HttpServletResponse response) {
 
@@ -187,7 +194,7 @@ public class GridSubmitController {
      * @return A JSON object with a versions attribute which is an array of
      *         versions installed at requested site.
      */
-    @RequestMapping("/listSiteVersions.do")
+    @RequestMapping("/listSiteVersions.do")    
     public ModelAndView listSiteVersions(HttpServletRequest request,
                                          HttpServletResponse response) {
 
@@ -220,7 +227,7 @@ public class GridSubmitController {
      * @return A JSON object with a data attribute containing a populated
      *         VRLJob object and a success attribute.
      */
-    @RequestMapping("/getJobObject.do")
+    @RequestMapping("/getJobObject.do")    
     public ModelAndView getJobObject(HttpServletRequest request,
                                      HttpServletResponse response) {
 
@@ -244,7 +251,7 @@ public class GridSubmitController {
      * @return A JSON object with a files attribute which is an array of
      *         filenames.
      */
-    @RequestMapping("/listJobFiles.do")
+    @RequestMapping("/listJobFiles.do")    
     public ModelAndView listJobFiles(HttpServletRequest request,
                                      HttpServletResponse response) {
 
@@ -276,7 +283,7 @@ public class GridSubmitController {
      *
      * @return null
      */
-    @RequestMapping("/uploadFile.do")
+    @RequestMapping("/uploadFile.do")    
     public ModelAndView uploadFile(HttpServletRequest request,
                                    HttpServletResponse response) {
 
@@ -301,20 +308,17 @@ public class GridSubmitController {
                 File destination = new File(
                         jobInputDir+f.getOriginalFilename());
                 if (destination.exists()) {
-                    success = false;
-                    error = new String("A file by that name already exists.");
-                    logger.warn("Tried to upload a file with existing filename.");
-                } else {
-                    try {
-                        f.transferTo(destination);
-                    } catch (IOException e) {
-                        logger.error("Could not move file: "+e.getMessage());
-                        success = false;
-                        error = new String("Could not process file.");
-                    }
-                    fileInfo = new FileInformation(
-                            f.getOriginalFilename(), f.getSize());
+                    logger.debug("Will overwrite existing file.");
                 }
+                try {
+                    f.transferTo(destination);
+                } catch (IOException e) {
+                    logger.error("Could not move file: "+e.getMessage());
+                    success = false;
+                    error = new String("Could not process file.");
+                }
+                fileInfo = new FileInformation(
+                        f.getOriginalFilename(), f.getSize());
             }
 
         } else {
@@ -345,6 +349,77 @@ public class GridSubmitController {
     }
 
     /**
+     * Deletes one or more uploaded files of the current job.
+     *
+     * @param request The servlet request
+     * @param response The servlet response
+     *
+     * @return A JSON object with a success attribute that indicates whether
+     *         the files were successfully deleted.
+     */
+    @RequestMapping("/deleteFiles.do")    
+    public ModelAndView deleteFiles(HttpServletRequest request,
+                                    HttpServletResponse response) {
+
+        String jobInputDir = (String) request.getSession()
+            .getAttribute("jobInputDir");
+        ModelAndView mav = new ModelAndView("jsonView");
+        boolean success;
+
+        if (jobInputDir != null) {
+            success = true;
+            String filesPrm = request.getParameter("files");
+            logger.debug("Request to delete "+filesPrm);
+            String[] files = (String[]) JSONArray.toArray(
+                    JSONArray.fromObject(filesPrm), String.class);
+
+            for (String filename: files) {
+                File f = new File(jobInputDir+filename);
+                if (f.exists() && f.isFile()) {
+                    logger.debug("Deleting "+f.getPath());
+                    boolean lsuccess = f.delete();
+                    if (!lsuccess) {
+                        logger.warn("Unable to delete "+f.getPath());
+                        success = false;
+                    }
+                } else {
+                    logger.warn(f.getPath()+" does not exist or is not a file!");
+                }
+            }
+        } else {
+            success = false;
+        }
+
+        mav.addObject("success", success);
+        return mav;
+    }
+
+    /**
+     * Cancels the current job submission. Called to clean up temporary files.
+     *
+     * @param request The servlet request
+     * @param response The servlet response
+     *
+     * @return null
+     */
+    @RequestMapping("/cancelSubmission.do")    
+    public ModelAndView cancelSubmission(HttpServletRequest request,
+                                         HttpServletResponse response) {
+
+        String jobInputDir = (String) request.getSession()
+            .getAttribute("jobInputDir");
+
+        if (jobInputDir != null) {
+            logger.debug("Deleting temporary job files.");
+            File jobDir = new File(jobInputDir);
+            Util.deleteFilesRecursive(jobDir);
+            request.getSession().removeAttribute("jobInputDir");
+        }
+
+        return null;
+    }
+
+    /**
      * Processes a job submission request.
      *
      * @param request The servlet request
@@ -353,7 +428,7 @@ public class GridSubmitController {
      * @return A JSON object with a success attribute that indicates whether
      *         the job was successfully submitted.
      */
-    @RequestMapping("/submitJob.do")
+    @RequestMapping("/submitJob.do")    
     public ModelAndView submitJob(HttpServletRequest request,
                                   HttpServletResponse response,
                                   VRLJob job) {
@@ -367,6 +442,16 @@ public class GridSubmitController {
             .getAttribute("jobInputDir");
         String newSeriesName = request.getParameter("seriesName");
         String seriesIdStr = request.getParameter("seriesId");
+        ModelAndView mav = new ModelAndView("jsonView");
+        Object credential = request.getSession().getAttribute("userCred");
+
+        if (credential == null) {
+            final String errorString = "Invalid grid credentials!";
+            logger.error(errorString);
+            mav.addObject("error", errorString);
+            mav.addObject("success", false);
+            return mav;
+        }
 
         // if seriesName parameter was provided then we create a new series
         // otherwise seriesId contains the id of the series to use.
@@ -420,27 +505,27 @@ public class GridSubmitController {
             logger.info("Submitting job with name " + job.getName() +
                     " to " + job.getSite());
             // ACTION!
-            submitEPR = gridAccess.submitJob(job);
+            submitEPR = gridAccess.submitJob(job, credential);
 
             if (submitEPR == null) {
                 success = false;
             } else {
                 logger.info("SUCCESS! EPR: "+submitEPR);
-                String status = gridAccess.retrieveJobStatus(submitEPR);
+                String status = gridAccess.retrieveJobStatus(
+                        submitEPR, credential);
                 job.setReference(submitEPR);
                 job.setStatus(status);
-                job.setSubmitDate(new Date().toString());
+                job.setSubmitDate(dateFmt);
                 jobManager.saveJob(job);
+                request.getSession().removeAttribute("jobInputDir");
             }
         }
 
-        ModelAndView result = new ModelAndView("jsonView");
-        result.addObject("success", success);
+        mav.addObject("success", success);
 
-        return result;
+        return mav;
     }
 
-    //TODO Fix this for Geodesy
     /**
      * Creates a new VRLJob object with predefined values for some fields.
      * If the ScriptBuilder was used the file is moved to the job input
@@ -453,8 +538,8 @@ public class GridSubmitController {
      */
     private VRLJob prepareModel(HttpServletRequest request) {
         final String user = request.getRemoteUser();
-        final String maxWallTime = "2";
-        final String maxMemory = "1024";
+        final String maxWallTime = "3000"; // 50 hours
+        final String maxMemory = "30720"; // 30 GB
         final String stdInput = "";
         final String stdOutput = "stdOutput.txt";
         final String stdError = "stdError.txt";

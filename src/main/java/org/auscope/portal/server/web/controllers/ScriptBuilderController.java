@@ -1,3 +1,9 @@
+/*
+ * This file is part of the AuScope Virtual Rock Lab (VRL) project.
+ * Copyright (c) 2009 ESSCC, The University of Queensland
+ *
+ * Licensed under the terms of the GNU Lesser General Public License.
+ */
 package org.auscope.portal.server.web.controllers;
 
 import java.io.BufferedReader;
@@ -19,6 +25,8 @@ import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * Controller for the ScriptBuilder view.
+ *
+ * @author Cihan Altinay
  */
 public class ScriptBuilderController extends MultiActionController {
 

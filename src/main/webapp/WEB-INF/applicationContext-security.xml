@@ -42,12 +42,12 @@
       <beans:property name="dataSource" ref="dataSource"/>
    </beans:bean>
 
-   <!-- This userDetailsService implementation is handy for quick testing   
+   <!-- This userDetailsService implementation is handy for quick testing -->  
    <authentication-provider>
       <user-service id="userDetailsService">
          <user password="password" name="Jarek.Sanders@csiro.au" authorities="ROLE_JOB_SUBMISSION" />
       </user-service>
    </authentication-provider>
-   -->
+
 
 </beans:beans>
