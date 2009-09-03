@@ -137,7 +137,7 @@ public class GridSubmitController {
     public ModelAndView listSites(HttpServletRequest request,
                                   HttpServletResponse response) {
 
-        logger.debug("Retrieving sites with ESyS-Particle installations.");
+        logger.debug("Retrieving sites with "+VRLJob.CODE_NAME+" installations.");
         String[] particleSites = gridAccess.
                 retrieveSitesWithSoftwareAndVersion(VRLJob.CODE_NAME, "");
 
@@ -547,7 +547,7 @@ public class GridSubmitController {
         final String[] inTransfers = new String[0];
         final String[] outTransfers = new String[0];
         String name = "VRLjob";
-        String site = "ESSCC";
+        String site = "iVEC";
         Integer cpuCount = 2;
         Integer numBonds = 0;
         Integer numParticles = 0;

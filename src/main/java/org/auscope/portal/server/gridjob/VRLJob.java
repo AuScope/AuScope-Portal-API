@@ -20,8 +20,8 @@ import org.auscope.gridtools.GridJob;
  * @author Cihan Altinay
  */
 public class VRLJob extends GridJob {
-    /** The name of the software to run VRL jobs with */
-    public static final String CODE_NAME = "esys_particle";
+    /** The name of the software to run Geodesy jobs with */
+    public static final String CODE_NAME = "Gamit";
     /** The job type */
     private static final String JOB_TYPE = "mpi";
     /** The prefix of checkpoint files */
