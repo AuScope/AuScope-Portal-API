@@ -170,11 +170,28 @@ function GeodesyCalendar_show (pDateSelected) {
   dateUrlsDivObj.id = dateUrlsDivId;
   dateUrlsDivObj.style.position = 'absolute';
   dateUrlsDivObj.style.left = '0px';
-  dateUrlsDivObj.style.top = '220px';
+  dateUrlsDivObj.style.top = '190px';
+
+  // Create an html div object to display the submit button.
+  var buttonDivId = "button_div_" + this.msStation;
+  // If this frame already exists - remove it before creating a new one.
+  var buttonDivObj = document.getElementById(buttonDivId);
+  if (buttonDivObj) {
+    datesDivObj.removeChild(buttonDivObj);
+  }
+  buttonDivObj = document.createElement("div");
+  buttonDivObj.id = buttonDivId;
+  buttonDivObj.style.position = 'absolute';
+  buttonDivObj.style.right = '10px';
+  buttonDivObj.style.bottom = '10px';
+  buttonDivObj.innerHTML = '<FORM><INPUT type="button" value="Export to Data Service Tool" onClick="GeodesyMarker.prototype.getSubmitButtonFn();"></FORM>' 
+  
+
   
   // Append the calendar and the urls div in the parent object.
   datesDivObj.appendChild(calendarDivObj);
   datesDivObj.appendChild(dateUrlsDivObj);
+  datesDivObj.appendChild(buttonDivObj);
   
   // Now we parse all the station urls for the dates,
   // depending on whether there is one available, 

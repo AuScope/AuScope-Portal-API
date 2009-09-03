@@ -28,7 +28,7 @@ img {
 }
 
 #header {
-    background-image: url("/img/img-auscope-banner.gif");
+    background-image: url("../img/img-auscope-banner.gif");
     background-repeat: no-repeat;
     width: 100%;
     height: 100px;
@@ -41,7 +41,7 @@ img {
 }
 
 #sitenav {
-    background: url("/img/navigation.gif") no-repeat;
+    background: url("../img/navigation.gif") no-repeat;
     width: 300px;
     height: 38px;
     margin: 0;
@@ -78,15 +78,15 @@ img {
 }
 
 #sitenav-01 a:hover {
-    background: url("/img/navigation.gif") 0px -38px no-repeat;
+    background: url("../img/navigation.gif") 0px -38px no-repeat;
 }
 
 #sitenav-02 a:hover {
-    background: url("/img/navigation.gif") -100px -38px no-repeat;
+    background: url("../img/navigation.gif") -100px -38px no-repeat;
 }
 
 #sitenav-03 a:hover {
-    background: url("/img/navigation.gif") -200px -38px no-repeat;
+    background: url("../img/navigation.gif") -200px -38px no-repeat;
 }
 
 #start-div h2 {
@@ -153,26 +153,26 @@ img {
 }
 
 .disk-icon {
-    background-image: url("/img/disk.png") !important
+    background-image: url("../img/disk.png") !important
 }
 
 .folder-icon {
-    background-image: url("/img/folder.png") !important
+    background-image: url("../img/folder.png") !important
 }
 
 .grid-icon {
-    background-image: url("/img/grid.png") !important
+    background-image: url("../img/grid.png") !important
 }
 
 .refresh-icon {
-    background-image: url("/img/refresh.png") !important
+    background-image: url("../img/refresh.png") !important
 }
 
 .find-icon {
-    background-image: url("/img/find.png") !important
+    background-image: url("../img/find.png") !important
 }
 
 .cross-icon {
-    background-image: url("/img/cross.png") !important
+    background-image: url("../img/cross.png") !important
 }
 

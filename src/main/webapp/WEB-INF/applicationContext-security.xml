@@ -15,6 +15,7 @@
       <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR" />
  <!-- <intercept-url pattern="/downloadProxy\?urls**" access="ROLE_DOWNLOAD" /> -->
       <intercept-url pattern="/**" filters="none" />
+      <concurrent-session-control max-sessions="1"/>
    </http>
       
    <authentication-manager alias="authenticationManager" />
@@ -36,18 +37,18 @@
       </beans:property>
    </beans:bean>   
 
-   <authentication-provider user-service-ref='myUserDetailsService'/>
+    <authentication-provider user-service-ref='myUserDetailsService'/> 
 
    <beans:bean id="myUserDetailsService" class="org.springframework.security.userdetails.jdbc.JdbcDaoImpl">
       <beans:property name="dataSource" ref="dataSource"/>
    </beans:bean>
 
    <!-- This userDetailsService implementation is handy for quick testing -->  
-   <authentication-provider>
-      <user-service id="userDetailsService">
-         <user password="password" name="Jarek.Sanders@csiro.au" authorities="ROLE_JOB_SUBMISSION" />
+   <!--<authentication-provider>
+      <user-service id="myUserDetailsService">
+         <user password="jarekspassword" name="Abdi.Jama@csiro.au" authorities="ROLE_JOB_SUBMISSION" />
       </user-service>
-   </authentication-provider>
+   </authentication-provider>-->
 
 
 </beans:beans>

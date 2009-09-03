@@ -328,7 +328,7 @@ GridSubmit.initialize = function() {
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
     });
-
+    
     // Store for ESyS-Particle versions at a specific site
     var versionsStore = new Ext.data.JsonStore({
         url: '/GeodesyWorkflow/listSiteVersions.do',
@@ -496,7 +496,7 @@ GridSubmit.initialize = function() {
             triggerAction: 'all',
             displayField: 'value',
             emptyText: 'Select a version...',
-            fieldLabel: 'ESyS-Particle Version',
+            fieldLabel: 'Select Program',
             allowBlank: false
         }, {
             xtype: 'combo',
@@ -743,6 +743,7 @@ GridSubmit.initialize = function() {
             GridSubmit.onWindowUnloading, GridSubmit);
 
     GridSubmit.loadJobObject();
+    //Ext.MessageBox.alert(getXmlTextForAllCheckedDataUrls());
 }
 
 

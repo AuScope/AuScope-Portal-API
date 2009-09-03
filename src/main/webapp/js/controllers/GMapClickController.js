@@ -15,7 +15,11 @@ var gMapClickController = function(map, overlay, latlng, statusBar, viewport, tr
             new NVCLMarker(overlay.title, overlay, overlay.description).getMarkerClickedFn()();
         }
         else if (overlay.featureType == "ngcp:GnssStation") {
-            new GeodesyMarker(overlay.wfsUrl, "geodesy:station_observations", overlay.getTitle(), overlay, overlay.description).getMarkerClickedFn()();
+            if(geoMarkers[overlay.title] == null)
+            {
+            	geoMarkers[overlay.title] = new GeodesyMarker(overlay.wfsUrl, "geodesy:station_observations", overlay.getTitle(), overlay, overlay.description);
+            }            
+            geoMarkers[overlay.title].getMarkerClickedFn()();
         }
         else if (overlay.description != null) {
             overlay.openInfoWindowHtml(overlay.description, {maxWidth:800, maxHeight:600, autoScroll:true});

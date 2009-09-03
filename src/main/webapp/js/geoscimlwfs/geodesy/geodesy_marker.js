@@ -303,6 +303,8 @@ GeodesyMarker.prototype.monthChecked = GeodesyMarker_monthChecked;
 
 GeodesyMarker.prototype.getDateCheckedFn = GeodesyMarker_getDateCheckedFn;
 
+GeodesyMarker.prototype.getSubmitButtonFn = GeodesyMarker_getSubmitButtonFn;
+
 GeodesyMarker.prototype.dateChecked = GeodesyMarker_dateChecked;
 
 GeodesyMarker.prototype.getDataUrlCheckedFn = GeodesyMarker_getDataUrlCheckedFn;
@@ -806,6 +808,21 @@ function GeodesyMarker_getDateCheckedFn (pYear, pMonth, pDate, pDateChkId, pDate
 }
 
 /**
+* This function returns the function to be called with the 
+* onclick event for a date checkbox in the calendar.
+* @param {String} pYear Year
+* @param {String} pMonth Month
+* @param {String} pDate Date checked
+* @param {String} pDateChkId Htmlid of the checkbox for the date clicked.
+* @param {String} pDateHrefId Html id of the href for the date clicked.
+* @return Function to be called when the checkbox for a date is clicked - {@link #dateChecked}
+*/
+function GeodesyMarker_getSubmitButtonFn () {
+  var oGeodesyMarker = this;
+  alert(getXmlTextForAllCheckedDataUrls());
+}
+
+/**
 * This function is called on the onlcick event of the date checkbox.<br> 
 * It remembers the user selection in the array {@link #maDataCheckedStateForDate}
 * and propogates the selection to all the renix files belonging to this date.
@@ -869,6 +886,7 @@ function GeodesyMarker_getYearClickedFn (pYear, pYearChkId, pYearHrefId, pMonths
 */
 function GeodesyMarker_yearClicked (pYear, pYearHrefId, pMonthsDivId, pDatesDivId, pCreateAll) {
    //alert('year clicked');
+	
   var station = this.stationId;//this.moGeodesyStation.msId;
   var yearHrefId = pYearHrefId;
   var year = pYear;

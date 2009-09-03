@@ -303,43 +303,45 @@ function getXmlTextForAllCheckedDataUrls() {
   xmlText += "<" + xmlRoot + ">";
   
   // Loop over all groups in geodesy
-  var group = gaGroups["geodesy:stations"];
+  var group = geoMarkers;
   if (group) {
-    num_stations = group.maMarkers.length;
+    num_stations = group.length;
     // Loop over all the stations in the group
-    for (var station_index=0; station_index<num_stations; station_index++) {
-      station = group.maMarkers[station_index];
-      // Loop over all years for the station
-      for (var year_index=0; year_index<gaYears.length; year_index++) {
-        year = gaYears[year_index];
-        if (station.maStationDataForDate[year] != undefined) {
-          // Loop over all months in the year
-          for (var month_index=1; month_index<=12; month_index++) {
-            month = gaMonths[month_index];
-            if (station.maStationDataForDate[year][month] 
-                && station.maStationDataForDate[year][month].length!=0) {
-              // Loop over all dates for the month
-              for (var date=1; date<=31; date++) {
-                if (station.maStationDataForDate[year][month][date] 
-                    && station.maStationDataForDate[year][month][date].length!=0) {
-                  // If data is avaialable for this date,
-                  // look for the renix urls that had been "checked" by the user
-                  // using the station popup windows.
-                  var num_urls = station.maStationDataForDate[year][month][date].length;
-                  for (var url_index=0; url_index<num_urls; url_index++) {
-                    if (station.maDataCheckedStateForDate[year][month][date][url_index]) {
-                      // create the xml fragment for each node.
-                      xmlDate = year + "-" + month + "-" + date;
-                      xmlUrl = station.maStationDataForDate[year][month][date][url_index];
-                      xmlText += createXmlNodeForDateUrl(xmlDate, xmlUrl);
-  					}
-                  }
-                }
-              } 
-            }
-          }
-        }
-      }
+    for (i in geoMarkers) {
+      if(i != 'remove') //Only process the stations. JS adds functions to the Array.
+      {  
+	      // Loop over all years for the station
+	      for (var year_index=0; year_index<gaYears.length; year_index++) {
+	        year = gaYears[year_index];
+	        if (geoMarkers[i].maStationDataForDate[year] != undefined) {
+	          // Loop over all months in the year
+	          for (var month_index=1; month_index<=12; month_index++) {
+	            month = gaMonths[month_index];
+	            if (geoMarkers[i].maStationDataForDate[year][month] 
+	                && geoMarkers[i].maStationDataForDate[year][month].length!=0) {
+	              // Loop over all dates for the month
+	              for (var date=1; date<=31; date++) {
+	                if (geoMarkers[i].maStationDataForDate[year][month][date] 
+	                    && geoMarkers[i].maStationDataForDate[year][month][date].length!=0) {
+	                  // If data is avaialable for this date,
+	                  // look for the renix urls that had been "checked" by the user
+	                  // using the station popup windows.
+	                  var num_urls = geoMarkers[i].maStationDataForDate[year][month][date].length;
+	                  for (var url_index=0; url_index<num_urls; url_index++) {
+	                    if (geoMarkers[i].maDataCheckedStateForDate[year][month][date][url_index]) {
+	                      // create the xml fragment for each node.
+	                      xmlDate = year + "-" + month + "-" + date;
+	                      xmlUrl = geoMarkers[i].maStationDataForDate[year][month][date][url_index];
+	                      xmlText += createXmlNodeForDateUrl(xmlDate, xmlUrl);
+	  					}
+	                  }
+	                }
+	              } 
+	            }
+	          }
+	        }
+	      }
+      }    
     }
   }
   xmlText += "</" + xmlRoot + ">";

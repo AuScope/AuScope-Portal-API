@@ -86,6 +86,8 @@ var gaFeatureTypes = new Array("gsml:Borehole", "geodesy:stations", "sa:Sampling
 
 var gaGroups = new Array();
 
+var geoMarkers = new Array();
+
 var gaFeatureTypeIconOn = new Array();
 gaFeatureTypeIconOn["gsml:Borehole"] = IMAGES_DIR + "/nvcl/borehole_on.png";
 gaFeatureTypeIconOn["geodesy:stations"] = IMAGES_DIR + "/geodesy/gps_stations_on.png";
