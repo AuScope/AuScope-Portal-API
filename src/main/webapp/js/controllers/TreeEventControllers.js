@@ -4,12 +4,11 @@
  * @param node
  * @param isChecked
  * @param map
- * @param statusBar
  * @param viewport
  * @param downloadUrls
  * @param filterPanel
  */
-var treeCheckChangeController = function(node, isChecked, map, statusBar, viewport, downloadUrls, filterPanel, treePanel) {
+var treeCheckChangeController = function(node, isChecked, map, viewport, downloadUrls, filterPanel, treePanel) {
 
     /**
      * Given a feature type string, determine which handler to use for that feature type
@@ -31,7 +30,7 @@ var treeCheckChangeController = function(node, isChecked, map, statusBar, viewpo
     this.miningActivityHandler = function() {
         if (node.attributes.filterPanel == null || node.attributes.filterPanel == "") {
             node.attributes.filterPanel = new buildMiningActivityFilterForm(node.id, "/getMineNames.do", "/doMiningActivityFilter.do", node.attributes.wfsUrl, function(form, action) {
-                addKmlLayer(node, action.result.data.kml, viewport, map, statusBar);
+                addKmlLayer(node, action.result.data.kml, viewport, map);
             }, function() {
                 if (node.attributes.tileOverlay instanceof GeoXml) {
                     node.attributes.tileOverlay.clear();
@@ -49,7 +48,7 @@ var treeCheckChangeController = function(node, isChecked, map, statusBar, viewpo
     this.mineHandler = function() {
         if (node.attributes.filterPanel == null || node.attributes.filterPanel == "") {
             node.attributes.filterPanel = new buildMineFilterForm(node.id, "/getMineNames.do", "/doMineFilter.do", node.attributes.wfsUrl, function(form, action) {
-                addKmlLayer(node, action.result.data.kml, viewport, map, statusBar);
+                addKmlLayer(node, action.result.data.kml, viewport, map);
             }, function() {
                 if (node.attributes.tileOverlay instanceof GeoXml) {
                     node.attributes.tileOverlay.clear();
@@ -67,7 +66,7 @@ var treeCheckChangeController = function(node, isChecked, map, statusBar, viewpo
     this.mineralOccurrenceHandler = function() {
         if (node.attributes.filterPanel == null || node.attributes.filterPanel == "") {
             node.attributes.filterPanel = new buildMineralOccurrenceFilterForm(node.id, "/getMineNames.do", "/doMineralOccurrenceFilter.do", node.attributes.wfsUrl, function(form, action) {
-                addKmlLayer(node, action.result.data.kml, viewport, map, statusBar);
+                addKmlLayer(node, action.result.data.kml, viewport, map);
             }, function() {
                 if (node.attributes.tileOverlay instanceof GeoXml) {
                     node.attributes.tileOverlay.clear();
@@ -94,9 +93,7 @@ var treeCheckChangeController = function(node, isChecked, map, statusBar, viewpo
                 }}});
                 exml.parseString(pData);
                 node.enable();
-                statusBar.setVisible(false);
                 viewport.doLayout();
-                statusBar.clearStatus();
 
                 node.attributes.tileOverlay = exml;
 
@@ -145,22 +142,13 @@ var treeCheckChangeController = function(node, isChecked, map, statusBar, viewpo
             wmsHandler();
         }
         else if (node.attributes.layerType == 'wfs') {        	
-            statusBar.setStatus({
-                text: 'Finished loading',
-                iconCls: 'ok-icon',
-                clear: true
-            });
-            statusBar.setVisible(true);
             viewport.doLayout();
-            statusBar.showBusy();
             node.disable();
 
             getFeatureTypeHandler(node.attributes.featureType)();
 
             node.enable();
-            statusBar.setVisible(false);
             viewport.doLayout();
-            statusBar.clearStatus();
         }
     }
     //the check was checked off so remove the overlay
@@ -217,7 +205,7 @@ var showNodesFilterPanel = function(node, filterPanel) {
  * @param kml
  * @param viewport
  */
-var addKmlLayer = function(node, kml, viewport, map, statusBar) {
+var addKmlLayer = function(node, kml, viewport, map) {
     var exml;
     var icon = new GIcon(G_DEFAULT_ICON, node.attributes.icon);
     icon.iconSize = new GSize(32, 32);
@@ -228,9 +216,8 @@ var addKmlLayer = function(node, kml, viewport, map, statusBar) {
     }}});
     exml.parseString(kml);
     node.enable();
-    statusBar.setVisible(false);
+    
     viewport.doLayout();
-    statusBar.clearStatus();
 
     node.attributes.tileOverlay = exml;
 };

@@ -2,12 +2,9 @@
  * When someone clicks on the google maps we show popups specific to each feature type/marker that is clicked on
  * @param overlay
  * @param latlng
- * @param statusBar
  * @param viewport
  */
-var gMapClickController = function(map, overlay, latlng, statusBar, viewport, treePanel) {
-    statusBar.showBusy();
-    statusBar.setVisible(true);
+var gMapClickController = function(map, overlay, latlng, viewport, treePanel) {
     viewport.doLayout();
 
     if (overlay instanceof GMarker) {
@@ -41,8 +38,6 @@ var gMapClickController = function(map, overlay, latlng, statusBar, viewport, tr
     }
 
 
-    statusBar.clearStatus();
-    statusBar.setVisible(false);
     viewport.doLayout();
 
 };
