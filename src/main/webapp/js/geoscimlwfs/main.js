@@ -274,12 +274,15 @@ function parseCapabilitiesDocument1_0_0(rootNode) {
 * It creates an xml document of the format
 * <dst:data>
 *   <dst:url_date>
-*     <dst:date>
+*     <dst:select_item>
+*       false
+*     <dst:select_item>
+*     <dst:fileDate>
 *       2008-01-31
-*     <dst:date>
-*     <dst:url>
+*     <dst:fileDate>
+*     <dst:fileUrl>
 *        http://srb.ivec.org/gpsdata/08061/alic0610.08o.Z
-*     <dst:url>
+*     <dst:fileUrl>
 *   </dst:url_date>
 * </dst:data>  
 */
@@ -287,9 +290,9 @@ function getXmlTextForAllCheckedDataUrls() {
 
   // Variables to create the xml text that would be converted to an XML doc
   // to be passed onto the DST portlet
-  var xmlText = "";
-  var xmlNamespace = "dst";
-  var xmlRoot = xmlNamespace + ":data";
+  var xmlText = '<?xml version="1.0" encoding="ISO-8859-1"?>';
+  var xmlNamespace = "";
+  var xmlRoot = xmlNamespace + "data";
 
   
   var group;
@@ -355,12 +358,16 @@ function getXmlTextForAllCheckedDataUrls() {
 // in the DataServiceToolPortlet - WEB-INF/data_service_tool/dataservicetool.jsp file
 function createXmlNodeForDateUrl (pDate, pUrl) {
 	var xmlNode = "";
-	var xmlNamespace = "dst";
-	var xmlPairNode = xmlNamespace + ":url_date";
-  	var xmlUrlNode = xmlNamespace + ":url";
-  	var xmlDateNode = xmlNamespace + ":date";
+	var xmlNamespace = "";
+	var xmlPairNode = xmlNamespace + "url_date";
+	var xmlSelectItemNode = xmlNamespace + "select_item"; //Needed to keep track of which files are selected in DST later.
+  	var xmlUrlNode = xmlNamespace + "fileUrl";
+  	var xmlDateNode = xmlNamespace + "fileDate";
 
 	xmlNode += "<" + xmlPairNode + ">";
+  	xmlNode += "<" + xmlSelectItemNode + ">";
+	xmlNode += "false";
+	xmlNode += "</" + xmlSelectItemNode + ">";	
   	xmlNode += "<" + xmlDateNode + ">";
 	xmlNode += pDate;
 	xmlNode += "</" + xmlDateNode + ">";

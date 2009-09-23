@@ -819,7 +819,19 @@ function GeodesyMarker_getDateCheckedFn (pYear, pMonth, pDate, pDateChkId, pDate
 */
 function GeodesyMarker_getSubmitButtonFn () {
   var oGeodesyMarker = this;
-  alert(getXmlTextForAllCheckedDataUrls());
+  var xmlFragment = getXmlTextForAllCheckedDataUrls();
+  if(xmlFragment != null) {
+      var url = "/GeodesyWorkflow/saveSelection.do?";
+      var postBody = "mySelection=" + xmlFragment;
+      GDownloadUrl(url, function(response, pResponseCode) {
+          if(pResponseCode == 200) {
+        	  alert("Data Saved");
+          }else
+          {
+        	  alert(pResponseCode);
+          }
+      }, postBody);        
+  }
 }
 
 /**
