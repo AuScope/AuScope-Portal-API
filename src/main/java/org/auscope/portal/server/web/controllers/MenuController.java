@@ -145,9 +145,9 @@ public class MenuController {
       return new ModelAndView("access_error");
    }
    
-   @RequestMapping("/place_holder_DST.html")
-   public ModelAndView place_holder_DST() {
-      return new ModelAndView("place_holder_DST");
+   @RequestMapping("/data_service_tool.html")
+   public ModelAndView data_service_tool() {
+      return new ModelAndView("data_service_tool");
    }
    
    @RequestMapping("/gridsubmit.html")
