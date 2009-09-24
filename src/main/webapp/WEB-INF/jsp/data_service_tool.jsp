@@ -16,14 +16,11 @@
     <link rel="stylesheet" type="text/css" href="js/external/ext-2.2/resources/css/ext-all.css">
     <script type="text/javascript" src="js/external/ext-2.2/adapter/ext/ext-base.js"></script>
     <script type="text/javascript" src="js/external/ext-2.2/ext-all.js"></script>
-    <script type="text/javascript" src="js/GridJob/JobList.js"></script>
-    <script src="js/geoscimlwfs/global_variables.js" type="text/javascript"></script>
-    <c:if test='${error != null}'>
-    <script type="text/javascript">
-        JobList.error = "${error}";
-    </script>
-    </c:if>
-    
+    <script type="text/javascript" src="js/external/ext-2.2/examples/shared/examples.js"></script>
+    <script type="text/javascript" src="js/GridJob/DataService.js"></script>
+    <script type="text/javascript" src="js/external/ext-2.2/examples/ux/CheckColumn.js"></script>
+    <script src="js/geoscimlwfs/global_variables.js" type="text/javascript"></script>  
+    <script src="http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=${googleKey}" type="text/javascript"></script>  
 </head>
 
 <body>

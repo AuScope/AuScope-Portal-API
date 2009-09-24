@@ -21,7 +21,7 @@
          <ul >
             <li class="current"><a href="gmap.html">Map Client<span></span></a></li>
             <security:authorize ifAllGranted="ROLE_JOB_SUBMISSION"> </security:authorize>
-            <li ><a href="place_holder_DST.html">Data Service<span></span></a></li>
+            <li ><a href="data_service_tool.html">Data Service<span></span></a></li>
             <li ><a href="gridsubmit.html">Submit Jobs<span></span></a></li>
             <li ><a href="joblist.html">Monitor Jobs<span></span></a></li>
             <li ><a href="http://apacsrv1.arrc.csiro.au/wms_v0.9dev/">GPS View<span></span></a></li>
