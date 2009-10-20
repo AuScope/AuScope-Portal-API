@@ -149,12 +149,12 @@ public class MenuController {
    public ModelAndView data_service_tool() {
       return new ModelAndView("data_service_tool");
    }
-   
+  /* 
    @RequestMapping("/gridsubmit.html")
    public ModelAndView gridsubmit(HttpServletRequest request) {
-	   return new ModelAndView("gridsubmit");
+	   //return new ModelAndView("gridsubmit");
        // Ensure user has valid grid credentials
-      /* if (gridAccess.isProxyValid(
+       if (gridAccess.isProxyValid(
                    request.getSession().getAttribute("userCred"))) {
            logger.debug("No/invalid action parameter; returning gridsubmit view.");
            return new ModelAndView("gridsubmit");
@@ -164,9 +164,9 @@ public class MenuController {
            logger.warn("Proxy not initialized. Redirecting to gridLogin.");
            return new ModelAndView(
                    new RedirectView("/gridLogin.html", true, false, false));
-       }*/	   
-   }
-   
+       }	   
+   }*/
+   /*
    @RequestMapping("/joblist.html")
    public ModelAndView joblist(HttpServletRequest request) {
        // Ensure user has valid grid credentials
@@ -181,5 +181,5 @@ public class MenuController {
            return new ModelAndView(
                    new RedirectView("/gridLogin.html", true, false, false));
        }
-   }
+   }*/
 }

@@ -23,7 +23,7 @@ public class VRLJob extends GridJob {
     /** The name of the software to run Geodesy jobs with */
     public static final String CODE_NAME = "Gamit";
     /** The job type */
-    private static final String JOB_TYPE = "mpi";
+    private static final String JOB_TYPE = "single";
     /** The prefix of checkpoint files */
     private String    checkpointPrefix;
     /** A description for this job */

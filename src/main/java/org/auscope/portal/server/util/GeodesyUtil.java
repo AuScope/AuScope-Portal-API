@@ -25,28 +25,28 @@ public class GeodesyUtil {
 	public static List<String> getSelectedGPSFiles(String xmlUrlText){
 
 		List<String> urlsList = new ArrayList<String>();
-		// Extract the url values
-		// from the xmlText sent in the request parameter.
-		try {
-			logger.debug("xml text to transfer is " + xmlUrlText);
-			Document doc = getXmlDocumentParser(xmlUrlText);
-			NodeList nodeLst = doc.getElementsByTagName("fileUrl");
-
-			for (int s = 0; s < nodeLst.getLength(); s++) {
-					
-				Node urlNode = nodeLst.item(s);
-					
-				if (urlNode.getNodeType() == Node.ELEMENT_NODE) {
-					String urlValue = getUrlValueFromXmlNode(urlNode);
-					//logger.debug("The url value during transfer is " + urlValue);
-					urlsList.add(urlValue);
+		
+		if(xmlUrlText != null){
+			// Extract the url values
+			// from the xmlText sent in the request parameter.
+			try {
+				logger.debug("xml text to transfer is " + xmlUrlText);
+				Document doc = getXmlDocumentParser(xmlUrlText);
+				NodeList nodeLst = doc.getElementsByTagName("fileUrl");
+	
+				for (int s = 0; s < nodeLst.getLength(); s++) {
+						
+					Node urlNode = nodeLst.item(s);
+						
+					if (urlNode.getNodeType() == Node.ELEMENT_NODE) {
+						String urlValue = getUrlValueFromXmlNode(urlNode);
+						//logger.debug("The url value during transfer is " + urlValue);
+						urlsList.add(urlValue);
+					}
 				}
+			} catch (Exception e) {
+				logger.error(e);
 			}
-		} catch (Exception e) {
-			logger.error(e);
-		}
-		if (urlsList.size() == 0) {
-			return null;
 		}
 	   	return urlsList;
 	}	

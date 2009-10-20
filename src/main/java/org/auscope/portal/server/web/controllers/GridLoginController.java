@@ -96,7 +96,7 @@ public class GridLoginController implements Controller {
 
         final String serviceUrl = "https://" + request.getServerName() +
             "/GeodesyWorkflow/gridLogin.html";
-
+        logger.debug("SessionID:"+request.getSession().getId());
         String sharedToken = (String)request.getSession().getAttribute("Shib-Shared-Token");//request.getHeader("Shib-Shared-Token");
         if (sharedToken == null) {
             logger.info("No shared token, redirecting to MyProxy login.");
@@ -283,8 +283,10 @@ public class GridLoginController implements Controller {
         RequestData rd = parseRequestData(slcsResponse);
 
         String certCN = rd.certDN.split("CN=")[1];
-        String shibCN = request.getHeader("Shib-Person-commonName") + " "
-                + request.getHeader("Shib-AuEduPerson-SharedToken");
+        String shibCN = (String)request.getSession().getAttribute("Shib-Person-commonName") + " "
+                + (String)request.getSession().getAttribute("Shib-Shared-Token");
+        logger.debug("SessionID:"+request.getSession().getId());
+        logger.debug("shibCN: "+shibCN);
         if (!certCN.equals(shibCN)) {
             logger.error(certCN+" != "+shibCN);
             throw new GeneralSecurityException(

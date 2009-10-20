@@ -63,6 +63,16 @@ public class VRLJobDao extends HibernateDaoSupport {
     public VRLJob get(final int id) {
         return (VRLJob) getHibernateTemplate().get(VRLJob.class, id);
     }
+    
+    
+    /**
+     * Retrieves the job with given ID.
+     *
+     * @return <code>VRLJob</code> object with given ID.
+     */
+    public void deleteJob(final VRLJob job) {
+        getHibernateTemplate().delete(job);
+    }
 
     /**
      * Saves or updates the given job.

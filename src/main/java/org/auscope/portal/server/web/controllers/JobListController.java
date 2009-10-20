@@ -41,15 +41,15 @@ import org.springframework.web.servlet.view.RedirectView;
  *
  * @author Cihan Altinay
  */
-@Controller
-public class JobListController{
+//@Controller
+public class JobListController extends MultiActionController{
 
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
 
-    @Autowired
+    //@Autowired
     private GridAccessController gridAccess;
-    @Autowired
+    //@Autowired
     private VRLJobManager jobManager;
 
     /**
@@ -58,9 +58,9 @@ public class JobListController{
      *
      * @param gridAccess the GridAccessController to use
      */
-    /*public void setGridAccess(GridAccessController gridAccess) {
+     public void setGridAccess(GridAccessController gridAccess) {
         this.gridAccess = gridAccess;
-    }*/
+     }
 
     /**
      * Sets the <code>VRLJobManager</code> to be used to retrieve and store
@@ -68,10 +68,10 @@ public class JobListController{
      *
      * @param jobManager the JobManager to use
      */
-    /*public void setJobManager(VRLJobManager jobManager) {
+     public void setJobManager(VRLJobManager jobManager) {
         this.jobManager = jobManager;
-    }*/
-/*
+     }
+
     protected ModelAndView handleNoSuchRequestHandlingMethod(
             NoSuchRequestHandlingMethodException ex,
             HttpServletRequest request,
@@ -79,17 +79,17 @@ public class JobListController{
 
         // Ensure user has valid grid credentials
         if (gridAccess.isProxyValid(
-                    request.getSession().getAttribute("userCred"))) {
-            logger.debug("No/invalid action parameter; returning joblist view.");
-            return new ModelAndView("joblist");
-        } else {
-            request.getSession().setAttribute(
-                    "redirectAfterLogin", "/joblist.html");
-            logger.debug("Proxy not initialized. Redirecting to login.");
-            return new ModelAndView(
-                    new RedirectView("/login.html", true, false, false));
-        }
-    }*/
+	                request.getSession().getAttribute("userCred"))) {
+	        logger.debug("No/invalid action parameter; returning gridsubmit view.");
+	        return new ModelAndView("joblist");
+	    } else {
+	        request.getSession().setAttribute(
+	                "redirectAfterLogin", "/joblist.html");
+	        logger.warn("Proxy not initialized. Redirecting to gridLogin.");
+	        return new ModelAndView(
+	                new RedirectView("/gridLogin.html", true, false, false));
+	    }
+    }
 
     /**
      * Triggers the retrieval of latest job files
@@ -100,7 +100,7 @@ public class JobListController{
      * @return A JSON object with a success attribute and an error attribute
      *         in case the job was not found in the job manager.
      */
-    @RequestMapping("/retrieveJobFiles.do")
+    //@RequestMapping("/retrieveJobFiles.do")
     public ModelAndView retrieveJobFiles(HttpServletRequest request,
                                          HttpServletResponse response) {
 
@@ -151,7 +151,153 @@ public class JobListController{
 
         return mav;
     }
+    /**
+     * Delete the job given by its reference.
+     *
+     * @param request The servlet request including a jobId parameter
+     * @param response The servlet response
+     *
+     * @return A JSON object with a success attribute and an error attribute
+     *         in case the job was not found or can not be deleted.
+     */
+    //@RequestMapping("/deleteJob.do")
+    public ModelAndView deleteJob(HttpServletRequest request,
+                                HttpServletResponse response) {
 
+        String jobIdStr = request.getParameter("jobId");
+        VRLJob job = null;
+        ModelAndView mav = new ModelAndView("jsonView");
+        boolean success = false;
+        Object credential = request.getSession().getAttribute("userCred");
+
+        if (credential == null) {
+            final String errorString = "Invalid grid credentials!";
+            logger.error(errorString);
+            mav.addObject("error", errorString);
+            mav.addObject("success", false);
+            return mav;
+        }
+
+
+        if (jobIdStr != null) {
+            try {
+                int jobId = Integer.parseInt(jobIdStr);
+                job = jobManager.getJobById(jobId);
+            } catch (NumberFormatException e) {
+                logger.error("Error parsing job ID!");
+            }
+        } else {
+            logger.warn("No job ID specified!");
+        }
+
+        if (job == null) {
+            final String errorString = "The requested job was not found.";
+            logger.error(errorString);
+            mav.addObject("error", errorString);
+
+        } else {
+            // check if current user is the owner of the job
+            VRLSeries s = jobManager.getSeriesById(job.getSeriesId());
+            if (request.getRemoteUser().equals(s.getUser())) {
+                logger.info("Deleting job with ID "+jobIdStr);
+                jobManager.deleteJob(job);
+                success = true;
+            } else {
+                logger.warn(request.getRemoteUser()+"'s attempt to kill "+
+                        s.getUser()+"'s job denied!");
+                mav.addObject("error", "You are not authorised to delete this job.");
+            }
+        }
+        mav.addObject("success", success);
+
+        return mav;
+    }
+    /**
+     * delete all jobs of given series.
+     *
+     * @param request The servlet request including a seriesId parameter
+     * @param response The servlet response
+     *
+     * @return A JSON object with a success attribute and an error attribute
+     *         in case the series was not found in the job manager.
+     */
+    //@RequestMapping("/deleteSeriesJobs.do")
+    public ModelAndView deleteSeriesJobs(HttpServletRequest request,
+                                       HttpServletResponse response) {
+
+        String seriesIdStr = request.getParameter("seriesId");
+        List<VRLJob> jobs = null;
+        ModelAndView mav = new ModelAndView("jsonView");
+        boolean success = false;
+        int seriesId = -1;
+        Object credential = request.getSession().getAttribute("userCred");
+
+        if (credential == null) {
+            final String errorString = "Invalid grid credentials!";
+            logger.error(errorString);
+            mav.addObject("error", errorString);
+            mav.addObject("success", false);
+            return mav;
+        }
+
+
+        if (seriesIdStr != null) {
+            try {
+                seriesId = Integer.parseInt(seriesIdStr);
+                jobs = jobManager.getSeriesJobs(seriesId);
+            } catch (NumberFormatException e) {
+                logger.error("Error parsing series ID!");
+            }
+        } else {
+            logger.warn("No series ID specified!");
+        }
+
+        if (jobs == null) {
+            final String errorString = "The requested series was not found.";
+            logger.error(errorString);
+            mav.addObject("error", errorString);
+            mav.addObject("success", false);
+
+        } else {
+            // check if current user is the owner of the series
+            VRLSeries s = jobManager.getSeriesById(seriesId);
+            if (request.getRemoteUser().equals(s.getUser())) {
+                logger.info("Deleting jobs of series "+seriesIdStr);
+                boolean jobsDeleted = true;
+                for (VRLJob job : jobs) {
+                    String oldStatus = job.getStatus();
+                    if (oldStatus.equals("Failed") || oldStatus.equals("Done") ||
+                            oldStatus.equals("Cancelled")) {
+                        jobManager.deleteJob(job);
+                        
+                    }else{
+                    	logger.debug("Skipping running job "+job.getId());
+                    	if(jobsDeleted){
+                    		jobsDeleted = false;
+                    		mav.addObject("error", "Can not delete series, there are running jobs.");
+                    	}        	
+                    	continue;                  	
+                    }
+                }
+                if(jobsDeleted){
+                	logger.info("Deleting series "+seriesIdStr);
+                	jobManager.deleteSeries(s);
+                	logger.info("Deleted series "+seriesIdStr);
+                	success = true;
+                }else{
+                	success = false;
+                }
+            } else {
+                logger.warn(request.getRemoteUser()+"'s attempt to delete "+
+                        s.getUser()+"'s jobs denied!");
+                mav.addObject("error", "You are not authorised to delete the jobs of this series.");
+            }
+        }
+
+        mav.addObject("success", success);
+        return mav;
+    }
+    
     /**
      * Kills the job given by its reference.
      *
@@ -161,7 +307,7 @@ public class JobListController{
      * @return A JSON object with a success attribute and an error attribute
      *         in case the job was not found in the job manager.
      */
-    @RequestMapping("/killJob.do")
+    //@RequestMapping("/killJob.do")
     public ModelAndView killJob(HttpServletRequest request,
                                 HttpServletResponse response) {
 
@@ -230,7 +376,7 @@ public class JobListController{
      * @return A JSON object with a success attribute and an error attribute
      *         in case the series was not found in the job manager.
      */
-    @RequestMapping("/killSeriesJobs.do")
+    //@RequestMapping("/killSeriesJobs.do")
     public ModelAndView killSeriesJobs(HttpServletRequest request,
                                        HttpServletResponse response) {
 
@@ -313,7 +459,7 @@ public class JobListController{
      *         manager the JSON object will contain an error attribute
      *         indicating the error.
      */
-    @RequestMapping("/jobFiles.do")
+    //@RequestMapping("/jobFiles.do")
     public ModelAndView jobFiles(HttpServletRequest request,
                                  HttpServletResponse response) {
 
@@ -372,7 +518,7 @@ public class JobListController{
      * @return null on success or the joblist view with an error parameter on
      *         failure.
      */
-    @RequestMapping("/downloadFile.do")
+    //@RequestMapping("/downloadFile.do")
     public ModelAndView downloadFile(HttpServletRequest request,
                                      HttpServletResponse response) {
 
@@ -448,7 +594,7 @@ public class JobListController{
      * @return null on success or the joblist view with an error parameter on
      *         failure.
      */
-    @RequestMapping("/downloadAsZip.do")
+    //@RequestMapping("/downloadAsZip.do")
     public ModelAndView downloadAsZip(HttpServletRequest request,
                                       HttpServletResponse response) {
 
@@ -543,7 +689,7 @@ public class JobListController{
      * @return A JSON object with a series attribute which is an array of
      *         VRLSeries objects matching the criteria.
      */
-    @RequestMapping("/querySeries.do")
+    //@RequestMapping("/querySeries.do")
     public ModelAndView querySeries(HttpServletRequest request,
                                     HttpServletResponse response) {
 
@@ -572,7 +718,7 @@ public class JobListController{
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VRLJob</code> objects.
      */
-    @RequestMapping("/listJobs.do")
+    //@RequestMapping("/listJobs.do")
     public ModelAndView listJobs(HttpServletRequest request,
                                  HttpServletResponse response) {
 
@@ -641,7 +787,7 @@ public class JobListController{
      * @return The scriptbuilder view prepared to resubmit the job or the
      *         joblist view with an error parameter if the job was not found.
      */
-    @RequestMapping("/resubmitJob.do")
+    //@RequestMapping("/resubmitJob.do")
     public ModelAndView resubmitJob(HttpServletRequest request,
                                     HttpServletResponse response) {
 
@@ -681,7 +827,7 @@ public class JobListController{
      *         the joblist model and view with an error parameter if the job
      *         or file was not found.
      */
-    @RequestMapping("/useScript.do")
+    //@RequestMapping("/useScript.do")
     public ModelAndView useScript(HttpServletRequest request,
                                   HttpServletResponse response) {
 

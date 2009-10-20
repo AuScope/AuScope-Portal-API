@@ -79,5 +79,12 @@ public class VRLSeriesDao extends HibernateDaoSupport {
     public void save(final VRLSeries series) {
         getHibernateTemplate().saveOrUpdate(series);
     }
+    
+    /**
+     * Delete the given series.
+     */
+    public void delete(final VRLSeries series) {
+        getHibernateTemplate().delete(series);
+    }
 }
 

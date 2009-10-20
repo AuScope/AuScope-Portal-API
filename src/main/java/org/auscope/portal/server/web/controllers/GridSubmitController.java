@@ -30,6 +30,7 @@ import org.auscope.portal.server.gridjob.Util;
 import org.auscope.portal.server.gridjob.VRLJob;
 import org.auscope.portal.server.gridjob.VRLJobManager;
 import org.auscope.portal.server.gridjob.VRLSeries;
+import org.auscope.portal.server.util.GeodesyUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -55,14 +57,15 @@ import javax.xml.parsers.ParserConfigurationException;
  *
  * @author Cihan Altinay
  */
-@Controller
-public class GridSubmitController {
+//@Controller
+//@RequestMapping("/gridsubmitcontroller.html")
+public class GridSubmitController extends MultiActionController{
 
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
-    @Autowired
+    //@Autowired
     private GridAccessController gridAccess;
-    @Autowired
+    //@Autowired
     private VRLJobManager jobManager;
 
     /**
@@ -71,9 +74,9 @@ public class GridSubmitController {
      *
      * @param gridAccess the GridAccessController to use
      */
-    /*public void setGridAccess(GridAccessController gridAccess) {
+    public void setGridAccess(GridAccessController gridAccess) {
         this.gridAccess = gridAccess;
-    }*/
+    }
 
     /**
      * Sets the <code>VRLJobManager</code> to be used to retrieve and store
@@ -81,28 +84,30 @@ public class GridSubmitController {
      *
      * @param jobManager the JobManager to use
      */
-   /* public void setJobManager(VRLJobManager jobManager) {
+    public void setJobManager(VRLJobManager jobManager) {
         this.jobManager = jobManager;
-    }*/
+    }
 
-  /*  protected ModelAndView handleNoSuchRequestHandlingMethod(
+    protected ModelAndView handleNoSuchRequestHandlingMethod(
             NoSuchRequestHandlingMethodException ex,
             HttpServletRequest request,
             HttpServletResponse response) {
 
         // Ensure user has valid grid credentials
         if (gridAccess.isProxyValid(
-                    request.getSession().getAttribute("userCred"))) {
-            logger.debug("No/invalid action parameter; returning gridsubmit view.");
-            return new ModelAndView("gridsubmit");
-        } else {
-            request.getSession().setAttribute(
-                    "redirectAfterLogin", "/gridsubmit.html");
-            logger.debug("Proxy not initialized. Redirecting to login.");
-            return new ModelAndView(
-                    new RedirectView("/login.html", true, false, false));
+                request.getSession().getAttribute("userCred"))) {
+        	logger.debug("No/invalid action parameter; returning gridsubmit view.");
+        	return new ModelAndView("gridsubmit");
+        } 
+        else 
+        {
+        	request.getSession().setAttribute(
+                "redirectAfterLogin", "/gridsubmit.html");
+        	logger.warn("Proxy not initialized. Redirecting to gridLogin.");
+        	return new ModelAndView(
+                new RedirectView("/gridLogin.html", true, false, false));
         }
-    }*/
+    }
 
     /**
      * Returns a JSON object containing a list of the current user's series.
@@ -113,7 +118,7 @@ public class GridSubmitController {
      * @return A JSON object with a series attribute which is an array of
      *         VRLSeries objects.
      */
-    @RequestMapping("/mySeries.do")
+    //@RequestMapping("/mySeries.do")
     public ModelAndView mySeries(HttpServletRequest request,
                                  HttpServletResponse response) {
 
@@ -144,7 +149,7 @@ public class GridSubmitController {
      * @return A JSON object with a sites attribute which is an array of
      *         sites on the grid that have an installation of ESyS-particle.
      */
-    @RequestMapping("/listSites.do")    
+    //@RequestMapping("/listSites.do")    
     public ModelAndView listSites(HttpServletRequest request,
                                   HttpServletResponse response) {
 
@@ -155,6 +160,7 @@ public class GridSubmitController {
         List<SimpleBean> sites = new ArrayList<SimpleBean>();
         for (int i=0; i<particleSites.length; i++) {
             sites.add(new SimpleBean(particleSites[i]));
+            logger.debug("Site name: "+particleSites[i]);
         }
 
         logger.debug("Returning list of "+particleSites.length+" sites.");
@@ -171,7 +177,7 @@ public class GridSubmitController {
      * @return A JSON object with a queues attribute which is an array of
      *         job queues available at requested site.
      */
-    @RequestMapping("/listSiteQueues.do")    
+    //@RequestMapping("/listSiteQueues.do")    
     public ModelAndView listSiteQueues(HttpServletRequest request,
                                        HttpServletResponse response) {
 
@@ -205,7 +211,7 @@ public class GridSubmitController {
      * @return A JSON object with a versions attribute which is an array of
      *         versions installed at requested site.
      */
-    @RequestMapping("/listSiteVersions.do")    
+    //@RequestMapping("/listSiteVersions.do")    
     public ModelAndView listSiteVersions(HttpServletRequest request,
                                          HttpServletResponse response) {
 
@@ -238,7 +244,7 @@ public class GridSubmitController {
      * @return A JSON object with a data attribute containing a populated
      *         VRLJob object and a success attribute.
      */
-    @RequestMapping("/getJobObject.do")    
+    //@RequestMapping("/getJobObject.do")    
     public ModelAndView getJobObject(HttpServletRequest request,
                                      HttpServletResponse response) {
 
@@ -262,7 +268,7 @@ public class GridSubmitController {
      * @return A JSON object with a files attribute which is an array of
      *         filenames.
      */
-    @RequestMapping("/listJobFiles.do")    
+    //@RequestMapping("/listJobFiles.do")    
     public ModelAndView listJobFiles(HttpServletRequest request,
                                      HttpServletResponse response) {
 
@@ -294,7 +300,7 @@ public class GridSubmitController {
      *
      * @return null
      */
-    @RequestMapping("/uploadFile.do")    
+    //@RequestMapping("/uploadFile.do")    
     public ModelAndView uploadFile(HttpServletRequest request,
                                    HttpServletResponse response) {
 
@@ -368,7 +374,7 @@ public class GridSubmitController {
      * @return A JSON object with a success attribute that indicates whether
      *         the files were successfully deleted.
      */
-    @RequestMapping("/deleteFiles.do")    
+    //@RequestMapping("/deleteFiles.do")    
     public ModelAndView deleteFiles(HttpServletRequest request,
                                     HttpServletResponse response) {
 
@@ -413,7 +419,7 @@ public class GridSubmitController {
      *
      * @return null
      */
-    @RequestMapping("/cancelSubmission.do")    
+    //@RequestMapping("/cancelSubmission.do")    
     public ModelAndView cancelSubmission(HttpServletRequest request,
                                          HttpServletResponse response) {
 
@@ -439,7 +445,7 @@ public class GridSubmitController {
      * @return A JSON object with a success attribute that indicates whether
      *         the job was successfully submitted.
      */
-    @RequestMapping("/submitJob.do")    
+    //@RequestMapping("/submitJob.do")    
     public ModelAndView submitJob(HttpServletRequest request,
                                   HttpServletResponse response,
                                   VRLJob job) {
@@ -498,7 +504,15 @@ public class GridSubmitController {
 
             // Add server part to local stage-in dir
             String stageInURL = gridAccess.getLocalGridFtpServer()+jobInputDir;
-            job.setInTransfers(new String[] { stageInURL });
+            String gpsFiles = (String)request.getSession().getAttribute("gridInputFiles");	
+            List<String> urlsList = GeodesyUtil.getSelectedGPSFiles(gpsFiles);
+            urlsList.add(stageInURL);
+            
+            // Convert List<String> to String[]
+    		String[] urlArray = new String[urlsList.size()];
+    		urlArray = urlsList.toArray(urlArray);
+
+            job.setInTransfers(urlArray);
 
             // Create a new directory for the output files of this job
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
@@ -507,7 +521,6 @@ public class GridSubmitController {
                 File.separator;
             String jobOutputDir = gridAccess.getLocalGridFtpStageOutDir()+jobID;
             String submitEPR = null;
-
             job.setEmailAddress(user);
             job.setOutputDir(jobOutputDir);
             job.setOutTransfers(new String[]
@@ -549,17 +562,17 @@ public class GridSubmitController {
      */
     private VRLJob prepareModel(HttpServletRequest request) {
         final String user = request.getRemoteUser();
-        final String maxWallTime = "3000"; // 50 hours
-        final String maxMemory = "30720"; // 30 GB
+        final String maxWallTime = "60"; // 50 hours
+        final String maxMemory = "2048"; // 30 GB
         final String stdInput = "";
         final String stdOutput = "stdOutput.txt";
         final String stdError = "stdError.txt";
         final String[] arguments = new String[0];
         final String[] inTransfers = new String[0];
         final String[] outTransfers = new String[0];
-        String name = "VRLjob";
+        String name = "GeodesyJob";
         String site = "iVEC";
-        Integer cpuCount = 2;
+        Integer cpuCount = 1;
         Integer numBonds = 0;
         Integer numParticles = 0;
         Integer numTimesteps = 0;
@@ -679,6 +692,6 @@ public class GridSubmitController {
         job.setCheckpointPrefix(checkpointPrefix);
 
         return job;
-    }
+    }    
 }
 

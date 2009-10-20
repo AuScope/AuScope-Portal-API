@@ -34,6 +34,10 @@ public class VRLJobManager {
         return vrlJobDao.get(jobId);
     }
 
+    public void deleteJob(VRLJob job) {
+        vrlJobDao.deleteJob(job);
+    }
+    
     public VRLSeries getSeriesById(int seriesId) {
         return vrlSeriesDao.get(seriesId);
     }
@@ -42,6 +46,9 @@ public class VRLJobManager {
         vrlJobDao.save(vrlJob);
     }
 
+    public void deleteSeries(VRLSeries series) {
+        vrlSeriesDao.delete(series);
+    }    
     public void saveSeries(VRLSeries series) {
         vrlSeriesDao.save(series);
     }
