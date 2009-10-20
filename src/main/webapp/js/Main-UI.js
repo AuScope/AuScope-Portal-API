@@ -61,7 +61,7 @@ Ext.onReady(function() {
     var centerPanel = new Ext.Panel({region:"center", margins:'100 0 0 0', cmargins:'100 0 0 0'});
 
     //used for notifications of activity
-    var statusBar = new Ext.StatusBar({
+   /* var statusBar = new Ext.StatusBar({
         region: "south",
         id: 'my-status',
         hidden: true,
@@ -73,12 +73,12 @@ Ext.onReady(function() {
         // values to set initially:
         text: 'Ready',
         iconCls: 'ready-icon'
-    });
+    });*/
 
     //add all the panels to the viewport
     var viewport = new Ext.Viewport({
         layout:'border',
-        items:[westPanel, centerPanel, statusBar]
+        items:[westPanel, centerPanel]
     });
 
     // Is user's browser suppported by Google Maps?
@@ -111,10 +111,10 @@ Ext.onReady(function() {
 
     //event handlers and listeners
     tree.on('click', function(node, event) { treeNodeOnClickController(node, event, viewport, filterPanel); });
-    tree.on('checkchange', function(node, isChecked) { treeCheckChangeController(node, isChecked, map, statusBar, viewport, downloadUrls, filterPanel, tree); });
+    tree.on('checkchange', function(node, isChecked) { treeCheckChangeController(node, isChecked, map, viewport, downloadUrls, filterPanel, tree); });
 
     //when a person clicks on a marker then do something
-    GEvent.addListener(map, "click", function(overlay, latlng) { gMapClickController(map, overlay, latlng, statusBar, viewport, tree); });
+    GEvent.addListener(map, "click", function(overlay, latlng) { gMapClickController(map, overlay, latlng, viewport, tree); });
 
 });
 
