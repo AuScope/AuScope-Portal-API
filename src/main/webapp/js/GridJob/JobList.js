@@ -44,6 +44,24 @@ JobList.onKillJobResponse = function(response, request) {
     JobList.jobStore.reload();
 }
 
+//callback for deleteJob action
+JobList.onDeleteJobResponse = function(response, request) {
+    var resp = Ext.decode(response.responseText);
+    if (resp.error != null) {
+        JobList.showError(resp.error);
+    }
+    JobList.jobStore.reload();
+}
+
+//callback for deleteSeries action
+JobList.onDeleteSeriesResponse = function(response, request) {
+    var resp = Ext.decode(response.responseText);
+    if (resp.error != null) {
+        JobList.showError(resp.error);
+    }
+    JobList.seriesStore.reload();
+}
+
 // callback for retrieveFiles action
 JobList.onRetrieveFilesResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
@@ -183,10 +201,11 @@ JobList.querySeries = function(user, name, desc) {
 
 JobList.retrieveFiles = function(jobId) {
     Ext.Ajax.request({
-        url: '/GeodesyWorkflow/retrieveJobFiles.do',
+        url: JobList.ControllerURL ,
         success: JobList.onRetrieveFilesResponse,
         failure: JobList.onRequestFailure, 
-        params: { 'jobId': jobId }
+        params: { 'action': 'retrieveJobFiles', 
+    	          'jobId': jobId }
     });
 }
 
@@ -202,10 +221,34 @@ JobList.killJob = function(jobId) {
         fn: function(btn) {
             if (btn == 'yes') {
                 Ext.Ajax.request({
-                    url: '/GeodesyWorkflow/killJob.do',
+                    url: JobList.ControllerURL ,
                     success: JobList.onKillJobResponse,
                     failure: JobList.onRequestFailure, 
-                    params: { 'jobId': jobId }
+                    params: { 'action': 'killJob',
+                	          'jobId': jobId }
+                });
+            }
+        }
+    });
+}
+
+//submits a "delete job" request after asking for confirmation
+JobList.deleteJob = function(jobId) {
+    Ext.Msg.show({
+        title: 'Delete Job',
+        msg: 'Are you sure you want to delete the selected job?',
+        buttons: Ext.Msg.YESNO,
+        icon: Ext.Msg.WARNING,
+        animEl: 'job-grid',
+        closable: false,
+        fn: function(btn) {
+            if (btn == 'yes') {
+                Ext.Ajax.request({
+                    url: JobList.ControllerURL ,
+                    success: JobList.onDeleteJobResponse,
+                    failure: JobList.onRequestFailure, 
+                    params: { 'action': 'deleteJob',
+                	          'jobId': jobId }
                 });
             }
         }
@@ -223,10 +266,34 @@ JobList.killSeriesJobs = function(seriesId) {
         fn: function(btn) {
             if (btn == 'yes') {
                 Ext.Ajax.request({
-                    url: '/GeodesyWorkflow/killSeriesJobs.do',
+                    url: JobList.ControllerURL ,
                     success: JobList.onKillJobResponse,
                     failure: JobList.onRequestFailure, 
-                    params: { 'seriesId': seriesId }
+                    params: { 'action': 'killSeriesJobs',
+                	          'seriesId': seriesId }
+                });
+            }
+        }
+    });
+}
+
+
+JobList.deleteSeriesJobs = function(seriesId) {
+    Ext.Msg.show({
+        title: 'Delete Series Jobs',
+        msg: 'Are you sure you want to delete ALL jobs in the selected series?',
+        buttons: Ext.Msg.YESNO,
+        icon: Ext.Msg.WARNING,
+        animEl: 'series-grid',
+        closable: false,
+        fn: function(btn) {
+            if (btn == 'yes') {
+                Ext.Ajax.request({
+                    url: JobList.ControllerURL ,
+                    success: JobList.onDeleteSeriesResponse,
+                    failure: JobList.onRequestFailure, 
+                    params: { 'action': 'deleteSeriesJobs',
+                	          'seriesId': seriesId }
                 });
             }
         }
@@ -235,8 +302,8 @@ JobList.killSeriesJobs = function(seriesId) {
 
 // downloads given file from a specified job
 JobList.downloadFile = function(job, file) {
-    window.location = '/GeodesyWorkflow/downloadFile.do' +
-        "?jobId="+job+"&filename="+file;
+    window.location = JobList.ControllerURL +
+    "?action=downloadFile&jobId="+job+"&filename="+file;
 }
 
 // downloads a ZIP file containing given files of given job
@@ -245,16 +312,16 @@ JobList.downloadAsZip = function(job, files) {
     for (var i=1; i<files.length; i++) {
         fparam += ','+files[i].data.name;
     }
-    window.location = '/GeodesyWorkflow/downloadAsZip.do' +
-        "?jobId="+job+"&files="+fparam;
+    window.location = JobList.ControllerURL +
+    "?action=downloadAsZip&jobId="+job+"&files="+fparam;
 }
 
 JobList.resubmitJob = function(job) {
-    window.location = '/GeodesyWorkflow/resubmitJob.do' + "?&jobId="+job;
+	window.location = JobList.ControllerURL + "?action=resubmitJob&jobId="+job;
 }
 
 JobList.useScript = function(job, file) {
-    window.location = '/GeodesyWorkflow/useScript.do' + "?&jobId="+job;
+	window.location = JobList.ControllerURL + "?action=useScript&jobId="+job;
 }
 
 JobList.showQueryDialog = function() {
@@ -312,8 +379,8 @@ JobList.initialize = function() {
     Ext.QuickTips.init();
 
     JobList.seriesStore = new Ext.data.JsonStore({
-        url: '/GeodesyWorkflow/querySeries.do',
-        //baseParams: { 'action': 'querySeries' },
+        url: JobList.ControllerURL,
+        baseParams: { 'action': 'querySeries' },
         root: 'series',
         autoLoad: true,
         fields: [
@@ -330,8 +397,8 @@ JobList.initialize = function() {
     });
 
     JobList.jobStore = new Ext.data.JsonStore({
-        url: '/GeodesyWorkflow/listJobs.do',
-        //baseParams: { 'action': 'listJobs' },
+        url: JobList.ControllerURL,
+        baseParams: { 'action': 'listJobs' },
         root: 'jobs',
         fields: [
             { name: 'id', type: 'int' },
@@ -357,8 +424,8 @@ JobList.initialize = function() {
     });
 
     JobList.jobFileStore = new Ext.data.JsonStore({
-        url: '/GeodesyWorkflow/jobFiles.do',
-        //baseParams: { 'action': 'jobFiles' },
+        url: JobList.ControllerURL,
+        baseParams: { 'action': 'jobFiles' },
         root: 'files',
         sortInfo: { field: 'name', direction: 'ASC' },
         fields: [
@@ -381,6 +448,15 @@ JobList.initialize = function() {
         handler: function() {
             var seriesId = seriesGrid.getSelectionModel().getSelected().data.id;
             JobList.killSeriesJobs(seriesId);
+        }
+    });
+    
+    var deleteSeriesAction = new Ext.Action({
+        text: 'Delete jobs',
+        iconCls: 'cross-icon',
+        handler: function() {
+            var seriesId = seriesGrid.getSelectionModel().getSelected().data.id;
+            JobList.deleteSeriesJobs(seriesId);
         }
     });
 
@@ -409,7 +485,7 @@ JobList.initialize = function() {
             grid.getSelectionModel().selectRow(rowIndex);
             if (!this.contextMenu) {
                 this.contextMenu = new Ext.menu.Menu({
-                    items: [ cancelSeriesAction ]
+                    items: [ cancelSeriesAction, deleteSeriesAction ]
                 });
             }
             e.stopEvent();
@@ -440,6 +516,15 @@ JobList.initialize = function() {
         }
     });
 
+    var deleteJobAction = new Ext.Action({
+        text: 'Delete Job',
+        iconCls: 'cross-icon',
+        handler: function() {
+            var jobId = jobGrid.getSelectionModel().getSelected().data.id;
+            JobList.deleteJob(jobId);
+        }
+    });
+    
     var resubmitJobAction = new Ext.Action({
         text: 'Re-submit Job',
         handler: function() {
@@ -475,15 +560,17 @@ JobList.initialize = function() {
             grid.getSelectionModel().selectRow(rowIndex);
             if (!this.contextMenu) {
                 this.contextMenu = new Ext.menu.Menu({
-                    items: [ resubmitJobAction, cancelJobAction ]
+                    items: [ cancelJobAction, deleteJobAction ]
                 });
             }
             e.stopEvent();
             var jobData = grid.getStore().getAt(rowIndex).data;
             if (jobData.status == 'Active' || jobData.status == 'StageIn') {
                 cancelJobAction.setDisabled(false);
+                deleteJobAction.setDisabled(true);
             } else {
                 cancelJobAction.setDisabled(true);
+                deleteJobAction.setDisabled(false);
             }
             this.contextMenu.showAt(e.getXY());
         }
@@ -572,9 +659,7 @@ JobList.initialize = function() {
         tbar: [{
             text: 'Actions',
             iconCls: 'folder-icon',
-            menu: [ downloadAction, downloadZipAction, useScriptAction,
-                    retrieveFilesAction
-                  ]
+            menu: [ downloadAction, downloadZipAction, retrieveFilesAction]
         }]
     });
 
@@ -603,11 +688,7 @@ JobList.initialize = function() {
         '<tr><td class="jobdesc-key">Part of series:</td><td>{seriesName}</td></tr>',
         '<tr><td class="jobdesc-key">Submitted on:</td><td>{submitDate}</td></tr>',
         '<tr><td class="jobdesc-key">Computation site:</td><td>{site}</td></tr>',
-        '<tr><td class="jobdesc-key">ESyS-Particle version:</td><td>{version}</td></tr>',
-        '<tr><td class="jobdesc-key">Input script filename:</td><td>{scriptFile}</td></tr>',
-        '<tr><td class="jobdesc-key">Number of timesteps:</td><td>{numTimesteps}</td></tr>',
-        '<tr><td class="jobdesc-key">Number of particles:</td><td>{numParticles}</td></tr>',
-        '<tr><td class="jobdesc-key">Number of bonds:</td><td>{numBonds}</td></tr></table><br/>',
+        '<tr><td class="jobdesc-key">Version:</td><td>{version}</td></tr></table><br/>',
         '<p class="jobdesc-key">Description:</p><br/><p>{description}</p>'
     );
     JobList.jobDescTpl.compile();

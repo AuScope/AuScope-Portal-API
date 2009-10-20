@@ -172,10 +172,10 @@ GridSubmit.successDlg = function(message) {
 //
 GridSubmit.loadJobFiles = function() {
     Ext.Ajax.request({
-        url: '/GeodesyWorkflow/listJobFiles.do',
+        url: GridSubmit.ControllerURL,
         success: GridSubmit.onFileListResponse,
-        failure: GridSubmit.onLoadDataFailure
-        //params: { 'action': 'listJobFiles' }
+        failure: GridSubmit.onLoadDataFailure,
+        params: { 'action': 'listJobFiles' }
     });
 }
 
@@ -185,10 +185,10 @@ GridSubmit.loadJobFiles = function() {
 GridSubmit.loadJobObject = function() {
     // Load job details from session
     Ext.getCmp('metadataForm').getForm().load({
-        url: '/GeodesyWorkflow/getJobObject.do',
+        url: GridSubmit.ControllerURL,
         success: GridSubmit.onLoadJobObject,
         failure: GridSubmit.onLoadDataFailure,
-        //params: { 'action': 'getJobObject' },
+        params: { 'action': 'getJobObject' },
         waitMsg: 'Retrieving data, please wait...',
         waitTitle: 'Submit Job'
     });
@@ -198,26 +198,20 @@ GridSubmit.loadJobObject = function() {
 // Requests submission of the current job from the server
 //
 GridSubmit.submitJob = function() {
-    var fileStore = Ext.getCmp('file-grid').getStore();
-    // sanity check: ensure that the script file exists
-    var scriptFile = Ext.getCmp('scriptFile').getRawValue();
-    if (fileStore.find('name', scriptFile) == -1) {
-        GridSubmit.showError('The script filename you entered is invalid. Please upload "'+scriptFile+'" or change the filename.');
-    }else {
-        Ext.getCmp('metadataForm').getForm().submit({
-            url: '/GeodesyWorkflow/submitJob.do',
-            success: GridSubmit.onSubmitJob,
-            failure: GridSubmit.onSubmitFailure,
-            params: {
-                //'action': 'submitJob',
-                'seriesId': GridSubmit.seriesId,
-                'seriesName': GridSubmit.seriesName,
-                'seriesDesc': GridSubmit.seriesDesc
-            },
-            waitMsg: 'Submitting job, please wait...',
-            waitTitle: 'Submit Job'
-        });
-    }
+
+    Ext.getCmp('metadataForm').getForm().submit({
+        url: GridSubmit.ControllerURL,
+        success: GridSubmit.onSubmitJob,
+        failure: GridSubmit.onSubmitFailure,
+        params: {
+            'action': 'submitJob',
+            'seriesId': GridSubmit.seriesId,
+            'seriesName': GridSubmit.seriesName,
+            'seriesDesc': GridSubmit.seriesDesc
+        },
+        waitMsg: 'Submitting job, please wait...',
+        waitTitle: 'Submit Job'
+    });
 }
 
 //
@@ -250,10 +244,11 @@ GridSubmit.deleteFiles = function() {
             fn: function(btn) {
                 if (btn == 'yes') {
                     Ext.Ajax.request({
-                        url: '/GeodesyWorkflow/deleteFiles.do',
+                        url: GridSubmit.ControllerURL,
                         success: GridSubmit.onDeleteResponse,
                         failure: GridSubmit.onDeleteResponse, 
-                        params: { 'files': Ext.encode(files)
+                        params: { 'action': 'deleteFiles',
+                    	          'files': Ext.encode(files)
                         }
                     });
                 }
@@ -276,10 +271,10 @@ GridSubmit.uploadFile = function(b, e, overwrite) {
             return;
         }
         Ext.getCmp('filesForm').getForm().submit({
-            url: '/GeodesyWorkflow/uploadFile.do',
+            url: GridSubmit.ControllerURL,
             success: GridSubmit.onUploadFile,
             failure: GridSubmit.onUploadFailure,
-            //params: {'action': 'uploadFile'},
+            params: {'action': 'uploadFile'},
             waitMsg: 'Uploading file, please wait...',
             waitTitle: 'Upload file'
         });
@@ -303,10 +298,10 @@ GridSubmit.confirmCancel = function() {
         fn: function(btn) {
             if (btn == 'yes') {
                 Ext.Ajax.request({
-                    url: '/GeodesyWorkflow/cancelSubmission.do',
+                    url: GridSubmit.ControllerURL,
                     success: GridSubmit.onCancelResponse,
-                    failure: GridSubmit.onCancelResponse 
-                    //params: { 'action': 'cancelSubmission' }
+                    failure: GridSubmit.onCancelResponse, 
+                    params: { 'action': 'cancelSubmission' }
                 });
             }
         }
@@ -322,8 +317,8 @@ GridSubmit.initialize = function() {
 
     // Store for ESyS-Particle sites
     var sitesStore = new Ext.data.JsonStore({
-        url: '/GeodesyWorkflow/listSites.do',
-        //baseParams: { 'action': 'listSites' },
+        url: GridSubmit.ControllerURL,
+        baseParams: { 'action': 'listSites' },
         root: 'sites',
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
@@ -331,8 +326,8 @@ GridSubmit.initialize = function() {
     
     // Store for ESyS-Particle versions at a specific site
     var versionsStore = new Ext.data.JsonStore({
-        url: '/GeodesyWorkflow/listSiteVersions.do',
-        //baseParams: { 'action': 'listSiteVersions' },
+        url: GridSubmit.ControllerURL,
+        baseParams: { 'action': 'listSiteVersions' },
         root: 'versions',
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
@@ -340,8 +335,8 @@ GridSubmit.initialize = function() {
 
     // Store for queue names at a specific site
     var queuesStore = new Ext.data.JsonStore({
-        url: '/GeodesyWorkflow/listSiteQueues.do',
-        //baseParams: { 'action': 'listSiteQueues' },
+        url: GridSubmit.ControllerURL,
+        baseParams: { 'action': 'listSiteQueues' },
         root: 'queues',
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
@@ -349,8 +344,8 @@ GridSubmit.initialize = function() {
 
     // Store for current user's list of series
     var mySeriesStore = new Ext.data.JsonStore({
-        url: '/GeodesyWorkflow/mySeries.do',
-        //baseParams: { 'action': 'mySeries' },
+        url: GridSubmit.ControllerURL,
+        baseParams: { 'action': 'mySeries' },
         root: 'series',
         autoLoad: true,
         fields: [
@@ -524,15 +519,15 @@ GridSubmit.initialize = function() {
         }, {
             xtype: 'textfield',
             name: 'cpuCount',
-            fieldLabel: 'Number of MPI procs',
+            fieldLabel: 'Number of CPUs',
             allowBlank: false,
             maskRe: /\d+/
         }, {
             xtype: 'textfield',
             id: 'scriptFile',
             name: 'scriptFile',
-            fieldLabel: 'Script Filename',
-            allowBlank: false,
+            fieldLabel: 'Parameters',
+            allowBlank: true,
             maskRe: /[\w+#@.,-]/
         }, {
             xtype: 'textarea',
