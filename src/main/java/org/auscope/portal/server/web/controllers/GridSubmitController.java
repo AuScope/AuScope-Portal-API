@@ -7,7 +7,11 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,6 +56,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+//Globus stuff
+/*import org.globus.ftp.DataChannelAuthentication;
+import org.globus.ftp.GridFTPClient;
+import org.globus.ftp.GridFTPSession;
+import org.globus.io.urlcopy.UrlCopy;
+import org.globus.io.urlcopy.UrlCopyException;
+import org.globus.myproxy.MyProxyException;
+import org.globus.util.GlobusURL;*/
+
+
 /**
  * Controller for the job submission view.
  *
@@ -68,6 +82,8 @@ public class GridSubmitController extends MultiActionController{
     //@Autowired
     private VRLJobManager jobManager;
 
+    private static final String TABLE_DIR = "tables";
+    private static final String RINEX_DIR = "rinex";
     /**
      * Sets the <code>GridAccessController</code> to be used for grid
      * activities.
@@ -323,7 +339,7 @@ public class GridSubmitController extends MultiActionController{
             } else {
                 logger.info("Saving uploaded file "+f.getOriginalFilename());
                 File destination = new File(
-                        jobInputDir+f.getOriginalFilename());
+                        jobInputDir+GridSubmitController.RINEX_DIR+File.separator+f.getOriginalFilename());
                 if (destination.exists()) {
                     logger.debug("Will overwrite existing file.");
                 }
@@ -594,12 +610,14 @@ public class GridSubmitController extends MultiActionController{
 
         // Create a new directory to put all files for this job into.
         // This directory will always be the first stageIn directive.
+        createDir(request);
+        /*
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String dateFmt = sdf.format(new Date());
-        String jobID = user + "-" + dateFmt + File.separator;
-        String jobInputDir = gridAccess.getLocalGridFtpStageInDir() + jobID;
-
-        boolean success = (new File(jobInputDir)).mkdir();
+        String jobID = user + "-" + dateFmt + File.separator;*/
+        String jobInputDir = (String) request.getSession().getAttribute("jobInputDir");
+        boolean success = false;
+       /* boolean success = (new File(jobInputDir)).mkdir();
 
         if (!success) {
             logger.error("Could not create directory "+jobInputDir);
@@ -607,7 +625,9 @@ public class GridSubmitController extends MultiActionController{
         }
 
         // Save in session to use it when submitting job
-        request.getSession().setAttribute("jobInputDir", jobInputDir);
+        request.getSession().setAttribute("jobInputDir", jobInputDir);*/
+        
+        
 
         // Check if the user requested to re-submit a previous job.
         String jobIdStr = (String) request.getSession().
@@ -692,6 +712,237 @@ public class GridSubmitController extends MultiActionController{
         job.setCheckpointPrefix(checkpointPrefix);
 
         return job;
-    }    
+    }
+    
+	/** 
+	 * urlCopy
+	 * 
+     * Copy data to the Grid Storage using URLCopy.  
+     * This is method which does authentication, remote create directory 
+     * and files copying
+     *
+     * @param fromURLs	an array of URLs to copy to the storage
+     * 
+     * @return          Number of files copied
+     * 
+     */
+	/*private int urlCopy(String[] fromURLs) {
+		int numFilesCopied = 0;
+		int i = 0;
+		String fullDirName;	// e.g. /tmp/geodesy/2008_04_10_14_27_35_0/
+		GridTransferStatus status = new GridTransferStatus();
+		String toURL;
+		
+		//
+		// Create a remote directory at ngdata
+		// 
+		fullDirName = createDir();	*/// e.g. /tmp/geodesy/2008_04_10_14_27_35_0/
+		/*if (((DSTThread)Thread.currentThread()).isStopped) {
+			logger.info("1Thread interrupted " + Thread.currentThread().getName());
+			return 0;
+		} else {
+			logger.info("1Thread continuing " + Thread.currentThread().getName());
+		}*/
+		
+		
+		
+		/*if( fullDirName != null )
+		{
+			for (i = 0; i < fromURLs.length; i++) {
+				// StageIn to Grid etc
+				
+				try {
+					GlobusURL from = new GlobusURL(fromURLs[i]);
+					logger.info("fromURL is: " + from.getURL());
+					
+					String fullFilename = new URL(fromURLs[i]).getFile();
+
+					// Extract just the filename
+					String filename = new File(fullFilename).getName();	// e.g. /tmp/geodesy/
+					status.file = filename;
+					
+					// Extract the directory name
+					File dir = new File(fullDirName);*/
+					/*if (((DSTThread)Thread.currentThread()).isStopped) {
+						logger.info("2Thread interrupted " + Thread.currentThread().getName());
+						return 0;
+					} else {
+						logger.info("2Thread continuing " + Thread.currentThread().getName());
+					}*/				
+					/*String dirName = dir.getName();	// e.g. /tmp/geodesy/2008_04_10_14_27_35_0/
+					
+					// Full URL
+					// e.g. "gsiftp://ngdata.ivec.org:2811//tmp/geodesy/" + "/tmp/geodesy/2008_04_10_14_27_35_0/" + "abeb0010.00d.Z"
+					toURL = this.baseToURL + dirName + "/" + filename;
+					GlobusURL to = new GlobusURL(toURL);		
+					logger.info("toURL is: " + to.getURL());
+					
+					UrlCopy uCopy = new UrlCopy();
+					uCopy.setCredentials(this.credential);
+					uCopy.setDestinationUrl(to);
+					uCopy.setSourceUrl(from);
+					uCopy.setUseThirdPartyCopy(false); 	// has to set to false, may
+														// be to do with security
+														// issue.
+					uCopy.copy();*/
+					/*if (((DSTThread)Thread.currentThread()).isStopped) {
+						logger.info("3Thread interrupted " + Thread.currentThread().getName());
+						return 0;
+					} else {
+						logger.info("3Thread continuing " + Thread.currentThread().getName());
+					}*/
+					/*numFilesCopied++;
+					
+					// Notify the observer
+					
+					//status.event = GridTransferStatus.Event.FILE_COPIED;
+					
+					logger.info(to.getProtocol()+"://"+to.getHost()+":"+to.getPort()+"/");*/
+					
+					/*this.gridServer = to.getProtocol() + "://" + to.getHost() + ":" + to.getPort();
+					this.gridDir = fullDirName;
+					this.gridFullURL =  this.gridServer + "/"+ this.gridDir;
+					
+					if (((DSTThread)Thread.currentThread()).isStopped) {
+						logger.info("4Thread interrupted " + Thread.currentThread().getName());
+						return 0;
+					} else {
+						logger.info("4Thread continuing " + Thread.currentThread().getName());
+					}
+					
+					status.numFileCopied = numFilesCopied;
+					status.gridFullURL = this.gridFullURL;
+					status.gridServer = this.gridServer;
+					status.gridDir = this.gridDir;
+					
+					
+					if (((DSTThread)Thread.currentThread()).isStopped) {
+						return 0;
+					}
+					notifyPortlet(status);*/
+	/*				
+				} catch (UrlCopyException e) {
+					logger.error("UrlCopy Error: " + e.getMessage());
+					
+					// Notify the observer
+					status.numFileCopied = numFilesCopied;
+					//status.event = GridTransferStatus.Event.FILE_COPY_ERROR;
+					//notifyPortlet(status);
+				} catch (Exception e) {
+					logger.error("Error: " + e.getMessage());
+					
+					// Notify the observer
+					status.numFileCopied = numFilesCopied;
+					//status.event = GridTransferStatus.Event.INTERNAL_ERROR;
+				}
+			}
+		}
+		return numFilesCopied;
+	}*/
+
+	/** 
+     * Create a directory based on the baseToURL
+     *
+     * @return          directory created on a Grid accessible host (e.g. ngdata).
+     * 
+     */
+	private void createDir(HttpServletRequest request) {
+		
+		final String user = request.getRemoteUser();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String dateFmt = sdf.format(new Date());
+        String jobID = user + "-" + dateFmt + File.separator;
+        String jobInputDir = gridAccess.getLocalGridFtpStageInDir() + jobID;
+        
+        boolean success = (new File(jobInputDir)).mkdir();
+        
+        //create rinex directories.
+        success = (new File(jobInputDir+GridSubmitController.RINEX_DIR+File.separator)).mkdir();
+        if (!success) {
+            logger.error("Could not create directory "+jobInputDir);
+            jobInputDir = gridAccess.getLocalGridFtpStageInDir();
+        }
+        
+        //tables files.
+        try
+        {
+        	copyDirectory(new File("/home/grid-auscope/tables/"),new File(jobInputDir+GridSubmitController.TABLE_DIR+File.separator));
+        }
+        catch(IOException e){
+            	
+        }
+        // Save in session to use it when submitting job
+        request.getSession().setAttribute("jobInputDir", jobInputDir);  
+	}
+
+
+	// If targetLocation does not exist, it will be created.
+    private void copyDirectory(File sourceLocation , File targetLocation)
+    throws IOException {
+        
+        if (sourceLocation.isDirectory()) {
+            if (!targetLocation.exists()) {
+                targetLocation.mkdir();
+            }
+            
+            String[] children = sourceLocation.list();
+            for (int i=0; i<children.length; i++) {
+                copyDirectory(new File(sourceLocation, children[i]),
+                        new File(targetLocation, children[i]));
+            }
+        } else {
+            
+            InputStream in = new FileInputStream(sourceLocation);
+            OutputStream out = new FileOutputStream(targetLocation);
+            
+            // Copy the bits from instream to outstream
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        }
+    }
+
+    
+	/** 
+     * Create a directory based on the baseToURL
+     *
+     * @return          directory created on a Grid accessible host (e.g. ngdata).
+     * 
+     */
+	/*private String createDir() {
+		
+        
+		String date = df.format(d);
+		String dirname =null;
+		
+		try {
+
+			String filename = new GlobusURL(this.baseToURL).getPath();
+			dirname = ( filename + date + (GridService.counter%100) +"/" );
+			GridService.counter++;
+			logger.info("dirname is: " + dirname);
+			//Load credentials from proxy file
+			//ExtendedGSSManager manager = (ExtendedGSSManager) ExtendedGSSManager.getInstance();
+			//GSSCredential cred = manager.createCredential(GSSCredential.INITIATE_AND_ACCEPT);
+			GridFTPClient gridStore = new GridFTPClient("ngdata.ivec.org", 2811);		
+			gridStore.authenticate(this.credential); //authenticating
+			gridStore.setDataChannelAuthentication(DataChannelAuthentication.SELF);
+			gridStore.setDataChannelProtection(GridFTPSession.PROTECTION_SAFE);
+			gridStore.makeDir(dirname);
+		} catch (ServerException e) {
+			logger.error("GridFTP ServerException: " + e.getMessage());
+		} catch (IOException e) {
+			logger.error("GridFTP IOException: " + e.getMessage());
+		} catch (Exception e) {
+			logger.error("GridFTP Exception: " + e.getMessage());
+		}
+		
+
+		return dirname;
+	}*/    
 }
 
