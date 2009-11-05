@@ -66,7 +66,7 @@ public class GeodesyJobDao extends HibernateDaoSupport {
     
     
     /**
-     * Retrieves the job with given ID.
+     * Deletes the job with given ID.
      *
      * @return <code>GeodesyJob</code> object with given ID.
      */
