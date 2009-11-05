@@ -23,12 +23,12 @@
         <property name="maxUploadSize" value="${fileupload.maxFileSize}"/>
     </bean>
 
-    <bean id="vrlSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <bean id="geodesySessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingResources">
             <list>
-                <value>vrljob.hbm.xml</value>
-                <value>vrlseries.hbm.xml</value>
+                <value>geodesyjob.hbm.xml</value>
+                <value>geodesyseries.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -37,25 +37,28 @@
     </bean>
 
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-        <property name="sessionFactory" ref="vrlSessionFactory"/>
+        <property name="sessionFactory" ref="geodesySessionFactory"/>
     </bean>
 
-    <bean id="vrlJobDao" class="org.auscope.portal.server.gridjob.VRLJobDao">
-        <property name="sessionFactory" ref="vrlSessionFactory"/>
+    <bean id="geodesyJobDao" class="org.auscope.portal.server.gridjob.GeodesyJobDao">
+        <property name="sessionFactory" ref="geodesySessionFactory"/>
     </bean>
 
-    <bean id="vrlSeriesDao" class="org.auscope.portal.server.gridjob.VRLSeriesDao">
-        <property name="sessionFactory" ref="vrlSessionFactory"/>
+    <bean id="geodesySeriesDao" class="org.auscope.portal.server.gridjob.GeodesySeriesDao">
+        <property name="sessionFactory" ref="geodesySessionFactory"/>
     </bean>
 
-    <bean id="vrlJobManager" class="org.auscope.portal.server.gridjob.VRLJobManager">
-        <property name="VRLJobDao" ref="vrlJobDao"/>
-        <property name="VRLSeriesDao" ref="vrlSeriesDao"/>
+    <bean id="geodesyJobManager" class="org.auscope.portal.server.gridjob.GeodesyJobManager">
+        <property name="geodesyJobDao" ref="geodesyJobDao"/>
+        <property name="geodesySeriesDao" ref="geodesySeriesDao"/>
     </bean>
 
     <bean id="gridAccess" class="org.auscope.portal.server.gridjob.GridAccessController">
-        <property name="localGridFtpServer" value="${gridftp.server}"/>
-        <property name="localGridFtpStageInDir" value="${gridftp.stageInDir}"/>
-        <property name="localGridFtpStageOutDir" value="${gridftp.stageOutDir}"/>
+        <property name="gridFtpServer" value="${gridftp.server}"/>
+        <property name="gridFtpStageInDir" value="${gridftp.stageInDir}"/>
+        <property name="gridFtpStageOutDir" value="${gridftp.stageOutDir}"/>
+        <property name="localGridFtpServer" value="${gridftp.localServer}"/>
+        <property name="localGridFtpStageInDir" value="${gridftp.localStageInDir}"/>
+        <property name="localGridFtpStageOutDir" value="${gridftp.localStageOutDir}"/>
     </bean>
 </beans>
