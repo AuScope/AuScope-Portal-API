@@ -52,6 +52,10 @@ public class GridAccessController {
     private String gridFtpServer = "";
     private String gridFtpStageInDir = "";
     private String gridFtpStageOutDir = "";
+    
+    private String localGridFtpServer = "";
+    private String localGridFtpStageInDir = "";
+    private String localGridFtpStageOutDir = "";
 
     /** MyProxy server to connect to */
     private static final String myProxyServer = "myproxy.arcs.org.au";
@@ -67,7 +71,7 @@ public class GridAccessController {
      *
      * @param gridFtpServer GridFTP server name
      */
-    public void setLocalGridFtpServer(String gridFtpServer) {
+    public void setGridFtpServer(String gridFtpServer) {
         this.gridFtpServer = gridFtpServer;
     }
 
@@ -76,25 +80,25 @@ public class GridAccessController {
      *
      * @return The local GridFTP server name
      */
-    public String getLocalGridFtpServer() {
+    public String getGridFtpServer() {
         return gridFtpServer;
     }
 
     /**
-     * Sets the directory on the local server to be used for stage-ins.
+     * Sets the directory on PBstore server to be used for stage-ins.
      *
      * @param gridFtpStageInDir stage-in directory
      */
-    public void setLocalGridFtpStageInDir(String gridFtpStageInDir) {
+    public void setGridFtpStageInDir(String gridFtpStageInDir) {
         this.gridFtpStageInDir = gridFtpStageInDir;
     }
 
     /**
-     * Returns the local stage-in directory.
+     * Returns PBstore stage-in directory.
      *
      * @return The stage-in directory
      */
-    public String getLocalGridFtpStageInDir() {
+    public String getGridFtpStageInDir() {
         return gridFtpStageInDir;
     }
 
@@ -103,7 +107,7 @@ public class GridAccessController {
      *
      * @param gridFtpStageOutDir stage-out directory
      */
-    public void setLocalGridFtpStageOutDir(String gridFtpStageOutDir) {
+    public void setGridFtpStageOutDir(String gridFtpStageOutDir) {
         this.gridFtpStageOutDir = gridFtpStageOutDir;
     }
 
@@ -112,11 +116,53 @@ public class GridAccessController {
      *
      * @return The stage-out directory
      */
-    public String getLocalGridFtpStageOutDir() {
+    public String getGridFtpStageOutDir() {
         return gridFtpStageOutDir;
     }
 
     /**
+	 * @param localGridFtpServer the localGridFtpServer to set
+	 */
+	public void setLocalGridFtpServer(String localGridFtpServer) {
+		this.localGridFtpServer = localGridFtpServer;
+	}
+
+	/**
+	 * @return the localGridFtpServer
+	 */
+	public String getLocalGridFtpServer() {
+		return localGridFtpServer;
+	}
+
+	/**
+	 * @param localGridFtpStageInDir the localGridFtpStageInDir to set
+	 */
+	public void setLocalGridFtpStageInDir(String localGridFtpStageInDir) {
+		this.localGridFtpStageInDir = localGridFtpStageInDir;
+	}
+
+	/**
+	 * @return the localGridFtpStageInDir
+	 */
+	public String getLocalGridFtpStageInDir() {
+		return localGridFtpStageInDir;
+	}
+
+	/**
+	 * @param localGridFtpStageOutDir the localGridFtpStageOutDir to set
+	 */
+	public void setLocalGridFtpStageOutDir(String localGridFtpStageOutDir) {
+		this.localGridFtpStageOutDir = localGridFtpStageOutDir;
+	}
+
+	/**
+	 * @return the localGridFtpStageOutDir
+	 */
+	public String getLocalGridFtpStageOutDir() {
+		return localGridFtpStageOutDir;
+	}
+
+	/**
      * Submits a job to the Grid. The View packages the job properties into a
      * <code>GridJob</code> object, which is used to get the information needed
      * to submit the job properly.
@@ -149,6 +195,7 @@ public class GridAccessController {
                 job.getSite());
 
         job.setModules(new String[] { moduleName });
+                
         job.setExeName(exeName);
         job.setSiteGridFTPServer(gridFtpServer);
         GramJobControl gjc = new GramJobControl((GSSCredential) credential);

@@ -24,9 +24,9 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.gridjob.GridAccessController;
 import org.auscope.portal.server.gridjob.Util;
-import org.auscope.portal.server.gridjob.VRLJob;
-import org.auscope.portal.server.gridjob.VRLJobManager;
-import org.auscope.portal.server.gridjob.VRLSeries;
+import org.auscope.portal.server.gridjob.GeodesyJob;
+import org.auscope.portal.server.gridjob.GeodesyJobManager;
+import org.auscope.portal.server.gridjob.GeodesySeries;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,7 +50,7 @@ public class JobListController extends MultiActionController{
     //@Autowired
     private GridAccessController gridAccess;
     //@Autowired
-    private VRLJobManager jobManager;
+    private GeodesyJobManager jobManager;
 
     /**
      * Sets the <code>GridAccessController</code> to be used for grid
@@ -63,12 +63,12 @@ public class JobListController extends MultiActionController{
      }
 
     /**
-     * Sets the <code>VRLJobManager</code> to be used to retrieve and store
+     * Sets the <code>GeodesyJobManager</code> to be used to retrieve and store
      * series and job details.
      *
      * @param jobManager the JobManager to use
      */
-     public void setJobManager(VRLJobManager jobManager) {
+     public void setJobManager(GeodesyJobManager jobManager) {
         this.jobManager = jobManager;
      }
 
@@ -105,7 +105,7 @@ public class JobListController extends MultiActionController{
                                          HttpServletResponse response) {
 
         String jobIdStr = request.getParameter("jobId");
-        VRLJob job = null;
+        GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
         Object credential = request.getSession().getAttribute("userCred");
 
@@ -165,7 +165,7 @@ public class JobListController extends MultiActionController{
                                 HttpServletResponse response) {
 
         String jobIdStr = request.getParameter("jobId");
-        VRLJob job = null;
+        GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
         Object credential = request.getSession().getAttribute("userCred");
@@ -197,7 +197,7 @@ public class JobListController extends MultiActionController{
 
         } else {
             // check if current user is the owner of the job
-            VRLSeries s = jobManager.getSeriesById(job.getSeriesId());
+            GeodesySeries s = jobManager.getSeriesById(job.getSeriesId());
             if (request.getRemoteUser().equals(s.getUser())) {
                 logger.info("Deleting job with ID "+jobIdStr);
                 jobManager.deleteJob(job);
@@ -226,7 +226,7 @@ public class JobListController extends MultiActionController{
                                        HttpServletResponse response) {
 
         String seriesIdStr = request.getParameter("seriesId");
-        List<VRLJob> jobs = null;
+        List<GeodesyJob> jobs = null;
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
         int seriesId = -1;
@@ -260,11 +260,11 @@ public class JobListController extends MultiActionController{
 
         } else {
             // check if current user is the owner of the series
-            VRLSeries s = jobManager.getSeriesById(seriesId);
+            GeodesySeries s = jobManager.getSeriesById(seriesId);
             if (request.getRemoteUser().equals(s.getUser())) {
                 logger.info("Deleting jobs of series "+seriesIdStr);
                 boolean jobsDeleted = true;
-                for (VRLJob job : jobs) {
+                for (GeodesyJob job : jobs) {
                     String oldStatus = job.getStatus();
                     if (oldStatus.equals("Failed") || oldStatus.equals("Done") ||
                             oldStatus.equals("Cancelled")) {
@@ -312,7 +312,7 @@ public class JobListController extends MultiActionController{
                                 HttpServletResponse response) {
 
         String jobIdStr = request.getParameter("jobId");
-        VRLJob job = null;
+        GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
         Object credential = request.getSession().getAttribute("userCred");
@@ -344,7 +344,7 @@ public class JobListController extends MultiActionController{
 
         } else {
             // check if current user is the owner of the job
-            VRLSeries s = jobManager.getSeriesById(job.getSeriesId());
+            GeodesySeries s = jobManager.getSeriesById(job.getSeriesId());
             if (request.getRemoteUser().equals(s.getUser())) {
                 logger.info("Cancelling job with ID "+jobIdStr);
                 String newState = gridAccess.killJob(
@@ -381,7 +381,7 @@ public class JobListController extends MultiActionController{
                                        HttpServletResponse response) {
 
         String seriesIdStr = request.getParameter("seriesId");
-        List<VRLJob> jobs = null;
+        List<GeodesyJob> jobs = null;
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
         int seriesId = -1;
@@ -415,10 +415,10 @@ public class JobListController extends MultiActionController{
 
         } else {
             // check if current user is the owner of the series
-            VRLSeries s = jobManager.getSeriesById(seriesId);
+            GeodesySeries s = jobManager.getSeriesById(seriesId);
             if (request.getRemoteUser().equals(s.getUser())) {
                 logger.info("Cancelling jobs of series "+seriesIdStr);
-                for (VRLJob job : jobs) {
+                for (GeodesyJob job : jobs) {
                     String oldStatus = job.getStatus();
                     if (oldStatus.equals("Failed") || oldStatus.equals("Done") ||
                             oldStatus.equals("Cancelled")) {
@@ -464,7 +464,7 @@ public class JobListController extends MultiActionController{
                                  HttpServletResponse response) {
 
         String jobIdStr = request.getParameter("jobId");
-        VRLJob job = null;
+        GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
 
         if (jobIdStr != null) {
@@ -524,7 +524,7 @@ public class JobListController extends MultiActionController{
 
         String jobIdStr = request.getParameter("jobId");
         String fileName = request.getParameter("filename");
-        VRLJob job = null;
+        GeodesyJob job = null;
         String errorString = null;
 
         if (jobIdStr != null) {
@@ -600,7 +600,7 @@ public class JobListController extends MultiActionController{
 
         String jobIdStr = request.getParameter("jobId");
         String filesParam = request.getParameter("files");
-        VRLJob job = null;
+        GeodesyJob job = null;
         String errorString = null;
 
         if (jobIdStr != null) {
@@ -687,7 +687,7 @@ public class JobListController extends MultiActionController{
      * @param response The servlet response
      *
      * @return A JSON object with a series attribute which is an array of
-     *         VRLSeries objects matching the criteria.
+     *         GeodesySeries objects matching the criteria.
      */
     //@RequestMapping("/querySeries.do")
     public ModelAndView querySeries(HttpServletRequest request,
@@ -703,7 +703,7 @@ public class JobListController extends MultiActionController{
         }
 
         logger.debug("qUser="+qUser+", qName="+qName+", qDesc="+qDesc);
-        List<VRLSeries> series = jobManager.querySeries(qUser, qName, qDesc);
+        List<GeodesySeries> series = jobManager.querySeries(qUser, qName, qDesc);
 
         logger.debug("Returning list of "+series.size()+" series.");
         return new ModelAndView("jsonView", "series", series);
@@ -716,14 +716,14 @@ public class JobListController extends MultiActionController{
      * @param response The servlet response
      *
      * @return A JSON object with a jobs attribute which is an array of
-     *         <code>VRLJob</code> objects.
+     *         <code>GeodesyJob</code> objects.
      */
     //@RequestMapping("/listJobs.do")
     public ModelAndView listJobs(HttpServletRequest request,
                                  HttpServletResponse response) {
 
         String seriesIdStr = request.getParameter("seriesId");
-        List<VRLJob> seriesJobs = null;
+        List<GeodesyJob> seriesJobs = null;
         ModelAndView mav = new ModelAndView("jsonView");
         Object credential = request.getSession().getAttribute("userCred");
         int seriesId = -1;
@@ -750,11 +750,11 @@ public class JobListController extends MultiActionController{
         if (seriesJobs != null) {
             // check if current user is the owner of the series and update
             // the status of the jobs if so
-            VRLSeries s = jobManager.getSeriesById(seriesId);
+            GeodesySeries s = jobManager.getSeriesById(seriesId);
             if (request.getRemoteUser().equals(s.getUser())) {
                 logger.debug("Updating status of jobs attached to series " +
                         seriesIdStr + ".");
-                for (VRLJob j : seriesJobs) {
+                for (GeodesyJob j : seriesJobs) {
                     String state = j.getStatus();
                     if (!state.equals("Done") && !state.equals("Failed") &&
                             !state.equals("Cancelled")) {
@@ -792,7 +792,7 @@ public class JobListController extends MultiActionController{
                                     HttpServletResponse response) {
 
         String jobIdStr = request.getParameter("jobId");
-        VRLJob job = null;
+        GeodesyJob job = null;
 
         if (jobIdStr != null) {
             try {
@@ -833,7 +833,7 @@ public class JobListController extends MultiActionController{
 
         String jobIdStr = request.getParameter("jobId");
 
-        VRLJob job = null;
+        GeodesyJob job = null;
         String errorString = null;
         String scriptFileName = null;
         File sourceFile = null;

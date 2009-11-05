@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.Element;
 
 /**
- * Controller that handles all Data Service related requests,
+ * Controller that handles all Data Service related requests.
  *
  * @author Abdi Jama
  */
@@ -81,7 +81,6 @@ public class DataServiceController {
        response.getWriter().print(selectedList);
        //response.getWriter().print("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><data><url_date><select_item>false</select_item><fileDate>2009-Sep-1</fileDate><fileUrl>http://files.ivec.org/geodesy/gpsdata/09244/alby2440.09g.Z</fileUrl></url_date><url_date><select_item>false</select_item><fileDate>2009-Sep-1</fileDate><fileUrl>http://files.ivec.org/geodesy/gpsdata/09244/alby2440.09n.Z</fileUrl></url_date><url_date><select_item>false</select_item><fileDate>2009-Sep-1</fileDate><fileUrl>http://files.ivec.org/geodesy/gpsdata/09244/alby2440.09o.Z</fileUrl></url_date></data>");
        response.getWriter().close();
-       //return selectedList;
    } 
    
    @RequestMapping("/sendToGrid.do")

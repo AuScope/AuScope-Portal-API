@@ -18,6 +18,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * Class that provides utility methods for processing xml fragment of rinex file list.
+ *
+ * @author Abdi Jama
+ */
 public class GeodesyUtil {
 	
 	private static final Log logger = LogFactory.getLog(GeodesyUtil.class);
@@ -40,7 +45,6 @@ public class GeodesyUtil {
 						
 					if (urlNode.getNodeType() == Node.ELEMENT_NODE) {
 						String urlValue = getUrlValueFromXmlNode(urlNode);
-						//logger.debug("The url value during transfer is " + urlValue);
 						urlsList.add(urlValue);
 					}
 				}
@@ -78,7 +82,6 @@ public class GeodesyUtil {
 	private static String getUrlValueFromXmlNode(Node urlNode) {
 		Element urlElmnt = (Element) urlNode;
 		String urlValue = urlElmnt.getFirstChild().getNodeValue();
-		//logger.debug("The url value during transfer is " + urlValue);
 		
 		return urlValue;
 	}
