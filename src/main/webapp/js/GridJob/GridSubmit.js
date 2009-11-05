@@ -50,7 +50,15 @@ GridSubmit.onLoadDataFailure = function(response, request) {
 // Called when the job submit request fails
 //
 GridSubmit.onSubmitFailure = function(form, action) {
-    GridSubmit.showError('Could not execute submit request.');
+    switch (action.failureType) {
+        case Ext.form.Action.CLIENT_INVALID:
+            Ext.Msg.alert('Failure', 'Could not execute submit request.');
+            break;
+        case Ext.form.Action.CONNECT_FAILURE:
+            break;
+        case Ext.form.Action.SERVER_INVALID:
+           Ext.Msg.alert('Failure', action.result.msg);
+    }	
 }
 
 //
@@ -82,7 +90,7 @@ GridSubmit.onDeleteResponse = function(response, request) {
 GridSubmit.onSubmitJob = function(form, action) {
     //GridSubmit.successDlg('The job was successfully submitted!');
     GridSubmit.confirmUnloading = false;
-    window.location = "joblist.html";
+    //window.location = "joblist.html";
 }
 
 //
@@ -125,6 +133,7 @@ GridSubmit.onFileListResponse = function(response, request) {
     }
     fileStore.sort('name', 'ASC');
 }
+
 
 //
 // Callback for a successful job object request
@@ -179,6 +188,20 @@ GridSubmit.loadJobFiles = function() {
     });
 }
 
+
+//
+//Loads status of Grid transfer on Job Submission
+//
+GridSubmit.getJobStatus = function() {
+ Ext.Ajax.request({
+     url: GridSubmit.ControllerURL,
+     success: GridSubmit.onJobStatusResponse,
+     failure: GridSubmit.onJobStatusResponse,
+     params: { 'action': 'getJobStatus' }
+ });
+}
+
+
 //
 // Loads the populated job object from the server
 //
@@ -194,11 +217,41 @@ GridSubmit.loadJobObject = function() {
     });
 }
 
+//Task and TaskRunner add for job submission status update.
+var task = {
+	run: GridSubmit.getJobStatus,
+	interval: 10000 //10 seconds
+}
+
+var runner = new Ext.util.TaskRunner();
+
+//
+//Callback for a successful status update request
+//checks if success transfer and redirects to jobList.
+GridSubmit.onJobStatusResponse = function(response, request) {
+	var statusField = Ext.getCmp('statusArea');
+	var resp = Ext.decode(response.responseText);
+	statusField.setText(resp.data);
+	
+	//This means file transfer complete.
+	if(resp.jobStatus == "Done")
+	{	
+		GridSubmit.confirmUnloading = false;
+		window.location = "joblist.html";
+	}else if(resp.jobStatus == "Failed"){
+		GridSubmit.confirmUnloading = false;
+		Ext.Msg.alert('Failure', 'Job submission failed.');	
+		runner.stop(task);
+	}
+}
+
 //
 // Requests submission of the current job from the server
 //
 GridSubmit.submitJob = function() {
-
+	
+	runner.start(task);
+	
     Ext.getCmp('metadataForm').getForm().submit({
         url: GridSubmit.ControllerURL,
         success: GridSubmit.onSubmitJob,
@@ -314,8 +367,8 @@ GridSubmit.confirmCancel = function() {
 GridSubmit.initialize = function() {
     
     Ext.QuickTips.init();
-
-    // Store for ESyS-Particle sites
+    
+    // Store for sites
     var sitesStore = new Ext.data.JsonStore({
         url: GridSubmit.ControllerURL,
         baseParams: { 'action': 'listSites' },
@@ -324,7 +377,7 @@ GridSubmit.initialize = function() {
         listeners: { 'loadexception': GridSubmit.onLoadException }
     });
     
-    // Store for ESyS-Particle versions at a specific site
+    // Store for versions at a specific site
     var versionsStore = new Ext.data.JsonStore({
         url: GridSubmit.ControllerURL,
         baseParams: { 'action': 'listSiteVersions' },
@@ -342,6 +395,15 @@ GridSubmit.initialize = function() {
         listeners: { 'loadexception': GridSubmit.onLoadException }
     });
 
+    // Store for job submission status update.
+    var gridTransferStatus = new Ext.data.JsonStore({
+        url: GridSubmit.ControllerURL,
+        baseParams: { 'action': 'getTransferStatus' },
+        root: 'transferStatus',
+        fields: [ { name: 'value', type: 'string' } ],
+        listeners: { 'loadexception': GridSubmit.onLoadException }
+    });
+    
     // Store for current user's list of series
     var mySeriesStore = new Ext.data.JsonStore({
         url: GridSubmit.ControllerURL,
@@ -362,7 +424,7 @@ GridSubmit.initialize = function() {
         { name: 'size', mapping: 'size' }
     ]);
     
-    // Store for uploaded file details
+    //Store for uploaded file details
     var uploadedFilesStore = new Ext.data.SimpleStore({
         fields: [
             { name: 'name', type: 'string' },
@@ -527,8 +589,7 @@ GridSubmit.initialize = function() {
             id: 'scriptFile',
             name: 'scriptFile',
             fieldLabel: 'Parameters',
-            allowBlank: true,
-            maskRe: /[\w+#@.,-]/
+            allowBlank: true
         }, {
             xtype: 'textarea',
             name: 'description',
@@ -641,7 +702,7 @@ GridSubmit.initialize = function() {
 
         })
     });
-
+        
     var filesForm = new Ext.FormPanel({
         bodyStyle: 'padding:10px;',
         id: 'filesForm',
@@ -652,7 +713,14 @@ GridSubmit.initialize = function() {
             uploadAction,
             deleteAction
         ],
-        items: [
+        items: [{
+            anchor: '100%',
+            xtype: 'label',
+            id: 'statusArea',
+            name: 'jobStatus',
+            style: 'font-weight:bold;',
+            text : ''
+        },
         {
             anchor: '100%',
             xtype: 'textfield',
@@ -738,7 +806,6 @@ GridSubmit.initialize = function() {
             GridSubmit.onWindowUnloading, GridSubmit);
 
     GridSubmit.loadJobObject();
-    //Ext.MessageBox.alert(getXmlTextForAllCheckedDataUrls());
 }
 
 
