@@ -51,7 +51,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * filter the output of the methods defined in the interface, and thus produce
  * more specialist queries. It also contains a few independent methods that
  * perform outrageous queries that can pinpoint information.
- * 
+ * Note: XPath translate matching is case insensitive. 
+ *  
  * @author Ryan Fraser
  * @author Terry Rankine
  * @author Darren Kidd

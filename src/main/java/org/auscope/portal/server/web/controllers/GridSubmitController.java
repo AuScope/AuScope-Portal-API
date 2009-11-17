@@ -88,6 +88,9 @@ public class GridSubmitController extends MultiActionController{
 
     private static final String TABLE_DIR = "tables";
     private static final String RINEX_DIR = "rinex";
+    private static final String PRE_STAGE_IN_TABLE_FILES = "/home/grid-auscope/tables/";
+    private static final String IVEC_MIRROR_URL = "http://files.ivec.org/geodesy/";
+    private static final String PBSTORE_RINEX_PATH = "//pbstore/cg01/geodesy/ftp.ga.gov.au/gpsdata/";
 
     //Grid File Transfer messages
     private static final String FILE_COPIED = "Please wait while files being transfered.... ";
@@ -282,9 +285,9 @@ public class GridSubmitController extends MultiActionController{
 
         logger.debug("Returning job.");
         ModelAndView result = new ModelAndView("jsonView");
-        result.addObject("data", job);
+
         GridTransferStatus status = (GridTransferStatus)request.getSession().getAttribute("gridStatus");
-        if(status == null){
+        if(status == null || job == null){
             logger.error("Job setup failure.");
             result.addObject("success", false);
         }else{
@@ -293,6 +296,7 @@ public class GridSubmitController extends MultiActionController{
                 result.addObject("success", false);        		
         	}
             logger.debug("Job setup success.");
+            result.addObject("data", job);
             result.addObject("success", true);
         }
 
@@ -538,6 +542,7 @@ public class GridSubmitController extends MultiActionController{
             logger.error(GridSubmitController.CREDENTIAL_ERROR);
             gridStatus.currentStatusMsg = GridSubmitController.CREDENTIAL_ERROR;
             gridStatus.jobSubmissionStatus = JobSubmissionStatus.Failed;
+            
             // Save in session for status update request for this job.
             request.getSession().setAttribute("gridStatus", gridStatus);
             //mav.addObject("error", errorString);
@@ -579,17 +584,19 @@ public class GridSubmitController extends MultiActionController{
         } else {
             String gpsFiles = (String)request.getSession().getAttribute("gridInputFiles");	
             List<String> urlsList = GeodesyUtil.getSelectedGPSFiles(gpsFiles);
-            //urlsList.add(stageInURL);
+
+            //TODO add this to stageIn array
+            //List<String> localFiles = this.getLocalGPSFiles(urlsList);
             
             // Convert List<String> to String[]
     		String[] urlArray = new String[urlsList.size()];
     		urlArray = urlsList.toArray(urlArray);
     		
     		//Transfer job input files to Grid StageInURL
-    		gridStatus = urlCopy(urlArray, request);
-    		
-    		
-    		
+    		if(urlsList != null && !urlsList.isEmpty()){
+        		gridStatus = urlCopy(urlArray, request);
+    		}    		
+    		    		
     		if(gridStatus.jobSubmissionStatus != JobSubmissionStatus.Failed){
     			
                 job.setSeriesId(series.getId());
@@ -624,7 +631,6 @@ public class GridSubmitController extends MultiActionController{
 
                 if (submitEPR == null) {
                     success = false;
-        			//This means file transfer completed.
        				gridStatus.jobSubmissionStatus = JobSubmissionStatus.Failed;
        				gridStatus.currentStatusMsg = GridSubmitController.INTERNAL_ERROR; 
                 } else {
@@ -638,7 +644,7 @@ public class GridSubmitController extends MultiActionController{
                     request.getSession().removeAttribute("jobInputDir");
                     request.getSession().removeAttribute("localJobInputDir");
                     
-        			//This means file transfer completed.
+        			//This means job submission to the grid done.
        				gridStatus.jobSubmissionStatus = JobSubmissionStatus.Done;
        				gridStatus.currentStatusMsg = GridSubmitController.TRANSFER_COMPLETE; 
                 }                   			
@@ -666,8 +672,8 @@ public class GridSubmitController extends MultiActionController{
      */
     private GeodesyJob prepareModel(HttpServletRequest request) {
         final String user = request.getRemoteUser();
-        final String maxWallTime = "60"; // 50 hours
-        final String maxMemory = "2048"; // 30 GB
+        final String maxWallTime = "60"; // in minutes
+        final String maxMemory = "2048"; // in MB
         final String stdInput = "";
         final String stdOutput = "stdOutput.txt";
         final String stdError = "stdError.txt";
@@ -677,14 +683,11 @@ public class GridSubmitController extends MultiActionController{
         String name = "GeodesyJob";
         String site = "iVEC";
         Integer cpuCount = 1;
-        Integer numBonds = 0;
-        Integer numParticles = 0;
-        Integer numTimesteps = 0;
         String version = "";
         String queue = "";
         String description = "";
         String scriptFile = "";
-        String checkpointPrefix = "";
+
 
         // Set a default version and queue
         String[] allVersions = gridAccess.retrieveCodeVersionsAtSite(
@@ -698,11 +701,18 @@ public class GridSubmitController extends MultiActionController{
 
         // Create a new directory to put all files for this job into.
         // This directory will always be the first stageIn directive.
-        createGridDir(request);
+        boolean success = createGridDir(request);
+        if(!success){
+        	logger.error("Setting up Grid StageIn directory failed.");
+        	return null;
+        }
         
         //Create local stageIn directory.
-        boolean success = createLocalDir(request);
-        
+        success = createLocalDir(request);
+        if(!success){
+        	logger.error("Setting up local StageIn directory failed.");
+        	return null;
+        }
         
         String jobInputDir = (String) request.getSession().getAttribute("jobInputDir");
         
@@ -728,10 +738,6 @@ public class GridSubmitController extends MultiActionController{
             name = existingJob.getName()+"_resubmit";
             scriptFile = existingJob.getScriptFile();
             description = existingJob.getDescription();
-            numBonds = existingJob.getNumBonds();
-            numParticles = existingJob.getNumParticles();
-            numTimesteps = existingJob.getNumTimesteps();
-            checkpointPrefix = existingJob.getCheckpointPrefix();
 
             allQueues = gridAccess.retrieveQueueNamesAtSite(site);
             if (allQueues.length > 0)
@@ -766,7 +772,6 @@ public class GridSubmitController extends MultiActionController{
                 try {
                     parser.parse(newScriptFile);
                     cpuCount = parser.getNumWorkerProcesses()+1;
-                    numTimesteps = parser.getNumTimeSteps();
                 } catch (IOException e) {
                     logger.warn("Error parsing file: "+e.getMessage());
                 }
@@ -782,10 +787,6 @@ public class GridSubmitController extends MultiActionController{
 
         job.setScriptFile(scriptFile);
         job.setDescription(description);
-        job.setNumBonds(numBonds);
-        job.setNumParticles(numParticles);
-        job.setNumTimesteps(numTimesteps);
-        job.setCheckpointPrefix(checkpointPrefix);
 
         return job;
     }
@@ -814,7 +815,8 @@ public class GridSubmitController extends MultiActionController{
         }
         
         //tables files.
-        success = Util.copyFilesRecursive(new File("/home/grid-auscope/tables/"),new File(jobInputDir+GridSubmitController.TABLE_DIR+File.separator));
+        success = Util.copyFilesRecursive(new File(GridSubmitController.PRE_STAGE_IN_TABLE_FILES),
+        		                new File(jobInputDir+GridSubmitController.TABLE_DIR+File.separator));
         
         // Save in session to use it when submitting job
         request.getSession().setAttribute("localJobInputDir", jobInputDir);
@@ -858,18 +860,21 @@ public class GridSubmitController extends MultiActionController{
 					
 					
 					// Full URL
-					// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"+"rinex/" + "abeb0010.00d.Z"
-					String toURL = gridAccess.getGridFtpServer()+File.separator+ jobInputDir +GridSubmitController.RINEX_DIR+File.separator+ filename;
+					// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
+					//       +"rinex/" + "abeb0010.00d.Z"
+					String toURL = gridAccess.getGridFtpServer()+File.separator+ jobInputDir 
+					               +GridSubmitController.RINEX_DIR+File.separator+ filename;
 					GlobusURL to = new GlobusURL(toURL);		
 					logger.info("toURL is: " + to.getURL());
 					
+					//Not knowing how long UrlCopy will take, the UI request status update of 
+					//file transfer periodically
 					UrlCopy uCopy = new UrlCopy();
 					uCopy.setCredentials((GSSCredential)credential);
 					uCopy.setDestinationUrl(to);
 					uCopy.setSourceUrl(from);
-					uCopy.setUseThirdPartyCopy(false); 	// has to set to false, may
-														// be to do with security
-														// issue.
+					// Disables usage of third party transfers, for grid security reasons.
+					uCopy.setUseThirdPartyCopy(false); 	
 					uCopy.copy();
 										
 					
@@ -886,7 +891,6 @@ public class GridSubmitController extends MultiActionController{
 					status.gridFullURL = gridFullURL;
 					status.gridServer = gridServer;
 					logger.debug(status.currentStatusMsg+" : "+fromURLs[i]);
-					status.jobSubmissionStatus = JobSubmissionStatus.Running;
 					
 					// Save in session for status update request for this job.
 			        request.getSession().setAttribute("gridStatus", status);
@@ -918,13 +922,13 @@ public class GridSubmitController extends MultiActionController{
      * @param the request to save created directories.
      * 
      */
-	private void createGridDir(HttpServletRequest request) {
+	private boolean createGridDir(HttpServletRequest request) {
 		GridTransferStatus status = new GridTransferStatus();
         Object credential = request.getSession().getAttribute("userCred");
-
+        boolean success = true;
         if (credential == null) {
         	status.currentStatusMsg = GridSubmitController.CREDENTIAL_ERROR;
-        	return;
+        	return false;
         }
         
 		final String user = request.getRemoteUser();
@@ -934,7 +938,7 @@ public class GridSubmitController extends MultiActionController{
         String jobInputDir = gridAccess.getGridFtpStageInDir() + jobID;
 		
 		try {
-			GridFTPClient gridStore = new GridFTPClient("pbstore.ivec.org", 2811);		
+			GridFTPClient gridStore = new GridFTPClient(gridAccess.getRepoHostName(), gridAccess.getRepoHostFTPPort());		
 			gridStore.authenticate((GSSCredential)credential); //authenticating
 			gridStore.setDataChannelAuthentication(DataChannelAuthentication.SELF);
 			gridStore.setDataChannelProtection(GridFTPSession.PROTECTION_SAFE);
@@ -950,18 +954,50 @@ public class GridSubmitController extends MultiActionController{
 			logger.error("GridFTP ServerException: " + e.getMessage());
 			status.currentStatusMsg = GridSubmitController.GRID_LINK;
 			status.jobSubmissionStatus = JobSubmissionStatus.Failed;
+			success = false;
 		} catch (IOException e) {
 			logger.error("GridFTP IOException: " + e.getMessage());
 			status.currentStatusMsg = GridSubmitController.GRID_LINK;
 			status.jobSubmissionStatus = JobSubmissionStatus.Failed;
+			success = false;
 		} catch (Exception e) {
 			logger.error("GridFTP Exception: " + e.getMessage());
 			status.currentStatusMsg = GridSubmitController.GRID_LINK;
 			status.jobSubmissionStatus = JobSubmissionStatus.Failed;
+			success = false;
 		}
 		
 		// Save in session for status update request for this job.
         request.getSession().setAttribute("gridStatus", status);
+        return success;
+	}
+
+	/**
+	 * function that moves local GPS files at ivec to a separate list.
+	 * @param list of selected GPS files
+	 * @return list of local GPS files.
+	 */
+	private List<String> getLocalGPSFiles(List<String> list){
+		List<String> ivecList = new ArrayList<String>();
+		for(String fileName : list){
+			if (fileName.contains(".ivec.org")){
+				ivecList.add(convertFilePathToIvec(fileName));
+				//The file can not be in two list
+				list.remove(fileName);				
+			}
+		}		
+		return ivecList;
+	}
+
+	/**
+	 * 
+	 * @param fileName file which to change it's path name
+	 * @return
+	 */
+	private String convertFilePathToIvec(String fileName){
+		//replace "http://files.ivec.org/geodesy/"  
+		//with "gsiftp://pbstore.ivec.org:2811//pbstore/cg01/geodesy/ftp.ga.gov.au/gpsdata/"
+		return fileName.replace(IVEC_MIRROR_URL, gridAccess.getGridFtpServer()+PBSTORE_RINEX_PATH);
 	}
 	
 	/**
@@ -985,4 +1021,3 @@ public class GridSubmitController extends MultiActionController{
 	 */
 	public enum JobSubmissionStatus{Running,Done,Failed }
 }
-

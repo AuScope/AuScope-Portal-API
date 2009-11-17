@@ -40,6 +40,7 @@ import org.springframework.web.servlet.view.RedirectView;
  * Controller for the job list view.
  *
  * @author Cihan Altinay
+ * @author Abdi Jama
  */
 //@Controller
 public class JobListController extends MultiActionController{

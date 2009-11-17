@@ -56,6 +56,10 @@ public class GridAccessController {
     private String localGridFtpServer = "";
     private String localGridFtpStageInDir = "";
     private String localGridFtpStageOutDir = "";
+    
+    private String repoHostName = "";
+    private int repoHostFTPPort = 2811;
+    
 
     /** MyProxy server to connect to */
     private static final String myProxyServer = "myproxy.arcs.org.au";
@@ -66,7 +70,39 @@ public class GridAccessController {
     /** Minimum lifetime for a proxy to be considered valid */
     private static final int MIN_LIFETIME = 5*60;
 
-    /**
+    /** 
+     * Gets the Grid repository host name
+     * @return the repoHostName
+     */
+    public String getRepoHostName() {
+		return repoHostName;
+	}
+
+	/** 
+	 * Sets the Grid repository host name
+	 * @param repoHostName
+	 */
+	public void setRepoHostName(String repoHostName) {
+		this.repoHostName = repoHostName;
+	}
+
+	/** 
+	 * Gets the GridFTP port for PbStore
+	 * @return the repoHostFTPPort
+	 */
+	public int getRepoHostFTPPort() {
+		return repoHostFTPPort;
+	}
+
+	/** 
+	 * Sets the GridFTP port for PbStore
+	 * @param repoHostFTPPort the repoHostFTPPort to set
+	 */
+	public void setRepoHostFTPPort(int repoHostFTPPort) {
+		this.repoHostFTPPort = repoHostFTPPort;
+	}
+
+	/**
      * Sets the server name of the GridFTP server to be used for file staging.
      *
      * @param gridFtpServer GridFTP server name

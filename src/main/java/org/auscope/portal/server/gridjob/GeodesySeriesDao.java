@@ -18,6 +18,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * A Hibernate-backed GeodesySeries data object
  *
  * @author Cihan Altinay
+ * @author Abdi Jama  -- Modified for Geodesy
  */
 public class GeodesySeriesDao extends HibernateDaoSupport {
 

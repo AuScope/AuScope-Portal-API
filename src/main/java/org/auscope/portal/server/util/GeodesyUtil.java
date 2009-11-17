@@ -25,8 +25,15 @@ import org.xml.sax.SAXException;
  */
 public class GeodesyUtil {
 	
+	public static final String FileXMLTag = "fileUrl";
+	
 	private static final Log logger = LogFactory.getLog(GeodesyUtil.class);
 	
+	/**
+	 * Function that extracts the full url path of the selected rinex files from the xml fragment.
+	 * @param xmlUrlText an xml fragment that contains selected files.
+	 * @return List of selected files.
+	 */
 	public static List<String> getSelectedGPSFiles(String xmlUrlText){
 
 		List<String> urlsList = new ArrayList<String>();
@@ -37,7 +44,7 @@ public class GeodesyUtil {
 			try {
 				logger.debug("xml text to transfer is " + xmlUrlText);
 				Document doc = getXmlDocumentParser(xmlUrlText);
-				NodeList nodeLst = doc.getElementsByTagName("fileUrl");
+				NodeList nodeLst = doc.getElementsByTagName(GeodesyUtil.FileXMLTag);
 	
 				for (int s = 0; s < nodeLst.getLength(); s++) {
 						

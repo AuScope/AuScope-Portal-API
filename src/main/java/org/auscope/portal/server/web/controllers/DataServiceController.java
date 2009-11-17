@@ -95,8 +95,7 @@ public class DataServiceController {
 		   @RequestParam("myFiles") String selectedFiles)throws Exception{
 	   logger.debug("selected GPS files for zip: "+selectedFiles);
 	   //Zip and Download is on hold.
-	   /*
-	   List<String> urlsList = GeodesyUtil.getSelectedGPSFiles(selectedFiles);
+	   /*List<String> urlsList = GeodesyUtil.getSelectedGPSFiles(selectedFiles);
 
 	   if(urlsList == null){
 		   logger.error("No files to Zip for download");
@@ -105,7 +104,7 @@ public class DataServiceController {
 	   
        // Create a new directory to zip all files into.
 	   //String user = request.getRemoteUser();
-	   String user = "Abdi";
+	   String user = "user";
 	   SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
        String dateFmt = sdf.format(new Date());
        String jobID = user + "-" + dateFmt + File.separator;
@@ -161,20 +160,6 @@ public class DataServiceController {
     	   in.close();
     	   out.close();
        }
-       */
-	   //return new ModelAndView("zipDownload");
-
-       // Ensure user has valid grid credentials
-      /* if (gridAccess.isProxyValid(
-                   request.getSession().getAttribute("userCred"))) {
-           logger.debug("No/invalid action parameter; returning gridsubmit view.");
-           return new ModelAndView("gridsubmit");
-       } else {
-           request.getSession().setAttribute(
-                   "redirectAfterLogin", "/gridsubmit.html");
-           logger.warn("Proxy not initialized. Redirecting to gridLogin.");
-           return new ModelAndView(
-                   new RedirectView("/gridLogin.html", true, false, false));
-       }*/	   
+	   return new ModelAndView("zipDownload");*/	   
    }
 }
