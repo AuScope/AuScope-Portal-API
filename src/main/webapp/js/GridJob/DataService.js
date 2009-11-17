@@ -9,6 +9,13 @@ Ext.BLANK_IMAGE_URL = 'js/external/ext-2.2/resources/images/default/s.gif';
 
 Ext.namespace('DataService');
 
+var xmlText = '<?xml version="1.0" encoding="ISO-8859-1"?>';
+var xmlRootOpenTag = "<data>";
+var xmlRootCloseTag = "</data>";
+var fileUrl = "fileUrl";
+var fileUrlOpenTag = "<fileUrl>";
+var fileUrlCloseTag = "</fileUrl>";
+
 //
 //Called when the user tries to navigate away from this site
 //
@@ -21,29 +28,15 @@ DataService.onWindowUnloading = function(e) {
 //
 DataService.zip4Download = function() {
 	  var myStore = Ext.getCmp('selection-grid').getStore();
-	  var xmlText = '<?xml version="1.0" encoding="ISO-8859-1"?>';
-	  var xmlRoot = "data";
-	  xmlText += "<" + xmlRoot + ">";
+	  xmlText += xmlRootOpenTag;
 	  myStore.each(function(url_date){
 		  url_date.fields.each(function(field){
 			  if((field.name == 'select_item') && (url_date.get(field.name).toString() == 'true')){
-			   	xmlText += '<fileUrl>'+url_date.get('fileUrl')+'</fileUrl>';
+			   	xmlText += fileUrlOpenTag + url_date.get(fileUrl) + fileUrlCloseTag;
 			  }
 		  });
 	  },this); 
-	  xmlText += "</" + xmlRoot + ">";
-	  /*Ext.Ajax.request({
-	      url: '/GeodesyWorkflow/sendToGrid.do',
-	      success: function ( result, request ) { 
-		  		Ext.MessageBox.alert('Success', 'Data saved the server:'); 
-		  },
-		  failure: function ( result, request) { 
-		  		Ext.MessageBox.alert('Failed', "Failed."); 
-		  }, 
-	      params: {
-	                'myFiles': xmlText
-	              }
-	  });*/
+	  xmlText += xmlRootCloseTag;
 
 	  var url = "/GeodesyWorkflow/zipDownload.do?myFiles=" + xmlText;
 	  GDownloadUrl(url, function(response, pResponseCode) {
@@ -61,29 +54,15 @@ DataService.zip4Download = function() {
 //
 DataService.send2Grid = function() {
   var myStore = Ext.getCmp('selection-grid').getStore();
-  var xmlText = '<?xml version="1.0" encoding="ISO-8859-1"?>';
-  var xmlRoot = "data";
-  xmlText += "<" + xmlRoot + ">";
+  xmlText += xmlRootOpenTag;
   myStore.each(function(url_date){
 	  url_date.fields.each(function(field){
 		  if((field.name == 'select_item') && (url_date.get(field.name).toString() == 'true')){
-		   	xmlText += '<fileUrl>'+url_date.get('fileUrl')+'</fileUrl>';
+		   	xmlText += fileUrlOpenTag + url_date.get(fileUrl) + fileUrlCloseTag;
 		  }
 	  });
   },this); 
-  xmlText += "</" + xmlRoot + ">";
-  /*Ext.Ajax.request({
-      url: '/GeodesyWorkflow/sendToGrid.do',
-      success: function ( result, request ) { 
-	  		Ext.MessageBox.alert('Success', 'Data saved the server:'); 
-	  },
-	  failure: function ( result, request) { 
-	  		Ext.MessageBox.alert('Failed', "Failed."); 
-	  }, 
-      params: {
-                'myFiles': xmlText
-              }
-  });*/
+  xmlText += xmlRootCloseTag;
 
   var url = "/GeodesyWorkflow/sendToGrid.do?myFiles=" + xmlText;
   GDownloadUrl(url, function(response, pResponseCode) {

@@ -237,6 +237,7 @@ GridSubmit.onJobStatusResponse = function(response, request) {
 	if(resp.jobStatus == "Done")
 	{	
 		GridSubmit.confirmUnloading = false;
+		runner.stop(task);
 		window.location = "joblist.html";
 	}else if(resp.jobStatus == "Failed"){
 		GridSubmit.confirmUnloading = false;
