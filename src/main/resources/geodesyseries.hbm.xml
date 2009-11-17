@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="org.auscope.portal.server.gridjob">
-    <class name="VRLSeries" table="series">
+    <class name="GeodesySeries" table="series">
         <id name="id" column="id">
             <generator class="native"/>
         </id>
