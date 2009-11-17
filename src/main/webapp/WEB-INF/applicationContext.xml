@@ -60,5 +60,7 @@
         <property name="localGridFtpServer" value="${gridftp.localServer}"/>
         <property name="localGridFtpStageInDir" value="${gridftp.localStageInDir}"/>
         <property name="localGridFtpStageOutDir" value="${gridftp.localStageOutDir}"/>
+        <property name="repoHostName" value="${grid.repoHostName}"/>
+        <property name="repoHostFTPPort" value="${grid.repoHostFTPPort}"/>
     </bean>
 </beans>
