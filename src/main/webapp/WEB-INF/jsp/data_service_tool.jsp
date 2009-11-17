@@ -20,7 +20,6 @@
     <script type="text/javascript" src="js/GridJob/DataService.js"></script>
     <script type="text/javascript" src="js/external/ext-2.2/examples/ux/CheckColumn.js"></script>
     <script src="js/geoscimlwfs/global_variables.js" type="text/javascript"></script>  
-    <script src="http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=${googleKey}" type="text/javascript"></script>  
 </head>
 
 <body>
