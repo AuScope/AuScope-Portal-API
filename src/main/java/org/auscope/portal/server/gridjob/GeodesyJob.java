@@ -6,6 +6,9 @@
  */
 package org.auscope.portal.server.gridjob;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import org.auscope.gridtools.GridJob;
 
 /**
@@ -48,6 +51,7 @@ public class GeodesyJob extends GridJob {
     private String    status;
     /** The submission date and time */
     private String    submitDate;
+
 
 
     /**
@@ -325,7 +329,8 @@ public class GeodesyJob extends GridJob {
         this.status = status;
     }
 
-    /**
+
+	/**
      * Returns a String representing the state of this <code>GeodesyJob</code>
      * object.
      *

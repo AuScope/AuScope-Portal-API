@@ -101,7 +101,7 @@ public class GridLoginController {
                                       HttpServletResponse response) {
 
         final String serviceUrl = "https://" + request.getServerName() +
-            "/gridLogin.do";
+            "/GeodesyWorkflow/gridLogin.do";
         logger.debug("SessionID:"+request.getSession().getId());
         String sharedToken = (String)request.getSession().getAttribute("Shib-Shared-Token");//request.getHeader("Shib-Shared-Token");
         if (sharedToken == null) {

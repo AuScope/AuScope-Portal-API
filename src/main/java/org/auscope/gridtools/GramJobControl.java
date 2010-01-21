@@ -332,9 +332,20 @@ public class GramJobControl implements JobControlInterface {
                     
                 for (String xfer : job.getInTransfers()) {
                     finalJobString += "  <transfer>   <sourceUrl>" + xfer +
-                        "</sourceUrl>   <destinationUrl>" + gridFtpInput +
+                        "</sourceUrl>   <destinationUrl>" + addDirExtenion(xfer, gridFtpInput) +
                         "</destinationUrl>  </transfer>";
                 }
+                
+                String subJobId = "subJob_"+Integer.toString(i);
+                
+                if(job.getSubJobStageIn().containsKey(subJobId)){
+                	String subJobInput = (String)job.getSubJobStageIn().get(subJobId);
+                    finalJobString += "  <transfer>   <sourceUrl>" + subJobInput +
+                    "</sourceUrl>   <destinationUrl>" + gridFtpInput +
+                    "</destinationUrl>  </transfer>";
+                }
+
+                
                 finalJobString += " </fileStageIn>";
             }
                 
@@ -553,7 +564,7 @@ public class GramJobControl implements JobControlInterface {
             // Listen for Job state changes if requested.
             if (listener != null)
                 job.addListener(listener);
-            job.submit(gramEndpoint, false); // SUBMIT THE JOB! YAY!
+            job.submit(gramEndpoint, true, false, job.getID() ); // SUBMIT THE JOB! YAY!
 
             job.getState();
             gramJobHandle = job.getHandle(); // Get the handle to the job.
@@ -746,6 +757,19 @@ public class GramJobControl implements JobControlInterface {
         }
 
         return outputDirectory;
+    }
+    
+    private String addDirExtenion(String subJobInput, String gridFTPInput){
+    	String rinex_dir = "rinex/";
+    	String tables_dir = "tables/";
+    	if(subJobInput.endsWith(rinex_dir)){
+    		return gridFTPInput+rinex_dir;
+    	}
+    	else if(subJobInput.endsWith(tables_dir)){
+    		return gridFTPInput+tables_dir;
+    	}
+    	
+    	return gridFTPInput;
     }
 }
 

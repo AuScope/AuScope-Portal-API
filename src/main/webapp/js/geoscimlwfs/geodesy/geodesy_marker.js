@@ -353,7 +353,7 @@ function GeodesyMarker_getYearMonthWfsUrl(pYear, pMonth) {
     sUrl = sUrl + "&CQL_FILTER=(date>='" + pYear + "-" + pMonth + "-01')AND(date<'" + pYear + "-" + nextMonth + "-01')" + "AND(id='" + station + "')";
   } else {
     // For the month of December, get the data between December of the current year and January of the next year.
-    sUrl = sUrl + "&CQL_FILTER=(date>='" + pYear + "-" + pMonth + "-01')AND(date<'" + nextYear + "-01-01')";
+    sUrl = sUrl + "&CQL_FILTER=(date>='" + pYear + "-" + pMonth + "-01')AND(date<'" + nextYear + "-01-01')" + "AND(id='" + station + "')";
   }
   return sUrl;
 }
@@ -810,18 +810,13 @@ function GeodesyMarker_getDateCheckedFn (pYear, pMonth, pDate, pDateChkId, pDate
 /**
 * This function returns the function to be called with the 
 * onclick event for a date checkbox in the calendar.
-* @param {String} pYear Year
-* @param {String} pMonth Month
-* @param {String} pDate Date checked
-* @param {String} pDateChkId Htmlid of the checkbox for the date clicked.
-* @param {String} pDateHrefId Html id of the href for the date clicked.
 * @return Function to be called when the checkbox for a date is clicked - {@link #dateChecked}
 */
 function GeodesyMarker_getSubmitButtonFn () {
   var oGeodesyMarker = this;
   var xmlFragment = getXmlTextForAllCheckedDataUrls();
   if(xmlFragment != null) {
-      var url = "/saveSelection.do?";
+      var url = "saveSelection.do?";
       var postBody = "mySelection=" + xmlFragment;
       GDownloadUrl(url, function(response, pResponseCode) {
           if(pResponseCode == 200) {

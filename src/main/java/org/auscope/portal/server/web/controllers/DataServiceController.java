@@ -72,7 +72,7 @@ public class DataServiceController {
    } 
    
    @RequestMapping("/getSelection.do")
-   public void saveSelection(HttpServletRequest request,
+   public void getSelection(HttpServletRequest request,
 		                     HttpServletResponse response) throws Exception {
 	   String selectedList = (String) request.getSession().getAttribute("selectedGPSfiles");
 	   

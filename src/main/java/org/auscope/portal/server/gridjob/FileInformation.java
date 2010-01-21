@@ -21,8 +21,24 @@ public class FileInformation implements Serializable {
     private String readableSize;
     /** The file size in bytes */
     private long size;
+    /** The subJob the file belongs to */
+    private String subJob = "";
 
     /**
+	 * @return the subJob
+	 */
+	public String getSubJob() {
+		return subJob;
+	}
+
+	/**
+	 * @param subJob the subJob to set
+	 */
+	public void setSubJob(String subJob) {
+		this.subJob = subJob;
+	}
+
+	/**
      * Constructor with name and size
      */
     public FileInformation(String name, long size) {
@@ -30,6 +46,15 @@ public class FileInformation implements Serializable {
         setSize(size);
     }
 
+	/**
+     * Constructor with name and size
+     */
+    public FileInformation(String name, long size, String subJob) {
+        this.name = name;
+        setSize(size);
+        this.subJob = subJob;
+    }
+    
     /**
      * Returns the filename.
      *

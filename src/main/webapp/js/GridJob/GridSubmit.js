@@ -12,6 +12,7 @@ Ext.namespace('GridSubmit');
 
 GridSubmit.ControllerURL = "gridsubmit.html";
 
+
 ////////////////////////
 ////// Callbacks ///////
 ////////////////////////
@@ -107,10 +108,11 @@ GridSubmit.onUploadFile = function(form, action) {
 
         var newFile = new GridSubmit.FileRecord({
             name: action.result.name,
-            size: action.result.size
+            size: action.result.size,
+            subJob: action.result.subJob
         });
         fileStore.add(newFile);
-        fileStore.sort('name', 'ASC');
+        fileStore.sort('subJob','ASC');
     } else {
         GridSubmit.showError('Error uploading file. '+action.result.error);
     }
@@ -127,11 +129,12 @@ GridSubmit.onFileListResponse = function(response, request) {
     for (var i=0; i<resp.files.length; i++) {
         var newFile = new GridSubmit.FileRecord({
             name: resp.files[i].name,
-            size: resp.files[i].size
+            size: resp.files[i].size,
+            subJob: resp.files[i].subJob
         });
         fileStore.add(newFile);
     }
-    fileStore.sort('name', 'ASC');
+    fileStore.sort('subJob', 'ASC');
 }
 
 
@@ -141,6 +144,8 @@ GridSubmit.onFileListResponse = function(response, request) {
 GridSubmit.onLoadJobObject = function(response, request) {
     Ext.getCmp('versionsCombo').getStore().baseParams.site =
        Ext.getCmp('sitesCombo').getValue();
+    Ext.getCmp('versionsCombo').getStore().baseParams.code = 
+       Ext.getCmp('codeCombo').getValue();
     Ext.getCmp('queuesCombo').getStore().baseParams.site =
        Ext.getCmp('sitesCombo').getValue();
 
@@ -180,10 +185,14 @@ GridSubmit.successDlg = function(message) {
 // Loads a list of job files
 //
 GridSubmit.loadJobFiles = function() {
+	var jobType = Ext.getCmp('jobTypeCombo').getValue();
     Ext.Ajax.request({
-        url: '/listJobFiles.do',
+        url: 'listJobFiles.do',
         success: GridSubmit.onFileListResponse,
-        failure: GridSubmit.onLoadDataFailure
+        failure: GridSubmit.onLoadDataFailure,
+        params: {
+            'jobType': jobType
+        }
     });
 }
 
@@ -193,7 +202,7 @@ GridSubmit.loadJobFiles = function() {
 //
 GridSubmit.getJobStatus = function() {
  Ext.Ajax.request({
-     url: '/getJobStatus.do',
+     url: 'getJobStatus.do',
      success: GridSubmit.onJobStatusResponse,
      failure: GridSubmit.onJobStatusResponse
  });
@@ -206,7 +215,7 @@ GridSubmit.getJobStatus = function() {
 GridSubmit.loadJobObject = function() {
     // Load job details from session
     Ext.getCmp('metadataForm').getForm().load({
-        url: '/getJobObject.do',
+        url: 'getJobObject.do',
         success: GridSubmit.onLoadJobObject,
         failure: GridSubmit.onLoadDataFailure,
         waitMsg: 'Retrieving data, please wait...',
@@ -249,15 +258,22 @@ GridSubmit.onJobStatusResponse = function(response, request) {
 GridSubmit.submitJob = function() {
 	
 	runner.start(task);
-	
+    var myParams = Ext.getCmp('arguments').getStore();
+    var param = [];
+    //param.hidden = hidden;
+    myParams.each(function(r, i){
+         param[i] = r.get('paramLine');
+    });
+    
     Ext.getCmp('metadataForm').getForm().submit({
-        url: '/submitJob.do',
+        url: 'submitJob.do',
         success: GridSubmit.onSubmitJob,
         failure: GridSubmit.onSubmitFailure,
         params: {
             'seriesId': GridSubmit.seriesId,
             'seriesName': GridSubmit.seriesName,
-            'seriesDesc': GridSubmit.seriesDesc
+            'seriesDesc': GridSubmit.seriesDesc,
+            'arguments': Ext.encode(param)
         },
         waitMsg: 'Submitting job, please wait...',
         waitTitle: 'Submit Job'
@@ -281,9 +297,12 @@ GridSubmit.deleteFiles = function() {
     if (fileGrid.getSelectionModel().getCount() > 0) {
         var selData = fileGrid.getSelectionModel().getSelections();
         var files = new Array();
+        var jobIds = new Array();
         for (var i=0; i<selData.length; i++) {
             files.push(selData[i].get('name'));
+            jobIds.push(selData[i].get('subJob'));
         }
+        
         Ext.Msg.show({
             title: 'Delete Files',
             msg: 'Are you sure you want to delete the selected files?',
@@ -294,11 +313,12 @@ GridSubmit.deleteFiles = function() {
             fn: function(btn) {
                 if (btn == 'yes') {
                     Ext.Ajax.request({
-                        url: '/deleteFiles.do',
+                        url: 'deleteFiles.do',
                         success: GridSubmit.onDeleteResponse,
                         failure: GridSubmit.onDeleteResponse, 
                         params: { 
-                    	          'files': Ext.encode(files)
+                    	          'files': Ext.encode(files),
+                    	          'subJobId': Ext.encode(jobIds)
                         }
                     });
                 }
@@ -320,10 +340,19 @@ GridSubmit.uploadFile = function(b, e, overwrite) {
                    GridSubmit.confirmOverwrite);
             return;
         }
+        var jobID = Ext.getCmp('jobSelectCombo').getValue();
+        if(jobID == null || jobID == "")
+        	jobID = "Common";
+        
+        var jobType = Ext.getCmp('jobTypeCombo').getValue();
         Ext.getCmp('filesForm').getForm().submit({
-            url: '/uploadFile.do',
+            url: 'uploadFile.do',
             success: GridSubmit.onUploadFile,
             failure: GridSubmit.onUploadFailure,
+            params: {
+                      'jobType': jobType,
+                      'subJobId': jobID
+            },
             waitMsg: 'Uploading file, please wait...',
             waitTitle: 'Upload file'
         });
@@ -347,7 +376,7 @@ GridSubmit.confirmCancel = function() {
         fn: function(btn) {
             if (btn == 'yes') {
                 Ext.Ajax.request({
-                    url: '/cancelSubmission.do',
+                    url: 'cancelSubmission.do',
                     success: GridSubmit.onCancelResponse,
                     failure: GridSubmit.onCancelResponse
                 });
@@ -362,10 +391,18 @@ GridSubmit.confirmCancel = function() {
 GridSubmit.initialize = function() {
     
     Ext.QuickTips.init();
+
+    // Store for code list
+    var codeStore = new Ext.data.JsonStore({
+        url: 'getCodeObject.do',
+        root: 'code',
+        fields: [ { name: 'value', type: 'string' } ],
+        listeners: { 'loadexception': GridSubmit.onLoadException }
+    });
     
     // Store for sites
     var sitesStore = new Ext.data.JsonStore({
-        url: '/listSites.do',
+        url: 'listSites.do',
         root: 'sites',
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
@@ -373,7 +410,7 @@ GridSubmit.initialize = function() {
     
     // Store for versions at a specific site
     var versionsStore = new Ext.data.JsonStore({
-        url: '/listSiteVersions.do',
+        url: 'listSiteVersions.do',
         root: 'versions',
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
@@ -381,15 +418,23 @@ GridSubmit.initialize = function() {
 
     // Store for queue names at a specific site
     var queuesStore = new Ext.data.JsonStore({
-        url: '/listSiteQueues.do',
+        url: 'listSiteQueues.do',
         root: 'queues',
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
     });
 
+    // Store for queue names at a specific site
+    var jobTypeStore = new Ext.data.JsonStore({
+        url: 'listJobTypes.do',
+        root: 'jobType',
+        fields: [ { name: 'value', type: 'string' } ],
+        listeners: { 'loadexception': GridSubmit.onLoadException }
+    });
+    
     // Store for job submission status update.
     var gridTransferStatus = new Ext.data.JsonStore({
-        url: '/getTransferStatus.do',
+        url: 'getTransferStatus.do',
         root: 'transferStatus',
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
@@ -397,7 +442,7 @@ GridSubmit.initialize = function() {
     
     // Store for current user's list of series
     var mySeriesStore = new Ext.data.JsonStore({
-        url: '/mySeries.do',
+        url: 'mySeries.do',
         root: 'series',
         autoLoad: true,
         fields: [
@@ -409,16 +454,20 @@ GridSubmit.initialize = function() {
         listeners: { 'loadexception': GridSubmit.onLoadException }
     });
 
+
+    
     GridSubmit.FileRecord = Ext.data.Record.create([
         { name: 'name', mapping: 'name' },
-        { name: 'size', mapping: 'size' }
+        { name: 'size', mapping: 'size' },
+        { name: 'subJob', mapping: 'subJob' }
     ]);
     
     //Store for uploaded file details
     var uploadedFilesStore = new Ext.data.SimpleStore({
         fields: [
             { name: 'name', type: 'string' },
-            { name: 'size', type: 'int' }
+            { name: 'size', type: 'int' },
+            { name: 'subJob', type: 'subJob' }
         ]
     });
 
@@ -443,6 +492,97 @@ GridSubmit.initialize = function() {
         }
     }
 
+    // shorthand alias
+    var fm = Ext.form;
+
+    // the column model has information about grid columns
+    // dataIndex maps the column to the specific data field in
+    // the data store (created below)
+    var cm = new Ext.grid.ColumnModel({
+        // specify any defaults for each column
+        defaults: {
+            sortable: true // columns are not sortable by default           
+        },
+        columns: [
+            {
+                id: 'paramID',
+                width: 10,
+                dataIndex: 'paramID'
+            },
+            {
+                id: 'paramLine',
+                dataIndex: 'paramLine',
+                // use shorthand alias defined above
+                editor: new fm.TextField({
+                    allowBlank: false
+                })
+            }            
+        ]
+    });
+
+    var paramStore = new Ext.data.SimpleStore({
+        fields: [ { name: 'paramID', type: 'string' },
+                  { name: 'paramLine', type: 'string' } ]
+    });
+    
+    var subJobStore = new Ext.data.SimpleStore({
+        fields: [ { name: 'paramID', type: 'string' }]
+    });
+    
+    var paramGrid = new Ext.grid.EditorGridPanel({
+        store: paramStore,
+        name: 'arguments',
+        id: 'arguments',
+        fieldLabel: 'Parameters',
+        viewConfig:{forceFit:true},
+        cm: cm,
+        height: 100,
+        stripeRows: true,
+        autoExpandColumn: 'paramLine', // column with this id will be expanded
+        title: 'Parameters',
+        frame: true,
+        clicksToEdit: 1,
+        tbar: [{
+            text: 'Add new parameter line',
+            handler : function(){
+        	
+                // access the Record constructor through the grid's store
+                var myGrid = Ext.getCmp('arguments');
+                var ParamLines = myGrid.getStore().recordType;
+                var jobID = 'subJob_'+(myGrid.getStore().getCount());
+                //can only add one parameter line for single jobs
+                if((myGrid.getStore().getCount()>= 1) && (Ext.getCmp('jobTypeCombo').getValue() == 'single')){
+                	Ext.Msg.alert('Failure', 'Can not add more than one parameter line for a single job.');
+                }else{
+                    //add common field
+                    if(subJobStore.getCount()==0)
+                    {
+                       var c = new SubJobRecord({
+                            paramID: 'Common'
+                       });
+                       subJobStore.add(c);
+                    }
+                    var p = new ParamLines({
+                         paramID: jobID,
+                         paramLine: 'Enter new Arg ...'
+                    });
+                    //add param line and stop edit the grid
+                    myGrid.stopEditing();
+                    paramStore.add(p);
+                    //add subJob
+                    c = new SubJobRecord({
+                            paramID: jobID
+                    });
+                    subJobStore.add(c);
+                    //select the inserted row.
+                    var pos = myGrid.getStore().getCount() -1;
+                    myGrid.selModel.selectRow(pos);
+                    myGrid.startEditing(pos, 1);
+               }
+            }
+        }]
+    })
+    
     var seriesForm = new Ext.FormPanel({
         bodyStyle: 'padding:10px;',
         id: 'seriesForm',
@@ -516,13 +656,17 @@ GridSubmit.initialize = function() {
         frame: true,
         defaults: { anchor: "100%" },
         labelWidth: 150,
-        items: [{
-            xtype: 'textfield',
-            name: 'name',
-            fieldLabel: 'Job Name',
-            minLength: 3,
-            allowBlank: false,
-            maskRe: /[^\W]/
+        items: [ {
+            xtype: 'combo',
+            id: 'codeCombo',
+            name: 'code',
+            editable: false,
+            store: codeStore,
+            triggerAction: 'all',
+            displayField: 'value',
+            emptyText: 'Select a code...',
+            fieldLabel: 'Code',
+            allowBlank: false
         }, {
             xtype: 'combo',
             id: 'sitesCombo',
@@ -558,6 +702,24 @@ GridSubmit.initialize = function() {
             allowBlank: false
         }, {
             xtype: 'textfield',
+            name: 'name',
+            fieldLabel: 'Job Name',
+            minLength: 3,
+            allowBlank: false,
+            maskRe: /[^\W]/
+        }, {
+            xtype: 'combo',
+            id: 'jobTypeCombo',
+            name: 'jobType',
+            editable: false,
+            store: jobTypeStore,
+            triggerAction: 'all',
+            displayField: 'value',
+            emptyText: 'Select a job type...',
+            fieldLabel: 'Job Type',
+            allowBlank: false
+        }, {
+            xtype: 'textfield',
             name: 'maxWallTime',
             fieldLabel: 'Max Walltime (mins)',
             allowBlank: false,
@@ -574,19 +736,15 @@ GridSubmit.initialize = function() {
             fieldLabel: 'Number of CPUs',
             allowBlank: false,
             maskRe: /\d+/
-        }, {
-            xtype: 'textfield',
-            id: 'scriptFile',
-            name: 'scriptFile',
-            fieldLabel: 'Parameters',
-            allowBlank: true
-        }, {
+        }, paramGrid,
+        {
             xtype: 'textarea',
             name: 'description',
             fieldLabel: 'Description',
-            anchor: '100% -200'
+            height: 100
         },
         { xtype: 'hidden', name: 'inTransfers' },
+        { xtype: 'hidden', name: 'scriptFile' },
         { xtype: 'hidden', name: 'outTransfers' },
         { xtype: 'hidden', name: 'jobType' },
         { xtype: 'hidden', name: 'numBonds' },
@@ -599,11 +757,22 @@ GridSubmit.initialize = function() {
         { xtype: 'hidden', name: 'stdOutput' }
         ]
     });
-
+    
+    Ext.getCmp('codeCombo').on({
+        'select': function(combo, record, index) {
+            var sitesCombo = Ext.getCmp('sitesCombo');
+            sitesStore.baseParams.code = record.get('value');
+            sitesStore.reload();
+            sitesCombo.enable();
+            sitesCombo.reset();
+        }
+    });
+        
     Ext.getCmp('sitesCombo').on({
         'select': function(combo, record, index) {
             var versionsCombo = Ext.getCmp('versionsCombo');
             versionsStore.baseParams.site = record.get('value');
+            versionsStore.baseParams.code = Ext.getCmp('codeCombo').getValue();
             versionsStore.reload();
             versionsCombo.enable();
             versionsCombo.reset();
@@ -618,6 +787,7 @@ GridSubmit.initialize = function() {
     var gotoStep = function(newStep) {
         var layout = Ext.getCmp('jobwizard-panel').getLayout();
         layout.setActiveItem(newStep);
+        //added code for common upload handling in here.
     };
 
     var validateSeries = function() {
@@ -644,6 +814,15 @@ GridSubmit.initialize = function() {
 
     var validateMetadata = function(newStep) {
         if (newStep==0 || metadataForm.getForm().isValid()) {
+    	    var jobTypeCombo = Ext.getCmp('jobTypeCombo').getValue();
+    	    var jobSelectCombo = Ext.getCmp('jobSelectCombo');
+    	    if(jobTypeCombo == 'single'){
+    	    	jobSelectCombo.disable();
+    	    }
+    	    else
+    	    {
+    	    	jobSelectCombo.enable();
+    	    }
             gotoStep(newStep);
             return true;
         } else {
@@ -676,7 +855,8 @@ GridSubmit.initialize = function() {
         columns: [
             { header: 'Filename', width: 200, sortable: true, dataIndex: 'name' },
             { header: 'Size', width: 100, sortable: true, dataIndex: 'size',
-                renderer: Ext.util.Format.fileSize, align: 'right' }
+                renderer: Ext.util.Format.fileSize, align: 'right' },
+            { header: 'subJob', width: 100, sortable: true, dataIndex: 'subJob' }    
         ],
         sm: new Ext.grid.RowSelectionModel({
             singleSelect: false,
@@ -710,8 +890,19 @@ GridSubmit.initialize = function() {
             name: 'jobStatus',
             style: 'font-weight:bold;',
             text : ''
-        },
-        {
+        },{
+            xtype: 'combo',
+            id: 'jobSelectCombo',
+            name: 'jobSelect',
+            editable: false,
+            mode: 'local',
+            store: subJobStore,
+            triggerAction: 'all',
+            displayField: 'paramID',
+            emptyText: 'Common',
+            fieldLabel: 'Select job to upload for',
+            allowBlank: true
+        },{
             anchor: '100%',
             xtype: 'textfield',
             id: 'fileInputField',

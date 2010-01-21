@@ -8,6 +8,7 @@
 package org.auscope.gridtools;
 
 import java.io.Serializable;
+import java.util.Hashtable;
 
 /**
  * Simple class that represents a Grid job. An instance of this class
@@ -60,7 +61,9 @@ public class GridJob implements Serializable
     /** The standard error filename */
     private String   stdError;
     
-
+    /** Container for subJobs stageIn directory */
+    private Hashtable subJobStageIn = null;
+    
     /**
      * Does some <em>very</em> basic setting up of the class variables. Just
      * to prevent errors. The strings are initialized to the empty String, and 
@@ -524,7 +527,20 @@ public class GridJob implements Serializable
         this.stdError = stdError;
     }
 
+    /**
+	 * @return the subJob StageIn
+	 */
+	public Hashtable getSubJobStageIn() {
+		return subJobStageIn;
+	}
 
+	/**
+	 * @param subJobStageIn the subJob StageIn to set
+	 */
+	public void setSubJobStageIn(Hashtable subJobStageIn) {
+		this.subJobStageIn = subJobStageIn;
+	}
+	
     /**
      * Returns a String representing the state of this
      * <code>GridJob</code> object.

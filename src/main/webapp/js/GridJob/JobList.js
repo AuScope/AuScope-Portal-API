@@ -201,7 +201,7 @@ JobList.querySeries = function(user, name, desc) {
 
 JobList.retrieveFiles = function(jobId) {
     Ext.Ajax.request({
-        url: '/retrieveJobFiles.do',
+        url: 'retrieveJobFiles.do',
         success: JobList.onRetrieveFilesResponse,
         failure: JobList.onRequestFailure, 
         params: {  
@@ -221,7 +221,7 @@ JobList.killJob = function(jobId) {
         fn: function(btn) {
             if (btn == 'yes') {
                 Ext.Ajax.request({
-                    url: '/killJob.do',
+                    url: 'killJob.do',
                     success: JobList.onKillJobResponse,
                     failure: JobList.onRequestFailure, 
                     params: { 'jobId': jobId }
@@ -243,7 +243,7 @@ JobList.deleteJob = function(jobId) {
         fn: function(btn) {
             if (btn == 'yes') {
                 Ext.Ajax.request({
-                    url: '/deleteJob.do',
+                    url: 'deleteJob.do',
                     success: JobList.onDeleteJobResponse,
                     failure: JobList.onRequestFailure, 
                     params: { 
@@ -265,7 +265,7 @@ JobList.killSeriesJobs = function(seriesId) {
         fn: function(btn) {
             if (btn == 'yes') {
                 Ext.Ajax.request({
-                    url: '/killSeriesJobs.do',
+                    url: 'killSeriesJobs.do',
                     success: JobList.onKillJobResponse,
                     failure: JobList.onRequestFailure, 
                     params: { 
@@ -288,7 +288,7 @@ JobList.deleteSeriesJobs = function(seriesId) {
         fn: function(btn) {
             if (btn == 'yes') {
                 Ext.Ajax.request({
-                    url: '/deleteSeriesJobs.do',
+                    url: 'deleteSeriesJobs.do',
                     success: JobList.onDeleteSeriesResponse,
                     failure: JobList.onRequestFailure, 
                     params: { 
@@ -301,7 +301,7 @@ JobList.deleteSeriesJobs = function(seriesId) {
 
 // downloads given file from a specified job
 JobList.downloadFile = function(job, file) {
-    window.location =  "/downloadFile.do?jobId="+job+"&filename="+file;
+    window.location =  "downloadFile.do?jobId="+job+"&filename="+file;
 }
 
 // downloads a ZIP file containing given files of given job
@@ -310,15 +310,15 @@ JobList.downloadAsZip = function(job, files) {
     for (var i=1; i<files.length; i++) {
         fparam += ','+files[i].data.name;
     }
-    window.location = "/downloadAsZip.do?jobId="+job+"&files="+fparam;
+    window.location = "downloadAsZip.do?jobId="+job+"&files="+fparam;
 }
 
 JobList.resubmitJob = function(job) {
-	window.location = "/resubmitJob.do?jobId="+job;
+	window.location = "resubmitJob.do?jobId="+job;
 }
 
 JobList.useScript = function(job, file) {
-	window.location = "/useScript.do?jobId="+job;
+	window.location = "useScript.do?jobId="+job;
 }
 
 JobList.showQueryDialog = function() {
@@ -376,7 +376,7 @@ JobList.initialize = function() {
     Ext.QuickTips.init();
 
     JobList.seriesStore = new Ext.data.JsonStore({
-        url: '/querySeries.do',
+        url: 'querySeries.do',
         root: 'series',
         autoLoad: true,
         fields: [
@@ -393,7 +393,7 @@ JobList.initialize = function() {
     });
 
     JobList.jobStore = new Ext.data.JsonStore({
-        url: '/listJobs.do',
+        url: 'listJobs.do',
         root: 'jobs',
         fields: [
             { name: 'id', type: 'int' },
@@ -419,7 +419,7 @@ JobList.initialize = function() {
     });
 
     JobList.jobFileStore = new Ext.data.JsonStore({
-        url: '/jobFiles.do',
+        url: 'jobFiles.do',
         root: 'files',
         sortInfo: { field: 'name', direction: 'ASC' },
         fields: [

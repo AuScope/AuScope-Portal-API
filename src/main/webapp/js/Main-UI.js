@@ -11,7 +11,7 @@ Ext.onReady(function() {
     //-----------Complex Features Panel Configurations
 
     var complexFeaturesStore = new Ext.data.Store({
-        proxy: new Ext.data.HttpProxy(new Ext.data.Connection({url: '/getComplexFeatures.do', timeout:180000})),
+        proxy: new Ext.data.HttpProxy(new Ext.data.Connection({url: 'getComplexFeatures.do', timeout:180000})),
         reader: new Ext.data.ArrayReader({}, [
             {   name: 'title'           },
             {   name: 'description'     },
@@ -83,7 +83,7 @@ Ext.onReady(function() {
     //----------- WMS Layers Panel Configurations
 
     var wmsLayersStore = new Ext.data.Store({
-        proxy: new Ext.data.HttpProxy({url: '/getWMSLayers.do'}),
+        proxy: new Ext.data.HttpProxy({url: 'getWMSLayers.do'}),
         reader: new Ext.data.ArrayReader({}, [
             {   name: 'title'           },
             {   name: 'description'     },

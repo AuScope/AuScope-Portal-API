@@ -40,10 +40,9 @@ public class CSWService {
         
     }
 
-    /**
-     * ServiceURL setter
-     * @param serviceUrl
-     */
+    /* (non-Javadoc)
+	 * @see org.auscope.portal.server.web.service.ICSWService#setServiceUrl(java.lang.String)
+	 */
     public void setServiceUrl(String serviceUrl) {
         this.serviceUrl = serviceUrl;
     }
@@ -88,11 +87,9 @@ public class CSWService {
         this.dataRecords = records;
     }
 
-    /**
-     * Returns the entire cached record set
-     * @return
-     * @throws Exception
-     */
+    /* (non-Javadoc)
+	 * @see org.auscope.portal.server.web.service.ICSWService#getDataRecords()
+	 */
     public CSWRecord[] getDataRecords() throws Exception {
         return dataRecords;
     }

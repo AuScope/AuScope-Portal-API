@@ -149,7 +149,7 @@ DataService.initialize = function(){
 
 
     var store = new Ext.data.Store({
-    	url: '/getSelection.do',
+    	url: 'getSelection.do',
     	reader: new Ext.data.XmlReader({
     		record: 'url_date',
     		fields: [
