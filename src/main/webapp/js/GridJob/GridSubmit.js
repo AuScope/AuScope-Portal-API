@@ -555,6 +555,7 @@ GridSubmit.initialize = function() {
                 	Ext.Msg.alert('Failure', 'Can not add more than one parameter line for a single job.');
                 }else{
                     //add common field
+                    var SubJobRecord = subJobStore.recordType;
                     if(subJobStore.getCount()==0)
                     {
                        var c = new SubJobRecord({

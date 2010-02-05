@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csw:Transaction service="CSW" version="2.0.2" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
+<csw:Insert>
+<gmd:MD_Metadata xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd">
+	<gmd:fileIdentifier>
+		<gco:CharacterString xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:srv="http://www.isotc211.org/2005/srv"></gco:CharacterString>
+	</gmd:fileIdentifier>
+	<gmd:language>
+		<gco:CharacterString>eng</gco:CharacterString>
+	</gmd:language>
+	<gmd:characterSet>
+		<gmd:MD_CharacterSetCode codeListValue="utf8" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CharacterSetCode"/>
+	</gmd:characterSet>
+	
+	<gmd:dateStamp>
+		<gco:DateTime xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:srv="http://www.isotc211.org/2005/srv">2009-12-23T13:47:40</gco:DateTime>
+	</gmd:dateStamp>
+	<gmd:metadataStandardName>
+		<gco:CharacterString xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:srv="http://www.isotc211.org/2005/srv">ISO 19115:2003/19139</gco:CharacterString>
+	</gmd:metadataStandardName>
+	<gmd:metadataStandardVersion>
+		<gco:CharacterString xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:srv="http://www.isotc211.org/2005/srv">1.0</gco:CharacterString>
+	</gmd:metadataStandardVersion>
+	<gmd:referenceSystemInfo>
+		<gmd:MD_ReferenceSystem>
+			<gmd:referenceSystemIdentifier>
+				<gmd:RS_Identifier>
+					<gmd:code>
+						<gco:CharacterString>WGS 1984</gco:CharacterString>
+					</gmd:code>
+				</gmd:RS_Identifier>
+			</gmd:referenceSystemIdentifier>
+		</gmd:MD_ReferenceSystem>
+	</gmd:referenceSystemInfo>
+	<gmd:identificationInfo>
+		<gmd:MD_DataIdentification>
+			<gmd:citation>
+				<gmd:CI_Citation>
+					<gmd:title>
+						<gco:CharacterString>JS - SERIES NAME</gco:CharacterString> <!--edit-->
+					</gmd:title>
+					<gmd:date>
+						<gmd:CI_Date>
+							<gmd:date>
+								<gco:DateTime>2009-12-23T13:38:00</gco:DateTime>  <!--edit-->
+							</gmd:date>
+							<gmd:dateType>
+								<gmd:CI_DateTypeCode codeListValue="creation" codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_DateTypeCode"/>
+							</gmd:dateType>
+						</gmd:CI_Date>
+					</gmd:date>
+					<gmd:edition gco:nilReason="missing">
+						<gco:CharacterString/>
+					</gmd:edition>
+					<gmd:presentationForm>
+						<gmd:CI_PresentationFormCode codeListValue="modelDigital" codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_PresentationFormCode"/> 
+					</gmd:presentationForm>
+				</gmd:CI_Citation>
+			</gmd:citation>
+			<gmd:abstract>
+				<gco:CharacterString>JS - Series Description Here</gco:CharacterString>  <!--edit-->
+			</gmd:abstract>
+			<gmd:purpose gco:nilReason="missing">
+				<gco:CharacterString/>
+			</gmd:purpose>
+			<gmd:status>
+				<gmd:MD_ProgressCode codeListValue="onGoing" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ProgressCode"/>
+			</gmd:status>
+			<gmd:pointOfContact>
+				<gmd:CI_ResponsibleParty>
+					<gmd:individualName>
+						<gco:CharacterString>IdP - Firstname Lastname</gco:CharacterString>  <!--edit-->
+					</gmd:individualName>
+					<gmd:organisationName>
+						<gco:CharacterString>IdP - Host org</gco:CharacterString>  <!--edit-->
+					</gmd:organisationName>
+					<gmd:positionName gco:nilReason="missing">
+						<gco:CharacterString/>
+					</gmd:positionName>
+					<gmd:contactInfo>
+						<gmd:CI_Contact>
+							<gmd:phone>
+								<gmd:CI_Telephone>
+									<gmd:voice gco:nilReason="missing">
+										<gco:CharacterString/>
+									</gmd:voice>
+									<gmd:facsimile gco:nilReason="missing">
+										<gco:CharacterString/>
+									</gmd:facsimile>
+								</gmd:CI_Telephone>
+							</gmd:phone>
+							<gmd:address>
+								<gmd:CI_Address>
+									<gmd:deliveryPoint gco:nilReason="missing">
+										<gco:CharacterString/>
+									</gmd:deliveryPoint>
+									<gmd:city gco:nilReason="missing">
+										<gco:CharacterString/>
+									</gmd:city>
+									<gmd:administrativeArea gco:nilReason="missing">
+										<gco:CharacterString/>
+									</gmd:administrativeArea>
+									<gmd:postalCode gco:nilReason="missing">
+										<gco:CharacterString/>
+									</gmd:postalCode>
+									<gmd:country gco:nilReason="missing">
+										<gco:CharacterString/>
+									</gmd:country>
+									<gmd:electronicMailAddress>
+										<gco:CharacterString>IdP - email</gco:CharacterString>  <!--edit-->
+									</gmd:electronicMailAddress>
+								</gmd:CI_Address>
+							</gmd:address>
+						</gmd:CI_Contact>
+					</gmd:contactInfo>
+					<gmd:role>
+						<gmd:CI_RoleCode codeListValue="originator" codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_RoleCode"/>
+					</gmd:role>
+				</gmd:CI_ResponsibleParty>
+			</gmd:pointOfContact>
+			<gmd:descriptiveKeywords>
+				<gmd:MD_Keywords>
+					<gmd:keyword>
+						<gco:CharacterString>Geodesy</gco:CharacterString>  <!--edit-->
+					</gmd:keyword>
+					<gmd:type>
+						<gmd:MD_KeywordTypeCode codeListValue="theme" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"/>
+					</gmd:type>
+				</gmd:MD_Keywords>
+			</gmd:descriptiveKeywords>
+			<gmd:descriptiveKeywords>
+				<gmd:MD_Keywords>
+					<gmd:keyword>
+						<gco:CharacterString>Australia (location)</gco:CharacterString>  <!--edit with location of stations analysed -->
+					</gmd:keyword>
+					<gmd:type>
+						<gmd:MD_KeywordTypeCode codeListValue="place" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"/>
+					</gmd:type>
+				</gmd:MD_Keywords>
+			</gmd:descriptiveKeywords>
+			<gmd:descriptiveKeywords>
+				<gmd:MD_Keywords>
+					<gmd:keyword>
+						<gco:CharacterString>GPS</gco:CharacterString>  <!--edit-->
+					</gmd:keyword>
+					<gmd:type>
+						<gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode" codeListValue=""/>
+					</gmd:type>
+				</gmd:MD_Keywords>
+			</gmd:descriptiveKeywords>
+			<gmd:spatialRepresentationType>
+				<gmd:MD_SpatialRepresentationTypeCode codeListValue="vector" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_SpatialRepresentationTypeCode"/>
+			</gmd:spatialRepresentationType>
+			<gmd:spatialResolution>
+				<gmd:MD_Resolution>
+					<gmd:equivalentScale>
+						<gmd:MD_RepresentativeFraction>
+							<gmd:denominator>
+								<gco:Integer>1000000</gco:Integer>
+							</gmd:denominator>
+						</gmd:MD_RepresentativeFraction>
+					</gmd:equivalentScale>
+				</gmd:MD_Resolution>
+			</gmd:spatialResolution>
+			<gmd:language>
+				<gco:CharacterString>eng</gco:CharacterString>
+			</gmd:language>
+			<gmd:characterSet>
+				<gmd:MD_CharacterSetCode codeListValue="utf8" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CharacterSetCode"/>
+			</gmd:characterSet>
+			<gmd:topicCategory>
+				<gmd:MD_TopicCategoryCode>boundaries</gmd:MD_TopicCategoryCode>
+			</gmd:topicCategory>
+			<gmd:extent>
+				<gmd:EX_Extent>
+					<gmd:temporalElement>
+						<gmd:EX_TemporalExtent>
+							<gmd:extent>
+								<gml:TimePeriod gml:id="d766e435a1049886">
+										<gml:beginPosition/>
+										<gml:endPosition/>
+								</gml:TimePeriod>
+							</gmd:extent>
+						</gmd:EX_TemporalExtent>
+					</gmd:temporalElement>
+				</gmd:EX_Extent>
+			</gmd:extent>
+			<gmd:extent>
+				<gmd:EX_Extent>
+					<gmd:geographicElement>
+						<gmd:EX_GeographicBoundingBox>		 <!--edit these to reflect the bbox being analysed-->
+							<gmd:westBoundLongitude>
+								<gco:Decimal>112.907</gco:Decimal>
+							</gmd:westBoundLongitude>
+							<gmd:eastBoundLongitude>
+								<gco:Decimal>158.96</gco:Decimal>
+							</gmd:eastBoundLongitude>
+							<gmd:southBoundLatitude>
+								<gco:Decimal>-54.7539</gco:Decimal>
+							</gmd:southBoundLatitude>
+							<gmd:northBoundLatitude>
+								<gco:Decimal>-10.1357</gco:Decimal>
+							</gmd:northBoundLatitude>
+						</gmd:EX_GeographicBoundingBox>
+					</gmd:geographicElement>
+				</gmd:EX_Extent>
+			</gmd:extent>
+			<gmd:supplementalInformation>
+				<gco:CharacterString>Job Details PLACE RSL file here or if batch only place 1st job here Example:
+Processing by $EXE
+Walltime:
+Site:
+Queue:
+CPUs:
+Batch: True/False</gco:CharacterString>
+			</gmd:supplementalInformation>
+		</gmd:MD_DataIdentification>
+	</gmd:identificationInfo>
+	<gmd:distributionInfo>
+		<gmd:MD_Distribution>
+			<gmd:transferOptions>
+				<gmd:MD_DigitalTransferOptions>
+					<gmd:onLine>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>ftp://location.on.pbstore/where/results/are</gmd:URL>  <!--edit-->
+							</gmd:linkage>
+							<gmd:protocol>
+								<gco:CharacterString>WWW:DOWNLOAD-1.0-ftp--download</gco:CharacterString>
+							</gmd:protocol>
+							<gmd:name gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>Results for $SERIES</gco:CharacterString>  <!--edit-->
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</gmd:onLine>
+					<gmd:onLine>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:srv="http://www.isotc211.org/2005/srv">
+							<gmd:URL>http://auscope-portal-2.arrc.csiro.au:80/geonetwork/srv/en/resources.get?id=50210&amp;fname=&amp;access=private</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol>
+								<gco:CharacterString>WWW:DOWNLOAD-1.0-http--download</gco:CharacterString>
+							</gmd:protocol>
+							<gmd:name gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:name>
+							<gmd:description gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</gmd:onLine>
+				</gmd:MD_DigitalTransferOptions>
+			</gmd:transferOptions>
+		</gmd:MD_Distribution>
+	</gmd:distributionInfo>
+	<gmd:dataQualityInfo>
+		<gmd:DQ_DataQuality>
+			<gmd:scope>
+				<gmd:DQ_Scope>
+					<gmd:level>
+						<gmd:MD_ScopeCode codeListValue="dataset" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ScopeCode"/>
+					</gmd:level>
+				</gmd:DQ_Scope>
+			</gmd:scope>
+			<gmd:lineage>
+				<gmd:LI_Lineage>
+					<gmd:statement gco:nilReason="missing">
+						<gco:CharacterString/>
+					</gmd:statement>
+				</gmd:LI_Lineage>
+			</gmd:lineage>
+		</gmd:DQ_DataQuality>
+	</gmd:dataQualityInfo>
+</gmd:MD_Metadata>
+</csw:Insert>
+</csw:Transaction>

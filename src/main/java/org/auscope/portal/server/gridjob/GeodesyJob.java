@@ -51,10 +51,16 @@ public class GeodesyJob extends GridJob {
     private String    status;
     /** The submission date and time */
     private String    submitDate;
+    
+    /** A boolean to identify if Job is registered to Geonetwork */
+    private String registered;
+    
+    /** Extra info required when registering job to GN */
+    private String extraJobDetails;
 
 
 
-    /**
+	/**
      * Does some basic setting up of the class variables to prevent errors.
      * Strings are initialized to the empty String, and integers are
      * initialized with zero.
@@ -329,6 +335,33 @@ public class GeodesyJob extends GridJob {
         this.status = status;
     }
 
+    /**
+	 * @return the registered
+	 */
+	public String getRegistered() {
+		return registered;
+	}
+
+	/**
+	 * @param registered the registered to set
+	 */
+	public void setRegistered(String registered) {
+		this.registered = registered;
+	}
+	
+	/**
+	 * @return the extraJobDetails
+	 */
+	public String getExtraJobDetails() {
+		return extraJobDetails;
+	}
+
+	/**
+	 * @param extraJobDetails the extraJobDetails to set
+	 */
+	public void setExtraJobDetails(String extraJobDetails) {
+		this.extraJobDetails = extraJobDetails;
+	}
 
 	/**
      * Returns a String representing the state of this <code>GeodesyJob</code>

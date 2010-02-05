@@ -880,6 +880,7 @@ public class GridSubmitController {
                     job.setReference(submitEPR);
                     job.setStatus(status);
                     job.setSubmitDate(dateFmt);
+                    jobSupplementInfo(job);
                     jobManager.saveJob(job);
                     request.getSession().removeAttribute("jobInputDir");
                     request.getSession().removeAttribute("localJobInputDir");
@@ -903,6 +904,24 @@ public class GridSubmitController {
         return mav;
     }
 
+    /**
+     * Method that store extra job info required for registering into Geonetwork
+     * @param job
+     */
+    private void jobSupplementInfo(GeodesyJob job){
+    	StringBuilder detail = new StringBuilder();
+    	detail.append("Executed Code: "+job.getCode()+"/n");
+    	detail.append("Version: "+job.getVersion()+"/n");
+    	detail.append("Site: "+job.getSite()+"/n");
+    	detail.append("Queue on site: "+job.getQueue()+"/n");
+    	detail.append("Walltime: "+job.getMaxWallTime()+"/n");
+    	detail.append("Max Memory (MB): "+job.getMaxMemory()+"/n");
+    	detail.append("Number of CPUs: "+job.getCpuCount()+"/n");
+    	detail.append("Job Type: "+job.getJobType());
+    	
+    	//We need to store this for when register
+    	job.setExtraJobDetails(detail.toString());
+    }
     /**
      * Creates a new Job object with predefined values for some fields.
      *

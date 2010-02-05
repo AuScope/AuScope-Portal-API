@@ -21,6 +21,8 @@
         <property name="numParticles"/>
         <property name="numBonds"/>
         <property name="checkpointPrefix"/>
+        <property name="registered"/>
+        <property name="extraJobDetails"/>
     </class>
 </hibernate-mapping>
 

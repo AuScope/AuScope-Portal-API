@@ -107,7 +107,7 @@ JobList.updateJobDetails = function() {
     var jobGrid = Ext.getCmp('job-grid');
     var descEl = Ext.getCmp('description-panel').body;
     var detailsPanel = Ext.getCmp('details-panel');
-
+Ext.Msg.alert("Success", "Job selected Woooooowoooooow");
     if (JobList.prevJobId) {
         var idx = JobList.jobStore.find("id", JobList.prevJobId);
         JobList.prevJobId = undefined;
@@ -125,10 +125,18 @@ JobList.updateJobDetails = function() {
             getSelectionModel().getSelected().data.name;
         JobList.jobDescTpl.overwrite(descEl, jobData);
         detailsPanel.enable();
+        
+        if(jobData.status == 'Done' && (jobData.registered == null || jobData.registered == "")){
+           Ext.getCmp('registerButton').enable();
+        }else
+        {
+           Ext.getCmp('registerButton').disable();
+        }
     } else {
         JobList.jobFileStore.removeAll();
         detailsPanel.setActiveTab('description-tab');
         detailsPanel.disable();
+        Ext.getCmp('registerButton').disable();
     }
 }
 
@@ -197,6 +205,17 @@ JobList.querySeries = function(user, name, desc) {
         JobList.seriesStore.baseParams.qSeriesDesc = desc;
     }
     JobList.seriesStore.reload();
+}
+
+JobList.register = function() {
+	//var jobData = jobGrid.getSelectionModel().getSelected().data;
+	var jobId = Ext.getCmp('job-grid').getSelectionModel().getSelected().data.id;
+    Ext.Ajax.request({
+        url: 'insertRecord.do',
+        success: JobList.onRegisterResponse,
+        failure: JobList.onRequestFailure, 
+        params: {'jobId': jobId }
+    });
 }
 
 JobList.retrieveFiles = function(jobId) {
@@ -409,6 +428,7 @@ JobList.initialize = function() {
             { name: 'reference', type: 'string' },
             { name: 'scriptFile', type: 'string' },
             { name: 'status', type: 'string'},
+            { name: 'registered', type: 'string'},
             { name: 'submitDate', type: 'date', dateFormat: 'Ymd_His' }
         ],
         listeners: {
@@ -545,7 +565,14 @@ JobList.initialize = function() {
                             JobList.updateJobDetails();
                          }
                        }
-        }),
+        }),        
+        buttons: [{
+            text: 'Register to GeoNetwork',
+            id: 'registerButton',
+            disabled : true,
+            tooltip: 'Register the job result into GeoNetwork',
+            handler: JobList.register
+        }],
         stripeRows: true
     });
 
@@ -682,7 +709,8 @@ JobList.initialize = function() {
         '<tr><td class="jobdesc-key">Part of series:</td><td>{seriesName}</td></tr>',
         '<tr><td class="jobdesc-key">Submitted on:</td><td>{submitDate}</td></tr>',
         '<tr><td class="jobdesc-key">Computation site:</td><td>{site}</td></tr>',
-        '<tr><td class="jobdesc-key">Version:</td><td>{version}</td></tr></table><br/>',
+        '<tr><td class="jobdesc-key">Version:</td><td>{version}</td></tr>',
+        '<tr><td class="jobdesc-key">Geonetwork url:</td><td><a href="{registered}"/></td></tr></table><br/>',
         '<p class="jobdesc-key">Description:</p><br/><p>{description}</p>'
     );
     JobList.jobDescTpl.compile();
