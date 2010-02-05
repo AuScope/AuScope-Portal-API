@@ -51,5 +51,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   numTimesteps integer,
   numParticles integer,
   numBonds integer,
-  checkpointPrefix varchar(255)
+  checkpointPrefix varchar(255),
+  registered varchar(255),
+  extraJobDetails varchar(255)
   );
