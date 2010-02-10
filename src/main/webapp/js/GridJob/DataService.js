@@ -179,6 +179,7 @@ DataService.initialize = function(){
         buttons: [{
             text: 'Zip for Download',
             tooltip: 'Zip selected files for download',
+            disabled : true,
             handler: DataService.zip4Download
         },
         {
