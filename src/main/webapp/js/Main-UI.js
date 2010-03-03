@@ -682,8 +682,8 @@ Ext.onReady(function() {
         height: 200,
         autoScroll: true,
         items:[
-            complexFeaturesPanel,
-            wmsLayersPanel
+            complexFeaturesPanel
+            //wmsLayersPanel
         ]
     });
 
@@ -788,6 +788,6 @@ Ext.onReady(function() {
     //new Ext.LoadMask(wmsLayersPanel.el, {msg: 'Please Wait...', store: wmsLayersStore});
 
     complexFeaturesStore.load();
-    wmsLayersStore.load();
+    //wmsLayersStore.load();
 
 });

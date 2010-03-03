@@ -21,10 +21,10 @@
     <bean id="knownTypes" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-                <ref bean="knownTypeMine" />
+                <!-- <ref bean="knownTypeMine" />
                 <ref bean="knownTypeMineralOccurrence" />
                 <ref bean="knownTypeMiningActivity" />
-                <ref bean="knownTypeBorehole" />
+                <ref bean="knownTypeBorehole" />  -->
                 <ref bean="knownTypeGeodesy" />
             </list>
         </constructor-arg>
