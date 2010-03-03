@@ -5,7 +5,7 @@
  * @param statusBar
  * @param viewport
  */
-var gMapClickController = function(map, overlay, latlng, statusBar, viewport, activeLayersStore) {
+var gMapClickController = function(map, overlay, latlng, viewport, activeLayersStore) {
 
     if (overlay instanceof GMarker) {
         if (overlay.typeName == "gsml:Borehole") {
