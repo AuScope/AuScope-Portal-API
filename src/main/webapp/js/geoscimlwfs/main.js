@@ -311,7 +311,7 @@ function getXmlTextForAllCheckedDataUrls() {
     num_stations = group.length;
     // Loop over all the stations in the group
     for (i in geoMarkers) {
-      if(i != 'remove') //Only process the stations. JS adds functions to the Array.
+      if(typeof geoMarkers[i] != 'function') //Only process the stations. JS adds functions to the Array.
       {  
 	      // Loop over all years for the station
 	      for (var year_index=0; year_index<gaYears.length; year_index++) {
