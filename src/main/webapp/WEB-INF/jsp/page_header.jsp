@@ -27,7 +27,13 @@
             <li ><a href="joblist.html">Monitor Jobs<span></span></a></li>
             <li ><a href="http://apacsrv1.arrc.csiro.au/wms_v0.9dev/">GPS View<span></span></a></li>
             
-            <li ><a href="login.html">Login<span></span></a></li>
+            <security:authorize ifAllGranted="ROLE_ANONYMOUS">
+            	<li ><a href="login.html">Login<span></span></a></li>
+            </security:authorize>
+            
+            <security:authorize ifNotGranted="ROLE_ANONYMOUS">
+            	<li ><a href="/Shibboleth.sso/Logout">Logout<span></span></a></li>
+            </security:authorize>
          </ul>
       </div>
    </div>
