@@ -18,6 +18,8 @@
       <intercept-url pattern="/**" filters="none" />
       <concurrent-session-control max-sessions="1"/>
       <s:anonymous/>
+      <!-- This is picked up by apache and redirected to the actual shib logout -->
+      <s:logout logout-success-url="/ShibLogout"/>
    </http>
       
    <authentication-manager alias="authenticationManager" />

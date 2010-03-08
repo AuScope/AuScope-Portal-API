@@ -32,7 +32,7 @@
             </security:authorize>
             
             <security:authorize ifNotGranted="ROLE_ANONYMOUS">
-            	<li ><a href="/Shibboleth.sso/Logout">Logout<span></span></a></li>
+            	<li ><a href="j_spring_security_logout">Logout<span></span></a></li>
             </security:authorize>
          </ul>
       </div>
