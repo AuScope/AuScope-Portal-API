@@ -475,6 +475,8 @@ public class JobListController {
                                  HttpServletResponse response) {
 
         String jobIdStr = request.getParameter("jobId");
+        String dirPathStr = request.getParameter("dirPath");
+        String dirNameStr = request.getParameter("dirName");
         GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
         Object credential = request.getSession().getAttribute("userCred");
@@ -493,59 +495,38 @@ public class JobListController {
         } else {
             logger.warn("No job ID specified!");
         }
-        GridFTPClient gridStore = null;
+        
+        FileInformation[] fileDetails = new FileInformation[0];
         if (job == null) {
             final String errorString = "The requested job was not found.";
             logger.error(errorString);
             mav.addObject("error", errorString);
 
         } else {
-    		try {
-    			gridStore = new GridFTPClient(gridAccess.getRepoHostName(), gridAccess.getRepoHostFTPPort());		
-    			gridStore.authenticate((GSSCredential)credential); //authenticating
-    			gridStore.setDataChannelAuthentication(DataChannelAuthentication.SELF);
-    			gridStore.setDataChannelProtection(GridFTPSession.PROTECTION_SAFE);
-    			logger.debug("Change to Grid StageOut dir:"+job.getOutputDir());
-    			gridStore.changeDir(job.getOutputDir());
-    			logger.debug("List files in StageOut dir:"+gridStore.getCurrentDir());
-    			gridStore.setType(GridFTPSession.TYPE_ASCII);
-    			gridStore.setPassive();
-    			gridStore.setLocalActive();
-    			
-
-    			//gridStore.setTCPBufferSize(32*1024);
-    			Vector list = gridStore.list("*");
-    			FileInformation[] fileDetails = null;
-    			if (list != null && !(list.isEmpty())) {
-        			fileDetails = new FileInformation[list.size()];
-        			for (int i = list.size() - 1; i >= 0; i--) {
-        				FileInfo fInfo = (FileInfo) list.get(i);
-                        fileDetails[i] = new FileInformation(
-                        		fInfo.getName(), fInfo.getSize());
-        			}                    
-    			} else{
-                    // Files not staged out (yet)
-                    fileDetails = new FileInformation[0];
-    			}
-    			mav.addObject("files", fileDetails);
-    		} catch (ServerException e) {
-    			logger.error("GridFTP ServerException: " + e.getMessage());
-    		} catch (IOException e) {
-    			logger.error("GridFTP IOException: " + e.getMessage());
-    		} catch (Exception e) {
-    			logger.error("GridFTP Exception: " + e.getMessage());
-    		}
-    		finally{
-    			try{
-    				if(gridStore != null)
-    					gridStore.close();
-    			}catch (Exception e) {
-        			logger.error("GridFTP Exception: " + e.getMessage());
+        	if(dirPathStr == null){
+        		fileDetails = getDirectoryListing(job.getOutputDir(), credential);
+        	}else{
+        		if(dirNameStr == null || dirNameStr.equals(".")){
+        		   fileDetails = getDirectoryListing(dirPathStr, credential);
+        		}else if(dirNameStr.equals("..")){
+        			// This is the top directory for this job, cannot allow further up
+        			if(dirPathStr.equals(job.getOutputDir()))
+        				fileDetails = getDirectoryListing(dirPathStr, credential);
+        			else
+        			{
+        		        //Going one directory up
+        				String tempDir = dirPathStr.substring(0, (dirPathStr.length() -1));
+        		        fileDetails = getDirectoryListing(tempDir.substring(0, (tempDir.lastIndexOf("/")+1)), credential);
+        			}
+        		}else{        		   
+        		   fileDetails = getDirectoryListing(dirPathStr+dirNameStr+"/", credential);
         		}
-    		}
+        	}
         }
+        mav.addObject("files", fileDetails);
     	return mav;
     }
+    
 
     /**
      * Sends the contents of a job file to the client.
@@ -923,5 +904,54 @@ public class JobListController {
         return new ModelAndView(
                 new RedirectView("/scriptbuilder.html", true, false, false));
     }
+    /**
+     * This method using GridFTP Client returns directory list of stageOut directory 
+     * and sub directories.
+     * @param fullDirname
+     * @param credential
+     * @return
+     */
+	private FileInformation[] getDirectoryListing(String fullDirname, Object credential){
+		GridFTPClient gridStore = null;
+		FileInformation[] fileDetails = new FileInformation[0];
+		try {
+			gridStore = new GridFTPClient(gridAccess.getRepoHostName(), gridAccess.getRepoHostFTPPort());		
+			gridStore.authenticate((GSSCredential)credential); //authenticating
+			gridStore.setDataChannelAuthentication(DataChannelAuthentication.SELF);
+			gridStore.setDataChannelProtection(GridFTPSession.PROTECTION_SAFE);
+			logger.debug("Change to Grid StageOut dir:"+fullDirname);
+			gridStore.changeDir(fullDirname);
+			logger.debug("List files in StageOut dir:"+gridStore.getCurrentDir());
+			gridStore.setType(GridFTPSession.TYPE_ASCII);
+			gridStore.setPassive();
+			gridStore.setLocalActive();
+			
+			Vector list = gridStore.list("*");
+
+			if (list != null && !(list.isEmpty())) {
+				fileDetails = new FileInformation[list.size()];
+				for (int i = list.size() - 1; i >= 0; i--) {
+					FileInfo fInfo = (FileInfo) list.get(i);
+		            fileDetails[i] = new FileInformation(
+		            		fInfo.getName(), fInfo.getSize(), fullDirname, fInfo.isDirectory());
+				}                    
+			} 
+		} catch (ServerException e) {
+			logger.error("GridFTP ServerException: " + e.getMessage());
+		} catch (IOException e) {
+			logger.error("GridFTP IOException: " + e.getMessage());
+		} catch (Exception e) {
+			logger.error("GridFTP Exception: " + e.getMessage());
+		}
+		finally{
+			try{
+				if(gridStore != null)
+					gridStore.close();
+			}catch (Exception e) {
+				logger.error("GridFTP Exception: " + e.getMessage());
+			}
+		}
+		return fileDetails;
+	}    
 }
 

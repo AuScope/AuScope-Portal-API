@@ -23,6 +23,10 @@ public class FileInformation implements Serializable {
     private long size;
     /** The subJob the file belongs to */
     private String subJob = "";
+    /** isDirectory flag */
+    private boolean directoryFlag = false;
+    /** parent directory path */
+    private String parentPath = "";
 
     /**
 	 * @return the subJob
@@ -53,6 +57,16 @@ public class FileInformation implements Serializable {
         this.name = name;
         setSize(size);
         this.subJob = subJob;
+    }
+    
+	/**
+     * Constructor with name and size
+     */
+    public FileInformation(String name, long size, String dirPath, boolean isDirectory) {
+        this.name = name;
+        setSize(size);
+        this.parentPath = dirPath;
+        this.directoryFlag = isDirectory;
     }
     
     /**
@@ -100,5 +114,34 @@ public class FileInformation implements Serializable {
         this.size = size;
         readableSize = NumberFormat.getInstance().format(size);
     }
+
+	/**
+	 * @return the directoryFlag
+	 */
+	public boolean getDirectoryFlag() {
+		return directoryFlag;
+	}
+
+	/**
+	 * @param directoryFlag the directoryFlag to set
+	 */
+	public void setDirectoryFlag(boolean directoryFlag) {
+		this.directoryFlag = directoryFlag;
+	}
+
+	/**
+	 * @return the parentPath
+	 */
+	public String getParentPath() {
+		return parentPath;
+	}
+
+	/**
+	 * @param parentPath the parentPath to set
+	 */
+	public void setParentPath(String parentPath) {
+		this.parentPath = parentPath;
+	}
+
 }
 

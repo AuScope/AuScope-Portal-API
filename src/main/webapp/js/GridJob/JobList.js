@@ -72,6 +72,16 @@ JobList.onRetrieveFilesResponse = function(response, request) {
     }
 }
 
+JobList.onRegisterResponse = function(response, request) {
+    var resp = Ext.decode(response.responseText);
+    if (resp.error != null) {
+        JobList.showError(resp.error);
+    } else {
+    	JobList.refreshAll();
+        Ext.Msg.alert("Success", "The job is registered.");
+        
+    }
+}
 ////////////////////////
 ////// Functions ///////
 ////////////////////////
@@ -107,7 +117,7 @@ JobList.updateJobDetails = function() {
     var jobGrid = Ext.getCmp('job-grid');
     var descEl = Ext.getCmp('description-panel').body;
     var detailsPanel = Ext.getCmp('details-panel');
-Ext.Msg.alert("Success", "Job selected Woooooowoooooow");
+
     if (JobList.prevJobId) {
         var idx = JobList.jobStore.find("id", JobList.prevJobId);
         JobList.prevJobId = undefined;
@@ -120,7 +130,13 @@ Ext.Msg.alert("Success", "Job selected Woooooowoooooow");
     if (jobGrid.getSelectionModel().getSelected()) {
         var jobData = jobGrid.getSelectionModel().getSelected().data;
         JobList.jobFileStore.baseParams.jobId = jobData.id;
-        JobList.jobFileStore.reload();
+        if(jobData.status == 'Done'){
+    		JobList.jobFileStore.baseParams.dirName = null;
+    		JobList.jobFileStore.baseParams.dirPath = null;        	
+            JobList.jobFileStore.reload();
+        }else{
+            JobList.jobFileStore.removeAll(true);
+        }
         jobData.seriesName = Ext.getCmp('series-grid').
             getSelectionModel().getSelected().data.name;
         JobList.jobDescTpl.overwrite(descEl, jobData);
@@ -139,6 +155,18 @@ Ext.Msg.alert("Success", "Job selected Woooooowoooooow");
         Ext.getCmp('registerButton').disable();
     }
 }
+
+//retrieves dirList of selected job and updates the Details panel
+JobList.retrieveDirList = function(jobId, fileData) {
+	
+	if(fileData.directoryFlag == true){
+		JobList.jobFileStore.baseParams.jobId = jobId;
+		JobList.jobFileStore.baseParams.dirName = fileData.name;
+		JobList.jobFileStore.baseParams.dirPath = fileData.parentPath;
+		JobList.jobFileStore.reload();
+	}
+}
+
 
 // retrieves list of jobs of selected series
 JobList.updateJobList = function() {
@@ -444,7 +472,9 @@ JobList.initialize = function() {
         sortInfo: { field: 'name', direction: 'ASC' },
         fields: [
             { name: 'name', type: 'string' },
-            { name: 'size', type: 'int' }
+            { name: 'size', type: 'int' },
+            { name: 'parentPath', type: 'string' },
+            { name: 'directoryFlag', type: 'bool' }
         ],
         listeners: {
             'beforeload': JobList.showProgressDlg,
@@ -687,8 +717,8 @@ JobList.initialize = function() {
     fileGrid.on({
         'rowdblclick': function(grid, rowIndex, e) {
             var jobData = jobGrid.getSelectionModel().getSelected().data;
-            var fileName = grid.getStore().getAt(rowIndex).data.name;
-            JobList.downloadFile(jobData.id, fileName);
+            var fileData = grid.getStore().getAt(rowIndex).data;
+            JobList.retrieveDirList(jobData.id, fileData);
         },
         'rowcontextmenu': function(grid, rowIndex, e) {
             grid.getSelectionModel().selectRow(rowIndex);
