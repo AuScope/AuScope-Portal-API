@@ -820,7 +820,7 @@ function GeodesyMarker_getSubmitButtonFn () {
       var postBody = "mySelection=" + xmlFragment;
       GDownloadUrl(url, function(response, pResponseCode) {
           if(pResponseCode == 200) {
-        	  alert("Data Saved");
+        	  alert("Selected points are now available in the Data Service Tool");
           }else
           {
         	  alert(pResponseCode);
