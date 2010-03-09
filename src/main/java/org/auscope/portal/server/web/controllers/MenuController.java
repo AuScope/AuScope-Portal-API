@@ -149,6 +149,11 @@ public class MenuController {
    public ModelAndView data_service_tool() {
       return new ModelAndView("data_service_tool");
    }
+   
+   @RequestMapping("/gpsview.html")
+   public ModelAndView gpsview() {
+      return new ModelAndView("gpsview");
+   }
  
    @RequestMapping("/gridsubmit.html")
    public ModelAndView gridsubmit(HttpServletRequest request) {
