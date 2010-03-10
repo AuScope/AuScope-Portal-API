@@ -565,7 +565,7 @@ GridSubmit.initialize = function() {
                     }
                     var p = new ParamLines({
                          paramID: jobID,
-                         paramLine: 'Enter new Arg ...'
+                         paramLine: '-d [yr] [days] -orbit SIOF -expt test -eops usno -nogifs -ftp_prog wget'
                     });
                     //add param line and stop edit the grid
                     myGrid.stopEditing();
