@@ -34,6 +34,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import org.auscope.portal.server.util.Util;;
 
+/**
+ * Controller that handles insert records into Geonetwork request.
+ *
+ * @author Abdi Jama
+ * Date: 13/01/2010
+ * Time: 10:18:21 AM
+ */
 @Controller
 public class GNController {
     protected final Log logger = LogFactory.getLog(getClass().getName());
@@ -51,6 +58,13 @@ public class GNController {
         this.serviceCaller = serviceCaller;
     }
 
+    /**
+     * Request that inserts details of the job into GeoNetwork
+     * @param jobId
+     * @param request
+     * @return JasonArray with success set to true or false.
+     * @throws Exception
+     */
     @RequestMapping("/insertRecord.do")
     public ModelAndView insertRecord(@RequestParam("jobId") final String jobId,
                                            HttpServletRequest request) throws Exception {
@@ -74,23 +88,26 @@ public class GNController {
         	{
                 serviceUrl =
                 	hostConfigurer.resolvePlaceholder("HOST.cswservice.url");
+                //Need to share same HttpClient for login and insert requests.
+                
             	HttpClient httpClient = serviceCaller.getHttpClient();
-            	//Logout first
+            	// Logout first
+            	// The url is like this "http://hostname/geonetwork/srv/en/xml.user.logout"
                 String gnResponse = serviceCaller.getMethodResponseAsString(new ICSWMethodMaker() {
                     public HttpMethodBase makeMethod() {
-                    	GetMethod method = new GetMethod("http://auscope-portal-2.arrc.csiro.au/geonetwork/srv/en/xml.user.logout");
+                    	GetMethod method = new GetMethod(serviceUrl.replaceFirst("csw", "xml.user.logout"));
                         return method;
                     }
                 }.makeMethod(), httpClient);
                 logger.debug("Logout in response: "+gnResponse);
                 
-              //Logout first
+                // Login
+                // Login url is like this "http://hostname/geonetwork/srv/en/xml.user.login"
                 gnResponse = serviceCaller.getMethodResponseAsString(new ICSWMethodMaker() {
                     public HttpMethodBase makeMethod() {
-                    	GetMethod method = new GetMethod("http://auscope-portal-2.arrc.csiro.au/geonetwork/srv/en/xml.user.login");
+                    	GetMethod method = new GetMethod(serviceUrl.replaceFirst("csw", "xml.user.login"));
 
                         //set all of the parameters
-
                         NameValuePair username = new NameValuePair("username", "admin");
                         NameValuePair password = new NameValuePair("password", "auscope#geonetwork");
 
@@ -124,7 +141,7 @@ public class GNController {
                 if(response != ""){
                 	//TODO get the GN url from config file
                 	//update job record
-                	job.setRegistered("http://auscope-portal-2.arrc.csiro.au/geonetwork/srv/en/metadata.show?uuid="+response);
+                	job.setRegistered(serviceUrl.replaceFirst("csw", "metadata.show?uuid="+response));
                 	jobManager.saveJob(job);
                 	mav.addObject("success", true );
                 }else
@@ -145,7 +162,7 @@ public class GNController {
     }
 
     /**
-     * Returns the record id if if insert was success otherwise empty string
+     * Returns the record id if insert was success otherwise empty string
      *  
      * @param response
      * @return

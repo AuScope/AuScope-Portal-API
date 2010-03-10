@@ -1,10 +1,8 @@
-/**
- * 
- */
 package org.auscope.portal.server.gridjob;
 
 /**
- * @author 
+ * Simple class that holds info required when registering jobs to Geonetwork.
+ * @author Abdi Jama
  *
  */
 public class GeodesyRecordInfo {

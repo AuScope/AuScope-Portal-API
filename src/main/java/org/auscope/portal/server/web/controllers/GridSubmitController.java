@@ -910,13 +910,13 @@ public class GridSubmitController {
      */
     private void jobSupplementInfo(GeodesyJob job){
     	StringBuilder detail = new StringBuilder();
-    	detail.append("Executed Code: "+job.getCode()+"/n");
-    	detail.append("Version: "+job.getVersion()+"/n");
-    	detail.append("Site: "+job.getSite()+"/n");
-    	detail.append("Queue on site: "+job.getQueue()+"/n");
-    	detail.append("Walltime: "+job.getMaxWallTime()+"/n");
-    	detail.append("Max Memory (MB): "+job.getMaxMemory()+"/n");
-    	detail.append("Number of CPUs: "+job.getCpuCount()+"/n");
+    	detail.append("Executed Code: "+job.getCode()+"\n");
+    	detail.append("Version: "+job.getVersion()+"\n");
+    	detail.append("Site: "+job.getSite()+"\n");
+    	detail.append("Queue on site: "+job.getQueue()+"\n");
+    	detail.append("Walltime: "+job.getMaxWallTime()+"\n");
+    	detail.append("Max Memory (MB): "+job.getMaxMemory()+"\n");
+    	detail.append("Number of CPUs: "+job.getCpuCount()+"\n");
     	detail.append("Job Type: "+job.getJobType());
     	
     	//We need to store this for when register

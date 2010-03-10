@@ -63,12 +63,26 @@ public class PortalPropertyPlaceholderConfigurer extends PropertyPlaceholderConf
 
       try {
          if (placeholder.startsWith("HOST.")) {
-            log.debug("Host: " + InetAddress.getLocalHost().getHostName()
+            log.info("Local Host: " + InetAddress.getLocalHost().getHostName()
                                + " for property " + placeholder);
-            String hostname = placeholder.replaceFirst("HOST",InetAddress.getLocalHost().getHostName());
-            String prop = props.getProperty(hostname);
             
-            if (prop == null) log.warn("Please define property: " + hostname);
+            String hostname = InetAddress.getLocalHost().getHostName();
+            
+            // Make sure that getHostName() did not returned FQHN
+            String search = ".";
+            int j = hostname.indexOf(search);
+            if (j!=-1)
+               hostname = hostname.substring(0,j);
+            
+            log.debug("Host Name: " + hostname);
+            
+            String property = placeholder.replaceFirst("HOST",hostname);
+            
+            log.info("Translated property: " + property);
+            
+            String prop = props.getProperty(property);
+            
+            if (prop == null) log.warn("Please define property: " + property);
            
             return prop;
          } else { 
@@ -79,5 +93,4 @@ public class PortalPropertyPlaceholderConfigurer extends PropertyPlaceholderConf
          return null;
       }
    }
-   
 }

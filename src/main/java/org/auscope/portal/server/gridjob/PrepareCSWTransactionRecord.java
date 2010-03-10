@@ -58,10 +58,6 @@ public class PrepareCSWTransactionRecord {
 		if(info != null)
 		{
 			try{
-				/* Get the XML File */
-				//String fileName = "/WEB-INF/xml/GNRecord.xml";
-				//logger.debug(fileName);
-				//File file = new File(fileName);
 				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 				DocumentBuilder db = dbf.newDocumentBuilder();
 				doc = db.parse(file);
@@ -90,9 +86,6 @@ public class PrepareCSWTransactionRecord {
 		                                                  format);
 		      serial.serialize(doc);
 
-	        //StringWriter stw = new StringWriter();
-	        //Transformer serializer = TransformerFactory.newInstance().newTransformer();
-	        //serializer.transform(new DOMSource(doc), new StreamResult(stw));
 	        return stringOut.toString(); 
 		}catch(Exception e){
 			logger.error("Converting CSWTRecord XML Failed:"+e.getMessage());
