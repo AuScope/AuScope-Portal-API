@@ -783,11 +783,19 @@ public class JobListController {
                         if (newState != null && !state.equals(newState)) {
                             j.setStatus(newState);
                             jobManager.saveJob(j);
+                        }else if(newState == null){ 
+                        	if (directoryExist(j.getOutputDir(), credential)){
+                                // job might have finished but status cannot be
+                                // retrieved anymore -> a good heuristics is to check
+                                // if the job files have been staged out and assume
+                                // success if that is the case.
+                                j.setStatus("Done");
+                                jobManager.saveJob(j);                        	   
+                            }else{
+                            	j.setStatus("Failed");
+                                jobManager.saveJob(j);
+                            }                            
                         }
-                        // TODO: job might have finished but status cannot be
-                        // retrieved anymore -> a good heuristics is to check
-                        // if the job files have been staged out and assume
-                        // success if that is the case.
                     }
                 }
             }
@@ -952,6 +960,38 @@ public class JobListController {
 			}
 		}
 		return fileDetails;
-	}    
+	}
+	
+	private boolean directoryExist(String fullDirname, Object credential){
+		GridFTPClient gridStore = null;
+		boolean rtnValue = true;
+		try {
+			gridStore = new GridFTPClient(gridAccess.getRepoHostName(), gridAccess.getRepoHostFTPPort());		
+			gridStore.authenticate((GSSCredential)credential); //authenticating
+			gridStore.setDataChannelAuthentication(DataChannelAuthentication.SELF);
+			gridStore.setDataChannelProtection(GridFTPSession.PROTECTION_SAFE);
+			logger.debug("Change to Grid StageOut dir:"+fullDirname);
+			gridStore.changeDir(fullDirname);
+			
+		} catch (ServerException e) {
+			logger.error("GridFTP ServerException: " + e.getMessage());
+			rtnValue = false;
+		} catch (IOException e) {
+			logger.error("GridFTP IOException: " + e.getMessage());
+			rtnValue = false;
+		} catch (Exception e) {
+			logger.error("GridFTP Exception: " + e.getMessage());
+			rtnValue = false;
+		}
+		finally{
+			try{
+				if(gridStore != null)
+					gridStore.close();
+			}catch (Exception e) {
+				logger.error("GridFTP Exception: " + e.getMessage());
+			}
+		}
+		return rtnValue;		
+	}
 }
 

@@ -631,14 +631,10 @@ JobList.initialize = function() {
     // File Grid & functions
     //
     function fileTypeRenderer(value, cell, record) {
-        var jobData = jobGrid.getSelectionModel().getSelected().data;
-        if (value == jobData.scriptFile) {
-            return '<span style="font-weight:bold;">*' + value + '</span>';
-        } else if (value.lastIndexOf(".py") == value.length-3) {
-            return '<span style="color:green;">' + value + '</span>';
-        } else if (jobData.checkpointPrefix.length > 0 &&
-                value.indexOf(jobData.checkpointPrefix) == 0) {
-            return '<span style="color:blue;">' + value + '</span>';
+        var fileData = jobGrid.getSelectionModel().getSelected().data;
+        
+        if(record.data.directoryFlag){
+        	return '<span style="color:blue;">' + value + '</span>';
         }
         return value;
     }
@@ -740,7 +736,7 @@ JobList.initialize = function() {
         '<tr><td class="jobdesc-key">Submitted on:</td><td>{submitDate}</td></tr>',
         '<tr><td class="jobdesc-key">Computation site:</td><td>{site}</td></tr>',
         '<tr><td class="jobdesc-key">Version:</td><td>{version}</td></tr>',
-        '<tr><td class="jobdesc-key">Geonetwork url:</td><td><a href="{registered}"/></td></tr></table><br/>',
+        '<tr><td class="jobdesc-key">Geonetwork url:</td><td><a href="{registered}">{registered}</a></td></tr></table><br/>',
         '<p class="jobdesc-key">Description:</p><br/><p>{description}</p>'
     );
     JobList.jobDescTpl.compile();
