@@ -657,6 +657,7 @@ GridSubmit.initialize = function() {
         frame: true,
         defaults: { anchor: "100%" },
         labelWidth: 150,
+        autoScroll: true,
         items: [ {
             xtype: 'combo',
             id: 'codeCombo',
