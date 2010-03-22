@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -430,11 +431,13 @@ public class GridSubmitController {
         List files = new ArrayList<FileInformation>();
 
         if (jobInputDir != null) {
-        	if(jobType != null && jobType.equals("multi")){
-	            File dir = new File(jobInputDir+GridSubmitController.RINEX_DIR+File.separator);
-	            addFileNamesOfDirectory(files, dir, GridSubmitController.FOR_ALL);
-	            dir = new File(jobInputDir+GridSubmitController.TABLE_DIR+File.separator);
-	            addFileNamesOfDirectory(files, dir, GridSubmitController.FOR_ALL);
+        	if(jobType != null ){
+        		String filePath = jobInputDir+GridSubmitController.RINEX_DIR;
+	            File dir = new File(filePath+File.separator);
+	            addFileNamesOfDirectory(files, dir, GridSubmitController.FOR_ALL, filePath);
+	            filePath = jobInputDir+GridSubmitController.TABLE_DIR;
+	            dir = new File(filePath+File.separator);
+	            addFileNamesOfDirectory(files, dir, GridSubmitController.FOR_ALL, filePath);
 	            logger.debug("Inside listJobFiles.do multi job");
 	            boolean subJobExist = true;
 	            int i = 0;
@@ -442,15 +445,17 @@ public class GridSubmitController {
 	            	String subDirID = "subJob_"+i;
 	            	File subDir = new File(jobInputDir+subDirID+File.separator);
 	            	if(subDir.exists()){
-	            		subDir = new File(jobInputDir+subDirID+File.separator
-	            				+GridSubmitController.RINEX_DIR+File.separator);
+	            		//list rinex dir
+	            		filePath = jobInputDir+subDirID+File.separator+GridSubmitController.RINEX_DIR;
+	            		subDir = new File(filePath +File.separator);
 	            		if(subDir.exists()){
-	            			addFileNamesOfDirectory(files, dir, subDirID);
+	            			addFileNamesOfDirectory(files, dir, subDirID, filePath);
 	            		}
-	            		subDir = new File(jobInputDir+subDirID+File.separator
-	            				+GridSubmitController.TABLE_DIR+File.separator);
+	            		//list tables dir
+	            		filePath = jobInputDir+subDirID+File.separator+GridSubmitController.TABLE_DIR;
+	            		subDir = new File(filePath+File.separator);
 	            		if(subDir.exists()){
-	            			addFileNamesOfDirectory(files, dir, subDirID);
+	            			addFileNamesOfDirectory(files, dir, subDirID, filePath);
 	            		}
 	            	}
 	            	else
@@ -461,19 +466,86 @@ public class GridSubmitController {
 	            	i++;
 	            }
 	             
-        	}else{
+        	}/*else{
         		logger.debug("Inside listJobFiles.do single job");
-	            File dir = new File(jobInputDir+GridSubmitController.RINEX_DIR+File.separator);
-	            addFileNamesOfDirectory(files, dir, GridSubmitController.FOR_ALL);
-	            dir = new File(jobInputDir+GridSubmitController.TABLE_DIR+File.separator);
-	            addFileNamesOfDirectory(files, dir, GridSubmitController.FOR_ALL);
-        	}
+        		String filePath = jobInputDir+GridSubmitController.RINEX_DIR;
+	            File dir = new File(filePath+File.separator);
+	            addFileNamesOfDirectory(files, dir, GridSubmitController.FOR_ALL, filePath);
+	            
+	            filePath = jobInputDir+GridSubmitController.TABLE_DIR;
+	            dir = new File(filePath+File.separator);
+	            addFileNamesOfDirectory(files, dir, GridSubmitController.FOR_ALL, filePath);
+        	}*/
         }
 
         logger.debug("Returning list of "+files.size()+" files.");
         return new ModelAndView("jsonView", "files", files);
     }
 
+    /**
+     * Sends the contents of a input job file to the client.
+     *
+     * @param request The servlet request including a filename parameter
+     *                
+     * @param response The servlet response receiving the data
+     *
+     * @return null on success or the joblist view with an error parameter on
+     *         failure.
+     */
+    @RequestMapping("/downloadInputFile.do")
+    public ModelAndView downloadFile(HttpServletRequest request,
+                                     HttpServletResponse response) {
+
+        String dirPathStr = request.getParameter("dirPath");
+        String fileName = request.getParameter("filename");
+        String errorString = null;
+        
+        if (dirPathStr != null && fileName != null) {
+            logger.debug("Downloading: "+dirPathStr+fileName+".");
+            File f = new File(dirPathStr+File.separator+fileName);
+            if (!f.canRead()) {
+                logger.error("File "+f.getPath()+" not readable!");
+                errorString = new String("File could not be read.");
+            } else {
+                response.setContentType("application/octet-stream");
+                response.setHeader("Content-Disposition",
+                        "attachment; filename=\""+fileName+"\"");
+
+                try {
+                    byte[] buffer = new byte[16384];
+                    int count = 0;
+                    OutputStream out = response.getOutputStream();
+                    FileInputStream fin = new FileInputStream(f);
+                    while ((count = fin.read(buffer)) != -1) {
+                        out.write(buffer, 0, count);
+                    }
+                    out.flush();
+                    return null;
+
+                } catch (IOException e) {
+                    errorString = new String("Could not send file: " +
+                            e.getMessage());
+                    logger.error(errorString);
+                }
+            }
+        }
+
+        // We only end up here in case of an error so return a suitable message
+        if (errorString == null) {
+            if (dirPathStr == null) {
+                errorString = new String("Invalid input job file path specified!");
+                logger.error(errorString);
+            } else if (fileName == null) {
+                errorString = new String("No filename provided!");
+                logger.error(errorString);
+            } else {
+                // should never get here
+                errorString = new String("Something went wrong.");
+                logger.error(errorString);
+            }
+        }
+        return new ModelAndView("jsonView", "error", errorString);
+    }
     
     /**
      * Processes a file upload request returning a JSON object which indicates
@@ -1310,7 +1382,7 @@ public class GridSubmitController {
 	}
 
 	/**
-	 * function that check if the file
+	 * function that checks the file type is rinex or not
 	 * @param fileName
 	 * @return
 	 */
@@ -1325,15 +1397,24 @@ public class GridSubmitController {
 	  }
 	  return rtnValue;
 	}
-	
-	private void addFileNamesOfDirectory(List files, File dir, String subJob){
+	/**
+	 * Funtion th
+	 * @param files
+	 * @param dir
+	 * @param subJob
+	 */
+	private void addFileNamesOfDirectory(List files, File dir, String subJob, String filePath){
         String fileNames[] = dir.list();
         logger.debug("Inside listJobFiles.do adding files.");
         for (int i=0; i<fileNames.length; i++) {
             File f = new File(dir, fileNames[i]);
-            files.add(new FileInformation(fileNames[i], f.length(), subJob));     
+            FileInformation fileInfo = new FileInformation(fileNames[i], f.length(), subJob);
+            fileInfo.setParentPath(filePath);
+            logger.debug("File path is:"+filePath);
+            files.add(fileInfo);     
         }
 	}
+	
 	/**
 	 * Simple object to hold Grid file transfer status.
 	 * @author jam19d

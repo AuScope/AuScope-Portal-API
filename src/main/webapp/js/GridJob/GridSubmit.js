@@ -130,7 +130,8 @@ GridSubmit.onFileListResponse = function(response, request) {
         var newFile = new GridSubmit.FileRecord({
             name: resp.files[i].name,
             size: resp.files[i].size,
-            subJob: resp.files[i].subJob
+            subJob: resp.files[i].subJob,
+            parentPath: resp.files[i].parentPath
         });
         fileStore.add(newFile);
     }
@@ -385,6 +386,34 @@ GridSubmit.confirmCancel = function() {
     });
 }
 
+//downloads given file specified.
+GridSubmit.downloadFile = function(filePath, file) {
+    var body = Ext.getBody();
+    var frame = body.createChild({
+        tag:'iframe',
+        cls:'x-hidden',
+        id:'iframe',
+        name:'iframe'
+    });
+    var myGrid = Ext.getCmp('file-grid');
+    var jobData = myGrid.getSelectionModel().getSelected().data;
+    var params = {dirPath: jobData.parentPath, filename: jobData.name};
+    var form = body.createChild({
+        tag:'form',
+        cls:'x-hidden',
+        id:'form',
+        //action: 'downloadInputFile.do?'+Ext.urlEncode(params),
+        target:'iframe',
+        method:'POST'
+    });
+    //form.dom.params.dirPath = jobData.parentPath;
+    //form.dom.params.filename = jobData.name;
+    form.dom.action = 'downloadInputFile.do?'+Ext.urlEncode(params);
+    form.dom.submit();
+    //Ext.urlEncode(params)
+    //window.location =  "downloadInputFile.do?dirPath="+filePath+"&filename="+file;
+}
+
 //
 // This is the main layout definition.
 //
@@ -459,7 +488,9 @@ GridSubmit.initialize = function() {
     GridSubmit.FileRecord = Ext.data.Record.create([
         { name: 'name', mapping: 'name' },
         { name: 'size', mapping: 'size' },
-        { name: 'subJob', mapping: 'subJob' }
+        { name: 'subJob', mapping: 'subJob' },
+        { name: 'parentPath', mapping: 'parentPath' }
+        
     ]);
     
     //Store for uploaded file details
@@ -467,7 +498,8 @@ GridSubmit.initialize = function() {
         fields: [
             { name: 'name', type: 'string' },
             { name: 'size', type: 'int' },
-            { name: 'subJob', type: 'subJob' }
+            { name: 'subJob', type: 'string' },
+            { name: 'parentPath', type: 'string' }
         ]
     });
 
@@ -847,7 +879,17 @@ GridSubmit.initialize = function() {
         iconCls: 'cross-icon',
         handler: GridSubmit.deleteFiles
     });
-
+    
+    var downloadAction = new Ext.Action({
+        text: 'Download',
+        disabled: true,
+        iconCls: 'disk-icon',
+        handler: function() {
+            //var jobData = fileGrid.getSelectionModel().getSelected().data;
+            GridSubmit.downloadFile();
+        }
+    });
+    
     var fileGrid = new Ext.grid.GridPanel({
         id: 'file-grid',
         title: 'Uploaded files',
@@ -858,7 +900,7 @@ GridSubmit.initialize = function() {
             { header: 'Filename', width: 200, sortable: true, dataIndex: 'name' },
             { header: 'Size', width: 100, sortable: true, dataIndex: 'size',
                 renderer: Ext.util.Format.fileSize, align: 'right' },
-            { header: 'subJob', width: 100, sortable: true, dataIndex: 'subJob' }    
+            { header: 'subJob', width: 100, sortable: true, dataIndex: 'subJob' }
         ],
         sm: new Ext.grid.RowSelectionModel({
             singleSelect: false,
@@ -866,8 +908,10 @@ GridSubmit.initialize = function() {
                 'selectionchange': function(sm) {
                     if (fileGrid.getSelectionModel().getCount() == 0) {
                         deleteAction.setDisabled(true);
+                        downloadAction.setDisabled(true);
                     } else {
                         deleteAction.setDisabled(false);
+                        downloadAction.setDisabled(false);
                     }
                 }
             }
@@ -883,7 +927,8 @@ GridSubmit.initialize = function() {
         labelWidth: 150,
         buttons: [
             uploadAction,
-            deleteAction
+            deleteAction,
+            downloadAction
         ],
         items: [{
             anchor: '100%',
