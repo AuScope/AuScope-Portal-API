@@ -66,6 +66,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 //Globus stuff
 import org.globus.ftp.DataChannelAuthentication;
+import org.globus.ftp.FileInfo;
 import org.globus.ftp.GridFTPClient;
 import org.globus.ftp.GridFTPSession;
 import org.globus.io.urlcopy.UrlCopy;
@@ -982,14 +983,15 @@ public class GridSubmitController {
      */
     private void jobSupplementInfo(GeodesyJob job){
     	StringBuilder detail = new StringBuilder();
-    	detail.append("Executed Code: "+job.getCode()+"\n");
+    	detail.append("ExecutedCode: "+job.getCode()+"\n");
     	detail.append("Version: "+job.getVersion()+"\n");
     	detail.append("Site: "+job.getSite()+"\n");
-    	detail.append("Queue on site: "+job.getQueue()+"\n");
+    	detail.append("QueueOnSite: "+job.getQueue()+"\n");
     	detail.append("Walltime: "+job.getMaxWallTime()+"\n");
-    	detail.append("Max Memory (MB): "+job.getMaxMemory()+"\n");
-    	detail.append("Number of CPUs: "+job.getCpuCount()+"\n");
-    	detail.append("Job Type: "+job.getJobType());
+    	detail.append("MaxMemory: "+job.getMaxMemory()+"\n");
+    	detail.append("NumberOfCPUs: "+job.getCpuCount()+"\n");
+    	detail.append("JobType: "+job.getJobType()+"\n");
+    	detail.append("Arguments: "+job.getArguments()[0]);
     	
     	//We need to store this for when register
     	job.setExtraJobDetails(detail.toString());
@@ -1214,7 +1216,6 @@ public class GridSubmitController {
         
         return success;
 	}
-	
 	/** 
 	 * urlCopy
 	 * 
@@ -1227,7 +1228,7 @@ public class GridSubmitController {
      * @return          GridTransferStatus of files copied
      * 
      */
-	private GridTransferStatus urlCopy(String[] fromURLs, HttpServletRequest request) {
+	/*private GridTransferStatus urlCopy(String[] fromURLs, HttpServletRequest request) {
 
 		Object credential = request.getSession().getAttribute("userCred");		
 		String jobInputDir = (String) request.getSession().getAttribute("jobInputDir");				
@@ -1239,7 +1240,7 @@ public class GridSubmitController {
 				// StageIn to Grid etc
 				
 				try {
-					GlobusURL from = new GlobusURL(fromURLs[i]);
+					GlobusURL from = new GlobusURL(fromURLs[i].replace("http://files.ivec.org/geodesy/", "gsiftp://pbstore.ivec.org:2811//pbstore/cg01/geodesy/ftp.ga.gov.au/"));
 					logger.info("fromURL is: " + from.getURL());
 					
 					String fullFilename = new URL(fromURLs[i]).getFile();
@@ -1272,7 +1273,7 @@ public class GridSubmitController {
 					logger.info(to.getProtocol()+"://"+to.getHost()+":"+to.getPort()+"/");
 					
 					String gridServer = to.getProtocol() + "://" + to.getHost() + ":" + to.getPort();
-					//String gridDir = fullDirName;
+
 					String gridFullURL =  gridServer + "/"+ jobInputDir;
 										
 					status.numFileCopied++;
@@ -1304,8 +1305,118 @@ public class GridSubmitController {
 		}
 		
 		return status;
+	}*/	
+	/** 
+	 * urlCopy
+	 * 
+     * Copy data to the Grid Storage using URLCopy.  
+     * This is method which does authentication, remote create directory 
+     * and files copying
+     *
+     * @param fromURLs	an array of URLs to copy to the storage
+     * 
+     * @return          GridTransferStatus of files copied
+     * 
+     */
+	private GridTransferStatus urlCopy(String[] fromURLs, HttpServletRequest request) {
+
+		Object credential = request.getSession().getAttribute("userCred");		
+		String jobInputDir = (String) request.getSession().getAttribute("jobInputDir");				
+        GridTransferStatus status = new GridTransferStatus();
+		
+		if( jobInputDir != null )
+		{
+			for (int i = 0; i < fromURLs.length; i++) {
+				// StageIn to Grid etc
+				int rtnValue = urlCopy(fromURLs[i], credential, jobInputDir, status );
+				//This means time-out issue exception, so retry 2 more times.
+				if(rtnValue == 1){
+					logger.info("UrlCopy timed-out retry 2 for: " + fromURLs[i]);
+					rtnValue = urlCopy(fromURLs[i], credential, jobInputDir, status );
+					if(rtnValue == 1){
+						logger.info("UrlCopy timed-out retry 3 for: " + fromURLs[i]);
+						rtnValue = urlCopy(fromURLs[i], credential, jobInputDir, status );
+						if(rtnValue == 1){
+							status.numFileCopied = i;
+							status.currentStatusMsg = GridSubmitController.FILE_COPY_ERROR;
+							status.jobSubmissionStatus = JobSubmissionStatus.Failed;
+							// Save in session for status update request for this job.
+					        request.getSession().setAttribute("gridStatus", status);
+					        logger.error("UrlCopy retry timed-out for: " + fromURLs[i]);
+							break;
+						}
+					}
+				}
+				
+				//This means bad exception like network error, so quit.
+				if(rtnValue == 2){
+					request.getSession().setAttribute("gridStatus", status);
+					break;
+				}
+				
+				status.numFileCopied++;
+				status.currentStatusMsg = GridSubmitController.FILE_COPIED + status.numFileCopied
+				+" of "+fromURLs.length+" files transfered.";
+				logger.debug(status.currentStatusMsg+" : "+fromURLs[i]);
+				
+				// Save in session for status update request for this job.
+		        request.getSession().setAttribute("gridStatus", status);															
+			}
+		}
+		
+		return status;
 	}
-    
+
+	/**
+     * Copy file to the Grid Storage using URLCopy.  
+     * This is method which does authentication and transfers the file.
+	 * @param fileUri The file to transfer
+	 * @param credential Credential to use
+	 * @param jobInputDir Path to copy to
+	 * @param status holds status of the transfer
+	 * @return
+	 */
+    private int urlCopy(String fileUri, Object credential, String jobInputDir, GridTransferStatus status ) 
+    {
+        int rtnValue = 0;
+        try {
+    		GlobusURL from = new GlobusURL(fileUri.replace("http://files.ivec.org/geodesy/", "gsiftp://pbstore.ivec.org:2811//pbstore/cg01/geodesy/ftp.ga.gov.au/"));
+    		logger.info("fromURL is: " + from.getURL());
+    		
+    		String fullFilename = new URL(fileUri).getFile();
+
+    		// Extract just the filename
+    		String filename = new File(fullFilename).getName();	
+    		status.file = filename;   		
+    		
+    		// Full URL
+    		// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
+    		//       +"rinex/" + "abeb0010.00d.Z"
+    		String toURL = gridAccess.getGridFtpServer()+File.separator+ jobInputDir 
+    		               +GridSubmitController.RINEX_DIR+File.separator+ filename;
+    		GlobusURL to = new GlobusURL(toURL);		
+    		logger.info("toURL is: " + to.getURL());
+    		
+    		//Not knowing how long UrlCopy will take, the UI request status update of 
+    		//file transfer periodically
+    		UrlCopy uCopy = new UrlCopy();
+    		uCopy.setCredentials((GSSCredential)credential);
+    		uCopy.setDestinationUrl(to);
+    		uCopy.setSourceUrl(from);
+    		// Disables usage of third party transfers, for grid security reasons.
+    		uCopy.setUseThirdPartyCopy(false); 	
+    		uCopy.copy();   		
+    	} catch (UrlCopyException e) {
+    		logger.info("UrlCopy timed-out: " + e.getMessage());
+    		rtnValue = 1;
+    	} catch (Exception e) {
+    		logger.error("Error: " + e.getMessage());
+    		status.currentStatusMsg = GridSubmitController.INTERNAL_ERROR;
+    		status.jobSubmissionStatus = JobSubmissionStatus.Failed;
+    		rtnValue = 2;
+    	}    	   
+        return rtnValue;
+    }
 
     /**
      * Create a stageIn directories on Pbstore. If any errors update status.
@@ -1414,7 +1525,56 @@ public class GridSubmitController {
             files.add(fileInfo);     
         }
 	}
-	
+
+    /**
+     * This method using GridFTP Client returns directory list of stageOut directory 
+     * and sub directories.
+     * @param fullDirname
+     * @param credential
+     * @return
+     */
+	private FileInformation[] getDirectoryListing(String fullDirname, Object credential){
+		GridFTPClient gridStore = null;
+		FileInformation[] fileDetails = new FileInformation[0];
+		try {
+			gridStore = new GridFTPClient(gridAccess.getRepoHostName(), gridAccess.getRepoHostFTPPort());		
+			gridStore.authenticate((GSSCredential)credential); //authenticating
+			gridStore.setDataChannelAuthentication(DataChannelAuthentication.SELF);
+			gridStore.setDataChannelProtection(GridFTPSession.PROTECTION_SAFE);
+			logger.debug("Change to Grid StageOut dir:"+fullDirname);
+			gridStore.changeDir(fullDirname);
+			logger.debug("List files in StageOut dir:"+gridStore.getCurrentDir());
+			gridStore.setType(GridFTPSession.TYPE_ASCII);
+			gridStore.setPassive();
+			gridStore.setLocalActive();
+			
+			Vector list = gridStore.list("*");
+
+			if (list != null && !(list.isEmpty())) {
+				fileDetails = new FileInformation[list.size()];
+				for (int i = list.size() - 1; i >= 0; i--) {
+					FileInfo fInfo = (FileInfo) list.get(i);
+		            fileDetails[i] = new FileInformation(
+		            		fInfo.getName(), fInfo.getSize(), fullDirname, fInfo.isDirectory());
+				}                    
+			} 
+		} catch (ServerException e) {
+			logger.error("GridFTP ServerException: " + e.getMessage());
+		} catch (IOException e) {
+			logger.error("GridFTP IOException: " + e.getMessage());
+		} catch (Exception e) {
+			logger.error("GridFTP Exception: " + e.getMessage());
+		}
+		finally{
+			try{
+				if(gridStore != null)
+					gridStore.close();
+			}catch (Exception e) {
+				logger.error("GridFTP Exception: " + e.getMessage());
+			}
+		}
+		return fileDetails;
+	}	
 	/**
 	 * Simple object to hold Grid file transfer status.
 	 * @author jam19d

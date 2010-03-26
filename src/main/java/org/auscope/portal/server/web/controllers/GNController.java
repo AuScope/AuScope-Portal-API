@@ -75,9 +75,9 @@ public class GNController {
 		GeodesySeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
     	
     	//final String data = null;//createRecord();
-    	
+    	String output = job.getOutputDir().substring(job.getOutputDir().indexOf("grid-auscope"), job.getOutputDir().length());
     	GeodesyRecordInfo info = new GeodesyRecordInfo(jobSeries.getUser(), jobSeries.getUser(), "idp.ivec.org",
-    			jobSeries.getName(), job.getSubmitDate(), job.getDescription(), "keyWord", "Australia", "ftp://pbstore.ivec.org/../../"+job.getOutputDir(), 112,
+    			jobSeries.getName(), job.getSubmitDate(), job.getDescription(), "keyWord", "Australia", "http://files.ivec.org/"+output, 112,
 			154, -44, -9, job.getExtraJobDetails());
     	try{
     		
@@ -87,7 +87,7 @@ public class GNController {
         	if (tempRecord.isRecordLoaded())
         	{
                 serviceUrl =
-                	hostConfigurer.resolvePlaceholder("HOST.cswservice.url");
+                	hostConfigurer.resolvePlaceholder("HOST.geodesy.csw");
                 //Need to share same HttpClient for login and insert requests.
                 
             	HttpClient httpClient = serviceCaller.getHttpClient();
@@ -108,8 +108,8 @@ public class GNController {
                     	GetMethod method = new GetMethod(serviceUrl.replaceFirst("csw", "xml.user.login"));
 
                         //set all of the parameters
-                        NameValuePair username = new NameValuePair("username", "admin");
-                        NameValuePair password = new NameValuePair("password", "auscope#geonetwork");
+                        NameValuePair username = new NameValuePair("username", "test");
+                        NameValuePair password = new NameValuePair("password", "testtest");
 
                         //attach them to the method
                         method.setQueryString(new NameValuePair[]{username, password});
