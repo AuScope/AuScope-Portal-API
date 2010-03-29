@@ -16,6 +16,8 @@ import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesyRecordInfo;
 import org.auscope.portal.server.gridjob.GeodesySeries;
 import org.auscope.portal.server.gridjob.PrepareCSWTransactionRecord;
+import org.auscope.portal.server.web.security.UserDao;
+import org.auscope.portal.server.web.security.User;
 
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.csw.ICSWMethodMaker;
@@ -54,6 +56,9 @@ public class GNController {
     private GeodesyJobManager jobManager;
     
     @Autowired
+    private UserDao userDao;
+    
+    @Autowired
     public GNController(HttpServiceCaller serviceCaller) {
         this.serviceCaller = serviceCaller;
     }
@@ -73,7 +78,15 @@ public class GNController {
     	
 		GeodesyJob job = jobManager.getJobById(Integer.parseInt(jobId));
 		GeodesySeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
-    	
+		final User user = userDao.get((String)request.getSession().getAttribute("Shib-Person-mail"));
+		
+		if(user == null)
+		{
+			mav.addObject("error", "User is not registered on Portal");
+			mav.addObject("success", false);
+			return mav;
+		}
+		
     	//final String data = null;//createRecord();
     	String output = job.getOutputDir().substring(job.getOutputDir().indexOf("grid-auscope"), job.getOutputDir().length());
     	GeodesyRecordInfo info = new GeodesyRecordInfo(jobSeries.getUser(), jobSeries.getUser(), "idp.ivec.org",
@@ -108,8 +121,8 @@ public class GNController {
                     	GetMethod method = new GetMethod(serviceUrl.replaceFirst("csw", "xml.user.login"));
 
                         //set all of the parameters
-                        NameValuePair username = new NameValuePair("username", "test");
-                        NameValuePair password = new NameValuePair("password", "testtest");
+                        NameValuePair username = new NameValuePair("username", user.getId());
+                        NameValuePair password = new NameValuePair("password", user.getPassword());
 
                         //attach them to the method
                         method.setQueryString(new NameValuePair[]{username, password});
@@ -154,7 +167,8 @@ public class GNController {
         		logger.error("Can not create Geonetwork record for job: "+jobId);
         	}
     	}catch(Exception e){
-    		
+    		mav.addObject("error", e.getMessage());
+			mav.addObject("success", false);
     	}    	
         
         
