@@ -17,7 +17,9 @@
     <link rel="stylesheet" type="text/css" href="js/external/ext-2.2/resources/css/ext-all.css">
     <script type="text/javascript" src="js/external/ext-2.2/adapter/ext/ext-base.js"></script>
     <script type="text/javascript" src="js/external/ext-2.2/ext-all.js"></script>
+    <script src="js/geoscimlwfs/main.js" type="text/javascript"></script>
     <script type="text/javascript" src="js/GridJob/GridSubmit.js"></script>
+    <script type="text/javascript" src="js/GridJob/StationSelect.js"></script>
     <script src="js/geoscimlwfs/global_variables.js" type="text/javascript"></script>
 </head>
 

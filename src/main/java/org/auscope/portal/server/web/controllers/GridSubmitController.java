@@ -8,29 +8,38 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
-import java.io.StringReader;
 import java.net.URL;
 import java.rmi.ServerException;
+import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import net.sf.json.JSONArray;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.GetMethod;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.csw.CSWNamespaceContext;
+import org.auscope.portal.csw.CSWRecord;
+import org.auscope.portal.csw.ICSWMethodMaker;
 
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.gridjob.GridAccessController;
@@ -40,29 +49,17 @@ import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
 import org.auscope.portal.server.util.GeodesyUtil;
-import org.auscope.portal.server.web.view.JSONModelAndView;
+import org.auscope.portal.server.web.service.CSWService;
+import org.auscope.portal.server.web.service.HttpServiceCaller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
-import org.springframework.web.servlet.view.RedirectView;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 //Globus stuff
 import org.globus.ftp.DataChannelAuthentication;
@@ -71,9 +68,13 @@ import org.globus.ftp.GridFTPClient;
 import org.globus.ftp.GridFTPSession;
 import org.globus.io.urlcopy.UrlCopy;
 import org.globus.io.urlcopy.UrlCopyException;
-import org.globus.myproxy.MyProxyException;
 import org.globus.util.GlobusURL;
 import org.ietf.jgss.GSSCredential;
+import org.springframework.ui.ModelMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 
 /**
@@ -91,6 +92,10 @@ public class GridSubmitController {
     private GridAccessController gridAccess;
     @Autowired
     private GeodesyJobManager jobManager;
+    @Autowired
+    private CSWService cswService;
+    @Autowired
+    private HttpServiceCaller serviceCaller;
 
     private static final String TABLE_DIR = "tables";
     private static final String RINEX_DIR = "rinex";
@@ -108,6 +113,200 @@ public class GridSubmitController {
     private static final String CREDENTIAL_ERROR = "Job submission failed due to Invalid Credential Error";
     
     
+    /**
+     * Given a list of stations and a date range this function queries the remote serviceUrl for a list of log files
+     * and returns a JSON representation of the response
+     * 
+     * @param dateFrom The (inclusive) start of date range in YYYY-MM-DD format
+     * @param dateTo The (inclusive) end of date range in YYYY-MM-DD format
+     * @param serviceUrl The remote service URL to query
+     * @param stationList a list (comma seperated) of the GPSSITEID to fetch log files for
+     * 
+     * Response Format
+     * {
+     *     success : (true/false),
+     *     urlList : [{
+     *         url    : (Mapped from url or empty string)
+     *         date   : (Mapped from date or empty string)
+     *     }]
+     * }
+     */
+    @RequestMapping(value = "/getStationListUrls.do", params = {"dateFrom","dateTo", "stationList", "serviceUrl"})
+    public ModelAndView getStationListUrls(@RequestParam("dateFrom") final String dateFrom,
+								          @RequestParam("dateTo") final String dateTo,
+								          @RequestParam("serviceUrl") final String serviceUrl,
+								          @RequestParam("stationList") final String stationList,
+								          HttpServletRequest request) {
+    	boolean success = true;
+    	ModelAndView jsonResponse = new ModelAndView("jsonView");
+    	JSONArray urlList = new JSONArray();
+    	
+    	logger.debug("getStationListUrls : Requesting urls for " + stationList + " in the range " + dateFrom + " -> " + dateTo);
+    	
+    	try {
+    		String gmlResponse = serviceCaller.getMethodResponseAsString(new ICSWMethodMaker() {
+                public HttpMethodBase makeMethod() {
+                    GetMethod method = new GetMethod(serviceUrl);
+
+                    //Generate our filter string based on date and station list
+                    String cqlFilter = "(date>='" + dateFrom + "')AND(date<='" + dateTo + "')";
+                    if (stationList != null && stationList.length() > 0) {
+                    	
+                    	String[] stations = stationList.split(",");
+                    	
+                    	cqlFilter += "AND(";
+                    	
+                    	for (int i = 0; i < stations.length; i++) {
+                    		if (i > 0)
+                    			cqlFilter += "OR";
+                    		
+                    		cqlFilter += "(id='" + stations[i] + "')";
+                    	}
+                    	
+                    	cqlFilter += ")";
+                    }
+
+                    //attach them to the method
+                    method.setQueryString(new NameValuePair[]{new NameValuePair("request", "GetFeature"), 
+                    											new NameValuePair("outputFormat", "GML2"),
+                    											new NameValuePair("typeName", "geodesy:station_observations"),
+                    											new NameValuePair("PropertyName", "geodesy:date,geodesy:url"),
+                    											new NameValuePair("CQL_FILTER", cqlFilter)});
+
+                    return method;
+                }
+            }.makeMethod(), serviceCaller.getHttpClient());
+    		
+    		//Parse our XML string into a document
+    		XPath xPath = XPathFactory.newInstance().newXPath();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document responseDocument = builder.parse(new InputSource(new StringReader(gmlResponse)));
+    		
+            //Extract the URL list and parse it into the JSON list
+            HttpSession userSession = request.getSession();
+            String featureMemberExpression = "/FeatureCollection/featureMember";
+            NodeList nodes = (NodeList) xPath.evaluate(featureMemberExpression, responseDocument, XPathConstants.NODESET);
+            if (nodes != null) {
+	            for(int i=0; i < nodes.getLength(); i++ ) {
+	            	ModelMap urlMap = new ModelMap();
+	            	Node tempNode = (Node) xPath.evaluate("station_observations/url", nodes.item(i), XPathConstants.NODE);
+	            	urlMap.addAttribute("url", tempNode == null ? "" : tempNode.getTextContent());
+	            	
+	            	tempNode = (Node) xPath.evaluate("station_observations/date", nodes.item(i), XPathConstants.NODE);
+	            	urlMap.addAttribute("date", tempNode == null ? "" : tempNode.getTextContent());
+	            	
+	            	urlList.add(urlMap);
+	            }
+            }
+            
+    	} catch (Exception ex) {
+    		logger.warn("selectStationList.do : Error " + ex.getMessage());
+    		urlList.clear();
+            success = false;
+    	}
+    	
+    	jsonResponse.addObject("success", success);
+    	jsonResponse.addObject("urlList", urlList);
+    	
+        return jsonResponse;
+    }
+    
+    /**
+     * Returns every Geodesy station (and some extra descriptive info) in a JSON format.
+     * 
+     * Response Format
+     * {
+     *     success : (true/false),
+     *     records : [{
+     *         stationNumber : (Mapped from STATIONNO or empty string)
+     *         stationName   : (Mapped from STATIONNAME or empty string)
+     *         gpsSiteId     : (Mapped from GPSSITEID or empty string)
+     *         countryId     : (Mapped from COUNTRYID or empty string)
+     *         stateId       : (Mapped from STATEID or empty string)
+     *     }]
+     * }
+     */
+    @RequestMapping("/getStationList.do")
+    public ModelAndView getStationList() {
+        final String stationTypeName = "ngcp:GnssStation";
+        ModelAndView jsonResponse = new ModelAndView("jsonView");
+        JSONArray stationList = new JSONArray();
+        boolean success = true;
+
+        try {
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            
+            //Query every geodesy station provider for the raw GML
+            CSWRecord[] geodesyRecords = cswService.getWFSRecordsForTypename(stationTypeName);
+            if (geodesyRecords == null || geodesyRecords.length == 0)
+            	throw new Exception("No " + stationTypeName + " records available");
+            
+            //This makes the assumption of only a single geodesy WFS
+            CSWRecord record = geodesyRecords[0];
+            final String serviceUrl = record.getServiceUrl();
+            
+            jsonResponse.addObject("serviceUrl", serviceUrl);
+
+            logger.debug("getStationListXML.do : Requesting " + stationTypeName + " for " + serviceUrl);
+
+            String gmlResponse = serviceCaller.getMethodResponseAsString(new ICSWMethodMaker() {
+                public HttpMethodBase makeMethod() {
+                    GetMethod method = new GetMethod(serviceUrl);
+
+                    //set all of the parameters
+                    NameValuePair request = new NameValuePair("request", "GetFeature");
+                    NameValuePair elementSet = new NameValuePair("typeName", stationTypeName);
+
+                    //attach them to the method
+                    method.setQueryString(new NameValuePair[]{request, elementSet});
+
+                    return method;
+                }
+            }.makeMethod(), serviceCaller.getHttpClient());
+            
+            //Parse the raw GML and generate some useful JSON objects
+            Document doc = builder.parse(new InputSource(new StringReader(gmlResponse)));
+            
+            String serviceTitleExpression = "/FeatureCollection/featureMembers/GnssStation";
+            NodeList nodes = (NodeList) xPath.evaluate(serviceTitleExpression, doc, XPathConstants.NODESET);
+
+            //Lets pull some useful info out
+            for(int i=0; nodes != null && i < nodes.getLength(); i++ ) {
+                Node node = nodes.item(i);
+                ModelMap stationMap = new ModelMap();
+
+                Node tempNode = (Node) xPath.evaluate("STATIONNO", node, XPathConstants.NODE);
+                stationMap.addAttribute("stationNumber", tempNode == null ? "" : tempNode.getTextContent());
+                
+                tempNode = (Node) xPath.evaluate("GPSSITEID", node, XPathConstants.NODE);
+                stationMap.addAttribute("gpsSiteId", tempNode == null ? "" : tempNode.getTextContent());
+                
+                tempNode = (Node) xPath.evaluate("STATIONNAME", node, XPathConstants.NODE);
+                stationMap.addAttribute("stationName", tempNode == null ? "" : tempNode.getTextContent());
+                
+                tempNode = (Node) xPath.evaluate("COUNTRYID", node, XPathConstants.NODE);
+                stationMap.addAttribute("countryId", tempNode == null ? "" : tempNode.getTextContent());
+                
+                tempNode = (Node) xPath.evaluate("STATEID", node, XPathConstants.NODE);
+                stationMap.addAttribute("stateId", tempNode == null ? "" : tempNode.getTextContent());
+
+                stationList.add(stationMap);
+            }
+        } catch (Exception ex) {
+            logger.warn("getStationListXML.do : Error " + ex.getMessage());
+            success = false;
+            stationList.clear();
+        }
+
+        //Form our response object
+        jsonResponse.addObject("stations", stationList);
+        jsonResponse.addObject("success", success);
+        return jsonResponse;
+    }
+
     /**
      * Sets the <code>GridAccessController</code> to be used for grid
      * activities.

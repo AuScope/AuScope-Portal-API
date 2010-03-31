@@ -842,7 +842,7 @@ GridSubmit.initialize = function() {
                 return false;
             }
         }
-        gotoStep(1);
+        gotoStep(2);
         return true;
     };
 
@@ -962,42 +962,61 @@ GridSubmit.initialize = function() {
         ]
     });
 
+    StationSelect.onSuccessfulSubmit = function() {
+    	gotoStep(1);
+    }
+    
     var jobWizard = {
         id: 'jobwizard-panel',
         layout: 'card',
         activeItem: 0,
         defaults: { layout:'fit', frame: true, buttonAlign: 'right' },
         items: [{
-            id: 'card-0',
-            title: 'Step 1: Choose a job series...',
+        	id: 'card-select',
+            title: 'Step 1: Select the station list...',
             defaults: { border: false },
             buttons: [{
                 text: '&laquo; Previous',
                 disabled: true
             }, {
                 text: 'Next &raquo;',
+                handler: StationSelect.okButtonHandler
+            }],
+            items: [ StationSelect.generatePanel() ]
+        },
+        {
+            id: 'card-series',
+            title: 'Step 2: Choose a job series...',
+            defaults: { border: false },
+            buttons: [{
+                text: '&laquo; Previous',
+                handler: function() {
+                	gotoStep(0);
+                }
+            }, {
+                text: 'Next &raquo;',
                 handler: validateSeries
             }],
             items: [ seriesForm ]
         }, {
-            id: 'card-1',
-            title: 'Step 2: Enter job details...',
-            defaults: { border: false },
-            buttons: [{
-                text: '&laquo; Previous',
-                handler: validateMetadata.createDelegate(this, [0])
-            }, {
-                text: 'Next &raquo;',
-                handler: validateMetadata.createDelegate(this, [2])
-            }],
-            items: [ metadataForm ]
-        }, {
-            id: 'card-2',
-            title: 'Step 3: Add files to job...',
+            id: 'card-job',
+            title: 'Step 3: Enter job details...',
             defaults: { border: false },
             buttons: [{
                 text: '&laquo; Previous',
                 handler: validateMetadata.createDelegate(this, [1])
+            }, {
+                text: 'Next &raquo;',
+                handler: validateMetadata.createDelegate(this, [3])
+            }],
+            items: [ metadataForm ]
+        }, {
+            id: 'card-files',
+            title: 'Step 4: Add files to job...',
+            defaults: { border: false },
+            buttons: [{
+                text: '&laquo; Previous',
+                handler: validateMetadata.createDelegate(this, [2])
             }, {
                 text: 'Submit',
                 handler: GridSubmit.submitJob
