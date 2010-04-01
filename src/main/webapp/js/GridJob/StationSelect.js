@@ -224,6 +224,7 @@ StationSelect.generatePanel = function() {
                     id : 'startDateField',
                     anchor: '80%',
                     height : 100,
+                    format : 'Y/m/d',
                     value : new Date()
 
                 }]
@@ -239,6 +240,7 @@ StationSelect.generatePanel = function() {
                     id : 'endDateField',
                     anchor: '80%',
                     name: 'endDate',
+                    format : 'Y/m/d',
                     value : new Date()
                 }]
             }]
