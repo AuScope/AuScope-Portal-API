@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   reference varchar(128),
   name varchar(64) NOT NULL,
   description TEXT,
-  scriptFile varchar(32),
+  scriptFile varchar(255),
   status varchar(32),
   submitDate varchar(64),
   outputDir varchar(128),

@@ -78,7 +78,7 @@ public class User implements Serializable {
 
 
 	/**
-     * Returns a String representing the state of this <code>GeodesySeries</code>
+     * Returns a String representing the state of this <code>User</code>
      * object.
      *
      * @return A summary of the values of this object's fields
