@@ -5,7 +5,7 @@
     <groupId>org.auscope.portal</groupId>
     <artifactId>GeodesyWorkflow</artifactId>
     <packaging>war</packaging>
-    <version>2.3.2</version>
+    <version>1.0.0</version>
     <name>Geodesy Workflow Portal Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <scm>
