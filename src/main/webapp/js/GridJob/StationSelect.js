@@ -95,7 +95,7 @@ StationSelect.requestStationListUrlsSuccess = function (response, options) {
     	url : 'sendToGrid.do',
     	success : StationSelect.saveStationListSuccess,
     	failure : StationSelect.saveStationListFailure,
-    	timeout : 180000, //Timeout is 5 minutes
+    	timeout : (6000 * 20), //Timeout is 20 minutes
     	params : {
 			myFiles : xmlFragment
 		}
@@ -182,11 +182,11 @@ StationSelect.okButtonHandler = function() {
     	url : 'getStationListUrls.do',
     	success : StationSelect.requestStationListUrlsSuccess,
     	failure : StationSelect.requestStationListUrlsFailure,
+    	timeout : (6000 * 20), //Timeout is 20 minutes
     	params : {
 			dateFrom : startDate.format('Y-m-d'),
 			dateTo   : endDate.format('Y-m-d'),
 			serviceUrl : StationSelect.serviceUrl,
-			timeout : 180000, //Timeout is 5 minutes
 			stationList : selectedStations
 		}
     });
