@@ -78,16 +78,8 @@ StationSelect.requestStationListUrlsSuccess = function (response, options) {
 	}
 	
 	//Lets save our list of URL's
-	//var xmlFragment =  //getXmlTextForSpecifiedDataUrls(responseObj.urlList);
-	var xmlFragment = xmlHeader;
-	xmlFragment += xmlRootOpenTag;
-	for (var i = 0; i < responseObj.urlList.length; i++) {
-		xmlFragment += fileUrlOpenTag + responseObj.urlList[i].url + fileUrlCloseTag;
-	}
-	xmlFragment += xmlRootCloseTag;
-	
 	var mask = new Ext.LoadMask(Ext.getBody(),{
-		msg : 'Submitting to grid...',
+		msg : 'Submitting to grid...'
 	})
 	mask.show();
 	
@@ -97,7 +89,7 @@ StationSelect.requestStationListUrlsSuccess = function (response, options) {
     	failure : StationSelect.saveStationListFailure,
     	timeout : (6000 * 20), //Timeout is 20 minutes
     	params : {
-			myFiles : xmlFragment
+			myFiles : Ext.util.JSON.encode(responseObj.urlList)
 		}
     });
 }
@@ -173,7 +165,7 @@ StationSelect.okButtonHandler = function() {
     }
     
     var mask = new Ext.LoadMask(Ext.getBody(),{
-		msg : 'Requesting Files...',
+		msg : 'Requesting Files...'
 	})
 	mask.show();
     

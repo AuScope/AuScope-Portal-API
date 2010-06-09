@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -25,12 +26,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.auscope.portal.server.util.GeodesyUtil;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.web.view.JSONModelAndView;
+import org.auscope.portal.server.gridjob.GeodesyGridInputFile;
 import org.auscope.portal.server.gridjob.GridAccessController;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,36 +67,89 @@ public class DataServiceController {
    @Qualifier(value = "propertyConfigurer")
    private PortalPropertyPlaceholderConfigurer hostConfigurer;
    
-     
+
+   private List<GeodesyGridInputFile> parseJSONArrayString(String jsonList) {
+	   JSONArray items = JSONArray.fromObject(jsonList);
+	   
+	   List<GeodesyGridInputFile> selection = new ArrayList<GeodesyGridInputFile>();
+	   for (Object obj : items) {
+		   if (obj instanceof JSONObject) {
+			   selection.add(GeodesyGridInputFile.fromJSONObject((JSONObject) obj));
+		   }
+	   }
+	   
+	   return selection;
+   }
+   
+   /**
+    * 
+    * @param request
+    * @param response
+    * @param selectedList a JSON String representing an array of GeodesyGridInputFile objects
+    */
    @RequestMapping("/saveSelection.do")
    public void saveSelection(HttpServletRequest request,
 		                     HttpServletResponse response,
 		                     @RequestParam("mySelection") String selectedList) {
-	   request.getSession().setAttribute("selectedGPSfiles", selectedList);
-       logger.debug("Saved user's selected GPS files "+selectedList);
-   } 
-   
-   @RequestMapping("/getSelection.do")
-   public void getSelection(HttpServletRequest request,
-		                     HttpServletResponse response) throws Exception {
-	   String selectedList = (String) request.getSession().getAttribute("selectedGPSfiles");
 	   
-       logger.debug("Return user's selected GPS files "+selectedList);
-       response.setContentType("text/xml");
-       response.getWriter().print(selectedList);
-       //response.getWriter().print("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><data><url_date><select_item>false</select_item><fileDate>2009-Sep-1</fileDate><fileUrl>http://files.ivec.org/geodesy/gpsdata/09244/alby2440.09g.Z</fileUrl></url_date><url_date><select_item>false</select_item><fileDate>2009-Sep-1</fileDate><fileUrl>http://files.ivec.org/geodesy/gpsdata/09244/alby2440.09n.Z</fileUrl></url_date><url_date><select_item>false</select_item><fileDate>2009-Sep-1</fileDate><fileUrl>http://files.ivec.org/geodesy/gpsdata/09244/alby2440.09o.Z</fileUrl></url_date></data>");
-       response.getWriter().close();
+	   List<GeodesyGridInputFile> selection = parseJSONArrayString(selectedList);
+	   
+	   request.getSession().setAttribute("selectedGPSfiles", selection);
+	   
+       logger.debug("Saved user's selected GPS files " + selectedList);
    } 
    
+   /**
+    * Gets all selected items
+    * Returns a JSON Array Response in the following format
+    * selections :
+    * 		[
+    *   		{"stationId": "id", "fileDate" : "1/3/5", "fileUrl" : "http://somewhere", "selected" : true },
+    *   		...
+    * 		]
+    * @param request
+    * @param response
+    * @throws Exception
+    */
+   @RequestMapping("/getSelection.do")
+   public ModelAndView getSelection(HttpServletRequest request) throws Exception {
+	   List<GeodesyGridInputFile> selectedList = (List<GeodesyGridInputFile>) request.getSession().getAttribute("selectedGPSfiles");
+	   JSONArray response = new JSONArray();
+	   if (selectedList != null) {
+		   logger.debug("Return user's selected GPS files "+selectedList);
+       
+       
+		   for (GeodesyGridInputFile ggif : selectedList) {
+			   response.add(ggif);
+		   }
+	   }
+       
+	   ModelMap map = new ModelMap();
+	   map.addAttribute("selections", response);
+	   
+       return new JSONModelAndView(map);
+   } 
+   
+   /**
+    * Sets all selected urls to send to the grid
+    * Expects a JSON Array Response in the following format
+    * [
+    *   {"stationId": "id", "fileDate" : "1/3/5", "fileUrl" : "http://somewhere", "selected" : true },
+    *   ...
+    * ]
+    * @param request
+    * @param selectedUrls A JSON String representing an array
+    * @throws Exception
+    */
    @RequestMapping("/sendToGrid.do")
-   public ModelAndView sendToGrid(HttpServletRequest request,
-                                  HttpServletResponse response, ModelMap model)throws Exception {
-	   String selectedFiles = request.getParameter("myFiles");
-	   logger.debug("selected GPS files for grid job: "+selectedFiles);
-	   request.getSession().setAttribute("gridInputFiles", selectedFiles);
+   public ModelAndView sendToGrid(HttpServletRequest request, String myFiles, ModelMap model)throws Exception {
+	   List<GeodesyGridInputFile> selection = parseJSONArrayString(myFiles);
+	   
+	   logger.debug("selected GPS files for grid job: "+selection);
+	   
+	   request.getSession().setAttribute("gridInputFiles", selection);
 
 	   model.put("success", true);
-	   
 	   return new JSONModelAndView(model);
    }
    

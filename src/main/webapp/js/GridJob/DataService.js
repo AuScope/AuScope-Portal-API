@@ -48,7 +48,7 @@ DataService.zip4Download = function() {
 	  xmlText += xmlRootOpenTag;
 	  myStore.each(function(url_date){
 		  url_date.fields.each(function(field){
-			  if((field.name == 'select_item') && (url_date.get(field.name).toString() == 'true')){
+			  if((field.name == 'selected') && (url_date.get(field.name).toString() == 'true')){
 			   	xmlText += fileUrlOpenTag + url_date.get(fileUrl) + fileUrlCloseTag;
 			  }
 		  });
@@ -68,23 +68,22 @@ DataService.zip4Download = function() {
 //Send selected files as an input for Grid job
 //
 DataService.send2Grid = function() {
-	  var myStore = Ext.getCmp('selection-grid').getStore();
-	  xmlText += xmlRootOpenTag;
-	  myStore.each(function(url_date){
-		  url_date.fields.each(function(field){
-			  if((field.name == 'select_item') && (url_date.get(field.name).toString() == 'true')){
-			   	xmlText += fileUrlOpenTag + url_date.get(fileUrl) + fileUrlCloseTag;
-			  }
-		  });
-	  },this); 
-	  xmlText += xmlRootCloseTag;
-
-	  Ext.Ajax.request({
-	      url: 'sendToGrid.do' ,
-	      success: DataService.onSendToGridResponse,
-	      failure: DataService.onRequestFailure,
-	      params: { 'myFiles': xmlText }
-	  });
+	var myStore = Ext.getCmp('selection-grid').getStore();
+	var jsonObjList = [];
+	  
+	for (var i = 0; i < myStore.getCount(); i++) {
+		var field = myStore.getAt(i);
+		if (field.get('selected')) {
+		    jsonObjList.push(field.json);
+		}
+	}
+	  
+	Ext.Ajax.request({
+		url: 'sendToGrid.do' ,
+		success: DataService.onSendToGridResponse,
+		failure: DataService.onRequestFailure,
+		params: { 'myFiles': Ext.util.JSON.encode(jsonObjList) }
+	});
 }
 
 
@@ -109,7 +108,7 @@ DataService.initialize = function(){
     // the check column is created using a custom plugin
     var checkColumn = new Ext.grid.CheckColumn({
        header: 'Select',
-       dataIndex: 'select_item',
+       dataIndex: 'selected',
        width: 55
     });
 
@@ -147,16 +146,15 @@ DataService.initialize = function(){
     });
     
 
-
     var store = new Ext.data.Store({
     	url: 'getSelection.do',
-    	reader: new Ext.data.XmlReader({
-    		record: 'url_date',
-    		fields: [
-    	          {name: 'fileDate', type: 'string'},                
-    	          {name: 'fileUrl', type: 'string'},            
-    	          {name: 'select_item', type: 'bool'}
-    	    ]
+    	reader : new Ext.data.JsonReader({
+    		root : 'selections',
+    		fields : 
+    			[ {name:'fileDate'},
+    			  {name:'fileUrl'},
+    			  {name:'selected'}
+    			]
     	})
     });
    

@@ -286,6 +286,7 @@ function parseCapabilitiesDocument1_0_0(rootNode) {
 *   </dst:url_date>
 * </dst:data>  
 */
+/*
 function getXmlTextForAllCheckedDataUrls() {
 
   // Variables to create the xml text that would be converted to an XML doc
@@ -350,12 +351,88 @@ function getXmlTextForAllCheckedDataUrls() {
   xmlText += "</" + xmlRoot + ">";
   return xmlText;
 }
+*/
+
+/*
+ * This function gets all the data urls checked across all categories, groups and stations.
+ * It creates a JSON Response in the form
+ * [
+ *  {"stationId": "value", "fileDate" : "value", "fileUrl" : "value", "selected" : true },
+ * ...
+ * ]
+ */
+function getJSONTextForAllCheckedDataUrls() {
+
+	  // Variables to create the xml text that would be converted to an XML doc
+	  // to be passed onto the DST portlet
+	  var jsonList = [];
+
+	  var group;
+	  var num_stations;
+	  var station;
+	  var year;
+	  var month;
+	  var num_urls;
+	  var selected_urls = "";
+	  var date_str = "";
+	  
+	  // Loop over all groups in geodesy
+	  var group = geoMarkers;
+	  if (group) {
+	    num_stations = group.length;
+	    // Loop over all the stations in the group
+	    for (i in geoMarkers) {
+	      if(typeof geoMarkers[i] != 'function') //Only process the stations. JS adds functions to the Array.
+	      {  
+		      // Loop over all years for the station
+		      for (var year_index=0; year_index<gaYears.length; year_index++) {
+		        year = gaYears[year_index];
+		        if (geoMarkers[i].maStationDataForDate[year] != undefined) {
+		          // Loop over all months in the year
+		          for (var month_index=1; month_index<=12; month_index++) {
+		            month = gaMonths[month_index];
+		            if (geoMarkers[i].maStationDataForDate[year][month] 
+		                && geoMarkers[i].maStationDataForDate[year][month].length!=0) {
+		              // Loop over all dates for the month
+		              for (var date=1; date<=31; date++) {
+		                if (geoMarkers[i].maStationDataForDate[year][month][date] 
+		                    && geoMarkers[i].maStationDataForDate[year][month][date].length!=0) {
+		                  // If data is avaialable for this date,
+		                  // look for the renix urls that had been "checked" by the user
+		                  // using the station popup windows.
+		                  var num_urls = geoMarkers[i].maStationDataForDate[year][month][date].length;
+		                  for (var url_index=0; url_index<num_urls; url_index++) {
+		                    if (geoMarkers[i].maDataCheckedStateForDate[year][month][date][url_index]) {
+		                      // create the json fragment for each node.
+		                      jsonObj = {
+		                    		  stationId : geoMarkers[i].stationId,
+		                    		  fileDate : year + "-" + month + "-" + date,
+		                    		  fileUrl : geoMarkers[i].maStationDataForDate[year][month][date][url_index],
+		                    		  selected : true
+		                      };
+		                      
+		                      jsonList.push(jsonObj);
+		  					}
+		                  }
+		                }
+		              } 
+		            }
+		          }
+		        }
+		      }
+	      }    
+	    }
+	  }
+	  
+	  return Ext.util.JSON.encode(jsonList);
+	}
 
 // This function creates the xml node for a date-url pair
 // See the xml schema in the comment for function getXmlTextForAllCheckedDataUrls
 // Please be sure that the schema of the xml document
 // conforms to the one used in the function createXmlNodeForDateUrl
 // in the DataServiceToolPortlet - WEB-INF/data_service_tool/dataservicetool.jsp file
+/*
 function createXmlNodeForDateUrl (pDate, pUrl) {
 	var xmlNode = "";
 	var xmlNamespace = "";
@@ -378,6 +455,7 @@ function createXmlNodeForDateUrl (pDate, pUrl) {
 	
 	return xmlNode;
 }
+*/
 
 var MAGIC_NUMBER=6356752.3142;
 var WGS84_SEMI_MAJOR_AXIS = 6378137.0;

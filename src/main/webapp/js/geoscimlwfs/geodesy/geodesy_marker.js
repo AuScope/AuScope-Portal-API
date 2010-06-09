@@ -814,10 +814,10 @@ function GeodesyMarker_getDateCheckedFn (pYear, pMonth, pDate, pDateChkId, pDate
 */
 function GeodesyMarker_getSubmitButtonFn () {
   var oGeodesyMarker = this;
-  var xmlFragment = getXmlTextForAllCheckedDataUrls();
-  if(xmlFragment != null) {
+  var jsonFragment = getJSONTextForAllCheckedDataUrls();
+  if(jsonFragment != null) {
       var url = "saveSelection.do?";
-      var postBody = "mySelection=" + xmlFragment;
+      var postBody = "mySelection=" + jsonFragment;
       GDownloadUrl(url, function(response, pResponseCode) {
           if(pResponseCode == 200) {
         	  alert("Selected points are now available in the Data Service Tool");

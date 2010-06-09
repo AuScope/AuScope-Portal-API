@@ -42,6 +42,7 @@ import org.auscope.portal.csw.CSWRecord;
 import org.auscope.portal.csw.ICSWMethodMaker;
 
 import org.auscope.portal.server.gridjob.FileInformation;
+import org.auscope.portal.server.gridjob.GeodesyGridInputFile;
 import org.auscope.portal.server.gridjob.GridAccessController;
 import org.auscope.portal.server.gridjob.ScriptParser;
 import org.auscope.portal.server.gridjob.Util;
@@ -113,6 +114,8 @@ public class GridSubmitController {
     private static final String CREDENTIAL_ERROR = "Job submission failed due to Invalid Credential Error";
     
     
+    
+    
     /**
      * Given a list of stations and a date range this function queries the remote serviceUrl for a list of log files
      * and returns a JSON representation of the response
@@ -126,8 +129,10 @@ public class GridSubmitController {
      * {
      *     success : (true/false),
      *     urlList : [{
-     *         url    : (Mapped from url or empty string)
-     *         date   : (Mapped from date or empty string)
+     *         fileUrl    : (Mapped from url or empty string)
+     *         fileDate   : (Mapped from date or empty string)
+     *         stationId  : (Mapped from stationId or empty string)
+     *         selected   : will be always set to true
      *     }]
      * }
      */
@@ -170,7 +175,7 @@ public class GridSubmitController {
                     method.setQueryString(new NameValuePair[]{new NameValuePair("request", "GetFeature"), 
                     											new NameValuePair("outputFormat", "GML2"),
                     											new NameValuePair("typeName", "geodesy:station_observations"),
-                    											new NameValuePair("PropertyName", "geodesy:date,geodesy:url"),
+                    											new NameValuePair("PropertyName", "geodesy:date,geodesy:url,geodesy:id"),
                     											new NameValuePair("CQL_FILTER", cqlFilter)});
 
                     return method;
@@ -189,14 +194,20 @@ public class GridSubmitController {
             NodeList nodes = (NodeList) xPath.evaluate(featureMemberExpression, responseDocument, XPathConstants.NODESET);
             if (nodes != null) {
 	            for(int i=0; i < nodes.getLength(); i++ ) {
-	            	ModelMap urlMap = new ModelMap();
+	            	GeodesyGridInputFile ggif = new GeodesyGridInputFile();
+	            	
 	            	Node tempNode = (Node) xPath.evaluate("station_observations/url", nodes.item(i), XPathConstants.NODE);
-	            	urlMap.addAttribute("url", tempNode == null ? "" : tempNode.getTextContent());
+	            	ggif.setFileUrl(tempNode == null ? "" : tempNode.getTextContent());
 	            	
 	            	tempNode = (Node) xPath.evaluate("station_observations/date", nodes.item(i), XPathConstants.NODE);
-	            	urlMap.addAttribute("date", tempNode == null ? "" : tempNode.getTextContent());
+	            	ggif.setFileDate(tempNode == null ? "" : tempNode.getTextContent());
 	            	
-	            	urlList.add(urlMap);
+	            	tempNode = (Node) xPath.evaluate("station_observations/id", nodes.item(i), XPathConstants.NODE);
+	            	ggif.setStationId(tempNode == null ? "" : tempNode.getTextContent());
+	            	
+	            	ggif.setSelected(true);
+	            	
+	            	urlList.add(ggif);
 	            }
             }
             
@@ -1065,18 +1076,21 @@ public class GridSubmitController {
             gridStatus.jobSubmissionStatus = JobSubmissionStatus.Failed;
 
         } else {
-            String gpsFiles = (String)request.getSession().getAttribute("gridInputFiles");	
-            List<String> urlsList = GeodesyUtil.getSelectedGPSFiles(gpsFiles);
-
-            //TODO add this to stageIn array
-            //List<String> localFiles = this.getLocalGPSFiles(urlsList);
+        	//Reduce our list of input files to an array of urls
+        	List<GeodesyGridInputFile> gpsFiles = (List<GeodesyGridInputFile>)request.getSession().getAttribute("gridInputFiles");
+            if (gpsFiles == null) {
+            	logger.warn("gridInputFiles is null, using empty list instead");
+            	gpsFiles = new ArrayList<GeodesyGridInputFile>();
+            }
             
-            // Convert List<String> to String[]
-    		String[] urlArray = new String[urlsList.size()];
-    		urlArray = urlsList.toArray(urlArray);
+            String[] urlArray = new String[gpsFiles.size()];
+            int urlArrayIndex = 0;
+            for (GeodesyGridInputFile ggif : gpsFiles) {
+            	urlArray[urlArrayIndex++] = ggif.getFileUrl();
+            }
     		
     		//Transfer job input files to Grid StageInURL
-    		if(urlsList != null && !urlsList.isEmpty()){
+    		if(urlArray.length > 0){
         		gridStatus = urlCopy(urlArray, request);
     		}    		
     		    		
