@@ -72,7 +72,8 @@
                <xsl:text>GeoSciML data converted to KML</xsl:text>
             </description>
 
-            <xsl:apply-templates select="gml:featureMember/er:Mine"/>
+			
+            <!-- <xsl:apply-templates select="gml:featureMember/er:Mine"/>
             <xsl:apply-templates select="gml:featureMember/er:MiningActivity"/>
             <xsl:apply-templates select="gml:featureMember/er:MiningFeatureOccurrence"/>
             <xsl:apply-templates select="gml:featureMember/er:MineralOccurrence"/>
@@ -85,8 +86,15 @@
             <xsl:apply-templates select="gml:featureMembers/er:MiningActivity"/>
             <xsl:apply-templates select="gml:featureMembers/ngcp:GnssStation"/>
             <xsl:apply-templates select="gml:featureMembers/er:MineralOccurrence"/>
-            <xsl:apply-templates select="gml:featureMembers/gsml:Borehole"/>
+            
             <xsl:apply-templates select="gml:featureMembers/sa:SamplingPoint"/>
+            
+            <xsl:apply-templates select="gml:featureMembers/gsml:Borehole"/>  -->
+            
+             
+            
+            <!-- This is the generic parser which will attempt to transform everything else -->
+            <xsl:apply-templates select="gml:featureMembers/* | gml:featureMember/*"/>
          </Document>
       </kml>
    </xsl:template>
@@ -94,7 +102,7 @@
    
    <!-- TEMPLATE FOR TRANSLATING er:Mine -->
    <!-- ================================================================= -->
-   <xsl:template match="gml:featureMember/er:Mine | gml:featureMembers/er:Mine">
+   <xsl:template match="gml:featureMember/er:Mine | gml:featureMembers/er:Mine" priority="100">
    
       <xsl:variable name="coordinates">
          <xsl:value-of select="./er:occurrence/er:MiningFeatureOccurrence/er:location/gml:Point/gml:pos"/>
@@ -134,7 +142,7 @@
    
    <!-- TEMPLATE FOR TRANSLATING Mining Activity -->
    <!-- ================================================================= -->
-   <xsl:template match="gml:featureMember/er:MiningActivity | gml:featureMembers/er:MiningActivity">
+   <xsl:template match="gml:featureMember/er:MiningActivity | gml:featureMembers/er:MiningActivity" priority="100">
 
       <xsl:variable name="coordinates">
          <xsl:value-of select="./er:occurrence/er:MiningFeatureOccurrence/er:location/gml:Point/gml:pos"/>
@@ -181,7 +189,7 @@
    
    <!-- TEMPLATE FOR TRANSLATING Mining Feature Occurence -->
    <!-- ================================================================= -->
-   <xsl:template match="gml:featureMember/er:MiningFeatureOccurrence">
+   <xsl:template match="gml:featureMember/er:MiningFeatureOccurrence" priority="100">
    
       <xsl:variable name="coordinates">
          <xsl:value-of select="./er:location/gml:Point/gml:pos"/>
@@ -202,7 +210,7 @@
    
    <!-- TEMPLATE FOR TRANSLATING Mineral Occurrences -->
    <!-- ================================================================= -->
-   <xsl:template match="gml:featureMember/er:MineralOccurrence | gml:featureMembers/er:MineralOccurrence">
+   <xsl:template match="gml:featureMember/er:MineralOccurrence | gml:featureMembers/er:MineralOccurrence" priority="100">
    
       <xsl:variable name="coordinates">
          <xsl:value-of select="./gsml:occurrence/gsml:MappedFeature/gsml:shape/gml:Point/gml:pos"/>
@@ -287,7 +295,7 @@
    
    <!-- TEMPLATE FOR TRANSLATING Geologic Unit -->
    <!-- ================================================================= -->
-   <xsl:template match="gml:featureMember/gsml:GeologicUnit">
+   <xsl:template match="gml:featureMember/gsml:GeologicUnit" priority="100">
    
          <!--
          <xsl:value-of select="local-name()"/>  
@@ -320,7 +328,7 @@
    
    <!-- TEMPLATE FOR TRANSLATING MAPPED FEATURE -->
    <!-- ================================================================= -->
-   <xsl:template match="gml:featureMember/gsml:MappedFeature">
+   <xsl:template match="gml:featureMember/gsml:MappedFeature" priority="100">
 
       <Placemark>
          <name><xsl:value-of select="@gml:id"/></name>
@@ -339,7 +347,7 @@
    
    <!-- TEMPLATE FOR TRANSLATING GU ShearDisplacementStructure -->
    <!-- ================================================================= -->
-   <xsl:template match="gml:featureMember/gsml:ShearDisplacementStructure">
+   <xsl:template match="gml:featureMember/gsml:ShearDisplacementStructure" priority="100">
    
       <xsl:variable name="coordinates">
          <xsl:value-of select="./gsml:occurrence/gsml:MappedFeature/gsml:shape/gml:MultiCurve/gml:curveMember/gml:LineString/gml:posList"/>
@@ -362,7 +370,7 @@
    
    <!-- TEMPLATE FOR TRANSLATING GEODESY -->
    <!-- ================================================================= -->
-   <xsl:template match="gml:featureMember/ngcp:GnssStation | gml:featureMembers/ngcp:GnssStation">
+   <xsl:template match="gml:featureMember/ngcp:GnssStation | gml:featureMembers/ngcp:GnssStation" priority="100">
    
       <xsl:variable name="coordinates">
          <xsl:value-of select="./ngcp:GEOM/gml:Point/gml:pos"/>
@@ -390,7 +398,7 @@
    
    <!-- TEMPLATE FOR TRANSLATING NVCL -->
    <!-- ================================================================= -->
-   <xsl:template match="gml:featureMembers/gsml:Borehole">
+   <xsl:template match="gml:featureMembers/gsml:Borehole" priority="100">
 
       <xsl:variable name="coordinates">
          <xsl:value-of select="./gsml:collarLocation/gsml:BoreholeCollar/gsml:location/gml:Point/gml:pos"/>
@@ -417,6 +425,30 @@
          <xsl:apply-templates select="./gsml:collarLocation/gsml:BoreholeCollar/gsml:location/gml:Point"/>
       </Placemark>
    </xsl:template>
+
+	<!--TEMPLATE FOR TRANSLATING A GENERIC INPUT-->
+	<!-- ================================================================= -->
+	<xsl:template match="gml:featureMembers/* | gml:featureMember/*" priority="1">
+		<Placemark>
+	         <name>
+				 <xsl:value-of select="@gml:id"/>
+	         </name>
+	         
+	         <!-- This is just a simple description of the node -->
+	         <description>
+	         	<!--  This is to tell the JS to specifically search for this -->
+	         	<xsl:text>GENERIC_PARSER:</xsl:text><xsl:value-of select="@gml:id"/>
+	         </description>
+	         
+	         <!-- This is so we can pickup where the node should be drawn -->
+                 <MultiGeometry>
+	         <xsl:apply-templates select="./descendant::gml:Polygon"/>
+	         <xsl:apply-templates select="./descendant::gml:Multicurve"/>
+	         <xsl:apply-templates select="./descendant::gml:Point"/>
+	         <xsl:apply-templates select="./descendant::gml:MultiLineString"/>
+	         </MultiGeometry>
+	    </Placemark>
+	</xsl:template>
 
 
    <!-- TEMPLATE FOR TRANSLATING GNSS -->
@@ -495,6 +527,7 @@
    <!-- ================================================================= -->
    <xsl:template match="gml:Polygon">
       <Polygon>
+		  <altitudeMode><xsl:text>clampToGround</xsl:text></altitudeMode> 
          <xsl:apply-templates select="gml:exterior"/>
          <xsl:apply-templates select="gml:interior"/>
       </Polygon>
@@ -523,6 +556,22 @@
 		</LineString>
    </xsl:template>
    
+   <xsl:template match="gml:MultiLineString">   
+		<xsl:variable name="int_coordinates">
+				 <xsl:value-of select="./gml:lineStringMember/gml:LineString/gml:posList"/>
+		</xsl:variable>
+			
+		<LineString>
+			<extrude><xsl:text>1</xsl:text></extrude>
+			<tessellate><xsl:text>1</xsl:text></tessellate>
+			<coordinates>
+				<xsl:call-template name="parseLatLongCoord">
+					<xsl:with-param name="coordinates" select="$int_coordinates"/>
+				</xsl:call-template>
+	        </coordinates>
+				
+		</LineString>
+	</xsl:template>
    
    <!-- ================================================================= -->
    <xsl:template match="gml:MultiSurface//gml:PolygonPatch">
