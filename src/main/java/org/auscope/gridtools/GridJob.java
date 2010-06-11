@@ -64,6 +64,9 @@ public class GridJob implements Serializable
     /** Container for subJobs stageIn directory */
     private Hashtable subJobStageIn = null;
     
+    /** Container for subJobs stageIn directory */
+    private Hashtable gridSubJobStageIn = null;
+    
     /**
      * Does some <em>very</em> basic setting up of the class variables. Just
      * to prevent errors. The strings are initialized to the empty String, and 
@@ -542,6 +545,20 @@ public class GridJob implements Serializable
 	}
 	
     /**
+	 * @return the gridSubJobStageIn
+	 */
+	public Hashtable getGridSubJobStageIn() {
+		return gridSubJobStageIn;
+	}
+
+	/**
+	 * @param gridSubJobStageIn the gridSubJobStageIn to set
+	 */
+	public void setGridSubJobStageIn(Hashtable gridSubJobStageIn) {
+		this.gridSubJobStageIn = gridSubJobStageIn;
+	}
+
+	/**
      * Returns a String representing the state of this
      * <code>GridJob</code> object.
      * 

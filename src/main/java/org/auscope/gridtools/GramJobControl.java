@@ -344,7 +344,13 @@ public class GramJobControl implements JobControlInterface {
                     "</sourceUrl>   <destinationUrl>" + gridFtpInput +
                     "</destinationUrl>  </transfer>";
                 }
-
+                
+                if(job.getGridSubJobStageIn().containsKey(subJobId)){
+                	String gridSubJobInput = (String)job.getGridSubJobStageIn().get(subJobId);
+                    finalJobString += "  <transfer>   <sourceUrl>" + gridSubJobInput +
+                    "</sourceUrl>   <destinationUrl>" + gridFtpInput +
+                    "</destinationUrl>  </transfer>";
+                }
                 
                 finalJobString += " </fileStageIn>";
             }

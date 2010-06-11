@@ -52,8 +52,11 @@ public class GeodesyJob extends GridJob {
     /** The submission date and time */
     private String    submitDate;
     
-    /** A boolean to identify if Job is registered to Geonetwork */
+    /** URL of the Job is registered to Geonetwork */
     private String registered;
+    
+    /** URL of the output location */
+    private String  outputLocation;
     
     /** Extra info required when registering job to GN */
     private String extraJobDetails;
@@ -349,6 +352,20 @@ public class GeodesyJob extends GridJob {
 		this.registered = registered;
 	}
 	
+	/**
+	 * @return the outputLocation
+	 */
+	public String getOutputLocation() {
+		return outputLocation;
+	}
+
+	/**
+	 * @param outputLocation the outputLocation to set
+	 */
+	public void setOutputLocation(String outputLocation) {
+		this.outputLocation = outputLocation;
+	}
+
 	/**
 	 * @return the extraJobDetails
 	 */

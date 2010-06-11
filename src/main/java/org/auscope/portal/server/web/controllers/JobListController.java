@@ -790,6 +790,7 @@ public class JobListController {
                                 // if the job files have been staged out and assume
                                 // success if that is the case.
                                 j.setStatus("Done");
+                                
                                 jobManager.saveJob(j);                        	   
                             }else{
                             	j.setStatus("Failed");
@@ -797,6 +798,8 @@ public class JobListController {
                             }                            
                         }
                     }
+                    String output = j.getOutputDir().substring(j.getOutputDir().indexOf("grid-auscope"), j.getOutputDir().length());
+                    j.setOutputLocation("http://files.ivec.org/"+output);
                 }
             }
             mav.addObject("jobs", seriesJobs);

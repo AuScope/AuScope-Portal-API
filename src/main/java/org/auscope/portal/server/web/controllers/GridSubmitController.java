@@ -12,14 +12,20 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.net.URL;
 import java.rmi.ServerException;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,7 +76,9 @@ import org.globus.ftp.GridFTPSession;
 import org.globus.io.urlcopy.UrlCopy;
 import org.globus.io.urlcopy.UrlCopyException;
 import org.globus.util.GlobusURL;
+import org.globus.wsrf.utils.FaultHelper;
 import org.ietf.jgss.GSSCredential;
+import org.ietf.jgss.GSSException;
 import org.springframework.ui.ModelMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -83,6 +91,10 @@ import org.xml.sax.InputSource;
  *
  * @author Cihan Altinay
  * @author Abdi Jama
+ */
+/**
+ * @author jam19d
+ *
  */
 @Controller
 public class GridSubmitController {
@@ -113,6 +125,20 @@ public class GridSubmitController {
     private static final String TRANSFER_COMPLETE = "Transfer Complete";
     private static final String CREDENTIAL_ERROR = "Job submission failed due to Invalid Credential Error";
     
+    /**
+     * Pattern to match compressed RINEX file name.
+     * 
+     * <p>
+     * Groups in the pattern:
+     * <ol>
+     * <li>four character site id (should be lowercase)
+     * <li>day of the year (1 is the first of January)
+     * <li>two-digit year (we assume start at 1990)
+     * </ol>
+     */
+    private static Pattern RINEX_FILENAME_PATTERN = Pattern
+            .compile("(\\w{4})(\\d{3})\\d\\.(\\d{2})\\w\\.Z");
+
     
     
     
@@ -216,6 +242,9 @@ public class GridSubmitController {
     		urlList.clear();
             success = false;
     	}
+    	//save the date range for later processing
+    	request.getSession().setAttribute("dateFrom", dateFrom);
+    	request.getSession().setAttribute("dateTo", dateTo);
     	
     	jsonResponse.addObject("success", success);
     	jsonResponse.addObject("urlList", urlList);
@@ -617,7 +646,11 @@ public class GridSubmitController {
             result.addObject("data", job);
             result.addObject("success", true);
         }
-
+        
+        //reset the date range for new job
+        request.getSession().removeAttribute("dateTo");
+        request.getSession().removeAttribute("dateFrom");
+        
         return result;
     }
 
@@ -1090,9 +1123,9 @@ public class GridSubmitController {
             }
     		
     		//Transfer job input files to Grid StageInURL
-    		if(urlArray.length > 0){
-        		gridStatus = urlCopy(urlArray, request);
-    		}    		
+    		//if(urlArray.length > 0){
+        	//	gridStatus = urlCopy(urlArray, request);
+    		//}    		
     		    		
     		if(gridStatus.jobSubmissionStatus != JobSubmissionStatus.Failed){
     			
@@ -1102,21 +1135,43 @@ public class GridSubmitController {
                 job.setJobType(job.getJobType().replace(",", ""));
                 JSONArray args = JSONArray.fromObject(request.getParameter("arguments"));
                 logger.info("Args in Json : "+args.toArray().length);
-
                 job.setArguments((String[])args.toArray(new String [args.toArray().length]));
                 
                 // Create a new directory for the output files of this job
+                //String certDN = (String)request.getSession().getAttribute("certDN");
+                String certDN_DIR = "";
+                try {
+                    GSSCredential cred = (GSSCredential)credential;
+                    certDN_DIR = cred.getName().toString().replaceAll("=", "_").replaceAll("/", "_").replaceAll(" ", "_").substring(1);//certDN.replaceAll("=", "_").replaceAll(" ", "_").replaceAll(",", "_");
+                    
+                    logger.debug("certDN_DIR: "+certDN_DIR);
+        		} catch (GSSException e) {
+                    logger.error(FaultHelper.getMessage(e));
+                }
+        		
+                success = createGridDir(request, gridAccess.getGridFtpStageOutDir()+certDN_DIR+File.separator);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
                 String dateFmt = sdf.format(new Date());
                 String jobID = user + "-" + job.getName() + "-" + dateFmt +
                     File.separator;
-                String jobOutputDir = gridAccess.getGridFtpStageOutDir()+jobID;
+                String jobOutputDir = gridAccess.getGridFtpStageOutDir()+certDN_DIR+File.separator+jobID;
                 
                 // Add grid stage-in directory and local stage-in directory.
                 String stageInURL = gridAccess.getGridFtpServer()+jobInputDir;
                 logger.debug("stagInURL: "+stageInURL);
                                 
                 if(job.getJobType().equals("single")){
+            		
+            		//Transfer job input files to Grid StageInURL
+            		if(urlArray != null && urlArray.length > 0){
+                		// Full URL
+                		// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
+                		//       +"rinex/" + filename
+                		String toURL = gridAccess.getGridFtpServer()+File.separator+ jobInputDir 
+ 		               +GridSubmitController.RINEX_DIR+File.separator;
+                		gridStatus = urlCopy(urlArray, request, toURL);
+            		}
+            		
                     String localStageInURL = gridAccess.getLocalGridFtpServer()+
                     (String) request.getSession().getAttribute("localJobInputDir");
                     job.setInTransfers(new String[]{stageInURL,localStageInURL});
@@ -1124,6 +1179,28 @@ public class GridSubmitController {
                     logger.debug("localStagInURL: "+localStageInURL);                	
                 }
                 else{
+                	//Here see if date range is used and not parameter list from the gui for multi job
+            		String strDateFrom = (String)request.getSession().getAttribute("dateFrom");
+            		String strDateTo = (String)request.getSession().getAttribute("dateTo");
+                	if(strDateFrom != null && strDateTo != null)
+                	{	
+                		String[] params = createSubjobs(strDateFrom, strDateTo, job.getArguments()[0], request, gpsFiles);
+                		
+                		//overwrite job args
+                		job.setArguments(params);
+                	}
+                	else
+                	{
+                		if(urlArray != null && urlArray.length > 0){
+                    		// Full URL
+                    		// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
+                    		//       +"rinex/" + filename
+                			String toURL = gridAccess.getGridFtpServer()+File.separator+ jobInputDir 
+      		               +GridSubmitController.RINEX_DIR+File.separator;
+                    		gridStatus = urlCopy(urlArray, request, toURL );
+                		}                		
+                	}
+                	
                 	//create the base directory for multi job, because this fails on stage out.
                 	success = createGridDir(request, jobOutputDir);
                 	String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
@@ -1138,7 +1215,16 @@ public class GridSubmitController {
                 	if(localSubJobDir == null)
                 		localSubJobDir = new Hashtable();
                 	job.setSubJobStageIn(localSubJobDir);
+                	request.getSession().removeAttribute("localSubJobDir");
                 	logger.debug("localSubJobDir size: "+localSubJobDir.size());
+                	
+                	//Add grigSubJobStageIns
+                	Hashtable gridSubJobStageInDir = (Hashtable) request.getSession().getAttribute("subJobStageInDir");
+                	if(gridSubJobStageInDir == null)
+                		gridSubJobStageInDir = new Hashtable();
+                	job.setGridSubJobStageIn(gridSubJobStageInDir);
+                	request.getSession().removeAttribute("subJobStageInDir");
+                	logger.debug("gridSubJobStageInDir size: "+gridSubJobStageInDir.size());
                 }
                 
 
@@ -1189,7 +1275,170 @@ public class GridSubmitController {
 
         return mav;
     }
+    
+    /**
+     * create a subjob for each day in the date range, using first parameter as a template.
+     * Then transfer all the rinex files for each subjob. 
+     * @param strDateFrom
+     * @param strDateTo
+     * @param param
+     * @return array of strings
+     */
+    private String[] createSubjobs(String strDateFrom, String strDateTo, String param, 
+    		                    HttpServletRequest request, List<GeodesyGridInputFile> gpsFiles){
+    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    	List<String> paramList = new ArrayList<String>();
+    	// Save in session to use it when submitting job
+        String jobInputDir = (String)request.getSession().getAttribute("jobInputDir");
+    	//for now use this as template param
+    	//TO-DO change to the first param entered by the gui
+    	String paramTemp = new String(" -expt grid -orbt IGSF -no_ftp -aprfile itrf05.apr");
+    	try
+        {
+            Date dateFrom = df.parse(strDateFrom);
+            Date dateTo = df.parse(strDateTo);
+            
+            Calendar calFrom = Calendar.getInstance();
+            calFrom.setTime(dateFrom);
+            
+            Calendar calTo = Calendar.getInstance();
+            calTo.setTime(dateTo);
+            
+            //String gpsFiles = (String)request.getSession().getAttribute("gridInputFiles");	
+            //List<String> urlsList = GeodesyUtil.getSelectedGPSFiles(gpsFiles);
+            
+            //while dateFrom is less than or equal to dateTo
+            int jobCount = 0;
+            while((calFrom.compareTo(calTo))<= 0 ){
+                //TO-DO check if this subJob has renix files available
+            	int year = calFrom.get(Calendar.YEAR);
+            	int doy = calFrom.get(Calendar.DAY_OF_YEAR);
+            	String strParam = "-d "+year+" "+doy+paramTemp;
+            	paramList.add(strParam);
+            	
+            	String[] rinexOfDay = getRinexFilesOfDate(calFrom, gpsFiles);
+            	if(rinexOfDay.length > 0)
+            	{
+            		//First create subJob and rinex directory for each subJob
+            		String subJobId = "subJob_"+jobCount;
+            		if(createGridDir(request, jobInputDir+subJobId+File.separator)){
+                		// Full URL
+                		// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
+                		//       +"rinex/" + filename
+            			String toURL = gridAccess.getGridFtpServer()+File.separator+jobInputDir+subJobId+File.separator;
+            			urlCopy(rinexOfDay, request, toURL);
+            			
+                    	Hashtable subJobStageInDir = (Hashtable) request.getSession().getAttribute("subJobStageInDir");
+                    	
+                    	if(subJobStageInDir == null)
+                    		subJobStageInDir = new Hashtable();
+                    	
+                    	if(!subJobStageInDir.containsKey(subJobId)){
+                    		String gridSubjobDir = gridAccess.getGridFtpServer()+jobInputDir+subJobId+File.separator;
+                    		subJobStageInDir.put(subJobId, gridSubjobDir);
+                    		request.getSession().setAttribute("subJobStageInDir", subJobStageInDir);
+                    		logger.info("Added gridStageInDir: "+gridSubjobDir);
+                    	}
+            		}
+            	}else
+            	{
+            		logger.info("No rinex files found for this day: "+year+"-"+doy);
+            	}
+            	
+            	calFrom.add(Calendar.DATE, 1);
+            	jobCount++;
+            	logger.debug("Added param: "+strParam);
+            }                        
+        } 
+    	catch (ParseException e)
+        {
+    		//do we need to pass this to the gui
+    		logger.error("Error casting date: "+e.getMessage());
+        }
+    	String[] paramArray = new String[paramList.size()];
+		paramArray = paramList.toArray(paramArray);
+    	return paramArray;
+    }
 
+    
+    private String[] getRinexFilesOfDate(Calendar currentDate, List<GeodesyGridInputFile> gpsFiles){
+
+    	List<String> rinexFilesOfDate = new ArrayList<String>();
+    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    	Calendar fileDate = Calendar.getInstance();
+    	for (GeodesyGridInputFile rinexUrl : gpsFiles){
+    		try{
+        		Date date = df.parse(rinexUrl.getFileDate());        		
+        		fileDate.setTime(date);
+	            
+	            //now check if the file if for the current date, we don't care about which station
+	            if(currentDate.compareTo(fileDate)==0){
+	            	logger.debug("Date: "+currentDate.get(Calendar.YEAR)+"-"+currentDate.get(Calendar.DAY_OF_YEAR)+" is matched to rinex file: "+rinexUrl.getFileUrl());
+	            	rinexFilesOfDate.add(rinexUrl.getFileUrl());
+	            	//gpsFiles.remove(rinexUrl);
+	            }
+            } catch (Exception e)
+            {
+        		//do we need to pass this to the gui
+        		logger.error("Error casting date of the rinex file: "+e.getMessage());
+            }
+    		
+    	}
+    	
+    	String[] rinexArray = new String[rinexFilesOfDate.size()];
+		rinexArray = rinexFilesOfDate.toArray(rinexArray);
+    	return rinexArray;
+    }
+    
+   /* private String[] getRinexFilesOfDate(int year, int doy, List<GeodesyGridInputFile> gpsFiles){
+
+    	List<String> rinexFilesOfDate = new ArrayList<String>();
+    	String filename = null;
+    	for (GeodesyGridInputFile rinexUrl : gpsFiles){
+    		try{
+    			URL url = new URL(rinexUrl.getFileUrl());
+    			filename = (new File(url.getPath())).getName();
+    		}catch (Exception e){
+    			//do we need to pass this to the gui
+    			logger.error("Not valid url: "+e.getMessage());
+    		}
+    		
+			if(filename != null)
+			{
+		        Matcher matcher = RINEX_FILENAME_PATTERN.matcher(filename);
+		        
+		        //the rinex file matches the pattern
+		        if (matcher.matches()) {
+		            int rinex_doy = Integer.parseInt(matcher.group(2));
+		            int rinex_year = Integer.parseInt(matcher.group(3));
+
+		            if (year < 90) {
+		                rinex_year += 2000;
+		            } else {
+		                rinex_year += 1900;
+		            }
+		            
+		            logger.debug("doy= ");
+		            
+		            //now check if the file if for the current date, we don't care about which station
+		            if(year == rinex_year && doy == rinex_doy){
+		            	logger.debug("Date"+year+"-"+doy+"is matched to rinex file: "+filename);
+		            	rinexFilesOfDate.add(rinexUrl.getFileUrl());
+		            	gpsFiles.remove(rinexUrl);
+		            }
+		        }else
+		        {
+		        	logger.debug("Rinex File name not in expected form: "+filename);
+		        }
+			}    		
+    	}
+    	
+    	String[] rinexArray = new String[rinexFilesOfDate.size()];
+		rinexArray = rinexFilesOfDate.toArray(rinexArray);
+    	return rinexArray;
+    }*/
+    
+    
     /**
      * Method that store extra job info required for registering into Geonetwork
      * @param job
@@ -1441,84 +1690,7 @@ public class GridSubmitController {
      * @return          GridTransferStatus of files copied
      * 
      */
-	/*private GridTransferStatus urlCopy(String[] fromURLs, HttpServletRequest request) {
 
-		Object credential = request.getSession().getAttribute("userCred");		
-		String jobInputDir = (String) request.getSession().getAttribute("jobInputDir");				
-        GridTransferStatus status = new GridTransferStatus();
-		
-		if( jobInputDir != null )
-		{
-			for (int i = 0; i < fromURLs.length; i++) {
-				// StageIn to Grid etc
-				
-				try {
-					GlobusURL from = new GlobusURL(fromURLs[i].replace("http://files.ivec.org/geodesy/", "gsiftp://pbstore.ivec.org:2811//pbstore/cg01/geodesy/ftp.ga.gov.au/"));
-					logger.info("fromURL is: " + from.getURL());
-					
-					String fullFilename = new URL(fromURLs[i]).getFile();
-
-					// Extract just the filename
-					String filename = new File(fullFilename).getName();	
-					status.file = filename;
-					
-					
-					// Full URL
-					// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
-					//       +"rinex/" + "abeb0010.00d.Z"
-					String toURL = gridAccess.getGridFtpServer()+File.separator+ jobInputDir 
-					               +GridSubmitController.RINEX_DIR+File.separator+ filename;
-					GlobusURL to = new GlobusURL(toURL);		
-					logger.info("toURL is: " + to.getURL());
-					
-					//Not knowing how long UrlCopy will take, the UI request status update of 
-					//file transfer periodically
-					UrlCopy uCopy = new UrlCopy();
-					uCopy.setCredentials((GSSCredential)credential);
-					uCopy.setDestinationUrl(to);
-					uCopy.setSourceUrl(from);
-					// Disables usage of third party transfers, for grid security reasons.
-					uCopy.setUseThirdPartyCopy(false); 	
-					uCopy.copy();
-										
-					
-					
-					logger.info(to.getProtocol()+"://"+to.getHost()+":"+to.getPort()+"/");
-					
-					String gridServer = to.getProtocol() + "://" + to.getHost() + ":" + to.getPort();
-
-					String gridFullURL =  gridServer + "/"+ jobInputDir;
-										
-					status.numFileCopied++;
-					status.currentStatusMsg = GridSubmitController.FILE_COPIED + status.numFileCopied
-					+" of "+fromURLs.length+" files transfered.";
-					status.gridFullURL = gridFullURL;
-					status.gridServer = gridServer;
-					logger.debug(status.currentStatusMsg+" : "+fromURLs[i]);
-					
-					// Save in session for status update request for this job.
-			        request.getSession().setAttribute("gridStatus", status);
-					
-				} catch (UrlCopyException e) {
-					logger.error("UrlCopy Error: " + e.getMessage());
-					status.numFileCopied = i;
-					status.currentStatusMsg = GridSubmitController.FILE_COPY_ERROR;
-					status.jobSubmissionStatus = JobSubmissionStatus.Failed;
-					// Save in session for status update request for this job.
-			        request.getSession().setAttribute("gridStatus", status);
-				} catch (Exception e) {
-					logger.error("Error: " + e.getMessage());
-					status.numFileCopied = i;
-					status.currentStatusMsg = GridSubmitController.INTERNAL_ERROR;
-					status.jobSubmissionStatus = JobSubmissionStatus.Failed;
-					// Save in session for status update request for this job.
-			        request.getSession().setAttribute("gridStatus", status);
-				}
-			}
-		}
-		
-		return status;
-	}*/	
 	/** 
 	 * urlCopy
 	 * 
@@ -1531,7 +1703,7 @@ public class GridSubmitController {
      * @return          GridTransferStatus of files copied
      * 
      */
-	private GridTransferStatus urlCopy(String[] fromURLs, HttpServletRequest request) {
+	private GridTransferStatus urlCopy(String[] fromURLs, HttpServletRequest request, String toURL) {
 
 		Object credential = request.getSession().getAttribute("userCred");		
 		String jobInputDir = (String) request.getSession().getAttribute("jobInputDir");				
@@ -1541,14 +1713,14 @@ public class GridSubmitController {
 		{
 			for (int i = 0; i < fromURLs.length; i++) {
 				// StageIn to Grid etc
-				int rtnValue = urlCopy(fromURLs[i], credential, jobInputDir, status );
+				int rtnValue = urlCopy(fromURLs[i], credential, jobInputDir, status, toURL );
 				//This means time-out issue exception, so retry 2 more times.
 				if(rtnValue == 1){
 					logger.info("UrlCopy timed-out retry 2 for: " + fromURLs[i]);
-					rtnValue = urlCopy(fromURLs[i], credential, jobInputDir, status );
+					rtnValue = urlCopy(fromURLs[i], credential, jobInputDir, status, toURL );
 					if(rtnValue == 1){
 						logger.info("UrlCopy timed-out retry 3 for: " + fromURLs[i]);
-						rtnValue = urlCopy(fromURLs[i], credential, jobInputDir, status );
+						rtnValue = urlCopy(fromURLs[i], credential, jobInputDir, status, toURL );
 						if(rtnValue == 1){
 							status.numFileCopied = i;
 							status.currentStatusMsg = GridSubmitController.FILE_COPY_ERROR;
@@ -1589,7 +1761,7 @@ public class GridSubmitController {
 	 * @param status holds status of the transfer
 	 * @return
 	 */
-    private int urlCopy(String fileUri, Object credential, String jobInputDir, GridTransferStatus status ) 
+    private int urlCopy(String fileUri, Object credential, String jobInputDir, GridTransferStatus status, String toURL ) 
     {
         int rtnValue = 0;
         try {
@@ -1602,11 +1774,8 @@ public class GridSubmitController {
     		String filename = new File(fullFilename).getName();	
     		status.file = filename;   		
     		
-    		// Full URL
-    		// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
-    		//       +"rinex/" + "abeb0010.00d.Z"
-    		String toURL = gridAccess.getGridFtpServer()+File.separator+ jobInputDir 
-    		               +GridSubmitController.RINEX_DIR+File.separator+ filename;
+
+    		toURL = toURL + filename;
     		GlobusURL to = new GlobusURL(toURL);		
     		logger.info("toURL is: " + to.getURL());
     		
@@ -1650,7 +1819,8 @@ public class GridSubmitController {
 			gridStore.authenticate((GSSCredential)credential); //authenticating
 			gridStore.setDataChannelAuthentication(DataChannelAuthentication.SELF);
 			gridStore.setDataChannelProtection(GridFTPSession.PROTECTION_SAFE);
-			gridStore.makeDir(myDir);
+			if (!gridStore.exists(myDir))
+				gridStore.makeDir(myDir);
 
 	        logger.debug("Created Grid Directory.");
 	        gridStore.close();

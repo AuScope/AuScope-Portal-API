@@ -554,11 +554,13 @@ GridSubmit.initialize = function() {
 
     var paramStore = new Ext.data.SimpleStore({
         fields: [ { name: 'paramID', type: 'string' },
-                  { name: 'paramLine', type: 'string' } ]
+                  { name: 'paramLine', type: 'string' } ],
+        data: [['subJob_0', '-d yr doy -expt grid -orbt IGSF -no_ftp -aprfile itrf05.apr']]
     });
     
     var subJobStore = new Ext.data.SimpleStore({
-        fields: [ { name: 'paramID', type: 'string' }]
+        fields: [ { name: 'paramID', type: 'string' }],
+        data: [['Common']]
     });
     
     var paramGrid = new Ext.grid.EditorGridPanel({
@@ -597,7 +599,7 @@ GridSubmit.initialize = function() {
                     }
                     var p = new ParamLines({
                          paramID: jobID,
-                         paramLine: '-d year day -expt tig1 tig2 aust -orbt IGSF'
+                         paramLine: '-d yr doy -expt grid -orbt IGSF -no_ftp -aprfile itrf05.apr'
                     });
                     //add param line and stop edit the grid
                     myGrid.stopEditing();
@@ -769,6 +771,7 @@ GridSubmit.initialize = function() {
             name: 'cpuCount',
             fieldLabel: 'Number of CPUs',
             allowBlank: false,
+            hidden : true,
             maskRe: /\d+/
         }, paramGrid,
         {

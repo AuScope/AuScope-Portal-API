@@ -457,6 +457,7 @@ JobList.initialize = function() {
             { name: 'scriptFile', type: 'string' },
             { name: 'status', type: 'string'},
             { name: 'registered', type: 'string'},
+            { name: 'outputLocation', type: 'string'},
             { name: 'submitDate', type: 'date', dateFormat: 'Ymd_His' }
         ],
         listeners: {
@@ -736,6 +737,7 @@ JobList.initialize = function() {
         '<tr><td class="jobdesc-key">Submitted on:</td><td>{submitDate}</td></tr>',
         '<tr><td class="jobdesc-key">Computation site:</td><td>{site}</td></tr>',
         '<tr><td class="jobdesc-key">Version:</td><td>{version}</td></tr>',
+        '<tr><td class="jobdesc-key">Ouput url:</td><td><a href="{outputLocation}">{outputLocation}</a></td></tr>',
         '<tr><td class="jobdesc-key">Geonetwork url:</td><td><a href="{registered}">{registered}</a></td></tr></table><br/>',
         '<p class="jobdesc-key">Description:</p><br/><p>{description}</p>'
     );

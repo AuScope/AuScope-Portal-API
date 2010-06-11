@@ -288,6 +288,7 @@ public class GridLoginController {
         logger.debug("SLCSResponse:\n"+slcsResponse);
         RequestData rd = parseRequestData(slcsResponse);
 
+        
         String certCN = rd.certDN.split("CN=")[1];
         String shibCN = (String)request.getSession().getAttribute("Shib-Person-commonName") + " "
                 + (String)request.getSession().getAttribute("Shib-Shared-Token");
@@ -343,6 +344,8 @@ public class GridLoginController {
                 request.getSession().setAttribute("userCred", credential);
             }
         }
+        logger.debug("certDN: "+rd.certDN);
+        request.getSession().setAttribute("certDN", rd.certDN);
     }
 }
 
