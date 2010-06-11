@@ -8,6 +8,7 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -18,8 +19,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.net.URL;
 import java.rmi.ServerException;
 import java.util.Vector;
@@ -1060,9 +1063,23 @@ public class GridSubmitController {
         String seriesIdStr = request.getParameter("seriesId");
         ModelAndView mav = new ModelAndView("jsonView");
         Object credential = request.getSession().getAttribute("userCred");
-
+        String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
+    	
         //Used to store Job Submission status, because there will be another request checking this.
 		GridTransferStatus gridStatus = new GridTransferStatus();
+    	
+    	
+    	//Lets replace our sites.default with a new template we create dynamically 
+        if (!templateSitesDefaults(request, localJobInputDir + GridSubmitController.TABLE_DIR + File.separator, job)) {
+        	logger.error("Error creating template sites.default");
+            gridStatus.currentStatusMsg = GridSubmitController.INTERNAL_ERROR;
+            gridStatus.jobSubmissionStatus = JobSubmissionStatus.Failed;
+                
+                // Save in session for status update request for this job.
+           request.getSession().setAttribute("gridStatus", gridStatus);
+           mav.addObject("success", false);
+           return mav;
+        }
 		
         if (credential == null) {
             //final String errorString = "Invalid grid credentials!";
@@ -1203,7 +1220,6 @@ public class GridSubmitController {
                 	
                 	//create the base directory for multi job, because this fails on stage out.
                 	success = createGridDir(request, jobOutputDir);
-                	String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
                     String localRinexStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
                                                   +GridSubmitController.RINEX_DIR+File.separator;
                     String localTablesStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
@@ -1599,6 +1615,79 @@ public class GridSubmitController {
     }
     
 
+    /**
+     * This function replaces the sites.defaults file in the specified directory
+     * With a new file (based on a hardcoded template and the site's selected).
+     * 
+     * @param request
+     * @param stageInDirectory 
+     * @param job Will have its arguments parameter parsed for an -expt option
+     * @return
+     */
+    private boolean templateSitesDefaults(HttpServletRequest request, String stageInDirectory, GeodesyJob job) {
+    	String[] argumentList = job.getArguments();
+    	if (argumentList == null || argumentList.length < 1) {
+    		logger.warn("No job arguments specified");
+    		return false;
+    	}
+    	
+    	//Current strategy - Grab the FIRST argument line and parse out the value of the -expt option
+    	String[] arguments = argumentList[0].split(" ");
+    	String experimentName = null;
+    	for (int i = 0; i < arguments.length; i++) {
+    		if (arguments[i].equals("-expt") && i < (arguments.length - 1)) {
+    			experimentName = arguments[i + 1];
+    		}
+    	}
+    	
+    	if (experimentName == null) {
+    		logger.warn("No -expt option specified");
+    		return false;
+    	}
+    	
+    	return templateSitesDefaults(request, stageInDirectory, experimentName); 
+    }
+    
+    /**
+     * This function replaces the sites.defaults file in the specified directory
+     * With a new file (based on a hardcoded template and the site's selected).
+     * @return
+     */
+    private boolean templateSitesDefaults(HttpServletRequest request, String stageInDirectory, String experimentName) {
+    	boolean success = true;
+    	
+    	FileWriter fw = null;
+    	try {
+    		fw = new FileWriter(stageInDirectory + "sites.defaults");
+
+    		//We have a list of files each with a different station ID, we want only the list of station ID's (No Duplicates)
+    		Map<String, String> stationMap = new HashMap<String, String>();
+    		List<GeodesyGridInputFile> ggifs = (List<GeodesyGridInputFile>) request.getSession().getAttribute("gridInputFiles");
+	    	for (GeodesyGridInputFile ggif : ggifs) {
+	    		stationMap.put(ggif.getStationId(), null);
+	    	}
+	    	
+	    	//Now iterate our map for the list of non duplicated station ID's
+	    	for (String stationName : stationMap.keySet()) {
+	    		fw.write(String.format("  %1$2s_gps  %2$2s localrx xstinfo  \n", stationName, experimentName));
+	    	}
+	    	
+    	} catch (Exception ex) {
+    		logger.error(ex);
+    		success = false;
+    	} finally {
+    		if (fw != null) {
+				try {
+					fw.close();
+				} catch (IOException ioex) {
+					logger.error("Error closing: " + ioex);
+					success = false;
+				}
+    		}
+    	}
+    	
+    	return success;
+    }
 
 	/** 
      * Create stageIn directories on portal host, so user can upload files easy.

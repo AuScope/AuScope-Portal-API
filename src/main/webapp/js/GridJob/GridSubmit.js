@@ -966,6 +966,7 @@ GridSubmit.initialize = function() {
     });
 
     StationSelect.onSuccessfulSubmit = function() {
+    	GridSubmit.loadJobObject();
     	gotoStep(1);
     }
     
@@ -1054,8 +1055,6 @@ GridSubmit.initialize = function() {
     // Avoid accidentally navigating away from this page
     Ext.EventManager.on(window, 'beforeunload',
             GridSubmit.onWindowUnloading, GridSubmit);
-
-    GridSubmit.loadJobObject();
 }
 
 
