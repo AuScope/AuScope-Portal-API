@@ -786,7 +786,8 @@ JobList.initialize = function() {
             buttons: [{
                 text: 'My Jobs',
                 tooltip: 'Retrieves the list of your series and jobs',
-                handler: JobList.querySeries
+                handler: JobList.querySeries,
+				disabled: true
             }, {
                 text: 'Query...',
                 tooltip: 'Displays the query dialog to search for jobs',
