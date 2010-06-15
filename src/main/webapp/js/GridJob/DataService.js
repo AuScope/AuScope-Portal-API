@@ -193,11 +193,11 @@ DataService.initialize = function(){
 	  var myGrid = Ext.getCmp('selection-grid');
   	  if (checked) {
 	      myStore.each(function(url_date){
-	    	  url_date.set("select_item",true);
+	    	  url_date.set("selected",true);
 	      },myStore);
 	  }else{	  	  
 	  	  myStore.each(function(url_date){
-			  url_date.set("select_item",false);
+			  url_date.set("selected",false);
 		  },myStore);
 	  }
     }
