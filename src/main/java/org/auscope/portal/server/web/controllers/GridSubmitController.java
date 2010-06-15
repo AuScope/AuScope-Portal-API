@@ -649,11 +649,7 @@ public class GridSubmitController {
             result.addObject("data", job);
             result.addObject("success", true);
         }
-        
-        //reset the date range for new job
-        request.getSession().removeAttribute("dateTo");
-        request.getSession().removeAttribute("dateFrom");
-        
+                
         return result;
     }
 
@@ -1205,6 +1201,12 @@ public class GridSubmitController {
                 		
                 		//overwrite job args
                 		job.setArguments(params);
+                        //String localRinexStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
+                        //                              +GridSubmitController.RINEX_DIR+File.separator;
+                        //String localTablesStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
+                        //                               +GridSubmitController.TABLE_DIR+File.separator;
+                		String localStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir;
+                        job.setInTransfers(new String[]{localStageInURL});
                 	}
                 	else
                 	{
@@ -1215,16 +1217,19 @@ public class GridSubmitController {
                 			String toURL = gridAccess.getGridFtpServer()+File.separator+ jobInputDir 
       		               +GridSubmitController.RINEX_DIR+File.separator;
                     		gridStatus = urlCopy(urlArray, request, toURL );
-                		}                		
+                		}
+                        //String localRinexStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
+                        //                              +GridSubmitController.RINEX_DIR+File.separator;
+                        //String localTablesStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
+                        //                               +GridSubmitController.TABLE_DIR+File.separator;
+                		String localStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir;
+                		job.setInTransfers(new String[]{stageInURL, localStageInURL});
                 	}
                 	
                 	//create the base directory for multi job, because this fails on stage out.
                 	success = createGridDir(request, jobOutputDir);
-                    String localRinexStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
-                                                  +GridSubmitController.RINEX_DIR+File.separator;
-                    String localTablesStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
-                                                   +GridSubmitController.TABLE_DIR+File.separator;
-                    job.setInTransfers(new String[]{stageInURL, localRinexStageInURL, localTablesStageInURL});
+
+
                     
                     //Add subJobStageIns
                 	Hashtable localSubJobDir = (Hashtable) request.getSession().getAttribute("localSubJobDir");
@@ -1287,6 +1292,11 @@ public class GridSubmitController {
         }
         // Save in session for status update request for this job.
         request.getSession().setAttribute("gridStatus", gridStatus);
+        
+        //reset the date range for next job
+        request.getSession().removeAttribute("dateTo");
+        request.getSession().removeAttribute("dateFrom");
+        
         mav.addObject("success", success);
 
         return mav;
@@ -1306,9 +1316,10 @@ public class GridSubmitController {
     	List<String> paramList = new ArrayList<String>();
     	// Save in session to use it when submitting job
         String jobInputDir = (String)request.getSession().getAttribute("jobInputDir");
-    	//for now use this as template param
-    	//TO-DO change to the first param entered by the gui
-    	String paramTemp = new String(" -expt grid -orbt IGSF -no_ftp -aprfile itrf05.apr");
+
+    	//Use the first parameter from GUI as template for generating param for each day in the date range
+        String paramTemp = param.substring(param.indexOf("-expt", 0), param.length());
+
     	try
         {
             Date dateFrom = df.parse(strDateFrom);
@@ -1329,32 +1340,48 @@ public class GridSubmitController {
                 //TO-DO check if this subJob has renix files available
             	int year = calFrom.get(Calendar.YEAR);
             	int doy = calFrom.get(Calendar.DAY_OF_YEAR);
-            	String strParam = "-d "+year+" "+doy+paramTemp;
+            	String strParam = "-d "+year+" "+doy+" "+paramTemp;
             	paramList.add(strParam);
             	
             	String[] rinexOfDay = getRinexFilesOfDate(calFrom, gpsFiles);
             	if(rinexOfDay.length > 0)
             	{
-            		//First create subJob and rinex directory for each subJob
+            		//First create subJob/rinex/ directories path for this subJob
+            		//Then urlcopy relevent rinex files for this sub job
             		String subJobId = "subJob_"+jobCount;
-            		if(createGridDir(request, jobInputDir+subJobId+File.separator)){
-                		// Full URL
-                		// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
-                		//       +"rinex/" + filename
-            			String toURL = gridAccess.getGridFtpServer()+File.separator+jobInputDir+subJobId+File.separator;
-            			urlCopy(rinexOfDay, request, toURL);
-            			
-                    	Hashtable subJobStageInDir = (Hashtable) request.getSession().getAttribute("subJobStageInDir");
+            		String subJobDir = jobInputDir+subJobId+File.separator;
+            		if(createGridDir(request, subJobDir)){
+            			String rinexSubJobDir = subJobDir+GridSubmitController.RINEX_DIR+File.separator;
+            			if(createGridDir(request, rinexSubJobDir)){
+                    		// Full URL
+                    		// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
+                    		//       +"rinex/" + filename
+                			String toURL = gridAccess.getGridFtpServer()+File.separator+rinexSubJobDir;
+                			urlCopy(rinexOfDay, request, toURL);
+                			
+                        	Hashtable subJobStageInDir = (Hashtable) request.getSession().getAttribute("subJobStageInDir");
+                        	
+                        	if(subJobStageInDir == null)
+                        		subJobStageInDir = new Hashtable();
+                        	
+                        	if(!subJobStageInDir.containsKey(subJobId)){
+                        		String gridSubjobDir = gridAccess.getGridFtpServer()+subJobDir;
+                        		subJobStageInDir.put(subJobId, gridSubjobDir);
+                        		request.getSession().setAttribute("subJobStageInDir", subJobStageInDir);
+                        		logger.info("Added gridStageInDir: "+gridSubjobDir);
+                        	}           				
+            			}
+                    	/*Hashtable subJobStageInDir = (Hashtable) request.getSession().getAttribute("subJobStageInDir");
                     	
                     	if(subJobStageInDir == null)
                     		subJobStageInDir = new Hashtable();
                     	
                     	if(!subJobStageInDir.containsKey(subJobId)){
-                    		String gridSubjobDir = gridAccess.getGridFtpServer()+jobInputDir+subJobId+File.separator;
+                    		String gridSubjobDir = gridAccess.getGridFtpServer()+subJobDir;
                     		subJobStageInDir.put(subJobId, gridSubjobDir);
                     		request.getSession().setAttribute("subJobStageInDir", subJobStageInDir);
                     		logger.info("Added gridStageInDir: "+gridSubjobDir);
-                    	}
+                    	}*/
             		}
             	}else
             	{

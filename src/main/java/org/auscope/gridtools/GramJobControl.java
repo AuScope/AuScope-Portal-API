@@ -7,6 +7,7 @@
 
 package org.auscope.gridtools;
 
+import java.io.FileWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -332,7 +333,7 @@ public class GramJobControl implements JobControlInterface {
                     
                 for (String xfer : job.getInTransfers()) {
                     finalJobString += "  <transfer>   <sourceUrl>" + xfer +
-                        "</sourceUrl>   <destinationUrl>" + addDirExtenion(xfer, gridFtpInput) +
+                        "</sourceUrl>   <destinationUrl>" + gridFtpInput +
                         "</destinationUrl>  </transfer>";
                 }
                 
@@ -405,12 +406,13 @@ public class GramJobControl implements JobControlInterface {
                 logger.error(e.getMessage(), e);
             }
             logger.debug("Finished creating job description "+i);
-
+            logger.debug(finalJobString);
             writeJobStr += finalJobString;
+            
         }
             
-        /*
-        try {
+        
+        /*try {
             final String JOBFILE = "GridJob.xml";
 
             logger.info("Writing " + JOBFILE + " file...");
@@ -422,13 +424,14 @@ public class GramJobControl implements JobControlInterface {
             writeJobStr = writeJobStr.replaceAll("> <", ">\n <");
             writeJobStr = writeJobStr.replaceAll(">  <", ">\n  <");
             writeJobStr = writeJobStr.replaceAll(">   <", ">\n   <");
+            
             fw.write(writeJobStr);
             fw.close();
         } catch (Throwable e) {
             logger.error("Could not write Job string to file.");
             logger.error(e.getMessage());
-        }
-        */
+        }*/
+        
 
         return jobs;
     }
@@ -765,7 +768,7 @@ public class GramJobControl implements JobControlInterface {
         return outputDirectory;
     }
     
-    private String addDirExtenion(String subJobInput, String gridFTPInput){
+   /* private String addDirExtenion(String subJobInput, String gridFTPInput){
     	String rinex_dir = "rinex/";
     	String tables_dir = "tables/";
     	if(subJobInput.endsWith(rinex_dir)){
@@ -776,6 +779,6 @@ public class GramJobControl implements JobControlInterface {
     	}
     	
     	return gridFTPInput;
-    }
+    }*/
 }
 
