@@ -2,8 +2,8 @@
    <div id="header-container">
       <div id="logo">
          <h1>
-            <a href="#" onclick="window.open('about.html','AboutWin','toolbar=no, menubar=no,location=no,resizable=no,scrollbars=yes,statusbar=no,top=100,left=200,height=650,width=450');return false"><img alt="" src="/img/img-auscope-banner.gif"></a>
-            <!-- <a href="login.html"><img alt="" src="/img/img-auscope-banner.gif" /></a> -->
+            <a href="#" onclick="window.open('about.html','AboutWin','toolbar=no, menubar=no,location=no,resizable=no,scrollbars=yes,statusbar=no,top=100,left=200,height=650,width=450');return false"><img alt="" src="img/img-auscope-banner.gif"></a>
+            <!-- <a href="login.html"><img alt="" src="img/img-auscope-banner.gif" /></a> -->
          </h1>
       </div>
                                   
@@ -14,7 +14,7 @@
       <STYLE type="text/css">
         H2 { text-align: center}
         #nav-example-02 a {
-            background: url("../img/navigation.gif") -100px -38px no-repeat;
+            background: url("img/navigation.gif") -100px -38px no-repeat;
         }
       </STYLE>
       

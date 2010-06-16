@@ -15,7 +15,7 @@
 
       <STYLE type="text/css">
         #nav-example-02 a {
-            background: url("/img/navigation.gif") -100px -38px no-repeat;
+            background: url("img/navigation.gif") -100px -38px no-repeat;
         }
       </STYLE>
 
@@ -30,11 +30,8 @@
 
         <script type="text/javascript" src="js/external/ext-2.2/adapter/ext/ext-base.js"></script>
         <script type="text/javascript" src="js/external/ext-2.2/ext-all-debug.js"></script>
-        <!--<script type="text/javascript" src="js/external/ext-2.2/ext-basex.js"></script>-->
         <script type="text/javascript" src="js/external/ext-2.2/RowExpander.js"></script>
         <script type="text/javascript" src="js/external/ext-2.2/CheckColumn.js"></script>
-        <script type="text/javascript" src="js/external/ext-2.2/adapter/jquery/jquery.js"></script>
-
 
         <script src="js/external/geoxml/geoxml.js" type="text/javascript"></script>
 
