@@ -1858,7 +1858,7 @@ public class GridSubmitController {
 				status.numFileCopied++;
 				status.currentStatusMsg = GridSubmitController.FILE_COPIED + status.numFileCopied
 				+" of "+fromURLs.length+" files transfered.";
-				logger.debug(status.currentStatusMsg+" : "+fromURLs[i]);
+				logger.debug("Copy " + status.numFileCopied + " of " + fromURLs.length);
 				
 				// Save in session for status update request for this job.
 		        request.getSession().setAttribute("gridStatus", status);															
@@ -1881,19 +1881,18 @@ public class GridSubmitController {
     {
         int rtnValue = 0;
         try {
-    		GlobusURL from = new GlobusURL(fileUri.replace("http://files.ivec.org/geodesy/", "gsiftp://pbstore.ivec.org:2811//pbstore/cg01/geodesy/ftp.ga.gov.au/"));
-    		logger.info("fromURL is: " + from.getURL());
+    		GlobusURL from = new GlobusURL(fileUri.replace("http://files.ivec.org/geodesy/", "gsiftp://pbstore.ivec.org:2811/pbstore/cg01/geodesy/ftp.ga.gov.au/"));
+    		logger.debug("fromURL is: " + from.getURL());
     		
     		String fullFilename = new URL(fileUri).getFile();
 
     		// Extract just the filename
     		String filename = new File(fullFilename).getName();	
     		status.file = filename;   		
-    		
 
     		toURL = toURL + filename;
     		GlobusURL to = new GlobusURL(toURL);		
-    		logger.info("toURL is: " + to.getURL());
+    		logger.debug("toURL is: " + to.getURL());
     		
     		//Not knowing how long UrlCopy will take, the UI request status update of 
     		//file transfer periodically
