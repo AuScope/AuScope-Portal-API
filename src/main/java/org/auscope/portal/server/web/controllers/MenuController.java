@@ -186,4 +186,9 @@ public class MenuController {
                    new RedirectView("/gridLogin.do", true, false, false));
        }
    }
+   
+   @RequestMapping("/dbg/debug.html")
+   public ModelAndView debug(HttpServletRequest request) {
+	   return new ModelAndView("debug");
+   }
 }
