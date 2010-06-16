@@ -87,7 +87,7 @@ StationSelect.requestStationListUrlsSuccess = function (response, options) {
     	url : 'sendToGrid.do',
     	success : StationSelect.saveStationListSuccess,
     	failure : StationSelect.saveStationListFailure,
-    	timeout : (6000 * 20), //Timeout is 20 minutes
+    	timeout : (60000 * 20), //Timeout is 20 minutes
     	params : {
 			myFiles : Ext.util.JSON.encode(responseObj.urlList)
 		}
@@ -174,7 +174,7 @@ StationSelect.okButtonHandler = function() {
     	url : 'getStationListUrls.do',
     	success : StationSelect.requestStationListUrlsSuccess,
     	failure : StationSelect.requestStationListUrlsFailure,
-    	timeout : (6000 * 20), //Timeout is 20 minutes
+    	timeout : (60000 * 20), //Timeout is 20 minutes
     	params : {
 			dateFrom : startDate.format('Y-m-d'),
 			dateTo   : endDate.format('Y-m-d'),
