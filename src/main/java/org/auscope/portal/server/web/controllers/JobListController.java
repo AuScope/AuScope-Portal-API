@@ -11,8 +11,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.rmi.ServerException;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
@@ -23,27 +21,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.auscope.portal.server.gridjob.FileInformation;
-import org.auscope.portal.server.gridjob.GridAccessController;
-import org.auscope.portal.server.gridjob.Util;
 import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
+import org.auscope.portal.server.gridjob.GridAccessController;
+import org.auscope.portal.server.gridjob.Util;
 import org.globus.ftp.DataChannelAuthentication;
+import org.globus.ftp.FileInfo;
 import org.globus.ftp.GridFTPClient;
 import org.globus.ftp.GridFTPSession;
 import org.ietf.jgss.GSSCredential;
-import org.globus.ftp.FileInfo;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.auscope.portal.server.web.view.JSONModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 import org.springframework.web.servlet.view.RedirectView;
 
 /**

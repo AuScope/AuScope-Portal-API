@@ -1,24 +1,22 @@
 package org.auscope.portal.server.util;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.Transformer;
-import javax.servlet.http.HttpServletRequest;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 
 /**
  * <p> This class converts geoSciML into KML format </p>

@@ -1,22 +1,22 @@
 package org.auscope.portal.mineraloccurrence;
 
-import org.auscope.portal.server.web.service.HttpServiceCaller;
-import org.auscope.portal.server.web.service.MineralOccurrenceService;
-import org.auscope.portal.server.web.IWFSGetFeatureMethodMaker;
-import org.junit.Before;
-import org.junit.Test;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.HttpClient;
-
-import java.util.Collection;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import junit.framework.Assert;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.auscope.portal.server.web.IWFSGetFeatureMethodMaker;
+import org.auscope.portal.server.web.service.HttpServiceCaller;
+import org.auscope.portal.server.web.service.MineralOccurrenceService;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Created by IntelliJ IDEA.

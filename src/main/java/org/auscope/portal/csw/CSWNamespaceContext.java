@@ -1,9 +1,10 @@
 package org.auscope.portal.csw;
 
-import javax.xml.namespace.NamespaceContext;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
+
+import javax.xml.namespace.NamespaceContext;
 
 /**
  * User: Mathew Wyatt

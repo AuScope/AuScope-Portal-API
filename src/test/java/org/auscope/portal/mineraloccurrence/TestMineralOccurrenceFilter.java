@@ -1,16 +1,16 @@
 package org.auscope.portal.mineraloccurrence;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Arrays;
+import java.util.Collection;
 
 import junit.framework.Assert;
 
 import org.auscope.portal.Util;
-import org.junit.Test;
-import org.jmock.Mockery;
 import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Test;
 
 
 /**

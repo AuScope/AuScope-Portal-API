@@ -6,9 +6,6 @@
  */
 package org.auscope.portal.server.gridjob;
 
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.auscope.gridtools.GridJob;
 
 /**

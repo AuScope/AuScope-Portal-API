@@ -1,14 +1,18 @@
 package org.auscope.portal.mineraloccurrence;
 
-import org.junit.Test;
-import org.xml.sax.SAXException;
-
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+
 import junit.framework.Assert;
+
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 /**
  * User: Mathew Wyatt

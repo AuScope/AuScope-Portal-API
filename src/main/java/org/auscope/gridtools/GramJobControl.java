@@ -7,11 +7,8 @@
 
 package org.auscope.gridtools;
 
-import java.io.FileWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
 
 import org.apache.axis.message.addressing.EndpointReferenceType;

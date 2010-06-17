@@ -1,14 +1,19 @@
 package org.auscope.portal.server.web.service;
 
-import org.auscope.portal.server.web.service.HttpServiceCaller;
-import org.auscope.portal.server.web.IWFSGetFeatureMethodMaker;
-import org.auscope.portal.server.web.WFSGetFeatureMethodMakerPOST;
-import org.auscope.portal.mineraloccurrence.*;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.springframework.stereotype.Service;
-
 import java.util.Collection;
 import java.util.List;
+
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.auscope.portal.mineraloccurrence.Commodity;
+import org.auscope.portal.mineraloccurrence.CommodityFilter;
+import org.auscope.portal.mineraloccurrence.Mine;
+import org.auscope.portal.mineraloccurrence.MineFilter;
+import org.auscope.portal.mineraloccurrence.MineralOccurrenceFilter;
+import org.auscope.portal.mineraloccurrence.MineralOccurrencesResponseHandler;
+import org.auscope.portal.mineraloccurrence.MiningActivityFilter;
+import org.auscope.portal.server.web.IWFSGetFeatureMethodMaker;
+import org.auscope.portal.server.web.WFSGetFeatureMethodMakerPOST;
+import org.springframework.stereotype.Service;
 
 /**
  * A utility class which provides methods for querying a mineral occurence service

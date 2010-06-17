@@ -1,10 +1,11 @@
 package org.auscope.portal.mineraloccurrence;
 
-import org.junit.Test;
-import org.auscope.portal.Util;
+import java.io.IOException;
+
 import junit.framework.Assert;
 
-import java.io.IOException;
+import org.auscope.portal.Util;
+import org.junit.Test;
 
 /**
  * User: Mathew Wyatt

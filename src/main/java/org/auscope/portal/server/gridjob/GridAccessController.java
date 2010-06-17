@@ -12,20 +12,16 @@ import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.auscope.gridtools.GramJobControl;
 import org.auscope.gridtools.GridJob;
 import org.auscope.gridtools.MyProxyManager;
 import org.auscope.gridtools.RegistryQueryClient;
 import org.auscope.gridtools.SiteInfo;
-
-import org.globus.exec.generated.JobDescriptionType;
-import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.GSIConstants;
+import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.X509ExtensionSet;
 import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.globus.myproxy.MyProxyException;
 import org.globus.wsrf.utils.FaultHelper;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;

@@ -1,29 +1,35 @@
 package org.auscope.portal.server.web.controllers;
 
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.auscope.portal.server.util.GmlToKml;
-import org.auscope.portal.server.web.view.JSONModelAndView;
-import org.auscope.portal.mineraloccurrence.*;
-import org.auscope.portal.server.web.ErrorMessages;
-import org.auscope.portal.server.web.service.MineralOccurrenceService;
-import org.xml.sax.SAXException;
-import org.apache.log4j.Logger;
-import org.apache.commons.httpclient.ConnectTimeoutException;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.util.*;
-import java.net.UnknownHostException;
-import java.net.ConnectException;
+import javax.xml.xpath.XPathExpressionException;
 
 import net.sf.json.JSONArray;
+
+import org.apache.commons.httpclient.ConnectTimeoutException;
+import org.apache.log4j.Logger;
+import org.auscope.portal.mineraloccurrence.Mine;
+import org.auscope.portal.mineraloccurrence.MineralOccurrencesResponseHandler;
+import org.auscope.portal.server.util.GmlToKml;
+import org.auscope.portal.server.web.ErrorMessages;
+import org.auscope.portal.server.web.service.MineralOccurrenceService;
+import org.auscope.portal.server.web.view.JSONModelAndView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.xml.sax.SAXException;
 
 /**
  * User: Mathew Wyatt

@@ -1,23 +1,24 @@
 package org.auscope.portal.server.web.controllers;
 
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.Assert;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.auscope.portal.server.web.service.HttpServiceCaller;
-import org.auscope.portal.server.util.GmlToKml;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.Header;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.ServletOutputStream;
-import java.io.*;
-import java.util.zip.ZipInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.auscope.portal.server.web.service.HttpServiceCaller;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * User: Mathew Wyatt

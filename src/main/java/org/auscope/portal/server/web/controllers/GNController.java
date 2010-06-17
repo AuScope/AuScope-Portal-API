@@ -1,26 +1,9 @@
 package org.auscope.portal.server.web.controllers;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.auscope.portal.server.web.service.HttpServiceCaller;
-import org.auscope.portal.server.gridjob.GeodesyJob;
-import org.auscope.portal.server.gridjob.GeodesyJobManager;
-import org.auscope.portal.server.gridjob.GeodesyRecordInfo;
-import org.auscope.portal.server.gridjob.GeodesySeries;
-import org.auscope.portal.server.gridjob.PrepareCSWTransactionRecord;
-import org.auscope.portal.server.web.security.UserDao;
-import org.auscope.portal.server.web.security.User;
+import java.io.InputStream;
 
-import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
-import org.auscope.portal.csw.ICSWMethodMaker;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NameValuePair;
@@ -29,12 +12,26 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.io.InputStream;
-import org.auscope.portal.server.util.Util;;
+import org.auscope.portal.csw.ICSWMethodMaker;
+import org.auscope.portal.server.gridjob.GeodesyJob;
+import org.auscope.portal.server.gridjob.GeodesyJobManager;
+import org.auscope.portal.server.gridjob.GeodesyRecordInfo;
+import org.auscope.portal.server.gridjob.GeodesySeries;
+import org.auscope.portal.server.gridjob.PrepareCSWTransactionRecord;
+import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.server.util.Util;
+import org.auscope.portal.server.web.security.User;
+import org.auscope.portal.server.web.security.UserDao;
+import org.auscope.portal.server.web.service.HttpServiceCaller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Controller that handles insert records into Geonetwork request.

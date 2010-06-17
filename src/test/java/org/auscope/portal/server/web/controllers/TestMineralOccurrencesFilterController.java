@@ -1,30 +1,30 @@
 package org.auscope.portal.server.web.controllers;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Assert;
-import org.auscope.portal.server.web.service.HttpServiceCaller;
-import org.auscope.portal.server.web.service.MineralOccurrenceService;
-import org.auscope.portal.server.web.ErrorMessages;
-import org.auscope.portal.mineraloccurrence.MineralOccurrencesResponseHandler;
-import org.auscope.portal.mineraloccurrence.Mine;
-import org.auscope.portal.server.util.GmlToKml;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.servlet.ModelAndView;
-import org.apache.commons.httpclient.ConnectTimeoutException;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
-import java.net.UnknownHostException;
-import java.net.ConnectException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.httpclient.ConnectTimeoutException;
+import org.auscope.portal.mineraloccurrence.Mine;
+import org.auscope.portal.mineraloccurrence.MineralOccurrencesResponseHandler;
+import org.auscope.portal.server.util.GmlToKml;
+import org.auscope.portal.server.web.ErrorMessages;
+import org.auscope.portal.server.web.service.HttpServiceCaller;
+import org.auscope.portal.server.web.service.MineralOccurrenceService;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
 
 /**

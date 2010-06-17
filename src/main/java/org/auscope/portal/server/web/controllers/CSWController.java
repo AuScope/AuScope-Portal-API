@@ -1,18 +1,19 @@
 package org.auscope.portal.server.web.controllers;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.auscope.portal.server.web.service.CSWService;
-import org.auscope.portal.csw.CSWRecord;
-import org.auscope.portal.server.web.view.JSONModelAndView;
-import org.auscope.portal.server.web.KnownFeatureTypeDefinition;
-import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+
 import net.sf.json.JSONArray;
 
-import java.util.ArrayList;
+import org.apache.log4j.Logger;
+import org.auscope.portal.csw.CSWRecord;
+import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.server.web.KnownFeatureTypeDefinition;
+import org.auscope.portal.server.web.service.CSWService;
+import org.auscope.portal.server.web.view.JSONModelAndView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * User: Mathew Wyatt

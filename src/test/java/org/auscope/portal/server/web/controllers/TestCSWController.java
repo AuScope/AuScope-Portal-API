@@ -1,25 +1,24 @@
 package org.auscope.portal.server.web.controllers;
 
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.Assert;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.auscope.portal.server.web.service.CSWService;
-import org.auscope.portal.server.web.service.HttpServiceCaller;
-import org.auscope.portal.server.web.KnownFeatureTypeDefinition;
-import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
-import org.auscope.portal.csw.CSWThreadExecutor;
-import org.auscope.portal.csw.CSWRecord;
-import org.springframework.web.servlet.ModelAndView;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+
+import org.auscope.portal.csw.CSWRecord;
+import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.server.web.KnownFeatureTypeDefinition;
+import org.auscope.portal.server.web.service.CSWService;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * User: Mathew Wyatt

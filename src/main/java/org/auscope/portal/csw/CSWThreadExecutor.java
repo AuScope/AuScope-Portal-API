@@ -1,9 +1,8 @@
 package org.auscope.portal.csw;
 
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Repository;
-
 import java.util.concurrent.Executor;
+
+import org.springframework.stereotype.Repository;
 
 /**
  * User: Mathew Wyatt

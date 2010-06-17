@@ -10,9 +10,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -32,25 +32,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.ssl.PKCS8Key;
-
 import org.auscope.portal.server.gridjob.GridAccessController;
-
-// see http://www.hpc.jcu.edu.au/projects/archer-data-activities/browser/security/current/slcs-common/src/
-// for source code of these classes
 import org.glite.slcs.pki.CertificateExtension;
 import org.glite.slcs.pki.CertificateExtensionFactory;
 import org.glite.slcs.pki.CertificateKeys;
 import org.glite.slcs.pki.CertificateRequest;
-
 import org.globus.gsi.CertUtil;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-//import org.springframework.web.servlet.mvc.Controller;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.view.RedirectView;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

@@ -1,16 +1,17 @@
 package org.auscope.portal.mineraloccurrence;
 
-import org.junit.Test;
-import org.junit.Before;
-import org.auscope.portal.Util;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import junit.framework.Assert;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Arrays;
+import org.auscope.portal.Util;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * User: Mathew Wyatt

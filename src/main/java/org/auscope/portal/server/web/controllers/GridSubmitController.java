@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.net.URL;
+import java.rmi.ServerException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,12 +25,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.net.URL;
-import java.rmi.ServerException;
 import java.util.Vector;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,38 +38,24 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import net.sf.json.JSONArray;
+
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.csw.CSWNamespaceContext;
 import org.auscope.portal.csw.CSWRecord;
 import org.auscope.portal.csw.ICSWMethodMaker;
-
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.gridjob.GeodesyGridInputFile;
-import org.auscope.portal.server.gridjob.GridAccessController;
-import org.auscope.portal.server.gridjob.ScriptParser;
-import org.auscope.portal.server.gridjob.Util;
 import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
-import org.auscope.portal.server.util.GeodesyUtil;
+import org.auscope.portal.server.gridjob.GridAccessController;
+import org.auscope.portal.server.gridjob.ScriptParser;
+import org.auscope.portal.server.gridjob.Util;
 import org.auscope.portal.server.web.service.CSWService;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.ModelAndView;
-
-
-//Globus stuff
 import org.globus.ftp.DataChannelAuthentication;
 import org.globus.ftp.FileInfo;
 import org.globus.ftp.GridFTPClient;
@@ -82,7 +66,14 @@ import org.globus.util.GlobusURL;
 import org.globus.wsrf.utils.FaultHelper;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

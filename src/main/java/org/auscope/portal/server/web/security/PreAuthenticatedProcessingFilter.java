@@ -2,10 +2,7 @@ package org.auscope.portal.server.web.security;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
-
 import org.springframework.security.ui.FilterChainOrder;
 import org.springframework.security.ui.preauth.AbstractPreAuthenticatedProcessingFilter;
 
