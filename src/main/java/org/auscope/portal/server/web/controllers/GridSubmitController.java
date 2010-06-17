@@ -1192,12 +1192,9 @@ public class GridSubmitController {
                 		
                 		//overwrite job args
                 		job.setArguments(params);
-                        //String localRinexStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
-                        //                              +GridSubmitController.RINEX_DIR+File.separator;
-                        //String localTablesStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
-                        //                               +GridSubmitController.TABLE_DIR+File.separator;
                 		String localStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir;
                         job.setInTransfers(new String[]{localStageInURL});
+                        gridStatus = (GridTransferStatus)request.getSession().getAttribute("gridStatus");
                 	}
                 	else
                 	{
@@ -1209,14 +1206,11 @@ public class GridSubmitController {
       		               +GridSubmitController.RINEX_DIR+File.separator;
                     		gridStatus = urlCopy(urlArray, request, toURL );
                 		}
-                        //String localRinexStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
-                        //                              +GridSubmitController.RINEX_DIR+File.separator;
-                        //String localTablesStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir
-                        //                               +GridSubmitController.TABLE_DIR+File.separator;
                 		String localStageInURL = gridAccess.getLocalGridFtpServer()+localJobInputDir;
                 		job.setInTransfers(new String[]{stageInURL, localStageInURL});
                 	}
-                	
+
+                		
                 	//create the base directory for multi job, because this fails on stage out.
                 	success = createGridDir(request, jobOutputDir);
 
@@ -1250,7 +1244,7 @@ public class GridSubmitController {
                 logger.info("Submitting job with name " + job.getName() +
                         " to " + job.getSite());
                 // ACTION!
-                if(success)
+                if(success && gridStatus.jobSubmissionStatus != JobSubmissionStatus.Failed)
                 	submitEPR = gridAccess.submitJob(job, credential);
 
                 if (submitEPR == null) {
@@ -1409,6 +1403,8 @@ public class GridSubmitController {
 	            if(currentDate.compareTo(fileDate)==0){
 	            	logger.debug("Date: "+currentDate.get(Calendar.YEAR)+"-"+currentDate.get(Calendar.DAY_OF_YEAR)+" is matched to rinex file: "+rinexUrl.getFileUrl());
 	            	rinexFilesOfDate.add(rinexUrl.getFileUrl());
+	            	//TO-DO it would be nice for performance if we could remove processed urls from the list
+	            	//somehow this fails.
 	            	//gpsFiles.remove(rinexUrl);
 	            }
             } catch (Exception e)
@@ -1872,7 +1868,7 @@ public class GridSubmitController {
     {
         int rtnValue = 0;
         try {
-    		GlobusURL from = new GlobusURL(fileUri.replace("http://files.ivec.org/geodesy/", "gsiftp://pbstore.ivec.org:2811/pbstore/cg01/geodesy/ftp.ga.gov.au/"));
+    		GlobusURL from = new GlobusURL(fileUri.replace("http://files.ivec.org/geodesy/", "gsiftp://pbstore.ivec.org:2811//pbstore/cg01/geodesy/ftp.ga.gov.au/"));
     		logger.debug("fromURL is: " + from.getURL());
     		
     		String fullFilename = new URL(fileUri).getFile();
