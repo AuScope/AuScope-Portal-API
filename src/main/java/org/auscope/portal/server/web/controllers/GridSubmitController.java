@@ -202,34 +202,11 @@ public class GridSubmitController {
                 }
             }.makeMethod(), serviceCaller.getHttpClient());
     		
-    		//Parse our XML string into a document
-    		XPath xPath = XPathFactory.newInstance().newXPath();
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document responseDocument = builder.parse(new InputSource(new StringReader(gmlResponse)));
-    		
-            //Extract the URL list and parse it into the JSON list
-            HttpSession userSession = request.getSession();
-            String featureMemberExpression = "/FeatureCollection/featureMember";
-            NodeList nodes = (NodeList) xPath.evaluate(featureMemberExpression, responseDocument, XPathConstants.NODESET);
-            if (nodes != null) {
-	            for(int i=0; i < nodes.getLength(); i++ ) {
-	            	GeodesyGridInputFile ggif = new GeodesyGridInputFile();
-	            	
-	            	Node tempNode = (Node) xPath.evaluate("station_observations/url", nodes.item(i), XPathConstants.NODE);
-	            	ggif.setFileUrl(tempNode == null ? "" : tempNode.getTextContent());
-	            	
-	            	tempNode = (Node) xPath.evaluate("station_observations/date", nodes.item(i), XPathConstants.NODE);
-	            	ggif.setFileDate(tempNode == null ? "" : tempNode.getTextContent());
-	            	
-	            	tempNode = (Node) xPath.evaluate("station_observations/id", nodes.item(i), XPathConstants.NODE);
-	            	ggif.setStationId(tempNode == null ? "" : tempNode.getTextContent());
-	            	
-	            	ggif.setSelected(true);
-	            	
-	            	urlList.add(ggif);
-	            }
-            }
+    		//Parse our XML string into a list of input files
+    		List<GeodesyGridInputFile> ggifList = GeodesyGridInputFile.fromGmlString(gmlResponse);
+    		for (GeodesyGridInputFile ggif : ggifList) {
+    			urlList.add(ggif);
+    		}
             
     	} catch (Exception ex) {
     		logger.warn("selectStationList.do : Error " + ex.getMessage());
@@ -970,8 +947,6 @@ public class GridSubmitController {
         mav.addObject("success", success);
         return mav;
     }
-
-
     
     /**
      * Get status of the current job submission.
@@ -1026,6 +1001,44 @@ public class GridSubmitController {
     }
 
     /**
+     * Replaces the sites.defaults file with a dynamically created template.
+     * 
+     * Returns a JSONResponse 
+     * {
+     * 	success : true/false
+     * }
+     * @param request
+     * @param response
+     * @param job
+     * @return
+     */
+    @RequestMapping("/generateSiteDefaultsTemplate.do")    
+    public ModelAndView generateSiteDefaultsTemplate(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  GeodesyJob job) {
+    	String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
+    	ModelAndView mav = new ModelAndView("jsonView");
+    	boolean success = false; //guilty until proven innocent
+    	
+    	if (localJobInputDir == null || localJobInputDir.length() == 0) {
+    		logger.error("session attribute \"localJobInputDir\" is null or empty");
+    	} else {
+    		//Lets replace our sites.default with a new template we create dynamically
+    		success = templateSitesDefaults(request, localJobInputDir + GridSubmitController.TABLE_DIR + File.separator, job);
+    	}
+    	
+    	if (success)
+        	logger.info("Successful generation of sites.defaults template");
+        else
+        	logger.error("Error creating template sites.default");
+    	
+        // Save in session for status update request for this job.
+        mav.addObject("success", success);
+        return mav;
+        
+    }
+    
+    /**
      * Processes a job submission request.
      *
      * @param request The servlet request
@@ -1054,19 +1067,6 @@ public class GridSubmitController {
     	
         //Used to store Job Submission status, because there will be another request checking this.
 		GridTransferStatus gridStatus = new GridTransferStatus();
-    	
-    	
-    	//Lets replace our sites.default with a new template we create dynamically 
-        if (!templateSitesDefaults(request, localJobInputDir + GridSubmitController.TABLE_DIR + File.separator, job)) {
-        	logger.error("Error creating template sites.default");
-            gridStatus.currentStatusMsg = GridSubmitController.INTERNAL_ERROR;
-            gridStatus.jobSubmissionStatus = JobSubmissionStatus.Failed;
-                
-                // Save in session for status update request for this job.
-           request.getSession().setAttribute("gridStatus", gridStatus);
-           mav.addObject("success", false);
-           return mav;
-        }
 		
         if (credential == null) {
             //final String errorString = "Invalid grid credentials!";
@@ -1651,6 +1651,7 @@ public class GridSubmitController {
     	for (int i = 0; i < arguments.length; i++) {
     		if (arguments[i].equals("-expt") && i < (arguments.length - 1)) {
     			experimentName = arguments[i + 1];
+    			break;
     		}
     	}
     	

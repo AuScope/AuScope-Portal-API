@@ -281,6 +281,54 @@ GridSubmit.submitJob = function() {
     });
 }
 
+GridSubmit.onGenerateSitesTemplateSuccess = function(response) {
+	var responseObj = null;
+	runner.stop(task);
+	
+	try {
+		responseObj = Ext.util.JSON.decode(response.responseText);
+	} catch (e) {
+		GridSubmit.showError('There was an error reading the server response about generating the sites.defaults file.\n\nThe sites.default file may not be templated correctly');
+		return;
+	}
+	
+	//Alert user of failure (Don't block the user from proceeding, just warn them of failure)
+	if (responseObj == null || !responseObj.success) {
+		GridSubmit.showError('There was an error generating the sites.default file.\n\nThe file will be left as its default value');
+	}
+}
+
+//Don't block the user from proceeding, just warn them of failure
+GridSubmit.onGenerateSitesTemplateFailure = function(response) {
+	runner.stop(task);
+	GridSubmit.showError('There was an error generating the sites.default file.\n\nThe file will be left as its default value');
+}
+
+GridSubmit.generateSitesDefaultTemplate = function() {
+	
+	runner.start(task);
+    var myParams = Ext.getCmp('arguments').getStore();
+    var param = [];
+    //param.hidden = hidden;
+    myParams.each(function(r, i){
+         param[i] = r.get('paramLine');
+    });
+    
+    Ext.Ajax.request({
+    	url: 'generateSiteDefaultsTemplate.do',
+        success: GridSubmit.onGenerateSitesTemplateSuccess,
+        failure: GridSubmit.onGenerateSitesTemplateFailure,
+        params: {
+            'seriesId': GridSubmit.seriesId,
+            'seriesName': GridSubmit.seriesName,
+            'seriesDesc': GridSubmit.seriesDesc,
+            'arguments': Ext.encode(param)
+        },
+        waitMsg: 'Generating sites.default, please wait...',
+        waitTitle: 'Template generation'
+    });
+}
+
 //
 // Called when user dismisses the confirmation dialog of a file upload
 //
@@ -849,8 +897,11 @@ GridSubmit.initialize = function() {
         return true;
     };
 
-    var validateMetadata = function(newStep) {
-        if (newStep==0 || metadataForm.getForm().isValid()) {
+    //newStep: An integer that represents the next form to in list to open (if form validation succeeds)
+    //onSuccessfulValidation : [Optional] a function that will be called after form validation but before the form changes 
+    var validateMetadata = function(newStep, onSuccesfulValidation) {
+        //if (newStep==0 || metadataForm.getForm().isValid()) {
+    	if (newStep==0 || true) {
     	    var jobTypeCombo = Ext.getCmp('jobTypeCombo').getValue();
     	    var jobSelectCombo = Ext.getCmp('jobSelectCombo');
     	    if(jobTypeCombo == 'single'){
@@ -860,6 +911,8 @@ GridSubmit.initialize = function() {
     	    {
     	    	jobSelectCombo.enable();
     	    }
+    	    if (onSuccesfulValidation)
+    	    	onSuccesfulValidation();
             gotoStep(newStep);
             return true;
         } else {
@@ -966,7 +1019,6 @@ GridSubmit.initialize = function() {
     });
 
     StationSelect.onSuccessfulSubmit = function() {
-    	GridSubmit.loadJobObject();
     	gotoStep(1);
     }
     
@@ -1011,7 +1063,7 @@ GridSubmit.initialize = function() {
                 handler: validateMetadata.createDelegate(this, [1])
             }, {
                 text: 'Next &raquo;',
-                handler: validateMetadata.createDelegate(this, [3])
+                handler: validateMetadata.createDelegate(this, [3, GridSubmit.generateSitesDefaultTemplate])
             }],
             items: [ metadataForm ]
         }, {
@@ -1055,6 +1107,8 @@ GridSubmit.initialize = function() {
     // Avoid accidentally navigating away from this page
     Ext.EventManager.on(window, 'beforeunload',
             GridSubmit.onWindowUnloading, GridSubmit);
+    
+    GridSubmit.loadJobObject();
 }
 
 
