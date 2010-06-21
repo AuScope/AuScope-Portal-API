@@ -152,41 +152,49 @@ public class MenuController {
    public ModelAndView gpsview() {
       return new ModelAndView("gpsview");
    }
- 
-   @RequestMapping("/gridsubmit.html")
-   public ModelAndView gridsubmit(HttpServletRequest request) {
-       // Ensure user has valid grid credentials
+   
+   /**
+    * If the user has valid grid credentials, this function will return a ModelAndView with redirectViewName
+    * If the user doesn't have valid credentials they will be redirected to the login page (and afterwards redirected to redirectUrl)
+    * 
+    * @param request
+    * @param redirectViewName
+    * @param redirectUrl
+    * @return
+    */
+   private ModelAndView doShibbolethAndSLCSLogin(HttpServletRequest request,String redirectViewName, String redirectUrl) {
        if (gridAccess.isProxyValid(
                    request.getSession().getAttribute("userCred"))) {
-           logger.debug("No/invalid action parameter; returning gridsubmit view.");
-           return new ModelAndView("gridsubmit");
+           logger.debug("No/invalid action parameter; returning " + redirectViewName + " view.");
+           return new ModelAndView(redirectViewName);
        } else {
            request.getSession().setAttribute(
-                   "redirectAfterLogin", "/gridsubmit.html");
-           logger.warn("Proxy not initialized. Redirecting to gridLogin.");
-           return new ModelAndView(
-                   new RedirectView("/gridLogin.do", true, false, false));
-       }	   
-   }
-
-   @RequestMapping("/joblist.html")
-   public ModelAndView joblist(HttpServletRequest request) {
-       // Ensure user has valid grid credentials
-       if (gridAccess.isProxyValid(
-                   request.getSession().getAttribute("userCred"))) {
-           logger.debug("No/invalid action parameter; returning jobList view.");
-           return new ModelAndView("joblist");
-       } else {
-           request.getSession().setAttribute(
-                   "redirectAfterLogin", "/joblist.html");
+                   "redirectAfterLogin", redirectUrl);
            logger.warn("Proxy not initialized. Redirecting to gridLogin.");
            return new ModelAndView(
                    new RedirectView("/gridLogin.do", true, false, false));
        }
    }
+ 
+   @RequestMapping("/gridsubmit.html")
+   public ModelAndView gridsubmit(HttpServletRequest request) {
+       // Ensure user has valid grid credentials
+	   return doShibbolethAndSLCSLogin(request, "gridsubmit", "/gridsubmit.html");
+   }
+
+   @RequestMapping("/joblist.html")
+   public ModelAndView joblist(HttpServletRequest request) {
+	   return doShibbolethAndSLCSLogin(request, "joblist", "/joblist.html");
+   }
    
    @RequestMapping("/dbg/debug.html")
    public ModelAndView debug(HttpServletRequest request) {
 	   return new ModelAndView("debug");
+   }
+   
+   @RequestMapping("/dbg/dologin.html")
+   public ModelAndView debugLogin(HttpServletRequest request) {
+       // Ensure user has valid grid credentials
+	   return doShibbolethAndSLCSLogin(request, "debug", "/dbg/debug.html");
    }
 }

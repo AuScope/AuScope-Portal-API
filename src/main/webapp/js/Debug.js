@@ -41,8 +41,6 @@ Debug.runSimpleTest = function(testName, testUrl, testParams) {
 		}
 	};
 	
-	
-	
 	//Firstly create a stub entry to let the user know a test is running
 	Debug.addOrUpdateSimpleTest(testName, 'running', '');
 	
@@ -51,6 +49,42 @@ Debug.runSimpleTest = function(testName, testUrl, testParams) {
 			params : testParams,
 			callback : callbackFunc
 	});
+};
+
+Debug.generateTestForm_urlCopyTest = function() {
+	return new Ext.form.FormPanel({
+		title: ' Url Copy Test',
+		id: 'advTest-url-copy',
+		collapsible: true,
+		collapsed: true,
+		items: [
+		        {
+		        	xtype: 'fieldset',
+		        	title: 'Urls',
+		        	items: [
+		        	        {
+		        	        	anchor: '100%',
+		        	        	xtype: 'textfield',
+		        	        	fieldLabel: 'From Url',
+		        	        	name: 'fromUrl'
+		        	        },{
+		        	        	anchor: '100%',
+		        	        	xtype: 'textfield',
+		        	        	fieldLabel: 'To Url',
+		        	        	name: 'toUrl'
+		        	        }
+		           ]
+		        	
+		        }, {
+		        	xtype: 'button',
+		        	text: 'Run Test',
+		        	handler: function() {
+		        		Debug.runSimpleTest('Url copy Test', 'urlCopyTest.do', Ext.getCmp('advTest-url-copy').getForm().getValues());
+		        	}
+		        }
+		]
+	});
+
 };
 
 Debug.initialize = function() {
@@ -73,25 +107,16 @@ Debug.initialize = function() {
 	
 	
 	var basicTestsPanel = new Ext.grid.GridPanel({
-		title : 'Basic Tests',
+		title : 'Test Results',
 		id: 'debug-basic-tests-panel',
 		store: basicTestsStore,
+		autoExpandColumn: 'testNotes',
 		//layout: 'fit',
 		columns : [
 		    {id:'testName', dataIndex:'testName', header:'Test Name', sortable:true},
             {id:'testStatus', dataIndex:'testStatus', header:'Test Status', sortable:true}, 
-            {id:'testNotes', dataIndex:'testNotes', header:'Test Notes', sortable:true},
+            {id:'testNotes', dataIndex:'testNotes', header:'Test Notes', sortable:true, editable:true},
         ]
-	});
-	
-	var advancedTestsPanel = new Ext.grid.GridPanel({
-		title : 'Advanced Tests',
-		id: 'debug-advanced-tests-panel',
-		store: advancedTestsStore,
-		//layout: 'fit',
-		columns : [
-		           {id:'todo', dataIndex:'todo', header:'TODO', sortable:true},
-		]
 	});
 	
 	var viewPort = new Ext.Viewport({
@@ -124,15 +149,19 @@ Debug.initialize = function() {
 				        region       : 'center',
 						items        : [
 							basicTestsPanel,
-							advancedTestsPanel
+							Debug.generateTestForm_urlCopyTest()
 						]
 				    }
                 ]
         }]
     });
 	
-	Debug.runSimpleTest('Check User', 'checkUsername.do');
-	Debug.runSimpleTest('Check Credentials', 'checkCredentials.do');
+	Debug.runSimpleTest('Username', 'checkUsername.do');
+	Debug.runSimpleTest('Credentials', 'checkCredentials.do');
+	Debug.runSimpleTest('Input files', 'checkInputFiles.do');
+	Debug.runSimpleTest('Local stageIn dir', 'checkLocalStageInDir.do');
+	Debug.runSimpleTest('Grid stageIn dir', 'checkRemoteStageInDir.do');
+	Debug.runSimpleTest('RINEX Urls', 'testRinexUrlAvailability.do');
 };
 
 Ext.onReady(Debug.initialize);
