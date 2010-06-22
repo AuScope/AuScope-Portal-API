@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.rmi.ServerException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +28,10 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.csw.CSWRecord;
 import org.auscope.portal.csw.ICSWMethodMaker;
 import org.auscope.portal.server.gridjob.GeodesyGridInputFile;
+import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GridAccessController;
+import org.auscope.portal.server.gridjob.ScriptParser;
+import org.auscope.portal.server.gridjob.Util;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.web.controllers.GridSubmitController.GridTransferStatus;
 import org.auscope.portal.server.web.controllers.GridSubmitController.JobSubmissionStatus;
@@ -39,6 +44,7 @@ import org.globus.io.urlcopy.UrlCopy;
 import org.globus.io.urlcopy.UrlCopyException;
 import org.globus.util.GlobusURL;
 import org.ietf.jgss.GSSCredential;
+import org.ietf.jgss.GSSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -360,9 +366,9 @@ public class DebugController {
     		uCopy.setUseThirdPartyCopy(false); 	
     		uCopy.copy();   		
     	} catch (UrlCopyException e) {
-    		return generateBasicTestResponse(false, e.toString());
+    		return generateBasicTestResponse(false,"Error! UrlCopyException: " + e.toString());
     	} catch (Exception e) {
-    		return generateBasicTestResponse(false, e.toString());
+    		return generateBasicTestResponse(false,"Error! Exception: " +  e.toString());
     	}
     	
     	
@@ -393,19 +399,25 @@ public class DebugController {
 		return GeodesyGridInputFile.fromGmlString(gmlResponse);
 	}
 	
+	private String getRinexFilesUrl() throws Exception {
+		CSWRecord[] records = cswService.getWFSRecordsForTypename("ngcp:GnssStation");
+		if (records == null || records.length == 0) {
+			throw new Exception("No ngcp:GnssStation record in the CSW");
+		}
+		
+		String serviceUrl = records[0].getServiceUrl();
+		if (serviceUrl == null || serviceUrl.length() == 0) {
+			throw new Exception("ngcp:GnssStation has no service url from its CSW");
+		}
+		
+		return serviceUrl;
+	}
+	
 	@RequestMapping("/dbg/testRinexUrlAvailability.do")
 	public ModelAndView testRinexUrlAvailability(HttpServletRequest request) {
 		String serviceUrl = null;
 		try {
-			CSWRecord[] records = cswService.getWFSRecordsForTypename("ngcp:GnssStation");
-			if (records == null || records.length == 0) {
-				throw new Exception("No ngcp:GnssStation record in the CSW");
-			}
-			
-			serviceUrl = records[0].getServiceUrl();
-			if (serviceUrl == null || serviceUrl.length() == 0) {
-				throw new Exception("ngcp:GnssStation has no service url from its CSW");
-			}
+			serviceUrl = getRinexFilesUrl();
 		} catch (Exception ex) {
 			return generateBasicTestResponse(false, "Error extracting service url: " + ex);
 		}
@@ -449,5 +461,165 @@ public class DebugController {
 		return generateBasicTestResponse(true, "Able to fetch a RINEX file url and also download it", url);
 	}
 	
+	private static String generateJobId(final String user) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String dateFmt = sdf.format(new Date());
+        return user + "-" + dateFmt + File.separator;
+	}
+	
+    private GeodesyJob prepareSimpleJob(final String user) throws Exception {
+        final String maxWallTime = "60"; // in minutes
+        final String maxMemory = "2048"; // in MB
+        final String stdInput = "";
+        final String stdOutput = "stdOutput.txt";
+        final String stdError = "stdError.txt";
+        final String[] arguments = new String[0];
+        final String[] inTransfers = new String[0];
+        final String[] outTransfers = new String[0];
+        String name = "GeodesyJob";
+        String site = "iVEC";
+        Integer cpuCount = 1;
+        String version = "";
+        String queue = "";
+        String description = "";
+        String scriptFile = "";
+
+
+        // Set a default version and queue
+        String[] allVersions = gridAccess.retrieveCodeVersionsAtSite(site, GeodesyJob.CODE_NAME);
+        if (allVersions.length > 0)
+            version = allVersions[0];
+        else
+        	throw new Exception(String.format("Couldn't lookup version for %1$s at site %2$s",GeodesyJob.CODE_NAME,site));
+        
+        String[] allQueues = gridAccess.retrieveQueueNamesAtSite(site);
+        if (allQueues.length > 0)
+            queue = allQueues[0];
+        else
+        	throw new Exception("Couldn't lookup job queue at site:" + site);
+
+        logger.debug("Creating new GeodesyJob instance");
+        GeodesyJob job = new GeodesyJob(site, name, version, arguments, queue,
+                maxWallTime, maxMemory, cpuCount, inTransfers, outTransfers,
+                user, stdInput, stdOutput, stdError);
+
+        job.setScriptFile(scriptFile);
+        job.setDescription(description);
+
+        return job;
+    }
+	
+    /**
+     * Creates a test job with default parameters and attempts to submit it to the grid
+     * @param request
+     * @return
+     */
+    @RequestMapping("/dbg/testRunJob.do")
+	public ModelAndView runTestJob(HttpServletRequest request) {
+		final String user = request.getRemoteUser();
+		final Object credentials = request.getSession().getAttribute("userCred");
+		final String jobId = "test" + generateJobId(user);
+		final String jobRootDir = gridAccess.getGridFtpStageInDir() + jobId;
+		final String jobRinexDir = jobRootDir + GridSubmitController.RINEX_DIR + File.separator;
+		final String localDir = gridAccess.getLocalGridFtpStageInDir() + "test" + user;
+		
+		if (user == null || user.length() == 0) {
+			return generateBasicTestResponse(false, "User is null or empty (Have you logged in?)");
+		}
+		
+		if (credentials == null) {
+			return generateBasicTestResponse(false, "User credentials are null (Have you logged in?)");
+		}
+		
+		//Form our job object
+		GeodesyJob job = null;
+		try {
+			job = prepareSimpleJob(user);
+		} catch (Exception ex) {
+			return generateBasicTestResponse(false, "Couldn't generate job object: " + ex.toString());
+		}
+		
+		//Generate local "stage in dir"
+		try {
+			boolean success = (new File(localDir)).mkdir();
+			if (!success)
+				throw new Exception("Error creating local test dir");
+			success = (new File(localDir+GridSubmitController.RINEX_DIR+File.separator)).mkdir();
+			if (!success)
+				throw new Exception("Error creating local test (rinex) dir");
+			success = Util.copyFilesRecursive(new File(GridSubmitController.PRE_STAGE_IN_TABLE_FILES),
+	                new File(localDir+GridSubmitController.TABLE_DIR+File.separator));
+			if (!success)
+				throw new Exception("Error creating local table (rinex) dir");
+		} catch (Exception ex) {
+			return generateBasicTestResponse(false, "Error creating a local stage in directory: " + ex.toString(), localDir);
+		}
+		
+		//Generate our output dir name
+		String temp = "";
+		try {
+			temp = gridAccess.getGridFtpStageOutDir()+ GridSubmitController.generateCertDNDirectory(credentials) + jobId + File.separator;
+		} catch (GSSException ex) {
+			return generateBasicTestResponse(false, "Unable to generate directory name based on credential DN: " + ex.toString());
+		}
+		final String jobOutputDir = temp; 
+		
+		//Create remote stage in / stage out directory
+		ModelAndView mav = doGridOperation(request, new GridOperation() {
+			public ModelAndView operation(HttpServletRequest request, GridFTPClient gridStore) throws Exception {
+				
+				if (!gridStore.exists(jobRootDir))
+					gridStore.makeDir(jobRootDir);
+				
+				if (!gridStore.exists(jobRinexDir))
+					gridStore.makeDir(jobRinexDir);
+				
+				if (!gridStore.exists(jobOutputDir))
+					gridStore.makeDir(jobOutputDir);
+				
+				return generateBasicTestResponse(true, "Success creating grid directories");
+			}
+		});
+		if (!(Boolean)mav.getModel().get("success")) 
+			return mav;
+		
+		//Get the rinex files to process
+		String rinexUrl = null;
+		try {
+			String serviceUrl = getRinexFilesUrl(); 
+			List<GeodesyGridInputFile> rinexFiles = getRinexFileUrls(serviceUrl, 1);
+			rinexUrl = rinexFiles.get(0).getFileUrl();
+		} catch (Exception ex) {
+			return generateBasicTestResponse(false, "Error extracting rinex url: " + ex);
+		}
+		
+		//Copy the rinex file over
+		mav = urlCopyTest(request,rinexUrl, jobRinexDir);
+		if (!(Boolean)mav.getModel().get("success")) 
+			return mav;
+		
+		//Final configuration of our job
+		job.setInTransfers(new String[]{gridAccess.getGridFtpServer()+jobRootDir, gridAccess.getLocalGridFtpServer()+localDir});
+		job.setEmailAddress(user);
+        job.setOutputDir(jobOutputDir);
+        job.setOutTransfers(new String[] { gridAccess.getGridFtpServer() + jobOutputDir });
+        job.setArguments(new String[] {"-d", "2010", "80", "-expt", "grid", "-orbt", "IGSF", "-no_ftp", "-aprfile", "itrf05.apr"});
+        job.setName("DebugPage-TestJob");
+        job.setDescription("This job has been auto created as a test, it will not return meaningful results");
+        
+        //Do the submission
+        String submitEpr = null;
+        try {
+        	submitEpr = gridAccess.submitJob(job, credentials);
+        	if (submitEpr == null || submitEpr.length() == 0)
+        		throw new Exception("returned EPR is null or empty");
+        	
+        } catch (Exception ex) {
+        	return generateBasicTestResponse(false, "Failure during job submission: " + ex.toString());
+        }
+        
+		
+		return generateBasicTestResponse(true, "Successfully submitted job. EPR:" + submitEpr, submitEpr);
+	}
 
 }

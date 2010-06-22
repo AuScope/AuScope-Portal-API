@@ -1,6 +1,13 @@
 
 Ext.namespace('Debug');
 
+
+Debug.statusRenderer = function jobStatusRenderer(value, cell, record, rowIndex, colIndex, store) {
+	if (value == "success")
+		return '<span style="color:green;">' + value + '</span>';
+	else
+		return '<span style="color:red;">' + value + '</span>';
+}
 /**
  * Creates or updates the specified basic test with new details
  */
@@ -53,7 +60,7 @@ Debug.runSimpleTest = function(testName, testUrl, testParams) {
 
 Debug.generateTestForm_urlCopyTest = function() {
 	return new Ext.form.FormPanel({
-		title: ' Url Copy Test',
+		title: 'Url Copy Test',
 		id: 'advTest-url-copy',
 		collapsible: true,
 		collapsed: true,
@@ -87,6 +94,25 @@ Debug.generateTestForm_urlCopyTest = function() {
 
 };
 
+Debug.generateTestForm_submitJobTest = function() {
+	return new Ext.form.FormPanel({
+		title: 'Submit Job Test',
+		id: 'advTest-submit-job',
+		collapsible: true,
+		collapsed: true,
+		items: [
+		        {
+		        	xtype: 'button',
+		        	text: 'Run Test',
+		        	handler: function() {
+		        		Debug.runSimpleTest('Submit test job', 'testRunJob.do');
+		        	}
+		        }
+		]
+	});
+
+};
+
 Debug.initialize = function() {
 	
 	var fieldList = ['testName', 'testStatus', 'testNotes'];
@@ -106,16 +132,16 @@ Debug.initialize = function() {
     });
 	
 	
-	var basicTestsPanel = new Ext.grid.GridPanel({
+	var basicTestsPanel = new Ext.grid.EditorGridPanel({
 		title : 'Test Results',
 		id: 'debug-basic-tests-panel',
 		store: basicTestsStore,
 		autoExpandColumn: 'testNotes',
-		//layout: 'fit',
+		//Make the notes column editable (So it's easy to copy paste)
 		columns : [
 		    {id:'testName', dataIndex:'testName', header:'Test Name', sortable:true},
-            {id:'testStatus', dataIndex:'testStatus', header:'Test Status', sortable:true}, 
-            {id:'testNotes', dataIndex:'testNotes', header:'Test Notes', sortable:true, editable:true},
+            {id:'testStatus', dataIndex:'testStatus', header:'Test Status', sortable:true, renderer:Debug.statusRenderer}, 
+            {id:'testNotes', dataIndex:'testNotes', header:'Test Notes', sortable:true, editor: new Ext.form.TextField({allowBlank: false})},
         ]
 	});
 	
@@ -149,7 +175,8 @@ Debug.initialize = function() {
 				        region       : 'center',
 						items        : [
 							basicTestsPanel,
-							Debug.generateTestForm_urlCopyTest()
+							Debug.generateTestForm_urlCopyTest(),
+							Debug.generateTestForm_submitJobTest()
 						]
 				    }
                 ]

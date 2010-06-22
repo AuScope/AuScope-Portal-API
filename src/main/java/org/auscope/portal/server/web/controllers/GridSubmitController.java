@@ -104,12 +104,12 @@ public class GridSubmitController {
     @Autowired
     private HttpServiceCaller serviceCaller;
 
-    private static final String TABLE_DIR = "tables";
-    private static final String RINEX_DIR = "rinex";
-    private static final String PRE_STAGE_IN_TABLE_FILES = "/home/grid-auscope/tables/";
-    private static final String IVEC_MIRROR_URL = "http://files.ivec.org/geodesy/";
-    private static final String PBSTORE_RINEX_PATH = "//pbstore/cg01/geodesy/ftp.ga.gov.au/gpsdata/";
-    private static final String FOR_ALL = "Common";
+    public static final String TABLE_DIR = "tables";
+    public static final String RINEX_DIR = "rinex";
+    public static final String PRE_STAGE_IN_TABLE_FILES = "/home/grid-auscope/tables/";
+    public static final String IVEC_MIRROR_URL = "http://files.ivec.org/geodesy/";
+    public static final String PBSTORE_RINEX_PATH = "//pbstore/cg01/geodesy/ftp.ga.gov.au/gpsdata/";
+    public static final String FOR_ALL = "Common";
 
     //Grid File Transfer messages
     private static final String FILE_COPIED = "Please wait while files being transfered.... ";
@@ -1039,6 +1039,16 @@ public class GridSubmitController {
     }
     
     /**
+     * Given a credential, this function generates a directory name based on the distinguished name of the credential
+     * @param credential
+     * @return
+     */
+    public static String generateCertDNDirectory(Object credential) throws GSSException {
+    	GSSCredential cred = (GSSCredential)credential;
+        return cred.getName().toString().replaceAll("=", "_").replaceAll("/", "_").replaceAll(" ", "_").substring(1);//certDN.replaceAll("=", "_").replaceAll(" ", "_").replaceAll(",", "_");
+    }
+    
+    /**
      * Processes a job submission request.
      *
      * @param request The servlet request
@@ -1145,9 +1155,7 @@ public class GridSubmitController {
                 //String certDN = (String)request.getSession().getAttribute("certDN");
                 String certDN_DIR = "";
                 try {
-                    GSSCredential cred = (GSSCredential)credential;
-                    certDN_DIR = cred.getName().toString().replaceAll("=", "_").replaceAll("/", "_").replaceAll(" ", "_").substring(1);//certDN.replaceAll("=", "_").replaceAll(" ", "_").replaceAll(",", "_");
-                    
+                    certDN_DIR = generateCertDNDirectory(credential);
                     logger.debug("certDN_DIR: "+certDN_DIR);
         		} catch (GSSException e) {
                     logger.error(FaultHelper.getMessage(e));
@@ -1233,7 +1241,6 @@ public class GridSubmitController {
                 	logger.debug("gridSubJobStageInDir size: "+gridSubJobStageInDir.size());
                 }
                 
-
                 
                 String submitEPR = null;
                 job.setEmailAddress(user);
