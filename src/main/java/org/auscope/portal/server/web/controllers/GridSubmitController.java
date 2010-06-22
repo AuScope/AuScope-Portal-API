@@ -431,8 +431,9 @@ public class GridSubmitController {
         String user = request.getRemoteUser();
         logger.debug("Querying job types list for "+user);
         List<SimpleBean> jobType = new ArrayList<SimpleBean>();
-        jobType.add(new SimpleBean("single"));
         jobType.add(new SimpleBean("multi"));
+        jobType.add(new SimpleBean("single"));
+
         
 
         logger.debug("Returning list of "+jobType.size()+" jobType.");
@@ -462,33 +463,6 @@ public class GridSubmitController {
         return new ModelAndView("jsonView", "paramLines", params);
     }
     
-    
-    /**
-     * Returns a JSON object containing an array of ESyS-particle sites.
-     *
-     * @param request The servlet request
-     * @param response The servlet response
-     *
-     * @return A JSON object with a sites attribute which is an array of
-     *         sites on the grid that have an installation of ESyS-particle.
-     */
-   /* @RequestMapping("/listSites.do")    
-    public ModelAndView listSites(HttpServletRequest request,
-                                  HttpServletResponse response) {
-
-        logger.debug("Retrieving sites with "+GeodesyJob.CODE_NAME+" installations.");
-        String[] particleSites = gridAccess.
-                retrieveSitesWithSoftwareAndVersion(GeodesyJob.CODE_NAME, "");
-
-        List<SimpleBean> sites = new ArrayList<SimpleBean>();
-        for (int i=0; i<particleSites.length; i++) {
-            sites.add(new SimpleBean(particleSites[i]));
-            logger.debug("Site name: "+particleSites[i]);
-        }
-
-        logger.debug("Returning list of "+particleSites.length+" sites.");
-        return new ModelAndView("jsonView", "sites", sites);
-    }*/
 
     /**
      * Returns a JSON object containing an array of sites that have the code.
@@ -1125,6 +1099,7 @@ public class GridSubmitController {
         } else {
         	//Reduce our list of input files to an array of urls
         	List<GeodesyGridInputFile> gpsFiles = (List<GeodesyGridInputFile>)request.getSession().getAttribute("gridInputFiles");
+        	logger.debug("gpsFiles: " + gpsFiles.toString());
             if (gpsFiles == null) {
             	logger.warn("gridInputFiles is null, using empty list instead");
             	gpsFiles = new ArrayList<GeodesyGridInputFile>();
@@ -1145,10 +1120,10 @@ public class GridSubmitController {
     			
                 job.setSeriesId(series.getId());
                 //job.setArguments(new String[] { job.getScriptFile() });
-                logger.info("args count: "+job.getArguments().length);
                 job.setJobType(job.getJobType().replace(",", ""));
                 JSONArray args = JSONArray.fromObject(request.getParameter("arguments"));
-                logger.info("Args in Json : "+args.toArray().length);
+				logger.info("Args count: " + job.getArguments().length
+						+ " | Args in Json : " + args.toArray().length);
                 job.setArguments((String[])args.toArray(new String [args.toArray().length]));
                 
                 // Create a new directory for the output files of this job
@@ -1179,8 +1154,10 @@ public class GridSubmitController {
                 		// Full URL
                 		// e.g. "gsiftp://pbstore.ivec.org:2811//pbstore/au01/grid-auscope/Abdi.Jama@csiro.au-20091103_163322/"
                 		//       +"rinex/" + filename
-                		String toURL = gridAccess.getGridFtpServer()+File.separator+ jobInputDir 
- 		               +GridSubmitController.RINEX_DIR+File.separator;
+						String toURL = gridAccess.getGridFtpServer()
+								+ File.separator + jobInputDir
+								+ GridSubmitController.RINEX_DIR
+								+ File.separator;
                 		gridStatus = urlCopy(urlArray, request, toURL);
             		}
             		
@@ -1877,7 +1854,7 @@ public class GridSubmitController {
         int rtnValue = 0;
         try {
     		GlobusURL from = new GlobusURL(fileUri.replace("http://files.ivec.org/geodesy/", "gsiftp://pbstore.ivec.org:2811//pbstore/cg01/geodesy/ftp.ga.gov.au/"));
-    		logger.debug("fromURL is: " + from.getURL());
+    		logger.debug("fromURL is: " + from.toString());
     		
     		String fullFilename = new URL(fileUri).getFile();
 
@@ -1887,7 +1864,7 @@ public class GridSubmitController {
 
     		toURL = toURL + filename;
     		GlobusURL to = new GlobusURL(toURL);		
-    		logger.debug("toURL is: " + to.getURL());
+    		logger.debug("toURL is: " + to.toString());
     		
     		//Not knowing how long UrlCopy will take, the UI request status update of 
     		//file transfer periodically
@@ -1899,7 +1876,7 @@ public class GridSubmitController {
     		uCopy.setUseThirdPartyCopy(false); 	
     		uCopy.copy();   		
     	} catch (UrlCopyException e) {
-    		logger.info("UrlCopy timed-out: " + e.getMessage());
+    		logger.error("UrlCopyException: " + e.getMessage());
     		rtnValue = 1;
     	} catch (Exception e) {
     		logger.error("Error: " + e.getMessage());

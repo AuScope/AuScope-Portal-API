@@ -7,6 +7,7 @@
 
 package org.auscope.gridtools;
 
+import java.io.FileWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -409,8 +410,8 @@ public class GramJobControl implements JobControlInterface {
         }
             
         
-        /*try {
-            final String JOBFILE = "GridJob.xml";
+        try {
+            final String JOBFILE = "/tmp/GeodesyGridJob.xml";
 
             logger.info("Writing " + JOBFILE + " file...");
             FileWriter fw = new FileWriter(JOBFILE);
@@ -427,7 +428,7 @@ public class GramJobControl implements JobControlInterface {
         } catch (Throwable e) {
             logger.error("Could not write Job string to file.");
             logger.error(e.getMessage());
-        }*/
+        }
         
 
         return jobs;
