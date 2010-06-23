@@ -162,6 +162,11 @@ public class DebugController {
 		return userResult;
 	}
 	
+	/**
+	 * Checks if the current session has a username attached to it
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/dbg/checkUsername.do")
 	public ModelAndView checkUsername(HttpServletRequest request) {
 		final String user = request.getRemoteUser();
@@ -173,6 +178,11 @@ public class DebugController {
 		return generateBasicTestResponse(true, "Username has no apparent problems");
 	} 
 	
+	/**
+	 * Checks if the session has a credentials object that is also valid
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/dbg/checkCredentials.do")
 	public ModelAndView checkCredentials(HttpServletRequest request) {
 		Object credentials = request.getSession().getAttribute("userCred");
@@ -188,6 +198,11 @@ public class DebugController {
 		return generateBasicTestResponse(true, "Credentials have no apparent problems");
 	}
 	
+	/**
+	 * Checks if the session variables selectedGPSfiles and gridInputFiles are set
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/dbg/checkInputFiles.do")
 	public ModelAndView checkInputFiles(HttpServletRequest request) {
 		List<GeodesyGridInputFile> selectedList = (List<GeodesyGridInputFile>) request.getSession().getAttribute("selectedGPSfiles");
@@ -233,6 +248,11 @@ public class DebugController {
 		return generateBasicTestResponse(true, "All files in stage in are valid");
 	}
 	
+	/**
+	 * Checks the local stage in directory (if set in the session) is well formed
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/dbg/checkLocalStageInDir.do")
 	public ModelAndView checkLocalStageInDir(HttpServletRequest request) {
 		String localStageInDir = (String) request.getSession().getAttribute("localJobInputDir");
@@ -326,6 +346,11 @@ public class DebugController {
 		return checkRemoteStageInDirContents_Recursive(request, gridStore, rootLocalDir, gridStageInDir);
 	}
 	
+	/**
+	 * Checks the remote stage in directory (if set in the session) is well formed
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/dbg/checkRemoteStageInDir.do")
 	public ModelAndView checkRemoteStageInDir(HttpServletRequest request) {
 		final String gridStageInDir = (String) request.getSession().getAttribute("jobInputDir");
@@ -347,6 +372,13 @@ public class DebugController {
 		}); 
 	}
 	
+	/**
+	 * Uses globus to copy a file from one url to another
+	 * @param request
+	 * @param fromUrl
+	 * @param toUrl
+	 * @return
+	 */
 	@RequestMapping("/dbg/urlCopyTest.do")
 	public ModelAndView urlCopyTest(HttpServletRequest request, String fromUrl, String toUrl) {
 		Object credentials = request.getSession().getAttribute("userCred");
@@ -366,9 +398,9 @@ public class DebugController {
     		uCopy.setUseThirdPartyCopy(false); 	
     		uCopy.copy();   		
     	} catch (UrlCopyException e) {
-    		return generateBasicTestResponse(false,"Error! UrlCopyException: " + e.toString());
+    		return generateBasicTestResponse(false,"UrlCopyError! UrlCopyException: " + e.toString(), String.format("from: '%1$s' to: '%2$s' ", fromUrl, toUrl));
     	} catch (Exception e) {
-    		return generateBasicTestResponse(false,"Error! Exception: " +  e.toString());
+    		return generateBasicTestResponse(false,"UrlCopyError! Exception: " +  e.toString(), String.format("from: '%1$s' to: '%2$s' ", fromUrl, toUrl));
     	}
     	
     	
@@ -413,8 +445,21 @@ public class DebugController {
 		return serviceUrl;
 	}
 	
+	/**
+	 * Runs a test that checks whether the rinex files are registered in Geoserver and that they are also downloadable
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/dbg/testRinexUrlAvailability.do")
 	public ModelAndView testRinexUrlAvailability(HttpServletRequest request) {
+		
+		try {
+			cswService.updateRecordsInBackground();
+		} catch (Exception ex) {
+			return generateBasicTestResponse(false, "Error updateRecordsInBackground(): " + ex);
+		}
+		
+		
 		String serviceUrl = null;
 		try {
 			serviceUrl = getRinexFilesUrl();
@@ -464,7 +509,7 @@ public class DebugController {
 	private static String generateJobId(final String user) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String dateFmt = sdf.format(new Date());
-        return user + "-" + dateFmt + File.separator;
+        return user + "-" + dateFmt;
 	}
 	
     private GeodesyJob prepareSimpleJob(final String user) throws Exception {
@@ -510,7 +555,9 @@ public class DebugController {
     }
 	
     /**
-     * Creates a test job with default parameters and attempts to submit it to the grid
+     * Creates a test job with default parameters and attempts to submit it to the grid.
+     * 
+     * This will NOT test the job output, only the act of submitting a job
      * @param request
      * @return
      */
@@ -518,10 +565,10 @@ public class DebugController {
 	public ModelAndView runTestJob(HttpServletRequest request) {
 		final String user = request.getRemoteUser();
 		final Object credentials = request.getSession().getAttribute("userCred");
-		final String jobId = "test" + generateJobId(user);
+		final String jobId = "test" + generateJobId(user) + File.separator;
 		final String jobRootDir = gridAccess.getGridFtpStageInDir() + jobId;
-		final String jobRinexDir = jobRootDir + GridSubmitController.RINEX_DIR + File.separator;
-		final String localDir = gridAccess.getLocalGridFtpStageInDir() + "test" + user;
+		final String jobRinexDir = jobRootDir + GridSubmitController.RINEX_DIR;
+		final String localDir = gridAccess.getLocalGridFtpStageInDir() + jobId + File.separator;
 		
 		if (user == null || user.length() == 0) {
 			return generateBasicTestResponse(false, "User is null or empty (Have you logged in?)");
@@ -585,16 +632,19 @@ public class DebugController {
 		
 		//Get the rinex files to process
 		String rinexUrl = null;
+		String rinexFileName = null;
 		try {
 			String serviceUrl = getRinexFilesUrl(); 
 			List<GeodesyGridInputFile> rinexFiles = getRinexFileUrls(serviceUrl, 1);
 			rinexUrl = rinexFiles.get(0).getFileUrl();
+			rinexFileName = new File(new URL(rinexUrl).getFile()).getName();
+			rinexUrl = rinexUrl.replace("http://files.ivec.org/geodesy/", "gsiftp://pbstore.ivec.org:2811//pbstore/cg01/geodesy/ftp.ga.gov.au/");
 		} catch (Exception ex) {
 			return generateBasicTestResponse(false, "Error extracting rinex url: " + ex);
 		}
 		
 		//Copy the rinex file over
-		mav = urlCopyTest(request,rinexUrl, jobRinexDir);
+		mav = urlCopyTest(request,rinexUrl, gridAccess.getGridFtpServer() + File.separator + jobRinexDir + rinexFileName);
 		if (!(Boolean)mav.getModel().get("success")) 
 			return mav;
 		
