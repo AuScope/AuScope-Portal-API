@@ -124,4 +124,19 @@ public class GeodesyGridInputFile implements Serializable {
         
         return result;
 	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("stationId='");
+		sb.append(this.stationId);
+		sb.append("' fileUrl='");
+		sb.append(this.fileUrl);
+		sb.append("' fileDate='");
+		sb.append(this.fileDate);
+		sb.append("' selected='");
+		sb.append(this.selected);
+		sb.append("'");
+		
+		return sb.toString();
+	}
 }
