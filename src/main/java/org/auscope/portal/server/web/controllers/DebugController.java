@@ -311,7 +311,8 @@ public class DebugController {
 			
 			//Recurse into directories
 			if (currentFile.isDirectory()) {
-				ModelAndView mav = checkRemoteStageInDirContents_Recursive(request, gridStore, currentFile, gridDir + File.pathSeparator + currentFile.getName());
+				String sep = (String.valueOf(gridDir.charAt(gridDir.length() - 1)) == File.separator) ? "" : File.separator;
+				ModelAndView mav = checkRemoteStageInDirContents_Recursive(request, gridStore, currentFile, gridDir + sep + currentFile.getName());
 				if (!((Boolean)mav.getModel().get("success"))) {
 					return mav;
 				}
