@@ -5,6 +5,8 @@ Ext.namespace('Debug');
 Debug.statusRenderer = function jobStatusRenderer(value, cell, record, rowIndex, colIndex, store) {
 	if (value == "success")
 		return '<span style="color:green;">' + value + '</span>';
+	else if (value == "running")
+		return '<span style="color:black;">' + value + '</span>';
 	else
 		return '<span style="color:red;">' + value + '</span>';
 }
@@ -63,7 +65,7 @@ Debug.generateTestForm_urlCopyTest = function() {
 		title: 'Url Copy Test',
 		id: 'advTest-url-copy',
 		collapsible: true,
-		collapsed: true,
+		collapsed: false,
 		items: [
 		        {
 		        	xtype: 'fieldset',
@@ -99,7 +101,7 @@ Debug.generateTestForm_submitJobTest = function() {
 		title: 'Submit Job Test',
 		id: 'advTest-submit-job',
 		collapsible: true,
-		collapsed: true,
+		collapsed: false,
 		items: [
 		        {
 		        	xtype: 'button',
