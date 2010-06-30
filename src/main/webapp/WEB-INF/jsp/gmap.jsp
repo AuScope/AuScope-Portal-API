@@ -3,7 +3,7 @@
 
 <html xmlns:v="urn:schemas-microsoft-com:vml">
    <head>
-      <title>AuScope Discovery Portal</title>
+      <title>Bureau of Meteorology Discovery Portal</title>
       
       <meta name="description" content="Access geoscientific information from around Australia, via AuScopes national e-Research infrastructure.">
       <meta name="keywords" content="AuScope, Discovery, Resources, GeoSciML, Mineral Occurrence, Geologic Unit, Australia">

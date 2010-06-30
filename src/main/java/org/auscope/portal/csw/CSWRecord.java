@@ -58,27 +58,27 @@ public class CSWRecord {
         contactOrganisation = tempNode != null ? tempNode.getTextContent() : "";
     }
 
-    public String getServiceName() throws XPathExpressionException {
+    public String getServiceName() {
         return serviceName;
     }
 
-    public String getServiceUrl() throws XPathExpressionException {
+    public String getServiceUrl(){
         return serviceUrl;
     }
 
-    public String getOnlineResourceName() throws XPathExpressionException {
+    public String getOnlineResourceName(){
         return onlineResourceName;
     }
 
-    public String getOnlineResourceDescription() throws XPathExpressionException {
+    public String getOnlineResourceDescription() {
         return onlineResourceDescription;
     }
 
-    public String getOnlineResourceProtocol() throws XPathExpressionException {
+    public String getOnlineResourceProtocol()  {
         return onlineResourceProtocol;
     }
 
-    public String getContactOrganisation() throws XPathExpressionException {
+    public String getContactOrganisation(){
         return contactOrganisation;
     }
 

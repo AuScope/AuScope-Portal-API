@@ -11,7 +11,7 @@ Ext.onReady(function() {
     //-----------Complex Features Panel Configurations
 
     var complexFeaturesStore = new Ext.data.Store({
-        proxy: new Ext.data.HttpProxy(new Ext.data.Connection({url: '/getComplexFeatures.do', timeout:180000})),
+        proxy: new Ext.data.HttpProxy(new Ext.data.Connection({url: 'getComplexFeatures.do', timeout:180000})),
         reader: new Ext.data.ArrayReader({}, [
             {   name: 'title'           },
             {   name: 'description'     },
@@ -29,9 +29,35 @@ Ext.onReady(function() {
         ]),
         sortInfo: {field:'title', direction:'ASC'}
     });
+    
+    var genericFeaturesStore = new Ext.data.Store({
+        proxy: new Ext.data.HttpProxy(new Ext.data.Connection({url: 'getGenericFeatures.do', timeout:180000})),
+        reader: new Ext.data.ArrayReader({}, [
+            {   name: 'title'           },
+            {   name: 'description'     },
+            {   name: 'contactOrgs'     },
+            {   name: 'proxyURL'        },
+            {   name: 'serviceType'     },  
+            {   name: 'id'              },
+            {   name: 'typeName'        },
+            {   name: 'serviceURLs'     },
+            {   name: 'layerVisible'    },
+            {   name: 'loadingStatus'   },
+            {   name: 'iconImgSrc'      },
+            {   name: 'iconUrl'         },
+            {   name: 'dataSourceImage' },
+        ]),
+        sortInfo: {field:'title', direction:'ASC'}
+    });
 
     var complexFeaturesRowExpander = new Ext.grid.RowExpander({
         tpl : new Ext.Template('<p>{description} </p><br>')
+    });
+    
+    var genericFeaturesRowExpander = new Ext.grid.RowExpander({
+        tpl : new Ext.Template(
+                '<p>{description} </p><br>'
+                )
     });
 
     var complexFeaturesPanel = new Ext.grid.GridPanel({
@@ -62,10 +88,11 @@ Ext.onReady(function() {
             iconCls:'add',
             pressed: true,
             handler: function() {
+        	
                 var recordToAdd = complexFeaturesPanel.getSelectionModel().getSelected();
 
                 //Only add if the record isn't already there
-                if (activeLayersStore.findExact("id",recordToAdd.get("id")) < 0) {
+                if (activeLayersStore.findExact("id",recordToAdd.get("id")) < 0) {                
                     //add to active layers (At the top of the Z-order)
                     activeLayersStore.insert(0, [recordToAdd]);
                     
@@ -78,15 +105,60 @@ Ext.onReady(function() {
             }
         }]
     });
+    
+    var genericFeaturesPanel = new Ext.grid.GridPanel({
+        store: genericFeaturesStore,
+        columns: [
+            genericFeaturesRowExpander,
+            {
+                id:'title',
+                header: "Title",
+                width: 160,
+                sortable: true,
+                dataIndex: 'title'
+            }
+        ],
+        bbar: [
+            {
+                text:'Add Layer to Map',
+                tooltip:'Add Layer to Map',
+                iconCls:'add',
+                pressed: true,
+                handler: function() {
+                    var recordToAdd = genericFeaturesPanel.getSelectionModel().getSelected();
 
+                    //add to active layers
+                    activeLayersStore.add(recordToAdd);
+
+                    //invoke this layer as being checked
+                    activeLayerCheckHandler(genericFeaturesPanel.getSelectionModel().getSelected(), true);
+
+                    //set this record to selected
+                    activeLayersPanel.getSelectionModel().selectRecords([recordToAdd], false);
+                }
+            }
+        ],
+
+        stripeRows: true,
+        autoExpandColumn: 'title',
+        plugins: [genericFeaturesRowExpander],
+        viewConfig: {scrollOffset: 0},
+
+        title: 'Generic Layers',
+        region:'north',
+        split: true,
+        height: 200,
+        autoScroll: true
+    });
+    
     //----------- WMS Layers Panel Configurations
 
     var wmsLayersStore = new Ext.data.GroupingStore({
-        proxy: new Ext.data.HttpProxy({url: '/getWMSLayers.do'}),
+        proxy: new Ext.data.HttpProxy({url: 'getWMSLayers.do'}),
         reader: new Ext.data.ArrayReader({}, [
             {   name: 'title'           },
             {   name: 'description'     },
-            {   name: 'contactOrg'      },
+            {   name: 'contactOrg'     },
             {   name: 'proxyURL'        },
             {   name: 'serviceType'     },
             {   name: 'id'              },
@@ -161,98 +233,6 @@ Ext.onReady(function() {
 
     });
 
-
-    var customLayersStore = new Ext.data.Store({
-        proxy: new Ext.data.HttpProxy({url: '/getCustomLayers.do'}),
-        //baseParams : {service_URL : 'fullName' }, // one parameter, column, which is set to ‘fullNname’
-        baseParams : { service_URL : '' },
-        reader: new Ext.data.ArrayReader({}, [
-            {   name: 'title'           },
-            {   name: 'description'     },
-            {   name: 'contactOrg'      },
-            {   name: 'proxyURL'        },
-            {   name: 'serviceType'     },
-            {   name: 'id'              },
-            {   name: 'typeName'        },
-            {   name: 'serviceURLs'     },
-            {   name: 'layerVisible'    },
-            {   name: 'loadingStatus'   },
-            {   name: 'dataSourceImage' },
-            {   name: 'opacity'         }
-        ]),
-        groupField:'contactOrg',
-        sortInfo: {field:'title', direction:'ASC'}
-    });
-
-    var customLayersRowExpander = new Ext.grid.RowExpander({
-        tpl : new Ext.Template('<p>{description}</p><br>')
-    });
-    
-    //----------- Search Panel
-    var customLayersPanel = new Ext.grid.GridPanel({
-        stripeRows       : true,
-        autoExpandColumn : 'title',
-        plugins          : [ customLayersRowExpander ],
-        viewConfig       : {scrollOffset: 0, forceFit:true},
-        title            : 'Custom Layers',
-        region           :'north',
-        split            : true,
-        height           : 160,
-        //width: 80,
-        autoScroll       : true,
-        store            : customLayersStore,
-        loadMask         : true,
-        columns: [
-            customLayersRowExpander,
-            {
-                id:'title',
-                header: "Title",
-                sortable: true,
-                dataIndex: 'title'
-            },{
-                id:'contactOrg',
-                header: "Provider",
-                width: 160,
-                sortable: true,
-                dataIndex: 'contactOrg',
-                hidden:true
-            }
-        ],
-        tbar: [
-            '<span style="color:#15428B; font-weight:bold">Enter WMS Url: </span>',
-            ' ',
-            new Ext.ux.form.SearchTwinTriggerField({
-                store: customLayersStore,
-                width:260,
-                name : 'STTField',
-                emptyText : 'http://'
-            })
-        ],
-        bbar: [{
-            text:'Add Layer to Map',
-            tooltip:'Add Layer to Map',
-            iconCls:'add',
-            pressed: true,
-            region :'south',
-            handler: function() {
-                var recordToAdd = customLayersPanel.getSelectionModel().getSelected();
-
-                //Only add if the record isn't already there
-                if (activeLayersStore.findExact("id",recordToAdd.get("id")) < 0) {
-                    //add to active layers (At the top of the Z-order)
-                    activeLayersStore.insert(0, [recordToAdd]);
-                    
-                    //invoke this layer as being checked
-                    activeLayerCheckHandler(customLayersPanel.getSelectionModel().getSelected(), true);
-                }
-
-                //set this record to selected
-                activeLayersPanel.getSelectionModel().selectRecords([recordToAdd], false);
-            }
-        }]
-    });
-    
-    
     var filterButton = new Ext.Button({
         text     :'Apply Filter >>',
         tooltip  :'Apply Filter',
@@ -326,7 +306,7 @@ Ext.onReady(function() {
     /**
      *@param forceApplyFilter (Optional) if set AND isChecked is set AND this function has a filter panel, it will force the current filter to be loaded
      */
-    var activeLayerCheckHandler = function(record, isChecked, forceApplyFilter) {
+    var activeLayerCheckHandler = function(record, isChecked, forceApplyFilter) {        
         //set the record to be selected if checked
         activeLayersPanel.getSelectionModel().selectRecords([record], false);
 
@@ -376,9 +356,7 @@ Ext.onReady(function() {
             }
         } else {
             if (record.get('serviceType') == 'wfs') {
-                if (record.tileOverlay instanceof MarkerManager) {
-                    record.tileOverlay.clearMarkers();
-                }
+                if (record.tileOverlay instanceof OverlayManager) record.tileOverlay.clearOverlays();
             } else if (record.get('serviceType') == 'wms') {
                 //remove from the map
                 map.removeOverlay(record.tileOverlay);
@@ -402,9 +380,7 @@ Ext.onReady(function() {
             return;
         }
 
-        if (selectedRecord.tileOverlay instanceof MarkerManager) { 
-            selectedRecord.tileOverlay.clearMarkers();
-        }
+        if (selectedRecord.tileOverlay instanceof OverlayManager) selectedRecord.tileOverlay.clearOverlays();
 
         //a response status holder
         selectedRecord.responseTooltip = new ResponseTooltip();
@@ -416,8 +392,8 @@ Ext.onReady(function() {
         var finishedLoadingCounter = serviceURLs.length;
         // var markerOverlay = new MarkerOverlay();
 
-        var markerManager = new MarkerManager(map);
-        selectedRecord.tileOverlay = markerManager;
+        var overlayManager = new OverlayManager(map);
+        selectedRecord.tileOverlay = overlayManager;
 
         //set the status as loading for this record
         selectedRecord.set('loadingStatus', '<img src="js/external/extjs/resources/images/default/grid/loading.gif">');
@@ -425,7 +401,7 @@ Ext.onReady(function() {
         var filterParameters = filterPanel.getLayout().activeItem == filterPanel.getComponent(0) ? "&typeName=" + selectedRecord.get('typeName') : filterPanel.getLayout().activeItem.getForm().getValues(true);
         
         for (var i = 0; i < serviceURLs.length; i++) {
-            handleQuery(serviceURLs[i], selectedRecord, proxyURL, iconUrl, markerManager, filterParameters, function() {
+            handleQuery(serviceURLs[i], selectedRecord, proxyURL, iconUrl, overlayManager, filterParameters, function() {
                 //decrement the counter
                 finishedLoadingCounter--;
 
@@ -437,7 +413,7 @@ Ext.onReady(function() {
         }
     };
 
-    var handleQuery = function(serviceUrl, selectedRecord, proxyURL, iconUrl, markerManager, filterParameters, finishedLoadingHandler) {
+    var handleQuery = function(serviceUrl, selectedRecord, proxyURL, iconUrl, overlayManager, filterParameters, finishedLoadingHandler) {
         selectedRecord.responseTooltip.addResponse(serviceUrl, "Loading...");
         GDownloadUrl(proxyURL + '?' + filterParameters + '&serviceUrl=' + serviceUrl, function(data, responseCode) {
             if (responseCode == 200) {
@@ -445,18 +421,27 @@ Ext.onReady(function() {
                 if (jsonResponse.success) {
                     var icon = new GIcon(G_DEFAULT_ICON, iconUrl);
                     icon.iconSize = new GSize(32, 32);
-                    var markers = new KMLParser(jsonResponse.data.kml).makeMarkers(icon, function(marker) {
+                    
+                    //Parse our KML
+                    var parser = new KMLParser(jsonResponse.data.kml);
+                    parser.makeMarkers(icon, function(marker) {
                         marker.typeName = selectedRecord.get('typeName');
                         marker.wfsUrl = serviceUrl;
+                        marker.parentRecord = selectedRecord;
                     });
-                    markerManager.addMarkers(markers, 0);
-                    markerManager.refresh();
-
-                    //store the gml for later download needs
-                    selectedRecord.gml = jsonResponse.data.gml;
+                    
+                    var markers = parser.markers;
+                    var overlays = parser.overlays;
+                    
+                    //Add our single points and overlays
+                    overlayManager.markerManager.addMarkers(markers, 0);
+                    for(var i = 0; i < overlays.length; i++) {
+                    	overlayManager.addOverlay(overlays[i]);
+                    }
+                    overlayManager.markerManager.refresh();
 
                     //store the status
-                    selectedRecord.responseTooltip.addResponse(serviceUrl, markers.length + " records retrieved.");
+                    selectedRecord.responseTooltip.addResponse(serviceUrl, (markers.length + overlays.length) + " records retrieved.");
                 } else {
                     //store the status
                     selectedRecord.responseTooltip.addResponse(serviceUrl, jsonResponse.msg);
@@ -485,9 +470,10 @@ Ext.onReady(function() {
         tileLayer.opacity = record.get('opacity');
 
         //TODO: remove code specific to feature types and styles specific to GSV
-        if (record.get('typeName') == 'gsmlGeologicUnit') {
+        if (record.get('typeName') == 'gsmlGeologicUnit')
             tileLayer.styles = 'ColorByLithology';
-        }
+        //if (record.get('id') == '7')
+        //    tileLayer.styles = '7';
 
         record.tileOverlay = new GTileLayerOverlay(tileLayer);
 
@@ -554,8 +540,8 @@ Ext.onReady(function() {
                     }
 
                     if (record.get('serviceType') == 'wfs') {
-                        if (record.tileOverlay instanceof MarkerManager) {
-                            record.tileOverlay.clearMarkers();
+                        if (record.tileOverlay instanceof OverlayManager) { 
+                        	record.tileOverlay.clearOverlays();
                         }
                     } else if (record.get('serviceType') == 'wms') {
                         //remove from the map
@@ -745,17 +731,11 @@ Ext.onReady(function() {
                                            map.getBounds().getNorthEast().lat();
 
                             var url = serviceUrls[i];
-                                                          
-                            var last_char = url.charAt(url.length - 1);
-                            if ((last_char !== "?") && (last_char !== "&")) {
-                                if (url.indexOf('?') == -1) {
-                                    url += "?";
-                                } else {
-                                    url += "&";
-                                }
-                            }
-                             
-                            url += "REQUEST=GetMap";
+
+                            if (url.length > 0 && url[url.length - 1] != '?')
+                                url += '?';
+                            
+                            url += "&REQUEST=GetMap";
                             url += "&SERVICE=WMS";
                             url += "&VERSION=1.1.0";
                             url += "&LAYERS=" + record.get('typeName');
@@ -863,8 +843,8 @@ Ext.onReady(function() {
         //autosize:true,
         items:[
             complexFeaturesPanel,
-            wmsLayersPanel,
-            customLayersPanel
+            genericFeaturesPanel,
+            wmsLayersPanel
         ]
     });
 
@@ -982,21 +962,22 @@ Ext.onReady(function() {
     });
 
     GEvent.addListener(map, "mousemove", function(latlng){
-        var latStr = "<b>Long:</b> " + latlng.lng().toFixed(6)
+        var latStr = "<b>Long:</b> " + latlng.lng().toFixed(6) 
                    + "&nbsp&nbsp&nbsp&nbsp"
-                   + "<b>Lat:</b> " + latlng.lat().toFixed(6);
+                   + "<b>Lat:</b> " + latlng.lat().toFixed(6);  
     	document.getElementById("latlng").innerHTML = latStr;
     });
 
     GEvent.addListener(map, "mouseout", function(latlng){
         document.getElementById("latlng").innerHTML = "";
-    });
+    });     
     
     new Ext.LoadMask(tabsPanel.el, {msg: 'Please Wait...', store: wmsLayersStore});
     //new Ext.LoadMask(complexFeaturesPanel.el, {msg: 'Please Wait...', store: complexFeaturesStore});
     //new Ext.LoadMask(wmsLayersPanel.el, {msg: 'Please Wait...', store: wmsLayersStore});
 
     complexFeaturesStore.load();
+    genericFeaturesStore.load();
     wmsLayersStore.load();
     
 });

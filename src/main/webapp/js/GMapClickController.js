@@ -1,30 +1,60 @@
+
+//Returs true if the click has originated froma generic parser layer
+var genericParserClickHandler = function (map, overlay, latlng, activeLayersStore) {
+	if (overlay == null || !overlay.description)
+		return false;
+	
+	//The generic parser stamps the description with a specific string followed by the gml:id of the node
+	var genericParserString = 'GENERIC_PARSER:';
+	
+	if (overlay.description.indexOf(genericParserString) == 0) {
+		
+		//Lets extract the ID and then lookup the parent record
+		var gmlID = overlay.description.substring(genericParserString.length);
+		var parentRecord = null;
+		for (var i = 0; i < activeLayersStore.getCount(); i++) {
+			var recordToCheck = activeLayersStore.getAt(i);
+			if (recordToCheck == overlay.parentRecord) {
+				parentRecord = recordToCheck;
+				break;
+			} 
+		}
+		
+		//Parse the parameters to our iframe popup and get that to request the raw gml
+		var html = '<iframe src="genericparser.html';
+		html += '?serviceUrl=' + parentRecord.get('serviceURLs');
+		html += '&typeName=' + parentRecord.get('typeName');
+		html += '&featureId=' + gmlID;
+		html += '" width="600" height="350"/>';
+		
+		if (overlay instanceof GMarker) {
+			overlay.openInfoWindowHtml(html);
+		} else {
+			map.openInfoWindowHtml(overlay.getBounds().getCenter(), html);
+		}
+		
+		return true;
+	}
+		
+
+	return false;
+}
+
 /**
  * When someone clicks on the google maps we show popups specific to each 
  * feature type/marker that is clicked on
- * 
- * This event is fired when the user clicks on the map with the mouse. A
- * click event passes different arguments based on the context of the
- * click, and whether or not the click occured on a clickable overlay. If
- * the click does not occur on a clickable overlay, the overlay argument
- * is null and the latlng argument contains the geographical coordinates
- * of the point that was clicked. If the user clicks on an overlay that
- * is clickable (such as a GMarker, GPolygon, GPolyline, or GInfoWindow),
- * the overlay argument contains the overlay object, while the
- * overlaylatlng argument contains the coordinates of the clicked
- * overlay. In addition, a click event is then also fired on the overlay
- * itself. 
- * 
- * @param {GMap2}
- * @param {GOverlay} overlay object (such as a GMarker, GPolygon, GPolyline, or GInfoWindow)
- * @param {GLatLng}  geographical coordinates
- * @param {Ext.data.Store}
- * 
- * @version $Id$
+ * @param {map}
+ * @param {overlay}
+ * @param {latlng}
+ * @param {activeLayersStore}
  */
 var gMapClickController = function(map, overlay, latlng, activeLayersStore) {
 	
+	//Try to handle a generic parser layer click
+	if (genericParserClickHandler(map,overlay,latlng,activeLayersStore))
+		return;
+	
     if (overlay instanceof GMarker) {
-        
         if (overlay.typeName == "gsml:Borehole") {
             new NvclInfoWindow(map,overlay).show();
         }
@@ -32,18 +62,19 @@ var gMapClickController = function(map, overlay, latlng, activeLayersStore) {
             new GeodesyMarker(overlay.wfsUrl, "geodesy:station_observations", overlay.title, overlay, overlay.description).getMarkerClickedFn()();
         }
         else if (overlay.description != null) {
-            overlay.openInfoWindowHtml(overlay.description, {maxWidth:800, maxHeight:600, autoScroll:true});
+        	overlay.openInfoWindowHtml(overlay.description, {maxWidth:800, maxHeight:600, autoScroll:true});
         }
-        
+    } else if (overlay instanceof GPolygon) {
+    	if (overlay.description != null) {
+    		map.openInfoWindowHtml(overlay.getVertex(0),overlay.description);
+    	}
     } else {
     	//If the user clicks on an info window, we will still get click events, lets ignore these
     	if (latlng == null || latlng == undefined)
     		return;
 
         for (var i = 0; i < activeLayersStore.getCount(); i++) {
-            
             var record = activeLayersPanel.getStore().getAt(i);
-            
             if (record.get('serviceType') == 'wms') {
                 var TileUtl = new Tile(map,latlng);
 
@@ -56,8 +87,7 @@ var gMapClickController = function(map, overlay, latlng, activeLayersStore) {
                 url += "&y=" + TileUtl.getTilePoint().y;
                 url += '&BBOX=' + TileUtl.getTileCoordinates();
                 url += '&WIDTH=' + TileUtl.getTileWidth();
-                url += '&HEIGHT=' + TileUtl.getTileHeight();
-                //alert(url);
+                url += '&HEIGHT=' + TileUtl.getTileHeight();    			
                 
                 map.getDragObject().setDraggableCursor("pointer");
                 GDownloadUrl(url, function(response, responseCode) {
