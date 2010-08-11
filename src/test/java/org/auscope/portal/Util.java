@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+//import java.io.*;
+
 /**
  * User: Mathew Wyatt
  * Date: 25/03/2009
- * Time: 8:44:18 AM
+ * @version $Id$
  */
 public class Util {
     public static String loadXML(String fileName) throws IOException {

@@ -1,47 +1,40 @@
 /**
- * Builds updateCSWRecords form panel for Mine filters
- * @param id to specify the id of this formpanel instance
- * @param serviceUrl the service url for submit
+ * Builds a form panel for Mine filters
+ * @param {number} id of this formpanel instance
+ * @param {string} the service url for submit
  */
 MineFilterForm = function(id, serviceUrl) {
-    /*var mineNamesStore = new Ext.data.Store({
+    /*
+    var mineNamesStore = new Ext.data.Store({
         baseParams: {serviceUrl: serviceUrl},
         proxy: new Ext.data.HttpProxy(new Ext.data.Connection({url: '/getMineNames.do', timeout:180000})),
         reader: new Ext.data.JsonReader({
             root:'data'
         }, [{name:'mineDisplayName', mapping:'mineDisplayName'}])
     });*/
-
+    
     Ext.FormPanel.call(this, {
-        //region: "center",
-        //collapsible: true,
-        //title: "Filter Properties",
-        //url: loadUrl,
-        id: 'my-id-'+id,
-        border: false,
-        autoScroll:true,
-        hideMode:'offsets',
-        width: '100%',
-        buttonAlign: 'right',
-        labelAlign: 'right',
-        labelWidth: 60,
-
-        //labelWidth: 140,
-        timeout: 180, //should not time out before the server does
-
-        items: [{
-            xtype:'fieldset',
-            title: 'Mine Filter Properties',
-
-            autoHeight:true,
-            anchor: '100%',
-
-            items :[
+        id          : String.format('{0}',id),
+        border      : false,
+        autoScroll  : true,
+        hideMode    :'offsets',
+        width       :'100%',
+        buttonAlign :'right',
+        labelAlign  :'right',
+        labelWidth  : 70,
+        timeout     : 180, //should not time out before the server does
+        bodyStyle   :'padding:5px',
+        autoHeight: true,
+        items       : [{
+            xtype      :'fieldset',
+            title      : 'Mine Filter Properties',
+            autoHeight : true,
+            items      : [
             {
-                anchor: '100%',
-                xtype: 'textfield',
-                fieldLabel: 'Mine Name',
-                name: 'mineName'
+                anchor     : '100%',
+                xtype      : 'textfield',
+                fieldLabel : 'Mine Name',
+                name       : 'mineName'
             }
             /*new Ext.form.ComboBox({
                 anchor: '100%',

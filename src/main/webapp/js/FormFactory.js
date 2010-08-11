@@ -17,11 +17,16 @@
 
 FormFactory = function() {};
 
-FormFactory.prototype.getFilterForm = function(record) {
-    switch (record.get('typeName')) {
-        case 'er:Mine': return new MineFilterForm(record.get('id'), record.get('serviceURLs')[0]); break;
-        case 'er:MiningActivity': return new MiningActivityFilterForm(record.get('id'), record.get('serviceURLs')[0]); break;
-        case 'er:MineralOccurrence': return new MineralOccurrenceFilterForm(record.get('id')); break;
-        default: return null; break;
+FormFactory.prototype.getFilterForm = function(record, map) {
+
+    if (record.get('serviceType') == 'wms') {
+        return new WMSLayerFilterForm(record, map);
+    } else {
+        switch (record.get('typeName')) {
+            case 'er:Mine': return new MineFilterForm(record.get('id'), record.get('serviceURLs')[0]); break;
+            case 'er:MiningActivity': return new MiningActivityFilterForm(record.get('id'), record.get('serviceURLs')[0]); break;
+            case 'er:MineralOccurrence': return new MineralOccurrenceFilterForm(record.get('id')); break;
+            default: return null; break;
+        }
     }
 };

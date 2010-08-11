@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 /**
  * User: Mathew Wyatt
  * Date: 12/07/2009
- * Time: 9:07:53 PM
+ * @version $Id$
  */
 @Repository
 public class CSWThreadExecutor implements Executor {

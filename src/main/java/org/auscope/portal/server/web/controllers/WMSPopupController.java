@@ -1,17 +1,19 @@
 package org.auscope.portal.server.web.controllers;
 
-import java.io.IOException;
-import java.net.URL;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.auscope.portal.server.web.service.HttpServiceCaller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.server.web.service.HttpServiceCaller;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import java.io.IOException;
+import java.net.URL;
 
 
 /**

@@ -1,9 +1,9 @@
 package org.auscope.portal.server.web.controllers;
 
-import java.awt.Menu;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -11,14 +11,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.server.gridjob.GridAccessController;
+
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * Controller that handles all {@link Menu}-related requests,
@@ -33,9 +33,7 @@ public class MenuController {
    @Autowired
    @Qualifier(value = "propertyConfigurer")
    private PortalPropertyPlaceholderConfigurer hostConfigurer;
-  
-   @Autowired
-   private GridAccessController gridAccess;
+
    /* Commented out, for the time being we are redirecting Home link to AuScope site
    @RequestMapping("/home.html")
    public ModelAndView menu() {
@@ -44,22 +42,29 @@ public class MenuController {
    }
    */
    
+   @RequestMapping("/genericparser.html")
+   public ModelAndView genericParser() {
+	   String googleKey = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
+	   
+	   ModelAndView mav = new ModelAndView("genericparser");
+	      mav.addObject("googleKey", googleKey);
+	      
+	   return mav;
+   }
+   
    @RequestMapping("/gmap.html")
    public ModelAndView gmap() {
       String googleKey 
          = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
       String vocabServiceUrl
          = hostConfigurer.resolvePlaceholder("HOST.vocabService.url");
-      String nvclWebService
-         = hostConfigurer.resolvePlaceholder("nvcl-web-service.url");
+
       logger.debug("googleKey: " + googleKey);
       logger.debug("vocabServiceUrl: " + vocabServiceUrl);
-      logger.debug("nvclWebServiceUrl: " + nvclWebService);
       
       ModelAndView mav = new ModelAndView("gmap");
       mav.addObject("googleKey", googleKey);
       mav.addObject("vocabServiceUrl", vocabServiceUrl);
-      mav.addObject("nvclWebServiceIP", nvclWebService);
       return mav;
    }
 
@@ -141,60 +146,5 @@ public class MenuController {
    @RequestMapping("/access_error.html")
    public ModelAndView access_error() {
       return new ModelAndView("access_error");
-   }
-   
-   @RequestMapping("/data_service_tool.html")
-   public ModelAndView data_service_tool() {
-      return new ModelAndView("data_service_tool");
-   }
-   
-   @RequestMapping("/gpsview.html")
-   public ModelAndView gpsview() {
-      return new ModelAndView("gpsview");
-   }
-   
-   /**
-    * If the user has valid grid credentials, this function will return a ModelAndView with redirectViewName
-    * If the user doesn't have valid credentials they will be redirected to the login page (and afterwards redirected to redirectUrl)
-    * 
-    * @param request
-    * @param redirectViewName
-    * @param redirectUrl
-    * @return
-    */
-   private ModelAndView doShibbolethAndSLCSLogin(HttpServletRequest request,String redirectViewName, String redirectUrl) {
-       if (gridAccess.isProxyValid(
-                   request.getSession().getAttribute("userCred"))) {
-           logger.debug("No/invalid action parameter; returning " + redirectViewName + " view.");
-           return new ModelAndView(redirectViewName);
-       } else {
-           request.getSession().setAttribute(
-                   "redirectAfterLogin", redirectUrl);
-           logger.warn("Proxy not initialized. Redirecting to gridLogin.");
-           return new ModelAndView(
-                   new RedirectView("/gridLogin.do", true, false, false));
-       }
-   }
- 
-   @RequestMapping("/gridsubmit.html")
-   public ModelAndView gridsubmit(HttpServletRequest request) {
-       // Ensure user has valid grid credentials
-	   return doShibbolethAndSLCSLogin(request, "gridsubmit", "/gridsubmit.html");
-   }
-
-   @RequestMapping("/joblist.html")
-   public ModelAndView joblist(HttpServletRequest request) {
-	   return doShibbolethAndSLCSLogin(request, "joblist", "/joblist.html");
-   }
-   
-   @RequestMapping("/dbg/debug.html")
-   public ModelAndView debug(HttpServletRequest request) {
-	   return new ModelAndView("debug");
-   }
-   
-   @RequestMapping("/dbg/dologin.html")
-   public ModelAndView debugLogin(HttpServletRequest request) {
-       // Ensure user has valid grid credentials
-	   return doShibbolethAndSLCSLogin(request, "debug", "/dbg/debug.html");
    }
 }

@@ -1,38 +1,42 @@
 package org.auscope.portal.server.web.service;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ConnectException;
-import java.net.URL;
-import java.net.UnknownHostException;
-
-import org.apache.commons.httpclient.ConnectTimeoutException;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.SimpleHttpConnectionManager;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
+
+import java.net.*;
+import java.io.BufferedReader;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
 
 
 /**
  * Utility class used to call web service end points
  * 
- * User: Mathew Wyatt
- * Date: 25/03/2009
- * Time: 11:37:40 AM
+ * @version $Id$
  */
 
 @Repository
 public class HttpServiceCaller {
     protected final Log log = LogFactory.getLog(getClass());
+    
+    private PortalPropertyPlaceholderConfigurer hostConfigurer;
+
+    @Autowired
+    @Qualifier(value = "propertyConfigurer")    
+    public void setHostConfigurer(PortalPropertyPlaceholderConfigurer hostConfig) {
+        this.hostConfigurer = hostConfig;
+    }    
+    
     /**
      * Makes a call to a http GetMethod and returns the response as a string
      *
@@ -42,6 +46,7 @@ public class HttpServiceCaller {
      * @throws Exception
      */
     public String getMethodResponseAsString(HttpMethodBase method, HttpClient httpClient) throws ConnectException, UnknownHostException, ConnectTimeoutException, Exception{
+
         //invoke the method
         this.invokeTheMethod(method, httpClient);
 
@@ -51,8 +56,25 @@ public class HttpServiceCaller {
         //release the connection
         method.releaseConnection();
 
+        log.trace("XML response from server:");
+        log.trace("\n" + response);
+        
         //return it
         return response;
+    }
+    
+    /**
+     * Invokes a method and returns the binary response as a stream
+     * 
+     * WARNING - ensure you call method.releaseConnection() AFTER you have finished reading the input stream
+     *
+     * @return
+     */
+    public InputStream getMethodResponseAsStream(HttpMethodBase method, HttpClient httpClient) throws Exception {
+        //invoke the method
+        this.invokeTheMethod(method, httpClient);
+
+        return method.getResponseBodyAsStream();
     }
 
     /**
@@ -80,11 +102,41 @@ public class HttpServiceCaller {
      * @param httpClient
      */
     private void invokeTheMethod(HttpMethodBase method, HttpClient httpClient) throws Exception {
-        //set the timeout, to 1 minute
+
         HttpConnectionManagerParams clientParams = new HttpConnectionManagerParams();
-        clientParams.setParameter(HttpMethodParams.HEAD_BODY_CHECK_TIMEOUT, 60000);
-        clientParams.setSoTimeout(60000);
-        clientParams.setConnectionTimeout(60000);
+
+        int SECOND = 1000;      // 1000 millisecond
+        
+        int BODY_TIMEOUT;
+        int SOCK_TIMEOUT;
+        int CONN_TIMEOUT;
+        
+        try {
+            BODY_TIMEOUT = SECOND * Integer.parseInt(hostConfigurer.resolvePlaceholder("wait-for-body-content.timeout"));        
+            SOCK_TIMEOUT = SECOND * Integer.parseInt(hostConfigurer.resolvePlaceholder("socket.timeout"));
+            CONN_TIMEOUT = SECOND * Integer.parseInt(hostConfigurer.resolvePlaceholder("connection-establish.timeout"));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+
+        log.trace("BODY_TIMEOUT : " + BODY_TIMEOUT);
+        log.trace("SOCK_TIMEOUT : " + SOCK_TIMEOUT);
+        log.trace("CONN_TIMEOUT : " + CONN_TIMEOUT);
+        
+        log.debug("method=" + method.getURI());
+        
+        // Period of time in milliseconds to wait for a content body 
+        // sent in response to HEAD method from a non-compliant server.
+        clientParams.setParameter( HttpMethodParams.HEAD_BODY_CHECK_TIMEOUT
+                                 , BODY_TIMEOUT);
+
+        // Default socket timeout in milliseconds which is the timeout for waiting for data
+        clientParams.setSoTimeout(SOCK_TIMEOUT);
+        
+        // Timeout until connection is etablished.
+        clientParams.setConnectionTimeout(CONN_TIMEOUT);
 
         //create the connection manager and add it to the client
         HttpConnectionManager man = new SimpleHttpConnectionManager();

@@ -1,9 +1,9 @@
 package org.auscope.portal.server.web.view;
 
-import net.sf.json.JSONArray;
+import org.springframework.web.servlet.ModelAndView;
 
 import org.springframework.ui.ModelMap;
-import org.springframework.web.servlet.ModelAndView;
+import net.sf.json.JSONArray;
 
 /**
  * A spring ModelAndView for json objects

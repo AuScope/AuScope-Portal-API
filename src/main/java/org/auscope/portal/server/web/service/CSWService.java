@@ -1,37 +1,56 @@
 package org.auscope.portal.server.web.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.auscope.portal.csw.CSWGetRecordResponse;
 import org.auscope.portal.csw.CSWMethodMakerGetDataRecords;
+import org.auscope.portal.csw.CSWOnlineResource;
 import org.auscope.portal.csw.CSWRecord;
 import org.auscope.portal.csw.CSWThreadExecutor;
 import org.auscope.portal.csw.ICSWMethodMaker;
+import org.auscope.portal.csw.CSWOnlineResource.OnlineResourceType;
+
 import org.auscope.portal.server.util.Util;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import org.w3c.dom.Document;
+
 
 /**
  * Provides some utility methods for accessing data from a CSW service
  *
- * User: Mathew Wyatt
- * Date: 02/07/2009
- * Time: 2:33:49 PM
+ * @version $Id$
+ * TODO: create an interface, as this implementation does things like caching,
+ * TODO: which is not desirable in all cases
  */
 @Service
 public class CSWService {
-    private Logger logger = Logger.getLogger(getClass());
+    protected final Log log = LogFactory.getLog(getClass());
 
     private CSWRecord[] dataRecords = new CSWRecord[0];
     private HttpServiceCaller serviceCaller;
     private String serviceUrl;
     private CSWThreadExecutor executor;        
     private Util util;
-    private long lastUpdated = 0;
+    private volatile long lastUpdated = 0;
     private static final int UPDATE_INTERVAL = 300000;
+    
+    /*
+     * This is used to prevent multiple updates running concurrently
+     * (Any updates that trigger when an update is already running will be ignored)
+     */
+    private final Lock lock = new ReentrantLock();
 
+    
     @Autowired
     public CSWService(CSWThreadExecutor executor,
                       HttpServiceCaller serviceCaller,
@@ -39,13 +58,13 @@ public class CSWService {
 
         this.executor = executor;
         this.serviceCaller = serviceCaller;
-        this.util = util;
-        
+        this.util = util;        
     }
 
-    /* (non-Javadoc)
-	 * @see org.auscope.portal.server.web.service.ICSWService#setServiceUrl(java.lang.String)
-	 */
+    /**
+     * ServiceURL setter
+     * @param serviceUrl
+     */
     public void setServiceUrl(String serviceUrl) {
         this.serviceUrl = serviceUrl;
     }
@@ -55,7 +74,8 @@ public class CSWService {
      * @throws Exception
      */
     public void updateRecordsInBackground() throws Exception {
-        if(System.currentTimeMillis() - lastUpdated > UPDATE_INTERVAL || dataRecords.length == 0) { //if older that 5 mins or there are no records then do the update
+        // Update the cache if older that 5 mins or there are no records
+        if (System.currentTimeMillis() - lastUpdated > UPDATE_INTERVAL || dataRecords.length == 0) {
             executor.execute(new Runnable() {
                 public void run() {
                     updateCSWRecords();
@@ -69,16 +89,29 @@ public class CSWService {
      * Updates the cached data records from the CSW service.
      */
     public void updateCSWRecords() {
+        //If an update is already running, don't bother continuing
+        if (!lock.tryLock()) {
+            log.trace("Update is already running - update skipped");
+            return;
+        }
+        
+        log.trace("Update Starting");
+        
         try {
+            
             ICSWMethodMaker getRecordsMethod = new CSWMethodMakerGetDataRecords(serviceUrl);
-
+            
+            log.debug(getRecordsMethod.makeMethod().getQueryString());
             Document document = util.buildDomFromString(serviceCaller.getMethodResponseAsString(getRecordsMethod.makeMethod(), serviceCaller.getHttpClient()));
 
             CSWRecord[] tempRecords = new CSWGetRecordResponse(document).getCSWRecords();
-
+            
             setDatarecords(tempRecords);
         } catch (Exception e) {
-            logger.error(e);
+            log.error("Error parsing CSW record list",e);
+        } finally {
+            lock.unlock();
+            log.trace("Update completed");
         }
     }
 
@@ -90,9 +123,11 @@ public class CSWService {
         this.dataRecords = records;
     }
 
-    /* (non-Javadoc)
-	 * @see org.auscope.portal.server.web.service.ICSWService#getDataRecords()
-	 */
+    /**
+     * Returns the entire cached record set
+     * @return
+     * @throws Exception
+     */
     public CSWRecord[] getDataRecords() throws Exception {
         return dataRecords;
     }
@@ -103,18 +138,17 @@ public class CSWService {
      * @throws Exception
      */
     public CSWRecord[] getWMSRecords() throws Exception {
-        CSWRecord[] records = getDataRecords();
+        return getFilteredDataRecords(OnlineResourceType.WMS);
+    }
+    
 
-         ArrayList<CSWRecord> wfsRecords = new ArrayList<CSWRecord>();
-
-        for(CSWRecord rec : records) {
-            if(rec.getOnlineResourceProtocol() != null)
-                if(rec.getOnlineResourceProtocol().contains("WMS") && !rec.getServiceUrl().equals("")) {
-                    wfsRecords.add(rec);
-                }
-        }
-
-        return wfsRecords.toArray(new CSWRecord[wfsRecords.size()]);
+    /**
+     * Returns only WCS data records
+     * @return
+     * @throws Exception
+     */
+    public CSWRecord[] getWCSRecords() throws Exception {
+        return getFilteredDataRecords(OnlineResourceType.WCS);
     }
 
     /**
@@ -123,18 +157,7 @@ public class CSWService {
      * @throws Exception
      */
     public CSWRecord[] getWFSRecords() throws Exception {
-         CSWRecord[] records = getDataRecords();
-
-         ArrayList<CSWRecord> wfsRecords = new ArrayList<CSWRecord>();
-
-        for(CSWRecord rec : records) {
-            if(rec.getOnlineResourceProtocol() != null)
-                if(rec.getOnlineResourceProtocol().contains("WFS") && !rec.getServiceUrl().equals("")) {
-                    wfsRecords.add(rec);
-                }
-        }
-
-        return wfsRecords.toArray(new CSWRecord[wfsRecords.size()]);
+        return getFilteredDataRecords(OnlineResourceType.WFS);
     }
 
     /**
@@ -144,16 +167,40 @@ public class CSWService {
      * @throws Exception
      */
     public CSWRecord[] getWFSRecordsForTypename(String featureTypeName) throws Exception {
-         CSWRecord[] records = getDataRecords();
-         ArrayList<CSWRecord> wfsRecords = new ArrayList<CSWRecord>();
-
-        for(CSWRecord rec : records) {
-            if(rec.getOnlineResourceProtocol() != null)
-                if(rec.getOnlineResourceProtocol().contains("WFS") && !rec.getServiceUrl().equals("") && featureTypeName.equals(rec.getOnlineResourceName())) {
-                    wfsRecords.add(rec);
+        CSWRecord[] records = getDataRecords();
+        List<CSWRecord> filteredRecords = new ArrayList<CSWRecord>();
+        
+        for (CSWRecord rec : records) {
+            CSWOnlineResource[] wfsResources = rec.getOnlineResourcesByType(OnlineResourceType.WFS);
+            
+            for (CSWOnlineResource res : wfsResources) {
+                if (res.getName().equals(featureTypeName)) {
+                    filteredRecords.add(rec);
+                    break;
                 }
+            }
         }
-
-        return wfsRecords.toArray(new CSWRecord[wfsRecords.size()]);
+        
+        return filteredRecords.toArray(new CSWRecord[filteredRecords.size()]);
+    }
+    
+    
+    /**
+     * Gets all records thta have at least one of the specifed types as an online resource
+     * @param types
+     * @return
+     * @throws Exception
+     */
+    private CSWRecord[] getFilteredDataRecords(CSWOnlineResource.OnlineResourceType... types) throws Exception {
+        CSWRecord[] records = getDataRecords();
+        List<CSWRecord> filteredRecords = new ArrayList<CSWRecord>();
+        
+        for (CSWRecord rec : records) {
+            if (rec.containsAnyOnlineResource(types)) {
+                filteredRecords.add(rec);
+            }
+        }
+        
+        return filteredRecords.toArray(new CSWRecord[filteredRecords.size()]);
     }
 }

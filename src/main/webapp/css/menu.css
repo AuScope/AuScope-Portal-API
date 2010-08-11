@@ -27,7 +27,7 @@
 	margin-right:15px;
 	text-decoration:none;
 	color:#EEE;
-	background:url(../img/nav.gif) 0 0px no-repeat;
+	background:url(/img/nav.gif) 0 0px no-repeat;
 }
 
 #menu a span {
@@ -36,7 +36,7 @@
 	left:100%;
 	width:15px;
 	height:40px;
-	background:url(../img/nav.gif) -295px -0px no-repeat;
+	background:url(/img/nav.gif) -295px -0px no-repeat;
 }
 
 #menu .current a {
@@ -60,4 +60,12 @@
 #menu a:focus span,
 #menu a:hover span {
 	background-position:-295px -40px;
+}
+
+#latlng {
+	position:absolute;
+    top: 80px;
+    right: 30px;
+    color: #15428B;
+    font: 12px Arial, Tahoma, Helvetica, sans-serif;
 }

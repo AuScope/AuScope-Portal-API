@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
    xsi:schemaLocation="
-      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd"
    >
       
@@ -20,104 +20,114 @@
 
     <bean id="knownTypes" class="java.util.ArrayList">
         <constructor-arg>
-            <list>
-                <!-- <ref bean="knownTypeMine" />
+            <list>                 		
+                <ref bean="knownTypeMine" />
                 <ref bean="knownTypeMineralOccurrence" />
                 <ref bean="knownTypeMiningActivity" />
-                <ref bean="knownTypeBorehole" />  -->
+                <ref bean="knownTypeBorehole" />
                 <ref bean="knownTypeGeodesy" />
             </list>
         </constructor-arg>
     </bean>
-
+   
    <bean id="knownTypeMine" class="org.auscope.portal.server.web.KnownFeatureTypeDefinition">
        <constructor-arg index="0" value="er:Mine"/>
        <constructor-arg index="1" value="Earth Resource Mine"/>
        <constructor-arg index="2" value=""/>
-       <constructor-arg index="3" value="doMineFilter.do"/>
+       <constructor-arg index="3" value="/doMineFilter.do"/>
        <constructor-arg index="4" value="http://maps.google.com/mapfiles/kml/paddle/pink-blank.png"/>
-   </bean>
+       <constructor-arg index="5">
+           <bean class="java.awt.Point">
+               <constructor-arg index="0" value="16"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
+       <constructor-arg index="6">
+           <bean class="java.awt.Dimension">
+               <constructor-arg index="0" value="32"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
+    </bean>
 
     <bean id="knownTypeMineralOccurrence" class="org.auscope.portal.server.web.KnownFeatureTypeDefinition">
        <constructor-arg index="0" value="er:MineralOccurrence"/>
        <constructor-arg index="1" value="Earth Resource Mineral Occurrence"/>
        <constructor-arg index="2" value=""/>
-       <constructor-arg index="3" value="doMineralOccurrenceFilter.do"/>
+       <constructor-arg index="3" value="/doMineralOccurrenceFilter.do"/>
        <constructor-arg index="4" value="http://maps.google.com/mapfiles/kml/paddle/purple-blank.png"/>
-   </bean>
+       <constructor-arg index="5">
+           <bean class="java.awt.Point">
+               <constructor-arg index="0" value="16"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
+       <constructor-arg index="6">
+           <bean class="java.awt.Dimension">
+               <constructor-arg index="0" value="32"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
+    </bean>
 
     <bean id="knownTypeMiningActivity" class="org.auscope.portal.server.web.KnownFeatureTypeDefinition">
        <constructor-arg index="0" value="er:MiningActivity"/>
        <constructor-arg index="1" value="Earth Resource Mining Activity"/>
        <constructor-arg index="2" value=""/>
-       <constructor-arg index="3" value="doMiningActivityFilter.do"/>
+       <constructor-arg index="3" value="/doMiningActivityFilter.do"/>
        <constructor-arg index="4" value="http://maps.google.com/mapfiles/kml/paddle/orange-blank.png"/>
-   </bean>
+       <constructor-arg index="5">
+           <bean class="java.awt.Point">
+               <constructor-arg index="0" value="16"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
+       <constructor-arg index="6">
+           <bean class="java.awt.Dimension">
+               <constructor-arg index="0" value="32"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
+    </bean>
 
     <bean id="knownTypeBorehole" class="org.auscope.portal.server.web.KnownFeatureTypeDefinition">
        <constructor-arg index="0" value="gsml:Borehole"/>
        <constructor-arg index="1" value="National Virtual Core Library"/>
        <constructor-arg index="2" value=""/>
-       <constructor-arg index="3" value="getAllFeatures.do"/>
+       <constructor-arg index="3" value="/doNvclFilter.do"/>
        <constructor-arg index="4" value="http://maps.google.com/mapfiles/kml/paddle/blu-blank.png"/>
+       <constructor-arg index="5">
+           <bean class="java.awt.Point">
+               <constructor-arg index="0" value="16"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
+       <constructor-arg index="6">
+           <bean class="java.awt.Dimension">
+               <constructor-arg index="0" value="32"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
    </bean>
 
     <bean id="knownTypeGeodesy" class="org.auscope.portal.server.web.KnownFeatureTypeDefinition">
        <constructor-arg index="0" value="ngcp:GnssStation"/>
        <constructor-arg index="1" value="Geodesy"/>
        <constructor-arg index="2" value=""/>
-       <constructor-arg index="3" value="getAllFeatures.do"/>
+       <constructor-arg index="3" value="/getAllFeatures.do"/>
        <constructor-arg index="4" value="http://maps.google.com/mapfiles/kml/paddle/wht-blank.png"/>
+       <constructor-arg index="5">
+           <bean class="java.awt.Point">
+               <constructor-arg index="0" value="16"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
+       <constructor-arg index="6">
+           <bean class="java.awt.Dimension">
+               <constructor-arg index="0" value="32"/>
+               <constructor-arg index="1" value="32"/>
+           </bean>
+       </constructor-arg>
    </bean>
-   <!-- Added for GeodesyWorkflow -->
-   <bean id="multipartResolver"
-        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <property name="maxUploadSize" value="${fileupload.maxFileSize}"/>
-   </bean>
 
-    <bean id="geodesySessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="mappingResources">
-            <list>
-                <value>geodesyjob.hbm.xml</value>
-                <value>geodesyseries.hbm.xml</value>
-                <value>user.hbm.xml</value>
-            </list>
-        </property>
-        <property name="hibernateProperties">
-            <value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>
-        </property>
-    </bean>
-
-    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-        <property name="sessionFactory" ref="geodesySessionFactory"/>
-    </bean>
-
-    <bean id="geodesyJobDao" class="org.auscope.portal.server.gridjob.GeodesyJobDao">
-        <property name="sessionFactory" ref="geodesySessionFactory"/>
-    </bean>
-
-    <bean id="geodesySeriesDao" class="org.auscope.portal.server.gridjob.GeodesySeriesDao">
-        <property name="sessionFactory" ref="geodesySessionFactory"/>
-    </bean>
-
-    <bean id="userDao" class="org.auscope.portal.server.web.security.UserDao">
-        <property name="sessionFactory" ref="geodesySessionFactory"/>
-    </bean>
-    
-    <bean id="geodesyJobManager" class="org.auscope.portal.server.gridjob.GeodesyJobManager">
-        <property name="geodesyJobDao" ref="geodesyJobDao"/>
-        <property name="geodesySeriesDao" ref="geodesySeriesDao"/>
-    </bean>
-
-    <bean id="gridAccess" class="org.auscope.portal.server.gridjob.GridAccessController">
-        <property name="gridFtpServer" value="${gridftp.server}"/>
-        <property name="gridFtpStageInDir" value="${gridftp.stageInDir}"/>
-        <property name="gridFtpStageOutDir" value="${gridftp.stageOutDir}"/>
-        <property name="localGridFtpServer" value="${gridftp.localServer}"/>
-        <property name="localGridFtpStageInDir" value="${gridftp.localStageInDir}"/>
-        <property name="localGridFtpStageOutDir" value="${gridftp.localStageOutDir}"/>
-        <property name="repoHostName" value="${grid.repoHostName}"/>
-        <property name="repoHostFTPPort" value="${grid.repoHostFTPPort}"/>
-    </bean>
 </beans>

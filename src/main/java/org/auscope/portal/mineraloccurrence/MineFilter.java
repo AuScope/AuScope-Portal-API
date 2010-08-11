@@ -1,37 +1,37 @@
 package org.auscope.portal.mineraloccurrence;
 
 /**
- * User: Mathew Wyatt
- * Date: 23/03/2009
- * Time: 1:59:02 PM
+ * Class that represents ogc:Filter markup for er:mine queries
+ * 
+ * @author Mat Wyatt
+ * @version $Id$
  */
-public class MineFilter implements IFilter {
-    private String mineName;
+public class MineFilter extends AbstractFilter {
+    private String filterFragment;
 
     /**
-     * Given a mine name, this object will build a filter to do a PropertyIsLike serach for mine names
-     *
+     * Given a mine name, this object will build a filter to a wild card search
+     * for mine names
+     * 
      * @param mineName
+     *            the main name
      */
     public MineFilter(String mineName) {
-        this.mineName = mineName;
-        //this.kvps = "service=WFS&version=1.1.0&request=GetFeature&typeName=mo:Mine&namespace=xmlns(mo=urn:cgi:xmlns:GGIC:MineralOccurrence:1.0)";
+        if (mineName == null || mineName.isEmpty())
+            this.filterFragment = "";
+        else
+            this.filterFragment = this.generatePropertyIsLikeFragment("er:mineName/er:MineName/er:mineName", mineName);
     }
 
-
-    public String getFilterString() {
-        return  "        <ogc:Filter " +
-                "                   xmlns:er=\"urn:cgi:xmlns:GGIC:EarthResource:1.1\" " +
-                "                   xmlns:ogc=\"http://www.opengis.net/ogc\" " +
-                "                   xmlns:gml=\"http://www.opengis.net/gml\" " +
-                "                   xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
-                "                   xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
-                "                <ogc:PropertyIsLike wildCard=\"*\" singleChar=\"#\" escapeChar=\"!\">\n" +
-                "                    <ogc:PropertyName>er:mineName/er:MineName/er:mineName</ogc:PropertyName>\n" +
-                "                    <ogc:Literal>" + mineName + "</ogc:Literal>\n" +
-                "                </ogc:PropertyIsLike>\n" +
-                "        </ogc:Filter>";
-
+    public String getFilterStringAllRecords() {
+        return this.generateFilter(this.filterFragment);
     }
-    
+
+    public String getFilterStringBoundingBox(FilterBoundingBox bbox) {
+        return this.generateFilter(
+                this.generateAndComparisonFragment(
+                        this.generateBboxFragment(bbox, "er:occurrence/er:MiningFeatureOccurrence/er:location"), 
+                        this.filterFragment));
+    }
+
 }

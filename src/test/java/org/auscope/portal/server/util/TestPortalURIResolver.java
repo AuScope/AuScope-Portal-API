@@ -16,7 +16,7 @@ import org.junit.Test;
 /**
  * User: Mathew Wyatt
  * Date: 28/08/2009
- * Time: 3:03:49 PM
+ * @version $Id$
  */
 public class TestPortalURIResolver {
 

@@ -16,7 +16,7 @@
 
       <STYLE type="text/css">
          #nav-example-02 a {
-            background: url("img/navigation.gif") -100px -38px no-repeat;
+            background: url("/img/navigation.gif") -100px -38px no-repeat;
          }
          /* for IE */
          v\:* {
@@ -31,15 +31,11 @@
       <![endif]-->
                   
       <!-- Google Maps imports -->
-      <script src="http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=${googleKey}" type="text/javascript"></script>
+      <script src="http://maps.google.com/maps?file=api&amp;v=2.X&amp;key=${googleKey}" type="text/javascript"></script>
       <script src="http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js"
              type="text/javascript"></script>
              
-      <script type="text/javascript">
-         var VOCAB_SERVICE_URL = "${vocabServiceUrl}"; 
-         var NVCL_WEB_SERVICE_IP = "${nvclWebServiceIP}";
-      </script>     
-      
+     
       <jsp:include page="/jsimports.htm"/>
    </head>
 
@@ -49,7 +45,7 @@
       
       <security:authorize ifAllGranted="ROLE_DOWNLOAD">
         <script type="text/javascript">
-  		  buttonsPanel.enable();
+  		  //buttonsPanel.enable();
         </script>
       </security:authorize>
    </body>

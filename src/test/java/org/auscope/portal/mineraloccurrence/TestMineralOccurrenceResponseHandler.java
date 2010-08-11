@@ -1,18 +1,14 @@
 package org.auscope.portal.mineraloccurrence;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Collection;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.xml.sax.SAXException;
+
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
+import java.util.Collection;
+
+import junit.framework.Assert;
 
 /**
  * User: Mathew Wyatt
@@ -23,7 +19,7 @@ public class TestMineralOccurrenceResponseHandler {
     MineralOccurrencesResponseHandler mineralOccurrencesResponseHandler = new MineralOccurrencesResponseHandler();
 
     @Test
-    public void testHandleMineResponse() throws IOException, SAXException, XPathExpressionException, ParserConfigurationException {
+    public void testHandleMineResponse() throws Exception {
         File mineGetFeatureResponse = new File("src/test/resources/mineGetFeatureResponse.xml");
         BufferedReader reader = new BufferedReader( new FileReader(mineGetFeatureResponse) );
         StringBuffer mineGetFeatureResponseXML = new StringBuffer();
@@ -42,7 +38,7 @@ public class TestMineralOccurrenceResponseHandler {
     }
 
     @Test
-    public void testHandleCommodityResponse() throws IOException, SAXException, XPathExpressionException, ParserConfigurationException {
+    public void testHandleCommodityResponse() throws Exception {
         File commodityGetFeatureResponse = new File("src/test/resources/commodityGetFeatureResponse.xml");
         BufferedReader reader = new BufferedReader( new FileReader(commodityGetFeatureResponse) );
         StringBuffer commodityGetFeatureResponseXML = new StringBuffer();
@@ -58,11 +54,11 @@ public class TestMineralOccurrenceResponseHandler {
 
         Assert.assertEquals("There are 2 commodities", 2, commodities.size());
         Assert.assertEquals("The first one's name is Gold", "Gold", ((Commodity)commodities.toArray()[0]).getCommodityName());
-        Assert.assertEquals("The second one's MineralOccurrence source is urn:cgi:feature:GSV:MineralOccurrence:361170", "urn:cgi:feature:GSV:MineralOccurrence:361170", ((Commodity)commodities.toArray()[1]).getMineralOccurrenceURI());
+        Assert.assertEquals("The second one's MineralOccurrence source is urn:cgi:feature:GSV:MineralOccurrence:361170", "urn:cgi:feature:GSV:MineralOccurrence:361170", ((Commodity)commodities.toArray()[1]).getSource());
     }
     
     @Test
-    public void testGetNumberOfFeaturesTwo() throws IOException, ParserConfigurationException, SAXException {
+    public void testGetNumberOfFeaturesTwo() throws Exception {
         File commodityGetFeatureResponse = new File("src/test/resources/commodityGetFeatureResponse.xml");
         BufferedReader reader = new BufferedReader( new FileReader(commodityGetFeatureResponse) );
         StringBuffer commodityGetFeatureResponseXML = new StringBuffer();
@@ -80,7 +76,7 @@ public class TestMineralOccurrenceResponseHandler {
     }
 
     @Test
-    public void testGetNumberOfFeaturesZero() throws IOException, ParserConfigurationException, SAXException {
+    public void testGetNumberOfFeaturesZero() throws Exception {
         File getFeatureResponse = new File("src/test/resources/mineralOccurrenceNoFeaturesResponse.xml");
         BufferedReader reader = new BufferedReader( new FileReader(getFeatureResponse) );
         StringBuffer getFeatureResponseXML = new StringBuffer();
