@@ -99,12 +99,17 @@ public class CSWService {
         
         try {
             
+        	log.error("#### this.serviceUrl: " + serviceUrl);
             ICSWMethodMaker getRecordsMethod = new CSWMethodMakerGetDataRecords(serviceUrl);
             
             log.debug(getRecordsMethod.makeMethod().getQueryString());
             Document document = util.buildDomFromString(serviceCaller.getMethodResponseAsString(getRecordsMethod.makeMethod(), serviceCaller.getHttpClient()));
 
             CSWRecord[] tempRecords = new CSWGetRecordResponse(document).getCSWRecords();
+            for (CSWRecord rec : tempRecords)
+            {
+            	log.error("#### tempRecords: " + rec);
+            }
             
             setDatarecords(tempRecords);
         } catch (Exception e) {
