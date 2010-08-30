@@ -1,61 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/security"
-             xmlns:beans="http://www.springframework.org/schema/beans"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://www.springframework.org/schema/beans 
-                                 http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                                 http://www.springframework.org/schema/security 
-                                 http://www.springframework.org/schema/security/spring-security-3.0.xsd">
-                                 
-    <global-method-security secured-annotations="enabled" />
-    
-    <http auto-config="false" 
-          entry-point-ref="entryPoint" 
-          access-denied-page="/access_error.html" >
-          
-        <!-- <intercept-url pattern="/downloadProxy\?urls**" access="ROLE_DOWNLOAD" /> -->   
-        <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR" />
-        <intercept-url pattern="/**" filters="none" />
-      
-        <session-management session-fixation-protection="none" />
-            
-        <custom-filter position="PRE_AUTH_FILTER" ref="preAuthenticatedProcessingFilter"/>
-    </http>
-    
-    <beans:bean id="entryPoint"
+         xmlns:s="http://www.springframework.org/schema/security"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                             http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                             http://www.springframework.org/schema/security 
+                             http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+   
+   
+
+    <!--The following is for the portal to bind with the CSIRO LDAP  -->
+    <!-- 
+   <http auto-config="false" session-fixation-protection="none" access-denied-page="/access_error.html">
+      <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR" />
+      <intercept-url pattern="/**" filters="none" />
+      <form-login login-page="/login.html" authentication-failure-url="/login.html?login_error=1"/>
+      <s:anonymous/>
+      <s:logout logout-success-url="/gmap.html"/>
+   </http>
+   
+   
+   
+   <beans:bean id="ldapProvider" class="org.auscope.portal.server.web.security.PortalLDAPAuthenticationProvider">
+        <s:custom-authentication-provider />
+        <beans:property name="providerUrl" value="ldap://nxwa1-kf.nexus.csiro.au:389/dc=nexus,dc=csiro,dc=au"/>
+        <beans:property name="userSearchBase" value="ou=People"/>
+        <beans:property name="userSearchFilter" value="(employeeID={0})"/>
+        <beans:property name="groupSearchBase" value="ou=Groups"/>
+        <beans:property name="groupSearchFilter" value="(member={0})"/>
+        <beans:property name="rolePrefix" value="ROLE_"/>
+        <beans:property name="convertToUpperCase" value="true"/>
+        <beans:property name="searchSubTree" value="true"/>
+    </beans:bean>
+       -->
+ 
+     
+     <!-- The following is pre authentication for usage with Shibboleth -->
+     <beans:bean id="entryPoint"
         class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" >
     </beans:bean>
-    
-    <authentication-manager alias="authenticationManager" >
-        <authentication-provider ref='preAuthenticatedAuthenticationProvider' />
-    </authentication-manager>
-    
-    <beans:bean id="preAuthenticatedProcessingFilter"
-                class="org.auscope.portal.server.web.security.PreAuthenticatedProcessingFilter">
-        <beans:property name="authenticationManager" ref="authenticationManager" />
-    </beans:bean>
-    
-    <beans:bean id="preAuthenticatedAuthenticationProvider" 
-                class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-        <beans:property name="preAuthenticatedUserDetailsService">
-            <beans:bean id="userDetailsServiceWrapper"
-                        class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
-                <beans:property name="userDetailsService" ref="myUserDetailsService"/>
-            </beans:bean>
-        </beans:property>
+                                    
+   <http auto-config="false" entry-point-ref="entryPoint" access-denied-page="/access_error.html">
+    <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR" />
+      <intercept-url pattern="/**" filters="none" />
+      <custom-filter ref="preAuthenticatedProcessingFilter" position="PRE_AUTH_FILTER" />
+      <s:anonymous/>
+      <!-- <s:logout logout-success-url="/gmap.html"/> -->
+      <session-management session-fixation-protection="none" />
+      
+      <s:logout logout-success-url="/ShibLogout"/>
+   </http>
+
+   <!-- We use our own user details service so that we can assign ROLE_USER to users that authenticate with AAF but are unknown to us
+-->
+    <beans:bean id="portalUserDetailsService" class="org.auscope.portal.server.web.security.PortalUserDetailsService">
+        <beans:constructor-arg index="0" value="ROLE_USER"/>
+        <beans:constructor-arg index="1">
+            <beans:list>
+                <!-- Josh.Vote@csiro.au -->
+                <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
+                    <beans:constructor-arg index="0" value="v04hL1lRsd91/d/HCDWBYqf2bYo="/>
+                    <beans:constructor-arg index="1" value=""/>
+                    <beans:constructor-arg index="2" value="ROLE_ADMINISTRATOR"/>            
+                </beans:bean>                   
+            </beans:list>
+        </beans:constructor-arg>
     </beans:bean>
    
-    <beans:bean id="myUserDetailsService"
-                class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
-        <beans:property name="dataSource" ref="dataSource"/>
-    </beans:bean>
+   
+ 
+   <authentication-manager alias="authenticationManager" >
+        <authentication-provider ref="preAuthenticatedAuthenticationProvider" user-service-ref="portalUserDetailsService"/>
+   </authentication-manager>
+   
+   <beans:bean id="preAuthenticatedProcessingFilter" 
+            class="org.auscope.portal.server.web.security.PreAuthenticatedProcessingFilter">
+      <beans:property name="authenticationManager" ref="authenticationManager" />
+   </beans:bean>
 
-    <!-- This userDetailsService implementation is handy for quick testing   
-    <authentication-provider>
-        <user-service id="userDetailsService">
-            <user password="password" name="Jarek.Sanders@csiro.au" authorities="ROLE_JOB_SUBMISSION" />
-        </user-service>
-    </authentication-provider>
-    -->
-
+    <beans:bean id="preAuthenticatedAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+        <beans:property name="preAuthenticatedUserDetailsService">
+            <beans:bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+                <beans:property name="userDetailsService" ref="portalUserDetailsService"/>
+             </beans:bean>
+          </beans:property>
+       </beans:bean>   
+   
 </beans:beans>
