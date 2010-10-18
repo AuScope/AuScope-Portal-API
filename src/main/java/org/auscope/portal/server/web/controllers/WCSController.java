@@ -6,22 +6,17 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.csw.CSWGeographicBoundingBox;
@@ -32,7 +27,6 @@ import org.auscope.portal.server.web.IWCSGetCoverageMethodMaker;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
 import org.auscope.portal.server.web.view.JSONModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -352,4 +346,88 @@ public class WCSController {
         
         return new JSONModelAndView(response);
     }
+    
+    /**
+     * Gets the subset of the user drawn data, buffer and mesh bounding boxes in GeoTIFF format 
+     * and stores them as session attributes.
+     * 
+     * @param serviceUrl The remote URL to query
+     * @param layerName The coverage layername to request
+     * @param dataCoords The lat/lon co-ordinates of the user drawn data bounding box
+     * @param bufferCoords The lat/lon co-ordinates of the user drawn buffer bounding box
+     * @param meshCoords The lat/lon co-ordinates of the user drawn mesh bounding box
+     * @param request The HttpServletRequest
+     * @param response The HttpServletResponse
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/sendSubsetsToGrid.do")
+    public ModelAndView sendSubsetsToGrid(@RequestParam("serviceUrl") final String serviceUrl,
+                                 @RequestParam("layerName") final String layerName,
+                                 @RequestParam("dataCoords") final String dataCoords,
+                                 @RequestParam("bufferCoords") final String bufferCoords,
+                                 @RequestParam("meshCoords") final String meshCoords,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response) throws Exception {
+    	
+    	ModelAndView mav = new ModelAndView("jsonView");
+    	
+    	// get coverage subsets
+        InputStream isData = getCoverageSubset(dataCoords, request, serviceUrl, layerName);
+        InputStream isBuffer = getCoverageSubset(bufferCoords, request, serviceUrl, layerName);
+        InputStream isMesh = getCoverageSubset(meshCoords, request, serviceUrl, layerName);
+        
+        // set subsets as session attributes    	
+    	request.getSession().setAttribute("dataSubset", isData);
+    	request.getSession().setAttribute("bufferSubset", isBuffer);
+    	request.getSession().setAttribute("meshSubset", isMesh);
+        
+        mav.addObject("success", true);
+ 	    
+        return mav;
+    }
+
+	/**
+	 * Create a CSWGeographicBoundingBox from an array of lat/lon co-ordinates. 
+	 * Co-ordinates need to be in the order of SW lon, SW lat, NE lon, NE lat. 
+	 * 
+	 * @param coords String of comma separated lat/lon co-ordinates.
+	 * @return bbox the converted CSWGeographicBoundingBox
+	 */
+	private CSWGeographicBoundingBox createBoundingBox(String coords) {
+		String[] coordsArray = coords.split(",");
+        
+        CSWGeographicBoundingBox bbox = new CSWGeographicBoundingBox();
+        bbox.setWestBoundLongitude(Double.parseDouble(coordsArray[0]));
+        bbox.setSouthBoundLatitude(Double.parseDouble(coordsArray[1]));
+        bbox.setEastBoundLongitude(Double.parseDouble(coordsArray[2]));
+        bbox.setNorthBoundLatitude(Double.parseDouble(coordsArray[3]));
+		
+        return bbox;
+	}
+	
+	/**
+	 * Takes the co-ordinates of a user drawn bounding box and performs a 
+	 * GetCoverage request to the THREDDS server to get a subset of the 
+	 * coverage data in GeoTIFF format. 
+	 * 
+	 * @param coords The lat/lon co-ordinates of the user drawn bounding box
+	 * @param request The HttpServletRequest
+	 * @param serviceUrl The remote URL to query
+	 * @param layerName The coverage layername to request
+	 * @return The subset of the coverage layer as an InputStream
+	 * @throws Exception
+	 */
+	private InputStream getCoverageSubset(String coords, HttpServletRequest request, 
+			String serviceUrl, String layerName) throws Exception {
+		
+		CSWGeographicBoundingBox bbox = createBoundingBox(coords);
+		
+		logger.debug(String.format("serviceUrl='%1$s' bbox='%2$s' layerName='%3$s'", serviceUrl, bbox, layerName));
+        
+        HttpMethodBase method = getCoverageMethodMaker.makeMethod(serviceUrl, layerName, "GeoTIFF", 
+                null, 256, 256, 0, 0, "OGC:CRS84", bbox, null, null);
+        
+        return serviceCaller.getMethodResponseAsStream(method, serviceCaller.getHttpClient());
+	}
 }

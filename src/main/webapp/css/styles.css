@@ -36,6 +36,45 @@
         display: none;
     }
     
+.jobdesc-title {
+    font-weight: bold;
+    font-size: medium;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.jobdesc-key {
+    font-weight: bold;
+}
+
+.jobdesc-content {
+}
+
+.disk-icon {
+    background-image: url("../img/disk.png") !important
+}
+
+.folder-icon {
+    background-image: url("../img/folder.png") !important
+}
+
+.grid-icon {
+    background-image: url("../img/grid.png") !important
+}
+
+.refresh-icon {
+    background-image: url("../img/refresh.png") !important
+}
+
+.find-icon {
+    background-image: url("../img/find.png") !important
+}
+
+.cross-icon {
+    background-image: url("../img/delete.gif") !important
+}
+
+    
     /*#menu {
         position: absolute;
         top: 0px;

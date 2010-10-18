@@ -1,6 +1,6 @@
 	var styleStr = '';
 	styleStr += '<style>';
-	styleStr += '.MDR_labelStyle {background: #FFFF00; font: bold 10px verdana; color: #000; text-align: left; width: 40px; padding: 2px;}';
+	styleStr += '.MDR_labelStyle {background: #000; font: bold 10px verdana; color: #FFF; text-align: left; width: 40px; padding: 2px;}';
 	styleStr += '</style>';
 	document.write(styleStr);
 
@@ -213,7 +213,7 @@ MPolyDragControl.prototype.drawPoly = function(points) {
 		this.map.removeOverlay(this.poly);
 		this.poly = null;
 	}
-	this.poly = new GPolygon(points,'#ffff00',1,1,'#ffff00',0.2);
+	this.poly = new GPolygon(points,'#000',1,1,'#000',0.2);
 	this.map.addOverlay(this.poly);
 
 	var html = '';
@@ -243,8 +243,11 @@ MPolyDragControl.prototype.getParams = function() {
 		return null;
 	}
 	else {
-		str += 'lat1=' + this.bounds.getSouthWest().lat().toFixed(5) + '&lat2=' + this.bounds.getNorthEast().lat().toFixed(5);
-		str += '&lon1=' + this.bounds.getSouthWest().lng().toFixed(5) + '&lon2=' + this.bounds.getNorthEast().lng().toFixed(5);
+		//str += 'lat1=' + this.bounds.getSouthWest().lat().toFixed(5) + '&lat2=' + this.bounds.getNorthEast().lat().toFixed(5);
+		//str += '&lon1=' + this.bounds.getSouthWest().lng().toFixed(5) + '&lon2=' + this.bounds.getNorthEast().lng().toFixed(5);
+		
+		str += this.bounds.getSouthWest().lng().toFixed(5) + ',' + this.bounds.getSouthWest().lat().toFixed(5) + ',';
+		str += this.bounds.getNorthEast().lng().toFixed(5) + ',' + this.bounds.getNorthEast().lat().toFixed(5);
 	}
 	return str;
 };

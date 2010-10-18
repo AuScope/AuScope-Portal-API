@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/security"
          xmlns:s="http://www.springframework.org/schema/security"
-            xmlns:beans="http://www.springframework.org/schema/beans"
+         xmlns:beans="http://www.springframework.org/schema/beans"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.springframework.org/schema/beans 
                              http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -51,6 +51,10 @@
       
       <s:logout logout-success-url="/ShibLogout"/>
    </http>
+   
+   <authentication-manager alias="authenticationManager" >
+        <authentication-provider ref="preAuthenticatedAuthenticationProvider" user-service-ref="portalUserDetailsService"/>
+   </authentication-manager> 
 
    <!-- We use our own user details service so that we can assign ROLE_USER to users that authenticate with AAF but are unknown to us
 -->
@@ -60,31 +64,43 @@
             <beans:list>
                 <!-- Josh.Vote@csiro.au -->
                 <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                    <beans:constructor-arg index="0" value="v04hL1lRsd91/d/HCDWBYqf2bYo="/>
-                    <beans:constructor-arg index="1" value=""/>
-                    <beans:constructor-arg index="2" value="ROLE_ADMINISTRATOR"/>            
-                </beans:bean>                   
+                <beans:constructor-arg index="0" value="v04hL1lRsd91/d/HCDWBYqf2bYo="/>
+                <beans:constructor-arg index="1" value=""/>
+                <beans:constructor-arg index="2" value="ROLE_ADMINISTRATOR"/>            
+            </beans:bean>                   
             </beans:list>
         </beans:constructor-arg>
     </beans:bean>
-   
-   
  
-   <authentication-manager alias="authenticationManager" >
-        <authentication-provider ref="preAuthenticatedAuthenticationProvider" user-service-ref="portalUserDetailsService"/>
+ <!--<authentication-manager alias="authenticationManager" >
+        <authentication-provider ref="preAuthenticatedAuthenticationProvider" user-service-ref="myUserDetailsService"/>
    </authentication-manager>
    
-   <beans:bean id="preAuthenticatedProcessingFilter" 
+   --><beans:bean id="preAuthenticatedProcessingFilter" 
             class="org.auscope.portal.server.web.security.PreAuthenticatedProcessingFilter">
       <beans:property name="authenticationManager" ref="authenticationManager" />
    </beans:bean>
+   
+   <!--<beans:bean id="preAuthenticatedAuthenticationProvider" 
+            class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+      <beans:property name="preAuthenticatedUserDetailsService">
+         <beans:bean id="userDetailsServiceWrapper"   
+                  class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+            <beans:property name="userDetailsService" ref="myUserDetailsService"/>
+         </beans:bean>
+      </beans:property>
+    </beans:bean>   
+   
+   <beans:bean id="myUserDetailsService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
+      <beans:property name="dataSource" ref="dataSource"/>
+   </beans:bean>
 
-    <beans:bean id="preAuthenticatedAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+    --><beans:bean id="preAuthenticatedAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
         <beans:property name="preAuthenticatedUserDetailsService">
             <beans:bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
                 <beans:property name="userDetailsService" ref="portalUserDetailsService"/>
              </beans:bean>
           </beans:property>
        </beans:bean>   
-   
+    
 </beans:beans>

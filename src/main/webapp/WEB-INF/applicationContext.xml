@@ -185,6 +185,48 @@
                <constructor-arg index="1" value="32"/>
            </bean>
        </constructor-arg>
-   </bean>   
-
+   </bean>
+   
+   <bean id="gridAccess" class="org.auscope.portal.server.gridjob.GridAccessController">
+        <property name="gridFtpServer" value="${gridftp.server}"/>
+        <property name="gridFtpStageInDir" value="${gridftp.stageInDir}"/>
+        <property name="gridFtpStageOutDir" value="${gridftp.stageOutDir}"/>
+        <property name="localGridFtpServer" value="${gridftp.localServer}"/>
+        <property name="localGridFtpStageInDir" value="${gridftp.localStageInDir}"/>
+        <property name="localGridFtpStageOutDir" value="${gridftp.localStageOutDir}"/>
+        <property name="repoHostName" value="${grid.repoHostName}"/>
+        <property name="repoHostFTPPort" value="${grid.repoHostFTPPort}"/>
+    </bean>
+    
+    <bean id="geodesyJobManager" class="org.auscope.portal.server.gridjob.GeodesyJobManager">
+        <property name="geodesyJobDao" ref="geodesyJobDao"/>
+        <property name="geodesySeriesDao" ref="geodesySeriesDao"/>
+    </bean>
+    
+    <bean id="geodesyJobDao" class="org.auscope.portal.server.gridjob.GeodesyJobDao">
+        <property name="sessionFactory" ref="geodesySessionFactory"/>
+    </bean>
+    
+    <bean id="geodesySeriesDao" class="org.auscope.portal.server.gridjob.GeodesySeriesDao">
+        <property name="sessionFactory" ref="geodesySessionFactory"/>
+    </bean>
+    
+    <bean id="geodesySessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mappingResources">
+            <list>
+                <value>geodesyjob.hbm.xml</value>
+                <value>geodesyseries.hbm.xml</value>
+                <value>user.hbm.xml</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>
+        </property>
+    </bean>
+    
+    <bean id="multipartResolver"
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="${fileupload.maxFileSize}"/>
+   </bean>
 </beans>

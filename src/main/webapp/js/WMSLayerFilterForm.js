@@ -59,15 +59,27 @@ WMSLayerFilterForm = function(record, map) {
         text 	: 'Send to Grid',
         disabled: true,
         handler: function() {
-    		if (dataBbox.getParams() == null || bufferBbox.getParams() == null || meshBbox.getParams() == null) {
-    			alert("You must specify bounding boxes for data, buffer and mesh before sending to the grid.");
-    		}
-    		else {
-    		alert('Data: ' + dataBbox.getParams() + 
-    				'\nBuffer: ' + bufferBbox.getParams() + 
-    				'\nMesh: ' + meshBbox.getParams());
-    		}
-    	}
+        	
+        	if (dataBbox.getParams() == null || bufferBbox.getParams() == null 
+        			|| meshBbox.getParams() == null) {
+        		Ext.Msg.alert("Error", 'You must draw the data, buffer and mesh bounds ' + 
+        				'before submitting to the grid.');
+        	}
+        	else {
+	        	Ext.Ajax.request({
+	        		url: 'sendSubsetsToGrid.do' ,
+	        		success: WMSLayerFilterForm.onSendToGridResponse,
+	        		failure: WMSLayerFilterForm.onRequestFailure,
+	        		params		: {
+	            		serviceUrl 		: record.get('serviceURLs')[0],
+	        			layerName  		: record.get('typeName'),
+	        			dataCoords 		: dataBbox.getParams(),
+	        			bufferCoords	: bufferBbox.getParams(),
+	        			meshCoords		: meshBbox.getParams()
+	            	}
+	        	});
+        	}
+        }
     });
     
     //-----------Panel
@@ -117,6 +129,21 @@ WMSLayerFilterForm = function(record, map) {
             ]
         }]
     });
+};
+
+WMSLayerFilterForm.onSendToGridResponse = function(response, request) {
+    var resp = Ext.decode(response.responseText);
+    if (resp.error != null) {
+        JobList.showError(resp.error);
+    } else {
+        Ext.Msg.alert("Success", "The selected coverage subsets have been added as inputs for the grid job.");
+    }
+};
+
+//called when an Ajax request fails
+WMSLayerFilterForm.onRequestFailure = function(response, request) {
+	Ext.Msg.alert("Error", 'Could not execute last request. Status: '+
+        response.status+' ('+response.statusText+')');
 };
 
 Ext.extend(WMSLayerFilterForm, Ext.FormPanel, {
