@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.server.domain.wcs.DescribeCoverageRecord;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.server.web.IERDDAPMethodMaker;
 import org.auscope.portal.server.web.IWCSDescribeCoverageMethodMaker;
 import org.auscope.portal.server.web.IWCSGetCoverageMethodMaker;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
@@ -46,15 +47,20 @@ public class WCSController {
     private HttpServiceCaller serviceCaller;
     private IWCSGetCoverageMethodMaker getCoverageMethodMaker;
     private IWCSDescribeCoverageMethodMaker describeCoverageMethodMaker;
+    private IERDDAPMethodMaker erddapMethodMaker;
     
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
     
     @Autowired
-    public WCSController(HttpServiceCaller serviceCaller, IWCSGetCoverageMethodMaker methodMaker, IWCSDescribeCoverageMethodMaker describeCoverageMethodMaker, PortalPropertyPlaceholderConfigurer hostConfigurer) {
+    public WCSController(HttpServiceCaller serviceCaller, IWCSGetCoverageMethodMaker methodMaker, 
+    		IWCSDescribeCoverageMethodMaker describeCoverageMethodMaker, PortalPropertyPlaceholderConfigurer hostConfigurer, 
+    		IERDDAPMethodMaker erddapMethodMaker) {
         this.serviceCaller = serviceCaller;      
+        this.getCoverageMethodMaker = methodMaker;
         this.getCoverageMethodMaker = methodMaker;
         this.describeCoverageMethodMaker = describeCoverageMethodMaker;
         this.hostConfigurer = hostConfigurer;
+        this.erddapMethodMaker = erddapMethodMaker;
     }
     
     private String generateOutputFilename(String layerName, String format) throws IllegalArgumentException {
@@ -356,26 +362,28 @@ public class WCSController {
      * @param dataCoords The lat/lon co-ordinates of the user drawn data bounding box
      * @param bufferCoords The lat/lon co-ordinates of the user drawn buffer bounding box
      * @param meshCoords The lat/lon co-ordinates of the user drawn mesh bounding box
+     * @param format The subset file output format 
      * @param request The HttpServletRequest
      * @param response The HttpServletResponse
      * @return
      * @throws Exception
      */
     @RequestMapping("/sendSubsetsToGrid.do")
-    public ModelAndView sendSubsetsToGrid(@RequestParam("serviceUrl") final String serviceUrl,
-                                 @RequestParam("layerName") final String layerName,
+    public ModelAndView sendSubsetsToGrid(@RequestParam("layerName") final String layerName,
                                  @RequestParam("dataCoords") final String dataCoords,
                                  @RequestParam("bufferCoords") final String bufferCoords,
                                  @RequestParam("meshCoords") final String meshCoords,
+                                 @RequestParam("format") final String format,
                                  HttpServletRequest request,
                                  HttpServletResponse response) throws Exception {
     	
     	ModelAndView mav = new ModelAndView("jsonView");
+    	String serviceUrl = hostConfigurer.resolvePlaceholder("HOST.erddapservice.url");
     	
     	// get coverage subsets
-        InputStream isData = getCoverageSubset(dataCoords, request, serviceUrl, layerName);
-        InputStream isBuffer = getCoverageSubset(bufferCoords, request, serviceUrl, layerName);
-        InputStream isMesh = getCoverageSubset(meshCoords, request, serviceUrl, layerName);
+        InputStream isData = getCoverageSubset(dataCoords, request, serviceUrl, layerName, format);
+        InputStream isBuffer = getCoverageSubset(bufferCoords, request, serviceUrl, layerName, format);
+        InputStream isMesh = getCoverageSubset(meshCoords, request, serviceUrl, layerName, format);
         
         // set subsets as session attributes    	
     	request.getSession().setAttribute("dataSubset", isData);
@@ -419,14 +427,13 @@ public class WCSController {
 	 * @throws Exception
 	 */
 	private InputStream getCoverageSubset(String coords, HttpServletRequest request, 
-			String serviceUrl, String layerName) throws Exception {
+			String serviceUrl, String layerName, String format) throws Exception {
 		
 		CSWGeographicBoundingBox bbox = createBoundingBox(coords);
 		
 		logger.debug(String.format("serviceUrl='%1$s' bbox='%2$s' layerName='%3$s'", serviceUrl, bbox, layerName));
         
-        HttpMethodBase method = getCoverageMethodMaker.makeMethod(serviceUrl, layerName, "GeoTIFF", 
-                null, 256, 256, 0, 0, "OGC:CRS84", bbox, null, null);
+        HttpMethodBase method = erddapMethodMaker.makeMethod(serviceUrl, layerName, bbox, format);
         
         return serviceCaller.getMethodResponseAsStream(method, serviceCaller.getHttpClient());
 	}

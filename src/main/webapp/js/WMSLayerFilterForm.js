@@ -71,11 +71,11 @@ WMSLayerFilterForm = function(record, map) {
 	        		success: WMSLayerFilterForm.onSendToGridResponse,
 	        		failure: WMSLayerFilterForm.onRequestFailure,
 	        		params		: {
-	            		serviceUrl 		: record.get('serviceURLs')[0],
 	        			layerName  		: record.get('typeName'),
 	        			dataCoords 		: dataBbox.getParams(),
 	        			bufferCoords	: bufferBbox.getParams(),
-	        			meshCoords		: meshBbox.getParams()
+	        			meshCoords		: meshBbox.getParams(),
+	        			format			: 'geotif'
 	            	}
 	        	});
         	}
