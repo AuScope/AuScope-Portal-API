@@ -114,7 +114,7 @@ public class GramJobControl implements JobControlInterface {
      */
     public String constructJobScript(GridJob job) {
 
-        final String DATE_FORMAT = "-yyyyMMdd_HHmmss";
+    	final String DATE_FORMAT = "-yyyyMMdd_HHmmss";
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         // Create a unique job ID using the current (formatted) date
         final String JOB_ID = job.getName() + sdf.format(new Date());
@@ -127,8 +127,63 @@ public class GramJobControl implements JobControlInterface {
 
         String gridFtpInput = job.getSiteGridFTPServer() + localInputDir;
         String gridFtpOutput = job.getSiteGridFTPServer() + localOutputDir;
+        
+        String dummyString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+	        "<job> <executable>rsync</executable>" +
+	        " <directory>" + localOutputDir + "</directory>" +
+        	" <argument>-vvv</argument>" +
+        	" <argument>tables/data.tif</argument>" +
+        	" <argument>dataCopy.tif</argument>" +
+        	" <stdout>" + job.getStdOutput() + "</stdout>" +
+        	" <stderr>" + job.getStdError() + "</stderr>" +
+        	" <count>1</count>" +
+        	" <queue>express</queue>" +
+        	" <maxWallTime>15</maxWallTime>" +
+        	" <maxMemory>1000</maxMemory>" +
+        	" <jobType>single</jobType>";
+        
+        // File Stage In
+        if (job.getInTransfers()[0].compareToIgnoreCase("NULL") != 0) {
+        	dummyString += " <fileStageIn>";
 
-        // Header
+            for (String xfer : job.getInTransfers()) {
+            	dummyString += "  <transfer>   <sourceUrl>" + xfer +
+                    "</sourceUrl>   <destinationUrl>" + gridFtpInput +
+                    "</destinationUrl>  </transfer>";
+            }
+            dummyString += " </fileStageIn>";
+        }
+
+        // File Stage Out
+        if (job.getOutTransfers()[0].compareToIgnoreCase("NULL") !=0 ) {
+        	dummyString += " <fileStageOut>";
+            for (String xfer : job.getOutTransfers()) {
+            	dummyString += "  <transfer>   <sourceUrl>" +
+                    gridFtpOutput + "</sourceUrl>" +
+                    "   <destinationUrl>" + xfer + "/</destinationUrl>" +
+                    "  </transfer>";
+            }
+            dummyString += " </fileStageOut>";
+        }
+
+        // Delete the directory created on remote resource and all associated
+        // files
+        //dummyString += " <fileCleanUp>  <deletion>   <file>" +
+            //gridFtpOutput + "</file>  </deletion> </fileCleanUp>";
+        
+        dummyString += "<extensions><email_address>shane.bailie@csiro.au</email_address>" + 
+        " <email_on_execution>yes</email_on_execution>" + 
+        " <email_on_abort>yes</email_on_abort>" + 
+        " <email_on_termination>yes</email_on_termination>" + 
+        " </extensions>";
+        
+        dummyString += "</job>";
+        	
+    	logger.debug("Job xml: " + dummyString);
+
+        return dummyString;
+
+        /*// Header
         String finalJobString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<job> <executable>" + job.getExeName() + "</executable>" +
             " <directory>" + localOutputDir + "</directory>";
@@ -247,7 +302,7 @@ public class GramJobControl implements JobControlInterface {
         
         logger.debug("Job xml: " + finalJobString);
 
-        return finalJobString;
+        return finalJobString;*/
     }
 
     /**
