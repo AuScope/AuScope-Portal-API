@@ -7,7 +7,11 @@
 
 package org.auscope.gridtools;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -168,8 +172,8 @@ public class GramJobControl implements JobControlInterface {
 
         // Delete the directory created on remote resource and all associated
         // files
-        //dummyString += " <fileCleanUp>  <deletion>   <file>" +
-            //gridFtpOutput + "</file>  </deletion> </fileCleanUp>";
+        dummyString += " <fileCleanUp>  <deletion>   <file>" +
+            gridFtpOutput + "</file>  </deletion> </fileCleanUp>";
         
         dummyString += "<extensions><email_address>shane.bailie@csiro.au</email_address>" + 
         " <email_on_execution>yes</email_on_execution>" + 
@@ -180,6 +184,28 @@ public class GramJobControl implements JobControlInterface {
         dummyString += "</job>";
         	
     	logger.debug("Job xml: " + dummyString);
+    	
+        // write job xml to a file
+    	try {
+			InputStream is = new ByteArrayInputStream(dummyString.getBytes("UTF-8"));
+			byte[] iobuff = new byte[4096];
+			int bytes;
+			File jobxml = new File("/home/grid-auscope/jobs/"+JOB_ID+".xml");
+			FileOutputStream fos = new FileOutputStream(jobxml);
+			
+			while ( (bytes = is.read( iobuff )) != -1 ) {
+			    fos.write( iobuff, 0, bytes );
+			}
+			
+			is.close();
+			fos.close();
+			
+			logger.debug("Added job xml - " + jobxml.getPath());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("Failed to write job xml file");
+			e.printStackTrace();
+		} 
 
         return dummyString;
 
