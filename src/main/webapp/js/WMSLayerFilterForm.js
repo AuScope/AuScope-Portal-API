@@ -3,7 +3,7 @@
  *
  */
 
-WMSLayerFilterForm = function(record, map) {
+WMSLayerFilterForm = function(activeLayerRecord, map) {
 
 	var pos = new GControlPosition(G_ANCHOR_BOTTOM_LEFT, new GSize(0, -85));
 	map.addControl(new MStatusControl({position:pos}));
@@ -14,16 +14,11 @@ WMSLayerFilterForm = function(record, map) {
 	var dataBbox = new MPolyDragControl({map:map,type:'rectangle',label:'Data'});
 	
     var sliderHandler = function(caller, newValue) {
-        record.set('opacity', (newValue / 100));
-        
-        if (record.tileOverlay instanceof OverlayManager) {
-        	record.tileOverlay.updateOpacity(record.get('opacity'));
-        } else {
-	        record.tileOverlay.getTileLayer().opacity = record.get('opacity');
-	
-	        map.removeOverlay(record.tileOverlay);
-	        map.addOverlay(record.tileOverlay);
-        }
+    	var overlayManager = activeLayerRecord.getOverlayManager();
+    	var newOpacity = (newValue / 100);
+    	
+    	activeLayerRecord.setOpacity(newOpacity);
+    	overlayManager.updateOpacity(newOpacity);
     };
     
     var drawBoundsButton = new Ext.Button({  
@@ -71,7 +66,8 @@ WMSLayerFilterForm = function(record, map) {
 	        		success: WMSLayerFilterForm.onSendToGridResponse,
 	        		failure: WMSLayerFilterForm.onRequestFailure,
 	        		params		: {
-	        			layerName  		: record.get('typeName'),
+	        			//layerName  		: activeLayerRecord.get('typeName'),
+	        			layerName  		: activeLayerRecord.getTitle(),
 	        			dataCoords 		: dataBbox.getParams(),
 	        			bufferCoords	: bufferBbox.getParams(),
 	        			meshCoords		: meshBbox.getParams(),
@@ -84,7 +80,7 @@ WMSLayerFilterForm = function(record, map) {
     
     //-----------Panel
     WMSLayerFilterForm.superclass.constructor.call(this, {
-        id          : String.format('{0}',record.get('id')),
+        id          : String.format('{0}',activeLayerRecord.getId()),
         border      : false,
         autoScroll  : true,
         hideMode    : 'offsets',
@@ -102,7 +98,7 @@ WMSLayerFilterForm = function(record, map) {
                     fieldLabel  : 'Opacity',
                     minValue    : 0,
                     maxValue    : 100,
-                    value       : (record.get('opacity') * 100),
+                    value       : (activeLayerRecord.getOpacity() * 100),
                     listeners   : {changecomplete: sliderHandler}
             },
             	drawBoundsButton,

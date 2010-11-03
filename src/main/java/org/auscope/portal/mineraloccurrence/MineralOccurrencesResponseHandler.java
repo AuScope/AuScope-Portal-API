@@ -18,6 +18,9 @@ import java.util.List;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
  * User: Mathew Wyatt
@@ -26,7 +29,7 @@ import java.io.UnsupportedEncodingException;
  */
 @Repository
 public class MineralOccurrencesResponseHandler {
-
+	protected final Log log = LogFactory.getLog(getClass());
     
     public List<Mine> getMines(String mineResponse) throws Exception {
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
@@ -48,8 +51,7 @@ public class MineralOccurrencesResponseHandler {
 
         for(int i=0; i < mineNodes.getLength(); i++) {
             mines.add(new Mine(mineNodes.item(i)));
-        }
-
+        }        
         return mines;
     }
 
@@ -73,7 +75,7 @@ public class MineralOccurrencesResponseHandler {
         for(int i=0; i < commodityNodes.getLength(); i++) {
             commodities.add(new Commodity(commodityNodes.item(i)));
         }
-
+        
         return commodities;
     }
 
@@ -93,10 +95,11 @@ public class MineralOccurrencesResponseHandler {
         
         try {
             XPathExpression expr = xPath.compile("/wfs:FeatureCollection");
-            Node result = (Node)expr.evaluate(mineralOccurrenceDocument, XPathConstants.NODE);
+            Node result = (Node)expr.evaluate(mineralOccurrenceDocument, XPathConstants.NODE);           
             return Integer.parseInt(result.getAttributes().getNamedItem("numberOfFeatures").getTextContent());
         } catch (Exception e) {
-            return 0;
+        	return 0;
+            
         }
     }
 }

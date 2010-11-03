@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.server.domain.wcs.DescribeCoverageRecord;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -30,17 +29,30 @@ public class CSWRecord {
     private String contactOrganisation;
     private String fileIdentifier;
     private String recordInfoUrl;
-    private CSWGeographicElement cswGeographicElement;
-
-
+    private CSWGeographicElement[] cswGeographicElements;
+    private String[] descriptiveKeywords;
     private String dataIdentificationAbstract;
 
 
+    public CSWRecord(String serviceName, String contactOrganisation, String fileIdentifier,
+			String recordInfoUrl, String dataIdentificationAbstract, 
+			CSWOnlineResource[] onlineResources, CSWGeographicElement[] cswGeographicsElements) {
+    	this.serviceName = serviceName;
+    	this.contactOrganisation = contactOrganisation;
+    	this.fileIdentifier = fileIdentifier;
+    	this.recordInfoUrl = recordInfoUrl;
+    	this.dataIdentificationAbstract = dataIdentificationAbstract;
+    	this.onlineResources = onlineResources;
+    	this.cswGeographicElements = cswGeographicsElements;
+    	this.descriptiveKeywords = new String[0];
+    }
+    
     public CSWRecord(Node node) throws XPathExpressionException {
 
         XPath xPath = XPathFactory.newInstance().newXPath();
         Node tempNode = null;
-        NodeList tempNodeList = null;
+        NodeList tempNodeList1 = null;
+        NodeList tempNodeList2 = null;
         xPath.setNamespaceContext(new CSWNamespaceContext());
         
 
@@ -60,13 +72,13 @@ public class CSWRecord {
         tempNode = (Node)xPath.evaluate(fileIdentifierExpression, node, XPathConstants.NODE);
         fileIdentifier = tempNode != null ? tempNode.getTextContent() : "";
         
-        //There can be multiple gmd:onLine elements (which contain a number of fields we want), take the first one that can be treated as WMS/WFS
-        String onlineTransfersExpression = "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource";
-        tempNodeList = (NodeList)xPath.evaluate(onlineTransfersExpression, node, XPathConstants.NODESET);
+        //There can be multiple gmd:onLine elements (which contain a number of fields we want)
+        String onlineTransfersExpression = "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine";
+        tempNodeList1 = (NodeList)xPath.evaluate(onlineTransfersExpression, node, XPathConstants.NODESET);
         List<CSWOnlineResource> resources = new ArrayList<CSWOnlineResource>();
-        for (int i = 0; i < tempNodeList.getLength(); i++) {
+        for (int i = 0; i < tempNodeList1.getLength(); i++) {
         	try {
-        	    Node onlineNode = tempNodeList.item(i);
+        	    Node onlineNode = tempNodeList1.item(i);
         	    resources.add(CSWOnlineResourceFactory.parseFromNode(onlineNode, xPath));
         	} catch (IllegalArgumentException ex) {
         	    logger.debug(String.format("Unable to parse online resource for serviceName='%1$s' %2$s",serviceName, ex));
@@ -74,14 +86,47 @@ public class CSWRecord {
         }
         onlineResources = resources.toArray(new CSWOnlineResource[resources.size()]);
         
-        //Parse our bounding box (if it exists). If it's unparsable, don't worry and just continue
+        //Parse our bounding boxes (if they exist). If any are unparsable, don't worry and just continue
         String bboxExpression = "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox";
-        tempNode = (Node)xPath.evaluate(bboxExpression, node, XPathConstants.NODE);
-        if (tempNode != null) {
-            try {
-                cswGeographicElement = CSWGeographicBoundingBox.fromGeographicBoundingBoxNode(tempNode, xPath);
-            } catch (Exception ex) { }
+        tempNodeList1 = (NodeList)xPath.evaluate(bboxExpression, node, XPathConstants.NODESET);
+        if (tempNodeList1 != null) {
+        	List<CSWGeographicElement> elList = new ArrayList<CSWGeographicElement>();
+        	for (int i = 0; i < tempNodeList1.getLength(); i++) {
+	            try {
+	            	Node geographyNode = tempNodeList1.item(i);
+	            	elList.add(CSWGeographicBoundingBox.fromGeographicBoundingBoxNode(geographyNode, xPath));
+	            } catch (Exception ex) { 
+	            	logger.debug(String.format("Unable to parse CSWGeographicBoundingBox resource for serviceName='%1$s' %2$s",serviceName, ex));
+	            }
+        	}
+        	cswGeographicElements = elList.toArray(new CSWGeographicElement[elList.size()]);
         }
+        
+        //Parse descriptive keywords
+        String descriptiveKeywordsExpression = "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords";
+        tempNodeList1 = (NodeList)xPath.evaluate(descriptiveKeywordsExpression, node, XPathConstants.NODESET);
+        List<String> keywords = new ArrayList<String>();
+        for(int i = 0; i < tempNodeList1.getLength(); i++) {
+        	try {
+        		Node keywordList = tempNodeList1.item(i);
+        		
+        		tempNodeList2 = (NodeList)xPath.evaluate("gmd:MD_Keywords/gmd:keyword", keywordList, XPathConstants.NODESET);
+
+        		for(int j=0; j<tempNodeList2.getLength(); j++) {
+        			
+        			Node keyword = tempNodeList2.item(j);
+        			
+                    tempNode = (Node) xPath.evaluate("gco:CharacterString", keyword, XPathConstants.NODE);
+
+                    if(tempNode != null) {
+                    	keywords.add(tempNode.getTextContent());
+                    }
+        		}        	
+        	} catch(IllegalArgumentException ex) {
+        	    logger.debug(String.format("Unable to parse descriptive keywords for serviceName='%1$s' %2$s",serviceName, ex));
+        	}
+        }
+        descriptiveKeywords = keywords.toArray(new String[keywords.size()]);
     }
 
     public void setRecordInfoUrl(String recordInfoUrl) {
@@ -116,29 +161,38 @@ public class CSWRecord {
      * Set the CSWGeographicElement that bounds this record
      * @param cswGeographicElement (can be null)
      */
-    public void setCSWGeographicElement(CSWGeographicElement cswGeographicElement) {
-        this.cswGeographicElement = cswGeographicElement;
+    public void setCSWGeographicElements(CSWGeographicElement[] cswGeographicElements) {
+        this.cswGeographicElements = cswGeographicElements;
     }
 
     /**
      * gets the  CSWGeographicElement that bounds this record (or null if it DNE)
      * @return
      */
-    public CSWGeographicElement getCSWGeographicElement() {
-        return cswGeographicElement;
-    }
-    
-    @Override
-    public String toString() {
-        return "CSWRecord [contactOrganisation=" + contactOrganisation
-                + ", cswGeographicElement=" + cswGeographicElement
-                + ", dataIdentificationAbstract=" + dataIdentificationAbstract
-                + ", fileIdentifier=" + fileIdentifier + ", onlineResources="
-                + Arrays.toString(onlineResources) + ", recordInfoUrl="
-                + recordInfoUrl + ", serviceName=" + serviceName + "]";
+    public CSWGeographicElement[] getCSWGeographicElements() {
+        return cswGeographicElements;
     }
 
     /**
+     * Returns the descriptive keywords for this record
+     * @return descriptive keywords
+     */
+    public String[] getDescriptiveKeywords() {
+    	return descriptiveKeywords;
+    }
+    
+    @Override
+	public String toString() {
+		return "CSWRecord [contactOrganisation=" + contactOrganisation
+				+ ", cswGeographicElements="
+				+ Arrays.toString(cswGeographicElements)
+				+ ", dataIdentificationAbstract=" + dataIdentificationAbstract
+				+ ", fileIdentifier=" + fileIdentifier + ", onlineResources="
+				+ Arrays.toString(onlineResources) + ", recordInfoUrl="
+				+ recordInfoUrl + ", serviceName=" + serviceName + "]";
+	}
+
+	/**
      * Returns a filtered list of online resource protocols that match at least one of the specified types
      * 
      * @param types The list of types you want to filter by
@@ -181,5 +235,20 @@ public class CSWRecord {
         }
         
         return false;
+    }
+    
+    /**
+     * Returns true if this record contains the given descriptive keyword, false otherwise.
+     * 
+     * @param str
+     * @return true if this record contains the given descriptive keyword, false otherwise.
+     */
+    public boolean containsKeyword(String str) {
+		for(String keyword : descriptiveKeywords) {
+			if(keyword.equals(str)) {
+				return true;
+			}
+		}
+    	return false;
     }
 }

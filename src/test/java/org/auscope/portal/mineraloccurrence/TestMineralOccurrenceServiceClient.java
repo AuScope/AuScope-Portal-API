@@ -1,21 +1,20 @@
 package org.auscope.portal.mineraloccurrence;
 
-import org.auscope.portal.server.web.service.HttpServiceCaller;
-import org.auscope.portal.server.web.service.MineralOccurrenceService;
-import org.auscope.portal.server.web.IWFSGetFeatureMethodMaker;
-import org.junit.Before;
-import org.junit.Test;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.HttpClient;
-
-import java.util.Collection;
 import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.auscope.portal.server.web.IWFSGetFeatureMethodMaker;
+import org.auscope.portal.server.web.service.HttpServiceCaller;
+import org.auscope.portal.server.web.service.MineralOccurrenceService;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Created by IntelliJ IDEA.
@@ -181,16 +180,12 @@ public class TestMineralOccurrenceServiceClient {
                                            minCommodityAmountUOM );
 
         context.checking(new Expectations() {{           
-           
-            // This is the get commodities part
-            oneOf (methodMaker).makeMethod(serviceURL, "er:Commodity", commodityFilter.getFilterStringAllRecords(), 0); will(returnValue(mockMethod));
-            oneOf (httpServiceCaller).getHttpClient();will(returnValue(mockHttpClient));
-            oneOf (httpServiceCaller).getMethodResponseAsString(mockMethod, mockHttpClient); will(returnValue(mockCommodityResponse));
-            
+
             //the mineral occurrence query part
-            oneOf (methodMaker).makeMethod(serviceURL, "er:MineralOccurrence", mineralOccurrenceFilter.getFilterStringAllRecords(), 0); will(returnValue(mockMethod));
-            oneOf (httpServiceCaller).getHttpClient();will(returnValue(mockHttpClient));
-            oneOf (httpServiceCaller).getMethodResponseAsString(mockMethod, mockHttpClient); will(returnValue(mockCommodityResponse));
+            oneOf (methodMaker).makeMethod(serviceURL, "gsml:MappedFeature", mineralOccurrenceFilter.getFilterStringAllRecords(), 0); will(returnValue(mockMethod));
+            
+            /*oneOf (httpServiceCaller).getHttpClient();will(returnValue(mockHttpClient));
+            oneOf (httpServiceCaller).getMethodResponseAsString(mockMethod, mockHttpClient); will(returnValue(mockCommodityResponse));*/
         }});
 
         this.mineralOccurrenceService.getMineralOccurrenceGML(serviceURL,

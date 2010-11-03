@@ -37,9 +37,11 @@ Ext.onReady(function() {
 
         // We have a leaf
         if (isLeafNode(documentNode)) {
+            var textContent = documentNode.textContent ? documentNode.textContent : documentNode.text;  
+            
             treeNode = new Ext.tree.TreeNode( {
                 text : documentNode.tagName + " = "
-                        + documentNode.textContent
+                        + textContent
             });
         } else { // we have a parent node
             var parentName = documentNode.tagName;
@@ -88,10 +90,12 @@ Ext.onReady(function() {
                     + xmlDocNode.attributes[i].value + '&quot;';
         }
         htmlText += '&gt;</span>';
-        if (isLeaf)
-            htmlText += xmlDocNode.textContent;
-        else
+        if (isLeaf) {
+            var textContent = xmlDocNode.textContent ? xmlDocNode.textContent : xmlDocNode.text;
+            htmlText += textContent;
+        } else {
             htmlText += '<br/>';
+        }
 
         // Write any children
         Ext.each(xmlDocNode.childNodes, function(docNodeChild) {
@@ -155,8 +159,19 @@ Ext.onReady(function() {
 
         // Load our xml document
         var xmlString = jsonResponse.data.gml;
-        var parser = new DOMParser();
-        var xmlDocument = parser.parseFromString(xmlString, "text/xml");
+        
+        var xmlDocument;
+        if(window.DOMParser) {
+        	//browser supports DOMParser
+            var parser = new DOMParser();
+            xmlDocument = parser.parseFromString(xmlString, "text/xml");
+        } else if(window.ActiveXObject) {
+        	//IE
+        	xmlDocument = new ActiveXObject("Microsoft.XMLDOM");
+        	xmlDocument.async="false";
+        	xmlDocument.loadXML(xmlString);
+        }
+        
 
         // We got a valid (but empty response) ignore it
         if (!doesResponseContainsData(xmlDocument.documentElement)) {

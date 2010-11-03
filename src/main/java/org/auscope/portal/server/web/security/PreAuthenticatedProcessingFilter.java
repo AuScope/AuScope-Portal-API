@@ -20,6 +20,8 @@ public class PreAuthenticatedProcessingFilter
    protected final Logger logger = Logger.getLogger(getClass());
    
    protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
+	
+	  logger.error("inside AbstractPreAuthenticatedProcessingFilter.getPreAuthenticatedPrincipal");
 	  java.util.Enumeration eHeaders = request.getHeaderNames();
       while(eHeaders.hasMoreElements()) {
          String name = (String) eHeaders.nextElement();
@@ -29,7 +31,7 @@ public class PreAuthenticatedProcessingFilter
          {
                Object object = request.getHeader(name);
                String value = object.toString();
-               logger.debug(name + " : " + value);
+               logger.debug("Shib header - " + name + " : " + value);
          }
       }
       

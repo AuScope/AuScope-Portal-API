@@ -1,45 +1,42 @@
 package org.auscope.portal.server.web.controllers;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 
-import net.sf.json.JSONObject;
+import net.sf.json.JSONArray;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.auscope.portal.mineraloccurrence.Commodity;
-import org.auscope.portal.mineraloccurrence.FilterBoundingBox;
 import org.auscope.portal.mineraloccurrence.Mine;
 import org.auscope.portal.mineraloccurrence.MineralOccurrencesResponseHandler;
+import org.auscope.portal.server.domain.filter.FilterBoundingBox;
 import org.auscope.portal.server.util.GmlToKml;
 import org.auscope.portal.server.web.ErrorMessages;
+import org.auscope.portal.server.web.service.CSWService;
+import org.auscope.portal.server.web.service.CommodityService;
+import org.auscope.portal.server.web.service.HttpServiceCaller;
 import org.auscope.portal.server.web.service.MineralOccurrenceService;
 import org.auscope.portal.server.web.service.NvclService;
 import org.auscope.portal.server.web.view.JSONModelAndView;
-import org.auscope.portal.server.web.service.CommodityService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
-import org.xml.sax.SAXException;
 
 /**
  * Controller that handles all Earth Resource related requests
@@ -73,7 +70,11 @@ public class EarthResourcesFilterController {
     private NvclService nvclService;
     private GmlToKml gmlToKml;
     private CommodityService commodityService;
-
+    private HttpServiceCaller httpServiceCaller;
+    private CSWService cswService;
+   
+    
+    
     // ----------------------------------------------------------- Constructors
     
     @Autowired
@@ -82,36 +83,24 @@ public class EarthResourcesFilterController {
           MineralOccurrenceService mineralOccurrenceService,
           NvclService nvclService,
           GmlToKml gmlToKml,
-          CommodityService commodityService) {
+          CommodityService commodityService,
+          HttpServiceCaller httpServiceCaller
+          ) {
         
         this.mineralOccurrencesResponseHandler = mineralOccurrencesResponseHandler;
         this.mineralOccurrenceService = mineralOccurrenceService;
         this.nvclService = nvclService;
         this.gmlToKml = gmlToKml;
         this.commodityService = commodityService;
+        this.httpServiceCaller = httpServiceCaller;
+        
+        
+        
+       
     }
 
     // ------------------------------------------- Property Setters and Getters   
     
-    /**
-     * Convenience method to parse a bbox. Returns null if the parsing fails
-     */
-    private FilterBoundingBox attemptParseBbox(String json) {
-        FilterBoundingBox bbox = null;
-        try {
-            if (json != null) {
-                JSONObject obj = JSONObject.fromObject(json);
-                bbox = FilterBoundingBox.parseFromJSON(obj);
-                log.debug("bbox=" + bbox.toString());
-            } else {
-                log.debug("Skipping parsing of bbox, it hasn't been received");
-            }
-        } catch (Exception ex) {
-            log.warn("Couldnt parse bounding box filter (Invalid Values): " + ex);
-        }
-        
-        return bbox;
-    }
     
     /**
      * Handles the Earth Resource Mine filter queries.
@@ -121,6 +110,7 @@ public class EarthResourcesFilterController {
      * @param mineName   the name of the mine to query for
      * @param request    the HTTP client request
      * @return a WFS response converted into KML
+     * @throws Exception 
      */
     @RequestMapping("/doMineFilter.do")
     public ModelAndView doMineFilter(
@@ -128,41 +118,62 @@ public class EarthResourcesFilterController {
             @RequestParam("mineName") String mineName,
             @RequestParam(required=false, value="bbox") String bboxJson,
             @RequestParam(required=false, value="maxFeatures", defaultValue="0") int maxFeatures, 
-            HttpServletRequest request) {
+            HttpServletRequest request) throws Exception {
 
         //The presence of a bounding box causes us to assume we will be using this GML for visualizing on a map
         //This will in turn limit the number of points returned to 200
-        FilterBoundingBox bbox = attemptParseBbox(bboxJson);
+        FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
         
+        JSONArray requestInfo = new JSONArray();
         try {
             String gmlBlob;
-
+            HttpMethodBase method;
             if (mineName.equals(ALL_MINES)) {//get all mines 
-                if (bbox == null)
-                    gmlBlob = this.mineralOccurrenceService.getAllMinesGML(serviceUrl, maxFeatures);
-                else
-                    gmlBlob = this.mineralOccurrenceService.getAllVisibleMinesGML(serviceUrl, bbox, maxFeatures);
+                if (bbox == null){
+                	method = this.mineralOccurrenceService.getAllMinesGML(serviceUrl, maxFeatures);
+                    gmlBlob = this.httpServiceCaller.getMethodResponseAsString(method, httpServiceCaller.getHttpClient());
+                }
+                else{
+                	method = this.mineralOccurrenceService.getAllVisibleMinesGML(serviceUrl, bbox, maxFeatures);
+                    gmlBlob = this.httpServiceCaller.getMethodResponseAsString(method, httpServiceCaller.getHttpClient());
+                }
             } else {
-                if (bbox == null)
-                    gmlBlob = this.mineralOccurrenceService.getMineWithSpecifiedNameGML(serviceUrl, mineName, maxFeatures);
-                else
-                    gmlBlob = this.mineralOccurrenceService.getVisibleMineWithSpecifiedNameGML(serviceUrl, mineName, bbox, maxFeatures);
+                if (bbox == null){
+                	method = this.mineralOccurrenceService.getMineWithSpecifiedNameGML(serviceUrl, mineName, maxFeatures);
+                    gmlBlob = this.httpServiceCaller.getMethodResponseAsString(method, httpServiceCaller.getHttpClient());
+                }
+                else{
+                	method = this.mineralOccurrenceService.getVisibleMineWithSpecifiedNameGML(serviceUrl, mineName, bbox, maxFeatures);
+                    gmlBlob = this.httpServiceCaller.getMethodResponseAsString(method, httpServiceCaller.getHttpClient());
+                }
             }
 
-            String kmlBlob =  convertToKml(gmlBlob, request, serviceUrl);
-            //log.debug(kmlBlob);
             
+            /* getting the request string for debug window*/
+            RequestEntity ent;
+            String body = null;
+            if (method instanceof PostMethod) {
+            	ent = ((PostMethod) method).getRequestEntity();
+                body = ((StringRequestEntity) ent).getContent(); 
+            }
+            requestInfo.add(serviceUrl);
+            requestInfo.add(body); 
+            
+            String kmlBlob =  convertToKml(gmlBlob, request, serviceUrl);
+            
+            //log.debug(kmlBlob);
             //This failure test should be made a little bit more robust
             //And should probably try to extract an error message
             if (kmlBlob == null || kmlBlob.length() == 0) {
                 log.error(String.format("Transform failed serviceUrl='%1$s' gmlBlob='%2$s'",serviceUrl, gmlBlob));
-            	return makeModelAndViewFailure(ErrorMessages.OPERATION_FAILED);
-            } else {
-            	return makeModelAndViewKML(kmlBlob, gmlBlob);
+            	return makeModelAndViewFailure(ErrorMessages.OPERATION_FAILED ,requestInfo);
+            } else {            	
+            	return makeModelAndViewKML(kmlBlob, gmlBlob, requestInfo);
             }
         } catch (Exception e) {
-            return this.handleExceptionResponse(e, serviceUrl);
+            return this.handleExceptionResponse(e, serviceUrl, requestInfo);
         }
+        
     }
 
     
@@ -179,6 +190,7 @@ public class EarthResourcesFilterController {
      * @param request                the HTTP client request
      * 
      * @return a WFS response converted into KML
+     * @throws Exception 
      */
     @RequestMapping("/doMineralOccurrenceFilter.do")
     public ModelAndView doMineralOccurrenceFilter(
@@ -191,30 +203,33 @@ public class EarthResourcesFilterController {
         @RequestParam(value="minCommodityAmountUOM", required=false) String minCommodityAmountUOM,
         @RequestParam(required=false, value="bbox") String bboxJson,
         @RequestParam(required=false, value="maxFeatures", defaultValue="0") int maxFeatures,
-        HttpServletRequest request) 
+        HttpServletRequest request) throws Exception 
     {
         //The presence of a bounding box causes us to assume we will be using this GML for visualizing on a map
         //This will in turn limit the number of points returned to 200
-        FilterBoundingBox bbox = attemptParseBbox(bboxJson);
+        FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
+        
+        JSONArray requestInfo = new JSONArray();
         
         try {
 
             //get the mineral occurrences
             String mineralOccurrenceResponse = null;
-            if (bbox == null) {
-                mineralOccurrenceResponse 
-                    = this.mineralOccurrenceService.getMineralOccurrenceGML ( 
-                            serviceUrl,
-                            commodityName, 
-                            measureType,
-                            minOreAmount,
-                            minOreAmountUOM,
-                            minCommodityAmount,
-                            minCommodityAmountUOM,
-                            maxFeatures);
+            HttpMethodBase method;
+            if (bbox == null) { 
+            	method = this.mineralOccurrenceService.getMineralOccurrenceGML ( 
+                        serviceUrl,
+                        commodityName, 
+                        measureType,
+                        minOreAmount,
+                        minOreAmountUOM,
+                        minCommodityAmount,
+                        minCommodityAmountUOM,
+                        maxFeatures);            	           	
+            	mineralOccurrenceResponse = this.httpServiceCaller.getMethodResponseAsString(method, httpServiceCaller.getHttpClient());
+                
             } else {
-                mineralOccurrenceResponse 
-                    = this.mineralOccurrenceService.getVisibleMineralOccurrenceGML ( 
+                method = this.mineralOccurrenceService.getVisibleMineralOccurrenceGML ( 
                             serviceUrl,
                             commodityName,
                             measureType,
@@ -223,18 +238,28 @@ public class EarthResourcesFilterController {
                             minCommodityAmount,
                             minCommodityAmountUOM,
                             bbox,
-                            maxFeatures);
+                            maxFeatures);                
+                mineralOccurrenceResponse = this.httpServiceCaller.getMethodResponseAsString(method, httpServiceCaller.getHttpClient());                
+            }    
+            RequestEntity ent;
+            String body = null;
+            if (method instanceof PostMethod) {
+            	ent = ((PostMethod) method).getRequestEntity();
+                body = ((StringRequestEntity) ent).getContent(); 
             }
-
+            requestInfo.add(serviceUrl);
+            requestInfo.add(body);
+            
             // If there are 0 features then send NO_RESULTS message to the user
             if (mineralOccurrencesResponseHandler.getNumberOfFeatures(mineralOccurrenceResponse) == 0)
-                return makeModelAndViewFailure(ErrorMessages.NO_RESULTS);
-
+                return makeModelAndViewFailure(ErrorMessages.NO_RESULTS, requestInfo);
+            
             //if everything is good then return the KML
-            return makeModelAndViewKML(convertToKml(mineralOccurrenceResponse, request, serviceUrl), mineralOccurrenceResponse);
+            return makeModelAndViewKML(convertToKml(mineralOccurrenceResponse, request, serviceUrl), mineralOccurrenceResponse, requestInfo);
 
         } catch (Exception e) {
-            return this.handleExceptionResponse(e, serviceUrl);
+            return this.handleExceptionResponse(e, serviceUrl, requestInfo);
+            
         }
     }
     
@@ -253,6 +278,7 @@ public class EarthResourcesFilterController {
      * @param production 
      * @param request
      * @return the KML response
+     * @throws Exception 
      */    
     @RequestMapping("/doMiningActivityFilter.do")
     public ModelAndView doMiningActivityFilter(
@@ -267,13 +293,15 @@ public class EarthResourcesFilterController {
             @RequestParam(required=false, value="bbox") String bboxJson,
             @RequestParam(required=false, value="maxFeatures", defaultValue="0") int maxFeatures,
             HttpServletRequest request) 
-    throws IOException, SAXException, XPathExpressionException, ParserConfigurationException 
+    throws Exception 
     {
         //The presence of a bounding box causes us to assume we will be using this GML for visualizing on a map
         //This will in turn limit the number of points returned to 200
-        FilterBoundingBox bbox = attemptParseBbox(bboxJson);
+        FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
         
+        JSONArray requestInfo = new JSONArray();
         try {
+        	
             List<Mine> mines = new ArrayList<Mine>();   
            
             if (!mineName.equals("")) {
@@ -287,42 +315,53 @@ public class EarthResourcesFilterController {
                 if (mines.size() == 0)
                     return makeModelAndViewFailure(ErrorMessages.NO_RESULTS);                    
             }
-
+           
             // Get the mining activities
+            HttpMethodBase method = null;;
             String miningActivityResponse = null;
             if (bbox == null) {
-                miningActivityResponse = 
-                    this.mineralOccurrenceService.getMiningActivityGML( serviceUrl
-                                                                      , mines
-                                                                      , startDate
-                                                                      , endDate
-                                                                      , oreProcessed
-                                                                      , producedMaterial
-                                                                      , cutOffGrade
-                                                                      , production
-                                                                      , maxFeatures);
+            	method = this.mineralOccurrenceService.getMiningActivityGML( serviceUrl
+                        											, mines
+                        											, startDate
+                        											, endDate
+                        											, oreProcessed
+                        											, producedMaterial
+                        											, cutOffGrade
+                        											, production
+                        											, maxFeatures);
+                miningActivityResponse = this.httpServiceCaller.getMethodResponseAsString(method, httpServiceCaller.getHttpClient());
+                    
             } else {
-                miningActivityResponse = 
-                    this.mineralOccurrenceService.getVisibleMiningActivityGML( serviceUrl
-                                                                      , mines
-                                                                      , startDate
-                                                                      , endDate
-                                                                      , oreProcessed
-                                                                      , producedMaterial
-                                                                      , cutOffGrade
-                                                                      , production
-                                                                      , bbox
-                                                                      , maxFeatures);
+            	method = this.mineralOccurrenceService.getVisibleMiningActivityGML( serviceUrl
+            																, mines
+            																, startDate
+            																, endDate
+            																, oreProcessed
+            																, producedMaterial
+            																, cutOffGrade
+            																, production
+            																, bbox
+            																, maxFeatures);
+                miningActivityResponse = this.httpServiceCaller.getMethodResponseAsString(method, httpServiceCaller.getHttpClient());
+                    
             }
-            
+            /* getting the request string for debug window*/
+            RequestEntity ent;
+            String body = null;
+            if (method instanceof PostMethod) {
+            	ent = ((PostMethod) method).getRequestEntity();
+                body = ((StringRequestEntity) ent).getContent(); 
+            }
+            requestInfo.add(serviceUrl);
+            requestInfo.add(body);
             // If there are 0 features then send NO_RESULTS message to the user
             if (mineralOccurrencesResponseHandler.getNumberOfFeatures(miningActivityResponse) == 0)
-                return makeModelAndViewFailure(ErrorMessages.NO_RESULTS);
+                return makeModelAndViewFailure(ErrorMessages.NO_RESULTS, requestInfo);
             
-            return makeModelAndViewKML(convertToKml(miningActivityResponse, request, serviceUrl), miningActivityResponse);
+            return makeModelAndViewKML(convertToKml(miningActivityResponse, request, serviceUrl), miningActivityResponse, requestInfo);
 
         } catch (Exception e) {
-            return this.handleExceptionResponse(e, serviceUrl);
+            return this.handleExceptionResponse(e, serviceUrl, requestInfo);
         }
     }
 
@@ -334,27 +373,44 @@ public class EarthResourcesFilterController {
      * @param mineName   the name of the mine to query for
      * @param request    the HTTP client request
      * @return a WFS response converted into KML
+     * @throws Exception 
      */
     @RequestMapping("/doNvclFilter.do")
     public ModelAndView doNvclFilter( @RequestParam("serviceUrl") String serviceUrl,
                                       @RequestParam(required=false, value="maxFeatures", defaultValue="0") int maxFeatures,
-                                      HttpServletRequest request) {
+                                      @RequestParam(required=false, value="bbox") String bboxJson,
+                                      HttpServletRequest request) throws Exception {
+        
+        FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);  
+        
+        JSONArray requestInfo = new JSONArray();
+        
+        
         try {
-            String gmlBlob = this.nvclService.getAllBoreholes(serviceUrl, maxFeatures);
+        	HttpMethodBase method = this.nvclService.getAllBoreholes(serviceUrl, maxFeatures, bbox);
+            String gmlBlob = this.httpServiceCaller.getMethodResponseAsString(method, httpServiceCaller.getHttpClient());
 
             String kmlBlob = convertToKml(gmlBlob, request, serviceUrl);
+            RequestEntity ent;
+            String body = null;
+            if (method instanceof PostMethod) {
+            	ent = ((PostMethod) method).getRequestEntity();
+                body = ((StringRequestEntity) ent).getContent(); 
+            }
+            requestInfo.add(serviceUrl);
+            requestInfo.add(body);
+            
             //log.debug(kmlBlob);
-                
             // This failure test should be more robust,
             // it should try to extract an error message
             if (kmlBlob == null || kmlBlob.length() == 0) {
-                log.error(String.format("Transform failed serviceUrl='%1$s' gmlBlob='%2$s'",serviceUrl, gmlBlob));
-                return makeModelAndViewFailure(ErrorMessages.OPERATION_FAILED);
+                log.error(String.format("Transform failed serviceUrl='%1$s' gmlBlob='%2$s'", serviceUrl, gmlBlob));
+                return makeModelAndViewFailure(ErrorMessages.OPERATION_FAILED, requestInfo);
             } else {
-                return makeModelAndViewKML(kmlBlob, gmlBlob);
+                return makeModelAndViewKML(kmlBlob, gmlBlob, requestInfo);
             }
         } catch (Exception e) {
-            return this.handleExceptionResponse(e, serviceUrl);
+            return this.handleExceptionResponse(e, serviceUrl, requestInfo);
         }
     }    
     
@@ -384,6 +440,29 @@ public class EarthResourcesFilterController {
         // An error we don't specifically handle or expect
         return makeModelAndViewFailure(ErrorMessages.FILTER_FAILED);
     } 
+    
+    
+    public ModelAndView handleExceptionResponse(Exception e, String serviceUrl, JSONArray requestInfo) {
+
+        log.error(String.format("Exception! serviceUrl='%1$s'", serviceUrl),e);
+
+        // Service down or host down
+        if(e instanceof ConnectException || e instanceof UnknownHostException) {
+            return this.makeModelAndViewFailure(ErrorMessages.UNKNOWN_HOST_OR_FAILED_CONNECTION, requestInfo);
+        }
+
+        // Timouts
+        if(e instanceof ConnectTimeoutException) {
+            return this.makeModelAndViewFailure(ErrorMessages.OPERATION_TIMOUT, requestInfo);
+        }
+        
+        if(e instanceof SocketTimeoutException) {
+            return this.makeModelAndViewFailure(ErrorMessages.OPERATION_TIMOUT, requestInfo);
+        }        
+
+        // An error we don't specifically handle or expect
+        return makeModelAndViewFailure(ErrorMessages.FILTER_FAILED, requestInfo);
+    } 
    
 
     // ------------------------------------------------------ Protected Methods
@@ -395,7 +474,7 @@ public class EarthResourcesFilterController {
      * @param gmlBlob
      * @return ModelAndView JSON response object
      */
-    private ModelAndView makeModelAndViewKML(final String kmlBlob, final String gmlBlob) {
+   /* private ModelAndView makeModelAndViewKML(final String kmlBlob, final String gmlBlob) {
         final Map<String,String> data = new HashMap<String,String>();
         data.put("kml", kmlBlob);
         data.put("gml", gmlBlob);
@@ -405,8 +484,7 @@ public class EarthResourcesFilterController {
         model.put("data", data);
 
         return new JSONModelAndView(model);
-    }
-    
+    }*/
     
     /**
      * Create a failure response
@@ -414,11 +492,51 @@ public class EarthResourcesFilterController {
      * @param message
      * @return
      */
-    private ModelAndView makeModelAndViewFailure(final String message) {
-        ModelMap model = new ModelMap();
-        model.put("success", false);
-        model.put("msg", message);                      
   
+    
+    private ModelAndView makeModelAndViewFailure(final String message) {    	
+        ModelMap model = new ModelMap(); 
+        
+        model.put("success", false);
+        model.put("msg", message); 
+        
+        return new JSONModelAndView(model);
+    }
+    
+    private ModelAndView makeModelAndViewKML(final String kmlBlob, final String gmlBlob, JSONArray requestInfo) {
+    	
+    	    	
+    	final Map<String,String> data = new HashMap<String,String>();
+        data.put("kml", kmlBlob);
+        data.put("gml", gmlBlob);
+        
+        final Map<String,String> debugInfo = new HashMap<String,String>();
+        debugInfo.put("url",requestInfo.getString(0) );
+        debugInfo.put("info",requestInfo.getString(1) );
+        
+        ModelMap model = new ModelMap();
+        model.put("success", true);
+        model.put("data", data);
+        model.put("debugInfo", debugInfo);
+
+        return new JSONModelAndView(model);
+    }
+    
+    private ModelAndView makeModelAndViewFailure(final String message, JSONArray requestInfo) {
+    	ModelMap model = new ModelMap(); 
+        
+        model.put("success", false);
+        model.put("msg", message); 
+        
+        //Only add the request info if it has been specified
+        if (requestInfo != null && requestInfo.size() >= 2) {
+            final Map<String,String> debugInfo = new HashMap<String,String>();
+            debugInfo.put("url",requestInfo.getString(0) );
+            debugInfo.put("info",requestInfo.getString(1) );
+            
+            model.put("debugInfo", debugInfo);
+        }
+        
         return new JSONModelAndView(model);
     }
     
@@ -431,6 +549,7 @@ public class EarthResourcesFilterController {
      */
     private String convertToKml(String geoXML, HttpServletRequest httpRequest, String serviceUrl) {
         InputStream inXSLT = httpRequest.getSession().getServletContext().getResourceAsStream("/WEB-INF/xsl/kml.xsl");
+        
         return gmlToKml.convert(geoXML, inXSLT, serviceUrl);
     }
 }
