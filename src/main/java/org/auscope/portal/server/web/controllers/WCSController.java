@@ -389,6 +389,7 @@ public class WCSController {
     	request.getSession().setAttribute("dataSubset", isData);
     	request.getSession().setAttribute("bufferSubset", isBuffer);
     	request.getSession().setAttribute("meshSubset", isMesh);
+    	request.getSession().setAttribute("subsetFormat", format);
         
         mav.addObject("success", true);
  	    

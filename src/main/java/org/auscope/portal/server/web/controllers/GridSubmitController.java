@@ -947,9 +947,10 @@ public class GridSubmitController {
         
         // save subset files to stageIn directory
         logger.debug("saving subset to stageIn directory");
-        addSubsetFileToGridJob("dataSubset", "data.tif", request);
-        addSubsetFileToGridJob("bufferSubset", "buffer.tif", request);
-        addSubsetFileToGridJob("meshSubset", "mesh.tif", request);
+        String format = (String)request.getSession().getAttribute("subsetFormat");
+        addSubsetFileToGridJob("dataSubset", "data"+ generateSubsetFileExtension(format), request);
+        addSubsetFileToGridJob("bufferSubset", "buffer"+ generateSubsetFileExtension(format), request);
+        addSubsetFileToGridJob("meshSubset", "mesh"+ generateSubsetFileExtension(format), request);
 
         // Check if the user requested to re-submit a previous job.
         String jobIdStr = (String) request.getSession().getAttribute("resubmitJob");
@@ -1058,6 +1059,21 @@ public class GridSubmitController {
         }
         catch (Throwable e) {
             logger.error("Error writing subset file - " + e);
+        }
+    }
+    
+    /**
+     * Convert the ERDDAP format to a valid file extension if it isn't one already
+     * 
+     * @param format The format parameter used in the ERDDAP subset call
+     * @return A valid file extension. 
+     */
+    private String generateSubsetFileExtension(String format) {
+        if (format.toLowerCase().equals("geotif")) {
+        	return ".tiff";
+        }
+        else {
+            return "."+format;
         }
     }
 

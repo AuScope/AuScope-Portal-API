@@ -1142,7 +1142,7 @@ Ext.onReady(function() {
         });
         form.dom.action = url;
         form.dom.submit();
-    }
+    };
 
     // basic tabs 1, built from existing content
     var tabsPanel = new Ext.TabPanel({
@@ -1155,9 +1155,9 @@ Ext.onReady(function() {
         enableTabScroll: true,
         //autosize:true,
         items:[
-            knownLayersPanel,
+            knownLayersPanel/*,
             mapLayersPanel,
-            customLayersPanel
+            customLayersPanel*/
         ]
     });
 

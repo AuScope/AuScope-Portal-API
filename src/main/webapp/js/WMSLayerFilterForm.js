@@ -66,16 +66,43 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
 	        		success: WMSLayerFilterForm.onSendToGridResponse,
 	        		failure: WMSLayerFilterForm.onRequestFailure,
 	        		params		: {
-	        			//layerName  		: activeLayerRecord.get('typeName'),
-	        			layerName  		: activeLayerRecord.getTitle(),
+	        			layerName  		: activeLayerRecord.getLayerName(),
 	        			dataCoords 		: dataBbox.getParams(),
 	        			bufferCoords	: bufferBbox.getParams(),
 	        			meshCoords		: meshBbox.getParams(),
-	        			format			: 'geotif'
+	        			format			: fileTypeCombo.getValue()
 	            	}
 	        	});
         	}
         }
+    });
+    
+    // subset file type selection values
+	var fileTypes =  [
+   		 ['NetCDF','nc'],
+   		 ['GeoTIFF','geotif']
+   	];
+	
+	var fileTypeStore = new Ext.data.SimpleStore({
+		fields : ['type','value'],
+        data   : fileTypes
+    });
+	
+	var fileTypeCombo = new Ext.form.ComboBox({  
+		tpl: '<tpl for="."><div ext:qtip="{type}" class="x-combo-list-item">{type}</div></tpl>',
+        width          : 100,
+        editable       : false,
+        forceSelection : true,
+        fieldLabel     : 'Subset File Type',
+        mode           : 'local',
+        store          : fileTypeStore,
+        triggerAction  : 'all',
+        typeAhead      : false,
+        displayField   : 'type',
+        valueField     : 'value',
+        value          : 'nc',
+        id			   : 'fileType',
+        submitValue	   : false
     });
     
     //-----------Panel
@@ -101,6 +128,7 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
                     value       : (activeLayerRecord.getOpacity() * 100),
                     listeners   : {changecomplete: sliderHandler}
             },
+            	fileTypeCombo,
             	drawBoundsButton,
             	clearBoundsButton,
             	sendToGridButton,
@@ -108,6 +136,7 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
     				// column layout with 2 columns
                     layout:'column',
                     border: false,
+                    bodyStyle:'margin:5px 0 0 0',
                     items:[{
                         // right column
                         border: false,

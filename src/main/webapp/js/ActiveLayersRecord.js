@@ -301,3 +301,10 @@ ActiveLayersRecord.prototype.setParentKnownLayer = function(knownLayerRecord) {
 		this.internalRecord.parentKnownLayer = null;
 	}
 };
+
+/**
+ * Gets the layerName of this active layer as a String
+ */
+ActiveLayersRecord.prototype.getLayerName = function() {
+	return this.internalGetStringField('layerName');
+};

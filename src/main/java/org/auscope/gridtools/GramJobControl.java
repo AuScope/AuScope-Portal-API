@@ -136,8 +136,8 @@ public class GramJobControl implements JobControlInterface {
 	        "<job> <executable>rsync</executable>" +
 	        " <directory>" + localOutputDir + "</directory>" +
         	" <argument>-vvv</argument>" +
-        	" <argument>tables/data.tif</argument>" +
-        	" <argument>dataCopy.tif</argument>" +
+        	" <argument>tables/*</argument>" +
+        	" <argument>copy</argument>" +
         	" <stdout>" + job.getStdOutput() + "</stdout>" +
         	" <stderr>" + job.getStdError() + "</stderr>" +
         	" <count>1</count>" +

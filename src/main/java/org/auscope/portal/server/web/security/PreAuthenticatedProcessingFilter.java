@@ -21,7 +21,6 @@ public class PreAuthenticatedProcessingFilter
    
    protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
 	
-	  logger.error("inside AbstractPreAuthenticatedProcessingFilter.getPreAuthenticatedPrincipal");
 	  java.util.Enumeration eHeaders = request.getHeaderNames();
       while(eHeaders.hasMoreElements()) {
          String name = (String) eHeaders.nextElement();
