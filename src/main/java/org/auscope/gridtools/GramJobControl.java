@@ -135,9 +135,9 @@ public class GramJobControl implements JobControlInterface {
         String dummyString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 	        "<job> <executable>rsync</executable>" +
 	        " <directory>" + localOutputDir + "</directory>" +
-        	" <argument>-vvv</argument>" +
-        	" <argument>tables/*</argument>" +
-        	" <argument>copy</argument>" +
+        	" <argument>-vvvaz</argument>" +
+        	" <argument>tables/</argument>" +
+        	" <argument>copyfiles</argument>" +
         	" <stdout>" + job.getStdOutput() + "</stdout>" +
         	" <stderr>" + job.getStdError() + "</stderr>" +
         	" <count>1</count>" +
