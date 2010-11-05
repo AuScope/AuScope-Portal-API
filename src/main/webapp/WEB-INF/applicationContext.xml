@@ -27,15 +27,15 @@
         <property name="soTimeout" value="900000"/> <!--  15 minutes -->
    </bean>
 
-    <bean id="cswAuscopeDev" class="org.auscope.portal.server.web.service.CSWServiceItem">
+    <!--<bean id="cswAuscopeDev" class="org.auscope.portal.server.web.service.CSWServiceItem">
         <constructor-arg index="0" value="http://auscope-portal-2.arrc.csiro.au/geonetwork/srv/en/csw"/>
     </bean>
 
 	<bean id="cswAuscopeTest" class="org.auscope.portal.server.web.service.CSWServiceItem">
 		<constructor-arg index="0" value="http://auscope-portal-2.arrc.csiro.au/geonetwork/srv/en/csw"/>
-	</bean>
+	</bean>-->
 	
-	<!--<bean id="cswAuscopeDev" class="org.auscope.portal.server.web.service.CSWServiceItem">
+	<bean id="cswAuscopeDev" class="org.auscope.portal.server.web.service.CSWServiceItem">
         <constructor-arg index="0" value="http://apacsrv1.arrc.csiro.au/geonetwork/srv/en/csw"/>
     </bean>
 
@@ -43,7 +43,7 @@
 		<constructor-arg index="0" value="http://apacsrv1.arrc.csiro.au/geonetwork/srv/en/csw"/>
 	</bean>
 	
-	--><bean id="cswAuscopeProduction" class="org.auscope.portal.server.web.service.CSWServiceItem">
+	<bean id="cswAuscopeProduction" class="org.auscope.portal.server.web.service.CSWServiceItem">
         <constructor-arg index="0" value="http://portal.auscope.org/geonetwork/srv/en/csw"/>
     </bean>
 
