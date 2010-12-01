@@ -33,12 +33,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.ssl.PKCS8Key;
 import org.auscope.portal.server.gridjob.GridAccessController;
+import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.glite.slcs.pki.CertificateExtension;
 import org.glite.slcs.pki.CertificateExtensionFactory;
 import org.glite.slcs.pki.CertificateKeys;
 import org.glite.slcs.pki.CertificateRequest;
 import org.globus.gsi.CertUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -47,6 +50,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.PropertiesCredentials;
 
 /**
  * Controller that forwards shibboleth token to SLCS to retrieve a certificate
@@ -64,22 +70,16 @@ public class GridLoginController {
     private static final int PROXY_LIFETIME = 10*24*60*60; // 10 days
     @Autowired
     private GridAccessController gridAccess;
+    
+    @Autowired
+    @Qualifier(value = "propertyConfigurer")
+    private PortalPropertyPlaceholderConfigurer hostConfigurer;
 
     private class RequestData {
         public String authToken;
         public String certDN;
         public List certExtensions;
     }
-
-    /**
-     * Sets the <code>GridAccessController</code> to be used for proxy checking
-     * and initialisation.
-     *
-     * @param gridAccess the GridAccessController to use
-     */
-    /*public void setGridAccess(GridAccessController gridAccess) {
-        this.gridAccess = gridAccess;
-    }*/
 
     /**
      * Main entry point which decides where to redirect to.
@@ -333,10 +333,28 @@ public class GridLoginController {
             } else {
                 logger.info("Storing credentials in session.");
                 request.getSession().setAttribute("userCred", credential);
+                setAmazonCredentials(request);
             }
         }
         logger.debug("certDN: "+rd.certDN);
         request.getSession().setAttribute("certDN", rd.certDN);
     }
+
+	/**
+	 * Create an AWS credentials session attribute using the access and secret key stored in the 
+	 * credenials file.
+	 * 
+	 * @param request The HttpServletRequest
+	 */
+	private void setAmazonCredentials(HttpServletRequest request) throws Exception {
+		try {
+			String awsCredFileLocation = hostConfigurer.resolvePlaceholder("HOST.aws.credentials.file");
+	    	FileSystemResource res = new FileSystemResource(awsCredFileLocation);
+			AWSCredentials credentials = new PropertiesCredentials(res.getInputStream());
+			request.getSession().setAttribute("AWSCred", credentials);
+		} catch (IOException e) {
+            throw new Exception("Invalid AWS credentials");
+        } 
+	}
 }
 

@@ -6,19 +6,18 @@
  */
 package org.auscope.portal.server.web.controllers;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.rmi.ServerException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.server.gridjob.FileInformation;
@@ -26,17 +25,18 @@ import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
 import org.auscope.portal.server.gridjob.GridAccessController;
-import org.auscope.portal.server.gridjob.Util;
-import org.globus.ftp.DataChannelAuthentication;
-import org.globus.ftp.FileInfo;
-import org.globus.ftp.GridFTPClient;
-import org.globus.ftp.GridFTPSession;
-import org.ietf.jgss.GSSCredential;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
+
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 /**
  * Controller for the job list view.
@@ -55,66 +55,6 @@ public class JobListController {
     @Autowired
     private GeodesyJobManager jobManager;
 
-    /**
-     * Triggers the retrieval of latest job files
-     *
-     * @param request The servlet request including a jobId parameter
-     * @param response The servlet response
-     *
-     * @return A JSON object with a success attribute and an error attribute
-     *         in case the job was not found in the job manager.
-     */
-    @RequestMapping("/retrieveJobFiles.do")
-    public ModelAndView retrieveJobFiles(HttpServletRequest request,
-                                         HttpServletResponse response) {
-
-        String jobIdStr = request.getParameter("jobId");
-        GeodesyJob job = null;
-        ModelAndView mav = new ModelAndView("jsonView");
-        Object credential = request.getSession().getAttribute("userCred");
-
-        if (credential == null) {
-            final String errorString = "Invalid grid credentials!";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-            mav.addObject("success", false);
-            return mav;
-        }
-
-        if (jobIdStr != null) {
-            try {
-                int jobId = Integer.parseInt(jobIdStr);
-                job = jobManager.getJobById(jobId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing job ID!");
-            }
-        } else {
-            logger.warn("No job ID specified!");
-        }
-
-        if (job == null) {
-            final String errorString = "The requested job was not found.";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-            mav.addObject("success", false);
-
-        } else {
-            logger.debug("jobID = " + jobIdStr);
-            boolean success = false;
-            String jobState = gridAccess.retrieveJobStatus(
-                    job.getReference(), credential);
-            if (jobState != null && jobState.equals("Active")) {
-                success = gridAccess.retrieveJobResults(
-                        job.getReference(), credential);
-            } else {
-                mav.addObject("error", "Cannot retrieve files of a job that is not running!");
-            }
-            logger.debug("Success = "+success);
-            mav.addObject("success", success);
-        }
-
-        return mav;
-    }
     /**
      * Delete the job given by its reference.
      *
@@ -427,16 +367,11 @@ public class JobListController {
     public ModelAndView jobFiles(HttpServletRequest request,
                                  HttpServletResponse response) {
 
-        String jobIdStr = request.getParameter("jobId");
-        String dirPathStr = request.getParameter("dirPath");
-        String dirNameStr = request.getParameter("dirName");
-        GeodesyJob job = null;
+    	GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
-        Object credential = request.getSession().getAttribute("userCred");
-
-        if (credential == null) {
-        	logger.error("Error invalid credential.");
-        }
+        String jobIdStr = request.getParameter("jobId");
+        logger.debug("jobIdStr: " + jobIdStr);
+        int  totalItems = 0;
         
         if (jobIdStr != null) {
             try {
@@ -449,34 +384,38 @@ public class JobListController {
             logger.warn("No job ID specified!");
         }
         
-        FileInformation[] fileDetails = new FileInformation[0];
         if (job == null) {
             final String errorString = "The requested job was not found.";
-            logger.error(errorString);
+            logger.error("The requested job was not found.");
             mav.addObject("error", errorString);
-
-        } else {
-        	if(dirPathStr == null){
-        		fileDetails = getDirectoryListing(job.getOutputDir(), credential);
-        	}else{
-        		if(dirNameStr == null || dirNameStr.equals(".")){
-        		   fileDetails = getDirectoryListing(dirPathStr, credential);
-        		}else if(dirNameStr.equals("..")){
-        			// This is the top directory for this job, cannot allow further up
-        			if(dirPathStr.equals(job.getOutputDir()))
-        				fileDetails = getDirectoryListing(dirPathStr, credential);
-        			else
-        			{
-        		        //Going one directory up
-        				String tempDir = dirPathStr.substring(0, (dirPathStr.length() -1));
-        		        fileDetails = getDirectoryListing(tempDir.substring(0, (tempDir.lastIndexOf("/")+1)), credential);
-        			}
-        		}else{        		   
-        		   fileDetails = getDirectoryListing(dirPathStr+dirNameStr+"/", credential);
-        		}
-        	}
+        } else if (job.getOutputDir() != null) {
+	        List<S3ObjectSummary> fileSummary = new ArrayList<S3ObjectSummary>();
+	        AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
+	        logger.debug("AWS creds: " + credentials);
+	        AmazonS3 s3  = new AmazonS3Client(credentials);
+	        List<Bucket> buckets = s3.listBuckets();
+	        
+	        logger.info("job output dir: '" + job.getOutputDir() + "'");
+	        
+	        for (Bucket bucket : buckets) {
+	        	if (bucket.getName().equals(GridSubmitController.S3_BUCKET_NAME)) {
+		        	ObjectListing objects = s3.listObjects(bucket.getName(), job.getOutputDir());
+		        	fileSummary = objects.getObjectSummaries();
+		        	FileInformation[] fileDetails = new FileInformation[fileSummary.size()];
+		        	
+		        	int i = 0;
+		        	// get file information from s3 object summaries
+		        	for (S3ObjectSummary sum : fileSummary) {
+		        		fileDetails[i++] = new FileInformation(sum.getKey(), sum.getSize());
+		        		totalItems++;
+		        	}
+		        	
+		        	logger.info(totalItems + " job files located");
+		        	mav.addObject("files", fileDetails);
+	        	}
+	        }
         }
-        mav.addObject("files", fileDetails);
+        
     	return mav;
     }
     
@@ -497,6 +436,7 @@ public class JobListController {
 
         String jobIdStr = request.getParameter("jobId");
         String fileName = request.getParameter("filename");
+        String key = request.getParameter("key");
         GeodesyJob job = null;
         String errorString = null;
 
@@ -510,33 +450,41 @@ public class JobListController {
         }
 
         if (job != null && fileName != null) {
-            logger.debug("Download "+fileName+" of job with ID "+jobIdStr+".");
-            File f = new File(job.getOutputDir()+File.separator+fileName);
-            if (!f.canRead()) {
-                logger.error("File "+f.getPath()+" not readable!");
-                errorString = new String("File could not be read.");
-            } else {
-                response.setContentType("application/octet-stream");
+        	
+        	logger.debug("Download " + key);
+        	AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
+	        AmazonS3 s3  = new AmazonS3Client(credentials);
+        	S3Object s3obj = s3.getObject(GridSubmitController.S3_BUCKET_NAME, key);
+       		InputStream is = s3obj.getObjectContent();
+       			
+       		if (is != null) {
+       			response.setContentType("application/octet-stream");
                 response.setHeader("Content-Disposition",
-                        "attachment; filename=\""+fileName+"\"");
-
-                try {
-                    byte[] buffer = new byte[16384];
-                    int count = 0;
-                    OutputStream out = response.getOutputStream();
-                    FileInputStream fin = new FileInputStream(f);
-                    while ((count = fin.read(buffer)) != -1) {
-                        out.write(buffer, 0, count);
-                    }
-                    out.flush();
-                    return null;
-
-                } catch (IOException e) {
-                    errorString = new String("Could not send file: " +
+                        "attachment; filename=\""+key+"\"");
+                
+       		    try {
+       		    	OutputStream out = response.getOutputStream();
+       		        int n;
+       		        byte[] buffer = new byte[1024];
+       		     
+       		        while ((n = is.read(buffer)) != -1) {
+       		        	out.write(buffer, 0, n);
+       		        }
+       		        
+       		        out.flush();
+       		        return null;
+       		        
+       		    } catch(IOException e) {
+       		    	errorString = new String("Could not send file: " +
                             e.getMessage());
                     logger.error(errorString);
-                }
-            }
+       		    } finally {
+       		    	IOUtils.closeQuietly(is);
+       		    }
+       		}
+       		else{
+       			System.out.println("inputstream is null");
+       		}
         }
 
         // We only end up here in case of an error so return a suitable message
@@ -573,6 +521,7 @@ public class JobListController {
 
         String jobIdStr = request.getParameter("jobId");
         String filesParam = request.getParameter("files");
+        logger.debug("filesParam: " + filesParam);
         GeodesyJob job = null;
         String errorString = null;
 
@@ -586,35 +535,34 @@ public class JobListController {
         }
 
         if (job != null && filesParam != null) {
-            String[] fileNames = filesParam.split(",");
-            logger.debug("Archiving " + fileNames.length + " file(s) of job " +
+            String[] fileKeys = filesParam.split(",");
+            logger.debug("Archiving " + fileKeys.length + " file(s) of job " +
                     jobIdStr);
 
             response.setContentType("application/zip");
             response.setHeader("Content-Disposition",
                     "attachment; filename=\"jobfiles.zip\"");
+            
+            AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
+	        AmazonS3 s3  = new AmazonS3Client(credentials);
 
             try {
                 boolean readOneOrMoreFiles = false;
                 ZipOutputStream zout = new ZipOutputStream(
                         response.getOutputStream());
-                for (String fileName : fileNames) {
-                    File f = new File(job.getOutputDir()+File.separator+fileName);
-                    if (!f.canRead()) {
-                        // if a file could not be read we go ahead and try the
-                        // next one.
-                        logger.error("File "+f.getPath()+" not readable!");
-                    } else {
-                        byte[] buffer = new byte[16384];
-                        int count = 0;
-                        zout.putNextEntry(new ZipEntry(fileName));
-                        FileInputStream fin = new FileInputStream(f);
-                        while ((count = fin.read(buffer)) != -1) {
-                            zout.write(buffer, 0, count);
-                        }
-                        zout.closeEntry();
-                        readOneOrMoreFiles = true;
+                for (String fileKey : fileKeys) {
+                	
+                	S3Object s3obj = s3.getObject(GridSubmitController.S3_BUCKET_NAME, fileKey);
+               		InputStream is = s3obj.getObjectContent();
+                    
+                    byte[] buffer = new byte[16384];
+                    int count = 0;
+                    zout.putNextEntry(new ZipEntry(fileKey));
+                    while ((count = is.read(buffer)) != -1) {
+                        zout.write(buffer, 0, count);
                     }
+                    zout.closeEntry();
+                    readOneOrMoreFiles = true;
                 }
                 if (readOneOrMoreFiles) {
                     zout.finish();
@@ -737,22 +685,10 @@ public class JobListController {
                             j.setStatus(newState);
                             jobManager.saveJob(j);
                         }else if(newState == null){ 
-                        	if (directoryExist(j.getOutputDir(), credential)){
-                                // job might have finished but status cannot be
-                                // retrieved anymore -> a good heuristics is to check
-                                // if the job files have been staged out and assume
-                                // success if that is the case.
-                                j.setStatus("Done");
-                                
-                                jobManager.saveJob(j);                        	   
-                            }else{
                             	j.setStatus("Failed");
                                 jobManager.saveJob(j);
-                            }                            
                         }
                     }
-                    String output = j.getOutputDir().substring(j.getOutputDir().indexOf("grid-auscope"), j.getOutputDir().length());
-                    j.setOutputLocation("http://files.ivec.org/"+output);
                 }
             }
             mav.addObject("jobs", seriesJobs);
@@ -761,193 +697,5 @@ public class JobListController {
         logger.debug("Returning series job list");
         return mav;
     }
-
-    /**
-     * Re-submits a single job.
-     *
-     * @param request The servlet request including a jobId parameter
-     * @param response The servlet response
-     *
-     * @return The scriptbuilder view prepared to resubmit the job or the
-     *         joblist view with an error parameter if the job was not found.
-     */
-    @RequestMapping("/resubmitJob.do")
-    public ModelAndView resubmitJob(HttpServletRequest request,
-                                    HttpServletResponse response) {
-
-        String jobIdStr = request.getParameter("jobId");
-        GeodesyJob job = null;
-
-        if (jobIdStr != null) {
-            try {
-                int jobId = Integer.parseInt(jobIdStr);
-                job = jobManager.getJobById(jobId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing job ID!");
-            }
-        } else {
-            logger.warn("No job ID specified!");
-        }
-
-        if (job == null) {
-            final String errorString = "Could not retrieve job details!";
-            logger.error(errorString);
-            return new ModelAndView("joblist", "error", errorString);
-        }
-
-        logger.info("Re-submitting job " + jobIdStr + ".");
-        request.getSession().setAttribute("resubmitJob", jobIdStr);
-        return useScript(request, response);
-    }
-
-    /**
-     * Allows the user to edit a copy of an input script from a previous job
-     * and use it for a new job.
-     *
-     * @param request The servlet request including a jobId parameter
-     * @param response The servlet response
-     *
-     * @return The scriptbuilder model and view for editing the script or
-     *         the joblist model and view with an error parameter if the job
-     *         or file was not found.
-     */
-    @RequestMapping("/useScript.do")
-    public ModelAndView useScript(HttpServletRequest request,
-                                  HttpServletResponse response) {
-
-        String jobIdStr = request.getParameter("jobId");
-
-        GeodesyJob job = null;
-        String errorString = null;
-        String scriptFileName = null;
-        File sourceFile = null;
-
-        if (jobIdStr != null) {
-            try {
-                int jobId = Integer.parseInt(jobIdStr);
-                job = jobManager.getJobById(jobId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing job ID!");
-            }
-        } else {
-            logger.warn("No job ID specified!");
-        }
-
-        if (job == null) {
-            errorString = new String("Could not access the job!");
-            logger.error(errorString);
-        } else {
-            scriptFileName = job.getScriptFile();
-            sourceFile = new File(
-                    job.getOutputDir()+File.separator+scriptFileName);
-            if (!sourceFile.canRead()) {
-                errorString = new String("Script file could not be read.");
-                logger.error("File "+sourceFile.getPath()+" not readable!");
-            }
-        }
-
-        if (errorString == null) {
-            logger.debug("Copying script file of job " + jobIdStr + " to temp.");
-            String tempDir = System.getProperty("java.io.tmpdir");
-            File tempScript = new File(tempDir+File.separator+scriptFileName);
-            boolean success = Util.copyFile(sourceFile, tempScript);
-            if (success) {
-                tempScript.deleteOnExit();
-            } else {
-                errorString = new String("Script file could not be read.");
-                logger.error(errorString);
-            }
-        }
-
-        if (errorString != null) {
-            request.getSession().removeAttribute("resubmitJob");
-            return new ModelAndView("joblist", "error", errorString);
-        }
-
-        request.getSession().setAttribute("scriptFile", scriptFileName);
-        return new ModelAndView(
-                new RedirectView("/scriptbuilder.html", true, false, false));
-    }
-    /**
-     * This method using GridFTP Client returns directory list of stageOut directory 
-     * and sub directories.
-     * @param fullDirname
-     * @param credential
-     * @return
-     */
-	private FileInformation[] getDirectoryListing(String fullDirname, Object credential){
-		GridFTPClient gridStore = null;
-		FileInformation[] fileDetails = new FileInformation[0];
-		try {
-			gridStore = new GridFTPClient(gridAccess.getRepoHostName(), gridAccess.getRepoHostFTPPort());		
-			gridStore.authenticate((GSSCredential)credential); //authenticating
-			gridStore.setDataChannelAuthentication(DataChannelAuthentication.SELF);
-			gridStore.setDataChannelProtection(GridFTPSession.PROTECTION_SAFE);
-			logger.debug("Change to Grid StageOut dir:"+fullDirname);
-			gridStore.changeDir(fullDirname);
-			logger.debug("List files in StageOut dir:"+gridStore.getCurrentDir());
-			gridStore.setType(GridFTPSession.TYPE_ASCII);
-			gridStore.setPassive();
-			gridStore.setLocalActive();
-			
-			Vector list = gridStore.list("*");
-
-			if (list != null && !(list.isEmpty())) {
-				fileDetails = new FileInformation[list.size()];
-				for (int i = list.size() - 1; i >= 0; i--) {
-					FileInfo fInfo = (FileInfo) list.get(i);
-		            fileDetails[i] = new FileInformation(
-		            		fInfo.getName(), fInfo.getSize(), fullDirname, fInfo.isDirectory());
-				}                    
-			} 
-		} catch (ServerException e) {
-			logger.error("GridFTP ServerException: " + e.getMessage());
-		} catch (IOException e) {
-			logger.error("GridFTP IOException: " + e.getMessage());
-		} catch (Exception e) {
-			logger.error("GridFTP Exception: " + e.getMessage());
-		}
-		finally{
-			try{
-				if(gridStore != null)
-					gridStore.close();
-			}catch (Exception e) {
-				logger.error("GridFTP Exception: " + e.getMessage());
-			}
-		}
-		return fileDetails;
-	}
-	
-	private boolean directoryExist(String fullDirname, Object credential){
-		GridFTPClient gridStore = null;
-		boolean rtnValue = true;
-		try {
-			gridStore = new GridFTPClient(gridAccess.getRepoHostName(), gridAccess.getRepoHostFTPPort());		
-			gridStore.authenticate((GSSCredential)credential); //authenticating
-			gridStore.setDataChannelAuthentication(DataChannelAuthentication.SELF);
-			gridStore.setDataChannelProtection(GridFTPSession.PROTECTION_SAFE);
-			logger.debug("Change to Grid StageOut dir:"+fullDirname);
-			gridStore.changeDir(fullDirname);
-			
-		} catch (ServerException e) {
-			logger.error("GridFTP ServerException: " + e.getMessage());
-			rtnValue = false;
-		} catch (IOException e) {
-			logger.error("GridFTP IOException: " + e.getMessage());
-			rtnValue = false;
-		} catch (Exception e) {
-			logger.error("GridFTP Exception: " + e.getMessage());
-			rtnValue = false;
-		}
-		finally{
-			try{
-				if(gridStore != null)
-					gridStore.close();
-			}catch (Exception e) {
-				logger.error("GridFTP Exception: " + e.getMessage());
-			}
-		}
-		return rtnValue;		
-	}
 }
 

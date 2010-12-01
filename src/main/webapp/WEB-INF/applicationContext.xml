@@ -62,14 +62,7 @@
    </bean>
     
    <bean id="gridAccess" class="org.auscope.portal.server.gridjob.GridAccessController">
-        <property name="gridFtpServer" value="${gridftp.server}"/>
-        <property name="gridFtpStageInDir" value="${gridftp.stageInDir}"/>
-        <property name="gridFtpStageOutDir" value="${gridftp.stageOutDir}"/>
-        <property name="localGridFtpServer" value="${gridftp.localServer}"/>
-        <property name="localGridFtpStageInDir" value="${gridftp.localStageInDir}"/>
-        <property name="localGridFtpStageOutDir" value="${gridftp.localStageOutDir}"/>
-        <property name="repoHostName" value="${grid.repoHostName}"/>
-        <property name="repoHostFTPPort" value="${grid.repoHostFTPPort}"/>
+        <property name="localGridStageInDir" value="${grid.localStageInDir}"/>
     </bean>
     
     <bean id="geodesyJobManager" class="org.auscope.portal.server.gridjob.GeodesyJobManager">
@@ -101,6 +94,5 @@
     
     <bean id="multipartResolver"
         class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <property name="maxUploadSize" value="${fileupload.maxFileSize}"/>
    </bean>
 </beans>

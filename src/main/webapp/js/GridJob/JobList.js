@@ -236,23 +236,12 @@ JobList.querySeries = function(user, name, desc) {
 }
 
 JobList.register = function() {
-	//var jobData = jobGrid.getSelectionModel().getSelected().data;
 	var jobId = Ext.getCmp('job-grid').getSelectionModel().getSelected().data.id;
     Ext.Ajax.request({
         url: 'insertRecord.do',
         success: JobList.onRegisterResponse,
         failure: JobList.onRequestFailure, 
         params: {'jobId': jobId }
-    });
-}
-
-JobList.retrieveFiles = function(jobId) {
-    Ext.Ajax.request({
-        url: 'retrieveJobFiles.do',
-        success: JobList.onRetrieveFilesResponse,
-        failure: JobList.onRequestFailure, 
-        params: {  
-    	          'jobId': jobId }
     });
 }
 
@@ -347,25 +336,17 @@ JobList.deleteSeriesJobs = function(seriesId) {
 }
 
 // downloads given file from a specified job
-JobList.downloadFile = function(job, file) {
-    window.location =  "downloadFile.do?jobId="+job+"&filename="+file;
+JobList.downloadFile = function(job, file, key) {
+    window.location =  "downloadFile.do?jobId="+job+"&filename="+file+"&key="+key;
 }
 
 // downloads a ZIP file containing given files of given job
 JobList.downloadAsZip = function(job, files) {
-    var fparam = files[0].data.name;
+    var fparam = files[0].data.s3Key;
     for (var i=1; i<files.length; i++) {
-        fparam += ','+files[i].data.name;
+        fparam += ','+files[i].data.s3Key;
     }
     window.location = "downloadAsZip.do?jobId="+job+"&files="+fparam;
-}
-
-JobList.resubmitJob = function(job) {
-	window.location = "resubmitJob.do?jobId="+job;
-}
-
-JobList.useScript = function(job, file) {
-	window.location = "useScript.do?jobId="+job;
 }
 
 JobList.showQueryDialog = function() {
@@ -458,7 +439,8 @@ JobList.initialize = function() {
             { name: 'status', type: 'string'},
             { name: 'registered', type: 'string'},
             { name: 'outputLocation', type: 'string'},
-            { name: 'submitDate', type: 'date', dateFormat: 'Ymd_His' }
+            { name: 'submitDate', type: 'date', dateFormat: 'Ymd_His' },
+            { name: 'awsKey', type: 'string'},
         ],
         listeners: {
             'beforeload': JobList.showProgressDlg,
@@ -473,9 +455,10 @@ JobList.initialize = function() {
         sortInfo: { field: 'name', direction: 'ASC' },
         fields: [
             { name: 'name', type: 'string' },
-            { name: 'size', type: 'int' },
+            { name: 'size', type: 'long' },
+            { name: 's3Key', type: 'string' }/*,
             { name: 'parentPath', type: 'string' },
-            { name: 'directoryFlag', type: 'bool' }
+            { name: 'directoryFlag', type: 'bool' }*/
         ],
         listeners: {
             'beforeload': JobList.showProgressDlg,
@@ -570,14 +553,6 @@ JobList.initialize = function() {
         }
     });
     
-    var resubmitJobAction = new Ext.Action({
-        text: 'Re-submit Job',
-        handler: function() {
-            var jobId = jobGrid.getSelectionModel().getSelected().data.id;
-            JobList.resubmitJob(jobId);
-        }
-    });
-
     var jobGrid = new Ext.grid.GridPanel({
         id: 'job-grid',
         title: 'Jobs of selected series',
@@ -647,7 +622,8 @@ JobList.initialize = function() {
         handler: function() {
             var jobData = jobGrid.getSelectionModel().getSelected().data;
             var fileName = fileGrid.getSelectionModel().getSelected().data.name;
-            JobList.downloadFile(jobData.id, fileName);
+            var key = fileGrid.getSelectionModel().getSelected().data.s3Key;
+            JobList.downloadFile(jobData.id, fileName, key);
         }
     });
     var downloadZipAction = new Ext.Action({
@@ -658,22 +634,6 @@ JobList.initialize = function() {
             var jobData = jobGrid.getSelectionModel().getSelected().data;
             var files = fileGrid.getSelectionModel().getSelections();
             JobList.downloadAsZip(jobData.id, files);
-        }
-    });
-    var useScriptAction = new Ext.Action({
-        text: 'Edit and use script',
-        iconCls: 'grid-icon',
-        handler: function() {
-            var jobData = jobGrid.getSelectionModel().getSelected().data;
-            JobList.useScript(jobData.id);
-        }
-    });
-    var retrieveFilesAction = new Ext.Action({
-        text: 'Retrieve latest files',
-        iconCls: 'grid-icon',
-        handler: function() {
-            var jobData = jobGrid.getSelectionModel().getSelected().data;
-            JobList.retrieveFiles(jobData.id);
         }
     });
     
@@ -707,7 +667,7 @@ JobList.initialize = function() {
         tbar: [{
             text: 'Actions',
             iconCls: 'folder-icon',
-            menu: [ downloadAction, downloadZipAction, retrieveFilesAction]
+            menu: [ downloadAction, downloadZipAction/*, retrieveFilesAction*/]
         }]
     });
 
