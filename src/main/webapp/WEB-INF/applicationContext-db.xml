@@ -6,7 +6,7 @@
       
    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
       <property name="driverClassName" value="${jdbc.driverClass}"/>
-      <property name="url" value="${TIN-YF.jdbc.url}"/>
+      <property name="url" value="${HOST.jdbc.url}"/>
       <property name="username" value="${env.jdbc.user}"/>
       <property name="password" value="${env.jdbc.password}"/>
    </bean>
