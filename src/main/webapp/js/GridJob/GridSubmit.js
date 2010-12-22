@@ -238,7 +238,7 @@ GridSubmit.onJobStatusResponse = function(response, request) {
 	statusField.setText(resp.data);
 	
 	//This means file transfer complete.
-	if(resp.jobStatus == "Done")
+	if(resp.jobStatus == "Running")
 	{	
 		GridSubmit.confirmUnloading = false;
 		runner.stop(task);

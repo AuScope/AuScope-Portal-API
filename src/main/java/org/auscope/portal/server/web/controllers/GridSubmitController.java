@@ -25,6 +25,7 @@ import net.sf.json.JSONArray;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.aws.InstanceManager;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
@@ -42,6 +43,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 
@@ -65,6 +68,8 @@ public class GridSubmitController {
     private GridAccessController gridAccess;
     @Autowired
     private GeodesyJobManager jobManager;
+    @Autowired
+    private InstanceManager instanceMgr;
 
     public static final String S3_BUCKET_NAME = "vegl-portal";
     public static final String TABLE_DIR = "tables";
@@ -606,7 +611,7 @@ public class GridSubmitController {
     	
     	//Used to store Job Submission status, because there will be another request checking this.
 		GridTransferStatus gridStatus = new GridTransferStatus();
-		gridStatus.jobSubmissionStatus = JobSubmissionStatus.Running;
+		gridStatus.jobSubmissionStatus = JobSubmissionStatus.Pending;
 		request.getSession().setAttribute("gridStatus", gridStatus);
     	
     	// if seriesName parameter was provided then we create a new series
@@ -654,10 +659,11 @@ public class GridSubmitController {
             String dateFmt = sdf.format(new Date());
             
             logger.info("Submitting job with name " + job.getName());
+            AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
+            
 	    	// copy files to Amazon storage for processing 
 	        try {
-	        	AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-
+	        	
 				// get job files from local directory
 				String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
 				logger.info("uploading files from " + localJobInputDir + GridSubmitController.TABLE_DIR);
@@ -666,7 +672,7 @@ public class GridSubmitController {
 				
 				// create the base S3 object storage key path. The final key will be this with
 				// the filename appended.
-				String keyPath = user + "-" + job.getName() + "-" + dateFmt + File.separator;
+				String keyPath = user + "-" + job.getName() + "-" + dateFmt + "/";
 				job.setOutputDir(keyPath);
 				
 				// copy job files to Amazon storage service. 
@@ -678,7 +684,6 @@ public class GridSubmitController {
 					upload.waitForCompletion();
 					logger.info(keyPath + file.getName() +" uploaded to " + S3_BUCKET_NAME + "S3 bucket");
 				}
-				
 			} catch (AmazonClientException amazonClientException) {
 	        	logger.error(GridSubmitController.S3_FILE_COPY_ERROR);
 	        	gridStatus.currentStatusMsg = GridSubmitController.S3_FILE_COPY_ERROR;
@@ -693,16 +698,37 @@ public class GridSubmitController {
 			}
 	        
 	        if (success) {
-	        	job.setStatus("Done");
                 job.setSubmitDate(dateFmt);
+                job.setStatus("Active");
                 jobSupplementInfo(job);
                 jobManager.saveJob(job);
                 request.getSession().removeAttribute("jobInputDir");
                 request.getSession().removeAttribute("localJobInputDir");
                 
-                //This means job submission to the grid done.
-   				gridStatus.jobSubmissionStatus = JobSubmissionStatus.Done;
+   				gridStatus.jobSubmissionStatus = JobSubmissionStatus.Running;
    				gridStatus.currentStatusMsg = GridSubmitController.TRANSFER_COMPLETE;
+                
+                if (instanceMgr.getEC2() == null) {
+                	AmazonEC2 ec2 = new AmazonEC2Client(credentials);
+                	instanceMgr.setEC2(ec2);
+                }
+
+                // Kick off the EC2 processing. 
+                // Add the job to the InstanceManager job list. Check if an AMI is currently
+                // running and if so the job will be run on it. If not we launch a new AMI
+                // via the InstanceManager in a new thread so processing can carry on behind 
+                // the scenes.
+                instanceMgr.addJobToList(job);
+                if (!instanceMgr.isInstanceStarted()) {
+                	logger.info("Instance not running. Starting new instance");
+                	instanceMgr.setInstanceStarted(true);
+                	instanceMgr.setImageId("ami-1649bf7f");
+                	instanceMgr.setInstanceType("m1.small");
+                	new Thread(instanceMgr).start();
+                }
+                else {
+                	logger.info("Instance already running. Adding job to current instance.");
+                }
 	        } else {
 	        	gridStatus.jobSubmissionStatus = JobSubmissionStatus.Failed;
    				gridStatus.currentStatusMsg = GridSubmitController.INTERNAL_ERROR;
@@ -899,12 +925,12 @@ public class GridSubmitController {
 		public String gridFullURL = "";
 		public String gridServer = "";
 		public String currentStatusMsg = "";
-		public JobSubmissionStatus jobSubmissionStatus = JobSubmissionStatus.Running;				
+		public JobSubmissionStatus jobSubmissionStatus = JobSubmissionStatus.Pending;				
 	}
 	
 
 	/**
 	 * Enum to indicate over all job submission status.
 	 */
-	public enum JobSubmissionStatus{Running,Done,Failed }
+	public enum JobSubmissionStatus{Pending,Running,Done,Failed }
 }

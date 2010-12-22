@@ -669,28 +669,6 @@ public class JobListController {
         }
 
         if (seriesJobs != null) {
-            // check if current user is the owner of the series and update
-            // the status of the jobs if so
-            GeodesySeries s = jobManager.getSeriesById(seriesId);
-            if (request.getRemoteUser().equals(s.getUser())) {
-                logger.debug("Updating status of jobs attached to series " +
-                        seriesIdStr + ".");
-                for (GeodesyJob j : seriesJobs) {
-                    String state = j.getStatus();
-                    if (!state.equals("Done") && !state.equals("Failed") &&
-                            !state.equals("Cancelled")) {
-                        String newState = gridAccess.retrieveJobStatus(
-                                j.getReference(), credential);
-                        if (newState != null && !state.equals(newState)) {
-                            j.setStatus(newState);
-                            jobManager.saveJob(j);
-                        }else if(newState == null){ 
-                            	j.setStatus("Failed");
-                                jobManager.saveJob(j);
-                        }
-                    }
-                }
-            }
             mav.addObject("jobs", seriesJobs);
         }
 
