@@ -354,14 +354,13 @@ public class WCSController {
     }
     
     /**
-     * Gets the subset of the user drawn data, buffer and mesh bounding boxes in GeoTIFF format 
+     * Gets the subset of the user drawn data and buffer bounding boxes in GeoTIFF format 
      * and stores them as session attributes.
      * 
      * @param serviceUrl The remote URL to query
      * @param layerName The coverage layername to request
      * @param dataCoords The lat/lon co-ordinates of the user drawn data bounding box
      * @param bufferCoords The lat/lon co-ordinates of the user drawn buffer bounding box
-     * @param meshCoords The lat/lon co-ordinates of the user drawn mesh bounding box
      * @param format The subset file output format 
      * @param request The HttpServletRequest
      * @param response The HttpServletResponse
@@ -372,7 +371,6 @@ public class WCSController {
     public ModelAndView sendSubsetsToGrid(@RequestParam("layerName") final String layerName,
                                  @RequestParam("dataCoords") final String dataCoords,
                                  @RequestParam("bufferCoords") final String bufferCoords,
-                                 @RequestParam("meshCoords") final String meshCoords,
                                  @RequestParam("format") final String format,
                                  HttpServletRequest request,
                                  HttpServletResponse response) throws Exception {
@@ -383,12 +381,10 @@ public class WCSController {
     	// get coverage subsets
         InputStream isData = getCoverageSubset(dataCoords, request, serviceUrl, layerName, format);
         InputStream isBuffer = getCoverageSubset(bufferCoords, request, serviceUrl, layerName, format);
-        InputStream isMesh = getCoverageSubset(meshCoords, request, serviceUrl, layerName, format);
         
         // set subsets as session attributes    	
     	request.getSession().setAttribute("dataSubset", isData);
     	request.getSession().setAttribute("bufferSubset", isBuffer);
-    	request.getSession().setAttribute("meshSubset", isMesh);
     	request.getSession().setAttribute("subsetFormat", format);
         
         mav.addObject("success", true);

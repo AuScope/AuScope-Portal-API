@@ -804,7 +804,6 @@ public class GridSubmitController {
         String format = (String)request.getSession().getAttribute("subsetFormat");
         addSubsetFileToGridJob("dataSubset", "data"+ generateSubsetFileExtension(format), request);
         addSubsetFileToGridJob("bufferSubset", "buffer"+ generateSubsetFileExtension(format), request);
-        addSubsetFileToGridJob("meshSubset", "mesh"+ generateSubsetFileExtension(format), request);
 
         logger.debug("Creating new GeodesyJob instance");
         GeodesyJob job = new GeodesyJob(site, name, version, arguments, queue,

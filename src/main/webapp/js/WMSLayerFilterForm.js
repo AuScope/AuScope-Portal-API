@@ -9,7 +9,6 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
 	map.addControl(new MStatusControl({position:pos}));
 	
 	// create a drag control for each bounding box
-	var meshBbox = new MPolyDragControl({map:map,type:'rectangle',label:'Mesh'});
 	var bufferBbox = new MPolyDragControl({map:map,type:'rectangle',label:'Buffer'});
 	var dataBbox = new MPolyDragControl({map:map,type:'rectangle',label:'Data'});
 	
@@ -25,7 +24,6 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
         text 	: 'Draw Bounding Box',
         width	: 110,
         handler : function() {
-	    	meshBbox.enableTransMarker();
 			bufferBbox.enableTransMarker();
 			dataBbox.enableTransMarker();
 			
@@ -40,7 +38,6 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
         width	: 110,
         hidden	: true,
         handler : function() {
-    		meshBbox.reset();
     		bufferBbox.reset();
     		dataBbox.reset();
 			
@@ -55,9 +52,8 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
         disabled: true,
         handler: function() {
         	
-        	if (dataBbox.getParams() == null || bufferBbox.getParams() == null 
-        			|| meshBbox.getParams() == null) {
-        		Ext.Msg.alert("Error", 'You must draw the data, buffer and mesh bounds ' + 
+        	if (dataBbox.getParams() == null || bufferBbox.getParams() == null) {
+        		Ext.Msg.alert("Error", 'You must draw the data and buffer bounds ' + 
         				'before submitting to the grid.');
         	}
         	else {
@@ -69,7 +65,6 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
 	        			layerName  		: activeLayerRecord.getLayerName(),
 	        			dataCoords 		: dataBbox.getParams(),
 	        			bufferCoords	: bufferBbox.getParams(),
-	        			meshCoords		: meshBbox.getParams(),
 	        			format			: fileTypeCombo.getValue()
 	            	}
 	        	});
