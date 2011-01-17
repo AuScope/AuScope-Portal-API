@@ -11,13 +11,7 @@
     <bean id="knownTypes" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-                <ref bean="knownTypeMine" />
-                <ref bean="knownTypeMineralOccurrence" />
-                <ref bean="knownTypeMiningActivity" />
-                <ref bean="knownTypeBorehole" />
-                <ref bean="knownTypeGeodesy" />
-                <ref bean="knownTypeReports" />
-                <ref bean="knownTypeGeotransects" />
+                <ref bean="knownTypeBouguerGeodetic" />
             </list>
         </constructor-arg>
     </bean>
@@ -26,7 +20,6 @@
         <constructor-arg>
             <list>
                 <ref bean="cswAuscopeProduction" />
-                <ref bean="cswMDUProduction" />
             </list>
         </constructor-arg>
     </bean>       
