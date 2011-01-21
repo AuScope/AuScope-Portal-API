@@ -16,7 +16,6 @@ function GenericWCSInfoWindow (map, overlay, serviceUrl, layerName, cswRecord) {
     this.serviceUrl = serviceUrl;
     this.layerName = layerName;
     this.cswRecord = cswRecord;
-    this.wmsURLs = wmsURLs;
 }
 
 //Instance variables
@@ -25,7 +24,6 @@ GenericWCSInfoWindow.prototype.overlay = null;
 GenericWCSInfoWindow.prototype.serviceUrl = null;
 GenericWCSInfoWindow.prototype.layerName = null;
 GenericWCSInfoWindow.prototype.cswRecord = null;
-GenericWCSInfoWindow.prototype.wmsURLs = null;
 
 //gets the parameter string to submit to a controller 
 function getWCSInfoWindowDownloadParameters() {
