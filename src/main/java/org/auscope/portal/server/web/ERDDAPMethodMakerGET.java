@@ -27,7 +27,7 @@ public class ERDDAPMethodMakerGET implements
         String erddapDimensions = "%5B("+ bbox.getSouthBoundLatitude() +"):1:("+ bbox.getNorthBoundLatitude() +
 		")%5D%5B("+ bbox.getWestBoundLongitude() +"):1:("+ bbox.getEastBoundLongitude() +")%5D";
 		
-        String uri = serviceUrl + "." + format + "?" + layerName + erddapDimensions;
+        String uri = serviceUrl + layerName + "." + format + "?" + layerName + erddapDimensions;
         
         GetMethod httpMethod = new GetMethod(uri);
         logger.debug(String.format("uri='%1$s'", uri));

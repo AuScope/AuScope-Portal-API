@@ -74,6 +74,12 @@ Ext.extend(ActiveLayersStore, Ext.data.Store, {
 	 */
 	addKnownLayer	: function (knownLayerRecord, cswRecordStore) {
 		var linkedCSWRecords = knownLayerRecord.getLinkedCSWRecords(cswRecordStore);
+		if (knownLayerRecord.getType()=="KnownLayerWMS"){
+			keyIconHtml = '<img width="16" height="16" src="img/key.png">';
+		}
+		else{
+			keyIconHtml = '<img width="16" height="16" src="' + knownLayerRecord.getIconUrl() + '">';
+		}
 		
 		this.internalAddSingleRecord({
 			id			: knownLayerRecord.getId(),
@@ -82,7 +88,7 @@ Ext.extend(ActiveLayersStore, Ext.data.Store, {
 			proxyUrl	: knownLayerRecord.getProxyUrl(),
 			cswRecords	: linkedCSWRecords,
 			iconUrl		: knownLayerRecord.getIconUrl(),
-			keyIconHtml	: '<img width="16" height="16" src="' + knownLayerRecord.getIconUrl() + '">',
+			keyIconHtml	: keyIconHtml,
 			isLoading	: false,
 			layerVisible: true,
 			opacity		: 1,

@@ -19,7 +19,7 @@
     <bean id="cswServiceList" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-                <ref bean="cswAuscopeProduction" />
+                <ref bean="cswVEGLProduction" />
             </list>
         </constructor-arg>
     </bean>       
