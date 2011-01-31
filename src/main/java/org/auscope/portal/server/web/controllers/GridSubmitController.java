@@ -73,7 +73,7 @@ public class GridSubmitController {
 
     public static final String S3_BUCKET_NAME = "vegl-portal";
     public static final String TABLE_DIR = "tables";
-    public static final String PRE_STAGE_IN_TABLE_FILES = "/home/grid-auscope/tables/";
+    public static final String PRE_STAGE_IN_TABLE_FILES = "/home/vegl-portal/tables/";
     public static final String FOR_ALL = "Common";
 
     //Grid File Transfer messages
