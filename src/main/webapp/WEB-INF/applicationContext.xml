@@ -44,6 +44,12 @@
        <constructor-arg name="description" value=""/>
        <constructor-arg name="layerName" value="onshore_only_Bouguer_geodetic"/>
    </bean>
+   
+   <bean id="knownTypeGravAnomalyGeodetic" class="org.auscope.portal.server.web.KnownLayerWMS">
+       <constructor-arg name="title" value="Onshore and Offshore Gravity Anomaly Geodetic"/>
+       <constructor-arg name="description" value=""/>
+       <constructor-arg name="layerName" value="onshore_and_offshore_gravity_anomaly_geodetic"/>
+   </bean>
     
    <bean id="gridAccess" class="org.auscope.portal.server.gridjob.GridAccessController">
         <property name="localGridStageInDir" value="${grid.localStageInDir}"/>
