@@ -370,7 +370,7 @@ public class WCSController {
     @RequestMapping("/sendSubsetsToGrid.do")
     public ModelAndView sendSubsetsToGrid(@RequestParam("layerName") final String layerName,
                                  @RequestParam("dataCoords") final String dataCoords,
-                                 @RequestParam("bufferCoords") final String bufferCoords,
+                                 //@RequestParam("bufferCoords") final String bufferCoords,
                                  @RequestParam("format") final String format,
                                  HttpServletRequest request,
                                  HttpServletResponse response) throws Exception {
@@ -380,11 +380,11 @@ public class WCSController {
     	
     	// get coverage subsets
         InputStream isData = getCoverageSubset(dataCoords, request, serviceUrl, layerName, format);
-        InputStream isBuffer = getCoverageSubset(bufferCoords, request, serviceUrl, layerName, format);
+        //InputStream isBuffer = getCoverageSubset(bufferCoords, request, serviceUrl, layerName, format);
         
         // set subsets as session attributes    	
     	request.getSession().setAttribute("dataSubset", isData);
-    	request.getSession().setAttribute("bufferSubset", isBuffer);
+    	//request.getSession().setAttribute("bufferSubset", isBuffer);
     	request.getSession().setAttribute("subsetFormat", format);
         
         mav.addObject("success", true);

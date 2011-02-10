@@ -10,7 +10,7 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
 	
 	// create a drag control for each bounding box
 	var bufferBbox = new MPolyDragControl({map:map,type:'rectangle',label:'Buffer'});
-	var dataBbox = new MPolyDragControl({map:map,type:'rectangle',label:'Data'});
+	var dataBbox = new MPolyDragControl({map:map,type:'rectangle'});
 	
     var sliderHandler = function(caller, newValue) {
     	var overlayManager = activeLayerRecord.getOverlayManager();
@@ -20,43 +20,65 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
     	overlayManager.updateOpacity(newOpacity);
     };
     
-    var drawBoundsButton = new Ext.Button({  
-        text 	: 'Draw Bounding Box',
-        width	: 110,
-        handler : function() {
-			bufferBbox.enableTransMarker();
+    var freeDrawButton = new Ext.Button({  
+        text 		: 'Enable Free Draw',
+        right		: '5px',
+        handler 	: function() {
 			dataBbox.enableTransMarker();
-			
-			drawBoundsButton.hide();
-    		clearBoundsButton.show();
-    		sendToGridButton.setDisabled(false);
+			freeDrawButton.disable();
+			captureSubsetButton.enable();
     	}
     });
     
-    var clearBoundsButton = new Ext.Button({  
-        text 	: 'Clear Bounding Box',
-        width	: 110,
-        hidden	: true,
+    var drawCoordsButton = new Ext.Button({  
+        text 	: 'Draw Co-ords',
+        width	: 85,
         handler : function() {
-    		bufferBbox.reset();
-    		dataBbox.reset();
-			
-			drawBoundsButton.show();
-			clearBoundsButton.hide();
-			sendToGridButton.setDisabled(true);
+        	
+        	if (neLat.getValue() == '' || neLng.getValue() == '' || swLat.getValue() == '' || swLng.getValue() == '') {
+        		Ext.Msg.alert("Error", 'All lat/long co-ordinates must be entered before drawing.');
+        	}
+        	else {
+            	dataBbox.drawRectangle(neLat.getValue(), neLng.getValue(), swLat.getValue(), swLng.getValue());
+            	freeDrawButton.disable();
+            	captureSubsetButton.enable();
+        	}
     	}
     });
     
-    var sendToGridButton = new Ext.Button({  
-        text 	: 'Send to Grid',
+    // remove any bounding box and clear lat/long entries
+    var resetButton = new Ext.Button({  
+        text 	: 'Reset',
+        handler : function() {
+    		dataBbox.reset();
+    		neLat.setValue('');
+    		neLng.setValue('');
+    		swLat.setValue('');
+    		swLng.setValue('');
+			
+    		freeDrawButton.enable();
+    		captureSubsetButton.disable();
+    	}
+    });
+    
+    var captureSubsetButton = new Ext.Button({  
+        text 	: 'Capture Subset',
+        width	: 85,
+        bodyStyle	: 'margin:5px 0 0 0',
         disabled: true,
         handler: function() {
         	
-        	if (dataBbox.getParams() == null || bufferBbox.getParams() == null) {
-        		Ext.Msg.alert("Error", 'You must draw the data and buffer bounds ' + 
-        				'before submitting to the grid.');
-        	}
+        	if (dataBbox.getParams() == null) {
+        		Ext.Msg.alert("Error", 'You must draw the data bounds before capturing.');
+        	} 
+        	/*else if (bufferBbox.getParams() == null) {
+        		Ext.Msg.alert("Error", 'A buffer amount must be entered before capturing.');
+        	}*/
         	else {
+        		
+        		// set buffer co-ordinates
+        		//calculateBufferCoords(neLat.getValue(), neLng.getValue(), swLat.getValue(), swLng.getValue(), buffer.getValue());
+        		
 	        	Ext.Ajax.request({
 	        		url: 'sendSubsetsToGrid.do' ,
 	        		success: WMSLayerFilterForm.onSendToGridResponse,
@@ -64,13 +86,20 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
 	        		params		: {
 	        			layerName  		: activeLayerRecord.getLayerName(),
 	        			dataCoords 		: dataBbox.getParams(),
-	        			bufferCoords	: bufferBbox.getParams(),
+	        			//bufferCoords	: bufferBbox.getParams(),
 	        			format			: fileTypeCombo.getValue()
 	            	}
 	        	});
         	}
         }
     });
+    
+    // data bounding box lat/lng text fields
+    var neLat = createNumberfield('Lat (NE)', 'neLat');
+    var neLng = createNumberfield('Lon (NE)', 'neLng');
+    var swLat = createNumberfield('Lat (SW)', 'swLat');
+    var swLng = createNumberfield('Lon (SW)', 'swLng');
+    var buffer = createNumberfield('Buffer (km)', 'buffer');
     
     // subset file type selection values
 	var fileTypes =  [
@@ -106,14 +135,13 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
         border      : false,
         autoScroll  : true,
         hideMode    : 'offsets',
-        //width       : '100%',
         labelAlign  : 'right',
         bodyStyle   : 'padding:5px',
         autoHeight:    true,
         layout: 'anchor',
         items:[ {
             xtype      :'fieldset',
-            title      : 'WMS Properties',
+            title      : 'Coverage Subset Controls',
             autoHeight : true,
             items      : [{
                     xtype       : 'slider',
@@ -124,27 +152,31 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
                     listeners   : {changecomplete: sliderHandler}
             },
             	fileTypeCombo,
-            	drawBoundsButton,
-            	clearBoundsButton,
-            	sendToGridButton,
+            	neLat,
+            	neLng,
+            	swLat,
+            	swLng,
+            	//buffer,
             	{
-    				// column layout with 2 columns
+    				// column layout with 3 columns
                     layout:'column',
                     border: false,
-                    bodyStyle:'margin:5px 0 0 0',
                     items:[{
-                        // right column
-                        border: false,
-                        items:[drawBoundsButton,
-                           	clearBoundsButton]
-                    }
-                    ,{
-                        // right column
-                        border: false,
-                    	bodyStyle:'margin-left:5px',
-                        items:[sendToGridButton]
-                    }
-                    ]
+                    	border: false,
+                    	bodyStyle:'margin-right:3px',
+                    	items:[drawCoordsButton]
+                    },{
+                    	border: false,
+                    	bodyStyle:'margin-right:3px',
+                    	items:[freeDrawButton]
+                    },{
+                    	border: false,
+                    	items:[resetButton]
+                    }]
+                },{
+                border: false,
+                bodyStyle:'margin-top:3px',
+                items:[captureSubsetButton]
                 }
             ]
         }]
@@ -156,7 +188,7 @@ WMSLayerFilterForm.onSendToGridResponse = function(response, request) {
     if (resp.error != null) {
         JobList.showError(resp.error);
     } else {
-        Ext.Msg.alert("Success", "The selected coverage subsets have been added as inputs for the grid job.");
+        Ext.Msg.alert("Success", "The selected coverage subsets have been added as inputs for the job.");
     }
 };
 
@@ -164,6 +196,40 @@ WMSLayerFilterForm.onSendToGridResponse = function(response, request) {
 WMSLayerFilterForm.onRequestFailure = function(response, request) {
 	Ext.Msg.alert("Error", 'Could not execute last request. Status: '+
         response.status+' ('+response.statusText+')');
+};
+
+// create a number field
+createNumberfield = function(label, id) {
+	return new Ext.form.NumberField({
+    	width		: 100,
+    	xtype      	: 'numberfield',
+        fieldLabel 	: label,
+        name       	: id,
+        id		 	: id
+    });
+};
+
+// this method is incomplete due to the decision to drop the buffer sub set for now.
+// keeping code in case this decision changed.
+calculateBufferCoords = function(neLat, neLng, swLat, swLng, buffer) {
+	
+	// convert buffer to meters
+	buffer = buffer * 1000;
+	
+	// convert lat/lng to UTM
+	neLatLng = LatLng(neLat,neLng);
+	swLatLng = LatLng(wsLat,swLng);
+	neUTM = neLatLng.toUTMRef();
+	swUTM = swLatLng.toUTMRef();
+	
+	// apply buffer
+	neUTM.easting = neUTM.easting + buffer;
+	neUTM.northing = neUTM.northing + buffer;
+	swUTM.easting = swUTM.easting - buffer;
+	swUTM.northing = swUTM.northing - buffer;
+	
+	// convert back to lat/lng	
+	
 };
 
 Ext.extend(WMSLayerFilterForm, Ext.FormPanel, {

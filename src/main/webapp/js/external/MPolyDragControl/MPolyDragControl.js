@@ -2,14 +2,14 @@
 	styleStr += '<style>';
 	styleStr += '.MDR_labelStyle {background: #000; font: bold 10px verdana; color: #FFF; text-align: left; width: 40px; padding: 2px;}';
 	styleStr += '</style>';
-	document.write(styleStr);
+	//document.write(styleStr);
 
 
 MPolyDragControl = function(MOptions) {
 	MOptions = MOptions ? MOptions : {};
 	this.type = MOptions.type ? MOptions.type : 'rectangle';
 	this.map = MOptions.map ? MOptions.map : null;
-	this.label = MOptions.label ? MOptions.label : null;
+	//this.label = MOptions.label ? MOptions.label : null;
 
 	this.unitDivisor = 2589988.11;
 	this.initialize();
@@ -38,20 +38,17 @@ MPolyDragControl.prototype.initialize = function() {
 	this.polyEditIcon = (new GIcon(baseIcon, this.dragImage));
 	this.transIcon = (new GIcon(baseIcon, this.transImage));
 
-	this.floatingLabel = new ELabel(this.map.getCenter(), 'Label text', 'MDR_labelStyle',new GSize(5,16));
+	/*this.floatingLabel = new ELabel(this.map.getCenter(), 'Label text', 'MDR_labelStyle',new GSize(5,16));
 	this.floatingLabel.hide();
-	this.map.addOverlay(this.floatingLabel); 
+	this.map.addOverlay(this.floatingLabel); */
 
 	this.addMarkers();
-	//this.enableTransMarker();
-
 };
 
 MPolyDragControl.prototype.addMarkers = function() {
 	var self = this.self;
-//	GEvent.addListener(this.map,'click',function(a,b,c){self.mapClick(b)});
 
-	this.dragMarker0 = new GMarker(this.map.getCenter(),{icon:this.transIcon,draggable:true,bouncy:false,dragCrossMove:true});
+	this.dragMarker0 = new GMarker(this.map.getCenter(),{icon:this.polyEditIcon,draggable:true,bouncy:false,dragCrossMove:true});
 	this.map.addOverlay(this.dragMarker0);
 
 	this.mdListener = GEvent.addListener(this.dragMarker0,'mousedown',function(){self.markerMouseDown()});
@@ -64,6 +61,7 @@ MPolyDragControl.prototype.addMarkers = function() {
 	GEvent.addListener(self.dragMarker1,'dragstart',function(){self.dragStart(this)});
 	GEvent.addListener(self.dragMarker1,'drag',function(){self.drag(this)});
 	GEvent.addListener(self.dragMarker1,'dragend',function(){self.dragEnd(this)});
+	this.dragMarker0.hide();
 	this.dragMarker1.hide();
 };
 
@@ -91,8 +89,6 @@ MPolyDragControl.prototype.enableTransMarker = function() {
 	this.movelistener = GEvent.addListener(this.map,'mousemove',function(latlon){
 		self.dragMarker0.setLatLng(latlon);
 	});
-	
-	//this.mdListener = GEvent.addListener(this.dragMarker0,'mousedown',function(){self.markerMouseDown()});
 };
 
 MPolyDragControl.prototype.disableTransMarker = function() { 
@@ -112,13 +108,11 @@ MPolyDragControl.prototype.reset = function() {
 	if (this.dragMarker1) {
 		this.dragMarker1.hide();
 	}
-	if (this.floatingLabel) {
+	/*if (this.floatingLabel) {
 		this.floatingLabel.hide();
-	}
+	}*/
 
 	this.bounds = null;
-	this.disableTransMarker();
-	//this.enableTransMarker();
 	this.mdListener = GEvent.addListener(this.dragMarker0,'mousedown',function(){self.markerMouseDown()});
 
 };
@@ -184,6 +178,55 @@ MPolyDragControl.prototype.updateRectangle = function() {
 
 };
 
+MPolyDragControl.prototype.drawRectangle = function(neLat, neLng, swLat, swLng) {
+	this.enableTransMarker();
+	var self = this.self;
+	var latlon0 = new GLatLng(neLat, neLng);
+	var latlon1 = new GLatLng(swLat, swLng);
+
+	self.bounds = null;
+	self.bounds = new GLatLngBounds();
+
+	if (latlon0.lat() <= latlon1.lat() && latlon0.lng() <= latlon1.lng()) {
+		var p1 = latlon0; // SW
+		var p2 = latlon1; // NE
+	}
+	else if (latlon0.lat() <= latlon1.lat() && latlon0.lng() >= latlon1.lng()) {
+		var p1 = latlon0; // SE
+		var p2 = latlon1; // NW
+	}
+	else if (latlon0.lat() >= latlon1.lat() && latlon0.lng() >= latlon1.lng()) {
+		var p1 = latlon0; // NE
+		var p2 = latlon1; // SW
+	}
+	else if (latlon0.lat() >= latlon1.lat() && latlon0.lng() <= latlon1.lng()) {
+		var p1 = latlon0; // NW
+		var p2 = latlon1; // SE
+	}
+
+	self.bounds.extend(p1);
+	self.bounds.extend(p2);
+
+	var p1 = this.bounds.getSouthWest();
+	var p2 = new GLatLng(this.bounds.getNorthEast().lat(),this.bounds.getSouthWest().lng());
+	var p3 = this.bounds.getNorthEast();
+	var p4 = new GLatLng(this.bounds.getSouthWest().lat(),this.bounds.getNorthEast().lng());
+	var points = Array(p1,p2,p3,p4,p1);
+
+	self.drawPoly(points);
+	
+	// set drag marker positions
+	this.dragMarker0.setLatLng(p4);
+	this.dragMarker0.show();
+	this.dragMarker0.setImage(this.dragImage);
+	this.dragMarker1.setLatLng(p2);
+	this.dragMarker1.show();
+	
+	// set label position
+	//this.floatingLabel.setPoint(p2);
+	this.disableTransMarker();
+};
+
 MPolyDragControl.prototype.updateCircle = function() {
 
 	this.circleCenter = this.dragMarker0.getLatLng();
@@ -228,9 +271,9 @@ MPolyDragControl.prototype.drawPoly = function(points) {
 	html += 'Area:&nbsp;' + (this.poly.getArea()/ this.unitDivisor).toFixed(2) + '&nbsp;sq.mi.';
 	
 	
-	this.floatingLabel.setContents(this.label);
+	/*this.floatingLabel.setContents(this.label);
 	this.floatingLabel.setPoint(this.dragMarker1.getLatLng());
-	this.floatingLabel.show();
+	this.floatingLabel.show();*/
 };
 
 MPolyDragControl.prototype.getParams = function() {
