@@ -9,8 +9,8 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
 	map.addControl(new MStatusControl({position:pos}));
 	
 	// create a drag control for each bounding box
-	var bufferBbox = new MPolyDragControl({map:map,type:'rectangle',label:'Buffer'});
-	var dataBbox = new MPolyDragControl({map:map,type:'rectangle'});
+	//var bufferBbox = new MPolyDragControl({map:map,type:'rectangle',label:'Buffer'});
+	var dataBbox = new MPolyDragControl({map:map,type:'rectangle',activeLayerRecord:activeLayerRecord});
 	
     var sliderHandler = function(caller, newValue) {
     	var overlayManager = activeLayerRecord.getOverlayManager();
@@ -76,6 +76,22 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
         	}*/
         	else {
         		
+        		// check if selected region is within the bounds of the coverage layer
+        		var cswRecords = activeLayerRecord.getCSWRecordsWithType('WCS');
+                if (cswRecords.length != 0) {
+                	//Assumption - we only expect 1 WCS
+            		var cswRecord = cswRecords[0];
+            		var bbox = cswRecord.getGeographicElements()[0];
+            		            	
+            		if (bbox.eastBoundLongitude < dataBbox.getNorthEastLng() ||
+            				bbox.westBoundLongitude > dataBbox.getSouthWestLng() ||
+            				bbox.northBoundLatitude < dataBbox.getNorthEastLat() ||
+            				bbox.southBoundLatitude > dataBbox.getSouthWestLat()) {
+            			Ext.Msg.alert("Error", 'Selected region exceeds the coverage bounds. Please adjust region selection.');
+            			return;
+            		}
+                }        		
+        		
         		// set buffer co-ordinates
         		//calculateBufferCoords(neLat.getValue(), neLng.getValue(), swLat.getValue(), swLng.getValue(), buffer.getValue());
         		
@@ -103,8 +119,10 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
     
     // subset file type selection values
 	var fileTypes =  [
-   		 ['NetCDF','nc'],
-   		 ['GeoTIFF','geotif']
+   		 //['NetCDF','nc'],
+   		 ['CSV','csv'],
+   		 ['GeoTIFF','geotif'],
+   		 ['KML','kml']
    	];
 	
 	var fileTypeStore = new Ext.data.SimpleStore({
@@ -124,14 +142,15 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
         typeAhead      : false,
         displayField   : 'type',
         valueField     : 'value',
-        value          : 'nc',
-        id			   : 'fileType',
+        value          : 'csv',
         submitValue	   : false
     });
     
+	this.isFormLoaded = true; //We aren't reliant on any remote downloads
+	
     //-----------Panel
     WMSLayerFilterForm.superclass.constructor.call(this, {
-        id          : String.format('{0}',activeLayerRecord.getId()),
+    	id          : String.format('{0}',activeLayerRecord.getId()),
         border      : false,
         autoScroll  : true,
         hideMode    : 'offsets',
@@ -188,7 +207,7 @@ WMSLayerFilterForm.onSendToGridResponse = function(response, request) {
     if (resp.error != null) {
         JobList.showError(resp.error);
     } else {
-        Ext.Msg.alert("Success", "The selected coverage subsets have been added as inputs for the job.");
+        Ext.Msg.alert("Success", "The selected coverage subset was added as an input for the job.");
     }
 };
 
@@ -204,8 +223,7 @@ createNumberfield = function(label, id) {
     	width		: 100,
     	xtype      	: 'numberfield',
         fieldLabel 	: label,
-        name       	: id,
-        id		 	: id
+        name       	: id
     });
 };
 

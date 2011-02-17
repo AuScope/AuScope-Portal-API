@@ -4,7 +4,8 @@
  * Is a combination of a MarkerManager with the added extension for generic overlays too 
  */
 OverlayManager = function(map) {
-	this.overlayList = [];
+	this.serviceOverlayList = [];
+	this.customOverlayList = [];
 	this.markerManager = new MarkerManager(map);
 	this.map = map;
 };
@@ -12,15 +13,21 @@ OverlayManager = function(map) {
 
 
 /**
- * Removes all overlays and markers (that are managed by this instance) from the map
+ * Removes all service overlays and markers and hides all custom overlays 
+ * (that are managed by this instance) from the map.
  * @return
  */
 OverlayManager.prototype.clearOverlays = function() {
-	for (var i = 0; i < this.overlayList.length; i++) {
-		this.map.removeOverlay(this.overlayList[i]);
+	for (var i = 0; i < this.serviceOverlayList.length; i++) {
+		this.map.removeOverlay(this.serviceOverlayList[i]);
 	}
-	this.overlayList = [];
+	this.serviceOverlayList = [];
 	this.markerManager.clearMarkers();
+	
+	// hide the custom overlays rather then removing them
+	for (var i = 0; i < this.customOverlayList.length; i++) {
+		this.customOverlayList[i].hide();
+	}
 }
 
 /**
@@ -30,7 +37,7 @@ OverlayManager.prototype.clearOverlays = function() {
  */
 OverlayManager.prototype.addOverlay = function(overlay) {
 	this.map.addOverlay(overlay);
-	this.overlayList.push(overlay);
+	this.serviceOverlayList.push(overlay);
 }
 
 /**
@@ -39,10 +46,10 @@ OverlayManager.prototype.addOverlay = function(overlay) {
  * @return
  */
 OverlayManager.prototype.updateZOrder = function(newZOrder) {
-	for (var i = 0; i < this.overlayList.length; i++) {
-		this.overlayList[i].zPriority = newZOrder;
-        this.map.removeOverlay(this.overlayList[i]);
-        this.map.addOverlay(this.overlayList[i]);
+	for (var i = 0; i < this.serviceOverlayList.length; i++) {
+		this.serviceOverlayList[i].zPriority = newZOrder;
+        this.map.removeOverlay(this.serviceOverlayList[i]);
+        this.map.addOverlay(this.serviceOverlayList[i]);
 	}
 }
 
@@ -52,13 +59,30 @@ OverlayManager.prototype.updateZOrder = function(newZOrder) {
  * @return
  */
 OverlayManager.prototype.updateOpacity = function(newOpacity) {
-	for (var i = 0; i < this.overlayList.length; i++) {
-		if (this.overlayList[i] instanceof GTileLayerOverlay) {
-			this.overlayList[i].getTileLayer().opacity = newOpacity;
-	        this.map.removeOverlay(this.overlayList[i]);
-	        this.map.addOverlay(this.overlayList[i]);
+	for (var i = 0; i < this.serviceOverlayList.length; i++) {
+		if (this.serviceOverlayList[i] instanceof GTileLayerOverlay) {
+			this.serviceOverlayList[i].getTileLayer().opacity = newOpacity;
+	        this.map.removeOverlay(this.serviceOverlayList[i]);
+	        this.map.addOverlay(this.serviceOverlayList[i]);
 		}
 	}
 }
+
+/**
+ * Adds a custom overlay to the list  
+ * @param overlay
+ */
+OverlayManager.prototype.addCustomOverlay = function(overlay) {
+	this.customOverlayList.push(overlay);
+};
+
+/**
+ * Show all custom overlays  
+ */
+OverlayManager.prototype.showCustomOverlays = function() {
+	for (var i = 0; i < this.customOverlayList.length; i++) {
+		this.customOverlayList[i].show();
+	}
+};
 
 

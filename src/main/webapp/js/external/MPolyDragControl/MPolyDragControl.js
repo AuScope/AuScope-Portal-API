@@ -1,15 +1,15 @@
 	var styleStr = '';
 	styleStr += '<style>';
-	styleStr += '.MDR_labelStyle {background: #000; font: bold 10px verdana; color: #FFF; text-align: left; width: 40px; padding: 2px;}';
+	styleStr += '.MDR_labelStyle {background: #000; font: bold 10px verdana; color: #FFF; text-align: left; padding: 2px;}';
 	styleStr += '</style>';
-	//document.write(styleStr);
+	document.write(styleStr);
 
 
 MPolyDragControl = function(MOptions) {
 	MOptions = MOptions ? MOptions : {};
 	this.type = MOptions.type ? MOptions.type : 'rectangle';
 	this.map = MOptions.map ? MOptions.map : null;
-	//this.label = MOptions.label ? MOptions.label : null;
+	this.activeLayerRecord = MOptions.activeLayerRecord ? MOptions.activeLayerRecord : null;
 
 	this.unitDivisor = 2589988.11;
 	this.initialize();
@@ -38,9 +38,9 @@ MPolyDragControl.prototype.initialize = function() {
 	this.polyEditIcon = (new GIcon(baseIcon, this.dragImage));
 	this.transIcon = (new GIcon(baseIcon, this.transImage));
 
-	/*this.floatingLabel = new ELabel(this.map.getCenter(), 'Label text', 'MDR_labelStyle',new GSize(5,16));
+	this.floatingLabel = new ELabel(this.map.getCenter(), 'Label text', 'MDR_labelStyle',new GSize(5,16));
 	this.floatingLabel.hide();
-	this.map.addOverlay(this.floatingLabel); */
+	this.map.addOverlay(this.floatingLabel); 
 
 	this.addMarkers();
 };
@@ -80,6 +80,7 @@ MPolyDragControl.prototype.mapClick = function(latlon) {
 	this.map.addOverlay(this.poly);
 
 	GEvent.trigger(self.dragMarker1,'dragstart');
+	this.addSelectionOverlaysToManager();
 };
 
 MPolyDragControl.prototype.enableTransMarker = function() {
@@ -98,19 +99,7 @@ MPolyDragControl.prototype.disableTransMarker = function() {
 
 MPolyDragControl.prototype.reset = function() {
 	var self = this.self;
-	if (this.poly) {
-		this.poly.hide();
-	}
-
-	if (this.dragMarker0) {
-		this.dragMarker0.hide();
-	}
-	if (this.dragMarker1) {
-		this.dragMarker1.hide();
-	}
-	/*if (this.floatingLabel) {
-		this.floatingLabel.hide();
-	}*/
+	this.hide();
 
 	this.bounds = null;
 	this.mdListener = GEvent.addListener(this.dragMarker0,'mousedown',function(){self.markerMouseDown()});
@@ -223,7 +212,7 @@ MPolyDragControl.prototype.drawRectangle = function(neLat, neLng, swLat, swLng) 
 	this.dragMarker1.show();
 	
 	// set label position
-	//this.floatingLabel.setPoint(p2);
+	this.floatingLabel.setPoint(p2);
 	this.disableTransMarker();
 };
 
@@ -271,9 +260,10 @@ MPolyDragControl.prototype.drawPoly = function(points) {
 	html += 'Area:&nbsp;' + (this.poly.getArea()/ this.unitDivisor).toFixed(2) + '&nbsp;sq.mi.';
 	
 	
-	/*this.floatingLabel.setContents(this.label);
+	this.floatingLabel.setContents(this.activeLayerRecord.getLayerName());
 	this.floatingLabel.setPoint(this.dragMarker1.getLatLng());
-	this.floatingLabel.show();*/
+	this.floatingLabel.show();
+	this.addSelectionOverlaysToManager();
 };
 
 MPolyDragControl.prototype.getParams = function() {
@@ -295,6 +285,22 @@ MPolyDragControl.prototype.getParams = function() {
 	return str;
 };
 
+MPolyDragControl.prototype.getSouthWestLat = function() {
+	return this.bounds.getSouthWest().lat();
+};
+
+MPolyDragControl.prototype.getSouthWestLng = function() {
+	return this.bounds.getSouthWest().lng();
+};
+
+MPolyDragControl.prototype.getNorthEastLat = function() {
+	return this.bounds.getNorthEast().lat();
+};
+
+MPolyDragControl.prototype.getNorthEastLng = function() {
+	return this.bounds.getNorthEast().lng();
+};
+
 MPolyDragControl.prototype.setType = function(type) {
 	this.type = type;
 	if (this.poly) {
@@ -304,13 +310,51 @@ MPolyDragControl.prototype.setType = function(type) {
 };
 
 MPolyDragControl.prototype.show = function() {
-	this.poly.show();
+	if (this.poly) {
+		this.poly.show();
+	}
+
+	if (this.dragMarker0) {
+		this.dragMarker0.show();
+	}
+	if (this.dragMarker1) {
+		this.dragMarker1.show();
+	}
+	if (this.floatingLabel) {
+		this.floatingLabel.show();
+	}
 };
 
 MPolyDragControl.prototype.hide = function() {
-	this.poly.hide();
+	if (this.poly) {
+		this.poly.hide();
+	}
+
+	if (this.dragMarker0) {
+		this.dragMarker0.hide();
+	}
+	if (this.dragMarker1) {
+		this.dragMarker1.hide();
+	}
+	if (this.floatingLabel) {
+		this.floatingLabel.hide();
+	}
 };
 
 MPolyDragControl.prototype.isVisible = function() {
 	return !this.poly.isHidden();
+};
+
+MPolyDragControl.prototype.getOverlays = function() {
+	return [this.poly,this.dragMarker0,this.dragMarker1,this.floatingLabel];
+};
+
+MPolyDragControl.prototype.addSelectionOverlaysToManager = function() {
+	// add the data selection overlays to the overlayManager
+	var overlayManager = this.activeLayerRecord.getOverlayManager();
+	overlayManager.customOverlayList = [];
+	overlayManager.addCustomOverlay(this.poly);
+	overlayManager.addCustomOverlay(this.dragMarker0);
+	overlayManager.addCustomOverlay(this.dragMarker1);
+	overlayManager.addCustomOverlay(this.floatingLabel);
 };

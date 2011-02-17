@@ -400,6 +400,10 @@ Ext.onReady(function() {
             } else {
             	//Otherwise the layer doesn't need filtering, just display it immediately
                 loadLayer(activeLayerRecord);
+                var overlayManager = activeLayerRecord.getOverlayManager();
+            	if (overlayManager) {
+            		overlayManager.showCustomOverlays();
+            	}
             }
             filterPanel.doLayout();
         } else {
