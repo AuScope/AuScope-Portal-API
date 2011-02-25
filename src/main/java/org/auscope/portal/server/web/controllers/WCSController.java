@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.server.domain.wcs.DescribeCoverageRecord;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
-import org.auscope.portal.server.web.IERDDAPMethodMaker;
 import org.auscope.portal.server.web.IWCSDescribeCoverageMethodMaker;
 import org.auscope.portal.server.web.IWCSGetCoverageMethodMaker;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
@@ -47,20 +46,17 @@ public class WCSController {
     private HttpServiceCaller serviceCaller;
     private IWCSGetCoverageMethodMaker getCoverageMethodMaker;
     private IWCSDescribeCoverageMethodMaker describeCoverageMethodMaker;
-    private IERDDAPMethodMaker erddapMethodMaker;
     
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
     
     @Autowired
     public WCSController(HttpServiceCaller serviceCaller, IWCSGetCoverageMethodMaker methodMaker, 
-    		IWCSDescribeCoverageMethodMaker describeCoverageMethodMaker, PortalPropertyPlaceholderConfigurer hostConfigurer, 
-    		IERDDAPMethodMaker erddapMethodMaker) {
+    		IWCSDescribeCoverageMethodMaker describeCoverageMethodMaker, PortalPropertyPlaceholderConfigurer hostConfigurer) {
         this.serviceCaller = serviceCaller;      
         this.getCoverageMethodMaker = methodMaker;
         this.getCoverageMethodMaker = methodMaker;
         this.describeCoverageMethodMaker = describeCoverageMethodMaker;
         this.hostConfigurer = hostConfigurer;
-        this.erddapMethodMaker = erddapMethodMaker;
     }
     
     private String generateOutputFilename(String layerName, String format) throws IllegalArgumentException {
@@ -354,13 +350,10 @@ public class WCSController {
     }
     
     /**
-     * Gets the subset of the user drawn data and buffer bounding boxes in GeoTIFF format 
-     * and stores them as session attributes.
+     * Gets the URL of the ERDDAP subset request and saves it in session
      * 
-     * @param serviceUrl The remote URL to query
      * @param layerName The coverage layername to request
      * @param dataCoords The lat/lon co-ordinates of the user drawn data bounding box
-     * @param bufferCoords The lat/lon co-ordinates of the user drawn buffer bounding box
      * @param format The subset file output format 
      * @param request The HttpServletRequest
      * @param response The HttpServletResponse
@@ -370,7 +363,6 @@ public class WCSController {
     @RequestMapping("/sendSubsetsToGrid.do")
     public ModelAndView sendSubsetsToGrid(@RequestParam("layerName") final String layerName,
                                  @RequestParam("dataCoords") final String dataCoords,
-                                 //@RequestParam("bufferCoords") final String bufferCoords,
                                  @RequestParam("format") final String format,
                                  HttpServletRequest request,
                                  HttpServletResponse response) throws Exception {
@@ -378,14 +370,18 @@ public class WCSController {
     	ModelAndView mav = new ModelAndView("jsonView");
     	String serviceUrl = hostConfigurer.resolvePlaceholder("HOST.erddapservice.url");
     	
-    	// get coverage subsets
-        InputStream isData = getCoverageSubset(dataCoords, request, serviceUrl, layerName, format);
-        //InputStream isBuffer = getCoverageSubset(bufferCoords, request, serviceUrl, layerName, format);
-        
-        // set subsets as session attributes    	
-    	request.getSession().setAttribute("dataSubset", isData);
-    	//request.getSession().setAttribute("bufferSubset", isBuffer);
-    	request.getSession().setAttribute("subsetFormat", format);
+    	// add erddap url to the map or create a new one if it doesn't exist
+    	HashMap<String, String> erddapUrlMap = (HashMap)request.getSession().getAttribute("erddapUrlMap");
+    	
+    	if (erddapUrlMap == null) {
+    		erddapUrlMap = new HashMap<String,String>();
+    	}
+    	
+    	String erddapUrl = getCoverageSubsetUrl(dataCoords, serviceUrl, layerName, format);
+    	erddapUrlMap.put(layerName+"."+format, erddapUrl);
+    	logger.debug("erddapUrl: " + erddapUrl);
+    	
+    	request.getSession().setAttribute("erddapUrlMap", erddapUrlMap);
         
         mav.addObject("success", true);
  	    
@@ -412,26 +408,26 @@ public class WCSController {
 	}
 	
 	/**
-	 * Takes the co-ordinates of a user drawn bounding box and performs a 
-	 * GetCoverage request to the THREDDS server to get a subset of the 
-	 * coverage data in GeoTIFF format. 
+	 * Takes the co-ordinates of a user drawn bounding box and constructs an ERDDAP 
+	 * coverage subset request URL. 
 	 * 
 	 * @param coords The lat/lon co-ordinates of the user drawn bounding box
-	 * @param request The HttpServletRequest
 	 * @param serviceUrl The remote URL to query
 	 * @param layerName The coverage layername to request
-	 * @return The subset of the coverage layer as an InputStream
-	 * @throws Exception
+	 * @return The ERDDAP coverage subset request URL
 	 */
-	private InputStream getCoverageSubset(String coords, HttpServletRequest request, 
-			String serviceUrl, String layerName, String format) throws Exception {
+	private String getCoverageSubsetUrl(String coords, String serviceUrl, String layerName, String format) {
 		
 		CSWGeographicBoundingBox bbox = createBoundingBox(coords);
 		
 		logger.debug(String.format("serviceUrl='%1$s' bbox='%2$s' layerName='%3$s'", serviceUrl, bbox, layerName));
         
-        HttpMethodBase method = erddapMethodMaker.makeMethod(serviceUrl, layerName, bbox, format);
+		// convert bbox co-ordinates to ERDDAP an ERDDAP dimension string
+        String erddapDimensions = "%5B("+ bbox.getSouthBoundLatitude() +"):1:("+ bbox.getNorthBoundLatitude() +
+		")%5D%5B("+ bbox.getWestBoundLongitude() +"):1:("+ bbox.getEastBoundLongitude() +")%5D";
+		
+        String url = serviceUrl + layerName + "." + format + "?" + layerName + erddapDimensions;
         
-        return serviceCaller.getMethodResponseAsStream(method, serviceCaller.getHttpClient());
+        return url;
 	}
 }

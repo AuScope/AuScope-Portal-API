@@ -133,6 +133,7 @@ GridSubmit.onFileListResponse = function(response, request) {
         });
         fileStore.add(newFile);
     }
+    Ext.getCmp('fileRetrievalMessage').hide();
 }
 
 
@@ -147,8 +148,8 @@ GridSubmit.onLoadJobObject = function(response, request) {
     Ext.getCmp('queuesCombo').getStore().baseParams.site =
        Ext.getCmp('sitesCombo').getValue();
 
-    // Retrieve list of job files if any
-    GridSubmit.loadJobFiles();
+    // get get subsets
+    GridSubmit.getSubsetFiles();
 }
 
 ////////////////////////
@@ -219,6 +220,26 @@ GridSubmit.loadJobObject = function() {
         waitMsg: 'Retrieving data, please wait...',
         waitTitle: 'Submit Job'
     });
+}
+
+//
+// Gets coverage subset files form ERDDAP based on captured co-ordinates
+//
+
+GridSubmit.getSubsetFiles = function() {
+	Ext.Ajax.request({
+	     url: 'getSubsets.do',
+	     success: GridSubmit.onLoadSubsets,
+	     failure: GridSubmit.onLoadSubsets
+	 });
+}
+
+//
+//Callback for a successful subset request
+//
+GridSubmit.onLoadSubsets = function() {
+// Retrieve list of job files if any
+	GridSubmit.loadJobFiles();
 }
 
 //Task and TaskRunner add for job submission status update.
@@ -938,6 +959,13 @@ GridSubmit.initialize = function() {
 
         })
     });
+    
+    var fileRetrievalMessage = new Ext.form.Label({
+    	xtype: 'label',
+    	text:'Retrieving files... ',
+    	style: 'font-weight:bold;',
+    	id: 'fileRetrievalMessage'
+    })
         
     var filesForm = new Ext.FormPanel({
         bodyStyle: 'padding:10px;',
@@ -966,6 +994,8 @@ GridSubmit.initialize = function() {
             allowBlank: false,
             fieldLabel: 'Select File to upload'
         },
+        	fileRetrievalMessage
+        ,
             fileGrid
         ]
     });

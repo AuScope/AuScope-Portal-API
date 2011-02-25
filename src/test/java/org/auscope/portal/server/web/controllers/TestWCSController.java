@@ -109,14 +109,14 @@ public class TestWCSController {
     public void testBadTimePositions() throws Exception {
         try {
             final String[] timePositions = new String[] {"1986-10-09 12:34:56 FAIL"};
-            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer);
             controller.downloadWCSAsZip("url", "layer", "GeoTIFF", "inputCrs", 1, 1, 0, 0, "outputCrs", 1, 2, 3, 4, timePositions, null, null, null, null , mockResponse);
             Assert.fail("Should've failed to parse time");
         } catch (ParseException ex) { }
         
         try {
             final String[] timePositions = new String[] {"1986-10-09 12:99:56"};
-            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer);
             controller.downloadWCSAsZip("url", "layer", "GeoTIFF", "inputCrs", 1, 1, 0, 0, "outputCrs", 1, 2, 3, 4, timePositions, null, null, null, null , mockResponse);
             Assert.fail("Should've failed to parse time");
         } catch (ParseException ex) { }
@@ -126,21 +126,21 @@ public class TestWCSController {
     public void testBadCustomParams() throws Exception {
         try {
             final String[] customParamValue = new String[] {"param1=1/a/3", "param2=4", "param1=5"};
-            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer);
             controller.downloadWCSAsZip("url", "layer", "GeoTIFF", "inputCrs", 1, 1, 0, 0, "outputCrs", 1, 2, 3, 4, null, null, null, null, customParamValue , mockResponse);
             Assert.fail("Should've failed to parse custom params");
         } catch (IllegalArgumentException ex) { }
         
         try {
             final String[] customParamValue = new String[] {"param1=1/2/3", "param2=a", "param1=5"};
-            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer);
             controller.downloadWCSAsZip("url", "layer", "GeoTIFF", "inputCrs", 1, 1, 0, 0, "outputCrs", 1, 2, 3, 4, null, null, null, null, customParamValue , mockResponse);
             Assert.fail("Should've failed to parse custom params");
         } catch (IllegalArgumentException ex) { }
             
         try {
             final String[] customParamValue = new String[] {"param1=a/2/3", "param2=2", "param1=5"};
-            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+            WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer);
             controller.downloadWCSAsZip("url", "layer", "GeoTIFF", "inputCrs", 1, 1, 0, 0, "outputCrs", 1, 2, 3, 4, null, null, null, null, customParamValue , mockResponse);
             Assert.fail("Should've failed to parse custom params");
         } catch (IllegalArgumentException ex) { }
@@ -191,7 +191,7 @@ public class TestWCSController {
             }
         };
         
-        WCSController controller = new WCSController(mockServiceCaller, methodInterceptor , mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        WCSController controller = new WCSController(mockServiceCaller, methodInterceptor , mockDescribeMethodMaker, mockHostConfigurer);
         controller.downloadWCSAsZip(serviceUrl, layerName, "GeoTIFF", inputCrs, outputWidth, outputHeight, outputResX, outputResY, outputCrs, northBoundLat, southBoundLat, eastBoundLng, westBoundLng, timePositions, timePeriodFrom, timePeriodTo,timePeriodResolution, customParamValue , mockResponse);
     }
     
@@ -241,7 +241,7 @@ public class TestWCSController {
             }
         };
         
-        WCSController controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        WCSController controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer);
         controller.downloadWCSAsZip(serviceUrl, layerName, "GeoTIFF", inputCrs, outputWidth, outputHeight, outputResX, outputResY, outputCrs, northBoundLat, southBoundLat, eastBoundLng, westBoundLng, timePositions, timePeriodFrom, timePeriodTo,timePeriodResolution, customParamValue , mockResponse);
         
         ZipInputStream zip = outStream.getZipInputStream();
@@ -300,7 +300,7 @@ public class TestWCSController {
             }
         };
         
-        WCSController controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        WCSController controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer);
         controller.downloadWCSAsZip(serviceUrl, layerName, "NetCDF", inputCrs, outputWidth, outputHeight, outputResX, outputResY, outputCrs, northBoundLat, southBoundLat, eastBoundLng, westBoundLng, timePositions, timePeriodFrom, timePeriodTo,timePeriodResolution, customParams , mockResponse);
         
         ZipInputStream zip = outStream.getZipInputStream();
@@ -333,7 +333,7 @@ public class TestWCSController {
             oneOf(mockServiceCaller).getHttpClient();
          }});
         
-        WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        WCSController controller = new WCSController(mockServiceCaller, mockGetMethodMaker, mockDescribeMethodMaker, mockHostConfigurer);
         ModelAndView mav = controller.describeCoverage(serviceUrl, layerName);
         
         Assert.assertNotNull(mav);
@@ -386,28 +386,28 @@ public class TestWCSController {
         setupWCSDownloadAsZip(geotiffData);
         String[] inputTimes = new String[] {"2010-01-02 11:22:33 UTC"};
         IWCSGetCoverageMethodMaker methodInterceptor = new TimeComparatorMethodInterceptor("2010-01-02T11:22:33Z");
-        WCSController controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        WCSController controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer);
         controller.downloadWCSAsZip(serviceUrl, layerName, "GeoTIFF", inputCrs, 256, 256, 0, 0, outputCrs, 0, 0, 0, 0, inputTimes, null, null,null, null, mockResponse);
        
         //Test we can parse GMT
         setupWCSDownloadAsZip(geotiffData);
         inputTimes = new String[] {"2011-05-06 11:22:33 GMT"};
         methodInterceptor = new TimeComparatorMethodInterceptor("2011-05-06T11:22:33Z");
-        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer);
         controller.downloadWCSAsZip(serviceUrl, layerName, "GeoTIFF", inputCrs, 256, 256, 0, 0, outputCrs, 0, 0, 0, 0, inputTimes, null, null,null, null, mockResponse);
         
         //Test we can parse another timezone
         setupWCSDownloadAsZip(geotiffData);
         inputTimes = new String[] {"2010-03-04 12:22:33 WST"};
         methodInterceptor = new TimeComparatorMethodInterceptor("2010-03-04T04:22:33Z");
-        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer);
         controller.downloadWCSAsZip(serviceUrl, layerName, "GeoTIFF", inputCrs, 256, 256, 0, 0, outputCrs, 0, 0, 0, 0, inputTimes, null, null,null, null, mockResponse);
         
         //Test we can parse another timezone
         setupWCSDownloadAsZip(geotiffData);
         inputTimes = new String[] {"2010-03-04 12:22:33 -0500"};
         methodInterceptor = new TimeComparatorMethodInterceptor("2010-03-04T17:22:33Z");
-        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer);
         controller.downloadWCSAsZip(serviceUrl, layerName, "GeoTIFF", inputCrs, 256, 256, 0, 0, outputCrs, 0, 0, 0, 0, inputTimes, null, null,null, null, mockResponse);
         
         //Test we can parse another timezone (Using from, to)
@@ -415,14 +415,14 @@ public class TestWCSController {
         String startTime = "2010-03-04 12:22:33 +0500";
         String endTime = "2011-04-05 01:55:44 UTC";
         methodInterceptor = new TimeComparatorMethodInterceptor("2010-03-04T07:22:33Z/2011-04-05T01:55:44Z");
-        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer);
         controller.downloadWCSAsZip(serviceUrl, layerName, "GeoTIFF", inputCrs, 256, 256, 0, 0, outputCrs, 0, 0, 0, 0, null,startTime, endTime,null, null, mockResponse);
         
         setupWCSDownloadAsZip(geotiffData);
         startTime = "2010-09-14 12:22:33 GMT";
         endTime = "2011-04-05 01:55:44 -0901";
         methodInterceptor = new TimeComparatorMethodInterceptor("2010-09-14T12:22:33Z/2011-04-05T10:56:44Z");
-        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer, mockErddapMethodMaker);
+        controller = new WCSController(mockServiceCaller, methodInterceptor, mockDescribeMethodMaker, mockHostConfigurer);
         controller.downloadWCSAsZip(serviceUrl, layerName, "GeoTIFF", inputCrs, 256, 256, 0, 0, outputCrs, 0, 0, 0, 0, null,startTime, endTime,null, null, mockResponse);
         
     }

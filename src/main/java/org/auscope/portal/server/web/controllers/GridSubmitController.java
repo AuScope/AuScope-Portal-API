@@ -16,13 +16,17 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.aws.InstanceManager;
@@ -32,6 +36,7 @@ import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
 import org.auscope.portal.server.gridjob.GridAccessController;
 import org.auscope.portal.server.gridjob.Util;
+import org.auscope.portal.server.web.service.HttpServiceCaller;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +75,8 @@ public class GridSubmitController {
     private GeodesyJobManager jobManager;
     @Autowired
     private InstanceManager instanceMgr;
+    @Autowired
+    private HttpServiceCaller serviceCaller;
 
     public static final String S3_BUCKET_NAME = "vegl-portal";
     public static final String TABLE_DIR = "tables";
@@ -270,6 +277,31 @@ public class GridSubmitController {
         }else{
             logger.debug("Job setup success.");
             result.addObject("data", job);
+            result.addObject("success", true);
+        }
+
+        return result;
+    }
+    
+    /**
+     * Returns a JSON object containing a success attribute.
+     *
+     * @param request The servlet request
+     * @param response The servlet response
+     *
+     * @return A JSON object with a success attribute.
+     */
+    @RequestMapping("/getSubsets.do")    
+    public ModelAndView getSubsets(HttpServletRequest request,
+                                     HttpServletResponse response) {
+
+        ModelAndView result = new ModelAndView("jsonView");
+        
+        if(!addSubsetFilesToGridJob(request)){
+            logger.error("Subset failure.");
+            result.addObject("success", false);
+        }else{
+            logger.debug("Subset success.");
             result.addObject("success", true);
         }
 
@@ -742,9 +774,13 @@ public class GridSubmitController {
         request.getSession().removeAttribute("dateTo");
         request.getSession().removeAttribute("dateFrom");
         
+        // clear the subset files from the session so they aren't created again if the 
+        // user submits another job
+        request.getSession().setAttribute("erddapUrlMap", new HashMap<String,String>());
+        
         ModelAndView mav = new ModelAndView("jsonView");
         mav.addObject("success", success);
-
+        
         return mav;
     }
     
@@ -767,6 +803,7 @@ public class GridSubmitController {
     	//We need to store this for when register
     	job.setExtraJobDetails(detail.toString());
     }
+    
     /**
      * Creates a new Job object with predefined values for some fields.
      *
@@ -797,13 +834,7 @@ public class GridSubmitController {
         if(!success){
         	logger.error("Setting up local StageIn directory failed.");
         	return null;
-        }
-        
-        // save subset files to local stageIn directory
-        logger.debug("saving subset to stageIn directory");
-        String format = (String)request.getSession().getAttribute("subsetFormat");
-        addSubsetFileToGridJob("dataSubset", "data"+ generateSubsetFileExtension(format), request);
-        //addSubsetFileToGridJob("bufferSubset", "buffer"+ generateSubsetFileExtension(format), request);
+        }        
 
         logger.debug("Creating new GeodesyJob instance");
         GeodesyJob job = new GeodesyJob(site, name, version, arguments, queue,
@@ -819,36 +850,55 @@ public class GridSubmitController {
     /**
      * Adds a coverage subset file to the stageIn directory for attachment to the grid job
      * 
-     * @param sessionAttrName Name of the session attribute holding the subset data
-     * @param fileName Name to give to the newly created file
      * @param request The HttpServletRequest
+     * @return true if the subset process was successful.
      */
-    private void addSubsetFileToGridJob(String sessionAttrName, String fileName, HttpServletRequest request) {
+    private boolean addSubsetFilesToGridJob(HttpServletRequest request) {
     	
     	try {
-    		InputStream is = (InputStream)request.getSession().getAttribute(sessionAttrName);
+    		HashMap<String,String> erddapUrlMap = (HashMap)request.getSession().getAttribute("erddapUrlMap");
+    		Set<String> keys = erddapUrlMap.keySet();
+    		Iterator i = keys.iterator();
     		
-    		if (is != null)
-    		{
-	    		byte[] iobuff = new byte[4096];
-		        int bytes;
-		        String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
-		        File subsetFile = new File(localJobInputDir+GridSubmitController.TABLE_DIR+File.separator+fileName);
-		        FileOutputStream fos = new FileOutputStream(subsetFile);
-		        
-		        while ( (bytes = is.read( iobuff )) != -1 ) {
-		            fos.write( iobuff, 0, bytes );
-		        }
-		        
-		        is.close();
-		        fos.close();
-		        
-		        logger.debug("Added subset file - " + subsetFile.getPath());
+    		while (i.hasNext()) {
+    			
+    			// get the ERDDAP subset request url and layer name
+    			String fileName = (String)i.next();
+    			String url = (String)erddapUrlMap.get(fileName);
+
+    			logger.debug("Getting coverage subset - " + fileName);
+    			// create and execute the erddap request
+    			GetMethod httpMethod = new GetMethod(url);
+	    		InputStream is = serviceCaller.getMethodResponseAsStream(httpMethod, serviceCaller.getHttpClient());
+	    		
+	    		if (is != null)
+	    		{
+		    		byte[] iobuff = new byte[4096];
+			        int bytes;
+			        String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
+			        File subsetFile = new File(localJobInputDir+GridSubmitController.TABLE_DIR+File.separator+fileName);
+			        FileOutputStream fos = new FileOutputStream(subsetFile);
+			        
+			        logger.debug("Writing file...");
+			        
+			        while ( (bytes = is.read( iobuff )) != -1 ) {
+			            fos.write( iobuff, 0, bytes );
+			        }
+			        
+			        is.close();
+			        fos.close();
+			        
+			        logger.debug("Added subset file - " + subsetFile.getPath());
+	    		}
     		}
+    		
+    		return true;
         }
         catch (Throwable e) {
             logger.error("Error writing subset file - " + e);
         }
+        
+        return false;
     }
     
     /**
