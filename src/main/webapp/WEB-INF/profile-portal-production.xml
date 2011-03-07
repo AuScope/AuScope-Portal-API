@@ -12,6 +12,7 @@
         <constructor-arg>
             <list>
                 <ref bean="knownTypeBouguerGeodetic" />
+                <ref bean="knownTypeGravAnomalyGeodetic" />
             </list>
         </constructor-arg>
     </bean>
