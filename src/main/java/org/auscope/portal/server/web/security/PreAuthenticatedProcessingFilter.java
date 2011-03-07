@@ -20,7 +20,7 @@ public class PreAuthenticatedProcessingFilter
    protected final Logger logger = Logger.getLogger(getClass());
    
    protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
-	
+	logger.debug("inside getPreAuthenticatedPrincipal");
 	  java.util.Enumeration eHeaders = request.getHeaderNames();
       while(eHeaders.hasMoreElements()) {
          String name = (String) eHeaders.nextElement();
@@ -40,6 +40,12 @@ public class PreAuthenticatedProcessingFilter
 	      request.getSession().setAttribute("Shib-Person-mail", request.getHeader("Shib-Person-mail"));
 	      request.getSession().setAttribute("Shib-Shared-Token", request.getHeader("Shib-Shared-Token"));
 	      request.getSession().setAttribute("Shib-Person-commonName", request.getHeader("Shib-Person-commonName"));
+      }else if (request.getHeader("shared-token") != null) {
+    	  
+	      logger.info("mail: " + request.getHeader("mail"));
+	      request.getSession().setAttribute("Shib-Person-mail", request.getHeader("mail"));
+	      request.getSession().setAttribute("Shib-Shared-Token", request.getHeader("shared-token"));
+	      request.getSession().setAttribute("Shib-Person-commonName", request.getHeader("cn"));
       }
       
       return request.getSession().getAttribute("Shib-Person-mail");
