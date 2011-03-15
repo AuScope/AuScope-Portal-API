@@ -9,7 +9,6 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -25,18 +24,19 @@ import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
 import org.auscope.portal.server.gridjob.GridAccessController;
+import org.jets3t.service.S3Service;
+import org.jets3t.service.S3ServiceException;
+import org.jets3t.service.ServiceException;
+import org.jets3t.service.impl.rest.httpclient.RestS3Service;
+import org.jets3t.service.model.S3Bucket;
+import org.jets3t.service.model.S3Object;
+import org.jets3t.service.security.ProviderCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 /**
  * Controller for the job list view.
@@ -389,31 +389,35 @@ public class JobListController {
             logger.error("The requested job was not found.");
             mav.addObject("error", errorString);
         } else if (job.getOutputDir() != null) {
-	        List<S3ObjectSummary> fileSummary = new ArrayList<S3ObjectSummary>();
 	        AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-	        logger.debug("AWS creds: " + credentials);
-	        AmazonS3 s3  = new AmazonS3Client(credentials);
-	        List<Bucket> buckets = s3.listBuckets();
+	        ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey());
 	        
-	        logger.info("job output dir: '" + job.getOutputDir() + "'");
-	        
-	        for (Bucket bucket : buckets) {
-	        	if (bucket.getName().equals(GridSubmitController.S3_BUCKET_NAME)) {
-		        	ObjectListing objects = s3.listObjects(bucket.getName(), job.getOutputDir());
-		        	fileSummary = objects.getObjectSummaries();
-		        	FileInformation[] fileDetails = new FileInformation[fileSummary.size()];
-		        	
-		        	int i = 0;
-		        	// get file information from s3 object summaries
-		        	for (S3ObjectSummary sum : fileSummary) {
-		        		fileDetails[i++] = new FileInformation(sum.getKey(), sum.getSize());
-		        		totalItems++;
+	        try {
+				S3Service s3Service = new RestS3Service(provCreds);
+				S3Bucket[] buckets = s3Service.listAllBuckets();
+				
+				logger.info("job output dir: '" + job.getOutputDir() + "'");
+				
+				for (S3Bucket bucket : buckets) {
+		        	if (bucket.getName().equals(GridSubmitController.S3_BUCKET_NAME)) {
+		        		S3Object[] objects = s3Service.listObjects(bucket.getName(), job.getOutputDir(),null);
+			        	FileInformation[] fileDetails = new FileInformation[objects.length];
+			        	
+			        	int i = 0;
+			        	// get file information from s3 objects
+			        	for (S3Object object : objects) {
+			        		fileDetails[i++] = new FileInformation(object.getKey(), object.getContentLength());
+			        		totalItems++;
+			        	}
+			        	
+			        	logger.info(totalItems + " job files located");
+			        	mav.addObject("files", fileDetails);
 		        	}
-		        	
-		        	logger.info(totalItems + " job files located");
-		        	mav.addObject("files", fileDetails);
-	        	}
-	        }
+		        }
+			} catch (S3ServiceException e) {
+				logger.error("Error obtaining S3Service.");
+				e.printStackTrace();
+			}
         }
         
     	return mav;
@@ -453,38 +457,49 @@ public class JobListController {
         	
         	logger.debug("Download " + key);
         	AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-	        AmazonS3 s3  = new AmazonS3Client(credentials);
-        	S3Object s3obj = s3.getObject(GridSubmitController.S3_BUCKET_NAME, key);
-       		InputStream is = s3obj.getObjectContent();
-       			
-       		if (is != null) {
-       			response.setContentType("application/octet-stream");
-                response.setHeader("Content-Disposition",
-                        "attachment; filename=\""+key+"\"");
-                
-       		    try {
-       		    	OutputStream out = response.getOutputStream();
-       		        int n;
-       		        byte[] buffer = new byte[1024];
-       		     
-       		        while ((n = is.read(buffer)) != -1) {
-       		        	out.write(buffer, 0, n);
-       		        }
-       		        
-       		        out.flush();
-       		        return null;
-       		        
-       		    } catch(IOException e) {
-       		    	errorString = new String("Could not send file: " +
-                            e.getMessage());
-                    logger.error(errorString);
-       		    } finally {
-       		    	IOUtils.closeQuietly(is);
-       		    }
-       		}
-       		else{
-       			System.out.println("inputstream is null");
-       		}
+        	ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey());
+        	try {
+				S3Service s3Service = new RestS3Service(provCreds);
+				S3Object s3obj = s3Service.getObject(GridSubmitController.S3_BUCKET_NAME, key);
+				InputStream is = s3obj.getDataInputStream();
+					
+				if (is != null) {
+					response.setContentType("application/octet-stream");
+				    response.setHeader("Content-Disposition",
+				            "attachment; filename=\""+key+"\"");
+				    
+				    try {
+				    	OutputStream out = response.getOutputStream();
+				        int n;
+				        byte[] buffer = new byte[1024];
+				     
+				        while ((n = is.read(buffer)) != -1) {
+				        	out.write(buffer, 0, n);
+				        }
+				        
+				        out.flush();
+				        return null;
+				        
+				    } catch(IOException e) {
+				    	errorString = new String("Could not send file: " +
+				                e.getMessage());
+				        logger.error(errorString);
+				    } finally {
+				    	IOUtils.closeQuietly(is);
+				    }
+				}
+				else{
+					logger.error("inputstream is null");
+				}
+			} catch (S3ServiceException e) {
+				errorString = new String("Error creating S3Service: " +
+		                e.getMessage());
+		        logger.error(errorString);
+			} catch (ServiceException e) {
+				errorString = new String("Error getting S3Object data: " +
+		                e.getMessage());
+		        logger.error(errorString);
+			}
         }
 
         // We only end up here in case of an error so return a suitable message
@@ -543,17 +558,18 @@ public class JobListController {
             response.setHeader("Content-Disposition",
                     "attachment; filename=\"jobfiles.zip\"");
             
-            AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-	        AmazonS3 s3  = new AmazonS3Client(credentials);
-
             try {
+
+            	AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
+                ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey());
+            	S3Service s3Service = new RestS3Service(provCreds);
                 boolean readOneOrMoreFiles = false;
                 ZipOutputStream zout = new ZipOutputStream(
                         response.getOutputStream());
                 for (String fileKey : fileKeys) {
                 	
-                	S3Object s3obj = s3.getObject(GridSubmitController.S3_BUCKET_NAME, fileKey);
-               		InputStream is = s3obj.getObjectContent();
+                	S3Object s3obj = s3Service.getObject(GridSubmitController.S3_BUCKET_NAME, fileKey);
+               		InputStream is = s3obj.getDataInputStream();
                     
                     byte[] buffer = new byte[16384];
                     int count = 0;
@@ -580,7 +596,11 @@ public class JobListController {
                 errorString = new String("Could not create ZIP file: " +
                         e.getMessage());
                 logger.error(errorString);
-            }
+            } catch (ServiceException e) {
+            	errorString = new String("Error getting S3Object data: " +
+		                e.getMessage());
+		        logger.error(errorString);
+			}
         }
 
         // We only end up here in case of an error so return a suitable message

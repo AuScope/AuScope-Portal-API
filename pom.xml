@@ -164,6 +164,11 @@
 		  	<name>maven 2 central repository</name> 
 		  	<url>http://repo1.maven.org/maven2</url> 
 		</repository>
+		<repository>
+	      	<name>jets3t</name>
+	      	<id>jets3t</id>
+	      	<url>http://jets3t.s3.amazonaws.com/maven2</url>
+	    </repository>
     </repositories>
 
     <!-- Dependencies -->
@@ -556,5 +561,10 @@
 		    <artifactId>axis2-adb</artifactId>
 		    <version>1.5.3</version>
 		</dependency>
+		<dependency>
+	      	<groupId>net.java.dev.jets3t</groupId>
+	      	<artifactId>jets3t</artifactId>
+	      	<version>0.8.0</version>
+	    </dependency>
     </dependencies>
 </project>

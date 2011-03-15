@@ -39,6 +39,11 @@ import org.auscope.portal.server.gridjob.Util;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
+import org.jets3t.service.S3Service;
+import org.jets3t.service.impl.rest.httpclient.RestS3Service;
+import org.jets3t.service.model.S3Bucket;
+import org.jets3t.service.model.S3Object;
+import org.jets3t.service.security.ProviderCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,8 +55,6 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.s3.transfer.TransferManager;
-import com.amazonaws.services.s3.transfer.Upload;
 
 
 /**
@@ -692,8 +695,9 @@ public class GridSubmitController {
             
             logger.info("Submitting job with name " + job.getName());
             AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
+            ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey()); 
             
-	    	// copy files to Amazon storage for processing 
+	    	// copy files to S3 storage for processing 
 	        try {
 	        	
 				// get job files from local directory
@@ -707,13 +711,14 @@ public class GridSubmitController {
 				String keyPath = user + "-" + job.getName() + "-" + dateFmt + "/";
 				job.setOutputDir(keyPath);
 				
-				// copy job files to Amazon storage service. 
-				TransferManager tm = new TransferManager(credentials);
+				// copy job files to S3 storage service. 
+				S3Bucket bucket = new S3Bucket(S3_BUCKET_NAME);
+				S3Service s3Service = new RestS3Service(provCreds);
 				
 				for (File file : files){
 					logger.info("Uploading " + keyPath + file.getName());
-					Upload upload = tm.upload(S3_BUCKET_NAME, keyPath + file.getName(), file);
-					upload.waitForCompletion();
+					S3Object obj = new S3Object(bucket, keyPath + file.getName(), file.toString());
+					s3Service.putObject(bucket, obj);
 					logger.info(keyPath + file.getName() +" uploaded to " + S3_BUCKET_NAME + "S3 bucket");
 				}
 			} catch (AmazonClientException amazonClientException) {
@@ -742,6 +747,7 @@ public class GridSubmitController {
                 
                 if (instanceMgr.getEC2() == null) {
                 	AmazonEC2 ec2 = new AmazonEC2Client(credentials);
+                	ec2.setEndpoint("http://192.43.239.18:8773/services/Eucalyptus");
                 	instanceMgr.setEC2(ec2);
                 }
 
@@ -754,7 +760,8 @@ public class GridSubmitController {
                 if (!instanceMgr.isInstanceStarted()) {
                 	logger.info("Instance not running. Starting new instance");
                 	instanceMgr.setInstanceStarted(true);
-                	instanceMgr.setImageId("ami-1649bf7f");
+                	//instanceMgr.setImageId("ami-1649bf7f");
+                	instanceMgr.setImageId("emi-0BCC1149"); // test image needs to be replaced
                 	instanceMgr.setInstanceType("m1.small");
                 	new Thread(instanceMgr).start();
                 }
