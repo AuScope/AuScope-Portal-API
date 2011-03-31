@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<categories>
+    <category name="Particle Packing Geometry">
+        <component title="Simple Block" id="SimpleBlock" type="g">
+            Creates a collection of spheres arranged in a regular rectangular
+            lattice packing.
+        </component>
+        <component title="FCC Block" id="FCCBlock" type="g">
+            Creates a collection of spheres arranged in a cubic close (face
+            centred cubic) packing.
+        </component>
+        <component title="HCP Block" id="HCPBlock" type="g">
+            Creates a collection of spheres arranged in a hexagonal close
+            packing.
+        </component>
+        <component title="Random Block" id="RandomBlock" type="g">
+            Creates a collection of randomly sized spheres confined to a
+            specified box.
+        </component>
+        <component title="Read Geometry From File" id="ReadGeoFile" type="g">
+            Use this component to read geometry from an external file.
+        </component>
+    </category>
+
+    <category name="Elastic Walls">
+        <component title="Simple Wall" id="SimpleWall" type="w">
+            Creates a model wall, an infinite plane specified as point-on-plane
+            and normal-to-plane.
+        </component>
+    </category>
+
+    <category name="Particle-Particle Interactions">
+        <component title="Elastic Repulsion" id="ElasticRepulsion" type="i">
+            Adds linear elastic contact interactions to the simulation.
+        </component>
+        <component title="Bonded Elastic-Brittle" id="BondedElastic" type="i">
+            Adds linear elastic bond interactions to the simulation.
+        </component>
+        <component title="Rotational Bonded Elastic-Brittle" id="BondedRotElastic" type="i">
+            Adds rotational bonded interactions including normal, shear,
+            torsion and bending forces.
+        </component>
+        <component title="Frictional Contact" id="Friction" type="i">
+            Adds non-rotational friction (a Coulomb frictional law with shear
+            stiffness) to the simulation. Forces are applied at particle
+            centres, not at the contact point.
+        </component>
+        <component title="Rotational Frictional Contact" id="RotFriction" type="i">
+            Adds rotational friction (a Coulomb frictional law with shear
+            stiffness) to the simulation. Forces are applied at the contact
+            point which generates moments.
+        </component>
+        <component title="Interaction Exclusion Principle" id="Exclusion" type="x" requiresInts="2">
+            Creates an interaction exclusion. When a pair of particles come
+            into contact, a decision is made as to the types of interactions
+            to which the pair is subjected. An exclusion precludes a pair of
+            particles from being subjected to one interaction if they are
+            already subjected to a second interaction. This is necessary, for
+            example, in fracture models, where particles are initially
+            elastically bonded, but after fracture occurs particles are
+            subjected to a frictional type of interaction.
+        </component>
+    </category>
+
+    <category name="Particle-Wall Interactions">
+        <component title="Elastic Repulsion" id="ElasticWallRepulsion" type="i" requiresWalls="1">
+            Use this to set parameters for linear elastic contact between
+            particles and a wall.
+        </component>
+        <component title="Bonded Elastic" id="BondedWall" type="i" requiresWalls="1">
+            Use this component to set parameters for linear elastic bond
+            between particles and a wall.
+        </component>
+    </category>
+
+    <category name="Body Forces">
+        <component title="Gravity" id="Gravity" type="i">
+            Applies gravitational body forces to all particles.
+        </component>
+        <component title="Linear Viscosity" id="LinearVisc" type="i">
+            Applies linear velocity damping to the simulation.
+        </component>
+        <component title="Rotational Viscosity" id="RotationalVisc" type="i">
+            Applies rotational/angular velocity damping to the simulation.
+        </component>
+    </category>
+
+    <category name="Field Savers">
+        <component title="Particle Scalar Field Saver" id="PSFieldSaver" type="f">
+            Saves scalar particle data to a file.
+        </component>
+        <component title="Particle Vector Field Saver" id="PVFieldSaver" type="f">
+            Saves vector particle data to a file.
+        </component>
+        <component title="Interaction Scalar Field Saver" id="ISFieldSaver" type="f" requiresInts="1">
+            Saves scalar interaction data to a file.
+        </component>
+        <component title="Interaction Vector Field Saver" id="IVFieldSaver" type="f" requiresInts="1">
+            Saves vector interaction data to a file.
+        </component>
+        <component title="Wall Vector Field Saver" id="WVFieldSaver" type="f" requiresWalls="1">
+            Saves vector wall data to a file.
+        </component>
+    </category>
+
+    <category name="Checkpointer and Runnables">
+        <component title="CheckPointer" id="CheckPointer" type="c">
+            Creates check-point files of the simulation at regular intervals.
+        </component>
+        <component title="Open Inventor Camera" id="IVRunnable" type="r">
+            Creates snapshots of the simulation in the OpenInventor file format.
+        </component>
+        <component title="Wall Loader" id="WallLoader" type="r" requiresWalls="1">
+            Provides wall loading functionality.
+        </component>
+    </category>
+</categories>
+

@@ -1,0 +1,48 @@
+{
+  xtype: "form",
+  id: "BondedElasticForm",
+  nclass: BondedElasticNode,
+  bodyStyle: "padding:5px;",
+  labelWidth: 150,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "textfield",
+    name: "uniqueName",
+    value: "interaction",
+    fieldLabel: "Unique Interaction Name",
+    allowBlank: false,
+    maskRe: /[A-Za-z0-9._]+/
+  }, {
+    xtype: "numberfield",
+    name: "normalK",
+    value: "1.0",
+    fieldLabel: "Normal Stiffness",
+    decimalPrecision: 4,
+    allowNegative: false,
+    allowBlank: false
+  }, {
+    xtype: "numberfield",
+    name: "breakDist",
+    value: "0.15",
+    fieldLabel: "Breaking Distance",
+    decimalPrecision: 4,
+    allowNegative: false,
+    allowBlank: false
+  }, {
+    xtype: "numberfield",
+    name: "tag",
+    value: "0",
+    fieldLabel: "Tag of Particles to Bond",
+    allowDecimal: false,
+    allowBlank: false
+  }, {
+    xtype: "numberfield",
+    name: "maxDist",
+    value: "0.2",
+    fieldLabel: "Max Distance between Particles to Bond",
+    decimalPrecision: 4,
+    allowNegative: false,
+    allowBlank: false
+  }]
+}
+

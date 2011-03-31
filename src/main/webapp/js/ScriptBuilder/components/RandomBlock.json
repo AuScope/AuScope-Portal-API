@@ -1,0 +1,145 @@
+{
+  xtype: "form",
+  id: "RandomBlockForm",
+  nclass: RandomBlockNode,
+  bodyStyle: "padding:5px;",
+  labelWidth: 120,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "fieldset",
+    collapsible: false,
+    title: "Particle Radii",
+    autoHeight: true,
+    items: [{
+      xtype: "numberfield",
+      name: "minRadius",
+      value: "0.2",
+      anchor: "100%",
+      fieldLabel: "Min Particle Radius",
+      decimalPrecision: 4,
+      allowNegative: false,
+      allowBlank: false,
+    }, {
+      xtype: "numberfield",
+      name: "maxRadius",
+      value: "1.0",
+      anchor: "100%",
+      fieldLabel: "Max Particle Radius",
+      decimalPrecision: 4,
+      allowNegative: false,
+      allowBlank: false,
+    }]
+  }, {
+    layout: "column",
+    border: false,
+    items: [{
+      columnWidth: .5,
+      layout: "form",
+      border: false,
+      items: [{
+        xtype: "fieldset",
+        collapsible: false,
+        title: "Lower Left Corner Point",
+        autoHeight: true,
+        anchor: "100%",
+        labelWidth: 10,
+        items: [{
+          xtype: "numberfield",
+          name: "llX",
+          value: "-5.0",
+          anchor: "95%",
+          fieldLabel: "X",
+          decimalPrecision: 4,
+          allowBlank: false
+        }, {
+          xtype: "numberfield",
+          name: "llY",
+          value: "0.0",
+          anchor: "95%",
+          fieldLabel: "Y",
+          decimalPrecision: 4,
+          allowBlank: false
+        }, {
+          xtype: "numberfield",
+          name: "llZ",
+          value: "-5.0",
+          anchor: "95%",
+          fieldLabel: "Z",
+          decimalPrecision: 4,
+          allowBlank: false
+        }]
+      }]
+    }, {
+      columnWidth: .5,
+      layout: "form",
+      border: false,
+      items: [{
+        xtype: "fieldset",
+        collapsible: false,
+        title: "Upper Right Corner Point",
+        autoHeight: true,
+        anchor: "100%",
+        labelWidth: 10,
+        items: [{
+          xtype: "numberfield",
+          name: "urX",
+          value: "5.0",
+          anchor: "95%",
+          fieldLabel: "X",
+          decimalPrecision: 4,
+          allowBlank: false
+        }, {
+          xtype: "numberfield",
+          name: "urY",
+          value: "5.0",
+          anchor: "95%",
+          fieldLabel: "Y",
+          decimalPrecision: 4,
+          allowBlank: false
+        }, {
+          xtype: "numberfield",
+          name: "urZ",
+          value: "5.0",
+          anchor: "95%",
+          fieldLabel: "Z",
+          decimalPrecision: 4,
+          allowBlank: false
+        }]
+      }]
+    }]
+  }, {
+    xtype: "fieldset",
+    collapsible: false,
+    title: "Particle Packer Parameters",
+    autoHeight: true,
+    items: [{
+      xtype: "numberfield",
+      name: "cubicRadius",
+      value: "2.2",
+      anchor: "100%",
+      fieldLabel: "Cubic Pack Radius",
+      decimalPrecision: 4,
+      allowNegative: false,
+      allowBlank: false,
+    }, {
+      xtype: "numberfield",
+      name: "tolerance",
+      value: "0.00001",
+      anchor: "100%",
+      fieldLabel: "Tolerance",
+      decimalPrecision: 6,
+      allowNegative: false,
+      allowBlank: false,
+    }, {
+      xtype: "numberfield",
+      name: "maxFailures",
+      value: "1000",
+      anchor: "100%",
+      fieldLabel: "Max Insertion Failures",
+      allowBlank: false,
+      allowDecimals: false,
+      allowNegative: false
+    }]
+  }]
+}
+

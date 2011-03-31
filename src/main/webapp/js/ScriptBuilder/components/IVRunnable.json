@@ -1,0 +1,143 @@
+{
+  xtype: "form",
+  id: "IVRunnableForm",
+  nclass: IVRunnableNode,
+  bodyStyle: "padding:5px;",
+  defaults: { anchor: "100%" },
+  labelWidth: 160,
+  items: [{
+    xtype: "textfield",
+    name: "uniqueName",
+    value: "runnable",
+    fieldLabel: "Unique Name",
+    allowBlank: false,
+    maskRe: /[A-Za-z0-9._]+/
+  }, {
+    xtype: "numberfield",
+    name: "interval",
+    value: "100",
+    fieldLabel: "Interval between Snapshots",
+    allowBlank: false,
+    allowNegative: false,
+    allowDecimals: false
+  }, {
+    xtype: "radiogroup",
+    fieldLabel: "IV Snapshot Timing",
+    items: [
+      { boxLabel: "Before Timestep", name: "snapTiming", inputValue: 0, checked: true },
+      { boxLabel: "After Timestep", name: "snapTiming", inputValue: 1 }
+    ]
+  }, {
+    xtype: "numberfield",
+    name: "zoomFactor",
+    value: "0.1",
+    anchor: "100%",
+    fieldLabel: "Camera Zoom Factor",
+    decimalPrecision: 4,
+    allowNegative: false,
+    allowBlank: false
+  }, {
+    layout: "column",
+    border: false,
+    items: [{
+      columnWidth: .5,
+      layout: "form",
+      border: false,
+      items: [{
+        xtype: "fieldset",
+        collapsible: false,
+        title: "Position of Camera",
+        anchor: "100%",
+        autoHeight: true,
+        labelWidth: 20,
+        defaults: { anchor: "100%" },
+        items: [{
+          xtype: "numberfield",
+          name: "camPosX",
+          value: "0.0",
+          fieldLabel: "X",
+          decimalPrecision: 4,
+          allowBlank: false
+        }, {
+          xtype: "numberfield",
+          name: "camPosY",
+          value: "0.0",
+          fieldLabel: "Y",
+          decimalPrecision: 4,
+          allowBlank: false
+        }, {
+          xtype: "numberfield",
+          name: "camPosZ",
+          value: "10.0",
+          fieldLabel: "Z",
+          decimalPrecision: 4,
+          allowBlank: false
+        }]
+      }]
+    }, {
+      columnWidth: .5,
+      layout: "form",
+      border: false,
+      items: [{
+        xtype: "fieldset",
+        collapsible: false,
+        title: "Focal Point of Camera",
+        autoHeight: true,
+        labelWidth: 20,
+        anchor: "100%",
+        items: [{
+          xtype: "numberfield",
+          name: "lookAtX",
+          value: "0.0",
+          anchor: "100%",
+          fieldLabel: "X",
+          decimalPrecision: 4,
+          allowBlank: false
+        }, {
+          xtype: "numberfield",
+          name: "lookAtY",
+          value: "0.0",
+          anchor: "100%",
+          fieldLabel: "Y",
+          decimalPrecision: 4,
+          allowBlank: false
+        }, {
+          xtype: "numberfield",
+          name: "lookAtZ",
+          value: "0.0",
+          anchor: "100%",
+          fieldLabel: "Z",
+          decimalPrecision: 4,
+          allowBlank: false
+        }]
+      }]
+    }]
+  }, {
+    xtype: "fieldset",
+    collapsible: false,
+    title: "Image Resolution",
+    autoHeight: true,
+    labelWidth: 20,
+    anchor: "100%",
+    items: [{
+      xtype: "numberfield",
+      name: "resX",
+      value: "800",
+      anchor: "100%",
+      fieldLabel: "X",
+      allowDecimals: false,
+      allowNegative: false,
+      allowBlank: false
+    }, {
+      xtype: "numberfield",
+      name: "resY",
+      value: "600",
+      anchor: "100%",
+      fieldLabel: "Y",
+      allowDecimals: false,
+      allowNegative: false,
+      allowBlank: false
+    }]
+  }]
+}
+

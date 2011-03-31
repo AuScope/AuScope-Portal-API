@@ -11,6 +11,7 @@
                 <li ><a href="admin.html">Administration<span></span></a></li>
             </security:authorize>
             
+            <li <%if (request.getRequestURL().toString().contains("/scriptbuilder.jsp")) {%>class="current" <%} %>><a href="scriptbuilder.html">Script Builder<span></span></a></li>
             <li <%if (request.getRequestURL().toString().contains("/gridsubmit.jsp")) {%>class="current" <%} %>><a href="gridsubmit.html">Submit Jobs<span></span></a></li>
             <li <%if (request.getRequestURL().toString().contains("/joblist.jsp")) {%>class="current" <%} %>><a href="joblist.html">Monitor Jobs<span></span></a></li>
             

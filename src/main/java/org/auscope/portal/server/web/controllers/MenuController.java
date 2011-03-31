@@ -162,6 +162,12 @@ public class MenuController {
                    new RedirectView("/gridLogin.do", true, false, false));
        }
    }
+   
+   @RequestMapping("/scriptbuilder.html")
+   public ModelAndView scriptbuilder(HttpServletRequest request) {
+          
+	   return new ModelAndView("scriptbuilder");
+   }
  
    @RequestMapping("/gridsubmit.html")
    public ModelAndView gridsubmit(HttpServletRequest request) {

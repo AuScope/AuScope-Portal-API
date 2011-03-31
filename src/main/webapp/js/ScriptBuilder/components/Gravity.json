@@ -1,0 +1,46 @@
+{
+  xtype: "form",
+  id: "GravityForm",
+  nclass: GravityNode,
+  bodyStyle: "padding:5px;",
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "textfield",
+    name: "uniqueName",
+    value: "interaction",
+    fieldLabel: "Unique Name",
+    allowBlank: false,
+    maskRe: /[A-Za-z0-9._]+/
+  }, {
+    xtype: "fieldset",
+    collapsible: false,
+    title: "Gravitational Acceleration",
+    autoHeight: true,
+    items: [{
+      xtype: "numberfield",
+      name: "accX",
+      value: "0.0",
+      anchor: "100%",
+      fieldLabel: "X-component",
+      decimalPrecision: 5,
+      allowBlank: false
+    }, {
+      xtype: "numberfield",
+      name: "accY",
+      value: "-9.81",
+      anchor: "100%",
+      fieldLabel: "Y-component",
+      decimalPrecision: 5,
+      allowBlank: false
+    }, {
+      xtype: "numberfield",
+      name: "accZ",
+      value: "0.0",
+      anchor: "100%",
+      fieldLabel: "Z-component",
+      decimalPrecision: 5,
+      allowBlank: false
+    }]
+  }]
+}
+

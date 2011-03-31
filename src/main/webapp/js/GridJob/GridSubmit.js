@@ -810,6 +810,12 @@ GridSubmit.initialize = function() {
             maskRe: /\d+/
         }, {
             xtype: 'textfield',
+            name: 'scriptFile',
+            fieldLabel: 'Script Filename',
+            allowBlank: true,
+            maskRe: /[\w+#@.,-]/
+        }, {
+            xtype: 'textfield',
             name: 'cpuCount',
             fieldLabel: 'Number of CPUs',
             allowBlank: false,

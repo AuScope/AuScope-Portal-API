@@ -1,0 +1,41 @@
+{
+  xtype: "form",
+  id: "CheckPointerForm",
+  nclass: CheckPointerNode,
+  bodyStyle: "padding:5px;",
+  labelWidth: 160,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "textfield",
+    name: "fnPrefix",
+    value: "LSM_CheckPt",
+    fieldLabel: "Checkpoint Filename Prefix",
+    allowBlank: false,
+    maskRe: /[A-Za-z0-9._#-]+/
+  }, {
+    xtype: "numberfield",
+    name: "beginTS",
+    value: "0",
+    fieldLabel: "Timestep to Begin",
+    allowDecimals: false,
+    allowNegative: false,
+    allowBlank: false
+  }, {
+    xtype: "numberfield",
+    name: "endTS",
+    value: "1000",
+    fieldLabel: "Timestep to End",
+    allowDecimals: false,
+    allowNegative: false,
+    allowBlank: false
+  }, {
+    xtype: "numberfield",
+    name: "timeIncrement",
+    value: "100",
+    fieldLabel: "Timestep Increment",
+    allowDecimals: false,
+    allowNegative: false,
+    allowBlank: false
+  }]
+}
+

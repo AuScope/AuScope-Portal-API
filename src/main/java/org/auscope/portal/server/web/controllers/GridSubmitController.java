@@ -35,6 +35,7 @@ import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
 import org.auscope.portal.server.gridjob.GridAccessController;
+import org.auscope.portal.server.gridjob.ScriptParser;
 import org.auscope.portal.server.gridjob.Util;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
 import org.ietf.jgss.GSSCredential;
@@ -848,6 +849,37 @@ public class GridSubmitController {
         GeodesyJob job = new GeodesyJob(site, name, version, arguments, queue,
                 maxWallTime, maxMemory, cpuCount, inTransfers, outTransfers,
                 user, stdInput, stdOutput, stdError);
+        
+        // Check if the ScriptBuilder was used. If so, there is a file in the
+        // system temp directory which needs to be staged in.
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String dateFmt = sdf.format(new Date());
+        String jobID = user + "-" + dateFmt + File.separator;
+        String jobInputDir = gridAccess.getlocalGridStageInDir() + jobID;
+        String newScript = (String) request.getSession().getAttribute("scriptFile");
+	    if (newScript != null) {
+	        request.getSession().removeAttribute("scriptFile");
+	        logger.debug("Adding "+newScript+" to stage-in directory");
+	        File tmpScriptFile = new File(System.getProperty("java.io.tmpdir") +
+	                File.separator+newScript+".py");
+	        File newScriptFile = new File(jobInputDir+GridSubmitController.TABLE_DIR, tmpScriptFile.getName());
+	        success = Util.moveFile(tmpScriptFile, newScriptFile);
+	        if (success) {
+	            logger.info("Moved "+newScript+" to stageIn directory");
+	            scriptFile = newScript+".py";
+	
+	            // Extract information from script file
+	            ScriptParser parser = new ScriptParser();
+	            try {
+	                parser.parse(newScriptFile);
+	                cpuCount = parser.getNumWorkerProcesses()+1;
+	            } catch (IOException e) {
+	                logger.warn("Error parsing file: "+e.getMessage());
+	            }
+	        } else {
+	            logger.warn("Could not move "+newScript+" to stage-in!");
+	        }
+	    }
 
         job.setScriptFile(scriptFile);
         job.setDescription(description);

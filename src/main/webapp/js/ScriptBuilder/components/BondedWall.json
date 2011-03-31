@@ -1,0 +1,43 @@
+{
+  xtype: "form",
+  id: "BondedWallForm",
+  nclass: BondedWallNode,
+  bodyStyle: "padding:5px;",
+  labelWidth: 150,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "textfield",
+    name: "uniqueName",
+    value: "interaction",
+    fieldLabel: "Unique Interaction Name",
+    allowBlank: false,
+    maskRe: /[A-Za-z0-9._]+/
+  }, {
+    xtype: "numberfield",
+    name: "normalK",
+    value: "1.0",
+    fieldLabel: "Normal Stiffness",
+    decimalPrecision: 4,
+    allowNegative: false,
+    allowBlank: false
+  }, {
+    xtype: "combo",
+    name: "wallName",
+    value: "",
+    fieldLabel: "Name of Wall to Bond",
+    editable: false,
+    forceSelection: true,
+    mode: "local",
+    triggerAction: "all",
+    store: [],
+    allowBlank: false
+  }, {
+    xtype: "numberfield",
+    name: "tag",
+    value: "0",
+    fieldLabel: "Tag of Particles to Bond",
+    allowDecimal: false,
+    allowBlank: false
+  }]
+}
+

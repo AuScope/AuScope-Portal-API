@@ -1,0 +1,16 @@
+{
+  xtype: "form",
+  id: "ReadGeoFileForm",
+  nclass: ReadGeoFileNode,
+  bodyStyle: "padding:5px;",
+  //labelWidth: 50,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "textfield",
+    name: "fileName",
+    //inputType: "file",
+    fieldLabel: "File Name",
+    allowBlank: false
+  }]
+}
+

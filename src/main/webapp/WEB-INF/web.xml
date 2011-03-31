@@ -57,10 +57,10 @@
       <url-pattern>*.do</url-pattern>
    </servlet-mapping>
 
-    <servlet-mapping>
+    <!-- servlet-mapping>
       <servlet-name>annotationsDispatcher</servlet-name>
       <url-pattern>*.json</url-pattern>
-   </servlet-mapping>
+   </servlet-mapping -->
 
     <servlet-mapping>
       <servlet-name>annotationsDispatcher</servlet-name>
