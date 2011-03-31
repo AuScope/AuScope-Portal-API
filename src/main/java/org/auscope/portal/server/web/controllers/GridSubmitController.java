@@ -717,7 +717,8 @@ public class GridSubmitController {
 				
 				for (File file : files){
 					logger.info("Uploading " + keyPath + file.getName());
-					S3Object obj = new S3Object(bucket, keyPath + file.getName(), file.toString());
+					S3Object obj = new S3Object(bucket, file);
+					obj.setKey(keyPath + file.getName());
 					s3Service.putObject(bucket, obj);
 					logger.info(keyPath + file.getName() +" uploaded to " + S3_BUCKET_NAME + "S3 bucket");
 				}
