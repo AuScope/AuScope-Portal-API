@@ -368,16 +368,6 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>net.jsunit</groupId>
-            <artifactId>jsunit</artifactId>
-            <version>2.1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>net.jsunit</groupId>
-            <artifactId>jsunit-testRunner</artifactId>
-            <version>2.1.4</version>
-        </dependency>
-        <dependency>
             <groupId>org.jmock</groupId>
             <artifactId>jmock-junit4</artifactId>
             <version>2.5.1</version>
@@ -566,5 +556,20 @@
 	      	<artifactId>jets3t</artifactId>
 	      	<version>0.8.0</version>
 	    </dependency>
+	    <!-- Added for Openid -->
+	    <dependency>
+            <groupId>org.openid4java</groupId>
+            <!--artifactId>openid4java-consumer</artifactId-->
+            <!--artifactId>openid4java-server</artifactId-->
+            <!--artifactId>openid4java-infocard</artifactId-->
+            <!--artifactId>openid4java-xri</artifactId-->
+            <artifactId>openid4java</artifactId>
+            <version>0.9.5</version>
+        </dependency>
+	    <dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-openid</artifactId>
+		    <version>3.0.5.RELEASE</version>
+		</dependency>
     </dependencies>
 </project>

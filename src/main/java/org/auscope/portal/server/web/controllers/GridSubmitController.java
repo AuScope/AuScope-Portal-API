@@ -107,7 +107,7 @@ public class GridSubmitController {
     public ModelAndView mySeries(HttpServletRequest request,
                                  HttpServletResponse response) {
 
-        String user = request.getRemoteUser();
+        String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
         List<GeodesySeries> series = jobManager.querySeries(user, null, null);
 
         logger.debug("Returning list of "+series.size()+" series.");
@@ -136,7 +136,7 @@ public class GridSubmitController {
     public ModelAndView getCodeObject(HttpServletRequest request,
                                  HttpServletResponse response) {
 
-        String user = request.getRemoteUser();
+        String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
         logger.error("Querying code list for "+user);
         List<SimpleBean> code = new ArrayList<SimpleBean>();
         code.add(new SimpleBean("Gamit"));
@@ -160,7 +160,7 @@ public class GridSubmitController {
     public ModelAndView listJobTypes(HttpServletRequest request,
                                  HttpServletResponse response) {
 
-        String user = request.getRemoteUser();
+        String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
         logger.debug("Querying job types list for "+user);
         List<SimpleBean> jobType = new ArrayList<SimpleBean>();
         jobType.add(new SimpleBean("multi"));
@@ -183,7 +183,7 @@ public class GridSubmitController {
     public ModelAndView getGetArguments(HttpServletRequest request,
                                  HttpServletResponse response) {
 
-        String user = request.getRemoteUser();
+        String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
         logger.debug("Querying param for "+user);
         List<SimpleBean> params = new ArrayList<SimpleBean>();
         params.add(new SimpleBean("enter args ..."));
@@ -641,7 +641,7 @@ public class GridSubmitController {
     	logger.info("inside submitJob");
     	boolean success = true;
     	GeodesySeries series = null;
-    	final String user = request.getRemoteUser();
+    	final String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
     	String newSeriesName = request.getParameter("seriesName");
     	String seriesIdStr = request.getParameter("seriesId");
     	
@@ -697,8 +697,8 @@ public class GridSubmitController {
             logger.info("Submitting job with name " + job.getName());
             AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
             ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey()); 
-            
-	    	// copy files to S3 storage for processing 
+	    	
+            // copy files to S3 storage for processing 
 	        try {
 	        	
 				// get job files from local directory
@@ -821,7 +821,7 @@ public class GridSubmitController {
      * @return The new job object.
      */
     private GeodesyJob prepareModel(HttpServletRequest request) {
-        final String user = request.getRemoteUser();
+        final String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
         final String maxWallTime = "60"; // in minutes
         final String maxMemory = "2048"; // in MB
         final String stdInput = "";
@@ -963,7 +963,8 @@ public class GridSubmitController {
 	private boolean createLocalDir(HttpServletRequest request) {
 		
 		GridTransferStatus status = new GridTransferStatus();
-		final String user = request.getRemoteUser();
+		final String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
+		
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String dateFmt = sdf.format(new Date());
         String jobID = user + "-" + dateFmt + File.separator;
@@ -992,7 +993,7 @@ public class GridSubmitController {
 	 */
 	private void addFileNamesOfDirectory(List files, File dir, String filePath){
         String fileNames[] = dir.list();
-        logger.debug("Inside listJobFiles.do adding files.");
+        
         for (int i=0; i<fileNames.length; i++) {
             File f = new File(dir, fileNames[i]);
             FileInformation fileInfo = new FileInformation(fileNames[i], f.length());

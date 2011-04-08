@@ -15,10 +15,14 @@ import org.auscope.portal.server.gridjob.GridAccessController;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
+
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.PropertiesCredentials;
 
 /**
  * Controller that handles all {@link Menu}-related requests,
@@ -95,10 +99,9 @@ public class MenuController {
 
    @RequestMapping("/login.html")
    public ModelAndView login(HttpServletRequest request) {
-      logger.debug("Shib-Identity-Provider : " + request.getHeader("Shib-Identity-Provider"));
 
-      //return new ModelAndView("login");
-      return new ModelAndView("redirect:/gmap.html");
+      return new ModelAndView("login");
+      //return new ModelAndView("redirect:/gmap.html");
    }
 
    @RequestMapping("/about.html")
@@ -163,20 +166,44 @@ public class MenuController {
        }
    }
    
+   private ModelAndView setCloudCredentials(HttpServletRequest request,String redirectViewName) {
+	   
+	   if (request.getSession().getAttribute("AWSCred") == null) {
+		   
+			String awsCredFileLocation = hostConfigurer.resolvePlaceholder("HOST.aws.credentials.file");
+	    	FileSystemResource res = new FileSystemResource(awsCredFileLocation);
+			AWSCredentials credentials;
+			try {
+				credentials = new PropertiesCredentials(res.getInputStream());
+				request.getSession().setAttribute("AWSCred", credentials);
+			} catch (IOException e) {
+				logger.error("Error getting AWS credentials: " +
+	                    e.getMessage());
+				 // return user to map page if get creds fails
+				 return new ModelAndView("gmap");
+			}
+	   }
+	   
+	   return new ModelAndView(redirectViewName);
+   }
+   
    @RequestMapping("/scriptbuilder.html")
    public ModelAndView scriptbuilder(HttpServletRequest request) {
-          
 	   return new ModelAndView("scriptbuilder");
    }
  
    @RequestMapping("/gridsubmit.html")
    public ModelAndView gridsubmit(HttpServletRequest request) {
        // Ensure user has valid grid credentials
-	   return doShibbolethAndSLCSLogin(request, "gridsubmit", "/gridsubmit.html");
+	   //return doShibbolethAndSLCSLogin(request, "gridsubmit", "/gridsubmit.html");
+	   return setCloudCredentials(request, "gridsubmit");
+	   //return new ModelAndView("gridsubmit");
    }
    
    @RequestMapping("/joblist.html")
    public ModelAndView joblist(HttpServletRequest request) {
-	   return doShibbolethAndSLCSLogin(request, "joblist", "/joblist.html");
+	   //return doShibbolethAndSLCSLogin(request, "joblist", "/joblist.html");
+	   return setCloudCredentials(request, "joblist");
+	   //return new ModelAndView("joblist");
    }
 }

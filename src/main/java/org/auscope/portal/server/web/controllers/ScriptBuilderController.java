@@ -109,6 +109,7 @@ public class ScriptBuilderController {//extends MultiActionController {
                 PrintWriter writer = new PrintWriter(scriptFile);
                 writer.print(script);
                 writer.close();
+                logger.info("saved script file: " + scriptFile.getAbsolutePath());
 
             } catch (IOException e) {
                 logger.error("Could not create temp file: " + e.getMessage());

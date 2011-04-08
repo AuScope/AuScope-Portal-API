@@ -37,7 +37,7 @@
  
      
      <!-- The following is pre authentication for usage with Shibboleth -->
-     <beans:bean id="entryPoint"
+   <!--  <beans:bean id="entryPoint"
         class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" >
     </beans:bean>
                                     
@@ -46,11 +46,13 @@
       <intercept-url pattern="/**" filters="none" />
       <custom-filter ref="preAuthenticatedProcessingFilter" position="PRE_AUTH_FILTER" />
       <s:anonymous/>
-      <!-- <s:logout logout-success-url="/gmap.html"/> -->
+       <s:logout logout-success-url="/gmap.html"/> 
       <session-management session-fixation-protection="none" />
       
       <s:logout logout-success-url="/ShibLogout"/>
    </http>
+   
+   -->
    
    <authentication-manager alias="authenticationManager" >
         <authentication-provider ref="preAuthenticatedAuthenticationProvider" user-service-ref="portalUserDetailsService"/>
@@ -76,12 +78,12 @@
         <authentication-provider ref="preAuthenticatedAuthenticationProvider" user-service-ref="myUserDetailsService"/>
    </authentication-manager>
    
-   --><beans:bean id="preAuthenticatedProcessingFilter" 
+   --><!--<beans:bean id="preAuthenticatedProcessingFilter" 
             class="org.auscope.portal.server.web.security.PreAuthenticatedProcessingFilter">
       <beans:property name="authenticationManager" ref="authenticationManager" />
    </beans:bean>
    
-   <!--<beans:bean id="preAuthenticatedAuthenticationProvider" 
+   --><!--<beans:bean id="preAuthenticatedAuthenticationProvider" 
             class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
       <beans:property name="preAuthenticatedUserDetailsService">
          <beans:bean id="userDetailsServiceWrapper"   
@@ -95,12 +97,30 @@
       <beans:property name="dataSource" ref="dataSource"/>
    </beans:bean>
 
-    --><beans:bean id="preAuthenticatedAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-        <beans:property name="preAuthenticatedUserDetailsService">
+    -->
+    <beans:bean id="preAuthenticatedAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+    	<beans:property name="preAuthenticatedUserDetailsService">
             <beans:bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
                 <beans:property name="userDetailsService" ref="portalUserDetailsService"/>
-             </beans:bean>
-          </beans:property>
-       </beans:bean>   
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="preAuthenticatedProcessingFilter" class="org.auscope.portal.server.web.security.PreAuthenticatedProcessingFilter">
+      <beans:property name="authenticationManager" ref="authenticationManager" />
+   </beans:bean>
+   
+  	<http auto-config='true' >
+   		<intercept-url pattern="/gridsubmit.html" access="ROLE_USER"/>
+        <intercept-url pattern="/joblist.html" access="ROLE_USER"/>
+        <intercept-url pattern="/login.html*" filters="none"/>
+        <custom-filter ref="preAuthenticatedProcessingFilter" position="PRE_AUTH_FILTER" />
+        <logout/>
+        <openid-login login-page="/login.html">
+        	<attribute-exchange>
+				<openid-attribute name="email" type="http://schema.openid.net/contact/email" required="true" count="1"/>
+			</attribute-exchange>
+		</openid-login>
+    </http>   
     
 </beans:beans>

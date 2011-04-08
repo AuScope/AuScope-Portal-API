@@ -67,7 +67,7 @@ public class JobListController {
     @RequestMapping("/deleteJob.do")
     public ModelAndView deleteJob(HttpServletRequest request,
                                 HttpServletResponse response) {
-
+    	String userEmail = (String)request.getSession().getAttribute("openID-Email");
         String jobIdStr = request.getParameter("jobId");
         GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
@@ -102,12 +102,12 @@ public class JobListController {
         } else {
             // check if current user is the owner of the job
             GeodesySeries s = jobManager.getSeriesById(job.getSeriesId());
-            if (request.getRemoteUser().equals(s.getUser())) {
+            if (userEmail.equals(s.getUser())) {
                 logger.info("Deleting job with ID "+jobIdStr);
                 jobManager.deleteJob(job);
                 success = true;
             } else {
-                logger.warn(request.getRemoteUser()+"'s attempt to kill "+
+                logger.warn(userEmail+"'s attempt to kill "+
                         s.getUser()+"'s job denied!");
                 mav.addObject("error", "You are not authorised to delete this job.");
             }
@@ -128,7 +128,8 @@ public class JobListController {
     @RequestMapping("/deleteSeriesJobs.do")
     public ModelAndView deleteSeriesJobs(HttpServletRequest request,
                                        HttpServletResponse response) {
-
+    	
+    	String userEmail = (String)request.getSession().getAttribute("openID-Email");
         String seriesIdStr = request.getParameter("seriesId");
         List<GeodesyJob> jobs = null;
         ModelAndView mav = new ModelAndView("jsonView");
@@ -165,7 +166,7 @@ public class JobListController {
         } else {
             // check if current user is the owner of the series
             GeodesySeries s = jobManager.getSeriesById(seriesId);
-            if (request.getRemoteUser().equals(s.getUser())) {
+            if (userEmail.equals(s.getUser())) {
                 logger.info("Deleting jobs of series "+seriesIdStr);
                 boolean jobsDeleted = true;
                 for (GeodesyJob job : jobs) {
@@ -192,7 +193,7 @@ public class JobListController {
                 	success = false;
                 }
             } else {
-                logger.warn(request.getRemoteUser()+"'s attempt to delete "+
+                logger.warn(userEmail+"'s attempt to delete "+
                         s.getUser()+"'s jobs denied!");
                 mav.addObject("error", "You are not authorised to delete the jobs of this series.");
             }
@@ -215,6 +216,7 @@ public class JobListController {
     public ModelAndView killJob(HttpServletRequest request,
                                 HttpServletResponse response) {
 
+    	String userEmail = (String)request.getSession().getAttribute("openID-Email");
         String jobIdStr = request.getParameter("jobId");
         GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
@@ -249,7 +251,7 @@ public class JobListController {
         } else {
             // check if current user is the owner of the job
             GeodesySeries s = jobManager.getSeriesById(job.getSeriesId());
-            if (request.getRemoteUser().equals(s.getUser())) {
+            if (userEmail.equals(s.getUser())) {
                 logger.info("Cancelling job with ID "+jobIdStr);
                 String newState = gridAccess.killJob(
                         job.getReference(), credential);
@@ -261,7 +263,7 @@ public class JobListController {
                 jobManager.saveJob(job);
                 success = true;
             } else {
-                logger.warn(request.getRemoteUser()+"'s attempt to kill "+
+                logger.warn(userEmail+"'s attempt to kill "+
                         s.getUser()+"'s job denied!");
                 mav.addObject("error", "You are not authorised to cancel this job.");
             }
@@ -284,6 +286,7 @@ public class JobListController {
     public ModelAndView killSeriesJobs(HttpServletRequest request,
                                        HttpServletResponse response) {
 
+    	String userEmail = (String)request.getSession().getAttribute("openID-Email");
         String seriesIdStr = request.getParameter("seriesId");
         List<GeodesyJob> jobs = null;
         ModelAndView mav = new ModelAndView("jsonView");
@@ -320,7 +323,7 @@ public class JobListController {
         } else {
             // check if current user is the owner of the series
             GeodesySeries s = jobManager.getSeriesById(seriesId);
-            if (request.getRemoteUser().equals(s.getUser())) {
+            if (userEmail.equals(s.getUser())) {
                 logger.info("Cancelling jobs of series "+seriesIdStr);
                 for (GeodesyJob job : jobs) {
                     String oldStatus = job.getStatus();
@@ -341,7 +344,7 @@ public class JobListController {
                 }
                 success = true;
             } else {
-                logger.warn(request.getRemoteUser()+"'s attempt to kill "+
+                logger.warn(userEmail+"'s attempt to kill "+
                         s.getUser()+"'s jobs denied!");
                 mav.addObject("error", "You are not authorised to cancel the jobs of this series.");
             }
@@ -639,7 +642,7 @@ public class JobListController {
         String qDesc = request.getParameter("qSeriesDesc");
 
         if (qUser == null && qName == null && qDesc == null) {
-            qUser = request.getRemoteUser();
+            qUser = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
             logger.debug("No query parameters provided. Will return "+qUser+"'s series.");
         }
 
