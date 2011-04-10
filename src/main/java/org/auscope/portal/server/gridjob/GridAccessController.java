@@ -71,7 +71,7 @@ public class GridAccessController {
      * @return The status of the job after killing (a
      *         <code>StateEnumeration</code> string)
      */
-    public String killJob(String reference, Object credential) {
+    public String killJob(String reference/*, Object credential*/) {
         /*GramJobControl gjc = new GramJobControl((GSSCredential) credential);
         return gjc.killJob(reference);*/
     	return("Job killed");

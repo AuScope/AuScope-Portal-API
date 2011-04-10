@@ -72,7 +72,7 @@ public class JobListController {
         GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
-        Object credential = request.getSession().getAttribute("userCred");
+        /*Object credential = request.getSession().getAttribute("AWSCred");
 
         if (credential == null) {
             final String errorString = "Invalid grid credentials!";
@@ -80,7 +80,7 @@ public class JobListController {
             mav.addObject("error", errorString);
             mav.addObject("success", false);
             return mav;
-        }
+        }*/
 
 
         if (jobIdStr != null) {
@@ -135,7 +135,7 @@ public class JobListController {
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
         int seriesId = -1;
-        Object credential = request.getSession().getAttribute("userCred");
+        /*Object credential = request.getSession().getAttribute("AWSCred");
 
         if (credential == null) {
             final String errorString = "Invalid grid credentials!";
@@ -143,7 +143,7 @@ public class JobListController {
             mav.addObject("error", errorString);
             mav.addObject("success", false);
             return mav;
-        }
+        }*/
 
 
         if (seriesIdStr != null) {
@@ -221,7 +221,7 @@ public class JobListController {
         GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
-        Object credential = request.getSession().getAttribute("userCred");
+        /*Object credential = request.getSession().getAttribute("AWSCred");
 
         if (credential == null) {
             final String errorString = "Invalid grid credentials!";
@@ -229,7 +229,7 @@ public class JobListController {
             mav.addObject("error", errorString);
             mav.addObject("success", false);
             return mav;
-        }
+        }*/
 
 
         if (jobIdStr != null) {
@@ -254,7 +254,7 @@ public class JobListController {
             if (userEmail.equals(s.getUser())) {
                 logger.info("Cancelling job with ID "+jobIdStr);
                 String newState = gridAccess.killJob(
-                        job.getReference(), credential);
+                        job.getReference()/*, credential*/);
                 if (newState == null)
                     newState = "Cancelled";
                 logger.debug("New job state: "+newState);
@@ -292,7 +292,7 @@ public class JobListController {
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
         int seriesId = -1;
-        Object credential = request.getSession().getAttribute("userCred");
+        /*Object credential = request.getSession().getAttribute("AWSCred");
 
         if (credential == null) {
             final String errorString = "Invalid grid credentials!";
@@ -300,7 +300,7 @@ public class JobListController {
             mav.addObject("error", errorString);
             mav.addObject("success", false);
             return mav;
-        }
+        }*/
 
 
         if (seriesIdStr != null) {
@@ -334,7 +334,7 @@ public class JobListController {
                     }
                     logger.info("Killing job with ID "+job.getId());
                     String newState = gridAccess.killJob(
-                            job.getReference(), credential);
+                            job.getReference()/*, credential*/);
                     if (newState == null)
                         newState = "Cancelled";
                     logger.debug("New job state: "+newState);
@@ -669,16 +669,16 @@ public class JobListController {
         String seriesIdStr = request.getParameter("seriesId");
         List<GeodesyJob> seriesJobs = null;
         ModelAndView mav = new ModelAndView("jsonView");
-        Object credential = request.getSession().getAttribute("userCred");
+        //Object credential = request.getSession().getAttribute("AWSCred");
         int seriesId = -1;
 
-        if (credential == null) {
+        /*if (credential == null) {
             final String errorString = "Invalid grid credentials!";
             logger.error(errorString);
             mav.addObject("error", errorString);
             mav.addObject("success", false);
             return mav;
-        }
+        }*/
 
         if (seriesIdStr != null) {
             try {
