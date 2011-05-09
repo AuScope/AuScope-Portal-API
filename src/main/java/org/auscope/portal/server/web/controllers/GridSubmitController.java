@@ -29,7 +29,7 @@ import net.sf.json.JSONArray;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.aws.InstanceManager;
+import org.apache.commons.ssl.Base64;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
@@ -37,6 +37,7 @@ import org.auscope.portal.server.gridjob.GeodesySeries;
 import org.auscope.portal.server.gridjob.GridAccessController;
 import org.auscope.portal.server.gridjob.ScriptParser;
 import org.auscope.portal.server.gridjob.Util;
+import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -46,6 +47,7 @@ import org.jets3t.service.model.S3Bucket;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.ProviderCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,6 +58,9 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.RunInstancesRequest;
+import com.amazonaws.services.ec2.model.RunInstancesResult;
 
 
 /**
@@ -78,9 +83,11 @@ public class GridSubmitController {
     @Autowired
     private GeodesyJobManager jobManager;
     @Autowired
-    private InstanceManager instanceMgr;
-    @Autowired
     private HttpServiceCaller serviceCaller;
+    
+    @Autowired
+    @Qualifier(value = "propertyConfigurer")
+    private PortalPropertyPlaceholderConfigurer hostConfigurer;
 
     public static final String S3_BUCKET_NAME = "vegl-portal";
     public static final String TABLE_DIR = "tables";
@@ -638,7 +645,6 @@ public class GridSubmitController {
                                   HttpServletResponse response,
                                   GeodesyJob job) {
 
-    	logger.info("inside submitJob");
     	boolean success = true;
     	GeodesySeries series = null;
     	final String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
@@ -685,6 +691,7 @@ public class GridSubmitController {
         	
         	job.setSeriesId(series.getId());
             job.setJobType(job.getJobType().replace(",", ""));
+            job.setScriptFile(job.getScriptFile().replace(",", ""));
             JSONArray args = JSONArray.fromObject(request.getParameter("arguments"));
 			logger.info("Args count: " + job.getArguments().length
 					+ " | Args in Json : " + args.toArray().length);
@@ -697,7 +704,8 @@ public class GridSubmitController {
             logger.info("Submitting job with name " + job.getName());
             AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
             ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey()); 
-	    	
+            String keyPath = new String();
+            
             // copy files to S3 storage for processing 
 	        try {
 	        	
@@ -709,7 +717,7 @@ public class GridSubmitController {
 				
 				// create the base S3 object storage key path. The final key will be this with
 				// the filename appended.
-				String keyPath = user + "-" + job.getName() + "-" + dateFmt + "/";
+				keyPath = user + "-" + job.getName() + "-" + dateFmt;
 				job.setOutputDir(keyPath);
 				
 				// copy job files to S3 storage service. 
@@ -717,12 +725,15 @@ public class GridSubmitController {
 				S3Service s3Service = new RestS3Service(provCreds);
 				
 				for (File file : files){
-					logger.info("Uploading " + keyPath + file.getName());
+					logger.info("Uploading " + keyPath + "/" + file.getName());
 					S3Object obj = new S3Object(bucket, file);
-					obj.setKey(keyPath + file.getName());
+					obj.setKey(keyPath + "/" + file.getName());
 					s3Service.putObject(bucket, obj);
-					logger.info(keyPath + file.getName() +" uploaded to " + S3_BUCKET_NAME + "S3 bucket");
+					logger.info(keyPath + "/" + file.getName() +" uploaded to " + S3_BUCKET_NAME + "S3 bucket");
 				}
+				
+				gridStatus.currentStatusMsg = GridSubmitController.TRANSFER_COMPLETE;
+				
 			} catch (AmazonClientException amazonClientException) {
 	        	logger.error(GridSubmitController.S3_FILE_COPY_ERROR);
 	        	gridStatus.currentStatusMsg = GridSubmitController.S3_FILE_COPY_ERROR;
@@ -736,52 +747,51 @@ public class GridSubmitController {
 				success = false;
 			}
 	        
-	        if (success) {
+			// launch the ec2 instance
+			AmazonEC2 ec2 = new AmazonEC2Client(credentials);
+			ec2.setEndpoint(hostConfigurer.resolvePlaceholder("ec2.endpoint"));
+        	String imageId = hostConfigurer.resolvePlaceholder("emi.id");
+			RunInstancesRequest instanceRequest = new RunInstancesRequest(imageId, 1, 1);
+			
+			// user data is passed to the instance on launch. This will be the path to the S3 directory 
+			// where the input files are stored. The instance will download the input files and attempt
+			// to run the vegl_script.sh that was built in the Script Builder.
+			String encodedUserData = new String(Base64.encodeBase64(keyPath.toString().getBytes()));
+			instanceRequest.setUserData(encodedUserData);
+			instanceRequest.setKeyName("test");
+			instanceRequest.setInstanceType("m1.large");
+			RunInstancesResult result = ec2.runInstances(instanceRequest);
+			List<Instance> instances = result.getReservation().getInstances();
+			
+			if (instances.size() > 0)
+			{
+				Instance instance = instances.get(0);
+   				logger.info("Launched instance: " + instance.getInstanceId());
+   				success = true;
+			}
+			else
+			{
+				logger.error("Failed to launch instance to run job " + job.getId());
+				success = false;
+			}
+			
+   			if (success) {
                 job.setSubmitDate(dateFmt);
                 job.setStatus("Active");
                 jobSupplementInfo(job);
                 jobManager.saveJob(job);
-                request.getSession().removeAttribute("jobInputDir");
-                request.getSession().removeAttribute("localJobInputDir");
-                
-   				gridStatus.jobSubmissionStatus = JobSubmissionStatus.Running;
-   				gridStatus.currentStatusMsg = GridSubmitController.TRANSFER_COMPLETE;
-                
-                if (instanceMgr.getEC2() == null) {
-                	AmazonEC2 ec2 = new AmazonEC2Client(credentials);
-                	ec2.setEndpoint("http://192.43.239.18:8773/services/Eucalyptus");
-                	instanceMgr.setEC2(ec2);
-                }
-
-                // Kick off the EC2 processing. 
-                // Add the job to the InstanceManager job list. Check if an AMI is currently
-                // running and if so the job will be run on it. If not we launch a new AMI
-                // via the InstanceManager in a new thread so processing can carry on behind 
-                // the scenes.
-                instanceMgr.addJobToList(job);
-                if (!instanceMgr.isInstanceStarted()) {
-                	logger.info("Instance not running. Starting new instance");
-                	instanceMgr.setInstanceStarted(true);
-                	//instanceMgr.setImageId("ami-1649bf7f");
-                	instanceMgr.setImageId("emi-0BCC1149"); // test image needs to be replaced
-                	instanceMgr.setInstanceType("m1.small");
-                	new Thread(instanceMgr).start();
-                }
-                else {
-                	logger.info("Instance already running. Adding job to current instance.");
-                }
+                gridStatus.jobSubmissionStatus = JobSubmissionStatus.Running;
 	        } else {
 	        	gridStatus.jobSubmissionStatus = JobSubmissionStatus.Failed;
    				gridStatus.currentStatusMsg = GridSubmitController.INTERNAL_ERROR;
 	        }
+	        
+	        request.getSession().removeAttribute("jobInputDir");
+            request.getSession().removeAttribute("localJobInputDir");
         }
         
         // Save in session for status update request for this job.
         request.getSession().setAttribute("gridStatus", gridStatus);
-        
-        //reset the date range for next job
-        request.getSession().removeAttribute("dateTo");
-        request.getSession().removeAttribute("dateFrom");
         
         // clear the subset files from the session so they aren't created again if the 
         // user submits another job
@@ -858,15 +868,14 @@ public class GridSubmitController {
         String jobInputDir = gridAccess.getlocalGridStageInDir() + jobID;
         String newScript = (String) request.getSession().getAttribute("scriptFile");
 	    if (newScript != null) {
-	        request.getSession().removeAttribute("scriptFile");
 	        logger.debug("Adding "+newScript+" to stage-in directory");
 	        File tmpScriptFile = new File(System.getProperty("java.io.tmpdir") +
-	                File.separator+newScript+".py");
+	                File.separator+newScript+".sh");
 	        File newScriptFile = new File(jobInputDir+GridSubmitController.TABLE_DIR, tmpScriptFile.getName());
 	        success = Util.moveFile(tmpScriptFile, newScriptFile);
 	        if (success) {
 	            logger.info("Moved "+newScript+" to stageIn directory");
-	            scriptFile = newScript+".py";
+	            scriptFile = newScript+".sh";
 	
 	            // Extract information from script file
 	            ScriptParser parser = new ScriptParser();

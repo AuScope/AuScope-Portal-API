@@ -14,7 +14,7 @@
     items: [{
       xtype: "textfield",
       name: "scriptName",
-      value: "particle_script",
+      value: "vegl_script",
       fieldLabel: "Script Name",
       allowBlank: false,
       minLength: 3,

@@ -56,8 +56,8 @@ ScriptBuilder.onGetScriptTextFailure = function(response, request) {
     ScriptBuilder.updateSource();
 
     // Show settings dialog for new script
-    ScriptBuilder.showDialog('SimContainer', 'New Script',
-            Ext.getCmp('usedcomps-panel').getRootNode());
+    //ScriptBuilder.showDialog('SimContainer', 'New Script',
+            //Ext.getCmp('usedcomps-panel').getRootNode());
 }
 
 // called when the server replied to the initial script text request
@@ -338,7 +338,7 @@ ScriptBuilder.initialize = function() {
         }, {
             id: 'scriptname',
             xtype: 'hidden',
-            value: 'particle_script'
+            value: 'vegl_script'
         }]
     });
 

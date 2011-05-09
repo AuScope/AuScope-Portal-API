@@ -55,10 +55,6 @@
         <property name="localGridStageInDir" value="${grid.localStageInDir}"/>
     </bean>
     
-    <bean id="instanceMgr" class="org.auscope.portal.aws.InstanceManager">
-        <property name="jobManager" ref="geodesyJobManager"/>
-    </bean>
-    
     <bean id="geodesyJobManager" class="org.auscope.portal.server.gridjob.GeodesyJobManager">
         <property name="geodesyJobDao" ref="geodesyJobDao"/>
         <property name="geodesySeriesDao" ref="geodesySeriesDao"/>

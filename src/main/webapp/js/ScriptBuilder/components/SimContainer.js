@@ -19,23 +19,7 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
     this.expanded = true;
     
     this.values = {
-      "scriptName": "particle_script",
-      "particleType": "NRotSphere",
-      "numTimesteps": "1000",
-      "timeIncrement": "0.0001",
-      "constrain2D": "0",
-      "periodic": "0",
-      "subdivX": "1",
-      "subdivY": "1",
-      "subdivZ": "1",
-      "llfX": "-10",
-      "llfY": "-10",
-      "llfZ": "-10",
-      "urbX": "10",
-      "urbY": "10",
-      "urbZ": "10",
-      "gridSpacing": "2.5",
-      "verletDist": "0.2"
+      "scriptName": "vegl_script"
     }
   },
 
@@ -45,35 +29,22 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
 
   // collects the code fragments from all nodes in the tree
   getScript: function() {
-    var scriptHeader = "\
-# ESyS-Particle Simulation Script\n\
-# Created using the ESyS-Particle Script Builder Web Interface\n\
-# (c) 2009 ESSCC, The University of Queensland, Australia. All rights reserved.\n\n\
-from esys.lsm import *\n\
-from esys.lsm.util import *\n\
-from esys.lsm.geometry import *\n\n";
+    
+	var scriptHeader = "\
+#!/bin/bash\n\
+# VEGL script. \n\n";
+			
+	var scriptFooter = "\
+# adds a dummy file to the output directory for testing purposes\n\
+echo hello world > /tmp/output/result.txt";
 
-    var ret = scriptHeader;
+		
+	var ret = scriptHeader;
 
-    appendScript = function(node) { ret+=node.getScript(); }
+    appendScript = function(node) { ret+=node.getScript(); };
 
-    var numWorkers=this.values.subdivX*this.values.subdivY*this.values.subdivZ;
-    ret+="sim = LsmMpi ( numWorkerProcesses = "+numWorkers+", mpiDimList = [";
-    ret+=this.values.subdivX+", "+this.values.subdivY+", "+this.values.subdivZ+"] )\n";
-    ret+="sim.initVerletModel (\n   particleType = \""+this.values.particleType;
-    ret+="\",\n   gridSpacing = "+this.values.gridSpacing+",\n   verletDist = ";
-    ret+=this.values.verletDist+"\n)\n";
-    ret+="sim.setNumTimeSteps ( "+this.values.numTimesteps+" )\n";
-    ret+="sim.setTimeStepSize ( "+this.values.timeIncrement+" )\n";
-    ret+="sim.setSpatialDomain ( BoundingBox( Vec3(";
-    ret+=this.values.llfX+", "+this.values.llfY+", "+this.values.llfZ+"), Vec3(";
-    ret+=this.values.urbX+", "+this.values.urbY+", "+this.values.urbZ+") ) )\n";
-    if (this.values.constrain2D=="1") {
-      ret+="sim.force2dComputations ( True )\n";
-    }
-    ret+="\n";
     this.eachChild(appendScript);
-    ret+="\nsim.run()\n";
+    ret+=scriptFooter;
     return ret;
   },
 

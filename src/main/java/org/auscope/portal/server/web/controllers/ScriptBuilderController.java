@@ -29,7 +29,7 @@ import org.springframework.web.servlet.view.RedirectView;
  * @author Cihan Altinay
  */
 @Controller
-public class ScriptBuilderController {//extends MultiActionController {
+public class ScriptBuilderController {
 
     private final Log logger = LogFactory.getLog(getClass());
 
@@ -59,7 +59,7 @@ public class ScriptBuilderController {//extends MultiActionController {
         if (script != null) {
             String scriptName = request.getParameter("scriptname");
             if (scriptName == null) {
-                scriptName = "particle_script";
+                scriptName = "vegl_script";
             }
             response.setContentType("application/octet-stream");
             response.setContentLength(script.length());
@@ -98,13 +98,13 @@ public class ScriptBuilderController {//extends MultiActionController {
         if (script != null) {
             String scriptName = request.getParameter("scriptname");
             if (scriptName == null) {
-                scriptName = "particle_script";
+                scriptName = "vegl_script";
             }
 
             try {
                 String tempDir = System.getProperty("java.io.tmpdir");
                 File scriptFile = new File(
-                        tempDir+File.separator+scriptName+".py");
+                        tempDir+File.separator+scriptName+".sh");
                 scriptFile.deleteOnExit();
                 PrintWriter writer = new PrintWriter(scriptFile);
                 writer.print(script);
@@ -155,9 +155,9 @@ public class ScriptBuilderController {//extends MultiActionController {
                             System.getProperty("line.separator"));
                 }
                 input.close();
-                if (scriptFile.lastIndexOf(".py") > 0) {
+                if (scriptFile.lastIndexOf(".sh") > 0) {
                     scriptName = scriptFile.substring(0,
-                            scriptFile.lastIndexOf(".py"));
+                            scriptFile.lastIndexOf(".sh"));
                 } else {
                     scriptName = scriptFile;
                 }
