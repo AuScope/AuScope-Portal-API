@@ -31,12 +31,14 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
   getScript: function() {
     
 	var scriptHeader = "\
-#!/bin/bash\n\
-# VEGL script. \n\n";
+#!/bin/bash\n\n\
+# VEGL processing script.\n\
+# Subset files will be available from /tmp/input.\n\
+# Result files should be placed in /tmp/output for sync back to S3 storage.\n\n";
 			
 	var scriptFooter = "\
-# adds a dummy file to the output directory for testing purposes\n\
-echo hello world > /tmp/output/result.txt";
+# copies input files to the output dir for testing purposes\n\
+rsync /tmp/input/* /tmp/output";
 
 		
 	var ret = scriptHeader;

@@ -148,8 +148,8 @@ GridSubmit.onLoadJobObject = function(response, request) {
     Ext.getCmp('queuesCombo').getStore().baseParams.site =
        Ext.getCmp('sitesCombo').getValue();
 
-    // get get subsets
-    GridSubmit.getSubsetFiles();
+    // get script file
+    GridSubmit.loadJobFiles();
 }
 
 ////////////////////////
@@ -220,18 +220,6 @@ GridSubmit.loadJobObject = function() {
         waitMsg: 'Retrieving data, please wait...',
         waitTitle: 'Submit Job'
     });
-}
-
-//
-// Gets coverage subset files form ERDDAP based on captured co-ordinates
-//
-
-GridSubmit.getSubsetFiles = function() {
-	Ext.Ajax.request({
-	     url: 'getSubsets.do',
-	     success: GridSubmit.onLoadSubsets,
-	     failure: GridSubmit.onLoadSubsets
-	 });
 }
 
 //

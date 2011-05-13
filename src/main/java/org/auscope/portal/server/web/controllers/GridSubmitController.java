@@ -8,9 +8,8 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
@@ -26,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.ssl.Base64;
@@ -35,7 +33,6 @@ import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
 import org.auscope.portal.server.gridjob.GridAccessController;
-import org.auscope.portal.server.gridjob.ScriptParser;
 import org.auscope.portal.server.gridjob.Util;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
@@ -294,31 +291,6 @@ public class GridSubmitController {
         return result;
     }
     
-    /**
-     * Returns a JSON object containing a success attribute.
-     *
-     * @param request The servlet request
-     * @param response The servlet response
-     *
-     * @return A JSON object with a success attribute.
-     */
-    @RequestMapping("/getSubsets.do")    
-    public ModelAndView getSubsets(HttpServletRequest request,
-                                     HttpServletResponse response) {
-
-        ModelAndView result = new ModelAndView("jsonView");
-        
-        if(!addSubsetFilesToGridJob(request)){
-            logger.error("Subset failure.");
-            result.addObject("success", false);
-        }else{
-            logger.debug("Subset success.");
-            result.addObject("success", true);
-        }
-
-        return result;
-    }
-
     /**
      * Returns a JSON object containing an array of filenames and sizes which
      * are currently in the job's stage in directory.
@@ -718,7 +690,8 @@ public class GridSubmitController {
 				// create the base S3 object storage key path. The final key will be this with
 				// the filename appended.
 				keyPath = user + "-" + job.getName() + "-" + dateFmt;
-				job.setOutputDir(keyPath);
+				// set the output directory for results to be transferred to
+				job.setOutputDir(keyPath + "/output");
 				
 				// copy job files to S3 storage service. 
 				S3Bucket bucket = new S3Bucket(S3_BUCKET_NAME);
@@ -793,10 +766,6 @@ public class GridSubmitController {
         // Save in session for status update request for this job.
         request.getSession().setAttribute("gridStatus", gridStatus);
         
-        // clear the subset files from the session so they aren't created again if the 
-        // user submits another job
-        request.getSession().setAttribute("erddapUrlMap", new HashMap<String,String>());
-        
         ModelAndView mav = new ModelAndView("jsonView");
         mav.addObject("success", success);
         
@@ -860,33 +829,30 @@ public class GridSubmitController {
                 maxWallTime, maxMemory, cpuCount, inTransfers, outTransfers,
                 user, stdInput, stdOutput, stdError);
         
+        // create subset request script file
+        success = createSubsetScriptFile(request);
+        
+        if (!success){
+        	logger.error("creating subset request script file failed.");
+        	return null;
+        }
+        
         // Check if the ScriptBuilder was used. If so, there is a file in the
-        // system temp directory which needs to be staged in.
+        // system temp directory which needs to be staged in. 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String dateFmt = sdf.format(new Date());
         String jobID = user + "-" + dateFmt + File.separator;
         String jobInputDir = gridAccess.getlocalGridStageInDir() + jobID;
         String newScript = (String) request.getSession().getAttribute("scriptFile");
-	    if (newScript != null) {
+	    
+        if (newScript != null) {
 	        logger.debug("Adding "+newScript+" to stage-in directory");
-	        File tmpScriptFile = new File(System.getProperty("java.io.tmpdir") +
-	                File.separator+newScript+".sh");
+	        File tmpScriptFile = new File(System.getProperty("java.io.tmpdir") + File.separator+newScript+".sh");
 	        File newScriptFile = new File(jobInputDir+GridSubmitController.TABLE_DIR, tmpScriptFile.getName());
 	        success = Util.moveFile(tmpScriptFile, newScriptFile);
-	        if (success) {
-	            logger.info("Moved "+newScript+" to stageIn directory");
-	            scriptFile = newScript+".sh";
-	
-	            // Extract information from script file
-	            ScriptParser parser = new ScriptParser();
-	            try {
-	                parser.parse(newScriptFile);
-	                cpuCount = parser.getNumWorkerProcesses()+1;
-	            } catch (IOException e) {
-	                logger.warn("Error parsing file: "+e.getMessage());
-	            }
-	        } else {
-	            logger.warn("Could not move "+newScript+" to stage-in!");
+	        
+	        if (!success){
+	            logger.error("Could not move "+newScript+" to stage-in!");
 	        }
 	    }
 
@@ -897,74 +863,53 @@ public class GridSubmitController {
     }
     
     /**
-     * Adds a coverage subset file to the stageIn directory for attachment to the grid job
+     * Creates a new subset_request.sh script file that will get the subset files for the area selected
+     * on the map and save them to the input directory on the Eucalyptus instance. This script will 
+     * be executed on launch of the instance prior to the vegl processing script.
      * 
-     * @param request The HttpServletRequest
-     * @return true if the subset process was successful.
+     * @param request The HTTPServlet request
      */
-    private boolean addSubsetFilesToGridJob(HttpServletRequest request) {
+    private boolean createSubsetScriptFile(HttpServletRequest request) {
     	
-    	try {
-    		HashMap<String,String> erddapUrlMap = (HashMap)request.getSession().getAttribute("erddapUrlMap");
-    		Set<String> keys = erddapUrlMap.keySet();
-    		Iterator i = keys.iterator();
-    		
-    		while (i.hasNext()) {
-    			
-    			// get the ERDDAP subset request url and layer name
-    			String fileName = (String)i.next();
-    			String url = (String)erddapUrlMap.get(fileName);
-
-    			logger.debug("Getting coverage subset - " + fileName);
-    			// create and execute the erddap request
-    			GetMethod httpMethod = new GetMethod(url);
-	    		InputStream is = serviceCaller.getMethodResponseAsStream(httpMethod, serviceCaller.getHttpClient());
-	    		
-	    		if (is != null)
-	    		{
-		    		byte[] iobuff = new byte[4096];
-			        int bytes;
-			        String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
-			        File subsetFile = new File(localJobInputDir+GridSubmitController.TABLE_DIR+File.separator+fileName);
-			        FileOutputStream fos = new FileOutputStream(subsetFile);
-			        
-			        logger.debug("Writing file...");
-			        
-			        while ( (bytes = is.read( iobuff )) != -1 ) {
-			            fos.write( iobuff, 0, bytes );
-			        }
-			        
-			        is.close();
-			        fos.close();
-			        
-			        logger.debug("Added subset file - " + subsetFile.getPath());
-	    		}
-    		}
-    		
-    		return true;
-        }
-        catch (Throwable e) {
-            logger.error("Error writing subset file - " + e);
-        }
-        
-        return false;
+    	// create new subset request script file
+    	String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
+		File subsetRequestScript = new File(localJobInputDir+GridSubmitController.TABLE_DIR+File.separator+"subset_request.sh");
+		
+		// iterate through the map of subset request URL's
+    	HashMap<String,String> erddapUrlMap = (HashMap)request.getSession().getAttribute("erddapUrlMap");
+		Set<String> keys = erddapUrlMap.keySet();
+		Iterator<String> i = keys.iterator();
+		
+		try {
+			FileWriter out = new FileWriter(subsetRequestScript);
+			out.write("cd /tmp/input\n");
+			
+			while (i.hasNext()) {
+				
+				// get the ERDDAP subset request url and layer name
+				String fileName = (String)i.next();
+				String url = (String)erddapUrlMap.get(fileName);
+				
+				// add the command for making the subset request
+				out.write("wget '" + url +"'\n");
+			}
+			
+			out.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Error creating subset request script");
+			e.printStackTrace();
+			return false;
+		} 
+		
+		// clear the subset URL's from the session so they aren't created again if the 
+        // user submits another job
+        request.getSession().setAttribute("erddapUrlMap", new HashMap<String,String>());
+		
+		return true;
     }
     
-    /**
-     * Convert the ERDDAP format to a valid file extension if it isn't one already
-     * 
-     * @param format The format parameter used in the ERDDAP subset call
-     * @return A valid file extension. 
-     */
-    private String generateSubsetFileExtension(String format) {
-        if (format.toLowerCase().equals("geotif")) {
-        	return ".tiff";
-        }
-        else {
-            return "."+format;
-        }
-    }
-
 	/** 
      * Create stageIn directories on portal host, so user can upload files easy.
      *
