@@ -54,6 +54,8 @@ public class JobListController {
     private GridAccessController gridAccess;
     @Autowired
     private GeodesyJobManager jobManager;
+    
+    private S3Service s3Service;
 
     /**
      * Delete the job given by its reference.
@@ -392,35 +394,19 @@ public class JobListController {
             logger.error("The requested job was not found.");
             mav.addObject("error", errorString);
         } else if (job.getOutputDir() != null) {
-	        AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-	        ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey());
-	        
-	        try {
-				S3Service s3Service = new RestS3Service(provCreds);
-				S3Bucket[] buckets = s3Service.listAllBuckets();
-				
-				logger.info("job output dir: '" + job.getOutputDir() + "'");
-				
-				for (S3Bucket bucket : buckets) {
-		        	if (bucket.getName().equals(GridSubmitController.S3_BUCKET_NAME)) {
-		        		S3Object[] objects = s3Service.listObjects(bucket.getName(), job.getOutputDir(),null);
-			        	FileInformation[] fileDetails = new FileInformation[objects.length];
-			        	
-			        	int i = 0;
-			        	// get file information from s3 objects
-			        	for (S3Object object : objects) {
-			        		fileDetails[i++] = new FileInformation(object.getKey(), object.getContentLength());
-			        		totalItems++;
-			        	}
-			        	
-			        	logger.info(totalItems + " job files located");
-			        	mav.addObject("files", fileDetails);
-		        	}
-		        }
-			} catch (S3ServiceException e) {
-				logger.error("Error obtaining S3Service.");
-				e.printStackTrace();
-			}
+        	// get results file information to display in the Files tab
+        	S3Object[] results = getOutputFileDetails(request, job);
+        	FileInformation[] fileDetails = new FileInformation[results.length];
+        	
+        	int i = 0;
+        	// get file information from s3 objects
+        	for (S3Object object : results) {
+        		fileDetails[i++] = new FileInformation(object.getKey(), object.getContentLength());
+        		totalItems++;
+        	}
+        	
+        	logger.info(totalItems + " job files located");
+        	mav.addObject("files", fileDetails);
         }
         
     	return mav;
@@ -459,17 +445,15 @@ public class JobListController {
         if (job != null && fileName != null) {
         	
         	logger.debug("Download " + key);
-        	AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-        	ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey());
         	try {
-				S3Service s3Service = new RestS3Service(provCreds);
+				S3Service s3Service = getS3Service(request);
 				S3Object s3obj = s3Service.getObject(GridSubmitController.S3_BUCKET_NAME, key);
 				InputStream is = s3obj.getDataInputStream();
 					
 				if (is != null) {
 					response.setContentType("application/octet-stream");
 				    response.setHeader("Content-Disposition",
-				            "attachment; filename=\""+key+"\"");
+				            "attachment; filename=\""+fileName+"\"");
 				    
 				    try {
 				    	OutputStream out = response.getOutputStream();
@@ -563,9 +547,7 @@ public class JobListController {
             
             try {
 
-            	AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-                ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey());
-            	S3Service s3Service = new RestS3Service(provCreds);
+            	S3Service s3Service = getS3Service(request);
                 boolean readOneOrMoreFiles = false;
                 ZipOutputStream zout = new ZipOutputStream(
                         response.getOutputStream());
@@ -669,16 +651,7 @@ public class JobListController {
         String seriesIdStr = request.getParameter("seriesId");
         List<GeodesyJob> seriesJobs = null;
         ModelAndView mav = new ModelAndView("jsonView");
-        //Object credential = request.getSession().getAttribute("AWSCred");
         int seriesId = -1;
-
-        /*if (credential == null) {
-            final String errorString = "Invalid grid credentials!";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-            mav.addObject("success", false);
-            return mav;
-        }*/
 
         if (seriesIdStr != null) {
             try {
@@ -690,13 +663,83 @@ public class JobListController {
         } else {
             logger.warn("No series ID specified!");
         }
-
+        
+        // check to see if any active jobs have completed or failed so the status can be updated
         if (seriesJobs != null) {
-            mav.addObject("jobs", seriesJobs);
+        	
+        	for (GeodesyJob job : seriesJobs) {
+        		S3Object[] results = getOutputFileDetails(request, job);
+        		
+        		if (job.getStatus().equals("Active") && results.length > 0) {
+        			// update status to done
+        			job.setStatus("Done");
+        			 
+        			// check if an error log exists. If so the job has failed.
+        			for (S3Object object : results) {
+        				if (object.getName().endsWith("error.log")) {
+        					job.setStatus("Failed");
+        					break;
+        				}
+        			}
+        			
+        			jobManager.saveJob(job);
+        		}
+        	}
+        	
+        	mav.addObject("jobs", seriesJobs);
         }
 
         logger.debug("Returning series job list");
         return mav;
+    }
+    
+    /**
+     * Gets the details of any files in the jobs output directory.
+     * 
+     * @param request The HttpServletRequest
+     * @param job The job that that we want results for
+     * @return Array of S3Objects, or null if no results available.
+     */
+    private S3Object[] getOutputFileDetails(HttpServletRequest request, GeodesyJob job) {
+        
+        try {
+			S3Service s3Service = getS3Service(request);
+			S3Bucket[] buckets = s3Service.listAllBuckets();
+			
+			logger.info("job output dir: '" + job.getOutputDir() + "'");
+			
+			for (S3Bucket bucket : buckets) {
+	        	if (bucket.getName().equals(GridSubmitController.S3_BUCKET_NAME)) {
+	        		S3Object[] objects = s3Service.listObjects(bucket.getName(), job.getOutputDir(),null);
+		        	return objects;
+	        	}
+	        }
+		} catch (S3ServiceException e) {
+			logger.error("Error obtaining S3Service.");
+			e.printStackTrace();
+		}
+		
+		return null;
+    }
+    
+    /**
+     * Get or create a new S3Service for accessing job files in S3.
+     *  
+     * @param request The HttpServletRequest
+     * @return an S3Service object
+     * @throws S3ServiceException
+     */
+    private S3Service getS3Service(HttpServletRequest request) throws S3ServiceException {
+    	
+    	// create a new service object if we don't have one
+    	if (s3Service == null) {
+    		AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
+            ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey());
+            
+            s3Service = new RestS3Service(provCreds);
+    	}
+    	
+        return s3Service;
     }
 }
 

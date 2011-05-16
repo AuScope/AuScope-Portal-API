@@ -130,7 +130,7 @@ JobList.updateJobDetails = function() {
     if (jobGrid.getSelectionModel().getSelected()) {
         var jobData = jobGrid.getSelectionModel().getSelected().data;
         JobList.jobFileStore.baseParams.jobId = jobData.id;
-        if(jobData.status == 'Done'){
+        if(jobData.status == 'Done' || jobData.status == 'Failed'){
     		JobList.jobFileStore.baseParams.dirName = null;
     		JobList.jobFileStore.baseParams.dirPath = null;        	
             JobList.jobFileStore.reload();
