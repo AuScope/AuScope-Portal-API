@@ -50,6 +50,12 @@
        <constructor-arg name="description" value=""/>
        <constructor-arg name="layerName" value="onshore_and_offshore_gravity_anomaly_geodetic"/>
    </bean>
+   
+   <bean id="knownTypeMagMap" class="org.auscope.portal.server.web.KnownLayerWMS">
+       <constructor-arg name="title" value="MagMap V5 2010"/>
+       <constructor-arg name="description" value=""/>
+       <constructor-arg name="layerName" value="magmap_V5_2010"/>
+   </bean>
     
    <bean id="gridAccess" class="org.auscope.portal.server.gridjob.GridAccessController">
         <property name="localGridStageInDir" value="${grid.localStageInDir}"/>

@@ -9,6 +9,7 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -23,7 +24,7 @@ import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
-import org.auscope.portal.server.gridjob.GridAccessController;
+import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
@@ -32,11 +33,16 @@ import org.jets3t.service.model.S3Bucket;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.ProviderCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 
 /**
  * Controller for the job list view.
@@ -51,11 +57,13 @@ public class JobListController {
     private final Log logger = LogFactory.getLog(getClass());
 
     @Autowired
-    private GridAccessController gridAccess;
-    @Autowired
     private GeodesyJobManager jobManager;
+    @Autowired
+    @Qualifier(value = "propertyConfigurer")
+    private PortalPropertyPlaceholderConfigurer hostConfigurer;
     
     private S3Service s3Service;
+    private AmazonEC2 ec2;
 
     /**
      * Delete the job given by its reference.
@@ -74,16 +82,6 @@ public class JobListController {
         GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
-        /*Object credential = request.getSession().getAttribute("AWSCred");
-
-        if (credential == null) {
-            final String errorString = "Invalid grid credentials!";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-            mav.addObject("success", false);
-            return mav;
-        }*/
-
 
         if (jobIdStr != null) {
             try {
@@ -137,16 +135,6 @@ public class JobListController {
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
         int seriesId = -1;
-        /*Object credential = request.getSession().getAttribute("AWSCred");
-
-        if (credential == null) {
-            final String errorString = "Invalid grid credentials!";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-            mav.addObject("success", false);
-            return mav;
-        }*/
-
 
         if (seriesIdStr != null) {
             try {
@@ -223,16 +211,6 @@ public class JobListController {
         GeodesyJob job = null;
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
-        /*Object credential = request.getSession().getAttribute("AWSCred");
-
-        if (credential == null) {
-            final String errorString = "Invalid grid credentials!";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-            mav.addObject("success", false);
-            return mav;
-        }*/
-
 
         if (jobIdStr != null) {
             try {
@@ -255,15 +233,17 @@ public class JobListController {
             GeodesySeries s = jobManager.getSeriesById(job.getSeriesId());
             if (userEmail.equals(s.getUser())) {
                 logger.info("Cancelling job with ID "+jobIdStr);
-                String newState = gridAccess.killJob(
-                        job.getReference()/*, credential*/);
-                if (newState == null)
-                    newState = "Cancelled";
-                logger.debug("New job state: "+newState);
-
-                job.setStatus(newState);
-                jobManager.saveJob(job);
-                success = true;
+                
+                // terminate the EMI instance
+                try {
+					terminateInstance(request, job);
+	                success = true;
+	                
+				} catch (AmazonServiceException e) {
+					final String errorString = "Failed to terminate instance with id: " + job.getReference();
+					logger.error(errorString);
+					mav.addObject(errorString);
+				} 
             } else {
                 logger.warn(userEmail+"'s attempt to kill "+
                         s.getUser()+"'s job denied!");
@@ -274,6 +254,31 @@ public class JobListController {
 
         return mav;
     }
+    
+    
+	/**
+	 * Terminates the instance of an EMI that was launched by a job.
+	 * 
+	 * @param request The HttpServletRequest
+	 * @param job The job linked the to instance that is to be terminated
+	 */
+	private void terminateInstance(HttpServletRequest request, GeodesyJob job) {
+		
+		if (ec2 == null) {
+			AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
+			ec2 = new AmazonEC2Client(credentials);
+			ec2.setEndpoint(hostConfigurer.resolvePlaceholder("ec2.endpoint"));
+		}
+		
+		TerminateInstancesRequest termReq = new TerminateInstancesRequest();
+		ArrayList<String> instanceIdList = new ArrayList<String>();
+		instanceIdList.add(job.getReference());
+		termReq.setInstanceIds(instanceIdList);
+		ec2.terminateInstances(termReq);
+							
+		job.setStatus("Cancelled");
+		jobManager.saveJob(job);
+	}
 
     /**
      * Kills all jobs of given series.
@@ -294,17 +299,7 @@ public class JobListController {
         ModelAndView mav = new ModelAndView("jsonView");
         boolean success = false;
         int seriesId = -1;
-        /*Object credential = request.getSession().getAttribute("AWSCred");
-
-        if (credential == null) {
-            final String errorString = "Invalid grid credentials!";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-            mav.addObject("success", false);
-            return mav;
-        }*/
-
-
+        
         if (seriesIdStr != null) {
             try {
                 seriesId = Integer.parseInt(seriesIdStr);
@@ -334,15 +329,18 @@ public class JobListController {
                         logger.debug("Skipping finished job "+job.getId());
                         continue;
                     }
-                    logger.info("Killing job with ID "+job.getId());
-                    String newState = gridAccess.killJob(
-                            job.getReference()/*, credential*/);
-                    if (newState == null)
-                        newState = "Cancelled";
-                    logger.debug("New job state: "+newState);
-
-                    job.setStatus(newState);
-                    jobManager.saveJob(job);
+                    logger.info("Cancelling job with ID "+job.getId());
+                    
+                    // terminate the EMI instance
+                    try {
+    					terminateInstance(request, job);
+    	                success = true;
+    	                
+    				} catch (AmazonServiceException e) {
+    					final String errorString = "Failed to terminate instance with id: " + job.getReference();
+    					logger.error(errorString);
+    					mav.addObject(errorString);
+    				} 
                 }
                 success = true;
             } else {

@@ -739,8 +739,12 @@ public class GridSubmitController {
 			if (instances.size() > 0)
 			{
 				Instance instance = instances.get(0);
-   				logger.info("Launched instance: " + instance.getInstanceId());
+				String instanceId = instance.getInstanceId();
+   				logger.info("Launched instance: " + instanceId);
    				success = true;
+   				
+   				// set reference as instanceId for use when killing a job 
+   				job.setReference(instanceId);
 			}
 			else
 			{
