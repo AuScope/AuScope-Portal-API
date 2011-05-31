@@ -881,7 +881,7 @@ GridSubmit.initialize = function() {
                 return false;
             }
         }
-        gotoStep(1);
+        gotoStep(2);
         return true;
     };
 
@@ -1022,11 +1022,11 @@ GridSubmit.initialize = function() {
             items: [ metadataForm ]
         }, {
             id: 'card-files',
-            title: 'Step 3: Add files to job...',
+            title: 'Step 2: Add files to job...',
             defaults: { border: false },
             buttons: [{
                 text: '&laquo; Previous',
-                handler: validateMetadata.createDelegate(this, [1])
+                handler: validateMetadata.createDelegate(this, [0])
             }, {
                 text: 'Submit',
                 handler: GridSubmit.submitJob

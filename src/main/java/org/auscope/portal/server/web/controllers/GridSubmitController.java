@@ -560,7 +560,7 @@ public class GridSubmitController {
         	mav.addObject("data", jobStatus.currentStatusMsg);
         	mav.addObject("jobStatus", jobStatus.jobSubmissionStatus);
         } else {
-        	mav.addObject("data", "Grid File Transfere failed.");
+        	mav.addObject("data", "Cloud File Transfer failed.");
         	mav.addObject("jobStatus", JobSubmissionStatus.Failed);
         }
 
@@ -622,6 +622,7 @@ public class GridSubmitController {
     	final String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
     	String newSeriesName = request.getParameter("seriesName");
     	String seriesIdStr = request.getParameter("seriesId");
+    	ModelAndView mav = new ModelAndView("jsonView");
     	
     	//Used to store Job Submission status, because there will be another request checking this.
 		GridTransferStatus gridStatus = new GridTransferStatus();
@@ -686,6 +687,13 @@ public class GridSubmitController {
 				logger.info("uploading files from " + localJobInputDir + GridSubmitController.TABLE_DIR);
 				File dir = new File(localJobInputDir + GridSubmitController.TABLE_DIR); 
 				File[] files = dir.listFiles(); 
+				
+				// check if the vegl script and erddap request exist for the job. If not it can't be submitted
+				if (files.length == 0)
+				{
+					mav.addObject("msg", "Job must have a vegl_script and subset_request script file in order to submit");
+					return mav;
+				}
 				
 				// create the base S3 object storage key path. The final key will be this with
 				// the filename appended.
@@ -770,7 +778,6 @@ public class GridSubmitController {
         // Save in session for status update request for this job.
         request.getSession().setAttribute("gridStatus", gridStatus);
         
-        ModelAndView mav = new ModelAndView("jsonView");
         mav.addObject("success", success);
         
         return mav;
@@ -837,7 +844,7 @@ public class GridSubmitController {
         success = createSubsetScriptFile(request);
         
         if (!success){
-        	logger.error("creating subset request script file failed.");
+        	logger.error("No subset area has been selected.");
         	return null;
         }
         
@@ -875,42 +882,49 @@ public class GridSubmitController {
      */
     private boolean createSubsetScriptFile(HttpServletRequest request) {
     	
-    	// create new subset request script file
-    	String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
-		File subsetRequestScript = new File(localJobInputDir+GridSubmitController.TABLE_DIR+File.separator+"subset_request.sh");
-		
-		// iterate through the map of subset request URL's
+    	// check if subset areas have been selected
     	HashMap<String,String> erddapUrlMap = (HashMap)request.getSession().getAttribute("erddapUrlMap");
-		Set<String> keys = erddapUrlMap.keySet();
-		Iterator<String> i = keys.iterator();
-		
-		try {
-			FileWriter out = new FileWriter(subsetRequestScript);
-			out.write("cd /tmp/input\n");
-			
-			while (i.hasNext()) {
-				
-				// get the ERDDAP subset request url and layer name
-				String fileName = (String)i.next();
-				String url = (String)erddapUrlMap.get(fileName);
-				
-				// add the command for making the subset request
-				out.write("wget '" + url +"'\n");
-			}
-			
-			out.close();
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			logger.error("Error creating subset request script");
-			e.printStackTrace();
-			return false;
-		} 
-		
-		// clear the subset URL's from the session so they aren't created again if the 
-        // user submits another job
-        request.getSession().setAttribute("erddapUrlMap", new HashMap<String,String>());
-		
+    	
+    	if (erddapUrlMap != null) {
+    		// create new subset request script file
+        	String localJobInputDir = (String) request.getSession().getAttribute("localJobInputDir");
+    		File subsetRequestScript = new File(localJobInputDir+GridSubmitController.TABLE_DIR+File.separator+"subset_request.sh");
+    		
+    		// iterate through the map of subset request URL's
+    		Set<String> keys = erddapUrlMap.keySet();
+    		Iterator<String> i = keys.iterator();
+    		
+    		try {
+    			FileWriter out = new FileWriter(subsetRequestScript);
+    			out.write("cd /tmp/input\n");
+    			
+    			while (i.hasNext()) {
+    				
+    				// get the ERDDAP subset request url and layer name
+    				String fileName = (String)i.next();
+    				String url = (String)erddapUrlMap.get(fileName);
+    				
+    				// add the command for making the subset request
+    				out.write("wget '" + url +"'\n");
+    			}
+    			
+    			out.close();
+    			
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			logger.error("Error creating subset request script");
+    			e.printStackTrace();
+    			return false;
+    		} 
+    		
+    		// clear the subset URL's from the session so they aren't created again if the 
+            // user submits another job
+            request.getSession().setAttribute("erddapUrlMap", new HashMap<String,String>());
+
+    	} else {
+    		logger.warn("No subset area selected");
+    	}
+    	
 		return true;
     }
     
