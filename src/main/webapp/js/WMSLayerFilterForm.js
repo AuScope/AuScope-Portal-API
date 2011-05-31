@@ -5,12 +5,19 @@
 
 WMSLayerFilterForm = function(activeLayerRecord, map) {
 
+	this.activeLayerRecord = activeLayerRecord;
 	var pos = new GControlPosition(G_ANCHOR_BOTTOM_LEFT, new GSize(0, -85));
 	map.addControl(new MStatusControl({position:pos}));
 	
+	this.xCellDim;
+	this.yCellDim;
+	this.zCellDim;
+	this.maxDepth;
+	this.mgaZone;
+	
 	// create a drag control for each bounding box
-	//var bufferBbox = new MPolyDragControl({map:map,type:'rectangle',label:'Buffer'});
 	var dataBbox = new MPolyDragControl({map:map,type:'rectangle',activeLayerRecord:activeLayerRecord});
+	this.dataBbox = dataBbox;
 	
     var sliderHandler = function(caller, newValue) {
     	var overlayManager = activeLayerRecord.getOverlayManager();
@@ -66,14 +73,12 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
         width	: 85,
         bodyStyle	: 'margin:5px 0 0 0',
         disabled: true,
+        scope: this,
         handler: function() {
         	
         	if (dataBbox.getParams() == null) {
         		Ext.Msg.alert("Error", 'You must draw the data bounds before capturing.');
         	} 
-        	/*else if (bufferBbox.getParams() == null) {
-        		Ext.Msg.alert("Error", 'A buffer amount must be entered before capturing.');
-        	}*/
         	else {
         		
         		// check if selected region is within the bounds of the coverage layer
@@ -90,20 +95,15 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
             			Ext.Msg.alert("Error", 'Selected region exceeds the coverage bounds. Please adjust region selection.');
             			return;
             		}
-                }        		
-        		
-        		// set buffer co-ordinates
-        		//calculateBufferCoords(neLat.getValue(), neLng.getValue(), swLat.getValue(), swLng.getValue(), buffer.getValue());
-        		
-	        	Ext.Ajax.request({
-	        		url: 'sendSubsetsToGrid.do' ,
-	        		success: WMSLayerFilterForm.onSendToGridResponse,
-	        		failure: WMSLayerFilterForm.onRequestFailure,
-	        		params		: {
-	        			layerName  		: activeLayerRecord.getLayerName(),
-	        			dataCoords 		: dataBbox.getParams(),
-	        			//bufferCoords	: bufferBbox.getParams(),
-	        			format			: fileTypeCombo.getValue()
+                }    
+                
+                Ext.Ajax.request({
+	        		url		: 'calculateMgaZone.do' ,
+	        		scope	: this,
+	        		success : WMSLayerFilterForm.onCalculateMgaZoneResponse,
+	        		failure : WMSLayerFilterForm.onRequestFailure,
+	        		params	: {
+	        			dataCoords 		: dataBbox.getParams()
 	            	}
 	        	});
         	}
@@ -119,10 +119,9 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
     
     // subset file type selection values
 	var fileTypes =  [
-   		 //['NetCDF','nc'],
    		 ['CSV','csv'],
    		 ['GeoTIFF','geotif'],
-   		 ['KML','kml']
+   		 ['NetCDF','nc']
    	];
 	
 	var fileTypeStore = new Ext.data.SimpleStore({
@@ -145,12 +144,15 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
         value          : 'csv',
         submitValue	   : false
     });
+	
+	this.fileTypeCombo = fileTypeCombo;
     
 	this.isFormLoaded = true; //We aren't reliant on any remote downloads
 	
     //-----------Panel
     WMSLayerFilterForm.superclass.constructor.call(this, {
     	id          : String.format('{0}',activeLayerRecord.getId()),
+    	scope		: this,
         border      : false,
         autoScroll  : true,
         hideMode    : 'offsets',
@@ -175,7 +177,6 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
             	neLng,
             	swLat,
             	swLng,
-            	//buffer,
             	{
     				// column layout with 3 columns
                     layout:'column',
@@ -202,12 +203,95 @@ WMSLayerFilterForm = function(activeLayerRecord, map) {
     });
 };
 
-WMSLayerFilterForm.onSendToGridResponse = function(response, request) {
+WMSLayerFilterForm.onCalculateMgaZoneResponse = function(response, request) {
+    var resp = Ext.decode(response.responseText);
+    var wmsForm = this;
+    
+    if (resp.mgaZone != null) {
+
+    	var mgaZoneWindow = new InversionDimensionWindow({
+            mgaZone : resp.mgaZone,
+            scope	: wmsForm,
+            callback : function(wmsForm, newMgaZone, xCellDim, yCellDim, zCellDim, maxDepth) {
+            	
+            	// set instance variables for use again in creatingErddapRequest
+            	wmsForm.xCellDim = xCellDim;
+            	wmsForm.yCellDim = yCellDim;
+            	wmsForm.zCellDim = zCellDim;
+            	wmsForm.maxDepth = maxDepth;
+            	wmsForm.mgaZone = newMgaZone;
+            	
+            	Ext.Ajax.request({
+	        		url		: 'projectToUtm.do' ,
+	        		scope	: wmsForm,
+	        		success : WMSLayerFilterForm.onProjectToUtmResponse,
+	        		failure : WMSLayerFilterForm.onRequestFailure,
+	        		params	: {
+	        			dataCoords 	: wmsForm.dataBbox.getParams(),
+	        			mgaZone		: newMgaZone,
+	        			xCellDim	: xCellDim,
+	        			yCellDim	: yCellDim,
+	        			zCellDim	: zCellDim,
+	        			maxDepth	: maxDepth
+	            	}
+	        	});
+            }
+        });
+    	
+    	mgaZoneWindow.show();
+    } else {
+    	Ext.Msg.alert("Error", "Could not calculate MGA Zone" );
+    }
+};
+
+WMSLayerFilterForm.onProjectToUtmResponse = function(response, request) {
+    var resp = Ext.decode(response.responseText);
+    var wmsForm = this;
+    
+    if (resp.eastingArray != null && resp.northingArray != null && resp.depthArray) {
+
+    	var mgaZoneWindow = new UTMBoundsInfoWindow({
+    		scope	: wmsForm,
+    		eastingArray : resp.eastingArray,
+    		northingArray : resp.northingArray,
+    		depthArray : resp.depthArray,
+            callback : function(wmsForm, minEast, maxEast, minNorth, maxNorth, maxDepth) {
+            	
+            	Ext.Ajax.request({
+	        		url		: 'createErddapRequest.do' ,
+	        		scope	: this,
+	        		success : WMSLayerFilterForm.onCreateErddapRequestResponse,
+	        		failure : WMSLayerFilterForm.onRequestFailure,
+	        		params	: {
+	        			dataCoords 		: wmsForm.dataBbox.getParams(),
+	        			mgaZone		: wmsForm.mgaZone,
+	        			xCellDim	: wmsForm.xCellDim,
+	        			yCellDim	: wmsForm.yCellDim,
+	        			zCellDim	: wmsForm.zCellDim,
+	        			maxDepth	: wmsForm.maxDepth,
+	        			minEast		: minEast,
+	        			maxEast		: maxEast,
+	        			minNorth	: minNorth,
+	        			maxNorth	: maxNorth,
+	        			layerName  		: wmsForm.activeLayerRecord.getLayerName(),
+	        			format			: wmsForm.fileTypeCombo.getValue()
+	            	}
+	        	});
+            }
+        });
+    	
+    	mgaZoneWindow.show();
+    } else {
+    	Ext.Msg.alert("Error", "Failed to project co-ordinates to UTM" );
+    }
+};
+
+WMSLayerFilterForm.onCreateErddapRequestResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
     if (resp.error != null) {
         JobList.showError(resp.error);
     } else {
-        Ext.Msg.alert("Success", "The selected coverage subset was added as an input for the job.");
+        Ext.Msg.alert("Success", "Subset bounds have been captured.");
     }
 };
 
@@ -225,29 +309,6 @@ createNumberfield = function(label, id) {
         fieldLabel 	: label,
         name       	: id
     });
-};
-
-// this method is incomplete due to the decision to drop the buffer sub set for now.
-// keeping code in case this decision changed.
-calculateBufferCoords = function(neLat, neLng, swLat, swLng, buffer) {
-	
-	// convert buffer to meters
-	buffer = buffer * 1000;
-	
-	// convert lat/lng to UTM
-	neLatLng = LatLng(neLat,neLng);
-	swLatLng = LatLng(wsLat,swLng);
-	neUTM = neLatLng.toUTMRef();
-	swUTM = swLatLng.toUTMRef();
-	
-	// apply buffer
-	neUTM.easting = neUTM.easting + buffer;
-	neUTM.northing = neUTM.northing + buffer;
-	swUTM.easting = swUTM.easting - buffer;
-	swUTM.northing = swUTM.northing - buffer;
-	
-	// convert back to lat/lng	
-	
 };
 
 Ext.extend(WMSLayerFilterForm, Ext.FormPanel, {
