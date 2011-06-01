@@ -739,7 +739,6 @@ public class GridSubmitController {
 			// to run the vegl_script.sh that was built in the Script Builder.
 			String encodedUserData = new String(Base64.encodeBase64(keyPath.toString().getBytes()));
 			instanceRequest.setUserData(encodedUserData);
-			instanceRequest.setKeyName("test");
 			instanceRequest.setInstanceType("m1.large");
 			RunInstancesResult result = ec2.runInstances(instanceRequest);
 			List<Instance> instances = result.getReservation().getInstances();
