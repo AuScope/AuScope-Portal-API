@@ -672,9 +672,10 @@ public class JobListController {
         			// update status to done
         			job.setStatus("Done");
         			 
-        			// check if an error log exists. If so the job has failed.
+        			// check if any errors occurred. Errors will be written to stderr.txt
         			for (S3Object object : results) {
-        				if (object.getName().endsWith("error.log")) {
+        				if (object.getName().endsWith("stderr.txt") && object.getContentLength() > 0) {
+        					// change status to failed
         					job.setStatus("Failed");
         					break;
         				}
