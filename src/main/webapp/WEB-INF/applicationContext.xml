@@ -56,6 +56,12 @@
        <constructor-arg name="description" value=""/>
        <constructor-arg name="layerName" value="magmap_V5_2010"/>
    </bean>
+   
+   <bean id="knownTypeRadMapTotaldose" class="org.auscope.portal.server.web.KnownLayerWMS">
+       <constructor-arg name="title" value="RadMap Totaldose"/>
+       <constructor-arg name="description" value=""/>
+       <constructor-arg name="layerName" value="radmap10_filtered_totaldose"/>
+   </bean>
     
    <bean id="gridAccess" class="org.auscope.portal.server.gridjob.GridAccessController">
         <property name="localGridStageInDir" value="${grid.localStageInDir}"/>

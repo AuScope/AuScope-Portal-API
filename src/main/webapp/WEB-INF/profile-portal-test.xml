@@ -13,7 +13,7 @@
             <list>
             	<ref bean="knownTypeBouguerGeodetic" />
             	<ref bean="knownTypeGravAnomalyGeodetic" />
-            	<ref bean="knownTypeMagMap" />
+            	<ref bean="knownTypeRadMapTotaldose" />
             </list>
         </constructor-arg>
     </bean>
