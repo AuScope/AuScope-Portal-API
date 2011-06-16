@@ -731,7 +731,7 @@ public class GridSubmitController {
 			// launch the ec2 instance
 			AmazonEC2 ec2 = new AmazonEC2Client(credentials);
 			ec2.setEndpoint(hostConfigurer.resolvePlaceholder("ec2.endpoint"));
-        	String imageId = hostConfigurer.resolvePlaceholder("emi.id");
+        	String imageId = hostConfigurer.resolvePlaceholder("ami.id");
 			RunInstancesRequest instanceRequest = new RunInstancesRequest(imageId, 1, 1);
 			
 			// user data is passed to the instance on launch. This will be the path to the S3 directory 
