@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
-# ===============================================================
-#
-#
-#    Shell Script for managing the startup of the VEGL portal
-#
-#
-# ==============================================================
+# chkconfig: 2345 90 10
+# description: vegl.sh - Shell Script for managing the startup of the VEGL portal
 
 #Start by waiting until the system starts up
 sleep 30s
@@ -55,7 +50,7 @@ aws put "${s3Bucket}/${s3BaseKeyPath}/output/gzsen3d.log" "${EXAMPLE_DATA_DIR}/g
 aws put "${s3Bucket}/${s3BaseKeyPath}/output/sensitivity.txt" "${EXAMPLE_DATA_DIR}/sensitivity.txt"
 
 #At this point we can give developers a grace period in which they can login to the VM for debugging
-#sleep 15m
+sleep 15m
 if ["$VEGL_KEEP_ALIVE" -ne ""]; then
    echo 'VEGL_KEEP_ALIVE has been set'
 else
