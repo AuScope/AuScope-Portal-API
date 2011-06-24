@@ -5,6 +5,7 @@
 
 #configure our environment
 export PATH="/usr/lib64/openmpi/1.4-gcc/bin:/opt/ubc:$PATH"
+export LD_LIBRARY_PATH="/usr/lib64/openmpi/1.4-gcc/lib:/opt/intel64"
 WORKING_DIR="/root"
 EXAMPLE_DATA_DIR="${WORKING_DIR}/ubc-example-data"
 SUBSET_FILE="/tmp/subset.bin"
@@ -23,6 +24,7 @@ echo "                                      "
 echo "------ Printing Environment ----------"
 echo "VEGL_WORKFLOW_VERSION = ${VEGL_WORKFLOW_VERSION}"
 echo "PATH = ${PATH}"
+echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 echo "WORKING_DIR = ${WORKING_DIR}"
 echo "EXAMPLE_DATA_DIR = ${EXAMPLE_DATA_DIR}"
 echo "SUBSET_FILE = ${SUBSET_FILE}"
@@ -64,7 +66,7 @@ export AWS_ACCESS_KEY_ID="$s3AccessKey"
 
 #Download our input files from S3 and load them into variables or files
 echo "Downloading inputfiles from S3"
-downloadQueryPath="${s3Bucket}/${s3BaseKeyPath}/query.txt"
+downloadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}/query.txt" | sed "s/\/\/*/\//g"`
 echo "downloadQueryPath = ${downloadQueryPath}"
 downloadQueryUrl=`aws get "${downloadQueryPath}"`
 echo "downloadQueryUrl = ${downloadQueryUrl}"
