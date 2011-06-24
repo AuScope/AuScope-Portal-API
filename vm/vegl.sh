@@ -8,10 +8,14 @@ export PATH="/usr/lib64/openmpi/1.4-gcc/bin:/opt/ubc:$PATH"
 WORKING_DIR="/root"
 EXAMPLE_DATA_DIR="${WORKING_DIR}/ubc-example-data"
 SUBSET_FILE="/tmp/subset.bin"
-VEGL_LOG_FILE="${WORKING_DIR}/$vegl.sh.log"
+VEGL_LOG_FILE="${WORKING_DIR}/vegl.sh.log"
+INITIAL_SLEEP_LENGTH="30s"
 FINAL_SLEEP_LENGTH="15m"
 NTP_DATE_SERVER="pool.ntp.org"
 VEGL_WORKFLOW_VERSION="1"
+
+echo "VEGL Workflow Script... starting"
+echo "All future console output will be redirected to ${VEGL_LOG_FILE}"
 exec &> "$VEGL_LOG_FILE"
 
 echo "------ VEGL Workflow Script ----------"
@@ -27,6 +31,10 @@ echo "INITIAL_SLEEP_LENGTH = ${INITIAL_SLEEP_LENGTH}"
 echo "FINAL_SLEEP_LENGTH = ${FINAL_SLEEP_LENGTH}"
 echo "NTP_DATE_SERVER = ${NTP_DATE_SERVER}"
 echo "--------------------------------------"
+
+#Start by waiting until the system starts up
+echo "Sleeping for ${INITIAL_SLEEP_LENGTH}"
+sleep "$INITIAL_SLEEP_LENGTH"
 
 #Lets get started by moving to our working directory
 cd $WORKING_DIR
