@@ -8,8 +8,7 @@ export PATH="/usr/lib64/openmpi/1.4-gcc/bin:/opt/ubc:$PATH"
 WORKING_DIR="/root"
 EXAMPLE_DATA_DIR="${WORKING_DIR}/ubc-example-data"
 SUBSET_FILE="/tmp/subset.bin"
-VEGL_LOG_FILE="${WORKING_DIR}/${0}.log"
-INITIAL_SLEEP_LENGTH="30s"
+VEGL_LOG_FILE="${WORKING_DIR}/$vegl.sh.log"
 FINAL_SLEEP_LENGTH="15m"
 NTP_DATE_SERVER="pool.ntp.org"
 VEGL_WORKFLOW_VERSION="1"
@@ -28,10 +27,6 @@ echo "INITIAL_SLEEP_LENGTH = ${INITIAL_SLEEP_LENGTH}"
 echo "FINAL_SLEEP_LENGTH = ${FINAL_SLEEP_LENGTH}"
 echo "NTP_DATE_SERVER = ${NTP_DATE_SERVER}"
 echo "--------------------------------------"
-
-#Start by waiting until the system starts up
-echo "Sleeping for ${INITIAL_SLEEP_LENGTH}"
-sleep "$INITIAL_SLEEP_LENGTH"
 
 #Lets get started by moving to our working directory
 cd $WORKING_DIR
@@ -93,7 +88,7 @@ upload-aws() {
 upload-aws "${EXAMPLE_DATA_DIR}/gzinv3d.log" "${s3Bucket}" "${s3BaseKeyPath}/output/gzinv3d.log"
 upload-aws "${EXAMPLE_DATA_DIR}/gzsen3d.log" "${s3Bucket}" "${s3BaseKeyPath}/output/gzsen3d.log"
 upload-aws "${EXAMPLE_DATA_DIR}/sensitivity.txt" "${s3Bucket}" "${s3BaseKeyPath}/output/sensitivity.txt"
-upload-aws "${VEGL_LOG_FILE}" "${s3Bucket}" "${s3BaseKeyPath}/output/vegl.log"
+upload-aws "${VEGL_LOG_FILE}" "${s3Bucket}" "${s3BaseKeyPath}/output/vegl.sh.log"
 
 #At this point we can give developers a grace period in which they can login to the VM for debugging
 echo "Sleeping for ${FINAL_SLEEP_LENGTH} to allow someone to abort my shutdown..."
