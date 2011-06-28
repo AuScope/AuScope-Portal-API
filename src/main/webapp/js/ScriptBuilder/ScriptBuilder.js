@@ -78,6 +78,91 @@ ScriptBuilder.onGetScriptTextResponse = function(response, request) {
 ////// Functions ///////
 ////////////////////////
 
+//Loads a number of default pre-filled components and adds them to the SimContainer
+ScriptBuilder.loadDefaultComponents = function() {
+	var rootNode = Ext.getCmp('usedcomps-panel').getRootNode();
+	var newNode = null;
+	var i = 1;
+	
+	//Change to our working directory
+	newNode = new ChangeDirNode(rootNode);
+	newNode.setValuesObject({
+		directory : '${EXAMPLE_DATA_DIR}',
+		uniqueName : 'shell' + (i++)
+	});
+	rootNode.addComponent(newNode);
+	
+	//Add an MPIRun component
+	newNode = new MPIRunNode(rootNode);
+	newNode.setValuesObject({
+		numProcessors : 4,
+		executable : '/opt/ubc/gzsen3d_MPI',
+		mcaArgs : 'btl self,sm',
+		programArgs : '${EXAMPLE_DATA_DIR}/grav_sns.inp',
+		uniqueName : 'shell' + (i++)
+	});
+	rootNode.addComponent(newNode);
+	
+	//Add an MPIRun component
+	newNode = new MPIRunNode(rootNode);
+	newNode.setValuesObject({
+		numProcessors : 4,
+		executable : '/opt/ubc/gzinv3d_MPI',
+		mcaArgs : 'btl self,sm',
+		programArgs : '${EXAMPLE_DATA_DIR}/grav_inv.inp',
+		uniqueName : 'shell' + (i++)
+	});
+	rootNode.addComponent(newNode);
+	
+	//Change to our working directory
+	newNode = new ChangeDirNode(rootNode);
+	newNode.setValuesObject({
+		directory : '${WORKING_DIR}',
+		uniqueName : 'shell' + (i++)
+	});
+	rootNode.addComponent(newNode);
+	
+	//Upload some output
+	newNode = new AWSUploadNode(rootNode);
+	newNode.setValuesObject({
+		inputFilePath : '${EXAMPLE_DATA_DIR}/gzinv3d.log',
+		bucketName : '${S3_OUTPUT_BUCKET}',
+		keyPath : '${S3_BASE_KEY_PATH}/output/gzinv3d.log',
+		uniqueName : 'shell' + (i++)
+	});
+	rootNode.addComponent(newNode);
+	
+	//Upload some output
+	newNode = new AWSUploadNode(rootNode);
+	newNode.setValuesObject({
+		inputFilePath : '${EXAMPLE_DATA_DIR}/gzsen3d.log',
+		bucketName : '${S3_OUTPUT_BUCKET}',
+		keyPath : '${S3_BASE_KEY_PATH}/output/gzsen3d.log',
+		uniqueName : 'shell' + (i++)
+	});
+	rootNode.addComponent(newNode);
+	
+	//Upload some output
+	newNode = new AWSUploadNode(rootNode);
+	newNode.setValuesObject({
+		inputFilePath : '${EXAMPLE_DATA_DIR}/sensitivity.txt',
+		bucketName : '${S3_OUTPUT_BUCKET}',
+		keyPath : '${S3_BASE_KEY_PATH}/output/sensitivity.txt',
+		uniqueName : 'shell' + (i++)
+	});
+	rootNode.addComponent(newNode);
+	
+	//Upload some output
+	newNode = new AWSUploadNode(rootNode);
+	newNode.setValuesObject({
+		inputFilePath : '${VEGL_LOG_FILE}',
+		bucketName : '${S3_OUTPUT_BUCKET}',
+		keyPath : '${S3_BASE_KEY_PATH}/output/vegl.sh.log',
+		uniqueName : 'shell' + (i++)
+	});
+	rootNode.addComponent(newNode);
+}
+
 // opens the configuration dialog for given component type and ensures
 // that values are stored and restored accordingly
 // If 'node' is given its values are edited otherwise a new node is
@@ -168,6 +253,8 @@ ScriptBuilder.switchToTextEditor = function() {
 ScriptBuilder.onUseScriptFailure = function(response, request) {
 	ScriptBuilder.showError('Error storing script file!');
 }
+
+
 
 //
 // This is the main layout definition.
@@ -439,6 +526,7 @@ ScriptBuilder.initialize = function() {
         failure: ScriptBuilder.onGetScriptTextFailure
     });
 
+    ScriptBuilder.loadDefaultComponents();
 };
 
 

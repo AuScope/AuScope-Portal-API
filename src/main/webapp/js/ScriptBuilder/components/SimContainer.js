@@ -16,6 +16,7 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
     this.geomDesc = undefined;
     this.wallList = [];
     this.intList = [];
+    this.shellList = [];
     this.expanded = true;
     
     this.values = {
@@ -33,12 +34,17 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
 	var scriptHeader = "\
 #!/bin/bash\n\n\
 # VEGL processing script.\n\
-# Subset files will be available from /tmp/input.\n\
-# Result files should be placed in /tmp/output for sync back to S3 storage.\n\n";
+# Subset files will be available from /tmp/input.\n\n\
+# The following are the preconfigured environment variables available to this script\n\
+# AWS_SECRET_ACCESS_KEY - The S3 secret key used as a credential for writing output (user defined)\n\
+# AWS_ACCESS_KEY_ID - The S3 access key used as a credential for writing output (user defined)\n\
+# S3_BASE_KEY_PATH - The S3 base key path that will be used for storing output (portal defined)\n\
+# S3_OUTPUT_BUCKET - The S3 bucket that will be used for storing output (user defined)\n\
+# WORKING_DIR - The working directory for all calculations\n\
+# EXAMPLE_DATA_DIR - The location of some UBC example data\n\
+# VEGL_LOG_FILE - Where all STDOUT will be logged to\n\n";
 			
-	var scriptFooter = "\
-# copies input files to the output dir for testing purposes\n\
-rsync /tmp/input/* /tmp/output";
+	var scriptFooter = "";
 
 		
 	var ret = scriptHeader;
@@ -71,6 +77,10 @@ rsync /tmp/input/* /tmp/output";
 
   getWalls: function() {
     return this.wallList;
+  },
+  
+  getShellCommands : function() {
+	return this.shellList;
   },
 
   canAppend: function(nodeAttr) {
@@ -111,6 +121,8 @@ rsync /tmp/input/* /tmp/output";
       this.wallList.push(node);
     } else if (node.type == "i" || node.type == "i") {
       this.intList.push(node);
+    } else if (node.type == "s") {
+      this.shellList.push(node);
     }
   },
 
@@ -122,6 +134,8 @@ rsync /tmp/input/* /tmp/output";
       this.wallList.remove(node);
     } else if (node.type == "i" || node.type == "i") {
       this.intList.remove(node);
+    } else if (node.type == "s") {
+      this.shellList.remove(node);
     }
   }
 

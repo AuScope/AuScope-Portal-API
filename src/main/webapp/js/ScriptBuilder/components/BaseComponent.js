@@ -33,25 +33,28 @@ ScriptBuilder.BaseComponent = Ext.extend(Ext.tree.TreeNode, {
     return this.values;
   },
 
+  setValuesObject: function(obj) {
+	// if the name has changed check for an existing node with the same name
+    // and force changing
+    if (this.container && obj.uniqueName &&
+        this.getUniqueName() != obj.uniqueName &&
+        this.container.findByName(obj.uniqueName) != null) {
+      Ext.Msg.alert("Name not unique", "Please use a unique name for this component.");
+      return false;
+    } else {
+      this.values = obj;
+      this.setText(this.getUniqueName()+" ("+this.compTitle+")");
+      return true;
+    }
+  },
+  
   //
   // Retrieves values from the given form after checking uniqueness of the
   // component name. Returns false if the name is not unique.
   //
   setValues: function(form) {
     var tmpVals = form.getValues(false);
-
-    // if the name has changed check for an existing node with the same name
-    // and force changing
-    if (this.container && tmpVals.uniqueName &&
-        this.getUniqueName() != tmpVals.uniqueName &&
-        this.container.findByName(tmpVals.uniqueName) != null) {
-      Ext.Msg.alert("Name not unique", "Please use a unique name for this component.");
-      return false;
-    } else {
-      this.values = tmpVals;
-      this.setText(this.getUniqueName()+" ("+this.compTitle+")");
-      return true;
-    }
+    return this.setValuesObject(tmpVals);
   },
 
   //

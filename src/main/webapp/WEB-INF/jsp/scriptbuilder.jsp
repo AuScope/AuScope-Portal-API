@@ -27,13 +27,8 @@
 
     <!-- component includes -->
     <%
-    String[] comps = { "BaseComponent", "SimContainer", "SimpleBlock",
-        "FCCBlock", "HCPBlock", "RandomBlock", "ReadGeoFile", "SimpleWall",
-        "ElasticRepulsion", "BondedElastic", "BondedRotElastic", "Friction",
-        "RotFriction", "Exclusion", "ElasticWallRepulsion", "BondedWall",
-        "Gravity", "LinearVisc", "RotationalVisc", "PSFieldSaver",
-        "PVFieldSaver", "ISFieldSaver", "IVFieldSaver", "WVFieldSaver",
-        "CheckPointer", "IVRunnable", "WallLoader" };
+    String[] comps = { "BaseComponent", "SimContainer", "AWSUpload", "AWSDownload", "MPIRun",
+    		"ChangeDir"};
     for (String c : comps) {
     %>
     <script type="text/javascript" src="js/ScriptBuilder/components/<%= c %>.js"></script>

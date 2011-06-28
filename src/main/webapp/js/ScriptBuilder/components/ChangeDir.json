@@ -1,0 +1,15 @@
+{
+  xtype: "form",
+  id: "ChangeDirForm",
+  nclass: ChangeDirNode,
+  bodyStyle: "padding:5px;",
+  labelWidth: 150,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "textfield",
+    name: "directory",
+    fieldLabel: "Directory",
+    allowBlank: false
+  }]
+}
+
