@@ -14,6 +14,7 @@ INITIAL_SLEEP_LENGTH="30s"
 FINAL_SLEEP_LENGTH="15m"
 NTP_DATE_SERVER="pool.ntp.org"
 VEGL_WORKFLOW_VERSION="1"
+SUBSET_REQUEST_PATH="${WORKING_DIR}/subset_request.sh"
 
 echo "VEGL Workflow Script... starting"
 echo "All future console output will be redirected to ${VEGL_LOG_FILE}"
@@ -32,6 +33,7 @@ echo "VEGL_LOG_FILE = ${VEGL_LOG_FILE}"
 echo "INITIAL_SLEEP_LENGTH = ${INITIAL_SLEEP_LENGTH}"
 echo "FINAL_SLEEP_LENGTH = ${FINAL_SLEEP_LENGTH}"
 echo "NTP_DATE_SERVER = ${NTP_DATE_SERVER}"
+echo "SUBSET_REQUEST_PATH = ${SUBSET_REQUEST_PATH}"
 echo "--------------------------------------"
 
 #Start by waiting until the system starts up
@@ -52,10 +54,10 @@ echo "Downloading user data from ${userDataUrl}"
 userDataString=`curl -L "$userDataUrl"`
 
 #Decompose our user data string into the individual parameter strings
-s3Bucket=`echo $userDataString | jsawk 'return this.s3Bucket'`
-s3BaseKeyPath=`echo $userDataString | jsawk 'return this.s3BaseKeyPath'`
-s3AccessKey=`echo $userDataString | jsawk 'return this.s3AccessKey'`
-s3SecretKey=`echo $userDataString | jsawk 'return this.s3SecretKey'`
+s3Bucket=`echo $userDataString | jsawk 'return this.s3OutputBucket'`
+s3BaseKeyPath=`echo $userDataString | jsawk 'return this.s3OutputBaseKeyPath'`
+s3AccessKey=`echo $userDataString | jsawk 'return this.s3OutputAccessKey'`
+s3SecretKey=`echo $userDataString | jsawk 'return this.s3OutputSecretKey'`
 
 echo "s3Bucket = ${s3Bucket}"
 echo "s3BaseKeyPath = ${s3BaseKeyPath}"
@@ -66,13 +68,14 @@ export AWS_ACCESS_KEY_ID="$s3AccessKey"
 
 #Download our input files from S3 and load them into variables or files
 echo "Downloading inputfiles from S3"
-downloadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}/query.txt" | sed "s/\/\/*/\//g"`
+downloadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}/subset_request.sh" | sed "s/\/\/*/\//g"`
 echo "downloadQueryPath = ${downloadQueryPath}"
-downloadQueryUrl=`aws get "${downloadQueryPath}"`
-echo "downloadQueryUrl = ${downloadQueryUrl}"
+aws get "${downloadQueryPath}" > "$SUBSET_REQUEST_PATH"
 
 #With our input files in place we can make our subset requests
-curl -L "$downloadQueryUrl" > "$SUBSET_FILE"
+chmod +x "$SUBSET_REQUEST_PATH"
+$SUBSET_REQUEST_PATH
+cd $WORKING_DIR
 
 #Perform our UBC code
 #TODO - this is currently a "fake" job that is NOT using any of the input files generated above
