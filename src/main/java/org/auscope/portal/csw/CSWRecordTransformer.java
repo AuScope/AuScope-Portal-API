@@ -12,6 +12,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,11 +25,12 @@ import org.xml.sax.InputSource;
  * A class for taking a MD_Metadata DOM document representation as a template and using it
  * as a means to transform between CSWRecord and DOM.
  * 
- * This class can build its initial DOM representation from an existing XML template specified at TEMPLATE_FILE
+ * This class can build its initial DOM representation from an existing XML template specified at TEMPLATE_FILE. 
+ * This file must exist on the classpath
  * @author Josh Vote
  */
 public class CSWRecordTransformer {
-	public static final String TEMPLATE_FILE = "src/main/webapp/WEB-INF/xml/MD_MetadataTemplate.xml";
+	public static final String TEMPLATE_FILE = "MD_MetadataTemplate.xml";
 	protected final Log logger = LogFactory.getLog(getClass());
 	
 	private Node template;
@@ -97,9 +99,12 @@ public class CSWRecordTransformer {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true); // never forget this!
         DocumentBuilder builder = factory.newDocumentBuilder();
-        InputSource inputSource = new InputSource(new FileInputStream(TEMPLATE_FILE));
+        
+        ClassPathResource r = new ClassPathResource(TEMPLATE_FILE);
+        InputSource inputSource = new InputSource(r.getInputStream());
         this.document = builder.parse(inputSource);
         this.template = this.document.getDocumentElement();
+        
 	}
 	
 	/**
@@ -257,7 +262,9 @@ public class CSWRecordTransformer {
 		//Add our contact resource
 		Node ciContact = (Node) templateContactInfoExpression.evaluate(root, XPathConstants.NODE);
 		deleteMatchingNodes(root, contactResourceExpression);
-		appendChildOnlineResource(ciContact, nc.getNamespaceURI("gmd"), "onlineResource", record.getContactResource());
+		if (record.getContactResource() != null) {
+			appendChildOnlineResource(ciContact, nc.getNamespaceURI("gmd"), "onlineResource", record.getContactResource());
+		}
 		
 		//Choose specifically our extent that has a geographic element
 		CSWGeographicElement[] recordGeoEls = record.getCSWGeographicElements();
