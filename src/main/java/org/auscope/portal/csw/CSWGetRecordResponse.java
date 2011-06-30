@@ -1,6 +1,7 @@
 package org.auscope.portal.csw;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathFactory;
@@ -49,7 +50,9 @@ public class CSWGetRecordResponse {
         
         records = new CSWRecord[nodes.getLength()];
         for(int i=0; i<nodes.getLength(); i++ ) {
-            records[i] = new CSWRecord(nodes.item(i));
+        	Node metadataNode = nodes.item(i);
+        	CSWRecordTransformer transformer = new CSWRecordTransformer(metadataNode);
+            records[i] = transformer.transformToCSWRecord();
             log.debug("GN layer " + (i+1) + " : " + records[i].toString());            
         }
 
