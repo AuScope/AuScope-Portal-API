@@ -23,7 +23,7 @@ AWSUploadNode = Ext.extend(ScriptBuilder.BaseComponent, {
 	queryPath = queryPath.replace(/\/\/*/g, "/");
 	
 	var ret = 'QUERY_PATH=`echo "' + queryPath + '" | sed "s/\\/\\/*/\\//g"`\n';
-	ret += 'aws put "${QUERY_PATH}" "' + this.values.inputFilePath + '"\n';
+	ret += 'aws put "${QUERY_PATH}" "' + this.values.inputFilePath + ' --set-acl=public-read"\n';
 	//`echo "${s3Bucket}/${s3BaseKeyPath}/subset_request.sh" | sed "s/\/\/*/\//g"`
     return ret;
   }
