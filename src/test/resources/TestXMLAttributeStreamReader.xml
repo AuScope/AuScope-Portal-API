@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a>
+	<b attr="dontCare">
+		<c>Value1</c>
+		<c attr="dontCare">Value2</c>
+		<dElement attr="attr-1">Value3</dElement>
+		<e>Value3</e>
+	</b>
+	<b attr="dontCare">
+		<c>Value1</c>
+		<c attr="dontCare">Value2</c>
+		<dElement attr="attr-2">Value3</dElement>
+		<e>Value3</e>
+	</b>
+	<b attr="dontCare">
+		<c>Value1</c>
+		<c attr="dontCare">Value2</c>
+		<dElement attrFubar="blah" attr="attr-3" dontCare="DNE"/>
+		<e>Value3</e>
+	</b>
+	<b attr="dontCare"><c>Value1</c><c attr="dontCare">Value2</c><dElement attr="attr-4">Value3</dElement><e>Value3</e></b><b attr="dontCare"><c>Value1</c><c attr="dontCare">Value2</c><dElement attr="attr-5"/><e>Value3</e></b>
+	<b attr="dontCare">
+		<c>Value1</c>
+		<c attr="dontCare">Value2</c>
+		<dElement attrFubar="blah" dontCare="DNE"/>
+		<e>Value3</e>
+	</b>
+</a>
