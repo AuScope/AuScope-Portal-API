@@ -2,10 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
-   xsi:schemaLocation="
+       xsi:schemaLocation="
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd"
-   >
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
 	<!-- This is very important - it will selectively load our beans for the (machine specified) profile
     or use the default profile if none is specified. See AUS-1932 
@@ -20,6 +19,14 @@
             <value>classpath:env.properties</value>
          </list>
       </property>
+   </bean>
+   
+   
+   
+   <bean id="geonetworkCredentials" class="org.auscope.portal.server.web.GeonetworkDetails">
+        <property name="url" value="${env.outputgeonetwork.baseurl}"/>
+        <property name="user" value="${env.outputgeonetwork.user}"/>
+        <property name="password" value="${env.outputgeonetwork.password}"/>
    </bean>
    
    <bean id="connectionParams" class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">

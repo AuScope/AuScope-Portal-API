@@ -272,6 +272,8 @@ GridSubmit.submitJob = function() {
          param[i] = r.get('paramLine');
     });
     
+    var s3Values = Ext.getCmp('s3StorageForm').getForm().getValues();
+    
     Ext.getCmp('metadataForm').getForm().submit({
         url: 'submitJob.do',
         success: GridSubmit.onSubmitJob,
@@ -280,6 +282,10 @@ GridSubmit.submitJob = function() {
             'seriesId': GridSubmit.seriesId,
             'seriesName': GridSubmit.seriesName,
             'seriesDesc': GridSubmit.seriesDesc,
+            's3OutputSecretKey' : s3Values.s3OutputSecretKey,
+            's3OutputAccessKey' : s3Values.s3OutputAccessKey,
+            's3OutputBucket' : s3Values.s3OutputBucket,
+            's3OutputBaseKeyPath' : '',
             'arguments': Ext.encode(param)
         },
         waitMsg: 'Submitting job, please wait...',
@@ -715,6 +721,38 @@ GridSubmit.initialize = function() {
         }
     });
 
+    var s3StorageForm = new Ext.FormPanel({
+        bodyStyle: 'padding:10px;',
+        id: 's3StorageForm',
+        frame: true,
+        defaults: { anchor: "100%" },
+        labelWidth: 150,
+        autoScroll: true,
+        items: [ {
+            xtype: 'textfield',
+            id: 's3OutputBucket',
+            name: 's3OutputBucket',
+            emptyText: 'Enter an Amazon S3 bucket where your job results will be stored',
+            fieldLabel: 'S3 Bucket',
+            value : 'vegl-portal',
+            allowBlank: false
+        },{
+            xtype: 'textfield',
+            id: 's3OutputAccessKey',
+            name: 's3OutputAccessKey',
+            emptyText: 'Enter an Amazon S3 access key that will be used to store your job outputs',
+            fieldLabel: 'S3 Access Key',
+            allowBlank: false
+        }, {
+            xtype: 'textfield',
+            id: 's3OutputSecretKey',
+            name: 's3OutputSecretKey',
+            inputType: 'password',
+            fieldLabel: 'S3 Secret Key',
+            allowBlank: false
+        }]
+    });
+    
     var metadataForm = new Ext.FormPanel({
         bodyStyle: 'padding:10px;',
         id: 'metadataForm',
@@ -885,6 +923,16 @@ GridSubmit.initialize = function() {
         return true;
     };
 
+    var validateStorageForm = function(newStep) {
+    	if (s3StorageForm.getForm().isValid()) {
+    		gotoStep(newStep);
+    		return true;
+    	} else {
+    		Ext.Msg.alert('Invalid value(s)', 'Please provide values for all fields.');
+            return false;
+    	}
+    };
+    
     //newStep: An integer that represents the next form to in list to open (if form validation succeeds)
     //onSuccessfulValidation : [Optional] a function that will be called after form validation but before the form changes 
     var validateMetadata = function(newStep, onSuccesfulValidation) {
@@ -1021,8 +1069,20 @@ GridSubmit.initialize = function() {
             }],
             items: [ metadataForm ]
         }, {
+            id: 'card-s3',
+            title: 'Step 2: Configure output storage...',
+            defaults: { border: false },
+            buttons: [{
+                text: '&laquo; Previous',
+                handler: validateStorageForm.createDelegate(this, [0])
+            }, {
+            	text: 'Next &raquo;',
+                handler: validateStorageForm.createDelegate(this, [3])
+            }],
+            items: [ s3StorageForm ]
+        }, {
             id: 'card-files',
-            title: 'Step 2: Add files to job...',
+            title: 'Step 3: Add files to job...',
             defaults: { border: false },
             buttons: [{
                 text: '&laquo; Previous',

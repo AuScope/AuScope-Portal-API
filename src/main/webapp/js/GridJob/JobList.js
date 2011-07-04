@@ -694,11 +694,11 @@ JobList.initialize = function() {
         '<p class="jobdesc-title">{name}</p>',
         '<table width="100%"><col width="150px"></col><col class="jobdesc-content"></col>',
         '<tr><td class="jobdesc-key">Part of series:</td><td>{seriesName}</td></tr>',
-        '<tr><td class="jobdesc-key">Submitted on:</td><td>{submitDate}</td></tr>'
+        '<tr><td class="jobdesc-key">Submitted on:</td><td>{submitDate}</td></tr>',
         //'<tr><td class="jobdesc-key">Computation site:</td><td>{site}</td></tr>',
         //'<tr><td class="jobdesc-key">Version:</td><td>{version}</td></tr>',
         //'<tr><td class="jobdesc-key">Ouput url:</td><td><a href="{outputLocation}">{outputLocation}</a></td></tr>',
-        //'<tr><td class="jobdesc-key">Geonetwork url:</td><td><a href="{registered}">{registered}</a></td></tr></table><br/>',
+        '<tr><td class="jobdesc-key">Geonetwork url:</td><td><a href="{registered}" target="_blank">{registered}</a></td></tr></table><br/>'
         //'<p class="jobdesc-key">Description:</p><br/><p>{description}</p>'
     );
     JobList.jobDescTpl.compile();

@@ -23,6 +23,9 @@
         <property name="checkpointPrefix"/>
         <property name="registered"/>
         <property name="extraJobDetails"/>
+        <property name="s3OutputAccessKey"/>
+        <property name="s3OutputSecretKey"/>
+        <property name="s3OutputBucket"/>
     </class>
 </hibernate-mapping>
 

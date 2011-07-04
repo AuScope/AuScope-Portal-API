@@ -25,6 +25,7 @@ import org.auscope.portal.server.gridjob.GeodesyJob;
 import org.auscope.portal.server.gridjob.GeodesyJobManager;
 import org.auscope.portal.server.gridjob.GeodesySeries;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.server.web.service.JobStorageService;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
@@ -61,10 +62,13 @@ public class JobListController {
     @Autowired
     @Qualifier(value = "propertyConfigurer")
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
+    @Autowired
+    private JobStorageService jobStorageService;
     
-    private S3Service s3Service;
     private AmazonEC2 ec2;
 
+    
+    
     /**
      * Delete the job given by its reference.
      *
@@ -393,17 +397,14 @@ public class JobListController {
             mav.addObject("error", errorString);
         } else if (job.getOutputDir() != null) {
         	// get results file information to display in the Files tab
-        	S3Object[] results = getOutputFileDetails(request, job);
-        	FileInformation[] fileDetails = new FileInformation[results.length];
-        	
-        	int i = 0;
-        	// get file information from s3 objects
-        	for (S3Object object : results) {
-        		fileDetails[i++] = new FileInformation(object.getKey(), object.getContentLength());
-        		totalItems++;
-        	}
-        	
-        	logger.info(totalItems + " job files located");
+        	FileInformation[] fileDetails = null;
+			try {
+				fileDetails = jobStorageService.getOutputFileDetails(job);
+				logger.info(fileDetails.length + " job files located");
+			} catch (S3ServiceException e) {
+				logger.warn("Error fetching output directory information.", e);
+				mav.addObject("error", "Error fetching output directory information.");
+			}
         	mav.addObject("files", fileDetails);
         }
         
@@ -444,9 +445,7 @@ public class JobListController {
         	
         	logger.debug("Download " + key);
         	try {
-				S3Service s3Service = getS3Service(request);
-				S3Object s3obj = s3Service.getObject(GridSubmitController.S3_BUCKET_NAME, key);
-				InputStream is = s3obj.getDataInputStream();
+				InputStream is = jobStorageService.getJobFileData(job, key);
 					
 				if (is != null) {
 					response.setContentType("application/octet-stream");
@@ -545,14 +544,11 @@ public class JobListController {
             
             try {
 
-            	S3Service s3Service = getS3Service(request);
                 boolean readOneOrMoreFiles = false;
                 ZipOutputStream zout = new ZipOutputStream(
                         response.getOutputStream());
-                for (String fileKey : fileKeys) {
-                	
-                	S3Object s3obj = s3Service.getObject(GridSubmitController.S3_BUCKET_NAME, fileKey);
-               		InputStream is = s3obj.getDataInputStream();
+                for (String fileKey : fileKeys) {                	
+               		InputStream is = jobStorageService.getJobFileData(job, fileKey);
                     
                     byte[] buffer = new byte[16384];
                     int count = 0;
@@ -666,15 +662,20 @@ public class JobListController {
         if (seriesJobs != null) {
         	
         	for (GeodesyJob job : seriesJobs) {
-        		S3Object[] results = getOutputFileDetails(request, job);
+        		FileInformation[] results = null;
+				try {
+					results = jobStorageService.getOutputFileDetails(job);
+				} catch (S3ServiceException e) {
+					logger.error("Unable to list output job files", e);
+				}
         		
-        		if (job.getStatus().equals("Active") && results.length > 0) {
+        		if (job.getStatus().equals("Active") && results != null && results.length > 0) {
         			// update status to done
         			job.setStatus("Done");
         			 
         			// check if any errors occurred. Errors will be written to stderr.txt
-        			for (S3Object object : results) {
-        				if (object.getName().endsWith("stderr.txt") && object.getContentLength() > 0) {
+        			for (FileInformation result : results) {
+        				if (result.getName().endsWith("stderr.txt") && result.getSize() > 0) {
         					// change status to failed
         					job.setStatus("Failed");
         					break;
@@ -692,53 +693,6 @@ public class JobListController {
         return mav;
     }
     
-    /**
-     * Gets the details of any files in the jobs output directory.
-     * 
-     * @param request The HttpServletRequest
-     * @param job The job that that we want results for
-     * @return Array of S3Objects, or null if no results available.
-     */
-    private S3Object[] getOutputFileDetails(HttpServletRequest request, GeodesyJob job) {
-        
-        try {
-			S3Service s3Service = getS3Service(request);
-			S3Bucket[] buckets = s3Service.listAllBuckets();
-			
-			logger.info("job output dir: '" + job.getOutputDir() + "'");
-			
-			for (S3Bucket bucket : buckets) {
-	        	if (bucket.getName().equals(GridSubmitController.S3_BUCKET_NAME)) {
-	        		S3Object[] objects = s3Service.listObjects(bucket.getName(), job.getOutputDir(),null);
-		        	return objects;
-	        	}
-	        }
-		} catch (S3ServiceException e) {
-			logger.error("Error obtaining S3Service.");
-			e.printStackTrace();
-		}
-		
-		return null;
-    }
     
-    /**
-     * Get or create a new S3Service for accessing job files in S3.
-     *  
-     * @param request The HttpServletRequest
-     * @return an S3Service object
-     * @throws S3ServiceException
-     */
-    private S3Service getS3Service(HttpServletRequest request) throws S3ServiceException {
-    	
-    	// create a new service object if we don't have one
-    	if (s3Service == null) {
-    		AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-            ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey());
-            
-            s3Service = new RestS3Service(provCreds);
-    	}
-    	
-        return s3Service;
-    }
 }
 

@@ -18,12 +18,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.util.JSONBuilder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +41,7 @@ import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
+import org.jets3t.service.Jets3tProperties;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Bucket;
@@ -86,7 +90,6 @@ public class GridSubmitController {
     @Qualifier(value = "propertyConfigurer")
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
 
-    public static final String S3_BUCKET_NAME = "vegl-portal";
     public static final String TABLE_DIR = "tables";
     public static final String PRE_STAGE_IN_TABLE_FILES = "/home/vegl-portal/tables/";
     public static final String FOR_ALL = "Common";
@@ -653,13 +656,20 @@ public class GridSubmitController {
             }
         }
         
-        if (series == null) {
+        if (job.getS3OutputAccessKey() == null || job.getS3OutputAccessKey().isEmpty() ||
+        	job.getS3OutputSecretKey() == null || job.getS3OutputSecretKey().isEmpty() ||
+        	job.getS3OutputBucket() == null || job.getS3OutputBucket().isEmpty()) {
+        	success = false;
+        	final String msg = "No output S3 credentials found. NOT submitting job!";
+        	logger.error(msg);
+            gridStatus.currentStatusMsg = msg;
+            gridStatus.jobSubmissionStatus = JobSubmissionStatus.Failed;
+        } else if (series == null) {
             success = false;
             final String msg = "No valid series found. NOT submitting job!";
             logger.error(msg);
             gridStatus.currentStatusMsg = msg;
             gridStatus.jobSubmissionStatus = JobSubmissionStatus.Failed;
-
         } else {
         	
         	job.setSeriesId(series.getId());
@@ -676,9 +686,13 @@ public class GridSubmitController {
             
             logger.info("Submitting job with name " + job.getName());
             AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-            ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(credentials.getAWSAccessKeyId(), credentials.getAWSSecretKey()); 
-            String keyPath = new String();
+            ProviderCredentials outputS3StorageCreds = new org.jets3t.service.security.AWSCredentials(job.getS3OutputAccessKey(), job.getS3OutputSecretKey());
             
+            // create the base S3 object storage key path. The final key will be this with
+			// the filename appended.
+			String jobKeyPath = String.format("%1$s-%2$s-%3$s", user, job.getName(), dateFmt);
+			String virtualPath = ""; //required due to limitations in euca walrus
+			
             // copy files to S3 storage for processing 
 	        try {
 	        	
@@ -695,22 +709,24 @@ public class GridSubmitController {
 					return mav;
 				}
 				
-				// create the base S3 object storage key path. The final key will be this with
-				// the filename appended.
-				keyPath = user + "-" + job.getName() + "-" + dateFmt;
 				// set the output directory for results to be transferred to
-				job.setOutputDir(keyPath + "/output");
+				job.setOutputDir(jobKeyPath + "/output");
 				
 				// copy job files to S3 storage service. 
-				S3Bucket bucket = new S3Bucket(S3_BUCKET_NAME);
-				S3Service s3Service = new RestS3Service(provCreds);
+				S3Bucket bucket = new S3Bucket(job.getS3OutputBucket());
+				RestS3Service s3Service = new RestS3Service(outputS3StorageCreds);
 				
-				for (File file : files){
-					logger.info("Uploading " + keyPath + "/" + file.getName());
+				virtualPath = s3Service.getJetS3tProperties().getStringProperty("s3service.s3-endpoint-virtual-path", "");
+				logger.debug("virtualPath=" + virtualPath);
+				
+				
+				for (File file : files) {
+					String fileKeyPath =String.format("%1$s/%2$s", jobKeyPath, file.getName());
+					logger.info("Uploading " + fileKeyPath);
 					S3Object obj = new S3Object(bucket, file);
-					obj.setKey(keyPath + "/" + file.getName());
+					obj.setKey(fileKeyPath);
 					s3Service.putObject(bucket, obj);
-					logger.info(keyPath + "/" + file.getName() +" uploaded to " + S3_BUCKET_NAME + "S3 bucket");
+					logger.info(fileKeyPath + " uploaded to " + bucket.getName() + " S3 bucket");
 				}
 				
 				gridStatus.currentStatusMsg = GridSubmitController.TRANSFER_COMPLETE;
@@ -734,12 +750,23 @@ public class GridSubmitController {
         	String imageId = hostConfigurer.resolvePlaceholder("ami.id");
 			RunInstancesRequest instanceRequest = new RunInstancesRequest(imageId, 1, 1);
 			
+			//output virtual path
+			String outputVirtualPath = String.format("%1$s/%2$s", virtualPath, jobKeyPath);
+			outputVirtualPath = outputVirtualPath.replace("//", "/");
+			
 			// user data is passed to the instance on launch. This will be the path to the S3 directory 
 			// where the input files are stored. The instance will download the input files and attempt
 			// to run the vegl_script.sh that was built in the Script Builder.
-			String encodedUserData = new String(Base64.encodeBase64(keyPath.toString().getBytes()));
-			instanceRequest.setUserData(encodedUserData);
+			JSONObject encodedUserData = new JSONObject();
+			encodedUserData.put("s3OutputBucket", job.getS3OutputBucket());
+			encodedUserData.put("s3OutputBaseKeyPath", outputVirtualPath);
+			encodedUserData.put("s3OutputAccessKey", job.getS3OutputAccessKey());
+			encodedUserData.put("s3OutputSecretKey", job.getS3OutputSecretKey());
+			
+			String base64EncodedUserData = new String(Base64.encodeBase64(encodedUserData.toString().getBytes()));
+			instanceRequest.setUserData(base64EncodedUserData);
 			instanceRequest.setInstanceType("m1.large");
+			instanceRequest.setKeyName("terry-key"); //TODO - bacon - DELETE THIS CODE - it's for testing
 			RunInstancesResult result = ec2.runInstances(instanceRequest);
 			List<Instance> instances = result.getReservation().getInstances();
 			

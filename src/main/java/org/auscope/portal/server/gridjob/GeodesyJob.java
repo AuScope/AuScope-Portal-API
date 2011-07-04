@@ -58,7 +58,14 @@ public class GeodesyJob extends GridJob {
     /** Extra info required when registering job to GN */
     private String extraJobDetails;
 
-
+    /** The access key used to connect to amazon S3 for storing output*/
+    private String s3OutputAccessKey;
+    
+    /** The secret key used to connect to amazon S3 for storing output*/
+    private String s3OutputSecretKey;
+    
+    /** the amazon S3 bucket for storing output*/
+    private String s3OutputBucket;
 
 	/**
      * Does some basic setting up of the class variables to prevent errors.
@@ -375,6 +382,32 @@ public class GeodesyJob extends GridJob {
 	 */
 	public void setExtraJobDetails(String extraJobDetails) {
 		this.extraJobDetails = extraJobDetails;
+	}
+
+	
+	
+	public String getS3OutputAccessKey() {
+		return s3OutputAccessKey;
+	}
+
+	public void setS3OutputAccessKey(String s3OutputAccessKey) {
+		this.s3OutputAccessKey = s3OutputAccessKey;
+	}
+
+	public String getS3OutputSecretKey() {
+		return s3OutputSecretKey;
+	}
+
+	public void setS3OutputSecretKey(String s3OutputSecretKey) {
+		this.s3OutputSecretKey = s3OutputSecretKey;
+	}
+	
+	public String getS3OutputBucket() {
+		return s3OutputBucket;
+	}
+
+	public void setS3OutputBucket(String s3OutputBucket) {
+		this.s3OutputBucket = s3OutputBucket;
 	}
 
 	/**
