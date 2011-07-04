@@ -68,9 +68,12 @@ class VEGLParameters:
         self._cellZ = 2500
         self._invDepth = 25000.0
 
+    # Gets an instance of the VEGLBBox that represents the padded input bounds.
+    # The SRS parameter will represent the MGA zone number
     def getPaddedBounds(self):
         return self._paddedBounds
     
+    # Gets an instance of the VEGLBBox that represents the selected input bounds
     def getSelectedBounds(self):
         return self_selectedBounds
 
