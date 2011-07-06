@@ -1,25 +1,62 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <categories>
-    <category name="Amazon Web Service Commands">
-        <component title="AWS Download" id="AWSDownload" type="s">
-            Download a file from the Amazon web service S3 and store it
-            on the local file system.
-        </component>
-        <component title="AWS Upload" id="AWSUpload" type="s">
-            Upload a file from the local file system to the Amazon S3.
-        </component>
-    </category>
-    
-    <category name="Open MPI Commands">
-        <component title="MPI Run" id="MPIRun" type="s">
-            Execute serial and parallel jobs in Open MPI.
-        </component>
-    </category>
-    
-    <category name="Shell Commands">
-        <component title="cd (Change Directory)" id="ChangeDir" type="s">
-            Changes the current working directory.
-        </component>
-    </category>
+	<category name="Shell Components">
+		<category name="Amazon Web Service Commands">
+			<component title="AWS Download" id="AWSDownload" type="s">
+				Download a file from the Amazon web service S3 and store it
+				on the local file system.
+			</component>
+			<component title="AWS Upload" id="AWSUpload" type="s">
+				Upload a file from the local file system to the Amazon S3.
+			</component>
+		</category>
+
+		<category name="Open MPI Commands">
+			<component title="MPI Run" id="MPIRun" type="s">
+				Execute serial and parallel jobs in Open MPI.
+			</component>
+		</category>
+
+		<category name="Shell Commands">
+			<component title="cd (Change Directory)" id="ChangeDir" type="s">
+				Changes the current working directory.
+			</component>
+		</category>
+	</category>
+	<category name="Python Components">
+		<category name="Chops Commands">
+			<component title="Step 2" id="chops2" type="s">
+				Step 2
+			</component>
+			<component title="Step 3" id="chops3" type="s">
+				Step 3
+			</component>
+			<component title="Step 4" id="chops4" type="s">
+				Step 4
+			</component>
+			<component title="Step 5" id="chops5" type="s">
+				Step 5
+			</component>
+			<component title="Step 6" id="chops6" type="s">
+				Step 6
+			</component>
+		</category>
+		<category name="File Commands">
+			<component title="File Read" id="fileread" type="s">
+				File Reader
+			</component>
+			<component title="File Write" id="filewrite" type="s">
+				File Reader
+			</component>
+		</category>
+		<category name="Execute Commands">
+			<component title="Execute this" id="subprocess" type="s">
+				Execute and capture error/output via subprocess
+			</component>
+		</category>
+		<component title="Job Details" id="jobobject" type="s">
+			Place Job specifics inside a python dictionary.
+		</component>
+	</category>
 </categories>
 
