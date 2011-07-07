@@ -77,14 +77,17 @@ export AWS_ACCESS_KEY_ID="$s3AccessKey"
 export S3_OUTPUT_BUCKET="$s3Bucket"
 export S3_BASE_KEY_PATH="$s3BaseKeyPath"
 
-#Download our input files from S3 and load them into variables or files
-echo "Downloading inputfiles from S3"
-downloadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}/subset_request.sh" | sed "s/\/\/*/\//g"`
-echo "downloadQueryPath = ${downloadQueryPath}"
-aws get "${downloadQueryPath}" > "$SUBSET_REQUEST_PATH"
-downloadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}/vegl_script.sh" | sed "s/\/\/*/\//g"`
-echo "downloadQueryPath = ${downloadQueryPath}"
-aws get "${downloadQueryPath}" > "$VEGL_SCRIPT_PATH"
+#Download our input files from S3 and load them into files in the current working directory
+echo "Downloading inputfiles from S3..."
+downloadInputFilesBase=`echo "${s3Bucket}/${s3BaseKeyPath}" | sed "s/\/\/*/\//g"`
+for line in `aws ls "${downloadInputFilesBase}" -l | awk '{print $7}'`;do
+    downloadQueryPath=`echo "${s3Bucket}/${line}" | sed "s/\/\/*/\//g"`
+	downloadOutputFile=`basename "${line}"`
+	
+	echo "Attempting to download ${downloadQueryPath} and store it to ${downloadOutputFile}"
+	aws get "${downloadQueryPath}" > "${downloadOutputFile}"
+done
+echo "... finished downloading input files"
 
 #With our input files in place we can make our subset requests
 chmod +x "$SUBSET_REQUEST_PATH"
@@ -93,7 +96,7 @@ cd $WORKING_DIR
 
 #Next we can perform our actual work
 chmod +x "$VEGL_SCRIPT_PATH"
-sh $VEGL_SCRIPT_PATH
+python $VEGL_SCRIPT_PATH
 cd $WORKING_DIR
 
 #At this point we can give developers a grace period in which they can login to the VM for debugging
