@@ -18,7 +18,7 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
     this.intList = [];
     this.shellList = [];
     this.expanded = true;
-    
+
     this.values = {
       "scriptName": "vegl_script"
     }
@@ -30,11 +30,12 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
 
   // collects the code fragments from all nodes in the tree
   getScript: function() {
-    
+
 	var scriptHeader = "\
-#!/bin/bash\n\n\
+#!/usr/bin/env python\n\n\
 # VEGL processing script.\n\
-# Subset files will be available from /tmp/input.\n\n\
+# Please load the Job Object before you load other components\n\n";
+/*		"# Subset files will be available from /tmp/input.\n\n\
 # The following are the preconfigured environment variables available to this script\n\
 # AWS_SECRET_ACCESS_KEY - The S3 secret key used as a credential for writing output (user defined)\n\
 # AWS_ACCESS_KEY_ID - The S3 access key used as a credential for writing output (user defined)\n\
@@ -43,10 +44,11 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
 # WORKING_DIR - The working directory for all calculations\n\
 # EXAMPLE_DATA_DIR - The location of some UBC example data\n\
 # VEGL_LOG_FILE - Where all STDOUT will be logged to\n\n";
-			
+*/
+
 	var scriptFooter = "";
 
-		
+
 	var ret = scriptHeader;
 
     appendScript = function(node) { ret+=node.getScript(); };
@@ -67,7 +69,7 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
   //
   findByName: function(name) {
     nameMatch = function(node) { return node.getUniqueName() == name; }
-    
+
     return this.findChildBy(nameMatch);
   },
 
@@ -78,7 +80,7 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
   getWalls: function() {
     return this.wallList;
   },
-  
+
   getShellCommands : function() {
 	return this.shellList;
   },
