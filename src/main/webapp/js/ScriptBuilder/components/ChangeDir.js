@@ -13,8 +13,11 @@ ChangeDirNode = Ext.extend(ScriptBuilder.BaseComponent, {
 	ChangeDirNode.superclass.constructor.apply(this,
         [container, "Shell - cd", "ChangeDir", "s"]
     );
+
+	var numShells = container.getShellCommands().length;
+    this.values.uniqueName = "shell"+numShells;
   },
-  
+
   getScript: function() {
 	return 'cd "' + this.values.directory + '"\n';
   }

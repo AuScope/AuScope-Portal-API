@@ -156,7 +156,7 @@ GeotransectsInfoWindow.prototype = {
 		else {
 			sHtml += '<div style="padding-bottom:10px;" >' +
 			'No DataSets available.' +
-			'</div>'
+			'</div>';
 	        this.mask.hide();
 		}
 

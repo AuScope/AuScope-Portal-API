@@ -13,12 +13,15 @@ AWSDownloadNode = Ext.extend(ScriptBuilder.BaseComponent, {
 	AWSDownloadNode.superclass.constructor.apply(this,
         [container, "AWS - download", "AWSDownload", "s"]
     );
+
+	var numShells = container.getShellCommands().length;
+    this.values.uniqueName = "shell"+numShells;
   },
-  
+
   getScript: function() {
 	var queryPath = this.values.bucketName + "/" + this.values.keyPath;
 	queryPath = queryPath.replace(/\/\/*/g, "/");
-	
+
     return 'aws get "' + queryPath + '" > "' + this.values.outputFilePath + '"\n';
   }
 });

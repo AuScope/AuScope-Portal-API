@@ -25,8 +25,7 @@ VEGLStep2Node = Ext.extend(ScriptBuilder.BaseComponent, {
     for x, y, z in data:\n\
         newX, newY = project(x, y, zone)\n\
         temp_data.append([newX, newY, z])\n\
-        data = temp_data\n\";
-
+        data = temp_data\n";
   }
 });
 

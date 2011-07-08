@@ -11,7 +11,7 @@ Ext.ux.ComponentLoader.load({url: ScriptBuilder.componentPath+"VEGLStep4.json"})
 VEGLStep4Node = Ext.extend(ScriptBuilder.BaseComponent, {
   constructor: function(container) {
 	  VEGLStep4Node.superclass.constructor.apply(this,
-        [container, "VEGLStep4", "VEGLStep4", "s"]
+        [container, "VEGL - Step4", "VEGLStep4", "s"]
     );
 
 	var numShells = container.getShellCommands().length;
@@ -29,8 +29,7 @@ VEGLStep4Node = Ext.extend(ScriptBuilder.BaseComponent, {
 			  		"    for east,north,prop in data:\n" +
 			  		"        data[i] = east,north,prop/10\n" +
 			  		"        i = i + 1\n\n";
-	  }
-	  if (this.values.invType == "mag") {
+	  } else if (this.values.invType == "mag") {
 			  return "" +
 			  		"    # --- Scientific description below ---\n" +
 			  		"    # If we have a magnetic inversion, we need to define the magnetic field properties.\n" +
@@ -41,7 +40,9 @@ VEGLStep4Node = Ext.extend(ScriptBuilder.BaseComponent, {
 			  		"    central_lon = (VEGLSelectedBox.getMaxEasting() - VEGLSelectedBox.getMinEasting()) / 2\n" +
 			  		"    declination,inclination,intensity = get_mag_field_data(central_lat, central_lon,2010,01,01)\n";
 			  	  }
-	return "";
+	  else {
+	      return "";
+	  }
   }
 });
 

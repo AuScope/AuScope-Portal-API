@@ -22,7 +22,7 @@ KMLParser.prototype.generateCoordList = function(coordsAsString) {
     }
 
     return parsedCoordList;
-}
+};
 
 KMLParser.prototype.parseLineString = function(name, description, lineStringNode) {
 
@@ -36,7 +36,7 @@ KMLParser.prototype.parseLineString = function(name, description, lineStringNode
     lineString.title = name;
 
     return lineString;
-}
+};
 
 //Given a root placemark node attempt to parse it as a single point and return it
 //Returns a single GPolygon

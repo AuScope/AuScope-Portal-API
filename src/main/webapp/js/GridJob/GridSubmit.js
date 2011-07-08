@@ -29,7 +29,7 @@ GridSubmit.onLoadException = function(proxy, options, response, e) {
         GridSubmit.showError("Could not retrieve data from the server ("+
             response.statusText+").");
     }
-}
+};
 
 //
 // Called when the user tries to navigate away from this site
@@ -38,14 +38,14 @@ GridSubmit.onWindowUnloading = function(e) {
     if (GridSubmit.confirmUnloading != false) {
         e.browserEvent.returnValue = "All entered details will be lost!";
     }
-}
+};
 
 //
 // Called when the job object or file list request fails
 //
 GridSubmit.onLoadDataFailure = function(response, request) {
     GridSubmit.showError('Error retrieving data from the server!');
-}
+};
 
 //
 // Called when the job submit request fails
@@ -59,15 +59,15 @@ GridSubmit.onSubmitFailure = function(form, action) {
             break;
         case Ext.form.Action.SERVER_INVALID:
            Ext.Msg.alert('Failure', action.result.msg);
-    }	
-}
+    }
+};
 
 //
 // Called when the file upload request fails
 //
 GridSubmit.onUploadFailure = function(form, action) {
     GridSubmit.showError('Could not upload file. '+action.result.error);
-}
+};
 
 //
 // Callback for the cancelSubmission request
@@ -143,7 +143,7 @@ GridSubmit.onFileListResponse = function(response, request) {
 GridSubmit.onLoadJobObject = function(response, request) {
     Ext.getCmp('versionsCombo').getStore().baseParams.site =
        Ext.getCmp('sitesCombo').getValue();
-    Ext.getCmp('versionsCombo').getStore().baseParams.code = 
+    Ext.getCmp('versionsCombo').getStore().baseParams.code =
        Ext.getCmp('codeCombo').getValue();
     Ext.getCmp('queuesCombo').getStore().baseParams.site =
        Ext.getCmp('sitesCombo').getValue();
@@ -245,16 +245,16 @@ GridSubmit.onJobStatusResponse = function(response, request) {
 	var statusField = Ext.getCmp('statusArea');
 	var resp = Ext.decode(response.responseText);
 	statusField.setText(resp.data);
-	
+
 	//This means file transfer complete.
 	if(resp.jobStatus == "Running")
-	{	
+	{
 		GridSubmit.confirmUnloading = false;
 		runner.stop(task);
 		window.location = "joblist.html";
 	}else if(resp.jobStatus == "Failed"){
 		GridSubmit.confirmUnloading = false;
-		Ext.Msg.alert('Failure', 'Job submission failed.');	
+		Ext.Msg.alert('Failure', 'Job submission failed.');
 		runner.stop(task);
 	}
 }
@@ -263,7 +263,7 @@ GridSubmit.onJobStatusResponse = function(response, request) {
 // Requests submission of the current job from the server
 //
 GridSubmit.submitJob = function() {
-	
+
 	runner.start(task);
     var myParams = Ext.getCmp('arguments').getStore();
     var param = [];
@@ -271,9 +271,9 @@ GridSubmit.submitJob = function() {
     myParams.each(function(r, i){
          param[i] = r.get('paramLine');
     });
-    
+
     var s3Values = Ext.getCmp('s3StorageForm').getForm().getValues();
-    
+
     Ext.getCmp('metadataForm').getForm().submit({
         url: 'submitJob.do',
         success: GridSubmit.onSubmitJob,
@@ -296,14 +296,14 @@ GridSubmit.submitJob = function() {
 GridSubmit.onGenerateSitesTemplateSuccess = function(response) {
 	var responseObj = null;
 	runner.stop(task);
-	
+
 	try {
 		responseObj = Ext.util.JSON.decode(response.responseText);
 	} catch (e) {
 		GridSubmit.showError('There was an error reading the server response about generating the sites.defaults file.\n\nThe sites.default file may not be templated correctly');
 		return;
 	}
-	
+
 	//Alert user of failure (Don't block the user from proceeding, just warn them of failure)
 	if (responseObj == null || !responseObj.success) {
 		GridSubmit.showError('There was an error generating the sites.default file.\n\nThe file will be left as its default value');
@@ -317,7 +317,7 @@ GridSubmit.onGenerateSitesTemplateFailure = function(response) {
 }
 
 GridSubmit.generateSitesDefaultTemplate = function() {
-	
+
 	runner.start(task);
     var myParams = Ext.getCmp('arguments').getStore();
     var param = [];
@@ -325,7 +325,7 @@ GridSubmit.generateSitesDefaultTemplate = function() {
     myParams.each(function(r, i){
          param[i] = r.get('paramLine');
     });
-    
+
     Ext.Ajax.request({
     	url: 'generateSiteDefaultsTemplate.do',
         success: GridSubmit.onGenerateSitesTemplateSuccess,
@@ -362,7 +362,7 @@ GridSubmit.deleteFiles = function() {
         for (var i=0; i<selData.length; i++) {
             files.push(selData[i].get('name'));
         }
-        
+
         Ext.Msg.show({
             title: 'Delete Files',
             msg: 'Are you sure you want to delete the selected files?',
@@ -375,8 +375,8 @@ GridSubmit.deleteFiles = function() {
                     Ext.Ajax.request({
                         url: 'deleteFiles.do',
                         success: GridSubmit.onDeleteResponse,
-                        failure: GridSubmit.onDeleteResponse, 
-                        params: { 
+                        failure: GridSubmit.onDeleteResponse,
+                        params: {
                     	          'files': Ext.encode(files)
                         }
                     });
@@ -399,7 +399,7 @@ GridSubmit.uploadFile = function(b, e, overwrite) {
                    GridSubmit.confirmOverwrite);
             return;
         }
-        
+
         var jobID = "Common";
         var jobType = Ext.getCmp('jobTypeCombo').getValue();
         Ext.getCmp('filesForm').getForm().submit({
@@ -473,7 +473,7 @@ GridSubmit.downloadFile = function(filePath, file) {
 // This is the main layout definition.
 //
 GridSubmit.initialize = function() {
-    
+
     Ext.QuickTips.init();
 
     // Store for code list
@@ -483,7 +483,7 @@ GridSubmit.initialize = function() {
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
     });
-    
+
     // Store for sites
     var sitesStore = new Ext.data.JsonStore({
         url: 'listSites.do',
@@ -491,7 +491,7 @@ GridSubmit.initialize = function() {
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
     });
-    
+
     // Store for versions at a specific site
     var versionsStore = new Ext.data.JsonStore({
         url: 'listSiteVersions.do',
@@ -515,7 +515,7 @@ GridSubmit.initialize = function() {
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
     });
-    
+
     // Store for job submission status update.
     var gridTransferStatus = new Ext.data.JsonStore({
         url: 'getTransferStatus.do',
@@ -523,7 +523,7 @@ GridSubmit.initialize = function() {
         fields: [ { name: 'value', type: 'string' } ],
         listeners: { 'loadexception': GridSubmit.onLoadException }
     });
-    
+
     // Store for current user's list of series
     var mySeriesStore = new Ext.data.JsonStore({
         url: 'mySeries.do',
@@ -539,14 +539,14 @@ GridSubmit.initialize = function() {
     });
 
 
-    
+
     GridSubmit.FileRecord = Ext.data.Record.create([
         { name: 'name', mapping: 'name' },
         { name: 'size', mapping: 'size' },
         { name: 'parentPath', mapping: 'parentPath' }
-        
+
     ]);
-    
+
     //Store for uploaded file details
     var uploadedFilesStore = new Ext.data.SimpleStore({
         fields: [
@@ -586,7 +586,7 @@ GridSubmit.initialize = function() {
     var cm = new Ext.grid.ColumnModel({
         // specify any defaults for each column
         defaults: {
-            sortable: true // columns are not sortable by default           
+            sortable: true // columns are not sortable by default
         },
         columns: [
             {
@@ -601,7 +601,7 @@ GridSubmit.initialize = function() {
                 editor: new fm.TextField({
                     allowBlank: false
                 })
-            }            
+            }
         ]
     });
 
@@ -610,7 +610,7 @@ GridSubmit.initialize = function() {
                   { name: 'paramLine', type: 'string' } ],
         data: [['subJob_0', '-d yr doy -expt grid -orbt IGSF -no_ftp -aprfile itrf05.apr']]
     });
-        
+
     var paramGrid = new Ext.grid.EditorGridPanel({
         store: paramStore,
         name: 'arguments',
@@ -627,7 +627,7 @@ GridSubmit.initialize = function() {
         tbar: [{
             text: 'Add new parameter line',
             handler : function(){
-        	
+
                 // access the Record constructor through the grid's store
                 var myGrid = Ext.getCmp('arguments');
                 var ParamLines = myGrid.getStore().recordType;
@@ -636,7 +636,7 @@ GridSubmit.initialize = function() {
                 if((myGrid.getStore().getCount()>= 1) && (Ext.getCmp('jobTypeCombo').getValue() == 'single')){
                 	Ext.Msg.alert('Failure', 'Can not add more than one parameter line for a single job.');
                 }else{
-                    
+
                     var p = new ParamLines({
                          paramID: jobID,
                          paramLine: '-d yr doy -expt grid -orbt IGSF -no_ftp -aprfile itrf05.apr'
@@ -644,7 +644,7 @@ GridSubmit.initialize = function() {
                     //add param line and stop edit the grid
                     myGrid.stopEditing();
                     paramStore.add(p);
-                    
+
                     //select the inserted row.
                     var pos = myGrid.getStore().getCount() -1;
                     myGrid.selModel.selectRow(pos);
@@ -653,7 +653,7 @@ GridSubmit.initialize = function() {
             }
         }]
     })
-    
+
     var seriesForm = new Ext.FormPanel({
         bodyStyle: 'padding:10px;',
         id: 'seriesForm',
@@ -752,7 +752,7 @@ GridSubmit.initialize = function() {
             allowBlank: false
         }]
     });
-    
+
     var metadataForm = new Ext.FormPanel({
         bodyStyle: 'padding:10px;',
         id: 'metadataForm',
@@ -868,7 +868,7 @@ GridSubmit.initialize = function() {
         { xtype: 'hidden', name: 'stdOutput' }
         ]
     });
-    
+
     Ext.getCmp('codeCombo').on({
         'select': function(combo, record, index) {
             var sitesCombo = Ext.getCmp('sitesCombo');
@@ -878,7 +878,7 @@ GridSubmit.initialize = function() {
             sitesCombo.reset();
         }
     });
-        
+
     Ext.getCmp('sitesCombo').on({
         'select': function(combo, record, index) {
             var versionsCombo = Ext.getCmp('versionsCombo');
@@ -932,13 +932,13 @@ GridSubmit.initialize = function() {
             return false;
     	}
     };
-    
+
     //newStep: An integer that represents the next form to in list to open (if form validation succeeds)
-    //onSuccessfulValidation : [Optional] a function that will be called after form validation but before the form changes 
+    //onSuccessfulValidation : [Optional] a function that will be called after form validation but before the form changes
     var validateMetadata = function(newStep, onSuccesfulValidation) {
         //if (newStep==0 || metadataForm.getForm().isValid()) {
     	if (newStep==0 || true) {
-    	    var jobTypeCombo = Ext.getCmp('jobTypeCombo').getValue();    	    
+    	    var jobTypeCombo = Ext.getCmp('jobTypeCombo').getValue();
     	    if (onSuccesfulValidation)
     	    	onSuccesfulValidation();
             gotoStep(newStep);
@@ -963,7 +963,7 @@ GridSubmit.initialize = function() {
         iconCls: 'cross-icon',
         handler: GridSubmit.deleteFiles
     });
-    
+
     var downloadAction = new Ext.Action({
         text: 'Download',
         disabled: true,
@@ -973,7 +973,7 @@ GridSubmit.initialize = function() {
             GridSubmit.downloadFile();
         }
     });
-    
+
     var fileGrid = new Ext.grid.GridPanel({
         id: 'file-grid',
         title: 'Uploaded files',
@@ -1001,14 +1001,14 @@ GridSubmit.initialize = function() {
 
         })
     });
-    
+
     var fileRetrievalMessage = new Ext.form.Label({
     	xtype: 'label',
     	text:'Retrieving files... ',
     	style: 'font-weight:bold;',
     	id: 'fileRetrievalMessage'
     })
-        
+
     var filesForm = new Ext.FormPanel({
         bodyStyle: 'padding:10px;',
         id: 'filesForm',
@@ -1121,7 +1121,7 @@ GridSubmit.initialize = function() {
     // Avoid accidentally navigating away from this page
     Ext.EventManager.on(window, 'beforeunload',
             GridSubmit.onWindowUnloading, GridSubmit);
-    
+
     GridSubmit.loadJobObject();
 };
 

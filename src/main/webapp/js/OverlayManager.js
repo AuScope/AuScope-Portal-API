@@ -1,7 +1,7 @@
 
 
 /*
- * Is a combination of a MarkerManager with the added extension for generic overlays too 
+ * Is a combination of a MarkerManager with the added extension for generic overlays too
  */
 OverlayManager = function(map) {
 	this.serviceOverlayList = [];
@@ -13,7 +13,7 @@ OverlayManager = function(map) {
 
 
 /**
- * Removes all service overlays and markers and hides all custom overlays 
+ * Removes all service overlays and markers and hides all custom overlays
  * (that are managed by this instance) from the map.
  * @return
  */
@@ -23,12 +23,12 @@ OverlayManager.prototype.clearOverlays = function() {
 	}
 	this.serviceOverlayList = [];
 	this.markerManager.clearMarkers();
-	
+
 	// hide the custom overlays rather then removing them
 	for (var i = 0; i < this.customOverlayList.length; i++) {
 		this.customOverlayList[i].hide();
 	}
-}
+};
 
 /**
  * Adds a single overlay to the map and this instance
@@ -38,7 +38,7 @@ OverlayManager.prototype.clearOverlays = function() {
 OverlayManager.prototype.addOverlay = function(overlay) {
 	this.map.addOverlay(overlay);
 	this.serviceOverlayList.push(overlay);
-}
+};
 
 /**
  * Iterates through every layer in this manager and updates the overlay zOrder
@@ -51,10 +51,10 @@ OverlayManager.prototype.updateZOrder = function(newZOrder) {
         this.map.removeOverlay(this.serviceOverlayList[i]);
         this.map.addOverlay(this.serviceOverlayList[i]);
 	}
-}
+};
 
 /**
- * Iterates through every WMS layer sets the opacity to the specified value 
+ * Iterates through every WMS layer sets the opacity to the specified value
  * @param newOpacity
  * @return
  */
@@ -66,10 +66,10 @@ OverlayManager.prototype.updateOpacity = function(newOpacity) {
 	        this.map.addOverlay(this.serviceOverlayList[i]);
 		}
 	}
-}
+};
 
 /**
- * Adds a custom overlay to the list  
+ * Adds a custom overlay to the list
  * @param overlay
  */
 OverlayManager.prototype.addCustomOverlay = function(overlay) {
@@ -77,7 +77,7 @@ OverlayManager.prototype.addCustomOverlay = function(overlay) {
 };
 
 /**
- * Show all custom overlays  
+ * Show all custom overlays
  */
 OverlayManager.prototype.showCustomOverlays = function() {
 	for (var i = 0; i < this.customOverlayList.length; i++) {

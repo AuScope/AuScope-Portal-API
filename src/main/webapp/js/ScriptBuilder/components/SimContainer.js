@@ -21,7 +21,7 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
 
     this.values = {
       "scriptName": "vegl_script"
-    }
+    };
   },
 
   getScriptName: function() {
@@ -68,7 +68,7 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
   // Returns the node with given unique name or null if not found
   //
   findByName: function(name) {
-    nameMatch = function(node) { return node.getUniqueName() == name; }
+    nameMatch = function(node) { return node.getUniqueName() == name; };
 
     return this.findChildBy(nameMatch);
   },

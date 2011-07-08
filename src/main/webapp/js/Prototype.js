@@ -33,7 +33,7 @@ var Prototype = {
   JSONFilter: /^\/\*-secure-([\s\S]*)\*\/\s*$/,
 
   emptyFunction: function() { },
-  K: function(x) { return x }
+  K: function(x) { return x; }
 };
 
 if (Prototype.Browser.MobileSafari)
@@ -88,7 +88,7 @@ Class.Methods = {
           value.argumentNames().first() == "$super") {
         var method = value;
         value = (function(m) {
-          return function() { return ancestor[m].apply(this, arguments) };
+          return function() { return ancestor[m].apply(this, arguments); };
         })(property).wrap(method);
 
         value.valueOf = method.valueOf.bind(method);
@@ -212,14 +212,14 @@ Object.extend(Function.prototype, {
     var __method = this, args = $A(arguments), object = args.shift();
     return function() {
       return __method.apply(object, args.concat($A(arguments)));
-    }
+    };
   },
 
   bindAsEventListener: function() {
     var __method = this, args = $A(arguments), object = args.shift();
     return function(event) {
       return __method.apply(object, [event || window.event].concat(args));
-    }
+    };
   },
 
   curry: function() {
@@ -227,7 +227,7 @@ Object.extend(Function.prototype, {
     var __method = this, args = $A(arguments);
     return function() {
       return __method.apply(this, args.concat($A(arguments)));
-    }
+    };
   },
 
   delay: function() {
@@ -246,7 +246,7 @@ Object.extend(Function.prototype, {
     var __method = this;
     return function() {
       return wrapper.apply(this, [__method.bind(this)].concat($A(arguments)));
-    }
+    };
   },
 
   methodize: function() {
@@ -399,7 +399,7 @@ Object.extend(String.prototype, {
   },
 
   evalScripts: function() {
-    return this.extractScripts().map(function(script) { return eval(script) });
+    return this.extractScripts().map(function(script) { return eval(script); });
   },
 
   escapeHTML: function() {
@@ -412,7 +412,7 @@ Object.extend(String.prototype, {
     var div = new Element('div');
     div.innerHTML = this.stripTags();
     return div.childNodes[0] ? (div.childNodes.length > 1 ?
-      $A(div.childNodes).inject('', function(memo, node) { return memo+node.nodeValue }) :
+      $A(div.childNodes).inject('', function(memo, node) { return memo+node.nodeValue; }) :
       div.childNodes[0].nodeValue) : '';
   },
 
@@ -545,7 +545,7 @@ if (Prototype.Browser.WebKit || Prototype.Browser.IE) Object.extend(String.proto
 String.prototype.gsub.prepareReplacement = function(replacement) {
   if (Object.isFunction(replacement)) return replacement;
   var template = new Template(replacement);
-  return function(match) { return template.evaluate(match) };
+  return function(match) { return template.evaluate(match); };
 };
 
 String.prototype.parseQuery = String.prototype.toQueryParams;
@@ -895,7 +895,7 @@ Object.extend(Array.prototype, {
 
   intersect: function(array) {
     return this.uniq().findAll(function(item) {
-      return array.detect(function(value) { return item === value });
+      return array.detect(function(value) { return item === value; });
     });
   },
 
@@ -1086,7 +1086,7 @@ var Hash = Class.create(Enumerable, (function() {
     clone: function() {
       return new Hash(this);
     }
-  }
+  };
 })());
 
 Hash.prototype.toTemplateReplacements = Hash.prototype.toObject;
@@ -1122,9 +1122,9 @@ var $R = function(start, end, exclusive) {
 var Ajax = {
   getTransport: function() {
     return Try.these(
-      function() {return new XMLHttpRequest()},
-      function() {return new ActiveXObject('Msxml2.XMLHTTP')},
-      function() {return new ActiveXObject('Microsoft.XMLHTTP')}
+      function() {return new XMLHttpRequest();},
+      function() {return new ActiveXObject('Msxml2.XMLHTTP');},
+      function() {return new ActiveXObject('Microsoft.XMLHTTP');}
     ) || false;
   },
 
@@ -1161,8 +1161,8 @@ Ajax.Responders = {
 Object.extend(Ajax.Responders, Enumerable);
 
 Ajax.Responders.register({
-  onCreate:   function() { Ajax.activeRequestCount++ },
-  onComplete: function() { Ajax.activeRequestCount-- }
+  onCreate:   function() { Ajax.activeRequestCount++; },
+  onComplete: function() { Ajax.activeRequestCount--; }
 });
 
 Ajax.Base = Class.create({
@@ -1277,7 +1277,7 @@ Ajax.Request = Class.create(Ajax.Base, {
         for (var i = 0, length = extras.length; i < length; i += 2)
           headers[extras[i]] = extras[i+1];
       else
-        $H(extras).each(function(pair) { headers[pair.key] = pair.value });
+        $H(extras).each(function(pair) { headers[pair.key] = pair.value; });
     }
 
     for (var name in headers)
@@ -1292,7 +1292,7 @@ Ajax.Request = Class.create(Ajax.Base, {
   getStatus: function() {
     try {
       return this.transport.status || 0;
-    } catch (e) { return 0 }
+    } catch (e) { return 0; }
   },
 
   respondToReadyState: function(readyState) {
@@ -1340,7 +1340,7 @@ Ajax.Request = Class.create(Ajax.Base, {
   getHeader: function(name) {
     try {
       return this.transport.getResponseHeader(name) || null;
-    } catch (e) { return null }
+    } catch (e) { return null; }
   },
 
   evalResponse: function() {
@@ -1388,7 +1388,7 @@ Ajax.Response = Class.create({
   getStatusText: function() {
     try {
       return this.transport.statusText || '';
-    } catch (e) { return '' }
+    } catch (e) { return ''; }
   },
 
   getHeader: Ajax.Request.prototype.getHeader,
@@ -1396,7 +1396,7 @@ Ajax.Response = Class.create({
   getAllHeaders: function() {
     try {
       return this.getAllResponseHeaders();
-    } catch (e) { return null }
+    } catch (e) { return null; }
   },
 
   getResponseHeader: function(name) {
@@ -1780,7 +1780,7 @@ Element.Methods = {
     element = $(element);
     var id = element.readAttribute('id'), self = arguments.callee;
     if (id) return id;
-    do { id = 'anonymous_element_' + self.counter++ } while ($(id));
+    do { id = 'anonymous_element_' + self.counter++; } while ($(id));
     element.writeAttribute('id', id);
     return id;
   },
@@ -2225,8 +2225,8 @@ else if (Prototype.Browser.IE) {
     function(proceed, element) {
       element = $(element);
       // IE throws an error if element is not in document
-      try { element.offsetParent }
-      catch(e) { return $(document.body) }
+      try { element.offsetParent; }
+      catch(e) { return $(document.body); }
       var position = element.getStyle('position');
       if (position !== 'static') return proceed(element);
       element.setStyle({ position: 'relative' });

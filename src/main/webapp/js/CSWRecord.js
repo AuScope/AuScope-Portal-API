@@ -12,7 +12,7 @@ CSWRecord.prototype.internalGetStringField = function(fieldName) {
 	if (!str) {
 		return '';
 	}
-	
+
 	return str;
 };
 CSWRecord.prototype.internalGetArrayField = function(fieldName) {
@@ -20,7 +20,7 @@ CSWRecord.prototype.internalGetArrayField = function(fieldName) {
 	if (!arr) {
 		return [];
 	}
-	
+
 	return arr;
 };
 
@@ -64,7 +64,7 @@ CSWRecord.prototype.getDataIdentificationAbstract = function() {
 
 /**
  * Gets all online resource representations associated with this record
- * 
+ *
  * Returns an Array of Objects in the form
  * {
  * 	url					: String
@@ -80,13 +80,13 @@ CSWRecord.prototype.getOnlineResources = function() {
 
 /**
  * Gets all online resources associated with this record that pass the specified filters
- * 
- * 
+ *
+ *
  * onlineResourceType : [Set to undefined to not filter] must be from ['WMS', 'WCS', 'WFS', 'OPeNDAP']
  * name : [Set to undefined to not filter] The name to filter by
  * description : [Set to undefined to not filter] The description to filter by
  * url : [Set to undefined to not filter] The url to filter by
- * 
+ *
  * Returns an Array of Objects in the following form that pass every specified filter
  * {
  * 	url					: String
@@ -99,35 +99,35 @@ CSWRecord.prototype.getOnlineResources = function() {
 CSWRecord.prototype.getFilteredOnlineResources = function(onlineResourceType, name, description, url) {
 	var all = this.getOnlineResources();
 	var filtered = [];
-	
+
 	for (var i = 0; i < all.length; i++) {
 		var cmp = all[i];
-		
+
 		if (onlineResourceType !== undefined && cmp.onlineResourceType !== onlineResourceType) {
 			continue;
 		}
-		
+
 		if (name !== undefined && cmp.name !== name) {
 			continue;
 		}
-		
+
 		if (description !== undefined && cmp.description !== description) {
 			continue;
 		}
-		
+
 		if (url !== undefined && cmp.url !== url) {
 			continue;
 		}
-		
+
 		filtered.push(cmp);
 	}
-	
+
 	return filtered;
 };
 
 /**
  * Gets all geographic element representations associated with this record
- * 
+ *
  * Returns an Array of BBox Objects
  * @return
  */
@@ -137,7 +137,7 @@ CSWRecord.prototype.getGeographicElements = function() {
 
 /**
  * Gets all keywords associated with this record
- * 
+ *
  * Returns an Array of String
  * @return
  */
@@ -147,19 +147,19 @@ CSWRecord.prototype.getDescriptiveKeywords = function() {
 
 /**
  * Iterates through all geographic elements and returns a bounding box that contains them all.
- * 
+ *
  * Returns a BBox object.
- * 
+ *
  * If there are no geographic elements that can be parsed, null will be returned;
  * @return
  */
 CSWRecord.prototype.generateGeographicExtent = function() {
 	var geoEls = this.getGeographicElements();
 	var extent = null;
-	
+
 	for (var i = 0; i < geoEls.length; i++) {
 		if (geoEls[i] instanceof BBox) {
-			
+
 			if (extent == null) {
 				extent = geoEls[i];
 			} else {
@@ -167,7 +167,7 @@ CSWRecord.prototype.generateGeographicExtent = function() {
 			}
 		}
 	}
-	
+
 	return extent;
 };
 
@@ -196,4 +196,4 @@ CSWRecord.prototype.containsKeyword = function(str) {
 		}
 	}
 	return false;
-}
+};

@@ -27,13 +27,13 @@ JobList.onLoadException = function(proxy, options, response, e) {
         JobList.showError("Could not retrieve data from the server ("+
             response.statusText+").");
     }
-}
+};
 
 // called when an Ajax request fails
 JobList.onRequestFailure = function(response, request) {
     JobList.showError('Could not execute last request. Status: '+
         response.status+' ('+response.statusText+')');
-}
+};
 
 // callback for killJob action
 JobList.onKillJobResponse = function(response, request) {
@@ -42,7 +42,7 @@ JobList.onKillJobResponse = function(response, request) {
         JobList.showError(resp.error);
     }
     JobList.jobStore.reload();
-}
+};
 
 //callback for deleteJob action
 JobList.onDeleteJobResponse = function(response, request) {
@@ -51,7 +51,7 @@ JobList.onDeleteJobResponse = function(response, request) {
         JobList.showError(resp.error);
     }
     JobList.jobStore.reload();
-}
+};
 
 //callback for deleteSeries action
 JobList.onDeleteSeriesResponse = function(response, request) {
@@ -60,7 +60,7 @@ JobList.onDeleteSeriesResponse = function(response, request) {
         JobList.showError(resp.error);
     }
     JobList.seriesStore.reload();
-}
+};
 
 // callback for retrieveFiles action
 JobList.onRetrieveFilesResponse = function(response, request) {
@@ -70,7 +70,7 @@ JobList.onRetrieveFilesResponse = function(response, request) {
     } else {
         Ext.Msg.alert("Success", "The output files of the selected job will be transferred as soon as possible. Please note that it may take a while though.");
     }
-}
+};
 
 JobList.onRegisterResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
@@ -79,9 +79,9 @@ JobList.onRegisterResponse = function(response, request) {
     } else {
     	JobList.refreshAll();
         Ext.Msg.alert("Success", "The job is registered.");
-        
+
     }
-}
+};
 ////////////////////////
 ////// Functions ///////
 ////////////////////////
@@ -95,7 +95,7 @@ JobList.showError = function(message) {
         icon: Ext.Msg.ERROR,
         fn: function() { JobList.errorDlg = undefined; }
     });
-}
+};
 
 // hides the data retrieval progress dialog
 JobList.hideProgressDlg = function() {
@@ -103,14 +103,14 @@ JobList.hideProgressDlg = function() {
         JobList.progressDlg.hide();
         JobList.progressDlg = undefined;
     }
-}
+};
 
 // notifies the user through a progress dialog that data is being retrieved
 JobList.showProgressDlg = function() {
     if (!JobList.progressDlg && !JobList.errorDlg) {
         JobList.progressDlg = Ext.Msg.wait('Retrieving data, please wait...');
     }
-}
+};
 
 // retrieves filelist of selected job and updates the Details panel
 JobList.updateJobDetails = function() {
@@ -132,7 +132,7 @@ JobList.updateJobDetails = function() {
         JobList.jobFileStore.baseParams.jobId = jobData.id;
         if(jobData.status == 'Done' || jobData.status == 'Failed'){
     		JobList.jobFileStore.baseParams.dirName = null;
-    		JobList.jobFileStore.baseParams.dirPath = null;        	
+    		JobList.jobFileStore.baseParams.dirPath = null;
             JobList.jobFileStore.reload();
         }else{
             JobList.jobFileStore.removeAll(true);
@@ -141,7 +141,7 @@ JobList.updateJobDetails = function() {
             getSelectionModel().getSelected().data.name;
         JobList.jobDescTpl.overwrite(descEl, jobData);
         detailsPanel.enable();
-        
+
         if(jobData.status == 'Done' && (jobData.registered == null || jobData.registered == "")){
            Ext.getCmp('registerButton').enable();
         }else
@@ -154,18 +154,18 @@ JobList.updateJobDetails = function() {
         detailsPanel.disable();
         Ext.getCmp('registerButton').disable();
     }
-}
+};
 
 //retrieves dirList of selected job and updates the Details panel
 JobList.retrieveDirList = function(jobId, fileData) {
-	
+
 	if(fileData.directoryFlag == true){
 		JobList.jobFileStore.baseParams.jobId = jobId;
 		JobList.jobFileStore.baseParams.dirName = fileData.name;
 		JobList.jobFileStore.baseParams.dirPath = fileData.parentPath;
 		JobList.jobFileStore.reload();
 	}
-}
+};
 
 
 // retrieves list of jobs of selected series
@@ -200,7 +200,7 @@ JobList.updateJobList = function() {
             descEl.update('<p class="jobdesc-title">No series found.</p>');
         }
     }
-}
+};
 
 // (re-)retrieves job details from the server
 JobList.refreshAll = function() {
@@ -213,7 +213,7 @@ JobList.refreshAll = function() {
         JobList.prevJobId = jobGrid.getSelectionModel().getSelected().data.id;
     }
     JobList.seriesStore.reload();
-}
+};
 
 // loads series matching given query
 JobList.querySeries = function(user, name, desc) {
@@ -233,17 +233,17 @@ JobList.querySeries = function(user, name, desc) {
         JobList.seriesStore.baseParams.qSeriesDesc = desc;
     }
     JobList.seriesStore.reload();
-}
+};
 
 JobList.register = function() {
 	var jobId = Ext.getCmp('job-grid').getSelectionModel().getSelected().data.id;
     Ext.Ajax.request({
         url: 'insertRecord.do',
         success: JobList.onRegisterResponse,
-        failure: JobList.onRequestFailure, 
+        failure: JobList.onRequestFailure,
         params: {'jobId': jobId }
     });
-}
+};
 
 // submits a "kill job" request after asking for confirmation
 JobList.killJob = function(jobId) {
@@ -259,13 +259,13 @@ JobList.killJob = function(jobId) {
                 Ext.Ajax.request({
                     url: 'killJob.do',
                     success: JobList.onKillJobResponse,
-                    failure: JobList.onRequestFailure, 
+                    failure: JobList.onRequestFailure,
                     params: { 'jobId': jobId }
                 });
             }
         }
     });
-}
+};
 
 //submits a "delete job" request after asking for confirmation
 JobList.deleteJob = function(jobId) {
@@ -281,14 +281,14 @@ JobList.deleteJob = function(jobId) {
                 Ext.Ajax.request({
                     url: 'deleteJob.do',
                     success: JobList.onDeleteJobResponse,
-                    failure: JobList.onRequestFailure, 
-                    params: { 
+                    failure: JobList.onRequestFailure,
+                    params: {
                 	          'jobId': jobId }
                 });
             }
         }
     });
-}
+};
 
 JobList.killSeriesJobs = function(seriesId) {
     Ext.Msg.show({
@@ -303,14 +303,14 @@ JobList.killSeriesJobs = function(seriesId) {
                 Ext.Ajax.request({
                     url: 'killSeriesJobs.do',
                     success: JobList.onKillJobResponse,
-                    failure: JobList.onRequestFailure, 
-                    params: { 
+                    failure: JobList.onRequestFailure,
+                    params: {
                 	          'seriesId': seriesId }
                 });
             }
         }
     });
-}
+};
 
 
 JobList.deleteSeriesJobs = function(seriesId) {
@@ -326,19 +326,19 @@ JobList.deleteSeriesJobs = function(seriesId) {
                 Ext.Ajax.request({
                     url: 'deleteSeriesJobs.do',
                     success: JobList.onDeleteSeriesResponse,
-                    failure: JobList.onRequestFailure, 
-                    params: { 
+                    failure: JobList.onRequestFailure,
+                    params: {
                 	          'seriesId': seriesId }
                 });
             }
         }
     });
-}
+};
 
 // downloads given file from a specified job
 JobList.downloadFile = function(job, file, key) {
     window.location =  "downloadFile.do?jobId="+job+"&filename="+file+"&key="+key;
-}
+};
 
 // downloads a ZIP file containing given files of given job
 JobList.downloadAsZip = function(job, files) {
@@ -347,7 +347,7 @@ JobList.downloadAsZip = function(job, files) {
         fparam += ','+files[i].data.s3Key;
     }
     window.location = "downloadAsZip.do?jobId="+job+"&files="+fparam;
-}
+};
 
 JobList.showQueryDialog = function() {
     var queryForm = new Ext.FormPanel({
@@ -394,13 +394,13 @@ JobList.showQueryDialog = function() {
     });
 
     queryWindow.show();
-}
+};
 
 //
 // This is the main layout definition.
 //
 JobList.initialize = function() {
-    
+
     Ext.QuickTips.init();
 
     JobList.seriesStore = new Ext.data.JsonStore({
@@ -478,7 +478,7 @@ JobList.initialize = function() {
             JobList.killSeriesJobs(seriesId);
         }
     });
-    
+
     var deleteSeriesAction = new Ext.Action({
         text: 'Delete jobs',
         iconCls: 'cross-icon',
@@ -552,7 +552,7 @@ JobList.initialize = function() {
             JobList.deleteJob(jobId);
         }
     });
-    
+
     var jobGrid = new Ext.grid.GridPanel({
         id: 'job-grid',
         title: 'Jobs of selected series',
@@ -571,7 +571,7 @@ JobList.initialize = function() {
                             JobList.updateJobDetails();
                          }
                        }
-        }),        
+        }),
         buttons: [{
             text: 'Register to GeoNetwork',
             id: 'registerButton',
@@ -608,7 +608,7 @@ JobList.initialize = function() {
     //
     function fileTypeRenderer(value, cell, record) {
         var fileData = jobGrid.getSelectionModel().getSelected().data;
-        
+
         if(record.data.directoryFlag){
         	return '<span style="color:blue;">' + value + '</span>';
         }
@@ -636,7 +636,7 @@ JobList.initialize = function() {
             JobList.downloadAsZip(jobData.id, files);
         }
     });
-    
+
     fileGrid = new Ext.grid.GridPanel({
         id: 'file-grid',
         title: 'Files',
@@ -776,7 +776,7 @@ JobList.initialize = function() {
         JobList.showError(JobList.error);
         JobList.error = null;
     }
-}
+};
 
 
 Ext.onReady(JobList.initialize);

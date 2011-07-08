@@ -48,7 +48,7 @@ ScriptBuilder.onWindowUnloading = function(e) {
     if (this.confirmUnloading != false) {
         e.browserEvent.returnValue = "All changes will be lost! Please use the Download button if you want to keep the current script file or 'Use Script' to submit it.";
     }
-}
+};
 
 // called when retrieving an initial script from the server failed
 ScriptBuilder.onGetScriptTextFailure = function(response, request) {
@@ -58,7 +58,7 @@ ScriptBuilder.onGetScriptTextFailure = function(response, request) {
     // Show settings dialog for new script
     //ScriptBuilder.showDialog('SimContainer', 'New Script',
             //Ext.getCmp('usedcomps-panel').getRootNode());
-}
+};
 
 // called when the server replied to the initial script text request
 ScriptBuilder.onGetScriptTextResponse = function(response, request) {
@@ -72,7 +72,7 @@ ScriptBuilder.onGetScriptTextResponse = function(response, request) {
         // Reuse code from failure path
         ScriptBuilder.onGetScriptTextFailure(response, request);
     }
-}
+};
 
 ////////////////////////
 ////// Functions ///////
@@ -83,9 +83,7 @@ ScriptBuilder.loadDefaultComponents = function() {
 	var rootNode = Ext.getCmp('usedcomps-panel').getRootNode();
 	var newNode = null;
 	var i = 1;
-
-
-}
+};
 
 // opens the configuration dialog for given component type and ensures
 // that values are stored and restored accordingly
@@ -150,13 +148,13 @@ ScriptBuilder.showDialog = function(compId, compTitle, node) {
         node.fillFormValues(dlgContents.getForm());
     });
     dlg.show();
-}
+};
 
 // updates the source textarea with the current script text
 ScriptBuilder.updateSource = function() {
     var s = Ext.getCmp('usedcomps-panel').getRootNode().getScript();
     Ext.getCmp('sourcetext').setValue(s);
-}
+};
 
 // changes the interface so script can be edited and component adding is
 // no longer possible
@@ -169,16 +167,14 @@ ScriptBuilder.switchToTextEditor = function() {
     Ext.getCmp('edit-script-btn').disable();
     Ext.getCmp('sourcetext').enable();
     this.textEditMode = true;
-}
+};
 
 //
 //Called when the use script request fails
 //
 ScriptBuilder.onUseScriptFailure = function(response, request) {
 	ScriptBuilder.showError('Error storing script file!');
-}
-
-
+};
 
 //
 // This is the main layout definition.

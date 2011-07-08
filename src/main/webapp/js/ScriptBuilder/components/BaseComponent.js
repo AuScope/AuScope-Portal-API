@@ -42,12 +42,12 @@ ScriptBuilder.BaseComponent = Ext.extend(Ext.tree.TreeNode, {
       Ext.Msg.alert("Name not unique", "Please use a unique name for this component.");
       return false;
     } else {
-      this.values = obj;
       this.setText(this.getUniqueName()+" ("+this.compTitle+")");
+      this.values = obj;
       return true;
     }
   },
-  
+
   //
   // Retrieves values from the given form after checking uniqueness of the
   // component name. Returns false if the name is not unique.
