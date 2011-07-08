@@ -5,19 +5,19 @@
 
 <head>
     <title>VEGL Portal - Scriptbuilder</title>
-	<link rel="stylesheet" type="text/css" href="css/styles.css"> 
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
     <link rel="stylesheet" type="text/css" href="css/menu.css">
     <link rel="stylesheet" type="text/css" href="css/grid-examples.css">
     <link rel="stylesheet" type="text/css" href="js/external/extjs/resources/css/ext-all.css">
-    
+
     <link rel="stylesheet" type="text/css" href="css/scriptbuilder.css">
-    
+
 	<style type="text/css">
       #sitenav-03 a {
         background: url( "img/navigation.gif" ) -200px -38px no-repeat;
       }
     </style>
-    
+
     <script type="text/javascript" src="js/external/extjs/adapter/ext/ext-base.js"></script>
     <script type="text/javascript" src="js/external/extjs/ext-all.js"></script>
     <script type="text/javascript" src="js/geoscimlwfs/main.js"></script>
@@ -27,8 +27,10 @@
 
     <!-- component includes -->
     <%
-    String[] comps = { "BaseComponent", "SimContainer", "AWSUpload", "AWSDownload", "MPIRun",
-    		"ChangeDir"};
+    String[] comps = { "BaseComponent", "SimContainer",
+    		"AWSUpload", "AWSDownload", "MPIRun", "ChangeDir", "JobData",
+    		"VEGLStep1", "VEGLStep2", "VEGLStep3", "VEGLStep4", "VEGLStep5"};
+    		//"VEGLStep6", "VEGLStep7", "VEGLStep8"};
     for (String c : comps) {
     %>
     <script type="text/javascript" src="js/ScriptBuilder/components/<%= c %>.js"></script>

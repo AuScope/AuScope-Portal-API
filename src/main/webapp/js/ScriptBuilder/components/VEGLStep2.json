@@ -1,0 +1,15 @@
+{
+  xtype: "form",
+  id: "VEGLStep2Form",
+  nclass: VEGLStep2Node,
+  bodyStyle: "padding:5px;",
+  labelWidth: 150,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "textfield",
+    name: "paramsObj",
+    value: "VEGLParams",
+    fieldLabel: "Python VEGL Parameters Class",
+    allowBlank: false
+  }]
+}

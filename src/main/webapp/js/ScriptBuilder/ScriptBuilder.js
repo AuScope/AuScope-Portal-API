@@ -83,84 +83,8 @@ ScriptBuilder.loadDefaultComponents = function() {
 	var rootNode = Ext.getCmp('usedcomps-panel').getRootNode();
 	var newNode = null;
 	var i = 1;
-	
-	//Change to our working directory
-	newNode = new ChangeDirNode(rootNode);
-	newNode.setValuesObject({
-		directory : '${EXAMPLE_DATA_DIR}',
-		uniqueName : 'shell' + (i++)
-	});
-	rootNode.addComponent(newNode);
-	
-	//Add an MPIRun component
-	newNode = new MPIRunNode(rootNode);
-	newNode.setValuesObject({
-		numProcessors : 4,
-		executable : '/opt/ubc/gzsen3d_MPI',
-		mcaArgs : 'btl self,sm',
-		programArgs : '${EXAMPLE_DATA_DIR}/grav_sns.inp',
-		uniqueName : 'shell' + (i++)
-	});
-	rootNode.addComponent(newNode);
-	
-	//Add an MPIRun component
-	newNode = new MPIRunNode(rootNode);
-	newNode.setValuesObject({
-		numProcessors : 4,
-		executable : '/opt/ubc/gzinv3d_MPI',
-		mcaArgs : 'btl self,sm',
-		programArgs : '${EXAMPLE_DATA_DIR}/grav_inv.inp',
-		uniqueName : 'shell' + (i++)
-	});
-	rootNode.addComponent(newNode);
-	
-	//Change to our working directory
-	newNode = new ChangeDirNode(rootNode);
-	newNode.setValuesObject({
-		directory : '${WORKING_DIR}',
-		uniqueName : 'shell' + (i++)
-	});
-	rootNode.addComponent(newNode);
-	
-	//Upload some output
-	newNode = new AWSUploadNode(rootNode);
-	newNode.setValuesObject({
-		inputFilePath : '${EXAMPLE_DATA_DIR}/gzinv3d.log',
-		bucketName : '${S3_OUTPUT_BUCKET}',
-		keyPath : '${S3_BASE_KEY_PATH}/output/gzinv3d.log',
-		uniqueName : 'shell' + (i++)
-	});
-	rootNode.addComponent(newNode);
-	
-	//Upload some output
-	newNode = new AWSUploadNode(rootNode);
-	newNode.setValuesObject({
-		inputFilePath : '${EXAMPLE_DATA_DIR}/gzsen3d.log',
-		bucketName : '${S3_OUTPUT_BUCKET}',
-		keyPath : '${S3_BASE_KEY_PATH}/output/gzsen3d.log',
-		uniqueName : 'shell' + (i++)
-	});
-	rootNode.addComponent(newNode);
-	
-	//Upload some output
-	newNode = new AWSUploadNode(rootNode);
-	newNode.setValuesObject({
-		inputFilePath : '${EXAMPLE_DATA_DIR}/sensitivity.txt',
-		bucketName : '${S3_OUTPUT_BUCKET}',
-		keyPath : '${S3_BASE_KEY_PATH}/output/sensitivity.txt',
-		uniqueName : 'shell' + (i++)
-	});
-	rootNode.addComponent(newNode);
-	
-	//Upload some output
-	newNode = new AWSUploadNode(rootNode);
-	newNode.setValuesObject({
-		inputFilePath : '${VEGL_LOG_FILE}',
-		bucketName : '${S3_OUTPUT_BUCKET}',
-		keyPath : '${S3_BASE_KEY_PATH}/output/vegl.sh.log',
-		uniqueName : 'shell' + (i++)
-	});
-	rootNode.addComponent(newNode);
+
+
 }
 
 // opens the configuration dialog for given component type and ensures
@@ -260,9 +184,9 @@ ScriptBuilder.onUseScriptFailure = function(response, request) {
 // This is the main layout definition.
 //
 ScriptBuilder.initialize = function() {
-    
+
     Ext.QuickTips.init();
-    
+
     // a template for the component description html area
     var compDescTpl = new Ext.Template(
         '<h2 class="title">{title}</h2>',
@@ -388,7 +312,7 @@ ScriptBuilder.initialize = function() {
                     target:'iframe',
                     method:'POST'
                 });
-            	
+
                 form.dom.submit();
             }
         }, {
@@ -401,7 +325,7 @@ ScriptBuilder.initialize = function() {
                 }
                 ScriptBuilder.confirmUnloading = false;
                 Ext.getCmp('source-panel').getForm().submit();
-                
+
                 Ext.Ajax.request({
                     url: 'useScript.do',
                     success: window.location = "gridsubmit.html",
@@ -437,7 +361,7 @@ ScriptBuilder.initialize = function() {
         height: 300,
         minSize: 150,
         autoScroll: true,
-        
+
         // tree-specific configs:
         rootVisible: false,
         root: new Ext.tree.AsyncTreeNode(),
@@ -469,7 +393,7 @@ ScriptBuilder.initialize = function() {
             }
         }
     });
-    
+
     // This is the description panel that contains the description for the
     // selected component.
     var descriptionPanel = {
@@ -482,7 +406,7 @@ ScriptBuilder.initialize = function() {
         collapsible: true,
         html: ScriptBuilder.compDescText
     };
-    
+
     // Finally, build the main layout once all the pieces are ready.
     new Ext.Viewport({
         layout: 'border',
@@ -518,7 +442,7 @@ ScriptBuilder.initialize = function() {
     // Avoid accidentally navigating away from this page
     Ext.EventManager.on(window, 'beforeunload',
             ScriptBuilder.onWindowUnloading, ScriptBuilder);
-    
+
     // Check for existing script text to edit
     Ext.Ajax.request({
         url: 'getScriptText.do',

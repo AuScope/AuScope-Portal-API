@@ -24,20 +24,24 @@
 		</category>
 	</category>
 	<category name="Python Components">
-		<category name="Chops Commands">
-			<component title="Step 2" id="chops2" type="s">
-				Step 2
+		<category name="VEGL Workflow Steps">
+			<component title="VEGL Step 1" id="VEGLStep1" type="s">
+Reads in a 3 column CSV file, assumes the data are floating point numbers, and places these columns into the variable 'data'.
 			</component>
-			<component title="Step 3" id="chops3" type="s">
-				Step 3
+			<component title="Step 2" id="VEGLStep2" type="s">
+Takes the variable 'data' and transforms the coordinates to a different coordinate system.
+This is because the national-scale data are geodetic (unprojected) and we need a projected coordinate system for a UBC-GIF inversion.
 			</component>
-			<component title="Step 4" id="chops4" type="s">
-				Step 4
+			<component title="Step 3" id="VEGLStep3" type="s">
+Takes the variable 'data' and removes any data points which do not lie within a given bounding box. Assumes the coordinate systems of 'data' and the bounding box are the same.
 			</component>
-			<component title="Step 5" id="chops5" type="s">
+			<component title="Step 4" id="VEGLStep4" type="s">
+We need to determine the type of inversion. There are some corrections to be made to each type of data. The parameters for the inversions also vary slightly, as do the control files.
+			</component>
+			<component title="Step 5" id="VEGLStep5" type="s">
 				Step 5
 			</component>
-			<component title="Step 6" id="chops6" type="s">
+			<component title="Step 6" id="VEGLStep6" type="s">
 				Step 6
 			</component>
 		</category>

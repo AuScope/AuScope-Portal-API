@@ -10,10 +10,10 @@ Ext.ux.ComponentLoader.load({url: ScriptBuilder.componentPath+"MPIRun.json"});
 
 MPIRunNode = Ext.extend(ScriptBuilder.BaseComponent, {
   constructor: function(container) {
-	AWSDownloadNode.superclass.constructor.apply(this,
+	  MPIRunNode.superclass.constructor.apply(this,
         [container, "MPI - Run", "MPIRun", "s"]
     );
-	
+
 	var numShells = container.getShellCommands().length;
     this.values.uniqueName = "shell"+numShells;
   },
@@ -21,7 +21,7 @@ MPIRunNode = Ext.extend(ScriptBuilder.BaseComponent, {
   getScript: function() {
 	return "mpirun -np " + this.values.numProcessors +
 		   " --mca " + this.values.mcaArgs +
-		   " \"" + this.values.executable + "\"" + 
+		   " \"" + this.values.executable + "\"" +
 		   " \"" + this.values.programArgs + "\"\n";
   }
 });

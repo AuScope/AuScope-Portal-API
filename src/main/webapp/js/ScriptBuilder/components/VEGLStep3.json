@@ -1,0 +1,36 @@
+{
+  xtype: "form",
+  id: "VEGLStep3Form",
+  nclass: VEGLStep3Node,
+  bodyStyle: "padding:5px;",
+  labelWidth: 150,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "numberfield",
+    name: "numProcessors",
+    value: "4",
+    fieldLabel: "Number of processors",
+    decimalPrecision: 0,
+    allowNegative: false,
+    allowBlank: false
+  },{
+    xtype: "textfield",
+    name: "executable",
+    value: "/opt/ubc/gzsen3d_MPI",
+    fieldLabel: "Program Executable",
+    allowBlank: false
+  },{
+    xtype: "textfield",
+    name: "mcaArgs",
+    value: "btl self,sm",
+    fieldLabel: "MCA Arguments (key value)",
+    allowBlank: false
+  },{
+    xtype: "textfield",
+    name: "programArgs",
+    value: "${EXAMPLE_DATA_DIR}/grav_sns.inp",
+    fieldLabel: "Program Arguments",
+    allowBlank: false
+  }]
+}
+
