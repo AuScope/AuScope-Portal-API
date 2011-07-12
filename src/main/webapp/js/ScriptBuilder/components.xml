@@ -58,7 +58,7 @@ We need to determine the type of inversion. There are some corrections to be mad
 				Execute and capture error/output via subprocess
 			</component>
 		</category>
-		<component title="Job Details" id="jobobject" type="s">
+		<component title="Job Details" id="VEGLJobObject" type="s">
 			Place Job specifics inside a python dictionary.
 		</component>
 	</category>

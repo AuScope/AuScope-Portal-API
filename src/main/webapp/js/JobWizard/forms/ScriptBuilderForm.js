@@ -230,6 +230,7 @@ ScriptBuilderForm =  Ext.extend(BaseJobWizardForm, {
 		ScriptBuilderForm.superclass.constructor.call(this, {
 			wizardState : wizardState,
 			layout : 'border',
+			id : 'scriptbuilder-form',
 			defaults: { layout: 'border' },
 	        items: [{
 	            id: 'component-browser',
@@ -278,87 +279,7 @@ ScriptBuilderForm =  Ext.extend(BaseJobWizardForm, {
 	
 	//Loads the default components
 	loadDefaultComponents : function() {
-		var rootNode = Ext.getCmp('usedcomps-panel').getRootNode();
-		var newNode = null;
-		var i = 1;
 		
-		//Change to our working directory
-		newNode = new ChangeDirNode(rootNode);
-		newNode.setValuesObject({
-			directory : '${EXAMPLE_DATA_DIR}',
-			uniqueName : 'shell' + (i++)
-		});
-		rootNode.addComponent(newNode);
-		
-		//Add an MPIRun component
-		newNode = new MPIRunNode(rootNode);
-		newNode.setValuesObject({
-			numProcessors : 4,
-			executable : '/opt/ubc/gzsen3d_MPI',
-			mcaArgs : 'btl self,sm',
-			programArgs : '${EXAMPLE_DATA_DIR}/grav_sns.inp',
-			uniqueName : 'shell' + (i++)
-		});
-		rootNode.addComponent(newNode);
-		
-		//Add an MPIRun component
-		newNode = new MPIRunNode(rootNode);
-		newNode.setValuesObject({
-			numProcessors : 4,
-			executable : '/opt/ubc/gzinv3d_MPI',
-			mcaArgs : 'btl self,sm',
-			programArgs : '${EXAMPLE_DATA_DIR}/grav_inv.inp',
-			uniqueName : 'shell' + (i++)
-		});
-		rootNode.addComponent(newNode);
-		
-		//Change to our working directory
-		newNode = new ChangeDirNode(rootNode);
-		newNode.setValuesObject({
-			directory : '${WORKING_DIR}',
-			uniqueName : 'shell' + (i++)
-		});
-		rootNode.addComponent(newNode);
-		
-		//Upload some output
-		newNode = new AWSUploadNode(rootNode);
-		newNode.setValuesObject({
-			inputFilePath : '${EXAMPLE_DATA_DIR}/gzinv3d.log',
-			bucketName : '${S3_OUTPUT_BUCKET}',
-			keyPath : '${S3_BASE_KEY_PATH}/output/gzinv3d.log',
-			uniqueName : 'shell' + (i++)
-		});
-		rootNode.addComponent(newNode);
-		
-		//Upload some output
-		newNode = new AWSUploadNode(rootNode);
-		newNode.setValuesObject({
-			inputFilePath : '${EXAMPLE_DATA_DIR}/gzsen3d.log',
-			bucketName : '${S3_OUTPUT_BUCKET}',
-			keyPath : '${S3_BASE_KEY_PATH}/output/gzsen3d.log',
-			uniqueName : 'shell' + (i++)
-		});
-		rootNode.addComponent(newNode);
-		
-		//Upload some output
-		newNode = new AWSUploadNode(rootNode);
-		newNode.setValuesObject({
-			inputFilePath : '${EXAMPLE_DATA_DIR}/sensitivity.txt',
-			bucketName : '${S3_OUTPUT_BUCKET}',
-			keyPath : '${S3_BASE_KEY_PATH}/output/sensitivity.txt',
-			uniqueName : 'shell' + (i++)
-		});
-		rootNode.addComponent(newNode);
-		
-		//Upload some output
-		newNode = new AWSUploadNode(rootNode);
-		newNode.setValuesObject({
-			inputFilePath : '${VEGL_LOG_FILE}',
-			bucketName : '${S3_OUTPUT_BUCKET}',
-			keyPath : '${S3_BASE_KEY_PATH}/output/vegl.sh.log',
-			uniqueName : 'shell' + (i++)
-		});
-		rootNode.addComponent(newNode);
 	},
 	
 	// opens the configuration dialog for given component type and ensures
@@ -430,7 +351,15 @@ ScriptBuilderForm =  Ext.extend(BaseJobWizardForm, {
 	//updates the source textarea with the current script text
 	updateSource : function() {
 	    var s = Ext.getCmp('usedcomps-panel').getRootNode().getScript();
-	    Ext.getCmp('sourcetext').setValue(s);
+	    
+	    var textArea = Ext.getCmp('sourcetext');
+	    textArea.setValue(s);
+	    
+	    //Scroll to bottom (diving into DOM due to lack of support from ExtJS)
+	    if (textArea.el) {
+	        var textAreaDom = textArea.el.dom;
+	        textAreaDom.scrollTop = textAreaDom.scrollHeight;
+	    }
 	},
 	
 	// changes the interface so script can be edited and component adding is

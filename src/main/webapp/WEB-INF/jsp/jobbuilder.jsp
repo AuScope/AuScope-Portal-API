@@ -24,7 +24,7 @@
     <!-- component includes -->
     <%
     String[] comps = { "BaseComponent", "SimContainer", "AWSUpload", "AWSDownload", "MPIRun",
-            "ChangeDir"};
+            "ChangeDir", "VEGLJobObject"};
     for (String c : comps) {
     %>
     <script type="text/javascript" src="js/ScriptBuilder/components/<%= c %>.js"></script>
