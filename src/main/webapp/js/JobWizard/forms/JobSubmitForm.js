@@ -17,12 +17,18 @@ JobSubmitForm =  Ext.extend(JobUploadForm, {
 	//Validation means we go and submit the job
 	beginValidation : function(callback) {
 		var jobSubmitFrm = this;
+		var loadMask = new Ext.LoadMask(Ext.getBody(), {
+			msg : 'Submitting Job...',
+			removeMask : true
+		});
+		loadMask.show();
 		Ext.Ajax.request({
 			url : 'submitJob.do',
 			params : {
 				jobId : jobSubmitFrm.wizardState.jobId
 			},
 			callback : function(options, success, response) {
+				loadMask.hide();
 				if (success) {
 					var responseObj = Ext.util.JSON.decode(response.responseText);
 					if (responseObj.success) {
@@ -32,7 +38,6 @@ JobSubmitForm =  Ext.extend(JobUploadForm, {
 						return;
 					}
 				}
-				
 				
 				Ext.Msg.alert('Failure', 'There was a problem submitting your job. Please try again in a few minutes.');
 				callback(false);
