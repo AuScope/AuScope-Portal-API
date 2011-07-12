@@ -47,7 +47,16 @@ VEGLJobObjectNode = Ext.extend(ScriptBuilder.BaseComponent, {
         
         functionText += baseIndent + 'def get' + this._capitaliseFirst(fieldName) + '(self):' + this.pNewLine;
         
-        if (Ext.isString(value)) {
+        //Ext JS forms can't return non string values so we need to be very sure we dont have
+        //and integer/float encoded as a string
+        var isString = Ext.isString(value);
+        if (isString && value.length > 0) {
+            if (value.match(/[0-9]/i)) {
+                isString = isNaN(parseFloat(value));
+            }
+        }
+        
+        if (isString) {
             functionText += baseIndent + this.pTab + 'return \'' + value + '\'' + this.pNewLine;
         } else {
             functionText += baseIndent + this.pTab + 'return ' + value + '' + this.pNewLine;

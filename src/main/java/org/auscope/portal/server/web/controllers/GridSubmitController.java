@@ -13,6 +13,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONObject;
 
@@ -66,6 +67,9 @@ public class GridSubmitController extends BaseVEGLController {
     @Qualifier(value = "propertyConfigurer")
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
     
+    //This is a file path for a CENTOS VM
+    private static final String ERRDAP_SUBSET_VM_FILE_PATH = "/tmp/vegl-subset.csv";
+    
     public static final String STATUS_FAILED = "Failed";
     public static final String STATUS_ACTIVE = "Active";
     public static final String STATUS_DONE = "Done";
@@ -101,8 +105,9 @@ public class GridSubmitController extends BaseVEGLController {
      */
     @RequestMapping("/createJobObject.do")    
     public ModelAndView createJobObject(HttpServletRequest request) {
-    	final String email = (String)request.getSession().getAttribute("openID-Email");
-    	VEGLJob newJob = createDefaultVEGLJob(email);
+    	
+    	//Create our initial job object
+    	VEGLJob newJob = createDefaultVEGLJob(request.getSession());
     	
     	//Generate our stage in directory
     	try {
@@ -113,7 +118,7 @@ public class GridSubmitController extends BaseVEGLController {
     	}
     	
     	//Create the subset file and dump it in our stage in directory
-    	HashMap<String,String> erdapUrlMap = (HashMap) request.getSession().getAttribute("erddapUrlMap");
+    	HashMap<String,String> erdapUrlMap = (HashMap) request.getSession().getAttribute(ERRDAPController.SESSION_ERRDAP_URL_MAP);
     	if (erdapUrlMap != null) {
     		createSubsetScriptFile(newJob, erdapUrlMap);
     	} else {
@@ -457,11 +462,27 @@ public class GridSubmitController extends BaseVEGLController {
      * @param email
      * @return
      */
-    private VEGLJob createDefaultVEGLJob(String email) {
+    private VEGLJob createDefaultVEGLJob(HttpSession session) {
     	VEGLJob job = new VEGLJob(); 
     	
-    	job.setUser(email);
-    	job.setEmailAddress(email);
+    	//Load details from
+    	job.setUser((String) session.getAttribute("openID-Email"));
+    	job.setEmailAddress((String) session.getAttribute("openID-Email"));
+    	job.setSelectionMinEasting((Double) session.getAttribute(ERRDAPController.SESSION_SELECTION_MIN_EASTING));
+    	job.setSelectionMaxEasting((Double) session.getAttribute(ERRDAPController.SESSION_SELECTION_MAX_EASTING));
+    	job.setSelectionMinNorthing((Double) session.getAttribute(ERRDAPController.SESSION_SELECTION_MIN_NORTHING));
+    	job.setSelectionMaxNorthing((Double) session.getAttribute(ERRDAPController.SESSION_SELECTION_MAX_NORTHING));
+    	job.setPaddingMinEasting((Double) session.getAttribute(ERRDAPController.SESSION_PADDED_MIN_EASTING));
+    	job.setPaddingMaxEasting((Double) session.getAttribute(ERRDAPController.SESSION_PADDED_MAX_EASTING));
+    	job.setPaddingMinNorthing((Double) session.getAttribute(ERRDAPController.SESSION_PADDED_MIN_NORTHING));
+    	job.setPaddingMaxNorthing((Double) session.getAttribute(ERRDAPController.SESSION_PADDED_MAX_NORTHING));
+    	job.setMgaZone((String)session.getAttribute(ERRDAPController.SESSION_MGA_ZONE));
+    	job.setCellX((Integer) session.getAttribute(ERRDAPController.SESSION_CELL_X));
+    	job.setCellY((Integer) session.getAttribute(ERRDAPController.SESSION_CELL_Y));
+    	job.setCellZ((Integer) session.getAttribute(ERRDAPController.SESSION_CELL_Z));
+    	job.setInversionDepth((Integer) session.getAttribute(ERRDAPController.SESSION_INVERSION_DEPTH));
+    	
+    	job.setVmSubsetFilePath(ERRDAP_SUBSET_VM_FILE_PATH);
     	job.setEc2AMI(hostConfigurer.resolvePlaceholder("ami.id"));
     	job.setEc2Endpoint(hostConfigurer.resolvePlaceholder("ec2.endpoint"));
     	job.setS3OutputBucket("vegl-portal");
@@ -496,7 +517,6 @@ public class GridSubmitController extends BaseVEGLController {
 		
 		try {
 			FileWriter out = new FileWriter(subsetRequestScript);
-			out.write("cd /tmp/input\n");
 			
 			while (i.hasNext()) {
 				
@@ -505,7 +525,7 @@ public class GridSubmitController extends BaseVEGLController {
 				String url = (String)erddapUrlMap.get(fileName);
 				
 				// add the command for making the subset request
-				out.write("wget '" + url +"'\n");
+				out.write(String.format("curl -L '%1$s' > \"%2$s\"\n", url, ERRDAP_SUBSET_VM_FILE_PATH));
 			}
 			
 			out.close();

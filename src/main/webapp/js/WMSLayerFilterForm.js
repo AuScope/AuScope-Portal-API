@@ -207,10 +207,10 @@ WMSLayerFilterForm.onCalculateMgaZoneResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
     var wmsForm = this;
     
-    if (resp.mgaZone != null) {
+    if (resp.success && resp.data != null) {
 
     	var mgaZoneWindow = new InversionDimensionWindow({
-            mgaZone : resp.mgaZone,
+            mgaZone : resp.data,
             scope	: wmsForm,
             callback : function(wmsForm, newMgaZone, xCellDim, yCellDim, zCellDim, maxDepth) {
             	
@@ -240,7 +240,7 @@ WMSLayerFilterForm.onCalculateMgaZoneResponse = function(response, request) {
     	
     	mgaZoneWindow.show();
     } else {
-    	Ext.Msg.alert("Error", "Could not calculate MGA Zone" );
+    	Ext.Msg.alert("Error", "Could not calculate MGA Zone: " + resp.msg);
     }
 };
 
@@ -248,13 +248,13 @@ WMSLayerFilterForm.onProjectToUtmResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
     var wmsForm = this;
     
-    if (resp.eastingArray != null && resp.northingArray != null && resp.depthArray) {
+    if (resp.success && resp.data.eastingArray != null && resp.data.northingArray != null && resp.data.depthArray) {
 
     	var mgaZoneWindow = new UTMBoundsInfoWindow({
     		scope	: wmsForm,
-    		eastingArray : resp.eastingArray,
-    		northingArray : resp.northingArray,
-    		depthArray : resp.depthArray,
+    		eastingArray : resp.data.eastingArray,
+    		northingArray : resp.data.northingArray,
+    		depthArray : resp.data.depthArray,
             callback : function(wmsForm, minEast, maxEast, minNorth, maxNorth, maxDepth) {
             	
             	Ext.Ajax.request({
@@ -288,10 +288,10 @@ WMSLayerFilterForm.onProjectToUtmResponse = function(response, request) {
 
 WMSLayerFilterForm.onCreateErddapRequestResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
-    if (resp.error != null) {
-        JobList.showError(resp.error);
-    } else {
+    if (resp.success) {
         Ext.Msg.alert("Success", "Subset bounds have been captured.");
+    } else {
+        Ext.Msg.alert("Failure", "There has been a problem generating the ERRDAP request: " + resp.msg);
     }
 };
 

@@ -93,7 +93,22 @@ JobObjectForm =  Ext.extend(BaseJobWizardForm, {
 	        { xtype: 'hidden', name: 'ec2InstanceId' },
 	        { xtype: 'hidden', name: 's3OutputBaseKey' },
 	        { xtype: 'hidden', name: 'fileStorageId' },
-	        { xtype: 'hidden', name: 'registeredUrl' }
+	        { xtype: 'hidden', name: 'registeredUrl' },
+	        { xtype: 'hidden', name: 'paddingMinEasting' },
+	        { xtype: 'hidden', name: 'paddingMaxEasting' },
+	        { xtype: 'hidden', name: 'paddingMinNorthing' },
+	        { xtype: 'hidden', name: 'paddingMaxNorthing' },
+	        { xtype: 'hidden', name: 'selectionMinEasting' },
+	        { xtype: 'hidden', name: 'selectionMaxEasting' },
+	        { xtype: 'hidden', name: 'selectionMinNorthing' },
+	        { xtype: 'hidden', name: 'selectionMaxNorthing' },
+	        { xtype: 'hidden', name: 'mgaZone' },
+	        { xtype: 'hidden', name: 'cellX' },
+	        { xtype: 'hidden', name: 'cellY' },
+	        { xtype: 'hidden', name: 'cellZ' },
+	        { xtype: 'hidden', name: 'inversionDepth' },
+	        { xtype: 'hidden', name: 'registeredUrl' },
+	        { xtype: 'hidden', name: 'vmSubsetFilePath' }
 	        ]
 	    });
 	},
