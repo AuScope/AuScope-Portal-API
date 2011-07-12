@@ -14,7 +14,7 @@ INITIAL_SLEEP_LENGTH="30s"
 FINAL_SLEEP_LENGTH="15m"
 NTP_DATE_SERVER="pool.ntp.org"
 VEGL_WORKFLOW_VERSION="1"
-export VEGL_SCRIPT_PATH="${WORKING_DIR}/vegl_script.sh"
+export VEGL_SCRIPT_PATH="${WORKING_DIR}/vegl_script.py"
 export SUBSET_REQUEST_PATH="${WORKING_DIR}/subset_request.sh"
 ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
 
@@ -98,6 +98,10 @@ cd $WORKING_DIR
 chmod +x "$VEGL_SCRIPT_PATH"
 python $VEGL_SCRIPT_PATH
 cd $WORKING_DIR
+
+#Finally upload our logs for debug purposes
+uploadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}/vegl.sh.log" | sed "s/\/\/*/\//g"`
+aws put "${uploadQueryPath}" "${VEGL_LOG_FILE}" --set-acl=public-read
 
 #At this point we can give developers a grace period in which they can login to the VM for debugging
 echo "Sleeping for ${FINAL_SLEEP_LENGTH} before shutting down"

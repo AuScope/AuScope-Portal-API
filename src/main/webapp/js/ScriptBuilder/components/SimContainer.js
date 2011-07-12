@@ -34,18 +34,9 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
 	var scriptHeader = "\
 #!/usr/bin/env python\n\n\
 # VEGL processing script.\n\
-# Please load the Job Object before you load other components\n\n";
-/*		"# Subset files will be available from /tmp/input.\n\n\
-# The following are the preconfigured environment variables available to this script\n\
-# AWS_SECRET_ACCESS_KEY - The S3 secret key used as a credential for writing output (user defined)\n\
-# AWS_ACCESS_KEY_ID - The S3 access key used as a credential for writing output (user defined)\n\
-# S3_BASE_KEY_PATH - The S3 base key path that will be used for storing output (portal defined)\n\
-# S3_OUTPUT_BUCKET - The S3 bucket that will be used for storing output (user defined)\n\
-# WORKING_DIR - The working directory for all calculations\n\
-# EXAMPLE_DATA_DIR - The location of some UBC example data\n\
-# VEGL_LOG_FILE - Where all STDOUT will be logged to\n\n";
-*/
-
+# Please load the Job Object before you load other components\n\n\
+import subprocess\n\n";
+		
 	var scriptFooter = "";
 
 

@@ -61,6 +61,9 @@ We need to determine the type of inversion. There are some corrections to be mad
 		<component title="Job Details" id="VEGLJobObject" type="s">
 			Place Job specifics inside a python dictionary.
 		</component>
+		<component title="AWS Util Functions" id="AWSUtils" type="s">
+            Utility functions enabling python to communicate with AWS S3.
+        </component>
 	</category>
 </categories>
 
