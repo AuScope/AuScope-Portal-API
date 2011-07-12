@@ -2,7 +2,7 @@ package org.auscope.portal.mineraloccurrence;
 
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.auscope.portal.Util;
+import org.auscope.portal.TestUtil;
 import org.auscope.portal.server.domain.ogc.FilterTestUtilities;
 
 import junit.framework.Assert;

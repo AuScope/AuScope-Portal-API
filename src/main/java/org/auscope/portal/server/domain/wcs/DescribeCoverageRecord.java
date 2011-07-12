@@ -18,7 +18,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.server.domain.ows.OWSExceptionParser;
-import org.auscope.portal.server.util.Util;
+import org.auscope.portal.server.util.DOMUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -258,7 +258,7 @@ public class DescribeCoverageRecord implements Serializable {
      * @throws Exception
      */
     public static DescribeCoverageRecord[] parseRecords(String inXml) throws Exception {
-        Util util = new Util();
+        DOMUtil util = new DOMUtil();
         
         Document doc = util.buildDomFromString(inXml);
         

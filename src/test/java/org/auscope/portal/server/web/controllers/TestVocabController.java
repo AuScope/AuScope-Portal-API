@@ -87,7 +87,7 @@ public class TestVocabController {
      */
     @Test
     public void testGetCommodities() throws Exception {
-        final String docString = org.auscope.portal.Util.loadXML("src/test/resources/vocabularyServiceResponse.xml");
+        final String docString = org.auscope.portal.TestUtil.loadXML("src/test/resources/vocabularyServiceResponse.xml");
         final String expectedJSONResponse = "[[\"urn:cgi:classifier:PIRSA:commodity:QP\",\"Quarry Products\"],[\"urn:cgi:classifier:PIRSA:commodity:RHYO\",\"Rhyolite\"],[\"urn:cgi:classifier:PIRSA:commodity:RHYRB\",\"Rhyolite - road base\"],[\"urn:cgi:classifier:PIRSA:commodity:SCHFL\",\"Schist - filling\"],[\"urn:cgi:classifier:PIRSA:commodity:SCHRB\",\"Schist - road base\"],[\"urn:cgi:classifier:PIRSA:commodity:SCHT\",\"Schist\"],[\"urn:cgi:classifier:PIRSA:commodity:SLSCA\",\"Siltstone - concrete aggregate\"],[\"urn:cgi:classifier:PIRSA:commodity:SLSFL\",\"Siltstone - filling\"],[\"urn:cgi:classifier:PIRSA:commodity:SLSRB\",\"Siltstone - road base\"],[\"urn:cgi:classifier:PIRSA:commodity:SLSRS\",\"Siltstone - road seal aggregate\"],[\"urn:cgi:classifier:PIRSA:commodity:SLSSP\",\"Siltstone - spalls\"],[\"urn:cgi:classifier:PIRSA:commodity:SLSSS\",\"Siltstone - specification sand\"],[\"urn:cgi:classifier:PIRSA:commodity:SLST\",\"Siltstone\"],[\"urn:cgi:classifier:GSV:commodity:Agg\",\"Aggregate - undifferentiated\"],[\"urn:cgi:classifier:GSWA:commodity:Agg\",\"Aggregate - undifferentiated\"],[\"urn:cgi:classifier:PIRSA:commodity:AGGR\",\"Aggregate - undifferentiated\"],[\"urn:cgi:classifier:PIRSA:commodity:AMPRB\",\"Amphibolite - road base\"],[\"urn:cgi:classifier:PIRSA:commodity:GBRRB\",\"Gabbro - road base\"],[\"urn:cgi:classifier:PIRSA:commodity:GNSCA\",\"Gneiss - concrete aggregate\"],[\"urn:cgi:classifier:PIRSA:commodity:GNSCD\",\"Gneiss - crusher dust\"],[\"urn:cgi:classifier:PIRSA:commodity:GNSFL\",\"Gneiss - filling\"],[\"urn:cgi:classifier:PIRSA:commodity:GNSNA\",\"Gneiss - general purpose aggregate\"],[\"urn:cgi:classifier:PIRSA:commodity:GNSRB\",\"Gneiss - road base\"],[\"urn:cgi:classifier:PIRSA:commodity:GNSRS\",\"Gneiss - road seal aggregate\"],[\"urn:cgi:classifier:PIRSA:commodity:GNSS\",\"Gneiss\"],[\"urn:cgi:classifier:PIRSA:commodity:GNSSP\",\"Gneiss - spalls\"],[\"urn:cgi:classifier:PIRSA:commodity:GNSSS\",\"Gneiss - specification sand\"]]";
         final StringWriter actualJSONResponse = new StringWriter();
 
@@ -121,7 +121,7 @@ public class TestVocabController {
      */
     @Test
     public void testGetScalarQuery() throws Exception {
-    	final String docString = org.auscope.portal.Util.loadXML("src/test/resources/GetVocabQuery_Success.xml");
+    	final String docString = org.auscope.portal.TestUtil.loadXML("src/test/resources/GetVocabQuery_Success.xml");
         final String returnedString = docString.replace("\"", "\\\"").replace("\t","\\t").replace("</", "<\\/");
         final String expectedScopeNote =  "\"scopeNote\":\"Mineral index for TSA singleton match or primary mixture component\"";
         final String expectedSuccess = "\"success\":true";

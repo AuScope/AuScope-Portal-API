@@ -4,7 +4,7 @@
 <html>
 
 <head>
-    <title>AuScope Geodesy Workflow  - Monitor Jobs</title>
+    <title>AuScope VEGL Workflow  - Monitor Jobs</title>
     <link rel="stylesheet" type="text/css" href="css/styles.css">
     <link rel="stylesheet" type="text/css" href="css/menu.css">
     <link rel="stylesheet" type="text/css" href="css/grid-examples.css">

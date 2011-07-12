@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.csw.CSWRecord;
 import org.auscope.portal.csw.CSWRecordTransformer;
 import org.auscope.portal.server.domain.xml.XMLStreamAttributeExtractor;
-import org.auscope.portal.server.util.Util;
+import org.auscope.portal.server.util.DOMUtil;
 import org.auscope.portal.server.web.GeonetworkDetails;
 import org.auscope.portal.server.web.GeonetworkMethodMaker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class GeonetworkService {
      * @throws Exception
      */
     private String cswRecordToMDMetadataXml(CSWRecord record) throws Exception {
-    	Util util = new Util();
+    	DOMUtil util = new DOMUtil();
     	
     	CSWRecordTransformer transformer = new CSWRecordTransformer(); //more than meets the eye
 		Node mdMetadataNode = transformer.transformToNode(record);
@@ -64,7 +64,7 @@ public class GeonetworkService {
     private String extractUuid(String gnResponse) {
     	String rtnValue = "";
     	if(gnResponse != null && !gnResponse.isEmpty()){
-    		Util util = new Util();
+    		DOMUtil util = new DOMUtil();
     		try{
     			Document doc = util.buildDomFromString(gnResponse);
 

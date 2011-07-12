@@ -14,7 +14,7 @@ import org.auscope.portal.csw.CSWThreadExecutor;
 import org.auscope.portal.csw.ICSWMethodMaker;
 import org.auscope.portal.csw.CSWOnlineResource.OnlineResourceType;
 
-import org.auscope.portal.server.util.Util;
+import org.auscope.portal.server.util.DOMUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,13 +44,13 @@ public class CSWService {
 
     	//These are cached for the run method
     	private HttpServiceCaller serviceCaller;
-        private Util util;
+        private DOMUtil util;
 
         //This isn't perfect, but it does the job we need it to
         //This will stop multiple updates on different threads from running at the same time
         private volatile boolean updateInProgress;
 
-    	public UrlCache(CSWServiceItem serviceItem, HttpServiceCaller serviceCaller, Util util) {
+    	public UrlCache(CSWServiceItem serviceItem, HttpServiceCaller serviceCaller, DOMUtil util) {
     		this.serviceItem = serviceItem;
     		this.cache = new CSWRecord[0];
     		this.serviceCaller = serviceCaller;
@@ -123,7 +123,7 @@ public class CSWService {
     private UrlCache[]  cache;
     private HttpServiceCaller serviceCaller;
     private CSWThreadExecutor executor;
-    private Util util;
+    private DOMUtil util;
     private static final int UPDATE_INTERVAL = 300000;
     private static int FIRST_UPDATE_INTERVAL = 60000;
     private boolean FIRST_UPDATE_COMPLETE = false;
@@ -131,7 +131,7 @@ public class CSWService {
     @Autowired
     public CSWService(CSWThreadExecutor executor,
                       HttpServiceCaller serviceCaller,
-                      Util util,
+                      DOMUtil util,
                       @Qualifier(value = "cswServiceList") ArrayList cswServiceList) throws Exception {
 
         this.executor = executor;

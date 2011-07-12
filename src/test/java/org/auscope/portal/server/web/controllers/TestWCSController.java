@@ -319,7 +319,7 @@ public class TestWCSController {
     public void testDescribeCoverageSuccess() throws Exception {
         final String serviceUrl = "http://fake.com/bob";
         final String layerName = "layer_name";
-        final String xmlResponse = org.auscope.portal.Util.loadXML("src/test/resources/DescribeCoverageResponse1.xml");
+        final String xmlResponse = org.auscope.portal.TestUtil.loadXML("src/test/resources/DescribeCoverageResponse1.xml");
         
         context.checking(new Expectations() {{
             //Our method maker call should be passed all the correct variables

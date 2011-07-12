@@ -105,7 +105,7 @@ public class TestEarthResourcesFilterController {
         final String serviceURL = "http://testblah.com";
         final String expectedKML = ""; 
         final GetMethod mockMethod = context.mock(GetMethod.class);
-        final String xmlErrorResponse = org.auscope.portal.Util.loadXML("src/test/resources/GetMineError.xml");
+        final String xmlErrorResponse = org.auscope.portal.TestUtil.loadXML("src/test/resources/GetMineError.xml");
         final StringWriter jsonResponse = new StringWriter();
         
         context.checking(new Expectations() {{
@@ -142,7 +142,7 @@ public class TestEarthResourcesFilterController {
         final String serviceURL = "http://testblah.com";
         final String expectedKML = "";
         final GetMethod mockMethod = context.mock(GetMethod.class);
-        final String xmlErrorResponse = org.auscope.portal.Util.loadXML("src/test/resources/GetMineError.xml");
+        final String xmlErrorResponse = org.auscope.portal.TestUtil.loadXML("src/test/resources/GetMineError.xml");
         final StringWriter jsonResponse = new StringWriter();
         
         context.checking(new Expectations() {{

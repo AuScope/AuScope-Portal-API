@@ -31,7 +31,7 @@ public abstract class FilterTestUtilities {
         NamespaceContext nsc = new OGCNamespaceContext();
         xmlString = String.format("<test xmlns:ogc=\"%1$s\">%2$s</test>",nsc.getNamespaceURI("ogc"), xmlString);
         
-        return new org.auscope.portal.server.util.Util().buildDomFromString(xmlString);
+        return new org.auscope.portal.server.util.DOMUtil().buildDomFromString(xmlString);
     }
     
     

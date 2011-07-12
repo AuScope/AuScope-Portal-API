@@ -4,7 +4,7 @@
  *
  * Licensed under the terms of the GNU Lesser General Public License.
  */
-package org.auscope.portal.server.gridjob;
+package org.auscope.portal.server.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,15 +20,15 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Cihan Altinay
  */
-public class Util
+public class FileUtil
 {
     /** Logger for this class and subclasses */
-    private static Log logger = LogFactory.getLog(Util.class.getName());
+    private static Log logger = LogFactory.getLog(FileUtil.class.getName());
 
     /**
      * Private constructor to prevent instantiation.
      */
-    private Util() { }
+    private FileUtil() { }
 
     /**
      * Copies a file from source to destination.

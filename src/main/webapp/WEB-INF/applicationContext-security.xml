@@ -112,6 +112,7 @@
    
   	<http auto-config='true' >
    		<intercept-url pattern="/gridsubmit.html" access="ROLE_USER"/>
+   		<intercept-url pattern="/jobbuilder.html" access="ROLE_USER"/>
         <intercept-url pattern="/joblist.html" access="ROLE_USER"/>
         <intercept-url pattern="/login.html*" filters="none"/>
         <custom-filter ref="preAuthenticatedProcessingFilter" position="PRE_AUTH_FILTER" />

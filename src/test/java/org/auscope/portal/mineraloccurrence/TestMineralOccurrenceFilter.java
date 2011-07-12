@@ -13,7 +13,7 @@ import javax.xml.xpath.XPathFactory;
 
 import junit.framework.Assert;
 
-import org.auscope.portal.Util;
+import org.auscope.portal.TestUtil;
 import org.auscope.portal.server.domain.ogc.FilterTestUtilities;
 import org.auscope.portal.server.domain.ogc.OGCNamespaceContext;
 import org.auscope.portal.server.domain.wcs.WCSNamespaceContext;

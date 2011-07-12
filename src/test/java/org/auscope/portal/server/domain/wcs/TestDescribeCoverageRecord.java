@@ -14,7 +14,7 @@ public class TestDescribeCoverageRecord {
     
     @Test
     public void parseTest1() throws Exception { 
-        final String xmlString = org.auscope.portal.Util.loadXML("src/test/resources/DescribeCoverageResponse1.xml");
+        final String xmlString = org.auscope.portal.TestUtil.loadXML("src/test/resources/DescribeCoverageResponse1.xml");
         
         //Check the parsed response contains everything we want
         DescribeCoverageRecord[] records = DescribeCoverageRecord.parseRecords(xmlString);
@@ -98,7 +98,7 @@ public class TestDescribeCoverageRecord {
     
     @Test
     public void parseTest2() throws Exception { 
-        final String xmlString = org.auscope.portal.Util.loadXML("src/test/resources/DescribeCoverageResponse2.xml");
+        final String xmlString = org.auscope.portal.TestUtil.loadXML("src/test/resources/DescribeCoverageResponse2.xml");
         
         //Check the parsed response contains everything we want
         DescribeCoverageRecord[] records = DescribeCoverageRecord.parseRecords(xmlString);

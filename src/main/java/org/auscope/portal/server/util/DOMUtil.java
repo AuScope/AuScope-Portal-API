@@ -28,7 +28,7 @@ import java.util.Properties;
  * Time: 4:42:13 PM
  */
 @Repository
-public class Util {
+public class DOMUtil {
     public Document buildDomFromString(String xmlString) throws ParserConfigurationException, IOException, SAXException {
         //build the XML dom
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

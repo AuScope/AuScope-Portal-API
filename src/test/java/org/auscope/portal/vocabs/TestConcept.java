@@ -14,7 +14,7 @@ import javax.xml.xpath.XPathFactory;
 
 import junit.framework.Assert;
 
-import org.auscope.portal.Util;
+import org.auscope.portal.TestUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -39,7 +39,7 @@ public class TestConcept {
         DocumentBuilder builder = domFactory.newDocumentBuilder();
         Document conceptDocument =
             builder.parse(new ByteArrayInputStream(
-                    Util.loadXML("src/test/resources/conceptNode.xml").getBytes("UTF-8")));
+            		TestUtil.loadXML("src/test/resources/conceptNode.xml").getBytes("UTF-8")));
 
         XPathFactory factory = XPathFactory.newInstance();
         xPath = factory.newXPath();

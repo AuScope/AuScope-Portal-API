@@ -13,11 +13,10 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 /**
  * This AbstractPreAuthenticatedProcessingFilter implementation 
  * obtains the username from request header pre-populated by an 
- * external Shibboleth authentication system.
+ * external OpenID authentication system.
  * 
- * 
- * @author san218
- * @version $Id$
+ * @Author Shane Bailie
+ * @author Josh Vote
  */
 public class PreAuthenticatedProcessingFilter 
    extends AbstractPreAuthenticatedProcessingFilter {
@@ -49,35 +48,6 @@ public class PreAuthenticatedProcessingFilter
 			return false;
 		}
 	}
-	
-	/*java.util.Enumeration eHeaders = request.getHeaderNames();
-      while(eHeaders.hasMoreElements()) {
-         String name = (String) eHeaders.nextElement();
-         logger.error("header name: " + name + ", value: " + request.getHeader(name));
-         
-         if ( ( name.matches(".*Shib.*") || name.matches(".*shib.*") ) && 
-              !name.equals("HTTP_SHIB_ATTRIBUTES") && 
-              !name.equals("Shib-Attributes") ) 
-         {
-               Object object = request.getHeader(name);
-               String value = object.toString();
-               logger.debug("Shib header - " + name + " : " + value);
-         }
-      }
-      
-      if (request.getHeader("Shib-Shared-Token") != null) {
-    	  
-	      logger.info("Shib-Person-mail: " + request.getHeader("Shib-Person-mail"));
-	      request.getSession().setAttribute("Shib-Person-mail", request.getHeader("Shib-Person-mail"));
-	      request.getSession().setAttribute("Shib-Shared-Token", request.getHeader("Shib-Shared-Token"));
-	      request.getSession().setAttribute("Shib-Person-commonName", request.getHeader("Shib-Person-commonName"));
-      }else if (request.getHeader("shared-token") != null) {
-    	  
-	      logger.info("mail: " + request.getHeader("mail"));
-	      request.getSession().setAttribute("Shib-Person-mail", request.getHeader("mail"));
-	      request.getSession().setAttribute("Shib-Shared-Token", request.getHeader("shared-token"));
-	      request.getSession().setAttribute("Shib-Person-commonName", request.getHeader("cn"));
-      }*/
       
       return request.getSession().getAttribute("openID-Email");
    }

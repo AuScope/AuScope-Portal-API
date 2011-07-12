@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.server.gridjob.FileInformation;
-import org.auscope.portal.server.gridjob.GeodesyJob;
+import org.auscope.portal.server.cloud.S3FileInformation;
+import org.auscope.portal.server.vegl.VEGLJob;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
@@ -32,7 +32,7 @@ public class JobStorageService {
      * @return
      * @throws S3ServiceException
      */
-    private S3Service generateS3ServiceForJob(GeodesyJob job) throws S3ServiceException {
+    private S3Service generateS3ServiceForJob(VEGLJob job) throws S3ServiceException {
         ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(job.getS3OutputAccessKey(), job.getS3OutputSecretKey());
         
         return new RestS3Service(provCreds);
@@ -46,14 +46,14 @@ public class JobStorageService {
      * @return Array of S3Objects, or null if no results available.
      * @throws S3ServiceException 
      */
-    private S3Object[] getOutputS3Objects(GeodesyJob job) throws S3ServiceException {
+    private S3Object[] getOutputS3Objects(VEGLJob job) throws S3ServiceException {
     	S3Service s3Service = generateS3ServiceForJob(job);
-		String outputDir = job.getOutputDir();
+		String baseKey = job.getS3OutputBaseKey();
 		String bucket = job.getS3OutputBucket();
 		
-		logger.debug(String.format("bucket='%1$s' outputDir='%2$s'", bucket, outputDir));
+		logger.debug(String.format("bucket='%1$s' baseKey='%2$s'", bucket, baseKey));
 		
-		S3Object[] objs = s3Service.listObjects(bucket,outputDir,null);
+		S3Object[] objs = s3Service.listObjects(bucket,baseKey,null);
 		if (objs == null) {
 			return new S3Object[0];
 		} else {
@@ -68,7 +68,7 @@ public class JobStorageService {
      * @return
      * @throws ServiceException
      */
-    public InputStream getJobFileData(GeodesyJob job, String key) throws ServiceException {
+    public InputStream getJobFileData(VEGLJob job, String key) throws ServiceException {
     	S3Service service = generateS3ServiceForJob(job);
     	S3Object s3obj = service.getObject(job.getS3OutputBucket(), key);
 		return s3obj.getDataInputStream();
@@ -80,14 +80,14 @@ public class JobStorageService {
      * @return
      * @throws S3ServiceException
      */
-    public FileInformation[] getOutputFileDetails(GeodesyJob job) throws S3ServiceException {
+    public S3FileInformation[] getOutputFileDetails(VEGLJob job) throws S3ServiceException {
     	S3Object[] results = getOutputS3Objects(job);
-    	FileInformation[] fileDetails = new FileInformation[results.length];
+    	S3FileInformation[] fileDetails = new S3FileInformation[results.length];
     	
     	int i = 0;
     	// get file information from s3 objects
     	for (S3Object object : results) {
-    		fileDetails[i++] = new FileInformation(object.getKey(), object.getContentLength());
+    		fileDetails[i++] = new S3FileInformation(object.getKey(), object.getContentLength());
     	}
     	
     	return fileDetails;

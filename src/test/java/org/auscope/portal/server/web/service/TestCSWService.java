@@ -9,7 +9,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 
 import org.auscope.portal.csw.CSWThreadExecutor;
-import org.auscope.portal.server.util.Util;
+import org.auscope.portal.server.util.DOMUtil;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -64,7 +64,7 @@ public class TestCSWService {
      * Mock Util
      * @throws Exception
      */
-     private Util util = new Util();//context.mock(Util.class);
+     private DOMUtil util = new DOMUtil();//context.mock(Util.class);
 
     @Before
     public void setup() throws Exception {
@@ -175,7 +175,7 @@ public class TestCSWService {
      */
     @Test
     public void testUpdateCSWRecords() throws Exception {
-        final String docString = org.auscope.portal.Util.loadXML("src/test/resources/cswRecordResponse.xml");
+        final String docString = org.auscope.portal.TestUtil.loadXML("src/test/resources/cswRecordResponse.xml");
 
         context.checking(new Expectations() {{
             exactly(CONCURRENT_THREADS_TO_RUN).of(httpServiceCaller).getHttpClient();

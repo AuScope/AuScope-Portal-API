@@ -107,6 +107,5 @@ if [ -f $ABORT_SHUTDOWN_PATH ]; then
     echo 'Instance shutdown has been aborted'
 else
 	echo 'Shutting down this instance...'
-    awsInstanceID=`./ec2-metadata -i | awk '{print $2}'`
-    euca-terminate-instances "${awsInstanceID}"
+    shutdown -h now
 fi

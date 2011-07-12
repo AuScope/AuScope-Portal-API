@@ -1,15 +1,15 @@
 package org.auscope.portal.server.domain.ows;
 
-import org.auscope.portal.server.util.Util;
+import org.auscope.portal.server.util.DOMUtil;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
 public class TestOWSExceptionParser {
     
     private void check(String path) throws Exception {
-        final String xmlString = org.auscope.portal.Util.loadXML(path);
+        final String xmlString = org.auscope.portal.TestUtil.loadXML(path);
         
-        Util util = new Util();
+        DOMUtil util = new DOMUtil();
         
         Document doc = util.buildDomFromString(xmlString);
         

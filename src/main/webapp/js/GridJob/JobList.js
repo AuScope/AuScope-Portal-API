@@ -142,7 +142,7 @@ JobList.updateJobDetails = function() {
         JobList.jobDescTpl.overwrite(descEl, jobData);
         detailsPanel.enable();
 
-        if(jobData.status == 'Done' && (jobData.registered == null || jobData.registered == "")){
+        if(jobData.status == 'Done' && (jobData.registeredUrl == null || jobData.registeredUrl == "")){
            Ext.getCmp('registerButton').enable();
         }else
         {
@@ -427,20 +427,19 @@ JobList.initialize = function() {
             { name: 'id', type: 'int' },
             { name: 'name', type: 'string' },
             { name: 'description', type: 'string' },
-            { name: 'site', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'checkpointPrefix', type: 'string' },
-            { name: 'numTimesteps', type: 'int' },
-            { name: 'numParticles', type: 'int' },
-            { name: 'numBonds', type: 'int' },
-            { name: 'outputDir', type: 'string' },
-            { name: 'reference', type: 'string' },
-            { name: 'scriptFile', type: 'string' },
-            { name: 'status', type: 'string'},
-            { name: 'registered', type: 'string'},
-            { name: 'outputLocation', type: 'string'},
+            { name: 'emailAddress', type: 'string' },
+            { name: 'user', type: 'string' },
             { name: 'submitDate', type: 'date', dateFormat: 'Ymd_His' },
-            { name: 'awsKey', type: 'string'},
+            { name: 'status', type: 'string' },
+            { name: 'ec2AMI', type: 'string' },
+            { name: 'ec2InstanceId', type: 'string' },
+            { name: 'ec2Endpoint', type: 'string' },
+            { name: 's3OutputAccessKey', type: 'string' },
+            { name: 's3OutputSecretKey', type: 'string' },
+            { name: 's3OutputBucket', type: 'string' },
+            { name: 's3OutputBaseKey', type: 'string' },
+            { name: 'registeredUrl', type: 'string' },
+            { name: 'seriesId', type: 'int' }
         ],
         listeners: {
             'beforeload': JobList.showProgressDlg,
@@ -693,12 +692,9 @@ JobList.initialize = function() {
     JobList.jobDescTpl = new Ext.Template(
         '<p class="jobdesc-title">{name}</p>',
         '<table width="100%"><col width="150px"></col><col class="jobdesc-content"></col>',
-        '<tr><td class="jobdesc-key">Part of series:</td><td>{seriesName}</td></tr>',
+        '<tr><td class="jobdesc-key">Description:</td><td>{description}</td></tr>',
         '<tr><td class="jobdesc-key">Submitted on:</td><td>{submitDate}</td></tr>',
-        //'<tr><td class="jobdesc-key">Computation site:</td><td>{site}</td></tr>',
-        //'<tr><td class="jobdesc-key">Version:</td><td>{version}</td></tr>',
-        //'<tr><td class="jobdesc-key">Ouput url:</td><td><a href="{outputLocation}">{outputLocation}</a></td></tr>',
-        '<tr><td class="jobdesc-key">Geonetwork url:</td><td><a href="{registered}" target="_blank">{registered}</a></td></tr></table><br/>'
+        '<tr><td class="jobdesc-key">Geonetwork url:</td><td><a href="{registeredUrl}" target="_blank">{registeredUrl}</a></td></tr></table><br/>'
         //'<p class="jobdesc-key">Description:</p><br/><p>{description}</p>'
     );
     JobList.jobDescTpl.compile();

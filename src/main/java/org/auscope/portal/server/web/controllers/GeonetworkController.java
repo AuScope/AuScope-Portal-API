@@ -1,23 +1,10 @@
 package org.auscope.portal.server.web.controllers;
 
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.csw.CSWGeographicBoundingBox;
@@ -25,36 +12,18 @@ import org.auscope.portal.csw.CSWGeographicElement;
 import org.auscope.portal.csw.CSWOnlineResource;
 import org.auscope.portal.csw.CSWOnlineResourceImpl;
 import org.auscope.portal.csw.CSWRecord;
-import org.auscope.portal.csw.CSWRecordTransformer;
-import org.auscope.portal.server.domain.xml.XMLStreamAttributeExtractor;
-import org.auscope.portal.server.gridjob.FileInformation;
-import org.auscope.portal.server.gridjob.GeodesyJob;
-import org.auscope.portal.server.gridjob.GeodesyJobManager;
-import org.auscope.portal.server.gridjob.GeodesySeries;
-import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
-import org.auscope.portal.server.util.Util;
-import org.auscope.portal.server.web.GeonetworkDetails;
-import org.auscope.portal.server.web.GeonetworkMethodMaker;
+import org.auscope.portal.server.cloud.S3FileInformation;
+import org.auscope.portal.server.vegl.VEGLJob;
+import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.web.service.GeonetworkService;
-import org.auscope.portal.server.web.service.HttpServiceCaller;
 import org.auscope.portal.server.web.service.JobStorageService;
-import org.eclipse.emf.ecore.xml.type.internal.RegEx;
-import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
-import org.jets3t.service.acl.AccessControlList;
-import org.jets3t.service.acl.GroupGrantee;
-import org.jets3t.service.acl.Permission;
-import org.jets3t.service.impl.rest.httpclient.RestS3Service;
-import org.jets3t.service.model.S3Object;
-import org.jets3t.service.security.ProviderCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * A controller class for marshalling a users interactions with Geonetwork
@@ -66,12 +35,12 @@ public class GeonetworkController {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 	
-    private GeodesyJobManager jobManager;
+    private VEGLJobManager jobManager;
     private GeonetworkService gnService;
     private JobStorageService jobStorageService;
     
     @Autowired
-    public GeonetworkController(GeodesyJobManager jobManager, GeonetworkService gnService, JobStorageService jobStorageService) {
+    public GeonetworkController(VEGLJobManager jobManager, GeonetworkService gnService, JobStorageService jobStorageService) {
         this.jobManager = jobManager;
         this.gnService = gnService;
         this.jobStorageService = jobStorageService;
@@ -86,12 +55,12 @@ public class GeonetworkController {
      * @throws MalformedURLException
      * @throws S3ServiceException 
      */
-    private CSWRecord jobToCSWRecord(GeodesyJob job, GeodesySeries series) throws MalformedURLException, S3ServiceException {
-    	FileInformation[] outputFiles = jobStorageService.getOutputFileDetails(job);
+    private CSWRecord jobToCSWRecord(VEGLJob job, VEGLSeries series) throws MalformedURLException, S3ServiceException {
+    	S3FileInformation[] outputFiles = jobStorageService.getOutputFileDetails(job);
     	List<CSWOnlineResource> onlineResources = new ArrayList<CSWOnlineResource>();
     	
     	if (outputFiles != null) {
-    		for (FileInformation obj : outputFiles) {
+    		for (S3FileInformation obj : outputFiles) {
     			String url = String.format("http://%1$s.s3.amazonaws.com/%2$s", job.getS3OutputBucket(), obj.getS3Key());
     			onlineResources.add(new CSWOnlineResourceImpl(new URL(url), "WWW:DOWNLOAD-1.0-ftp--download", obj.getName(), obj.getName()));
     		}
@@ -119,15 +88,15 @@ public class GeonetworkController {
     	
     	try {
     		//Lookup our appropriate job
-    		GeodesyJob job = jobManager.getJobById(Integer.parseInt(jobId));
-    		GeodesySeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
+    		VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
+    		VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
     		
     		//Create an instance of our CSWRecord and transform it to a <gmd:MD_Metadata> record
     		CSWRecord record = jobToCSWRecord(job, jobSeries);
     		
     		//Lets connect to geonetwork and then send our new record
     		String metadataRecordUrl = gnService.makeCSWRecordInsertion(record);
-    		job.setRegistered(metadataRecordUrl);
+    		job.setRegisteredUrl(metadataRecordUrl);
         	jobManager.saveJob(job);
         	
         	mav.addObject("success", true );

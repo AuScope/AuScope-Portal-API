@@ -10,7 +10,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
-import org.auscope.portal.Util;
+import org.auscope.portal.TestUtil;
 import org.auscope.portal.csw.CSWGeographicElement;
 import org.auscope.portal.csw.CSWOnlineResource;
 import org.auscope.portal.csw.CSWRecord;
@@ -53,11 +53,11 @@ public class TestGeonetworkService {
 		
 		final String uuid = "4cda9dc3-9a0e-40cd-a3a9-64db5ce3c031";
 		final String recordId = "19144";
-		final String insertResponse = Util.loadXML("src/test/resources/GNCSWInsertResponse.xml");
-		final String loginResponse = Util.loadXML("src/test/resources/GNLoginLogoutSuccessResponse.xml");
-		final String logoutResponse = Util.loadXML("src/test/resources/GNLoginLogoutSuccessResponse.xml");
-		final String recordPublicResponse = Util.loadXML("src/test/resources/GNRecordPublicResponse.xml");
-		final String recordMetadata = Util.loadXML("src/test/resources/GNMetadataShowResponse.html");
+		final String insertResponse = TestUtil.loadXML("src/test/resources/GNCSWInsertResponse.xml");
+		final String loginResponse = TestUtil.loadXML("src/test/resources/GNLoginLogoutSuccessResponse.xml");
+		final String logoutResponse = TestUtil.loadXML("src/test/resources/GNLoginLogoutSuccessResponse.xml");
+		final String recordPublicResponse = TestUtil.loadXML("src/test/resources/GNRecordPublicResponse.xml");
+		final String recordMetadata = TestUtil.loadXML("src/test/resources/GNMetadataShowResponse.html");
 		final InputStream recordMetadataStream =  new ByteArrayInputStream(recordMetadata.getBytes());
 		
 		final CSWRecord record = new CSWRecord("a", "b", "c", "", "", new CSWOnlineResource[0], new CSWGeographicElement[0]);

@@ -23,12 +23,12 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.StringReader;
 
-import org.auscope.portal.server.util.Util;
+import org.auscope.portal.server.util.DOMUtil;
 
 public class TestGmlToKml {
 	private GmlToKml gmlToKml = new GmlToKml();
 	
-	private Util util = new Util();
+	private DOMUtil util = new DOMUtil();
 	
 	private Mockery context = new Mockery() {{
         setImposteriser(ClassImposteriser.INSTANCE);
@@ -48,7 +48,7 @@ public class TestGmlToKml {
 	
 	@Test
 	public void testGenericFeatureParser() throws Exception {
-		String testXml = org.auscope.portal.Util.loadXML("src/test/resources/GetUndefinedFeatureSet.xml");
+		String testXml = org.auscope.portal.TestUtil.loadXML("src/test/resources/GetUndefinedFeatureSet.xml");
 		InputStream inputStream = new FileInputStream("src/main/webapp/WEB-INF/xsl/kml.xsl");
 		
 		

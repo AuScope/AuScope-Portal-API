@@ -6,13 +6,14 @@
  */
 package org.auscope.portal.server.gridjob;
 
+import java.io.File;
 import java.io.Serializable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Simple bean class that stores information about a file.
+ * Simple bean class that stores basic information about a file. Designed to be passed between GUI and backend
  *
  * @author Cihan Altinay
  */
@@ -25,23 +26,12 @@ public class FileInformation implements Serializable {
     private boolean directoryFlag = false;
     /** parent directory path */
     private String parentPath = "";
-    /** AWS S3 storage key */
-    private String s3Key = "";
-    
-    /** Logger for this class */
-    private final Log logger = LogFactory.getLog(getClass());
 
-    /**
-     * Constructor with name and size
-     */
-    public FileInformation(String s3Key, long size) {
-        this.s3Key = s3Key;
-        this.size = size;
-        // key will be in the format email@address-VEGLJob-timestamp/filename.format.
-        // the file name will be the last part after the /
-        String [] keyParts = s3Key.split("/");
-        this.name = keyParts[keyParts.length-1];
-        logger.debug("filename: " + name);
+    public FileInformation(File file) {
+    	this.name = file.getName();
+    	this.size = file.length();
+    	this.directoryFlag = file.isDirectory();
+    	this.parentPath = file.getParent();
     }
     
     /**
@@ -98,14 +88,5 @@ public class FileInformation implements Serializable {
 	public void setParentPath(String parentPath) {
 		this.parentPath = parentPath;
 	}
-
-	public String getS3Key() {
-		return s3Key;
-	}
-
-	public void setS3Key(String s3Key) {
-		this.s3Key = s3Key;
-	}
-
 }
 

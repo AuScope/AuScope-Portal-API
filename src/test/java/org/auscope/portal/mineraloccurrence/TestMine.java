@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.auscope.portal.Util;
+import org.auscope.portal.TestUtil;
 
 import javax.xml.xpath.*;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,7 +30,7 @@ public class TestMine {
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true); // never forget this!
         DocumentBuilder builder = domFactory.newDocumentBuilder();
-        Document mineDocument = builder.parse(new ByteArrayInputStream(Util.loadXML("src/test/resources/mineNode.xml").getBytes("UTF-8")));
+        Document mineDocument = builder.parse(new ByteArrayInputStream(TestUtil.loadXML("src/test/resources/mineNode.xml").getBytes("UTF-8")));
 
         XPathFactory factory = XPathFactory.newInstance();
         xPath = factory.newXPath();

@@ -17,8 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.server.vegl.VEGLJob;
+import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.web.service.JobFileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 import org.springframework.web.servlet.view.RedirectView;
@@ -27,153 +32,56 @@ import org.springframework.web.servlet.view.RedirectView;
  * Controller for the ScriptBuilder view.
  *
  * @author Cihan Altinay
+ * @author Josh Vote - modified for usage with VEGL
  */
 @Controller
-public class ScriptBuilderController {
+public class ScriptBuilderController extends BaseVEGLController {
 
+	public static final String SCRIPT_FILE_NAME = "vegl_script.py";  
+	
     private final Log logger = LogFactory.getLog(getClass());
 
-    protected ModelAndView handleNoSuchRequestHandlingMethod(
-            NoSuchRequestHandlingMethodException ex,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-
-        logger.debug("No/invalid action parameter; returning scriptbuilder view.");
-        return new ModelAndView("scriptbuilder");
-    }
-
+    @Autowired
+    private JobFileService jobFileService;
+    
+    @Autowired
+    private VEGLJobManager jobManager;
+    
     /**
-     * Processes a script download request.
+     * Writes provided script text to a file in the specified jobs stage in directory
      *
-     * @param request The servlet request including a sourcetext parameter
-     * @param response The servlet response receiving the file
-     *
-     * @return null if successful, the scriptbuilder view otherwise.
+     * @return A JSON encoded response with a success flag
      */
-    @RequestMapping("/downloadScript.do")
-    public ModelAndView downloadScript(HttpServletRequest request,
-                                       HttpServletResponse response) {
+    @RequestMapping("/saveScript.do")
+    public ModelAndView saveScript(@RequestParam("jobId") String jobId,
+                                  @RequestParam("sourceText") String sourceText) {
 
-        logger.debug("User requested script download");
-        String script = request.getParameter("sourcetext");
-        if (script != null) {
-            String scriptName = request.getParameter("scriptname");
-            if (scriptName == null) {
-                scriptName = "vegl_script";
-            }
-            response.setContentType("application/octet-stream");
-            response.setContentLength(script.length());
-            response.setHeader("Content-Disposition",
-                    "attachment; filename=\""+scriptName+".py\"");
-
-            try {
-                PrintWriter writer = response.getWriter();
-                writer.print(script);
-                writer.close();
-                return null;
-            } catch (IOException e) {
-                logger.error("Could not open output stream!");
-            }
-        }
-        logger.debug("No source text provided. Returning scriptbuilder view.");
-        return new ModelAndView("scriptbuilder");
-    }
-
-    /**
-     * Writes provided script text to a file and redirects to the grid
-     * submission interface.
-     *
-     * @param request The servlet request including a sourcetext parameter
-     * @param response The servlet response
-     *
-     * @return The gridsubmit view if successful, the scriptbuilder view
-     *         otherwise.
-     */
-    @RequestMapping("/useScript.do")
-    public ModelAndView useScript(HttpServletRequest request,
-                                  HttpServletResponse response) {
-
-        logger.debug("User requested script use");
-        String script = request.getParameter("sourcetext");
-        if (script != null) {
-            String scriptName = request.getParameter("scriptname");
-            if (scriptName == null) {
-                scriptName = "vegl_script";
-            }
-
-            try {
-                String tempDir = System.getProperty("java.io.tmpdir");
-                File scriptFile = new File(
-                        tempDir+File.separator+scriptName+".sh");
-                scriptFile.deleteOnExit();
-                PrintWriter writer = new PrintWriter(scriptFile);
-                writer.print(script);
-                writer.close();
-                logger.info("saved script file: " + scriptFile.getAbsolutePath());
-
-            } catch (IOException e) {
-                logger.error("Could not create temp file: " + e.getMessage());
-            }
-
-            request.getSession().setAttribute("scriptFile", scriptName);
-            return new ModelAndView(new RedirectView("gridsubmit.html"));
-        }
-        logger.debug("No source text provided. Returning scriptbuilder view.");
-        return new ModelAndView("scriptbuilder");
-    }
-
-    /**
-     * Returns the contents of a script file to be edited.
-     *
-     * @param request The servlet request
-     * @param response The servlet response
-     *
-     * @return A JSON object containing a scriptName attribute and a
-     *         scriptText attribute.
-     */
-    @RequestMapping("/getScriptText.do")
-    public ModelAndView getScriptText(HttpServletRequest request,
-                                      HttpServletResponse response) {
-
-        ModelAndView mav = new ModelAndView("jsonView");
-        String scriptFile = (String) request.getSession()
-            .getAttribute("scriptFile");
-
-        String scriptName = null;
-        String scriptText = null;
-
-        if (scriptFile != null) {
-            logger.debug("Reading script source.");
-            String tempDir = System.getProperty("java.io.tmpdir");
-            try {
-                BufferedReader input = new BufferedReader(
-                    new FileReader(tempDir+File.separator+scriptFile));
-                StringBuffer contents = new StringBuffer();
-                String line = null;
-                while ((line = input.readLine()) != null) {
-                    contents.append(line).append(
-                            System.getProperty("line.separator"));
-                }
-                input.close();
-                if (scriptFile.lastIndexOf(".sh") > 0) {
-                    scriptName = scriptFile.substring(0,
-                            scriptFile.lastIndexOf(".sh"));
-                } else {
-                    scriptName = scriptFile;
-                }
-                scriptText = contents.toString();
-
-            } catch (IOException e) {
-                logger.error("Error reading file.");
-            }
-            request.getSession().removeAttribute("scriptFile");
+        
+    	if (sourceText == null || sourceText.isEmpty()) {
+    		return generateJSONResponseMAV(false, null, "No source text specified");
+    	}
+    	
+    	//Lookup our job
+    	VEGLJob job = null;
+    	try {
+    		job = jobManager.getJobById(Integer.parseInt(jobId));
+    	} catch (Exception ex) {
+    		logger.warn("Unable to lookup job with id " + jobId, ex);
+    		return generateJSONResponseMAV(false, null, "Unable to lookup jobId");
+    	}
+    	
+    	//Apply text contents to job stage in directory
+        try {
+        	File scriptFile = jobFileService.createStageInDirectoryFile(job, SCRIPT_FILE_NAME);
+            PrintWriter writer = new PrintWriter(scriptFile);
+            writer.print(sourceText);
+            writer.close();
+        } catch (IOException e) {
+            logger.error("Could write script file", e);
+            return generateJSONResponseMAV(false, null, "Unable to write script file");
         }
 
-        if (scriptText != null) {
-            mav.addObject("scriptName", scriptName);
-            mav.addObject("scriptText", scriptText);
-        }
-        return mav;
+        return generateJSONResponseMAV(true, null, "");
     }
 }
 

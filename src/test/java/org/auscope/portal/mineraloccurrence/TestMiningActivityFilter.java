@@ -2,7 +2,7 @@ package org.auscope.portal.mineraloccurrence;
 
 import org.junit.Test;
 import org.junit.Before;
-import org.auscope.portal.Util;
+import org.auscope.portal.TestUtil;
 import org.auscope.portal.server.domain.ogc.FilterTestUtilities;
 import org.jmock.Mockery;
 import org.jmock.Expectations;

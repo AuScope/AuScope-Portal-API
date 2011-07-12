@@ -12,7 +12,7 @@ import java.io.IOException;
  * Date: 25/03/2009
  * @version $Id$
  */
-public class Util {
+public class TestUtil {
     public static String loadXML(String fileName) throws IOException {
         File mineContents = new File(fileName);
         BufferedReader reader = new BufferedReader( new FileReader(mineContents) );
