@@ -157,7 +157,10 @@ ScriptBuilderForm =  Ext.extend(BaseJobWizardForm, {
 	            xtype: 'textarea',
 	            disabled: true,
 	            width: '100%',
-	            height: '100%'
+	            height: '100%',
+	            style : {
+	                'font-family' : 'monospace'
+	            }
 	        }, {
 	            id: 'action',
 	            xtype: 'hidden',

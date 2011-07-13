@@ -107,7 +107,6 @@ JobObjectForm =  Ext.extend(BaseJobWizardForm, {
 	        { xtype: 'hidden', name: 'cellY' },
 	        { xtype: 'hidden', name: 'cellZ' },
 	        { xtype: 'hidden', name: 'inversionDepth' },
-	        { xtype: 'hidden', name: 'registeredUrl' },
 	        { xtype: 'hidden', name: 'vmSubsetFilePath' }
 	        ]
 	    });

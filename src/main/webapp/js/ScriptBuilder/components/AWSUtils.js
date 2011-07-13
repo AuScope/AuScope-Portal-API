@@ -35,7 +35,7 @@ AWSUtilsNode = Ext.extend(ScriptBuilder.BasePythonComponent, {
         text += 'def awsDownload(awsBucket, awsKey, outFilePath):' + this._newLine;
         text += this._tab + 'queryPath = (awsBucket + "/" + awsKey).replace("//", "/")' + this._newLine;
         text += this._tab + 'print "awsDownload: " + queryPath + " to " + outFilePath' + this._newLine;
-        text += this._tab + 'subprocess.call(["aws", "get", queryPath, ">", outFilePath])' + this._newLine;
+        text += this._tab + 'subprocess.call(["aws", "get", queryPath, outFilePath])' + this._newLine;
         text += '# -----------------------------------------------' + this._newLine;
         text += this._newLine;
         

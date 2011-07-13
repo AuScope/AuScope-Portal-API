@@ -725,15 +725,11 @@ public class JobListController extends BaseVEGLController  {
 					}
 	        		
 	        		if (job.getStatus().equals(GridSubmitController.STATUS_ACTIVE) && results != null && results.length > 0) {
-	        			// update status to done
-	        			job.setStatus(GridSubmitController.STATUS_DONE);
-	        			 
-	        			// check if any errors occurred. Errors will be written to stderr.txt
+	        			//The final processing step is uploading the log
+	        			//It is uploaded to "vegl.sh.log"
 	        			for (S3FileInformation result : results) {
-	        				if (result.getName().endsWith("stderr.txt") && result.getSize() > 0) {
-	        					// change status to failed
-	        					job.setStatus(GridSubmitController.STATUS_FAILED);
-	        					break;
+	        				if (result.getName().endsWith("vegl.sh.log") && result.getSize() > 0) {
+	        					job.setStatus(GridSubmitController.STATUS_DONE);
 	        				}
 	        			}
 	        			

@@ -40,6 +40,9 @@ VEGLJobObjectNode = Ext.extend(ScriptBuilder.BasePythonComponent, {
             }
         }
         
+        classText += '# Global parameter instance for reference' + this._newLine;
+        classText += 'VEGLParams = VEGLParameters()' + this._newLine;
+        
         classText += this._newLine;
         
         return classText;
