@@ -21,7 +21,7 @@ VEGLStep1Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
   getScript: function() {
     var text = '';
     
-    text += this._tab + '# ------------ VEGL - Step 1 ---------';
+    text += this._tab + '# ------------ VEGL - Step 1 ---------' + this._newLine;
     text += this._tab + 'f = file(' + this.values.paramsInstance + '.getVmSubsetFilePath(), "r")' + this._newLine; 
     text += this._tab + 'input_csv = csv.reader(f)' + this._newLine;
     text += this._tab + 'data = []' + this._newLine;
@@ -33,9 +33,8 @@ VEGLStep1Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
     text += this._tab + this._tab + this._tab + 'z = float(strZ)' + this._newLine;
     text += this._tab + this._tab + this._tab + 'data.append([x,y,z])' + this._newLine;
     text += this._tab + this._tab + 'lineCount = lineCount + 1' + this._newLine;
-    text += this._tab + 'return data' + this._newLine;
     text += this._newLine;
-    text += this._tab + '# ------------------------------------';
+    text += this._tab + '# ------------------------------------' + this._newLine;;
     text += this._newLine;
     
     return text;
