@@ -7,9 +7,9 @@
   defaults: { anchor: "100%" },
   items: [{
     xtype: "textfield",
-    name: "paramsObj",
+    name: "paramsInstance",
     value: "VEGLParams",
-    fieldLabel: "Python VEGL Parameters Class",
+    fieldLabel: "Python VEGL Parameters Instance",
     allowBlank: false
   }]
 }

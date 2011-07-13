@@ -8,7 +8,7 @@
 Ext.namespace("ScriptBuilder");
 Ext.ux.ComponentLoader.load({url: ScriptBuilder.componentPath+"VEGLStep1.json"});
 
-VEGLStep1Node = Ext.extend(ScriptBuilder.BaseComponent, {
+VEGLStep1Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
   constructor: function(container) {
       VEGLStep1Node.superclass.constructor.apply(this,
         [container, "VEGL - Step1", "VEGLStep1", "s"]
@@ -19,16 +19,26 @@ VEGLStep1Node = Ext.extend(ScriptBuilder.BaseComponent, {
   },
 
   getScript: function() {
-    return "    # Step 1: Read in data file\n\
-    f = file(VEGLParams.getCSVName(), \"r\")\n\
-    input_csv = csv.reader(f)\n\
-    data = []\n\
-    for strX, strY, strZ in input_csv:\n\
-        x = float(strX)\n\
-        y = float(strY)\n\
-        z = float(strZ)\n\
-        data.append([x,y,z]);\n\n\
-";
+    var text = '';
+    
+    text += this._tab + '# ------------ VEGL - Step 1 ---------';
+    text += this._tab + 'f = file(' + this.values.paramsInstance + '.getVmSubsetFilePath(), "r")' + this._newLine; 
+    text += this._tab + 'input_csv = csv.reader(f)' + this._newLine;
+    text += this._tab + 'data = []' + this._newLine;
+    text += this._tab + 'lineCount = 0 # The first 2 lines contain text and must be skipped' + this._newLine;
+    text += this._tab + 'for strX, strY, strZ in input_csv:' + this._newLine;
+    text += this._tab + this._tab + 'if lineCount > 1:' + this._newLine;
+    text += this._tab + this._tab + this._tab + 'x = float(strX)' + this._newLine;
+    text += this._tab + this._tab + this._tab + 'y = float(strY)' + this._newLine;
+    text += this._tab + this._tab + this._tab + 'z = float(strZ)' + this._newLine;
+    text += this._tab + this._tab + this._tab + 'data.append([x,y,z])' + this._newLine;
+    text += this._tab + this._tab + 'lineCount = lineCount + 1' + this._newLine;
+    text += this._tab + 'return data' + this._newLine;
+    text += this._newLine;
+    text += this._tab + '# ------------------------------------';
+    text += this._newLine;
+    
+    return text;
   }
 });
 
