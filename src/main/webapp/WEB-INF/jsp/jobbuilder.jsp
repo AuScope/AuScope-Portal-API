@@ -23,7 +23,7 @@
 
     <!-- component includes -->
     <%
-    String[] comps = { "BaseComponent", "SimContainer", "AWSUpload", "AWSDownload", "MPIRun",
+    String[] comps = { "BaseComponent", "BasePythonComponent", "SimContainer", "AWSUpload", "AWSDownload", "MPIRun",
             "ChangeDir", "VEGLJobObject", "AWSUtils"};
     for (String c : comps) {
     %>
