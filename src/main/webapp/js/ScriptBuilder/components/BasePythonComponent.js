@@ -38,30 +38,83 @@ ScriptBuilder.BasePythonComponent = Ext.extend(ScriptBuilder.BaseComponent, {
         return s.charAt(0).toUpperCase() + s.substring(1);
     },
     
+    
     /**
-     * Generates a Python snippet as a String.
-     * 
-     *  The snippet will be a 'Get' function for fieldName that returns value.
+     * Given an array of field names as strings, generate a simple
+     * Plain old Python Object (POPO) class that can get the required fields
      */
-    _getPrimitiveFunction : function(fieldName, value, baseIndent) {
-        var functionText = '';
+    _popoClass : function(className, fields) {
+        var classText = '';
         
-        functionText += baseIndent + 'def get' + this._capitaliseFirst(fieldName) + '(self):' + this._newLine;
+        classText += 'class ' + className + ':' + this._newLine;
+        
+        //Local variables
+        for (var i = 0; i < fields.length; i++) {
+            classText += this._tab + '_' + fields[i] + ' = None' + this._newLine;
+        }
+        classText += this._newLine;
+        
+        //Constructor definition
+        classText += this._tab + 'def __init__(self';
+        for (var i = 0; i < fields.length; i++) {
+            classText += ', ' + fields[i]; 
+        }
+        classText += '):' + this._newLine;
+        
+        //Constructor body
+        for (var i = 0; i < fields.length; i++) {
+            classText += this._tab + this._tab + 'self._' + fields[i] + ' = ' + fields[i] + this._newLine;
+        }
+        classText += this._newLine;
+        
+        //Getter fields
+        for (var i = 0; i < fields.length; i++) {
+            classText += this._getPrimitiveFunction(fields[i], 'self._' + fields[i], this._tab, true);
+        }
+        classText += this._newLine;
+        
+        return classText;
+    },
+    
+    /**
+     * given a value of a primitive return the (possibly quoted) equivalent in python that can be assigned
+     * to a variable or passed as an argument literal.
+     * 
+     * forceUnquotedValue - [Optional] if true value will be forcibly printed without quotes
+     */
+    _getPrimitiveValue : function(value, forceUnquotedValue) {
         
         //Ext JS forms can't return non string values so we need to be very sure we dont have
         //and integer/float encoded as a string
-        var isString = Ext.isString(value);
-        if (isString && value.length > 0) {
-            if (value.match(/[0-9]/i)) {
-                isString = isNaN(parseFloat(value));
+        var isString = false;
+        if (!forceUnquotedValue) {
+            isString = Ext.isString(value)
+            if (isString && value.length > 0) {
+                if (value.match(/[0-9]/i)) {
+                    isString = isNaN(parseFloat(value));
+                }
             }
         }
         
         if (isString) {
-            functionText += baseIndent + this._tab + 'return \'' + value + '\'' + this._newLine;
-        } else {
-            functionText += baseIndent + this._tab + 'return ' + value + '' + this._newLine;
+            return "'" + value + "'";
         }
+        
+        return value;
+    },
+    
+    /**
+     * Generates a Python snippet as a String.
+     * 
+     *  The snippet will be a 'Get' function for fieldName that returns value.
+     *  
+     *  forceUnquotedValue - [Optional] if true value will be forcibly printed without quotes
+     */
+    _getPrimitiveFunction : function(fieldName, value, baseIndent, forceUnquotedValue) {
+        var functionText = '';
+        
+        functionText += baseIndent + 'def get' + this._capitaliseFirst(fieldName) + '(self):' + this._newLine;
+        functionText += baseIndent + this._tab + 'return ' + this._getPrimitiveValue(value, forceUnquotedValue) + '' + this._newLine;
         functionText += this._newLine;
         
         
