@@ -64,6 +64,9 @@ We need to determine the type of inversion. There are some corrections to be mad
 		<component title="AWS Util Functions" id="AWSUtils" type="s">
             Utility functions enabling python to communicate with AWS S3.
         </component>
+        <component title="VEGL Util Functions" id="VEGLUtils" type="s">
+            Utility functions enabling the standard VEGL workflow.
+        </component>
 	</category>
 </categories>
 

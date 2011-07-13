@@ -24,7 +24,8 @@
     <!-- component includes -->
     <%
     String[] comps = { "BaseComponent", "BasePythonComponent", "SimContainer", "AWSUpload", "AWSDownload", "MPIRun",
-            "ChangeDir", "VEGLJobObject", "AWSUtils", "VEGLStep1", "VEGLStep2", "VEGLStep3", "VEGLStep4", "VEGLStep5"};
+            "ChangeDir", "VEGLJobObject", "AWSUtils", "VEGLStep1", "VEGLStep2", "VEGLStep3", "VEGLStep4", "VEGLStep5",
+            "VEGLUtils"};
     for (String c : comps) {
     %>
     <script type="text/javascript" src="js/ScriptBuilder/components/<%= c %>.js"></script>
