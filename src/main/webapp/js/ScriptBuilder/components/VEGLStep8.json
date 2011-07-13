@@ -1,0 +1,23 @@
+{
+  xtype: "form",
+  id: "VEGLStep8Form",
+  nclass: VEGLStep8Node,
+  bodyStyle: "padding:5px;",
+  labelWidth: 150,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype      : 'radio',
+    fieldLabel : "",
+    boxLabel   : 'Gravity',
+    name       : 'invType',
+    inputValue : 'grav'
+    },{
+    xtype          : 'radio',
+    fieldLabel     : "",
+    labelSeparator : ' ',
+    boxLabel       : 'Magnetic',
+    name           : 'invType',
+    inputValue     : 'mag'
+  }]
+}
+

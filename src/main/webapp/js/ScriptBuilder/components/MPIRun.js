@@ -15,7 +15,7 @@ MPIRunNode = Ext.extend(ScriptBuilder.BaseComponent, {
     );
 
 	var numShells = container.getShellCommands().length;
-    this.values.uniqueName = "shell"+numShells;
+    this.values.uniqueName = "mpirun"+numShells;
   },
 
   getScript: function() {

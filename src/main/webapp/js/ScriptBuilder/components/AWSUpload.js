@@ -15,7 +15,7 @@ AWSUploadNode = Ext.extend(ScriptBuilder.BaseComponent, {
     );
 	
 	var numShells = container.getShellCommands().length;
-    this.values.uniqueName = "shell"+numShells;
+    this.values.uniqueName = "AWSUpload"+numShells;
   },
 
   getScript: function() {

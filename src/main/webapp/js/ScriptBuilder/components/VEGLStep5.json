@@ -1,4 +1,15 @@
 {
-
-}
+  xtype: "form",
+  id: "VEGLStep5Form",
+  nclass: VEGLStep5Node,
+  bodyStyle: "padding:5px;",
+  labelWidth: 150,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype      : 'button',
+    fieldLabel : "",
+    boxLabel   : 'OK',
+    name       : 'invType'
+  }]
+ }
 

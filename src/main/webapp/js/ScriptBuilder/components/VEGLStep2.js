@@ -8,7 +8,7 @@
 Ext.namespace("ScriptBuilder");
 Ext.ux.ComponentLoader.load({url: ScriptBuilder.componentPath+"VEGLStep2.json"});
 
-VEGLStep2Node = Ext.extend(ScriptBuilder.BaseComponent, {
+VEGLStep2Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
   constructor: function(container) {
     VEGLStep2Node.superclass.constructor.apply(this,
       [container, "VEGL - Step2", "VEGLStep2", "s"]
@@ -19,13 +19,18 @@ VEGLStep2Node = Ext.extend(ScriptBuilder.BaseComponent, {
   },
 
   getScript: function() {
-    return "	VEGLPaddedBox = VEGLParams.getPaddedBounds()\n\
-    zone = int(VEGLPaddedBox.getSpatialReferenceSystem())\n\
-    temp_data = []\n\
-    for x, y, z in data:\n\
-        newX, newY = project(x, y, zone)\n\
-        temp_data.append([newX, newY, z])\n\
-        data = temp_data\n";
+    var text = '';
+
+    text = this._tab + 'VEGLPaddedBox = VEGLParams.getPaddedBounds()' + this._newLine;
+    text += this._tab + 'zone = int(VEGLPaddedBox.getSpatialReferenceSystem())' + this._newLine;
+    text += this._tab + 'temp_data = []' + this._newLine;
+    text += this._tab + 'for x, y, z in data:' + this._newLine;
+    text += this._tab + this._tab +'newX, newY = project(x, y, zone)' + this._newLine;
+    text += this._tab + this._tab +'temp_data.append([newX, newY, z])' + this._newLine;
+    text += this._tab + this._tab +'data = temp_data' + this._newLine;
+    text += this._tab + '}' + this._newLine;
+
+    return text;
   }
 });
 

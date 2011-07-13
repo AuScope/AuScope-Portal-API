@@ -1,0 +1,13 @@
+{
+  xtype: "form",
+  id: "VEGLStep9Form",
+  nclass: VEGLStep9Node,
+  bodyStyle: "padding:5px;",
+  labelWidth: 150,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "label",
+    text: "Press OK to load."
+  }]
+ }
+

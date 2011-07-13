@@ -39,10 +39,18 @@ Takes the variable 'data' and removes any data points which do not lie within a 
 We need to determine the type of inversion. There are some corrections to be made to each type of data. The parameters for the inversions also vary slightly, as do the control files.
 			</component>
 			<component title="Step 5" id="VEGLStep5" type="s">
-				Step 5
+UBC-GIF needs a data file in a specific format.  We need to define a filename ('obs_filename'). This includes writing out expected errors in the data, number of data points etc.
 			</component>
 			<component title="Step 6" id="VEGLStep6" type="s">
-				Step 6
+Defines the mesh parameters and writes out a UBC-GIF mesh file. Mesh is defined by the minimum and maximum eastings and northings, inversion depth, and respective cell sizes. Mesh file name: 'mesh'			</component>
+			<component title="Step 7" id="VEGLStep7" type="s">
+There are two parts to running a UBC-GIF inversion. The first involves a sensitivity analysis; here we write out the appropriate control files for this analysis. File names for things defined outside this method are defined at the top
+			</component>
+			<component title="Step 8" id="VEGLStep8" type="s">
+In the second part to running a UBC-GIF inversion, we need to write out the control file for the actual inversion.
+			</component>
+			<component title="Step 9" id="VEGLStep9" type="s">
+Finalise things.
 			</component>
 		</category>
 		<category name="File Commands">
