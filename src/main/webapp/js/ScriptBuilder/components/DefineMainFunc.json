@@ -1,0 +1,16 @@
+{
+  xtype: "form",
+  id: "DefineMainFuncForm",
+  nclass: DefineMainFuncNode,
+  bodyStyle: "padding:5px;",
+  labelWidth: 150,
+  defaults: { anchor: "100%" },
+  items: [{
+    xtype: "textfield",
+    name: "funcName",
+    value: "main",
+    fieldLabel: "Main Function Name",
+    allowBlank: false
+  }]
+}
+

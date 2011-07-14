@@ -25,7 +25,7 @@
     <%
     String[] comps = { "BaseComponent", "BasePythonComponent", "SimContainer", "AWSUpload", "AWSDownload", "MPIRun",
             "ChangeDir", "VEGLJobObject", "VEGLUtils", "AWSUtils", "VEGLStep1", "VEGLStep2", "VEGLStep3", "VEGLStep4", "VEGLStep5",
-            "VEGLStep6", "VEGLStep7", "VEGLStep8", "VEGLStep9" };
+            "VEGLStep6", "VEGLStep7", "VEGLStep8", "VEGLStep9", "DefinePythonFunc", "DefineMainFunc" };
     for (String c : comps) {
     %>
     <script type="text/javascript" src="js/ScriptBuilder/components/<%= c %>.js"></script>

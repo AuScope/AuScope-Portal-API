@@ -27,7 +27,7 @@ VEGLStep5Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
     text += this._tab + "print 'Time to write out a data file'" + this._newLine;
     text += this._tab + "obs_file = 'temp_ubc_obs.asc'" + this._newLine;
     text += this._tab + "f = file(obs_file, 'w')" + this._newLine;
-    text += this._tab + "f.write(str(len(data)) + '\t! Number of points\n')" + this._newLine;
+    text += this._tab + "f.write(str(len(data)) + '\\t! Number of points\n')" + this._newLine;
     text += this._tab + "# For each data point, write out: Easting, Northing, Elevation, Data, Error" + this._newLine;
     text += this._tab + "# In this simple example, we assume elevation is 1 m, and error are 2 mGal / nT" + this._newLine;
     text += this._tab + "for east,north,prop in data:" + this._newLine;

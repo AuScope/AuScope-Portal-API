@@ -25,6 +25,9 @@
 	</category>
 	<category name="Python Components">
 		<category name="VEGL Workflow Steps">
+		    <component title="Define Function Name" id="DefinePythonFunc" type="s">
+Starts the definition of a Python function.
+            </component>
 			<component title="VEGL Step 1" id="VEGLStep1" type="s">
 Reads in a 3 column CSV file, assumes the data are floating point numbers, and places these columns into the variable 'data'.
 			</component>
@@ -52,6 +55,9 @@ In the second part to running a UBC-GIF inversion, we need to write out the cont
 			<component title="Step 9" id="VEGLStep9" type="s">
 Finalise things.
 			</component>
+			<component title="Specify 'Main' Function" id="DefineMainFunc" type="s">
+Defines a particular function as the main function. It will be run first if this script is executed.
+            </component>
 		</category>
 		<category name="File Commands">
 			<component title="File Read" id="fileread" type="s">

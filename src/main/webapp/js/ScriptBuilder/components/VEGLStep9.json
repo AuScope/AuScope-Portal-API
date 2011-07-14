@@ -7,7 +7,27 @@
   defaults: { anchor: "100%" },
   items: [{
     xtype: "label",
-    text: "Press OK to load."
+    text: "This step is dependent on the AWS Util Functions step. Please ensure that the AWS Utils component is included.",
+  },{
+    xtype: "textfield",
+    name: "paramsInstance",
+    value: "VEGLParams",
+    fieldLabel: "Python VEGL Parameters Instance",
+    allowBlank: false
+  },{
+    xtype: "numberfield",
+    name: "numProcessors",
+    value: "4",
+    fieldLabel: "Number of processors",
+    decimalPrecision: 0,
+    allowNegative: false,
+    allowBlank: false
+  },{
+    xtype: "textfield",
+    name: "mcaArgs",
+    value: "btl self,sm",
+    fieldLabel: "MCA Arguments (key value)",
+    allowBlank: false
   }]
  }
 
