@@ -28,14 +28,14 @@ AWSUtilsNode = Ext.extend(ScriptBuilder.BasePythonComponent, {
         text += '# Uploads inFilePath to the specified bucket with the specified key' + this._newLine;
         text += 'def awsUpload(inFilePath, awsBucket, awsKey):' + this._newLine;
         text += this._tab + 'queryPath = (awsBucket + "/" + awsKey).replace("//", "/")' + this._newLine;
-        text += this._tab + 'print "awsUpload: " + inFilePath + " to " + queryPath' + this._newLine;
-        text += this._tab + 'subprocess.call(["aws", "put", queryPath, inFilePath, "--set-acl=public-read"])' + this._newLine;
+        text += this._tab + 'retcode = subprocess.call(["aws", "put", queryPath, inFilePath, "--set-acl=public-read"])' + this._newLine;
+        text += this._tab + 'print "awsUpload: " + inFilePath + " to " + queryPath + " returned " + str(retcode)' + this._newLine;
         text += this._newLine;
         text += '# downloads the specified key from bucket and writes it to outfile' + this._newLine;
         text += 'def awsDownload(awsBucket, awsKey, outFilePath):' + this._newLine;
         text += this._tab + 'queryPath = (awsBucket + "/" + awsKey).replace("//", "/")' + this._newLine;
-        text += this._tab + 'print "awsDownload: " + queryPath + " to " + outFilePath' + this._newLine;
-        text += this._tab + 'subprocess.call(["aws", "get", queryPath, outFilePath])' + this._newLine;
+        text += this._tab + 'retcode = subprocess.call(["aws", "get", queryPath, outFilePath])' + this._newLine;
+        text += this._tab + 'print "awsDownload: " + queryPath + " to " + outFilePath + " returned " + str(retcode)' + this._newLine;
         text += '# -----------------------------------------------' + this._newLine;
         text += this._newLine;
 

@@ -388,10 +388,6 @@ public class GridSubmitController extends BaseVEGLController {
                 jobManager.saveJob(job);
         		return generateJSONResponseMAV(false, null, "No input files found. NOT submitting job!");
         	}
-        	
-			
-			// set the output directory for results to be transferred to
-			job.setS3OutputBaseKey(job.getFileStorageId() + "/output");
 			
 			// copy job files to S3 storage service. 
 			S3Bucket bucket = new S3Bucket(job.getS3OutputBucket());
@@ -496,6 +492,8 @@ public class GridSubmitController extends BaseVEGLController {
     	String fileStorageId = String.format("VEGL-%1$s-%2$s", job.getUser(), sdf.format(date));
     	fileStorageId = fileStorageId.replaceAll("[=/\\, @:]", "_"); //get rid of some obvious nasty characters
         job.setFileStorageId(fileStorageId);
+        
+        job.setS3OutputBaseKey(job.getFileStorageId());
     	
     	return job;
     }

@@ -77,6 +77,9 @@ export AWS_ACCESS_KEY_ID="$s3AccessKey"
 export S3_OUTPUT_BUCKET="$s3Bucket"
 export S3_BASE_KEY_PATH="$s3BaseKeyPath"
 
+#Write our secret key to our secret key file
+echo -e "${AWS_ACCESS_KEY_ID}\n${AWS_SECRET_ACCESS_KEY}\n" > "/root/.awssecret"
+
 #Download our input files from S3 and load them into files in the current working directory
 echo "Downloading inputfiles from S3..."
 downloadInputFilesBase=`echo "${s3Bucket}/${s3BaseKeyPath}" | sed "s/\/\/*/\//g"`
@@ -102,6 +105,7 @@ python $VEGL_SCRIPT_PATH
 cd $WORKING_DIR
 
 #Finally upload our logs for debug purposes
+echo "About to upload output log..."
 uploadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}/vegl.sh.log" | sed "s/\/\/*/\//g"`
 aws put "${uploadQueryPath}" "${VEGL_LOG_FILE}" --set-acl=public-read
 
