@@ -22,7 +22,7 @@ VEGLStep2Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
     var text = '';
 
     text = this._tab + 'VEGLPaddedBox = VEGLParams.getPaddedBounds()' + this._newLine;
-    text += this._tab + 'zone = int(VEGLPaddedBox.getSpatialReferenceSystem())' + this._newLine;
+    text += this._tab + 'zone = int(VEGLPaddedBox.getSrs())' + this._newLine;
     text += this._tab + 'temp_data = []' + this._newLine;
     text += this._tab + 'for x, y, z in data:' + this._newLine;
     text += this._tab + this._tab +'newX, newY = project(x, y, zone)' + this._newLine;

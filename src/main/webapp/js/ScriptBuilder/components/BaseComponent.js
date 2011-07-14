@@ -45,7 +45,7 @@ ScriptBuilder.BaseComponent = Ext.extend(Ext.tree.TreeNode, {
       this.setText(this.getUniqueName()+" ("+this.compTitle+")");
 
       // THis should be a merge operation - but its not....
-      this.values = obj;
+      this.values = Ext.apply(this.values, obj, {});
       return true;
     }
   },
