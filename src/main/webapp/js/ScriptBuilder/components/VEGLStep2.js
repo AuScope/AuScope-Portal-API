@@ -28,7 +28,7 @@ VEGLStep2Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
     text += this._tab + this._tab +'newX, newY = project(x, y, zone)' + this._newLine;
     text += this._tab + this._tab +'temp_data.append([newX, newY, z])' + this._newLine;
     text += this._tab + this._tab +'data = temp_data' + this._newLine;
-    text += this._tab + '}' + this._newLine;
+    text += this._newLine;
 
     return text;
   }

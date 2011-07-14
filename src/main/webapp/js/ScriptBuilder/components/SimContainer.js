@@ -35,7 +35,7 @@ SimContainerNode = Ext.extend(ScriptBuilder.BaseComponent, {
 #!/usr/bin/env python\n\n\
 # VEGL processing script.\n\
 # Please load the Job Object before you load other components\n\n\
-import subprocess\n\n";
+import subprocess, csv, math, os, sys, urllib;\n\n";
 		
 	var scriptFooter = "";
 

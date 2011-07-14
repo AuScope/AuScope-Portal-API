@@ -6,8 +6,11 @@
   labelWidth: 150,
   defaults: { anchor: "100%" },
   items: [{
-    xtype: "label",
-    text: "Press OK to load."
+    xtype: "textfield",
+    name: "paramsInstance",
+    value: "VEGLParams",
+    fieldLabel: "Python VEGL Parameters Instance",
+    allowBlank: false
   }]
  }
 
