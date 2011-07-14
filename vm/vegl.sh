@@ -91,11 +91,13 @@ echo "... finished downloading input files"
 
 #With our input files in place we can make our subset requests
 chmod +x "$SUBSET_REQUEST_PATH"
+echo "About to execute ${SUBSET_REQUEST_PATH} as a shell script"
 sh $SUBSET_REQUEST_PATH
 cd $WORKING_DIR
 
 #Next we can perform our actual work
 chmod +x "$VEGL_SCRIPT_PATH"
+echo "About to execute ${VEGL_SCRIPT_PATH} as a python script"
 python $VEGL_SCRIPT_PATH
 cd $WORKING_DIR
 
