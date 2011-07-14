@@ -27,7 +27,7 @@ VEGLStep3Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
     text += this._tab + this._tab + '# northings as y, and eastings as' + this._newLine;
     text += this._tab + this._tab + 'if VEGLPaddedBox.isPointInsideArea(y,x):' + this._newLine;
     text += this._tab + this._tab + this._tab + 'temp_data.append([x,y,z])' + this._newLine;
-    text += this._tab + this._tab + 'data = temp_data' + this._newLine;
+    text += this._tab + 'data = temp_data' + this._newLine;
     text += this._newLine;
     return text;
   }
