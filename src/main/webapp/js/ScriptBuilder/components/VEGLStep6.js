@@ -6,16 +6,16 @@
  */
 
 Ext.namespace("ScriptBuilder");
-Ext.ux.ComponentLoader.load({url: ScriptBuilder.componentPath+"VEGLStep5.json"});
+Ext.ux.ComponentLoader.load({url: ScriptBuilder.componentPath+"VEGLStep6.json"});
 
-VEGLStep5Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
+VEGLStep6Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
   constructor: function(container) {
-	  VEGLStep5Node.superclass.constructor.apply(this,
-        [container, "VEGL - Step5", "VEGLStep5", "s"]
+	  VEGLStep6Node.superclass.constructor.apply(this,
+        [container, "VEGL - Step6", "VEGLStep6", "s"]
     );
 
 	var numShells = container.getShellCommands().length;
-    this.values.uniqueName = "VEGLStep5-i"+numShells;
+    this.values.uniqueName = "VEGLStep6-i"+numShells;
   },
 
   getScript: function() {
@@ -45,10 +45,10 @@ VEGLStep5Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
     text += this._tab + "mesh = 'mesh.msh'" + this._newLine;
     text += this._tab + "try:" + this._newLine;
     text += this._tab + this._tab + "f = file(mesh, 'w')" + this._newLine;
-    text += this._tab + this._tab + "f.write(str(num_x_cells) + ' ' + str(num_y_cells) + ' ' + str(num_z_cells) + '\n')" + this._newLine;
-    text += this._tab + this._tab + "f.write(str(minEasting) + ' ' + str(minNorthing) + ' 0\n')" + this._newLine;
-    text += this._tab + this._tab + "f.write(str(num_x_cells) + '*' + str(cell_x) + '\n')" + this._newLine;
-    text += this._tab + this._tab + "f.write(str(num_y_cells) + '*' + str(cell_y) + '\n')" + this._newLine;
+    text += this._tab + this._tab + "f.write(str(num_x_cells) + ' ' + str(num_y_cells) + ' ' + str(num_z_cells) + '\\n')" + this._newLine;
+    text += this._tab + this._tab + "f.write(str(minEasting) + ' ' + str(minNorthing) + ' 0\\n')" + this._newLine;
+    text += this._tab + this._tab + "f.write(str(num_x_cells) + '*' + str(cell_x) + '\\n')" + this._newLine;
+    text += this._tab + this._tab + "f.write(str(num_y_cells) + '*' + str(cell_y) + '\\n')" + this._newLine;
     text += this._tab + this._tab + "f.write(str(num_z_cells) + '*' + str(cell_z))" + this._newLine;
     text += this._tab + this._tab + "f.close()" + this._newLine;
     text += this._tab + "except IOError, e:" + this._newLine;

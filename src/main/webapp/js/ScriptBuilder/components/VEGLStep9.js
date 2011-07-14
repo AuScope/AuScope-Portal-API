@@ -30,11 +30,10 @@ VEGLStep9Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
     text += this._tab + "inv_out = 'inv.out'" + this._newLine;
     text += this._tab + "sensitivity_command = 'gzsen3d_MPI ' + sns_inp + ' > ' + sns_out" + this._newLine;
     text += this._tab + "inversion_command = 'gzinv3d_MPI ' + inv_inp + ' > ' + inv_out" + this._newLine;
-    text += this._tab + "# exec(sensitivity_command)" + this._newLine;
-    text += this._tab + "# exec(inversion_command)" + this._newLine;
     text += this._tab + "print 'Sensitivity command: ' + sensitivity_command" + this._newLine;
+    text += this._tab + "subprocess.call(sensitivity_command)" + this._newLine;
     text += this._tab + "print 'Inversion command: ' + inversion_command" + this._newLine;
-
+    text += this._tab + "subprocess.call(inversion_command)" + this._newLine;
     return text;
   }
 });

@@ -6,10 +6,8 @@
   labelWidth: 150,
   defaults: { anchor: "100%" },
   items: [{
-    xtype      : 'button',
-    fieldLabel : "",
-    boxLabel   : 'OK',
-    name       : 'invType'
+    xtype: "label",
+    text: "Press OK to load."
   }]
  }
 

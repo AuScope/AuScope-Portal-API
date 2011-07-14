@@ -6,13 +6,9 @@
   labelWidth: 150,
   defaults: { anchor: "100%" },
   items: [{
-    xtype: "numberfield",
-    name: "numProcessors",
-    value: "4",
-    fieldLabel: "Number of processors",
-    decimalPrecision: 0,
-    allowNegative: false,
-    allowBlank: false
+    xtype: "label",
+    text: "Press OK to load."
   }]
-}
+ }
+
 
