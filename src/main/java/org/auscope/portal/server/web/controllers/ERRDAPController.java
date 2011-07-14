@@ -283,12 +283,7 @@ public class ERRDAPController extends BaseVEGLController {
     	String erddapUrl = getCoverageSubsetUrl(newDataCoords, serviceUrl, layerName, format);
 
     	// add erddap url to the map or create a new one if it doesn't exist
-    	HashMap<String, String> erddapUrlMap = (HashMap)request.getSession().getAttribute(SESSION_ERRDAP_URL_MAP);
-    	
-    	if (erddapUrlMap == null) {
-    		erddapUrlMap = new HashMap<String,String>();
-    	}
-    	
+    	HashMap<String, String> erddapUrlMap = new HashMap<String,String>();;
     	erddapUrlMap.put(layerName+"."+format, erddapUrl);
     	logger.debug("oldErddapUrl: " + oldErddapUrl);
     	logger.debug("erddapUrl: " + erddapUrl);
