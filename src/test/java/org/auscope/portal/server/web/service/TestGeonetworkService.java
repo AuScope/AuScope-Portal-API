@@ -45,27 +45,28 @@ public class TestGeonetworkService {
 	public void testSuccessfulRequest() throws Exception {
 		final String sessionCookie = "sessionCookie";
 		final HttpMethodBase insertRecordMethod = context.mock(HttpMethodBase.class, "insertRecordMethod");
-		final HttpMethodBase recordMetadataMethod = context.mock(HttpMethodBase.class, "recordMetadataMethod");
+		final HttpMethodBase recordMetadataShowMethod = context.mock(HttpMethodBase.class, "recordMetadataShowMethod");
+		final HttpMethodBase recordMetadataGetMethod = context.mock(HttpMethodBase.class, "recordMetadataGetMethod");
 		final HttpMethodBase recordPublicMethod = context.mock(HttpMethodBase.class, "recordPublicMethod");
 		final HttpMethodBase loginMethod = context.mock(HttpMethodBase.class, "loginMethod");
 		final HttpMethodBase logoutMethod = context.mock(HttpMethodBase.class, "logoutMethod");
 		final HttpClient mockClient = context.mock(HttpClient.class);
 		
 		final String uuid = "4cda9dc3-9a0e-40cd-a3a9-64db5ce3c031";
-		final String recordId = "19144";
+		final String recordId = "21569";
 		final String insertResponse = TestUtil.loadXML("src/test/resources/GNCSWInsertResponse.xml");
 		final String loginResponse = TestUtil.loadXML("src/test/resources/GNLoginLogoutSuccessResponse.xml");
 		final String logoutResponse = TestUtil.loadXML("src/test/resources/GNLoginLogoutSuccessResponse.xml");
 		final String recordPublicResponse = TestUtil.loadXML("src/test/resources/GNRecordPublicResponse.xml");
-		final String recordMetadata = TestUtil.loadXML("src/test/resources/GNMetadataShowResponse.html");
-		final InputStream recordMetadataStream =  new ByteArrayInputStream(recordMetadata.getBytes());
+		final String recordGetMetadata = TestUtil.loadXML("src/test/resources/GNMetadataGetXMLResponse.xml");
 		
 		final CSWRecord record = new CSWRecord("a", "b", "c", "", "", new CSWOnlineResource[0], new CSWGeographicElement[0]);
 		final URI responseUri = new URI("http://foo.bar.baz", false);
 		
 		context.checking(new Expectations() {{
 			allowing(gnMethodMaker).makeInsertRecordMethod(with(any(String.class)), with(any(String.class)), with(any(String.class)));will(returnValue(insertRecordMethod));
-			allowing(gnMethodMaker).makeRecordMetadataShowMethod(gnDetails.getUrl(), uuid, sessionCookie);will(returnValue(recordMetadataMethod));
+			allowing(gnMethodMaker).makeRecordMetadataGetMethod(gnDetails.getUrl(), uuid, sessionCookie);will(returnValue(recordMetadataGetMethod));
+			allowing(gnMethodMaker).makeRecordMetadataShowMethod(gnDetails.getUrl(), uuid, sessionCookie);will(returnValue(recordMetadataShowMethod));
 			allowing(gnMethodMaker).makeRecordPublicMethod(gnDetails.getUrl(), recordId, sessionCookie);will(returnValue(recordPublicMethod));
 			allowing(gnMethodMaker).makeUserLoginMethod(gnDetails.getUrl(), gnDetails.getUser(), gnDetails.getPassword());will(returnValue(loginMethod));
 			allowing(gnMethodMaker).makeUserLogoutMethod(gnDetails.getUrl(), sessionCookie);will(returnValue(logoutMethod));
@@ -75,12 +76,12 @@ public class TestGeonetworkService {
 			allowing(loginMethod).getResponseHeader("Set-Cookie");will(returnValue(new Header("Set-Cookie", sessionCookie)));
 			
 			oneOf(serviceCaller).getMethodResponseAsString(insertRecordMethod, mockClient);will(returnValue(insertResponse));
-			oneOf(serviceCaller).getMethodResponseAsStream(recordMetadataMethod, mockClient);will(returnValue(recordMetadataStream));
+			oneOf(serviceCaller).getMethodResponseAsString(recordMetadataGetMethod, mockClient);will(returnValue(recordGetMetadata));
 			oneOf(serviceCaller).getMethodResponseAsString(recordPublicMethod, mockClient);will(returnValue(recordPublicResponse));
 			oneOf(serviceCaller).getMethodResponseAsString(loginMethod, mockClient);will(returnValue(loginResponse));
 			oneOf(serviceCaller).getMethodResponseAsString(logoutMethod, mockClient);will(returnValue(logoutResponse));
 			
-			allowing(recordMetadataMethod).getURI();will(returnValue(responseUri));
+			allowing(recordMetadataShowMethod).getURI();will(returnValue(responseUri));
 		}});
 		
 		Assert.assertEquals(responseUri.toString(), service.makeCSWRecordInsertion(record));

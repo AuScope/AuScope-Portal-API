@@ -120,4 +120,20 @@ public class GeonetworkMethodMaker {
 		method.setRequestHeader("Cookie", sessionCookie);
 		return method;
 	}
+	
+	/**
+	 * Makes a method that when called will request XML describing the metadata associated with a CSWRecord with specified uuid
+	 * @param baseGeonetworkUrl The base URL for the geonetwork instance - eg http://example.com/geonetwork
+	 * @param uuid The unique ID of the record
+	 * @param sessionCookie Session cookie returned from a successful login response
+	 * @return
+	 * @throws UnsupportedEncodingException 
+	 */
+	public HttpMethodBase makeRecordMetadataGetMethod(String baseGeonetworkUrl, String uuid, String sessionCookie) throws UnsupportedEncodingException {
+		String url = appendUrl(baseGeonetworkUrl, String.format("srv/en/xml.metadata.get?uuid=%1$s", uuid));
+		
+		GetMethod method = new GetMethod(url); 
+		method.setRequestHeader("Cookie", sessionCookie);
+		return method;
+	}
 }

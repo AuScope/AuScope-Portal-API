@@ -22,7 +22,8 @@ public class CSWNamespaceContext implements NamespaceContext {
         map.put("gmd", "http://www.isotc211.org/2005/gmd");
         map.put("srv", "http://www.isotc211.org/2005/srv");
         map.put("csw", "http://www.opengis.net/cat/csw/2.0.2");
-        map.put("gco", "http://www.isotc211.org/2005/gco");        
+        map.put("gco", "http://www.isotc211.org/2005/gco");
+        map.put("geonet", "http://www.fao.org/geonetwork");
     };
         
     /**

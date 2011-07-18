@@ -2,12 +2,17 @@ package org.auscope.portal.server.web.service;
 
 import java.io.InputStream;
 
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.csw.CSWNamespaceContext;
 import org.auscope.portal.csw.CSWRecord;
 import org.auscope.portal.csw.CSWRecordTransformer;
+import org.auscope.portal.csw.CSWXPathUtil;
 import org.auscope.portal.server.domain.xml.XMLStreamAttributeExtractor;
 import org.auscope.portal.server.util.DOMUtil;
 import org.auscope.portal.server.web.GeonetworkDetails;
@@ -31,6 +36,12 @@ public class GeonetworkService {
 	private HttpServiceCaller serviceCaller;
 	private GeonetworkMethodMaker gnMethodMaker;
     private GeonetworkDetails gnDetails;
+    
+    private static final XPathExpression getMetadataXML_GetID;
+    
+    static {
+    	getMetadataXML_GetID = CSWXPathUtil.attemptCompileXpathExpr("/gmd:MD_Metadata/geonet:info/id");
+    }
     
     @Autowired
 	public GeonetworkService(HttpServiceCaller serviceCaller,
@@ -91,31 +102,20 @@ public class GeonetworkService {
      * @param uuid
      * @return
      */
-    private String convertUUIDToRecordID(String uuid, String sessionCookie) throws Exception {
-    	
-    	//Geonetwork doesn't have a 'supported' method of doing this
-    	//So we have to make a generic HTML request and decompose it to find the required ID
-    	HttpMethodBase metadataInfoMethod = gnMethodMaker.makeRecordMetadataShowMethod(gnDetails.getUrl(), uuid, sessionCookie);
-		InputStream inputStream = serviceCaller.getMethodResponseAsStream(metadataInfoMethod, serviceCaller.getHttpClient());
-		
-		//Find an '<input>' element with a 'value' attribute. Its contents will
-		//contain our record ID
-		XMLStreamAttributeExtractor attrExtractor = new XMLStreamAttributeExtractor("input", "value", inputStream);
-		int recordId = -1;
-		while (attrExtractor.hasNext()) {
-			String value = attrExtractor.next();
-			
-			//It's entirely possible we'll pick up an element with a non numerical value
-			//if we do we aren't interested in it
-			try {
-				recordId = Integer.parseInt(value);
-				break;
-			} catch (Exception ex) { }
+    private String convertUUIDToRecordID(String uuid, String sessionCookie) throws Exception {    	
+    	HttpMethodBase metadataInfoMethod = gnMethodMaker.makeRecordMetadataGetMethod(gnDetails.getUrl(), uuid, sessionCookie);
+		String responseString = serviceCaller.getMethodResponseAsString(metadataInfoMethod, serviceCaller.getHttpClient());
+		Document responseDoc = (new DOMUtil()).buildDomFromString(responseString);
+
+		Node idNode = (Node) getMetadataXML_GetID.evaluate(responseDoc, XPathConstants.NODE);
+		if (idNode == null) {
+			throw new Exception("Response does not contain geonetwork info about record's internal ID");
 		}
+		String recordId = idNode.getTextContent();
 		
 		logger.debug(String.format("converted uuid='%1$s' to recordId='%2$s", uuid, recordId));
 		
-		return Integer.toString(recordId);
+		return recordId;
     }
     
     /**

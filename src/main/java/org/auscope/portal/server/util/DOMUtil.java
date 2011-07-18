@@ -29,10 +29,34 @@ import java.util.Properties;
  */
 @Repository
 public class DOMUtil {
-    public Document buildDomFromString(String xmlString) throws ParserConfigurationException, IOException, SAXException {
+	
+	/**
+	 * Creates a namespace aware DOM document from the specified string. Exceptions thrown
+	 * if the String cannot be parsed into an XML DOM document
+	 * @param xmlString A string containing valid XML
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	public Document buildDomFromString(String xmlString) throws ParserConfigurationException, IOException, SAXException {
+		return buildDomFromString(xmlString, true);
+	}
+	
+	/**
+	 * Creates an (optionally) namespace aware DOM document from the specified string. Exceptions thrown
+	 * if the String cannot be parsed into an XML DOM document
+	 * @param xmlString A string containing valid XML
+	 * @param setNamespaceAware Whether the document will be made to process namespaces
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+    public Document buildDomFromString(String xmlString, boolean setNamespaceAware) throws ParserConfigurationException, IOException, SAXException {
         //build the XML dom
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true); // never forget this!
+        factory.setNamespaceAware(setNamespaceAware); // never forget this!
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputSource inputSource = new InputSource(new StringReader(xmlString.toString()));
         Document doc = builder.parse(inputSource);
