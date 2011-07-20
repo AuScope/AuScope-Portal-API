@@ -1,6 +1,9 @@
 package org.auscope.portal.server.web.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,6 +15,7 @@ import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
+import org.jets3t.service.model.S3Bucket;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.ProviderCredentials;
 import org.springframework.stereotype.Service;
@@ -28,14 +32,29 @@ public class JobStorageService {
 	
 	/**
      * Generates a connection to the appropriate S3 that was used for this particular job
-     * @param job
+     * @param job The job you want a connection for
      * @return
      * @throws S3ServiceException
      */
-    private S3Service generateS3ServiceForJob(VEGLJob job) throws S3ServiceException {
+    protected S3Service generateS3ServiceForJob(VEGLJob job) throws S3ServiceException {
         ProviderCredentials provCreds = new org.jets3t.service.security.AWSCredentials(job.getS3OutputAccessKey(), job.getS3OutputSecretKey());
         
         return new RestS3Service(provCreds);
+    }
+    
+    /**
+     * Generates a S3Object that can be used for uploading file
+     * @param job The job who will 'own' the file
+     * @param file The file to upload
+     * @return
+     * @throws IOException 
+     * @throws NoSuchAlgorithmException 
+     */
+    protected S3Object generateS3ObjectForFile(VEGLJob job, S3Bucket bucket, File file) throws NoSuchAlgorithmException, IOException {
+        String fileKeyPath = String.format("%1$s/%2$s", job.getS3OutputBaseKey(), file.getName());
+        S3Object obj = new S3Object(bucket, file);
+        obj.setKey(fileKeyPath);
+        return obj;
     }
     
     /**
@@ -93,4 +112,27 @@ public class JobStorageService {
     	return fileDetails;
     }
     
+    /**
+     * Uploads the specified files to the job's input storage area
+     * @param job The job who will 'own' these input files
+     * @param files The input files to be uploaded.
+     * @throws S3ServiceException 
+     * @throws IOException 
+     * @throws NoSuchAlgorithmException 
+     */
+    public void uploadInputJobFiles(VEGLJob job, File[] files) throws S3ServiceException, NoSuchAlgorithmException, IOException {
+        S3Service s3Service = generateS3ServiceForJob(job);
+        
+        S3Bucket bucket = s3Service.getOrCreateBucket(job.getS3OutputBucket());
+        if (bucket == null) {
+            throw new S3ServiceException(String.format("Unable to get/create bucket '%1$s'", job.getS3OutputBucket()));
+        }
+        
+        // copy job files to S3 storage service.
+        for (File file : files) {
+            S3Object obj = generateS3ObjectForFile(job, bucket, file);
+            s3Service.putObject(bucket, obj);
+            logger.info(obj.getKey() + " uploaded to " + bucket.getName() + " S3 bucket");
+        }
+    }
 }

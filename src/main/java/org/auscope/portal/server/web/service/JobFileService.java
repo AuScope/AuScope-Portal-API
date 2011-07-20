@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @Service
 public class JobFileService {
 	private final Log logger = LogFactory.getLog(getClass());
-    private StagingInformation stagingInformation;
+    protected StagingInformation stagingInformation;
     
     @Autowired
     public JobFileService(StagingInformation stagingInformation) {
@@ -47,7 +47,7 @@ public class JobFileService {
      * @param p2
      * @return
      */
-    private static String pathConcat(String p1, String p2) {
+    protected static String pathConcat(String p1, String p2) {
     	if (p1.endsWith(File.separator) && p2.startsWith(File.separator)) {
     		return p1 + p2.substring(1);
     	} else if ((!p1.endsWith(File.separator) && p2.startsWith(File.separator)) ||

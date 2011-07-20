@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.auscope.portal.csw.CSWGeographicBoundingBox;
+import org.auscope.portal.jmock.ReadableServletOutputStream;
 import org.auscope.portal.server.domain.wcs.DescribeCoverageRecord;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.web.ERDDAPMethodMakerGET;
@@ -45,25 +46,9 @@ public class TestWCSController {
     private IERDDAPMethodMaker mockErddapMethodMaker = context.mock(ERDDAPMethodMakerGET.class);
     private PortalPropertyPlaceholderConfigurer mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
     private HttpMethodBase mockMethod = context.mock(HttpMethodBase.class);
-    private MyServletOutputStream outStream;
+    private ReadableServletOutputStream outStream;
     
     private HttpServletResponse mockResponse = context.mock(HttpServletResponse.class);
-    
-    
-    /**
-     * Needed so we can check the contents of our zip file after it is written
-     */
-    final class MyServletOutputStream extends ServletOutputStream {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        
-        public void write(int i) throws IOException {
-            byteArrayOutputStream.write(i);
-        }
-        
-        public ZipInputStream getZipInputStream() {
-            return new ZipInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
-        }
-    };
     
     /**
      * This sets up expectations so a call to downloadWCSAsZip will return succesfully (assuming correct inputs)
@@ -72,7 +57,7 @@ public class TestWCSController {
      */
     private void setupWCSDownloadAsZip(final byte[] dataToBeReturned) throws Exception {
         
-        outStream = new MyServletOutputStream();
+        outStream = new ReadableServletOutputStream();
         
         context.checking(new Expectations() {{
             //Our method maker call should be passed all the correct variables

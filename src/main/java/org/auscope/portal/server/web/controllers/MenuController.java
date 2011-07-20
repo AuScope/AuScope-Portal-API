@@ -140,23 +140,6 @@ public class MenuController {
    }
    
    private ModelAndView setCloudCredentials(HttpServletRequest request,String redirectViewName) {
-	   
-	   if (request.getSession().getAttribute("AWSCred") == null) {
-		   
-			String awsCredFileLocation = hostConfigurer.resolvePlaceholder("HOST.aws.credentials.file");
-	    	FileSystemResource res = new FileSystemResource(awsCredFileLocation);
-			AWSCredentials credentials;
-			try {
-				credentials = new PropertiesCredentials(res.getInputStream());
-				request.getSession().setAttribute("AWSCred", credentials);
-			} catch (IOException e) {
-				logger.error("Error getting AWS credentials: " +
-	                    e.getMessage());
-				 // return user to map page if get creds fails
-				 return new ModelAndView("gmap");
-			}
-	   }
-	   
 	   return new ModelAndView(redirectViewName);
    }
  

@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 //import java.io.*;
 
 /**
@@ -25,5 +28,13 @@ public class TestUtil {
         reader.close();
 
         return mineXML.toString();
+    }
+    
+    /**
+     * JUnit doesn't like classes beginning with Test that have no unit tests
+     */
+    @Test
+    public void dummyTest() {
+        Assert.assertTrue(true);
     }
 }

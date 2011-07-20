@@ -25,6 +25,7 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.web.service.JobExecutionService;
 import org.auscope.portal.server.web.service.JobFileService;
 import org.auscope.portal.server.web.service.JobStorageService;
 import org.jets3t.service.S3Service;
@@ -69,8 +70,8 @@ public class JobListController extends BaseVEGLController  {
     private JobStorageService jobStorageService;
     @Autowired
     private JobFileService jobFileService;
-    
-    private AmazonEC2 ec2;
+    @Autowired
+    private JobExecutionService jobExecutionService;
 
     /**
      * Returns a JSON object containing a list of the current user's series.
@@ -265,7 +266,7 @@ public class JobListController extends BaseVEGLController  {
                 
                 // terminate the EMI instance
                 try {
-					terminateInstance(request, job);
+					terminateInstance(job);
 	                success = true;
 	                
 				} catch (AmazonServiceException e) {
@@ -291,20 +292,8 @@ public class JobListController extends BaseVEGLController  {
 	 * @param request The HttpServletRequest
 	 * @param job The job linked the to instance that is to be terminated
 	 */
-	private void terminateInstance(HttpServletRequest request, VEGLJob job) {
-		
-		if (ec2 == null) {
-			AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-			ec2 = new AmazonEC2Client(credentials);
-			ec2.setEndpoint(hostConfigurer.resolvePlaceholder("ec2.endpoint"));
-		}
-		
-		TerminateInstancesRequest termReq = new TerminateInstancesRequest();
-		ArrayList<String> instanceIdList = new ArrayList<String>();
-		instanceIdList.add(job.getEc2InstanceId());
-		termReq.setInstanceIds(instanceIdList);
-		ec2.terminateInstances(termReq);
-							
+	private void terminateInstance(VEGLJob job) {
+	    jobExecutionService.terminateJob(job);
 		job.setStatus("Cancelled");
 		jobManager.saveJob(job);
 	}
@@ -362,7 +351,7 @@ public class JobListController extends BaseVEGLController  {
                     
                     // terminate the EMI instance
                     try {
-    					terminateInstance(request, job);
+    					terminateInstance(job);
     	                success = true;
     	                
     				} catch (AmazonServiceException e) {

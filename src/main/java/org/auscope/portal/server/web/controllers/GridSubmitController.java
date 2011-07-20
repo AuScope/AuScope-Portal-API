@@ -17,21 +17,24 @@ import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.httpclient.auth.CredentialsProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.ssl.Base64;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.service.HttpServiceCaller;
+import org.auscope.portal.server.web.service.JobExecutionService;
 import org.auscope.portal.server.web.service.JobFileService;
+import org.auscope.portal.server.web.service.JobStorageService;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Bucket;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.ProviderCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.codec.Base64;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,14 +61,12 @@ public class GridSubmitController extends BaseVEGLController {
 
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
-    @Autowired
-    private VEGLJobManager jobManager;
-    @Autowired
-    private JobFileService jobFileService;
     
-    @Autowired
-    @Qualifier(value = "propertyConfigurer")
+    private VEGLJobManager jobManager;
+    private JobFileService jobFileService;
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
+    private JobStorageService jobStorageService;
+    private JobExecutionService jobExecutionService;
     
     //This is a file path for a CENTOS VM
     private static final String ERRDAP_SUBSET_VM_FILE_PATH = "/tmp/vegl-subset.csv";
@@ -76,8 +77,17 @@ public class GridSubmitController extends BaseVEGLController {
     public static final String STATUS_CANCELLED = "Cancelled";
     public static final String STATUS_UNSUBMITTED = "Unsubmitted";
     
-    
-    
+    @Autowired
+    public GridSubmitController(VEGLJobManager jobManager, JobFileService jobFileService, 
+            PortalPropertyPlaceholderConfigurer hostConfigurer, JobStorageService jobStorageService, 
+            JobExecutionService jobExecutionService) {
+        this.jobManager = jobManager;
+        this.jobFileService = jobFileService;
+        this.hostConfigurer = hostConfigurer;
+        this.jobStorageService = jobStorageService;
+        this.jobExecutionService = jobExecutionService;
+    }
+
     /**
      * Returns a JSON object containing a populated VEGLJob object.
      *
@@ -349,7 +359,6 @@ public class GridSubmitController extends BaseVEGLController {
     public ModelAndView submitJob(HttpServletRequest request,
                                   HttpServletResponse response,
                                   @RequestParam("jobId") String jobId) {
-
     	//Get our job
     	VEGLJob job = null;
     	try {
@@ -359,8 +368,12 @@ public class GridSubmitController extends BaseVEGLController {
     		return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
         
-    	//Check we have S3 credentials otherwise there is no point in continuing
-        if (job.getS3OutputAccessKey() == null || job.getS3OutputAccessKey().isEmpty() ||
+        //Do a quick couple of checks on our job object
+        if (job == null) {
+            logger.error("job with id " + jobId + " DNE");
+            return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        } else if (job.getS3OutputAccessKey() == null || job.getS3OutputAccessKey().isEmpty() ||
+            //Check we have S3 credentials otherwise there is no point in continuing
         	job.getS3OutputSecretKey() == null || job.getS3OutputSecretKey().isEmpty() ||
         	job.getS3OutputBucket() == null || job.getS3OutputBucket().isEmpty()) {
         	logger.error("No output S3 credentials found. NOT submitting job!");
@@ -371,12 +384,7 @@ public class GridSubmitController extends BaseVEGLController {
             return generateJSONResponseMAV(false, null, "No output S3 credentials found. NOT submitting job!");
         }  
         
-
         logger.info("Submitting job " + job);
-        
-        //Lets lookup our credentials
-        AWSCredentials credentials = (AWSCredentials)request.getSession().getAttribute("AWSCred");
-        ProviderCredentials outputS3StorageCreds = new org.jets3t.service.security.AWSCredentials(job.getS3OutputAccessKey(), job.getS3OutputSecretKey());
         
         // copy files to S3 storage for processing 
         try {
@@ -389,17 +397,8 @@ public class GridSubmitController extends BaseVEGLController {
         		return generateJSONResponseMAV(false, null, "No input files found. NOT submitting job!");
         	}
 			
-			// copy job files to S3 storage service. 
-			S3Bucket bucket = new S3Bucket(job.getS3OutputBucket());
-			RestS3Service s3Service = new RestS3Service(outputS3StorageCreds);
-			for (File file : files) {
-				String fileKeyPath = String.format("%1$s/%2$s", job.getS3OutputBaseKey(), file.getName());
-				logger.info("Uploading " + fileKeyPath);
-				S3Object obj = new S3Object(bucket, file);
-				obj.setKey(fileKeyPath);
-				s3Service.putObject(bucket, obj);
-				logger.info(fileKeyPath + " uploaded to " + bucket.getName() + " S3 bucket");
-			}
+			//Upload them to storage
+        	jobStorageService.uploadInputJobFiles(job, files);
 		} catch (Exception e) {
 			//We failed uploading
 			logger.error("Job submission failed.", e);
@@ -408,47 +407,39 @@ public class GridSubmitController extends BaseVEGLController {
 			return generateJSONResponseMAV(false, null, "Failed uploading files to S3");
 		}
         
-		// launch the ec2 instance
-		AmazonEC2 ec2 = new AmazonEC2Client(credentials);
-		ec2.setEndpoint(job.getEc2Endpoint());
-    	String imageId = job.getEc2AMI();
-		RunInstancesRequest instanceRequest = new RunInstancesRequest(imageId, 1, 1);
-		
-		// user data is passed to the instance on launch. This will be the path to the S3 directory 
-		// where the input files are stored. The instance will download the input files and attempt
-		// to run the vegl_script.sh that was built in the Script Builder.
+		//create our input user data string
 		JSONObject encodedUserData = new JSONObject();
-		encodedUserData.put("s3OutputBucket", job.getS3OutputBucket());
-		encodedUserData.put("s3OutputBaseKeyPath", job.getS3OutputBaseKey().replace("//", "/"));
-		encodedUserData.put("s3OutputAccessKey", job.getS3OutputAccessKey());
-		encodedUserData.put("s3OutputSecretKey", job.getS3OutputSecretKey());
+        encodedUserData.put("s3OutputBucket", job.getS3OutputBucket());
+        encodedUserData.put("s3OutputBaseKeyPath", job.getS3OutputBaseKey().replace("//", "/"));
+        encodedUserData.put("s3OutputAccessKey", job.getS3OutputAccessKey());
+        encodedUserData.put("s3OutputSecretKey", job.getS3OutputSecretKey());
+        String userDataString = encodedUserData.toString();
 		
-		String base64EncodedUserData = new String(Base64.encodeBase64(encodedUserData.toString().getBytes()));
-		instanceRequest.setUserData(base64EncodedUserData);
-		instanceRequest.setInstanceType("m1.large");
-		instanceRequest.setKeyName("terry-key"); //TODO - bacon - DELETE THIS CODE - it's for testing
-		RunInstancesResult result = ec2.runInstances(instanceRequest);
-		List<Instance> instances = result.getReservation().getInstances();
-		
-		//We should get a single item on success
-		if (instances.size() == 0) {
+		// launch the ec2 instance
+        String instanceId = null;
+        try {
+            instanceId = jobExecutionService.executeJob(job, userDataString);
+        } catch (Exception ex) {
+            logger.error("Failed to launch instance to run job " + job.getId(), ex);
+            job.setStatus(STATUS_FAILED);
+            jobManager.saveJob(job);
+            return generateJSONResponseMAV(false, null, "Failed submitting to EC2");
+        }
+		if (instanceId == null || instanceId.isEmpty()) {
 			logger.error("Failed to launch instance to run job " + job.getId());
 			job.setStatus(STATUS_FAILED);
 			jobManager.saveJob(job);
 			return generateJSONResponseMAV(false, null, "Failed submitting to EC2");
 		}
 		
-		Instance instance = instances.get(0);
-		String instanceId = instance.getInstanceId();
 		logger.info("Launched instance: " + instanceId);
 			
-		// set reference as instanceId for use when killing a job 
+		// set reference as instanceId for use when killing a job
 		job.setEc2InstanceId(instanceId);
 		job.setStatus(STATUS_ACTIVE);
 		job.setSubmitDate(new Date());
 		jobManager.saveJob(job);
 		
-
         // Save in session for status update request for this job.
 		return generateJSONResponseMAV(true, null, "");
     }
