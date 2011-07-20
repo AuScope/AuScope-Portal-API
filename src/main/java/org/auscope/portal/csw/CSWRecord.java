@@ -215,11 +215,18 @@ public class CSWRecord {
      * @return
      */
     public boolean containsAnyOnlineResource(CSWOnlineResource.OnlineResourceType... types) {
+        
+        if (onlineResources == null) {
+            return false;
+        }
+        
         for (CSWOnlineResource r : onlineResources) {
-            CSWOnlineResource.OnlineResourceType typeToMatch = r.getType();
-            for (CSWOnlineResource.OnlineResourceType type : types) {
-                if (typeToMatch == type) {
-                    return true;
+            if (r != null) {
+                CSWOnlineResource.OnlineResourceType typeToMatch = r.getType();
+                for (CSWOnlineResource.OnlineResourceType type : types) {
+                    if (typeToMatch == type) {
+                        return true;
+                    }
                 }
             }
         }
@@ -234,11 +241,6 @@ public class CSWRecord {
      * @return true if this record contains the given descriptive keyword, false otherwise.
      */
     public boolean containsKeyword(String str) {
-		for(String keyword : descriptiveKeywords) {
-			if(keyword.equals(str)) {
-				return true;
-			}
-		}
-    	return false;
+        return Arrays.asList(descriptiveKeywords).contains(str);
     }
 }
