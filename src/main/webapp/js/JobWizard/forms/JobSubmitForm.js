@@ -27,6 +27,7 @@ JobSubmitForm =  Ext.extend(JobUploadForm, {
 			params : {
 				jobId : jobSubmitFrm.wizardState.jobId
 			},
+			timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
 			callback : function(options, success, response) {
 				loadMask.hide();
 				if (success) {
