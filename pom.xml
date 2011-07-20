@@ -174,12 +174,7 @@
             <id>cgsrv8.arrc.csiro.au</id>
             <name>cgsrv8.arrc.csiro.au-releases</name>
             <url>https://cgsrv8.arrc.csiro.au/artifactory/PortalRepo</url>
-        </repository>		
-		<repository>
-		  	<id>cgsrv8.arrc.csiro.au-releases</id>
-		  	<name>cgsrv8.arrc.csiro.au-releases</name>
-		  	<url>https://cgsrv8.arrc.csiro.au:443/artifactory/Geodesy-repo</url>
-		</repository>
+        </repository>
     </repositories>
 
     <!-- Dependencies -->
@@ -465,11 +460,6 @@
 			<version>2.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons.ssl</groupId>
-			<artifactId>not-yet-commons-ssl</artifactId>
-			<version>0.3.10</version>
-		</dependency>
-		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate</artifactId>
     		<version>3.2.7.ga</version>
@@ -478,40 +468,6 @@
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
 			<version>3.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.globus</groupId>
-			<artifactId>wsgram-api</artifactId>
-			<version>4.0.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glite.slcs</groupId>
-			<artifactId>slsc-common</artifactId>
-			<version>1.4.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>bouncycastle</groupId>
-			<artifactId>bcprov-jdk14</artifactId>
-			<version>138</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cryptix</groupId>
-			<artifactId>cryptix</artifactId>
-			<version>gt4</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cryptix</groupId>
-			<artifactId>asn1</artifactId>
-			<version>gt4</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>puretls</groupId>
-			<artifactId>puretls</artifactId>
-			<version>gt4</version>
-			<scope>provided</scope>
 		</dependency>
         <dependency>
         	<groupId>org.slf4j</groupId>
@@ -524,23 +480,6 @@
         	<artifactId>netcdf</artifactId>
         	<version>4.1</version>
         	<optional>false</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>cryptix</groupId>
-            <artifactId>cryptix32</artifactId>
-            <version>gt4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.globus</groupId>
-            <artifactId>cog-axis</artifactId>
-            <version>gt4</version>
-        </dependency>
-		<dependency>
-            <groupId>org.globus</groupId>
-            <artifactId>cog-jglobus</artifactId>
-            <version>1.4</version>
         </dependency>
         <!-- Added for Amazon cloud -->
 		<dependency>
