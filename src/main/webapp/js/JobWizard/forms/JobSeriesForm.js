@@ -14,7 +14,7 @@ JobSeriesForm =  Ext.extend(BaseJobWizardForm, {
 		var jobSeriesObj = this;
 		var mySeriesStore = new Ext.data.JsonStore({
 	        url: 'mySeries.do',
-	        root: 'series',
+	        root: 'data',
 	        autoLoad: true,
 	        fields: [
 	            { name: 'id', type: 'int' },

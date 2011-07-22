@@ -9,7 +9,6 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -22,31 +21,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.server.cloud.S3FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
-import org.auscope.portal.server.vegl.VEGLSeries;
-import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.web.service.JobExecutionService;
 import org.auscope.portal.server.web.service.JobFileService;
 import org.auscope.portal.server.web.service.JobStorageService;
-import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
-import org.jets3t.service.impl.rest.httpclient.RestS3Service;
-import org.jets3t.service.model.S3Bucket;
-import org.jets3t.service.model.S3Object;
-import org.jets3t.service.security.ProviderCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 
 /**
  * Controller for the job list view.
@@ -61,18 +47,104 @@ public class JobListController extends BaseVEGLController  {
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
 
-    @Autowired
     private VEGLJobManager jobManager;
-    @Autowired
-    @Qualifier(value = "propertyConfigurer")
-    private PortalPropertyPlaceholderConfigurer hostConfigurer;
-    @Autowired
     private JobStorageService jobStorageService;
-    @Autowired
     private JobFileService jobFileService;
-    @Autowired
     private JobExecutionService jobExecutionService;
 
+    @Autowired
+    public JobListController(VEGLJobManager jobManager, JobStorageService jobStorageService, 
+            JobFileService jobFileService, JobExecutionService jobExecutionService) {
+        this.jobManager = jobManager;
+        this.jobStorageService = jobStorageService;
+        this.jobFileService = jobFileService;
+        this.jobExecutionService = jobExecutionService;
+    }
+    
+    /**
+     * Attempts to get a job with a particular ID. If the job ID does NOT belong to the current
+     * user session null will be returned.
+     * 
+     * This function will log all appropriate errors.
+     * @param jobId
+     * @return The VEGLJob object on success or null otherwise.
+     */
+    private VEGLJob attemptGetJob(Integer jobId, HttpServletRequest request) {
+        VEGLJob job = null;
+        String user = (String)request.getSession().getAttribute("openID-Email");
+        
+        //Check we have a user email
+        if (user == null || user.isEmpty()) {
+            logger.warn("The current session is missing an email attribute");
+            return null;
+        }
+        
+        //Attempt to fetch our job
+        if (jobId != null) {
+            try {
+                job = jobManager.getJobById(jobId.intValue());
+            } catch (Exception ex) {
+                logger.error(String.format("Exception when accessing jobManager for job id '%1$s'", jobId), ex);
+                return null;
+            }
+        } 
+        
+        if (job == null) {
+            logger.warn(String.format("Job with ID '%1$s' does not exist", jobId));
+            return null;
+        }
+        
+        //Check user matches job
+        if (!user.equals(job.getUser())) {
+            logger.warn(String.format("%1$s's attempt to fetch %2$s's job denied!", user, job.getUser()));
+            return null;
+        }
+        
+        return job;
+    }
+    
+    /**
+     * Attempts to get a series with a particular ID. If the series ID does NOT belong to the current
+     * user session null will be returned.
+     * 
+     * This function will log all appropriate errors.
+     * @param jobId
+     * @return The VEGLSeries object on success or null otherwise.
+     */
+    private VEGLSeries attemptGetSeries(Integer seriesId, HttpServletRequest request) {
+        VEGLSeries series = null;
+        String user = (String)request.getSession().getAttribute("openID-Email");
+        
+        //Check we have a user email
+        if (user == null || user.isEmpty()) {
+            logger.warn("The current session is missing an email attribute");
+            return null;
+        }
+        
+        //Attempt to fetch our job
+        if (seriesId != null) {
+            try {
+                series = jobManager.getSeriesById(seriesId.intValue());
+            } catch (Exception ex) {
+                logger.error(String.format("Exception when accessing jobManager for series id '%1$s'", seriesId), ex);
+                return null;
+            }
+        } 
+        
+        if (series == null) {
+            logger.warn(String.format("Series with ID '%1$s' does not exist", seriesId));
+            return null;
+        }
+        
+        //Check user matches job
+        if (!user.equals(series.getUser())) {
+            logger.warn(String.format("%1$s's attempt to fetch %2$s's job denied!", user, series.getUser()));
+            return null;
+        }
+        
+        return series;
+    }
+    
     /**
      * Returns a JSON object containing a list of the current user's series.
      *
@@ -87,10 +159,14 @@ public class JobListController extends BaseVEGLController  {
                                  HttpServletResponse response) {
 
         String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
+        if (user == null || user.isEmpty()) {
+            logger.warn("No email attached to session");
+            return generateJSONResponseMAV(false, null, "No email attached to session");
+        }
         List<VEGLSeries> series = jobManager.querySeries(user, null, null);
 
         logger.debug("Returning " + series);
-        return new ModelAndView("jsonView", "series", series);
+        return generateJSONResponseMAV(true, series, "");
     }
     
     /**
@@ -104,49 +180,22 @@ public class JobListController extends BaseVEGLController  {
      */
     @RequestMapping("/deleteJob.do")
     public ModelAndView deleteJob(HttpServletRequest request,
-                                HttpServletResponse response) {
-    	String userEmail = (String)request.getSession().getAttribute("openID-Email");
-        String jobIdStr = request.getParameter("jobId");
-        VEGLJob job = null;
-        ModelAndView mav = new ModelAndView("jsonView");
-        boolean success = false;
-
-        if (jobIdStr != null) {
-            try {
-                int jobId = Integer.parseInt(jobIdStr);
-                job = jobManager.getJobById(jobId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing job ID!");
-            }
-        } else {
-            logger.warn("No job ID specified!");
-        }
-
+                                HttpServletResponse response,
+                                @RequestParam("jobId") Integer jobId) {
+    	
+        VEGLJob job = attemptGetJob(jobId, request);
         if (job == null) {
-            final String errorString = "The requested job was not found.";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-
-        } else {
-            // check if current user is the owner of the job
-            VEGLSeries s = jobManager.getSeriesById(job.getSeriesId());
-            if (userEmail.equals(s.getUser())) {
-                logger.info("Deleting job with ID "+jobIdStr);
-                jobFileService.deleteStageInDirectory(job);
-                jobManager.deleteJob(job);
-                success = true;
-            } else {
-                logger.warn(userEmail+"'s attempt to kill "+
-                        s.getUser()+"'s job denied!");
-                mav.addObject("error", "You are not authorised to delete this job.");
-            }
+            return generateJSONResponseMAV(false, null, "The requested job was not found.");
         }
-        mav.addObject("success", success);
-
-        return mav;
+        
+        logger.info("Deleting job with ID " + jobId);
+        jobFileService.deleteStageInDirectory(job);
+        jobManager.deleteJob(job);
+        
+        return generateJSONResponseMAV (true, null, "");
     }
     /**
-     * delete all jobs of given series.
+     * delete all jobs of given series (and the series itself)
      *
      * @param request The servlet request including a seriesId parameter
      * @param response The servlet response
@@ -156,71 +205,32 @@ public class JobListController extends BaseVEGLController  {
      */
     @RequestMapping("/deleteSeriesJobs.do")
     public ModelAndView deleteSeriesJobs(HttpServletRequest request,
-                                       HttpServletResponse response) {
+                                       HttpServletResponse response,
+                                       @RequestParam("seriesId") Integer seriesId) {
     	
-    	String userEmail = (String)request.getSession().getAttribute("openID-Email");
-        String seriesIdStr = request.getParameter("seriesId");
-        List<VEGLJob> jobs = null;
-        ModelAndView mav = new ModelAndView("jsonView");
-        boolean success = false;
-        int seriesId = -1;
-
-        if (seriesIdStr != null) {
-            try {
-                seriesId = Integer.parseInt(seriesIdStr);
-                jobs = jobManager.getSeriesJobs(seriesId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing series ID!");
-            }
-        } else {
-            logger.warn("No series ID specified!");
+        VEGLSeries series = attemptGetSeries(seriesId, request);
+        if (series == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup series.");
         }
-
+        
+        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue());
         if (jobs == null) {
-            final String errorString = "The requested series was not found.";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-            mav.addObject("success", false);
-
-        } else {
-            // check if current user is the owner of the series
-            VEGLSeries s = jobManager.getSeriesById(seriesId);
-            if (userEmail.equals(s.getUser())) {
-                logger.info("Deleting jobs of series "+seriesIdStr);
-                boolean jobsDeleted = true;
-                for (VEGLJob job : jobs) {
-                    String oldStatus = job.getStatus();
-                    if (oldStatus.equals(GridSubmitController.STATUS_FAILED) || oldStatus.equals(GridSubmitController.STATUS_DONE) ||
-                    		oldStatus.equals(GridSubmitController.STATUS_CANCELLED) || oldStatus.equals(GridSubmitController.STATUS_UNSUBMITTED)) {
-                    	jobFileService.deleteStageInDirectory(job);
-                        jobManager.deleteJob(job);
-                        
-                    }else{
-                    	logger.debug("Skipping running job "+job.getId());
-                    	if(jobsDeleted){
-                    		jobsDeleted = false;
-                    		mav.addObject("error", "Can not delete series, there are running jobs.");
-                    	}        	
-                    	continue;                  	
-                    }
-                }
-                if(jobsDeleted){
-                	logger.info("Deleting series "+seriesIdStr);
-                	jobManager.deleteSeries(s);
-                	logger.info("Deleted series "+seriesIdStr);
-                	success = true;
-                }else{
-                	success = false;
-                }
-            } else {
-                logger.warn(userEmail+"'s attempt to delete "+
-                        s.getUser()+"'s jobs denied!");
-                mav.addObject("error", "You are not authorised to delete the jobs of this series.");
-            }
+            logger.warn(String.format("Unable to lookup jobs for series id '%1$s'", seriesId));
+            return generateJSONResponseMAV(false, null, "Unable to lookup jobs of series.");
         }
-
-        mav.addObject("success", success);
-        return mav;
+        
+        logger.info("Deleting jobs of series " + seriesId);
+        for (VEGLJob job : jobs) {
+            logger.debug(String.format("Deleting job %1$s",job));
+            
+            jobFileService.deleteStageInDirectory(job);
+            jobManager.deleteJob(job);
+        }
+        
+        logger.info("Deleting series "+seriesId);
+        jobManager.deleteSeries(series);
+        
+        return generateJSONResponseMAV(true, null, "");
     }
     
     /**
@@ -234,57 +244,27 @@ public class JobListController extends BaseVEGLController  {
      */
     @RequestMapping("/killJob.do")
     public ModelAndView killJob(HttpServletRequest request,
-                                HttpServletResponse response) {
+                                HttpServletResponse response,
+                                @RequestParam("jobId") Integer jobId) {
 
-    	String userEmail = (String)request.getSession().getAttribute("openID-Email");
-        String jobIdStr = request.getParameter("jobId");
-        VEGLJob job = null;
-        ModelAndView mav = new ModelAndView("jsonView");
-        boolean success = false;
-
-        if (jobIdStr != null) {
-            try {
-                int jobId = Integer.parseInt(jobIdStr);
-                job = jobManager.getJobById(jobId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing job ID!");
-            }
-        } else {
-            logger.warn("No job ID specified!");
-        }
-
+        VEGLJob job = attemptGetJob(jobId, request);
         if (job == null) {
-            final String errorString = "The requested job was not found.";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-
-        } else {
-            // check if current user is the owner of the job
-            VEGLSeries s = jobManager.getSeriesById(job.getSeriesId());
-            if (userEmail.equals(s.getUser())) {
-                logger.info("Cancelling job with ID "+jobIdStr);
-                
-                // terminate the EMI instance
-                try {
-					terminateInstance(job);
-	                success = true;
-	                
-				} catch (AmazonServiceException e) {
-					final String errorString = "Failed to terminate instance with id: " + job.getEc2InstanceId();
-					logger.error(errorString);
-					mav.addObject(errorString);
-				} 
-            } else {
-                logger.warn(userEmail+"'s attempt to kill "+
-                        s.getUser()+"'s job denied!");
-                mav.addObject("error", "You are not authorised to cancel this job.");
-            }
+            return generateJSONResponseMAV(false, null, "Unable to lookup job to kill.");
         }
-        mav.addObject("success", success);
-
-        return mav;
+        
+        // terminate the EMI instance
+        try {
+            logger.info("Cancelling job with ID "+jobId);
+            terminateInstance(job);
+        } catch (Exception e) {
+            logger.error("Failed to terminate instance with id: " + job.getEc2InstanceId(), e);
+            return generateJSONResponseMAV(false, null, "Error killing running instance");
+        }
+        
+        return generateJSONResponseMAV(true, null, "");
     }
     
+        
     
 	/**
 	 * Terminates the instance of an EMI that was launched by a job.
@@ -294,7 +274,7 @@ public class JobListController extends BaseVEGLController  {
 	 */
 	private void terminateInstance(VEGLJob job) {
 	    jobExecutionService.terminateJob(job);
-		job.setStatus("Cancelled");
+		job.setStatus(GridSubmitController.STATUS_CANCELLED);
 		jobManager.saveJob(job);
 	}
 
@@ -309,67 +289,40 @@ public class JobListController extends BaseVEGLController  {
      */
     @RequestMapping("/killSeriesJobs.do")
     public ModelAndView killSeriesJobs(HttpServletRequest request,
-                                       HttpServletResponse response) {
+                                       HttpServletResponse response,
+                                       @RequestParam("seriesId") Integer seriesId) {
 
-    	String userEmail = (String)request.getSession().getAttribute("openID-Email");
-        String seriesIdStr = request.getParameter("seriesId");
-        List<VEGLJob> jobs = null;
-        ModelAndView mav = new ModelAndView("jsonView");
-        boolean success = false;
-        int seriesId = -1;
+        VEGLSeries series = attemptGetSeries(seriesId, request);
+        if (series == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup series.");
+        }
         
-        if (seriesIdStr != null) {
-            try {
-                seriesId = Integer.parseInt(seriesIdStr);
-                jobs = jobManager.getSeriesJobs(seriesId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing series ID!");
-            }
-        } else {
-            logger.warn("No series ID specified!");
-        }
-
+        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue());
         if (jobs == null) {
-            final String errorString = "The requested series was not found.";
-            logger.error(errorString);
-            mav.addObject("error", errorString);
-            mav.addObject("success", false);
-
-        } else {
-            // check if current user is the owner of the series
-            VEGLSeries s = jobManager.getSeriesById(seriesId);
-            if (userEmail.equals(s.getUser())) {
-                logger.info("Cancelling jobs of series "+seriesIdStr);
-                for (VEGLJob job : jobs) {
-                    String oldStatus = job.getStatus();
-                    if (oldStatus.equals("Failed") || oldStatus.equals("Done") ||
-                            oldStatus.equals("Cancelled")) {
-                        logger.debug("Skipping finished job "+job.getId());
-                        continue;
-                    }
-                    logger.info("Cancelling job with ID "+job.getId());
-                    
-                    // terminate the EMI instance
-                    try {
-    					terminateInstance(job);
-    	                success = true;
-    	                
-    				} catch (AmazonServiceException e) {
-    					final String errorString = "Failed to terminate instance with id: " + job.getEc2InstanceId();
-    					logger.error(errorString);
-    					mav.addObject(errorString);
-    				} 
-                }
-                success = true;
-            } else {
-                logger.warn(userEmail+"'s attempt to kill "+
-                        s.getUser()+"'s jobs denied!");
-                mav.addObject("error", "You are not authorised to cancel the jobs of this series.");
+            logger.warn(String.format("Unable to lookup jobs for series id '%1$s'", seriesId));
+            return generateJSONResponseMAV(false, null, "Unable to lookup jobs of series.");
+        }
+        
+        //Iterate our jobs, terminating as we go (abort iteration on failure)
+        for (VEGLJob job : jobs) {
+            String oldStatus = job.getStatus();
+            if (!oldStatus.equals(GridSubmitController.STATUS_ACTIVE)) {
+                logger.debug("Skipping finished job "+job.getId());
+                continue;
+            }
+            logger.info("Cancelling job with ID "+job.getId());
+            
+            //terminate the EMI instance
+            try {
+                logger.info("Cancelling job with ID "+ job.getId());
+                terminateInstance(job);
+            } catch (Exception e) {
+                logger.error("Failed to terminate instance with id: " + job.getEc2InstanceId(), e);
+                return generateJSONResponseMAV(false, null, "Error killing running instance");
             }
         }
-
-        mav.addObject("success", success);
-        return mav;
+        
+        return generateJSONResponseMAV(true, null, "");
     }
 
     /**
@@ -386,43 +339,24 @@ public class JobListController extends BaseVEGLController  {
      */
     @RequestMapping("/jobFiles.do")
     public ModelAndView jobFiles(HttpServletRequest request,
-                                 HttpServletResponse response) {
+                                 HttpServletResponse response,
+                                 @RequestParam("jobId") Integer jobId) {
 
-    	VEGLJob job = null;
-        ModelAndView mav = new ModelAndView("jsonView");
-        String jobIdStr = request.getParameter("jobId");
-        logger.debug("jobIdStr: " + jobIdStr);
-        int  totalItems = 0;
-        
-        if (jobIdStr != null) {
-            try {
-                int jobId = Integer.parseInt(jobIdStr);
-                job = jobManager.getJobById(jobId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing job ID!");
-            }
-        } else {
-            logger.warn("No job ID specified!");
+    	VEGLJob job = attemptGetJob(jobId, request);
+    	if (job == null) {
+    	    return generateJSONResponseMAV(false, null, "The requested job was not found.");
+    	}
+    	
+    	S3FileInformation[] fileDetails = null;
+        try {
+            fileDetails = jobStorageService.getOutputFileDetails(job);
+            logger.info(fileDetails.length + " job files located");
+        } catch (S3ServiceException e) {
+            logger.warn("Error fetching output directory information.", e);
+            return generateJSONResponseMAV(false, null, "Error fetching output directory information");
         }
         
-        if (job == null) {
-            final String errorString = "The requested job was not found.";
-            logger.error("The requested job was not found.");
-            mav.addObject("error", errorString);
-        } else if (job.getS3OutputBaseKey() != null) {
-        	// get results file information to display in the Files tab
-        	S3FileInformation[] fileDetails = null;
-			try {
-				fileDetails = jobStorageService.getOutputFileDetails(job);
-				logger.info(fileDetails.length + " job files located");
-			} catch (S3ServiceException e) {
-				logger.warn("Error fetching output directory information.", e);
-				mav.addObject("error", "Error fetching output directory information.");
-			}
-        	mav.addObject("files", fileDetails);
-        }
-        
-    	return mav;
+    	return generateJSONResponseMAV(true, fileDetails, "");
     }
     
 
@@ -438,83 +372,55 @@ public class JobListController extends BaseVEGLController  {
      */
     @RequestMapping("/downloadFile.do")
     public ModelAndView downloadFile(HttpServletRequest request,
-                                     HttpServletResponse response) {
+                                     HttpServletResponse response,
+                                     @RequestParam("jobId") Integer jobId,
+                                     @RequestParam("filename") String fileName,
+                                     @RequestParam("key") String key) {
 
-        String jobIdStr = request.getParameter("jobId");
-        String fileName = request.getParameter("filename");
-        String key = request.getParameter("key");
-        VEGLJob job = null;
-        String errorString = null;
 
-        if (jobIdStr != null) {
+        VEGLJob job = attemptGetJob(jobId, request);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup job object.");
+        }
+        
+        logger.debug("Download " + key);
+        
+        //Get our Input Stream
+        InputStream is = null;
+        try {
+            is = jobStorageService.getJobFileData(job, key);
+        } catch (Exception ex) {
+            logger.warn(String.format("Unable to access '%1$s' from S3", key), ex);
+            return generateJSONResponseMAV(false, null, "Unable to access file from S3");
+        }
+        
+        //start writing our output stream
+        try {
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=\""+fileName+"\"");
+            
+            //Ensure that our streams get closed
+            OutputStream out = response.getOutputStream();
             try {
-                int jobId = Integer.parseInt(jobIdStr);
-                job = jobManager.getJobById(jobId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing job ID!");
+                
+                int n;
+                byte[] buffer = new byte[1024];
+             
+                while ((n = is.read(buffer)) != -1) {
+                    out.write(buffer, 0, n);
+                }
+                
+                out.flush();
+            } finally {
+                IOUtils.closeQuietly(is);
+                IOUtils.closeQuietly(out);
             }
+        } catch (Exception ex) {
+            logger.warn("Error whilst writing to output stream", ex);
         }
-
-        if (job != null && fileName != null) {
-        	
-        	logger.debug("Download " + key);
-        	try {
-				InputStream is = jobStorageService.getJobFileData(job, key);
-					
-				if (is != null) {
-					response.setContentType("application/octet-stream");
-				    response.setHeader("Content-Disposition",
-				            "attachment; filename=\""+fileName+"\"");
-				    
-				    try {
-				    	OutputStream out = response.getOutputStream();
-				        int n;
-				        byte[] buffer = new byte[1024];
-				     
-				        while ((n = is.read(buffer)) != -1) {
-				        	out.write(buffer, 0, n);
-				        }
-				        
-				        out.flush();
-				        return null;
-				        
-				    } catch(IOException e) {
-				    	errorString = new String("Could not send file: " +
-				                e.getMessage());
-				        logger.error(errorString);
-				    } finally {
-				    	IOUtils.closeQuietly(is);
-				    }
-				}
-				else{
-					logger.error("inputstream is null");
-				}
-			} catch (S3ServiceException e) {
-				errorString = new String("Error creating S3Service: " +
-		                e.getMessage());
-		        logger.error(errorString);
-			} catch (ServiceException e) {
-				errorString = new String("Error getting S3Object data: " +
-		                e.getMessage());
-		        logger.error(errorString);
-			}
-        }
-
-        // We only end up here in case of an error so return a suitable message
-        if (errorString == null) {
-            if (job == null) {
-                errorString = new String("Invalid job specified!");
-                logger.error(errorString);
-            } else if (fileName == null) {
-                errorString = new String("No filename provided!");
-                logger.error(errorString);
-            } else {
-                // should never get here
-                errorString = new String("Something went wrong.");
-                logger.error(errorString);
-            }
-        }
-        return new ModelAndView("joblist", "error", errorString);
+     
+        //The output is raw data down the output stream, just return null
+        return null;
     }
 
     /**
@@ -530,87 +436,61 @@ public class JobListController extends BaseVEGLController  {
      */
     @RequestMapping("/downloadAsZip.do")
     public ModelAndView downloadAsZip(HttpServletRequest request,
-                                      HttpServletResponse response) {
+                                      HttpServletResponse response,
+                                      @RequestParam("jobId") Integer jobId,
+                                      @RequestParam("files") String filesParam) {
 
-        String jobIdStr = request.getParameter("jobId");
-        String filesParam = request.getParameter("files");
+        //Lookup our job and check input files
+        VEGLJob job = attemptGetJob(jobId, request);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup job object.");
+        }
+        
         logger.debug("filesParam: " + filesParam);
-        VEGLJob job = null;
-        String errorString = null;
-
-        if (jobIdStr != null) {
-            try {
-                int jobId = Integer.parseInt(jobIdStr);
-                job = jobManager.getJobById(jobId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing job ID!");
-            }
+        if (filesParam == null || filesParam.isEmpty()) {
+            return generateJSONResponseMAV(false, null, "No files have been selected.");
         }
+        String[] fileKeys = filesParam.split(",");
+        logger.debug("Archiving " + fileKeys.length + " file(s) of job " + jobId);
 
-        if (job != null && filesParam != null) {
-            String[] fileKeys = filesParam.split(",");
-            logger.debug("Archiving " + fileKeys.length + " file(s) of job " +
-                    jobIdStr);
-
+        //Start writing our data to a zip archive (which is being streamed to user)
+        try {
             response.setContentType("application/zip");
-            response.setHeader("Content-Disposition",
-                    "attachment; filename=\"jobfiles.zip\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"jobfiles.zip\"");
             
-            try {
-
-                boolean readOneOrMoreFiles = false;
-                ZipOutputStream zout = new ZipOutputStream(
-                        response.getOutputStream());
-                for (String fileKey : fileKeys) {                	
-               		InputStream is = jobStorageService.getJobFileData(job, fileKey);
-                    
-                    byte[] buffer = new byte[16384];
-                    int count = 0;
-                    zout.putNextEntry(new ZipEntry(fileKey));
-                    while ((count = is.read(buffer)) != -1) {
-                        zout.write(buffer, 0, count);
-                    }
-                    zout.closeEntry();
-                    readOneOrMoreFiles = true;
+            boolean readOneOrMoreFiles = false;
+            ZipOutputStream zout = new ZipOutputStream(
+                    response.getOutputStream());
+            for (String fileKey : fileKeys) {                   
+                InputStream is = jobStorageService.getJobFileData(job, fileKey);
+                
+                byte[] buffer = new byte[16384];
+                int count = 0;
+                zout.putNextEntry(new ZipEntry(fileKey));
+                while ((count = is.read(buffer)) != -1) {
+                    zout.write(buffer, 0, count);
                 }
-                if (readOneOrMoreFiles) {
-                    zout.finish();
-                    zout.flush();
-                    zout.close();
-                    return null;
-
-                } else {
-                    zout.close();
-                    errorString = new String("Could not access the files!");
-                    logger.error(errorString);
-                }
-
-            } catch (IOException e) {
-                errorString = new String("Could not create ZIP file: " +
-                        e.getMessage());
-                logger.error(errorString);
-            } catch (ServiceException e) {
-            	errorString = new String("Error getting S3Object data: " +
-		                e.getMessage());
-		        logger.error(errorString);
-			}
-        }
-
-        // We only end up here in case of an error so return a suitable message
-        if (errorString == null) {
-            if (job == null) {
-                errorString = new String("Invalid job specified!");
-                logger.error(errorString);
-            } else if (filesParam == null) {
-                errorString = new String("No filename(s) provided!");
-                logger.error(errorString);
-            } else {
-                // should never get here
-                errorString = new String("Something went wrong.");
-                logger.error(errorString);
+                zout.closeEntry();
+                readOneOrMoreFiles = true;
             }
+            
+            if (readOneOrMoreFiles) {
+                zout.finish();
+                zout.flush();
+                zout.close();
+                return null;
+            } else {
+                zout.close();
+                logger.warn("Could not access the files!");
+            }
+
+        } catch (IOException e) {
+            logger.warn("Could not create ZIP file", e);
+        } catch (ServiceException e) {
+            logger.warn("Error getting S3Object data", e);
         }
-        return new ModelAndView("joblist", "error", errorString);
+        
+        return null;
     }
 
     /**
@@ -625,11 +505,11 @@ public class JobListController extends BaseVEGLController  {
      */
     @RequestMapping("/querySeries.do")
     public ModelAndView querySeries(HttpServletRequest request,
-                                    HttpServletResponse response) {
+                                    HttpServletResponse response,
+                                    @RequestParam(required=false, value="qUser") String qUser,
+                                    @RequestParam(required=false, value="qSeriesName") String qName,
+                                    @RequestParam(required=false, value="qSeriesDesc") String qDesc) {
 
-        String qUser = request.getParameter("qUser");
-        String qName = request.getParameter("qSeriesName");
-        String qDesc = request.getParameter("qSeriesDesc");
 
         if (qUser == null && qName == null && qDesc == null) {
             qUser = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
@@ -640,7 +520,7 @@ public class JobListController extends BaseVEGLController  {
         List<VEGLSeries> series = jobManager.querySeries(qUser, qName, qDesc);
 
         logger.debug("Returning list of "+series.size()+" series.");
-        return new ModelAndView("jsonView", "series", series);
+        return generateJSONResponseMAV(true, series, "");
     }
 
     /**
@@ -683,55 +563,42 @@ public class JobListController extends BaseVEGLController  {
      */
     @RequestMapping("/listJobs.do")
     public ModelAndView listJobs(HttpServletRequest request,
-                                 HttpServletResponse response) {
-
-        String seriesIdStr = request.getParameter("seriesId");
-        List<VEGLJob> seriesJobs = null;
-        ModelAndView mav = new ModelAndView("jsonView");
-        int seriesId = -1;
-
-        if (seriesIdStr != null) {
-            try {
-                seriesId = Integer.parseInt(seriesIdStr);
-                seriesJobs = jobManager.getSeriesJobs(seriesId);
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing series ID '"+seriesIdStr+"'");
-            }
-        } else {
-            logger.warn("No series ID specified!");
+                                 HttpServletResponse response,
+                                 @RequestParam("seriesId") Integer seriesId) {
+        VEGLSeries series = attemptGetSeries(seriesId, request);
+        if (series == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
         }
         
-        // check to see if any active jobs have completed or failed so the status can be updated
-        if (seriesJobs != null) {
-        	for (VEGLJob job : seriesJobs) {
-        		//Don't lookup files for jobs that haven't been submitted
-        		if (!job.getStatus().equals(GridSubmitController.STATUS_UNSUBMITTED)) {
-	        		S3FileInformation[] results = null;
-					try {
-						results = jobStorageService.getOutputFileDetails(job);
-					} catch (S3ServiceException e) {
-						logger.error("Unable to list output job files", e);
-					}
-	        		
-	        		if (job.getStatus().equals(GridSubmitController.STATUS_ACTIVE) && results != null && results.length > 0) {
-	        			//The final processing step is uploading the log
-	        			//It is uploaded to "vegl.sh.log"
-	        			for (S3FileInformation result : results) {
-	        				if (result.getName().endsWith("vegl.sh.log") && result.getSize() > 0) {
-	        					job.setStatus(GridSubmitController.STATUS_DONE);
-	        				}
-	        			}
-	        			
-	        			jobManager.saveJob(job);
-	        		}
-        		}
-        	}
-        	
-        	mav.addObject("jobs", seriesJobs);
+        List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue());
+        if (seriesJobs == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup jobs for the specified series.");
         }
-
-        logger.debug("Returning series job list");
-        return mav;
+        
+        for (VEGLJob job : seriesJobs) {
+            //Don't lookup files for jobs that haven't been submitted
+            if (!job.getStatus().equals(GridSubmitController.STATUS_UNSUBMITTED)) {
+                S3FileInformation[] results = null;
+                try {
+                    results = jobStorageService.getOutputFileDetails(job);
+                } catch (S3ServiceException e) {
+                    logger.error("Unable to list output job files", e);
+                }
+                
+                if (job.getStatus().equals(GridSubmitController.STATUS_ACTIVE) && results != null && results.length > 0) {
+                    //The final processing step is uploading the log
+                    //It is uploaded to "vegl.sh.log"
+                    for (S3FileInformation result : results) {
+                        if (result.getName().endsWith("vegl.sh.log") && result.getSize() > 0) {
+                            job.setStatus(GridSubmitController.STATUS_DONE);
+                        }
+                    }
+                    
+                    jobManager.saveJob(job);
+                }
+            }
+        }
+        return generateJSONResponseMAV(true, seriesJobs, "");
     }
     
     

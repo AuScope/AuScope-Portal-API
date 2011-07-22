@@ -38,8 +38,8 @@ JobList.onRequestFailure = function(response, request) {
 // callback for killJob action
 JobList.onKillJobResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
-    if (resp.error != null) {
-        JobList.showError(resp.error);
+    if (!resp.success) {
+        JobList.showError(resp.msg);
     }
     JobList.jobStore.reload();
 };
@@ -47,8 +47,8 @@ JobList.onKillJobResponse = function(response, request) {
 //callback for deleteJob action
 JobList.onDeleteJobResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
-    if (resp.error != null) {
-        JobList.showError(resp.error);
+    if (!resp.success) {
+        JobList.showError(resp.msg);
     }
     JobList.jobStore.reload();
 };
@@ -56,8 +56,8 @@ JobList.onDeleteJobResponse = function(response, request) {
 //callback for deleteSeries action
 JobList.onDeleteSeriesResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
-    if (resp.error != null) {
-        JobList.showError(resp.error);
+    if (!resp.success) {
+        JobList.showError(resp.msg);
     }
     JobList.seriesStore.reload();
 };
@@ -65,8 +65,8 @@ JobList.onDeleteSeriesResponse = function(response, request) {
 // callback for retrieveFiles action
 JobList.onRetrieveFilesResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
-    if (resp.error != null) {
-        JobList.showError(resp.error);
+    if (!resp.success) {
+        JobList.showError(resp.msg);
     } else {
         Ext.Msg.alert("Success", "The output files of the selected job will be transferred as soon as possible. Please note that it may take a while though.");
     }
@@ -74,8 +74,8 @@ JobList.onRetrieveFilesResponse = function(response, request) {
 
 JobList.onRegisterResponse = function(response, request) {
     var resp = Ext.decode(response.responseText);
-    if (resp.error != null) {
-        JobList.showError(resp.error);
+    if (!resp.success) {
+        JobList.showError(resp.msg);
     } else {
     	JobList.refreshAll();
         Ext.Msg.alert("Success", "The job is registered.");
@@ -405,7 +405,7 @@ JobList.initialize = function() {
 
     JobList.seriesStore = new Ext.data.JsonStore({
         url: 'querySeries.do',
-        root: 'series',
+        root: 'data',
         autoLoad: true,
         fields: [
             { name: 'id', type: 'int' },
@@ -422,7 +422,7 @@ JobList.initialize = function() {
 
     JobList.jobStore = new Ext.data.JsonStore({
         url: 'listJobs.do',
-        root: 'jobs',
+        root: 'data',
         fields: [
             { name: 'id', type: 'int' },
             { name: 'name', type: 'string' },
@@ -450,7 +450,7 @@ JobList.initialize = function() {
 
     JobList.jobFileStore = new Ext.data.JsonStore({
         url: 'jobFiles.do',
-        root: 'files',
+        root: 'data',
         sortInfo: { field: 'name', direction: 'ASC' },
         fields: [
             { name: 'name', type: 'string' },
@@ -768,9 +768,9 @@ JobList.initialize = function() {
         }]
     });
 
-    if (JobList.error != null) {
-        JobList.showError(JobList.error);
-        JobList.error = null;
+    if (JobList.msg != null) {
+        JobList.showError(JobList.msg);
+        JobList.msg = null;
     }
 };
 
