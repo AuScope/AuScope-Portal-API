@@ -839,14 +839,14 @@ public class TestJobListController {
                 context.mock(VEGLJob.class, "mockJobUnsubmitted"),
                 context.mock(VEGLJob.class, "mockJobDone"));
         final S3FileInformation[] jobActiveFiles = new S3FileInformation[] {
-                new S3FileInformation("key2/filename", 100L),
-                new S3FileInformation("key2/vegl.sh.log", 101L),
-                new S3FileInformation("key2/filename3", 102L),
+                new S3FileInformation("key2/filename", 100L, "http://public.url2/filename"),
+                new S3FileInformation("key2/vegl.sh.log", 101L, "http://public.url2/vegl.sh.log"),
+                new S3FileInformation("key2/filename3", 102L, "http://public.url2/filename3"),
         };
         final S3FileInformation[] jobDoneFiles = new S3FileInformation[] {
-                new S3FileInformation("key3/filename", 100L),
-                new S3FileInformation("key3/filename2", 101L),
-                new S3FileInformation("key3/filename3", 102L),
+                new S3FileInformation("key3/filename", 100L, "http://public.url3/filename"),
+                new S3FileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
+                new S3FileInformation("key3/filename3", 102L, "http://public.url3/filename3"),
         };
         
         context.checking(new Expectations() {{

@@ -20,13 +20,16 @@ public class S3FileInformation implements Serializable {
     private long size;
     /** AWS S3 storage key */
     private String s3Key = "";
+    /** URL where the file can be accessed by anyone (only valid if file is publicly readable) */
+    private String publicUrl = "";
 
     /**
      * Constructor with name and size
      */
-    public S3FileInformation(String s3Key, long size) {
+    public S3FileInformation(String s3Key, long size, String publicUrl) {
         this.s3Key = s3Key;
         this.size = size;
+        this.publicUrl = publicUrl;
     }
     
     /**
@@ -64,6 +67,24 @@ public class S3FileInformation implements Serializable {
 	public void setS3Key(String s3Key) {
 		this.s3Key = s3Key;
 	}
+
+	/**
+	 * Gets the public URL where this file can be accessed (assuming the file has its ACL set
+	 * to public read)
+	 * @return
+	 */
+    public String getPublicUrl() {
+        return publicUrl;
+    }
+
+    /**
+     * Sets the public URL where this file can be accessed (assuming the file has its ACL set
+     * to public read)
+     * @param publicUrl
+     */
+    public void setPublicUrl(String publicUrl) {
+        this.publicUrl = publicUrl;
+    }
 
 }
 

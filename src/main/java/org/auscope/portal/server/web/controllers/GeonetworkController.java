@@ -31,7 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 @Controller
-public class GeonetworkController {
+public class GeonetworkController extends BaseVEGLController {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 	
@@ -61,8 +61,7 @@ public class GeonetworkController {
     	
     	if (outputFiles != null) {
     		for (S3FileInformation obj : outputFiles) {
-    			String url = String.format("http://%1$s.s3.amazonaws.com/%2$s", job.getS3OutputBucket(), obj.getS3Key());
-    			onlineResources.add(new CSWOnlineResourceImpl(new URL(url), "WWW:DOWNLOAD-1.0-ftp--download", obj.getName(), obj.getName()));
+    			onlineResources.add(new CSWOnlineResourceImpl(new URL(obj.getPublicUrl()), "WWW:DOWNLOAD-1.0-ftp--download", obj.getName(), obj.getName()));
     		}
     	}
     	
@@ -79,18 +78,25 @@ public class GeonetworkController {
      * Requests that the portal should insert details of a job into GeoNetwork
      * @param jobId
      * @param request
-     * @return JasonArray with success set to true or false.
+     * @return A generic VEGL JSON response with the data element populated with the geonetwork URL string (on success)
      * @throws Exception
      */
     @RequestMapping("/insertRecord.do")
-    public ModelAndView insertRecord(@RequestParam("jobId") final String jobId) throws Exception {
-    	ModelAndView mav = new ModelAndView("jsonView");
+    public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId) throws Exception {
     	
+        //Lookup our appropriate job
+        VEGLJob job = jobManager.getJobById(jobId);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The specified job does not exist.");
+        }
+        
+        //Lookup our series
+        VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
+        if (jobSeries == null) {
+            return generateJSONResponseMAV(false, null, "The specified job does not belong to a series.");
+        }
+        
     	try {
-    		//Lookup our appropriate job
-    		VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
-    		VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
-    		
     		//Create an instance of our CSWRecord and transform it to a <gmd:MD_Metadata> record
     		CSWRecord record = jobToCSWRecord(job, jobSeries);
     		
@@ -98,15 +104,12 @@ public class GeonetworkController {
     		String metadataRecordUrl = gnService.makeCSWRecordInsertion(record);
     		job.setRegisteredUrl(metadataRecordUrl);
         	jobManager.saveJob(job);
-        	
-        	mav.addObject("success", true );
+        
+        	return generateJSONResponseMAV(true, metadataRecordUrl, "");
     	} catch (Exception ex) {
     		logger.warn("Error sending job to Geonetwork for jobId=" + jobId, ex);
-    		mav.addObject("success", "false");
-    		mav.addObject("error", "Internal error");
+    		return generateJSONResponseMAV(false, null, "Internal error");
     	}
-
-		return mav;
     }
     
     

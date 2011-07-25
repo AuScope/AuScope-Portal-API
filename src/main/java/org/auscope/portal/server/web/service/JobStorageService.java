@@ -65,11 +65,10 @@ public class JobStorageService {
      * @return Array of S3Objects, or null if no results available.
      * @throws S3ServiceException 
      */
-    private S3Object[] getOutputS3Objects(VEGLJob job) throws S3ServiceException {
-    	S3Service s3Service = generateS3ServiceForJob(job);
+    private S3Object[] getOutputS3Objects(VEGLJob job, S3Service s3Service) throws S3ServiceException {
 		String baseKey = job.getS3OutputBaseKey();
 		String bucket = job.getS3OutputBucket();
-		
+
 		logger.debug(String.format("bucket='%1$s' baseKey='%2$s'", bucket, baseKey));
 		
 		S3Object[] objs = s3Service.listObjects(bucket,baseKey,null);
@@ -100,13 +99,14 @@ public class JobStorageService {
      * @throws S3ServiceException
      */
     public S3FileInformation[] getOutputFileDetails(VEGLJob job) throws S3ServiceException {
-    	S3Object[] results = getOutputS3Objects(job);
+        S3Service s3Service = generateS3ServiceForJob(job);
+    	S3Object[] results = getOutputS3Objects(job, s3Service);
     	S3FileInformation[] fileDetails = new S3FileInformation[results.length];
     	
     	int i = 0;
     	// get file information from s3 objects
     	for (S3Object object : results) {
-    		fileDetails[i++] = new S3FileInformation(object.getKey(), object.getContentLength());
+    		fileDetails[i++] = new S3FileInformation(object.getKey(), object.getContentLength(), s3Service.createUnsignedObjectUrl(object.getBucketName(), object.getKey(), false, false, false));
     	}
     	
     	return fileDetails;
