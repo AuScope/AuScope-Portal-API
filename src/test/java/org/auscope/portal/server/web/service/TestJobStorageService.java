@@ -94,17 +94,27 @@ public class TestJobStorageService extends JobStorageService {
                 context.mock(S3Object.class, "mockS3Obj2"),
         };
         final String obj1Key = "key/obj1";
+        final String obj1Bucket = "bucket1";
+        final String obj1PublicUrl = "http://obj1.url.public";
         final long obj1Length = 1234L;
         final String obj2Key = "key/obj2";
+        final String obj2Bucket = "bucket2";
+        final String obj2PublicUrl = "http://obj1.url.public";
         final long obj2Length = 4567L;
         
         context.checking(new Expectations() {{
             oneOf(mockS3Service).listObjects(job.getS3OutputBucket(), job.getS3OutputBaseKey(), null);will(returnValue(mockS3Objects));
             
-            oneOf(mockS3Objects[0]).getKey();will(returnValue(obj1Key));
-            oneOf(mockS3Objects[0]).getContentLength();will(returnValue(obj1Length));
-            oneOf(mockS3Objects[1]).getKey();will(returnValue(obj2Key));
-            oneOf(mockS3Objects[1]).getContentLength();will(returnValue(obj2Length));
+            //We will be also creating URL's for the files to be publicly listed (assuming ACL priv's are set)
+            oneOf(mockS3Service).createUnsignedObjectUrl(obj1Bucket, obj1Key, false, false, false);will(returnValue(obj1PublicUrl));
+            oneOf(mockS3Service).createUnsignedObjectUrl(obj2Bucket, obj2Key, false, false, false);will(returnValue(obj2PublicUrl));
+            
+            allowing(mockS3Objects[0]).getKey();will(returnValue(obj1Key));
+            allowing(mockS3Objects[0]).getBucketName();will(returnValue(obj1Bucket));
+            allowing(mockS3Objects[0]).getContentLength();will(returnValue(obj1Length));
+            allowing(mockS3Objects[1]).getKey();will(returnValue(obj2Key));
+            allowing(mockS3Objects[1]).getBucketName();will(returnValue(obj2Bucket));
+            allowing(mockS3Objects[1]).getContentLength();will(returnValue(obj2Length));
         }});
         
         S3FileInformation[] fileInfo = this.getOutputFileDetails(job);
