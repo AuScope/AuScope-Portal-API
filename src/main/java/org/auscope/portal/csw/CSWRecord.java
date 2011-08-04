@@ -28,22 +28,24 @@ public class CSWRecord {
     private String dataIdentificationAbstract;
     private String supplementalInformation;
     private String contactIndividual;
-	private String contactEmail;
-	private CSWOnlineResource contactResource;
-	private String language;
-    
+    private String contactEmail;
+    private CSWOnlineResource contactResource;
+    private String language;
+    private String[] constraints;
+
     public CSWRecord(String serviceName, String contactOrganisation,
-    		String fileIdentifier, String recordInfoUrl, String dataIdentificationAbstract,
-			CSWOnlineResource[] onlineResources, CSWGeographicElement[] cswGeographicsElements) {
-    	this.serviceName = serviceName;
-    	this.contactOrganisation = contactOrganisation;
-    	this.fileIdentifier = fileIdentifier;
-    	this.recordInfoUrl = recordInfoUrl;
-    	this.dataIdentificationAbstract = dataIdentificationAbstract;
-    	this.onlineResources = onlineResources;
-    	this.cswGeographicElements = cswGeographicsElements;
-    	this.supplementalInformation = "";
-    	this.descriptiveKeywords = new String[0];
+            String fileIdentifier, String recordInfoUrl, String dataIdentificationAbstract,
+            CSWOnlineResource[] onlineResources, CSWGeographicElement[] cswGeographicsElements) {
+        this.serviceName = serviceName;
+        this.contactOrganisation = contactOrganisation;
+        this.fileIdentifier = fileIdentifier;
+        this.recordInfoUrl = recordInfoUrl;
+        this.dataIdentificationAbstract = dataIdentificationAbstract;
+        this.onlineResources = onlineResources;
+        this.cswGeographicElements = cswGeographicsElements;
+        this.supplementalInformation = "";
+        this.descriptiveKeywords = new String[0];
+        this.constraints = new String[0];
     }
 
     public void setRecordInfoUrl(String recordInfoUrl) {
@@ -71,7 +73,7 @@ public class CSWRecord {
     }
 
     public String getResourceProvider() {
-    	return resourceProvider;
+        return resourceProvider;
     }
 
     public String getDataIdentificationAbstract() {
@@ -99,90 +101,99 @@ public class CSWRecord {
      * @return descriptive keywords
      */
     public String[] getDescriptiveKeywords() {
-    	return descriptiveKeywords;
+        return descriptiveKeywords;
     }
 
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-	}
+    public String[] getConstraints() {
+        return constraints;
+    }
 
-	public void setOnlineResources(CSWOnlineResource[] onlineResources) {
-		this.onlineResources = onlineResources;
-	}
+    public void setConstraints(String[] constraints) {
+        this.constraints = constraints;
+    }
 
-	public void setContactOrganisation(String contactOrganisation) {
-		this.contactOrganisation = contactOrganisation;
-	}
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 
-	public void setResourceProvider(String resourceProvider) {
-		this.resourceProvider = resourceProvider;
-	}
+    public void setOnlineResources(CSWOnlineResource[] onlineResources) {
+        this.onlineResources = onlineResources;
+    }
 
-	public void setFileIdentifier(String fileIdentifier) {
-		this.fileIdentifier = fileIdentifier;
-	}
+    public void setContactOrganisation(String contactOrganisation) {
+        this.contactOrganisation = contactOrganisation;
+    }
 
-	public void setDescriptiveKeywords(String[] descriptiveKeywords) {
-		this.descriptiveKeywords = descriptiveKeywords;
-	}
+    public void setResourceProvider(String resourceProvider) {
+        this.resourceProvider = resourceProvider;
+    }
 
-	public void setDataIdentificationAbstract(String dataIdentificationAbstract) {
-		this.dataIdentificationAbstract = dataIdentificationAbstract;
-	}
-	
-	public String getSupplementalInformation() {
-		return supplementalInformation;
-	}
+    public void setFileIdentifier(String fileIdentifier) {
+        this.fileIdentifier = fileIdentifier;
+    }
 
-	public void setSupplementalInformation(String supplementalInformation) {
-		this.supplementalInformation = supplementalInformation;
-	}
-	
-	public String getContactIndividual() {
-		return contactIndividual;
-	}
+    public void setDescriptiveKeywords(String[] descriptiveKeywords) {
+        this.descriptiveKeywords = descriptiveKeywords;
+    }
 
-	public void setContactIndividual(String contactIndividual) {
-		this.contactIndividual = contactIndividual;
-	}
+    public void setDataIdentificationAbstract(String dataIdentificationAbstract) {
+        this.dataIdentificationAbstract = dataIdentificationAbstract;
+    }
 
-	public String getContactEmail() {
-		return contactEmail;
-	}
+    public String getSupplementalInformation() {
+        return supplementalInformation;
+    }
 
-	public void setContactEmail(String contactEmail) {
-		this.contactEmail = contactEmail;
-	}
+    public void setSupplementalInformation(String supplementalInformation) {
+        this.supplementalInformation = supplementalInformation;
+    }
 
-	public CSWOnlineResource getContactResource() {
-		return contactResource;
-	}
+    public String getContactIndividual() {
+        return contactIndividual;
+    }
 
-	public void setContactResource(CSWOnlineResource contactResource) {
-		this.contactResource = contactResource;
-	}
+    public void setContactIndividual(String contactIndividual) {
+        this.contactIndividual = contactIndividual;
+    }
 
-	public String getLanguage() {
-		return language;
-	}
+    public String getContactEmail() {
+        return contactEmail;
+    }
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
 
-	@Override
-	public String toString() {
-		return "CSWRecord [contactOrganisation=" + contactOrganisation
-				+ ", resourceProvider=" + resourceProvider
-				+ ", cswGeographicElements="
-				+ Arrays.toString(cswGeographicElements)
-				+ ", dataIdentificationAbstract=" + dataIdentificationAbstract
-				+ ", fileIdentifier=" + fileIdentifier + ", onlineResources="
-				+ Arrays.toString(onlineResources) + ", recordInfoUrl="
-				+ recordInfoUrl + ", serviceName=" + serviceName + "]";
-	}
+    public CSWOnlineResource getContactResource() {
+        return contactResource;
+    }
 
-	/**
+    public void setContactResource(CSWOnlineResource contactResource) {
+        this.contactResource = contactResource;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    @Override
+    public String toString() {
+        return "CSWRecord [contactOrganisation=" + contactOrganisation
+                + ", resourceProvider=" + resourceProvider
+                + ", cswGeographicElements="
+                + Arrays.toString(cswGeographicElements)
+                + ", dataIdentificationAbstract=" + dataIdentificationAbstract
+                + ", fileIdentifier=" + fileIdentifier + ", onlineResources="
+                + Arrays.toString(onlineResources) + ", recordInfoUrl="
+                + recordInfoUrl + ", serviceName=" + serviceName
+                + ", constraints=" + Arrays.toString(constraints) + "]";
+    }
+
+    /**
      * Returns a filtered list of online resource protocols that match at least one of the specified types
      *
      * @param types The list of types you want to filter by
@@ -215,11 +226,11 @@ public class CSWRecord {
      * @return
      */
     public boolean containsAnyOnlineResource(CSWOnlineResource.OnlineResourceType... types) {
-        
+
         if (onlineResources == null) {
             return false;
         }
-        
+
         for (CSWOnlineResource r : onlineResources) {
             if (r != null) {
                 CSWOnlineResource.OnlineResourceType typeToMatch = r.getType();
