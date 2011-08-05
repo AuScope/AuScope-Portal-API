@@ -8,11 +8,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.auscope.portal.csw.CSWGetRecordResponse;
 import org.auscope.portal.csw.CSWMethodMakerGetDataRecords;
-import org.auscope.portal.csw.CSWOnlineResource;
-import org.auscope.portal.csw.CSWRecord;
 import org.auscope.portal.csw.CSWThreadExecutor;
 import org.auscope.portal.csw.ICSWMethodMaker;
-import org.auscope.portal.csw.CSWOnlineResource.OnlineResourceType;
+import org.auscope.portal.csw.record.CSWOnlineResource.OnlineResourceType;
+import org.auscope.portal.csw.record.CSWRecord;
 
 import org.auscope.portal.server.util.DOMUtil;
 
@@ -38,51 +37,51 @@ public class CSWService {
      * A utility class that groups useful information about a single cache for a single service URL
      */
     private class UrlCache implements Runnable{
-    	private CSWRecord[] cache;
-    	private long lastTimeUpdated;
-    	private CSWServiceItem serviceItem;
+        private CSWRecord[] cache;
+        private long lastTimeUpdated;
+        private CSWServiceItem serviceItem;
 
-    	//These are cached for the run method
-    	private HttpServiceCaller serviceCaller;
+        //These are cached for the run method
+        private HttpServiceCaller serviceCaller;
         private DOMUtil util;
 
         //This isn't perfect, but it does the job we need it to
         //This will stop multiple updates on different threads from running at the same time
         private volatile boolean updateInProgress;
 
-    	public UrlCache(CSWServiceItem serviceItem, HttpServiceCaller serviceCaller, DOMUtil util) {
-    		this.serviceItem = serviceItem;
-    		this.cache = new CSWRecord[0];
-    		this.serviceCaller = serviceCaller;
-    		this.util = util;
-    	}
+        public UrlCache(CSWServiceItem serviceItem, HttpServiceCaller serviceCaller, DOMUtil util) {
+            this.serviceItem = serviceItem;
+            this.cache = new CSWRecord[0];
+            this.serviceCaller = serviceCaller;
+            this.util = util;
+        }
 
-    	public synchronized void setCache(CSWRecord[] cache) {
-    		this.cache = cache;
-    		this.lastTimeUpdated = System.currentTimeMillis();
-    	}
+        public synchronized void setCache(CSWRecord[] cache) {
+            this.cache = cache;
+            this.lastTimeUpdated = System.currentTimeMillis();
+        }
 
-    	public synchronized CSWRecord[] getCache() {
-    		return this.cache;
-    	}
+        public synchronized CSWRecord[] getCache() {
+            return this.cache;
+        }
 
-    	public synchronized long getLastTimeUpdated() {
-    		return this.lastTimeUpdated;
-    	}
+        public synchronized long getLastTimeUpdated() {
+            return this.lastTimeUpdated;
+        }
 
-    	public boolean getUpdateInProgress(){
-    		return updateInProgress;
-    	}
+        public boolean getUpdateInProgress(){
+            return updateInProgress;
+        }
 
-    	public void setUpdateInProgress(boolean updateInProgress){
-    		this.updateInProgress = updateInProgress;
-    	}
+        public void setUpdateInProgress(boolean updateInProgress){
+            this.updateInProgress = updateInProgress;
+        }
 
 
-    	public void run() {
-    		try {
-            	//This section is all "thread safe" because it uses all local variables (or rather its methods do)
-        		//It might be useful to mark this behaviour in the definition of the objects
+        public void run() {
+            try {
+                //This section is all "thread safe" because it uses all local variables (or rather its methods do)
+                //It might be useful to mark this behaviour in the definition of the objects
                 ICSWMethodMaker getRecordsMethod = new CSWMethodMakerGetDataRecords(this.serviceItem.getServiceUrl());
                 HttpClient newClient = serviceCaller.getHttpClient();
                 String methodResponse =  serviceCaller.getMethodResponseAsString(getRecordsMethod.makeMethod(), newClient);
@@ -94,7 +93,7 @@ public class CSWService {
                     for (CSWRecord record : tempRecords) {
                         if (record.getFileIdentifier() != null && record.getFileIdentifier().length() > 0) {
                             String recordInfoUrl = serviceItem.getRecordInformationUrl().replace(
-                            		serviceItem.PLACEHOLDER_RECORD_ID, record.getFileIdentifier());
+                                    serviceItem.PLACEHOLDER_RECORD_ID, record.getFileIdentifier());
                             record.setRecordInfoUrl(recordInfoUrl);
                         }
                     }
@@ -107,14 +106,14 @@ public class CSWService {
                 log.error(e);
             }
             finally {
-            	//It is possible that another thread can startup before this thread exits completely
-            	//But it won't be a problem. The main issue is to stop MULTIPLE updates firing at once
-            	//and hammering an external resource, at this point all communications with the external
-            	//source have finished.
-            	this.updateInProgress = false;
+                //It is possible that another thread can startup before this thread exits completely
+                //But it won't be a problem. The main issue is to stop MULTIPLE updates firing at once
+                //and hammering an external resource, at this point all communications with the external
+                //source have finished.
+                this.updateInProgress = false;
                 log.trace("Update completed");
             }
-    	}
+        }
     }
 
     /**
@@ -139,9 +138,9 @@ public class CSWService {
         this.util = util;
 
         this.cache = new UrlCache[cswServiceList.size()];
-    	for (int i = 0; i < cswServiceList.size(); i++) {
-    		cache[i] = new UrlCache((CSWServiceItem) cswServiceList.get(i), serviceCaller, util);
-    	}
+        for (int i = 0; i < cswServiceList.size(); i++) {
+            cache[i] = new UrlCache((CSWServiceItem) cswServiceList.get(i), serviceCaller, util);
+        }
     }
 
     /**
@@ -149,25 +148,25 @@ public class CSWService {
      * @throws Exception
      */
     public void updateRecordsInBackground() throws Exception {
-    	//Update every service URL
-    	for (int i = 0; i < cache.length; i++) {
-    		UrlCache currentCache = cache[i];
+        //Update every service URL
+        for (int i = 0; i < cache.length; i++) {
+            UrlCache currentCache = cache[i];
 
             // Update the cache if it's not already updating
-    		if (!currentCache.getUpdateInProgress()) {
-    			//First update is 60 seconds post load
-    			if ((FIRST_UPDATE_COMPLETE == false) && (System.currentTimeMillis() - currentCache.getLastTimeUpdated() > FIRST_UPDATE_INTERVAL)) {
-    				FIRST_UPDATE_COMPLETE=true;
-	            	currentCache.setUpdateInProgress(true);
-	                executor.execute(currentCache);
-    			}
-    			//Update cache each 5 mins.
-    			else if ((System.currentTimeMillis() - currentCache.getLastTimeUpdated() > UPDATE_INTERVAL)) {
-	            	currentCache.setUpdateInProgress(true);
-	                executor.execute(currentCache);
-	            }
-    		}
-    	}
+            if (!currentCache.getUpdateInProgress()) {
+                //First update is 60 seconds post load
+                if ((FIRST_UPDATE_COMPLETE == false) && (System.currentTimeMillis() - currentCache.getLastTimeUpdated() > FIRST_UPDATE_INTERVAL)) {
+                    FIRST_UPDATE_COMPLETE=true;
+                    currentCache.setUpdateInProgress(true);
+                    executor.execute(currentCache);
+                }
+                //Update cache each 5 mins.
+                else if ((System.currentTimeMillis() - currentCache.getLastTimeUpdated() > UPDATE_INTERVAL)) {
+                    currentCache.setUpdateInProgress(true);
+                    executor.execute(currentCache);
+                }
+            }
+        }
     }
 
 
@@ -178,7 +177,7 @@ public class CSWService {
      * @throws Exception
      */
     public CSWRecord[] getAllRecords() throws Exception {
-    	return getFilteredRecords(null);
+        return getFilteredRecords(null);
     }
 
     /**
@@ -216,16 +215,16 @@ public class CSWService {
      * @throws Exception
      */
     private synchronized CSWRecord[] getFilteredRecords(
-    		CSWOnlineResource.OnlineResourceType... types) throws Exception {
+            OnlineResourceType... types) throws Exception {
 
         ArrayList<CSWRecord> records = new ArrayList<CSWRecord>();
 
         //Iterate EVERY record for EVERY service URL
         for (int i = 0; i < cache.length; i++)
         {
-	    	for(CSWRecord rec : cache[i].getCache()) {
-            	if ((types == null || rec.containsAnyOnlineResource(types))) {
-            		records.add(rec);
+            for(CSWRecord rec : cache[i].getCache()) {
+                if ((types == null || rec.containsAnyOnlineResource(types))) {
+                    records.add(rec);
                 }
             }
         }

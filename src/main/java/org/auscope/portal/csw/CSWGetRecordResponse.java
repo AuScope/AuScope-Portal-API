@@ -11,6 +11,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.csw.record.CSWRecord;
 
 /**
  * User: Mathew Wyatt

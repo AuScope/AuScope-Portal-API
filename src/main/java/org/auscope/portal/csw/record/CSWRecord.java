@@ -1,25 +1,25 @@
-package org.auscope.portal.csw;
+package org.auscope.portal.csw.record;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * User: Mathew Wyatt
- * Date: 11/02/2009
- * Time: 11:58:21 AM
+ * Represents a parsed gmd:MD_Metadata element that is received as part of an OGC CSW transaction
+ *
+ * @author Mathew Wyatt
+ * @author Joshua Vote
  */
-//TODO: refactor into data and service records
 public class CSWRecord {
 
     private static final Log logger = LogFactory.getLog(CSWRecord.class);
 
     private String serviceName;
     private CSWOnlineResource[] onlineResources;
-    private String contactOrganisation;
     private String resourceProvider;
     private String fileIdentifier;
     private String recordInfoUrl;
@@ -27,17 +27,15 @@ public class CSWRecord {
     private String[] descriptiveKeywords;
     private String dataIdentificationAbstract;
     private String supplementalInformation;
-    private String contactIndividual;
-    private String contactEmail;
-    private CSWOnlineResource contactResource;
     private String language;
     private String[] constraints;
+    private CSWResponsibleParty contact;
+    private Date date;
 
-    public CSWRecord(String serviceName, String contactOrganisation,
-            String fileIdentifier, String recordInfoUrl, String dataIdentificationAbstract,
+    public CSWRecord(String serviceName, String fileIdentifier,
+            String recordInfoUrl, String dataIdentificationAbstract,
             CSWOnlineResource[] onlineResources, CSWGeographicElement[] cswGeographicsElements) {
         this.serviceName = serviceName;
-        this.contactOrganisation = contactOrganisation;
         this.fileIdentifier = fileIdentifier;
         this.recordInfoUrl = recordInfoUrl;
         this.dataIdentificationAbstract = dataIdentificationAbstract;
@@ -66,10 +64,6 @@ public class CSWRecord {
 
     public CSWOnlineResource[] getOnlineResources() {
         return onlineResources;
-    }
-
-    public String getContactOrganisation() {
-        return contactOrganisation;
     }
 
     public String getResourceProvider() {
@@ -120,10 +114,6 @@ public class CSWRecord {
         this.onlineResources = onlineResources;
     }
 
-    public void setContactOrganisation(String contactOrganisation) {
-        this.contactOrganisation = contactOrganisation;
-    }
-
     public void setResourceProvider(String resourceProvider) {
         this.resourceProvider = resourceProvider;
     }
@@ -148,30 +138,6 @@ public class CSWRecord {
         this.supplementalInformation = supplementalInformation;
     }
 
-    public String getContactIndividual() {
-        return contactIndividual;
-    }
-
-    public void setContactIndividual(String contactIndividual) {
-        this.contactIndividual = contactIndividual;
-    }
-
-    public String getContactEmail() {
-        return contactEmail;
-    }
-
-    public void setContactEmail(String contactEmail) {
-        this.contactEmail = contactEmail;
-    }
-
-    public CSWOnlineResource getContactResource() {
-        return contactResource;
-    }
-
-    public void setContactResource(CSWOnlineResource contactResource) {
-        this.contactResource = contactResource;
-    }
-
     public String getLanguage() {
         return language;
     }
@@ -180,17 +146,37 @@ public class CSWRecord {
         this.language = language;
     }
 
+    public CSWResponsibleParty getContact() {
+        return contact;
+    }
+
+    public void setContact(CSWResponsibleParty contact) {
+        this.contact = contact;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
-        return "CSWRecord [contactOrganisation=" + contactOrganisation
-                + ", resourceProvider=" + resourceProvider
+        return "CSWRecord [serviceName=" + serviceName + ", onlineResources="
+                + Arrays.toString(onlineResources) + ", resourceProvider="
+                + resourceProvider + ", fileIdentifier=" + fileIdentifier
+                + ", recordInfoUrl=" + recordInfoUrl
                 + ", cswGeographicElements="
                 + Arrays.toString(cswGeographicElements)
+                + ", descriptiveKeywords="
+                + Arrays.toString(descriptiveKeywords)
                 + ", dataIdentificationAbstract=" + dataIdentificationAbstract
-                + ", fileIdentifier=" + fileIdentifier + ", onlineResources="
-                + Arrays.toString(onlineResources) + ", recordInfoUrl="
-                + recordInfoUrl + ", serviceName=" + serviceName
-                + ", constraints=" + Arrays.toString(constraints) + "]";
+                + ", supplementalInformation=" + supplementalInformation
+                + ", language=" + language + ", constraints="
+                + Arrays.toString(constraints) + ", contact=" + contact
+                + ", date=" + date + "]";
     }
 
     /**

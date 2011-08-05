@@ -2,7 +2,9 @@ package org.auscope.portal.csw;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -14,7 +16,13 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.auscope.portal.csw.CSWOnlineResource.OnlineResourceType;
+import org.auscope.portal.csw.record.CSWContact;
+import org.auscope.portal.csw.record.CSWGeographicBoundingBox;
+import org.auscope.portal.csw.record.CSWGeographicElement;
+import org.auscope.portal.csw.record.CSWOnlineResource;
+import org.auscope.portal.csw.record.CSWRecord;
+import org.auscope.portal.csw.record.CSWOnlineResource.OnlineResourceType;
+import org.auscope.portal.csw.record.CSWResponsibleParty;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,15 +37,11 @@ public class TestCSWRecordTransformer {
     private CSWRecord[] records;
     private Document doc;
 
-    private XPathExpression exprGetAllMetadataNodes;
-    private XPathExpression exprGetFirstMetadataNode;
+    private static final XPathExpression exprGetAllMetadataNodes = CSWXPathUtil.attemptCompileXpathExpr("/csw:GetRecordsResponse/csw:SearchResults/gmd:MD_Metadata");
+    private static final XPathExpression exprGetFirstMetadataNode = CSWXPathUtil.attemptCompileXpathExpr("/csw:GetRecordsResponse/csw:SearchResults/gmd:MD_Metadata[1]");
 
     @Before
     public void setup() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-
-        exprGetAllMetadataNodes = CSWXPathUtil.attemptCompileXpathExpr("/csw:GetRecordsResponse/csw:SearchResults/gmd:MD_Metadata");
-        exprGetFirstMetadataNode = CSWXPathUtil.attemptCompileXpathExpr("/csw:GetRecordsResponse/csw:SearchResults/gmd:MD_Metadata[1]");
-
         // load CSW record response document
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -135,13 +139,30 @@ public class TestCSWRecordTransformer {
     public void testContactInfo() throws Exception {
         CSWRecord rec = this.records[0];
 
-        Assert.assertEquals("Michael Stegherr", rec.getContactIndividual());
-        Assert.assertEquals("CSIRO Exploration & Mining", rec.getContactOrganisation());
-        Assert.assertEquals("Michael.Stegherr@csiro.au", rec.getContactEmail());
+        CSWResponsibleParty respParty = rec.getContact();
+        Assert.assertNotNull(respParty);
 
-        Assert.assertEquals("http://www.em.csiro.au/", rec.getContactResource().getLinkage().toString());
-        Assert.assertEquals("WWW:LINK-1.0-http--link", rec.getContactResource().getProtocol());
-        Assert.assertEquals("CSIRO Exploration and Mining Web Site", rec.getContactResource().getName());
+        Assert.assertEquals("Michael Stegherr", respParty.getIndividualName());
+        Assert.assertEquals("CSIRO Exploration & Mining", respParty.getOrganisationName());
+        Assert.assertEquals("Software Developer", respParty.getPositionName());
+
+        CSWContact contact = respParty.getContactInfo();
+        Assert.assertNotNull(contact);
+
+        Assert.assertEquals("Michael.Stegherr@csiro.au", contact.getAddressEmail());
+        Assert.assertEquals("+61 2 2138961", contact.getTelephone());
+        Assert.assertEquals("+61 2 314717304219", contact.getFacsimile());
+        Assert.assertEquals("GPO Box 378", contact.getAddressDeliveryPoint());
+        Assert.assertEquals("Canberra", contact.getAddressCity());
+        Assert.assertEquals("ACT", contact.getAddressAdministrativeArea());
+        Assert.assertEquals("2601", contact.getAddressPostalCode());
+
+        CSWOnlineResource contactResource = contact.getOnlineResource();
+        Assert.assertNotNull(contactResource);
+
+        Assert.assertEquals("http://www.em.csiro.au/", contactResource.getLinkage().toString());
+        Assert.assertEquals("WWW:LINK-1.0-http--link", contactResource.getProtocol());
+        Assert.assertEquals("CSIRO Exploration and Mining Web Site", contactResource.getName());
     }
 
     /**
@@ -181,6 +202,23 @@ public class TestCSWRecordTransformer {
     }
 
     /**
+     * Gets every attribute of node that IS NOT an xmlns:namespace="uri" attribute
+     * @param node
+     * @return
+     */
+    private Map<String, String> getNonNamespaceAttributes(Node node) {
+        Map<String, String> result = new HashMap<String, String>();
+        NamedNodeMap expectedAttr = node.getAttributes();
+
+        for (int i = 0; i < expectedAttr.getLength(); i++) {
+            Node attr = expectedAttr.item(i);
+            System.out.println(attr);
+        }
+
+        return result;
+    }
+
+    /**
      * Asserts that 2 nodes and child nodes are equal
      * @param expected
      * @param actual
@@ -200,11 +238,14 @@ public class TestCSWRecordTransformer {
         Assert.assertEquals(debugLocationString, expectedUri, actualUri);
         Assert.assertEquals(debugLocationString, expected.getLocalName(), actual.getLocalName());
 
+        //getNonNamespaceAttributes(expected);
+
         //Compare attributes (if any)
         NamedNodeMap expectedAttr = expected.getAttributes();
         NamedNodeMap actualAttr = actual.getAttributes();
         if (expectedAttr != null) {
             Assert.assertNotNull(debugLocationString, actualAttr);
+
             Assert.assertEquals(debugLocationString, expectedAttr.getLength(), actualAttr.getLength());
 
             for (int i = 0; i < expectedAttr.getLength(); i++) {

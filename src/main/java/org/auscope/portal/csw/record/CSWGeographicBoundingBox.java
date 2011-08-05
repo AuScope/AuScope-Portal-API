@@ -1,4 +1,4 @@
-package org.auscope.portal.csw;
+package org.auscope.portal.csw.record;
 
 import java.io.Serializable;
 
@@ -7,6 +7,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.auscope.portal.csw.CSWXPathUtil;
 import org.w3c.dom.Node;
 
 /**
@@ -20,6 +21,18 @@ public class CSWGeographicBoundingBox implements Serializable, CSWGeographicElem
     double eastBoundLongitude;
     double southBoundLatitude;
     double northBoundLatitude;
+
+    private static final XPathExpression westBoundLongitudeExpr;
+    private static final XPathExpression eastBoundLongitudeExpr;
+    private static final XPathExpression northBoundLatitudeExpr;
+    private static final XPathExpression southBoundLatitudeExpr;
+
+    static {
+        westBoundLongitudeExpr = CSWXPathUtil.attemptCompileXpathExpr("gmd:westBoundLongitude/gco:Decimal");
+        eastBoundLongitudeExpr = CSWXPathUtil.attemptCompileXpathExpr("gmd:eastBoundLongitude/gco:Decimal");
+        northBoundLatitudeExpr = CSWXPathUtil.attemptCompileXpathExpr("gmd:northBoundLatitude/gco:Decimal");
+        southBoundLatitudeExpr = CSWXPathUtil.attemptCompileXpathExpr("gmd:southBoundLatitude/gco:Decimal");
+    }
 
     public CSWGeographicBoundingBox() {
     }
@@ -64,12 +77,6 @@ public class CSWGeographicBoundingBox implements Serializable, CSWGeographicElem
      * @return
      */
     public static CSWGeographicBoundingBox fromGeographicBoundingBoxNode(Node node) throws Exception {
-        //These XPath expressions are NOT threadsafe so we can't share them
-        XPathExpression westBoundLongitudeExpr = CSWXPathUtil.attemptCompileXpathExpr("gmd:westBoundLongitude/gco:Decimal");
-        XPathExpression eastBoundLongitudeExpr = CSWXPathUtil.attemptCompileXpathExpr("gmd:eastBoundLongitude/gco:Decimal");
-        XPathExpression northBoundLatitudeExpr = CSWXPathUtil.attemptCompileXpathExpr("gmd:northBoundLatitude/gco:Decimal");
-        XPathExpression southBoundLatitudeExpr = CSWXPathUtil.attemptCompileXpathExpr("gmd:southBoundLatitude/gco:Decimal");
-
 
         CSWGeographicBoundingBox bbox = new CSWGeographicBoundingBox();
 

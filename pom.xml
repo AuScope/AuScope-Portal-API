@@ -396,6 +396,17 @@
                     <artifactId>jmxri</artifactId>
                 </exclusion>
             </exclusions>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.jsunit</groupId>
+            <artifactId>jsunit</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>net.jsunit</groupId>
+            <artifactId>jsunit-testRunner</artifactId>
+            <version>2.1.4</version>
         </dependency>
         <dependency>
             <groupId>org.jmock</groupId>
