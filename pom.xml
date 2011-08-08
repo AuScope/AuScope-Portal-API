@@ -15,8 +15,8 @@
 
     <!-- Build Configuration -->
     <organization>
-    	<name>AuScope</name>
-    	<url>http://www.auscope.org</url>
+        <name>AuScope</name>
+        <url>http://www.auscope.org</url>
     </organization>
     <build>
         <finalName>VEGL-Portal</finalName>
@@ -101,31 +101,31 @@
                     <webApp>${project.build.directory}/${project.build.finalName}</webApp>
                     <scanIntervalSeconds>9999</scanIntervalSeconds>
                     <contextPath>/</contextPath>
-				</configuration>
+                </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.8</version>
-				<configuration>
-					<classpathContainers>
-						<classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER</classpathContainer>
-					</classpathContainers>
-					<wtpversion>2.0</wtpversion>
-				</configuration>
-			</plugin>
-    	  	<plugin>
-        		<groupId>net.alchim31.maven</groupId>
-		        <artifactId>yuicompressor-maven-plugin</artifactId>
-        		<configuration>
-					<excludes>
-				    	<!-- Exclude Ext JS -->
-				    	<exclude>js/external/**</exclude>
-					</excludes>
-                	<nosuffix>true</nosuffix>
-        		</configuration>
-        		<version>1.2</version>
-	      	</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <classpathContainers>
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER</classpathContainer>
+                    </classpathContainers>
+                    <wtpversion>2.0</wtpversion>
+                </configuration>
+            </plugin>
+              <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>yuicompressor-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- Exclude Ext JS -->
+                        <exclude>js/external/**</exclude>
+                    </excludes>
+                    <nosuffix>true</nosuffix>
+                </configuration>
+                <version>1.2</version>
+              </plugin>
         </plugins>
     </build>
 
@@ -138,38 +138,38 @@
     </properties>
 
     <repositories>
-		<repository>
-		  	<id>maven 2 central repository</id>
-		  	<name>maven 2 central repository</name>
-		  	<url>http://repo1.maven.org/maven2</url>
-		</repository>
-		<repository>
+        <repository>
+              <id>maven 2 central repository</id>
+              <name>maven 2 central repository</name>
+              <url>http://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
             <url>http://download.osgeo.org/webdav/geotools</url>
         </repository>
-		<repository>
-        	<id>geotoolkit</id>
-        	<name>Geo Toolkit Repository</name>
-        	<url>http://maven.geotoolkit.org/</url>
+        <repository>
+            <id>geotoolkit</id>
+            <name>Geo Toolkit Repository</name>
+            <url>http://maven.geotoolkit.org/</url>
         </repository>
-		<repository>
-	      	<name>jets3t</name>
-	      	<id>jets3t</id>
-	      	<url>http://jets3t.s3.amazonaws.com/maven2</url>
-	    </repository>
-	    <repository>
-			<id>mygrid-repository</id>
-			<name>myGrid repository</name>
-			<url>http://www.mygrid.org.uk/maven/repository</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-		<!-- The new home of RESTPROXY - its world readable -->
+        <repository>
+              <name>jets3t</name>
+              <id>jets3t</id>
+              <url>http://jets3t.s3.amazonaws.com/maven2</url>
+        </repository>
+        <repository>
+            <id>mygrid-repository</id>
+            <name>myGrid repository</name>
+            <url>http://www.mygrid.org.uk/maven/repository</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <!-- The new home of RESTPROXY - its world readable -->
         <repository>
             <id>cgsrv8.arrc.csiro.au</id>
             <name>cgsrv8.arrc.csiro.au-releases</name>
@@ -295,23 +295,23 @@
             <version>${spring.version}</version>
         </dependency>
 
-		<dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
             <scope>compile</scope>
         </dependency>
 
-		<dependency>
+        <dependency>
            <groupId>org.springframework</groupId>
            <artifactId>spring-orm</artifactId>
            <version>${spring.version}</version>
         </dependency>
-	    <dependency>
-		    <groupId>org.springframework.security</groupId>
-		    <artifactId>spring-security-openid</artifactId>
-		    <version>${spring.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-openid</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-mock</artifactId>
@@ -332,10 +332,10 @@
             <classifier>jdk15</classifier>
         </dependency>
         <dependency>
-			<groupId>net.sf.json-lib</groupId>
-			<artifactId>json-lib-ext-spring</artifactId>
-			<version>1.0.2</version>
-		</dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib-ext-spring</artifactId>
+            <version>1.0.2</version>
+        </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-wfs</artifactId>
@@ -352,16 +352,16 @@
             <version>8.7</version>
         </dependency>
         <dependency>
-        	<groupId>net.sf.saxon</groupId>
-        	<artifactId>saxon-xpath</artifactId>
-        	<version>8.7</version>
-        	<optional>false</optional>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon-xpath</artifactId>
+            <version>8.7</version>
+            <optional>false</optional>
         </dependency>
         <dependency>
-        	<groupId>net.sf.saxon</groupId>
-        	<artifactId>saxon-dom</artifactId>
-        	<version>8.7</version>
-        	<optional>false</optional>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon-dom</artifactId>
+            <version>8.7</version>
+            <optional>false</optional>
         </dependency>
         <dependency>
             <groupId>RestProxy</groupId>
@@ -398,7 +398,7 @@
             </exclusions>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>net.jsunit</groupId>
             <artifactId>jsunit</artifactId>
             <version>2.1.4</version>
@@ -407,7 +407,7 @@
             <groupId>net.jsunit</groupId>
             <artifactId>jsunit-testRunner</artifactId>
             <version>2.1.4</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.jmock</groupId>
             <artifactId>jmock-junit4</artifactId>
@@ -455,110 +455,115 @@
             <version>1.2.5</version>
         </dependency>
         <!-- Added for Job Submission -->
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate</artifactId>
-    		<version>3.2.7.ga</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2.1</version>
-		</dependency>
         <dependency>
-        	<groupId>org.slf4j</groupId>
-        	<artifactId>slf4j-log4j12</artifactId>
-        	<version>1.5.6</version>
-        	<optional>false</optional>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
         </dependency>
         <dependency>
-        	<groupId>edu.ucar</groupId>
-        	<artifactId>netcdf</artifactId>
-        	<version>4.1</version>
-        	<optional>false</optional>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>3.2.7.ga</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.6</version>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>edu.ucar</groupId>
+            <artifactId>netcdf</artifactId>
+            <version>4.1</version>
+            <optional>false</optional>
         </dependency>
         <!-- Added for Amazon cloud -->
-		<dependency>
-		    <groupId>com.amazonaws</groupId>
-		    <artifactId>aws-java-sdk</artifactId>
-		    <version>1.2.2</version>
-		</dependency>
-		<dependency>
-		    <groupId>commons-codec</groupId>
-		    <artifactId>commons-codec</artifactId>
-		    <version>1.3</version>
-		</dependency>
-		<dependency>
-		    <groupId>commons-logging</groupId>
-		    <artifactId>commons-logging</artifactId>
-		    <version>1.1.1</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-core-asl</artifactId>
-		    <version>1.4.3</version>
-		</dependency>
-		<dependency>
-		    <groupId>stax</groupId>
-		    <artifactId>stax</artifactId>
-		    <version>1.2.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>stax</groupId>
-		    <artifactId>stax-api</artifactId>
-		    <version>1.0.1</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.axis2</groupId>
-		    <artifactId>axis2-jaxws</artifactId>
-		    <version>1.4.1</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.axis2</groupId>
-		    <artifactId>axis2-adb</artifactId>
-		    <version>1.5.3</version>
-		</dependency>
-		<dependency>
-	      	<groupId>net.java.dev.jets3t</groupId>
-	      	<artifactId>jets3t</artifactId>
-	      	<version>0.8.0</version>
-	    </dependency>
-	    <!-- Added for Openid -->
-	    <dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.4.3</version>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-jaxws</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-adb</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+        <dependency>
+              <groupId>net.java.dev.jets3t</groupId>
+              <artifactId>jets3t</artifactId>
+              <version>0.8.0</version>
+        </dependency>
+        <!-- Added for Openid -->
+        <dependency>
             <groupId>org.openid4java</groupId>
-            <!--artifactId>openid4java-consumer</artifactId-->
             <!--artifactId>openid4java-server</artifactId-->
             <!--artifactId>openid4java-infocard</artifactId-->
             <!--artifactId>openid4java-xri</artifactId-->
-            <artifactId>openid4java</artifactId>
-            <version>0.9.5</version>
+            <artifactId>openid4java-consumer</artifactId>
+            <version>0.9.6</version>
+            <type>pom</type> 
         </dependency>
 
-		<!-- mapping projection -->
-		<dependency>
-		  <groupId>com.jhlabs</groupId>
-		  <artifactId>javaproj</artifactId>
-		  <version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>uk.org.mygrid.resources.jcoord</groupId>
-			<artifactId>jcoord</artifactId>
-			<version>1.0</version>
-		</dependency>
+        <!-- mapping projection -->
+        <dependency>
+          <groupId>com.jhlabs</groupId>
+          <artifactId>javaproj</artifactId>
+          <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.mygrid.resources.jcoord</groupId>
+            <artifactId>jcoord</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+          <version>2.9.1</version>
+        </dependency>
     </dependencies>
 </project>
