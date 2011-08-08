@@ -64,9 +64,21 @@ public class TestGeonetworkController {
 
         context.checking(new Expectations() {{
             //Our mock job configuration
+            allowing(mockJob).getSelectionMaxEasting();will(returnValue(1.0));
+            allowing(mockJob).getSelectionMinEasting();will(returnValue(2.0));
+            allowing(mockJob).getSelectionMaxNorthing();will(returnValue(3.0));
+            allowing(mockJob).getSelectionMinNorthing();will(returnValue(4.0));
+            allowing(mockJob).getDescription();will(returnValue("description"));
+            allowing(mockJob).getSubmitDate();will(returnValue("20110713_105730"));
+            allowing(mockJob).getName();will(returnValue("name"));
+            allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getS3OutputBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
+
+            //Our series configuration
+            allowing(mockSeries).getName();will(returnValue("seriesName"));
+            allowing(mockSeries).getDescription();will(returnValue("seriesDescription"));
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
@@ -178,9 +190,21 @@ public class TestGeonetworkController {
 
         context.checking(new Expectations() {{
             //Our mock job configuration
+            allowing(mockJob).getSelectionMaxEasting();will(returnValue(1.0));
+            allowing(mockJob).getSelectionMinEasting();will(returnValue(2.0));
+            allowing(mockJob).getSelectionMaxNorthing();will(returnValue(3.0));
+            allowing(mockJob).getSelectionMinNorthing();will(returnValue(4.0));
+            allowing(mockJob).getDescription();will(returnValue("description"));
+            allowing(mockJob).getSubmitDate();will(returnValue("20110713_105730"));
+            allowing(mockJob).getName();will(returnValue("name"));
+            allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getS3OutputBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
+
+            //Our series configuration
+            allowing(mockSeries).getName();will(returnValue("seriesName"));
+            allowing(mockSeries).getDescription();will(returnValue("seriesDescription"));
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));

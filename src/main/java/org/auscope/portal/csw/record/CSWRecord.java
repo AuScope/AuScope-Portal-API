@@ -32,6 +32,10 @@ public class CSWRecord {
     private CSWResponsibleParty contact;
     private Date date;
 
+    public CSWRecord() {
+        this("", "", "", "", new CSWOnlineResource[0], new CSWGeographicElement[0]);
+    }
+
     public CSWRecord(String serviceName, String fileIdentifier,
             String recordInfoUrl, String dataIdentificationAbstract,
             CSWOnlineResource[] onlineResources, CSWGeographicElement[] cswGeographicsElements) {

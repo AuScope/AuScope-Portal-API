@@ -2,16 +2,20 @@ package org.auscope.portal.server.web.controllers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.csw.record.CSWContact;
 import org.auscope.portal.csw.record.CSWGeographicBoundingBox;
 import org.auscope.portal.csw.record.CSWGeographicElement;
 import org.auscope.portal.csw.record.CSWOnlineResource;
 import org.auscope.portal.csw.record.CSWOnlineResourceImpl;
 import org.auscope.portal.csw.record.CSWRecord;
+import org.auscope.portal.csw.record.CSWResponsibleParty;
 import org.auscope.portal.server.cloud.S3FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -49,7 +53,9 @@ public class GeonetworkController extends BaseVEGLController {
 
 
     /**
-     * Converts a job into a CSWRecord that can be stored in a registry
+     * Converts a job into a CSWRecord that can be stored in a registry.
+     *
+     * The record is mostly prefilled with Geoscience Australia contact information
      * @param job
      * @return
      * @throws MalformedURLException
@@ -65,9 +71,49 @@ public class GeonetworkController extends BaseVEGLController {
             }
         }
 
-        CSWGeographicElement[] geoEls = new CSWGeographicElement[] {new CSWGeographicBoundingBox(-30, 60, -30, 60)};
+        //Generate our contact details
+        CSWContact contact = new CSWContact();
+        contact.setAddressAdministrativeArea("ACT");
+        contact.setAddressCity("Canberra");
+        contact.setAddressDeliveryPoint("GPO Box 378");
+        contact.setAddressPostalCode("2601");
+        contact.setAddressCountry("Australia");
+        contact.setTelephone("+61 2 62499111");
+        contact.setFacsimile("+61 2 62499999");
+        contact.setOnlineResource(new CSWOnlineResourceImpl(new URL("http://www.ga.gov.au/"), "WWW:LINK-1.0-http--link", "Geoscience Australia", "Geoscience Australia Homepage"));
 
-        CSWRecord rec = new CSWRecord("VEGL Workflow Portal", "", "", "TODO:", onlineResources.toArray(new CSWOnlineResource[onlineResources.size()]), geoEls);
+        CSWResponsibleParty rp = new CSWResponsibleParty();
+        rp.setContactInfo(contact);
+        rp.setIndividualName("Web Operations Manager");
+        rp.setOrganisationName("Geoscience Australia");
+        rp.setPositionName("Web Operations Manager");
+
+        //Build our bounding box
+        CSWGeographicElement[] geoEls = new CSWGeographicElement[] {new CSWGeographicBoundingBox(job.getSelectionMinEasting(), job.getSelectionMaxEasting(), job.getSelectionMinNorthing(), job.getSelectionMaxNorthing())};
+
+        //Build our CSW Record
+        CSWRecord rec = new CSWRecord();
+        rec.setContact(rp);
+        rec.setCSWGeographicElements(geoEls);
+        rec.setConstraints(new String[] {
+                "Copyright Commonwealth of Australia. This work is copyright. Unless otherwise specified on this website, you may display, print and reproduce this material in unaltered form only (retaining this notice) for your personal, non-commercial use, use within your organisation or, if you are an educational institution, use for educational purposes. Apart from any use as permitted under the Copyright Act 1968 or as otherwise specified on this website, all other rights are reserved. Requests and enquiries concerning copyright in the work should be addressed to the Information Services Branch, Geoscience Australia, GPO Box 378, CANBERRA, ACT, 2601 or email: copyright@ga.gov.au. See also http://www.ga.gov.au/about/copyright.jsp, and http://www.osdm.gov.au/OSDM/Policies+and+Guidelines/Spatial+Data+Access+and+Pricing/OSDM+Licence+Internet+-+no+registration/default.aspx"
+        });
+        rec.setDataIdentificationAbstract(job.getDescription());
+        SimpleDateFormat sdf = new SimpleDateFormat(GridSubmitController.SUBMIT_DATE_FORMAT_STRING);
+        try {
+            rec.setDate(sdf.parse(job.getSubmitDate()));
+        } catch (ParseException e) {
+            logger.debug("Unable to parse date", e);
+        }
+        rec.setDescriptiveKeywords(new String[] {
+           "VEGL",
+           "GA",
+           "NCI"
+        });
+        rec.setOnlineResources(onlineResources.toArray(new CSWOnlineResource[onlineResources.size()]));
+        rec.setResourceProvider("Geoscience Australia");
+        rec.setServiceName(job.getName());
+        rec.setSupplementalInformation(String.format("User: %1$s\nSeries: %2$s\nDescription: %3$s",job.getUser(), series.getName(), series.getDescription()));
 
         return rec;
     }
