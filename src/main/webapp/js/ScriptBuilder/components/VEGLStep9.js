@@ -53,7 +53,9 @@ VEGLStep9Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
     text += this._tab + "# Upload our logging outs" + this._newLine;
     text += this._tab + "awsUpload(sns_out, " + this.values.paramsInstance + ".getS3OutputBucket(), " + this.values.paramsInstance + ".getS3OutputBaseKey() + '/' + sns_out)" + this._newLine;
     text += this._tab + "awsUpload(inv_out, " + this.values.paramsInstance + ".getS3OutputBucket(), " + this.values.paramsInstance + ".getS3OutputBaseKey() + '/' + inv_out)" + this._newLine;
+    text += this._tab + "# Upload the mesh file" + this._newLine;
     text += this._tab + "awsUpload(mesh, " + this.values.paramsInstance + ".getS3OutputBucket(), " + this.values.paramsInstance + ".getS3OutputBaseKey() + '/' + mesh)" + this._newLine;
+    text += this._tab + "# Upload gravity or magnetic data file" + this._newLine;
     text += this._tab + "awsUpload('" + filename + "', " + this.values.paramsInstance + ".getS3OutputBucket(), " + this.values.paramsInstance + ".getS3OutputBaseKey() + '/' + '" + filename + "')" + this._newLine;
     text += this._newLine;
     return text;
