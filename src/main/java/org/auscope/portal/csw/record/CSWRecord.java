@@ -31,6 +31,7 @@ public class CSWRecord {
     private String[] constraints;
     private CSWResponsibleParty contact;
     private Date date;
+    private String dataQualityStatement;
 
     public CSWRecord() {
         this("", "", "", "", new CSWOnlineResource[0], new CSWGeographicElement[0]);
@@ -164,6 +165,14 @@ public class CSWRecord {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getDataQualityStatement() {
+        return dataQualityStatement;
+    }
+
+    public void setDataQualityStatement(String dataQualityStatement) {
+        this.dataQualityStatement = dataQualityStatement;
     }
 
     @Override
