@@ -1,11 +1,18 @@
 package org.auscope.portal.server.web.controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,7 +68,7 @@ public class GeonetworkController extends BaseVEGLController {
      * @throws MalformedURLException
      * @throws S3ServiceException
      */
-    private CSWRecord jobToCSWRecord(VEGLJob job, VEGLSeries series) throws MalformedURLException, S3ServiceException {
+    private CSWRecord jobToCSWRecord(HttpServletRequest request, VEGLJob job, VEGLSeries series) throws MalformedURLException, S3ServiceException {
         S3FileInformation[] outputFiles = jobStorageService.getOutputFileDetails(job);
         List<CSWOnlineResource> onlineResources = new ArrayList<CSWOnlineResource>();
 
@@ -115,6 +122,22 @@ public class GeonetworkController extends BaseVEGLController {
         rec.setServiceName(job.getName());
         rec.setSupplementalInformation(String.format("User: %1$s\nSeries: %2$s\nDescription: %3$s",job.getUser(), series.getName(), series.getDescription()));
 
+        String appServerHome = request.getSession().getServletContext().getRealPath("/");
+        File manifestFile = new File(appServerHome,"META-INF/MANIFEST.MF");
+        Manifest mf = new Manifest();
+        try {
+            mf.read(new FileInputStream(manifestFile));
+            Attributes atts = mf.getMainAttributes();
+            rec.setDataQualityStatement(String.format(
+                    "Workflow by %1$s Version %2$s.%3$s. \nProcessed by GRAV3D MPI - Version 4.0 20100108.",
+                    atts.getValue("Specification-Title"),
+                    atts.getValue("Implementation-Version"),
+                    atts.getValue("Implementation-Build")));
+        } catch (IOException e) {
+            logger.error("Error reading manifest file.", e);
+        }
+
+
         return rec;
     }
 
@@ -126,7 +149,7 @@ public class GeonetworkController extends BaseVEGLController {
      * @throws Exception
      */
     @RequestMapping("/insertRecord.do")
-    public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId) throws Exception {
+    public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request) throws Exception {
 
         //Lookup our appropriate job
         VEGLJob job = jobManager.getJobById(jobId);
@@ -142,7 +165,7 @@ public class GeonetworkController extends BaseVEGLController {
 
         try {
             //Create an instance of our CSWRecord and transform it to a <gmd:MD_Metadata> record
-            CSWRecord record = jobToCSWRecord(job, jobSeries);
+            CSWRecord record = jobToCSWRecord(request, job, jobSeries);
 
             //Lets connect to geonetwork and then send our new record
             String metadataRecordUrl = gnService.makeCSWRecordInsertion(record);

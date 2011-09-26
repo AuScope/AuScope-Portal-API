@@ -1,5 +1,9 @@
 package org.auscope.portal.server.web.controllers;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.auscope.portal.csw.record.CSWRecord;
 import org.auscope.portal.server.cloud.S3FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -15,6 +19,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -53,6 +58,9 @@ public class TestGeonetworkController {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
         final String registeredUrl  = "http://example.csw.url/";
+        final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
+        final HttpSession mockSession = context.mock(HttpSession.class);
+        final ServletContext mockContext = context.mock(ServletContext.class);
         final S3FileInformation[] outputFileInfo = new S3FileInformation[] {
                 new S3FileInformation("my/key1", 100L, "http://public.url1"),
                 new S3FileInformation("my/key2", 200L, "http://public.url2"),
@@ -93,9 +101,13 @@ public class TestGeonetworkController {
             //This must occur in sequence (set our value before saving it)
             oneOf(mockJob).setRegisteredUrl(registeredUrl);inSequence(jobSavingSequence);
             oneOf(mockJobManager).saveJob(mockJob);inSequence(jobSavingSequence);
+
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getServletContext();will(returnValue(mockContext));
+            allowing(mockContext).getRealPath("/");will(returnValue("src/main/webapp"));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertEquals(registeredUrl, mav.getModel().get("data"));
@@ -108,6 +120,7 @@ public class TestGeonetworkController {
     @Test
     public void testInsertRecordJobDNE() throws Exception {
         final Integer jobId = 1235;
+        final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 
         context.checking(new Expectations() {{
 
@@ -115,7 +128,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -128,6 +141,7 @@ public class TestGeonetworkController {
     public void testInsertRecordSeriesDNE() throws Exception {
         final Integer jobId = 1235;
         final Integer seriesId = 5432;
+        final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
@@ -139,7 +153,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -154,6 +168,7 @@ public class TestGeonetworkController {
         final Integer seriesId = 5432;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
+        final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 
         context.checking(new Expectations() {{
             //Our mock job configuration
@@ -167,7 +182,7 @@ public class TestGeonetworkController {
             oneOf(mockJobStorageService).getOutputFileDetails(mockJob);will(throwException(new S3ServiceException()));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -182,6 +197,9 @@ public class TestGeonetworkController {
         final Integer seriesId = 5432;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
+        final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
+        final HttpSession mockSession = context.mock(HttpSession.class);
+        final ServletContext mockContext = context.mock(ServletContext.class);
         final S3FileInformation[] outputFileInfo = new S3FileInformation[] {
                 new S3FileInformation("my/key1", 100L, "http://public.url1"),
                 new S3FileInformation("my/key2", 200L, "http://public.url2"),
@@ -215,9 +233,13 @@ public class TestGeonetworkController {
 
             //Only 1 call to save our newly created record
             oneOf(mockGNService).makeCSWRecordInsertion(with(any(CSWRecord.class)));will(throwException(new Exception()));
+
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getServletContext();will(returnValue(mockContext));
+            allowing(mockContext).getRealPath("/");will(returnValue("src/main/webapp"));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
