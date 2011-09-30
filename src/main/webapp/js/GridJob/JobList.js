@@ -77,7 +77,7 @@ JobList.onRegisterResponse = function(response, request) {
     if (!resp.success) {
         JobList.showError(resp.msg);
     } else {
-    	JobList.refreshAll();
+        JobList.refreshAll();
         Ext.Msg.alert("Success", "The job is registered.");
 
     }
@@ -131,8 +131,8 @@ JobList.updateJobDetails = function() {
         var jobData = jobGrid.getSelectionModel().getSelected().data;
         JobList.jobFileStore.baseParams.jobId = jobData.id;
         if(jobData.status == 'Done' || jobData.status == 'Failed'){
-    		JobList.jobFileStore.baseParams.dirName = null;
-    		JobList.jobFileStore.baseParams.dirPath = null;
+            JobList.jobFileStore.baseParams.dirName = null;
+            JobList.jobFileStore.baseParams.dirPath = null;
             JobList.jobFileStore.reload();
         }else{
             JobList.jobFileStore.removeAll(true);
@@ -159,12 +159,12 @@ JobList.updateJobDetails = function() {
 //retrieves dirList of selected job and updates the Details panel
 JobList.retrieveDirList = function(jobId, fileData) {
 
-	if(fileData.directoryFlag == true){
-		JobList.jobFileStore.baseParams.jobId = jobId;
-		JobList.jobFileStore.baseParams.dirName = fileData.name;
-		JobList.jobFileStore.baseParams.dirPath = fileData.parentPath;
-		JobList.jobFileStore.reload();
-	}
+    if(fileData.directoryFlag == true){
+        JobList.jobFileStore.baseParams.jobId = jobId;
+        JobList.jobFileStore.baseParams.dirName = fileData.name;
+        JobList.jobFileStore.baseParams.dirPath = fileData.parentPath;
+        JobList.jobFileStore.reload();
+    }
 };
 
 
@@ -236,7 +236,7 @@ JobList.querySeries = function(user, name, desc) {
 };
 
 JobList.register = function() {
-	var jobId = Ext.getCmp('job-grid').getSelectionModel().getSelected().data.id;
+    var jobId = Ext.getCmp('job-grid').getSelectionModel().getSelected().data.id;
     Ext.Ajax.request({
         url: 'insertRecord.do',
         success: JobList.onRegisterResponse,
@@ -283,7 +283,7 @@ JobList.deleteJob = function(jobId) {
                     success: JobList.onDeleteJobResponse,
                     failure: JobList.onRequestFailure,
                     params: {
-                	          'jobId': jobId }
+                              'jobId': jobId }
                 });
             }
         }
@@ -305,7 +305,7 @@ JobList.killSeriesJobs = function(seriesId) {
                     success: JobList.onKillJobResponse,
                     failure: JobList.onRequestFailure,
                     params: {
-                	          'seriesId': seriesId }
+                              'seriesId': seriesId }
                 });
             }
         }
@@ -328,7 +328,7 @@ JobList.deleteSeriesJobs = function(seriesId) {
                     success: JobList.onDeleteSeriesResponse,
                     failure: JobList.onRequestFailure,
                     params: {
-                	          'seriesId': seriesId }
+                              'seriesId': seriesId }
                 });
             }
         }
@@ -342,9 +342,9 @@ JobList.downloadFile = function(job, file, key) {
 
 // downloads a ZIP file containing given files of given job
 JobList.downloadAsZip = function(job, files) {
-    var fparam = files[0].data.s3Key;
+    var fparam = files[0].data.cloudKey;
     for (var i=1; i<files.length; i++) {
-        fparam += ','+files[i].data.s3Key;
+        fparam += ','+files[i].data.cloudKey;
     }
     window.location = "downloadAsZip.do?jobId="+job+"&files="+fparam;
 };
@@ -434,10 +434,10 @@ JobList.initialize = function() {
             { name: 'ec2AMI', type: 'string' },
             { name: 'ec2InstanceId', type: 'string' },
             { name: 'ec2Endpoint', type: 'string' },
-            { name: 's3OutputAccessKey', type: 'string' },
-            { name: 's3OutputSecretKey', type: 'string' },
-            { name: 's3OutputBucket', type: 'string' },
-            { name: 's3OutputBaseKey', type: 'string' },
+            { name: 'cloudOutputAccessKey', type: 'string' },
+            { name: 'cloudOutputSecretKey', type: 'string' },
+            { name: 'cloudOutputBucket', type: 'string' },
+            { name: 'cloudOutputBaseKey', type: 'string' },
             { name: 'registeredUrl', type: 'string' },
             { name: 'seriesId', type: 'int' }
         ],
@@ -455,7 +455,7 @@ JobList.initialize = function() {
         fields: [
             { name: 'name', type: 'string' },
             { name: 'size', type: 'long' },
-            { name: 's3Key', type: 'string' }/*,
+            { name: 'cloudKey', type: 'string' }/*,
             { name: 'parentPath', type: 'string' },
             { name: 'directoryFlag', type: 'bool' }*/
         ],
@@ -609,7 +609,7 @@ JobList.initialize = function() {
         var fileData = jobGrid.getSelectionModel().getSelected().data;
 
         if(record.data.directoryFlag){
-        	return '<span style="color:blue;">' + value + '</span>';
+            return '<span style="color:blue;">' + value + '</span>';
         }
         return value;
     }
@@ -621,7 +621,7 @@ JobList.initialize = function() {
         handler: function() {
             var jobData = jobGrid.getSelectionModel().getSelected().data;
             var fileName = fileGrid.getSelectionModel().getSelected().data.name;
-            var key = fileGrid.getSelectionModel().getSelected().data.s3Key;
+            var key = fileGrid.getSelectionModel().getSelected().data.cloudKey;
             JobList.downloadFile(jobData.id, fileName, key);
         }
     });
@@ -743,7 +743,7 @@ JobList.initialize = function() {
                 text: 'My Jobs',
                 tooltip: 'Retrieves the list of your series and jobs',
                 handler: JobList.querySeries,
-				disabled: true
+                disabled: true
             }, {
                 text: 'Query...',
                 tooltip: 'Displays the query dialog to search for jobs',

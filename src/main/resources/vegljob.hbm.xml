@@ -12,10 +12,10 @@
         <property name="ec2AMI"/>
         <property name="ec2InstanceId"/>
         <property name="ec2Endpoint"/>
-        <property name="s3OutputAccessKey"/>
-        <property name="s3OutputSecretKey"/>
-        <property name="s3OutputBucket"/>
-        <property name="s3OutputBaseKey"/>
+        <property name="cloudOutputAccessKey"/>
+        <property name="cloudOutputSecretKey"/>
+        <property name="cloudOutputBucket"/>
+        <property name="cloudOutputBaseKey"/>
         <property name="registeredUrl"/>
         <property name="emailAddress"/>
         <property name="status"/>
@@ -36,7 +36,7 @@
         <property name="cellZ"/>
         <property name="inversionDepth"/>
         <property name="vmSubsetFilePath"/>
-        
+
     </class>
 </hibernate-mapping>
 

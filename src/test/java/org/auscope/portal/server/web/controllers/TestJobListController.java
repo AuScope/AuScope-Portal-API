@@ -13,10 +13,11 @@ import javax.servlet.http.HttpSession;
 
 import org.auscope.portal.jmock.ReadableServletOutputStream;
 import org.auscope.portal.jmock.VEGLSeriesMatcher;
-import org.auscope.portal.server.cloud.S3FileInformation;
+import org.auscope.portal.server.cloud.CloudFileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.web.service.CloudStorageException;
 import org.auscope.portal.server.web.service.JobExecutionService;
 import org.auscope.portal.server.web.service.JobFileService;
 import org.auscope.portal.server.web.service.JobStorageService;
@@ -416,10 +417,10 @@ public class TestJobListController {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final S3FileInformation[] fileDetails = new S3FileInformation[] {
-                context.mock(S3FileInformation.class, "fileInfo1"),
-                context.mock(S3FileInformation.class, "fileInfo2"),
-                context.mock(S3FileInformation.class, "fileInfo3")
+        final CloudFileInformation[] fileDetails = new CloudFileInformation[] {
+                context.mock(CloudFileInformation.class, "fileInfo1"),
+                context.mock(CloudFileInformation.class, "fileInfo2"),
+                context.mock(CloudFileInformation.class, "fileInfo3")
         };
         
         context.checking(new Expectations() {{
@@ -497,7 +498,7 @@ public class TestJobListController {
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             
-            oneOf(mockJobStorageService).getOutputFileDetails(mockJob);will(throwException(new S3ServiceException()));
+            oneOf(mockJobStorageService).getOutputFileDetails(mockJob);will(throwException(new CloudStorageException()));
         }});
         
         ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId);
@@ -838,15 +839,15 @@ public class TestJobListController {
                 context.mock(VEGLJob.class, "mockJobActive"),
                 context.mock(VEGLJob.class, "mockJobUnsubmitted"),
                 context.mock(VEGLJob.class, "mockJobDone"));
-        final S3FileInformation[] jobActiveFiles = new S3FileInformation[] {
-                new S3FileInformation("key2/filename", 100L, "http://public.url2/filename"),
-                new S3FileInformation("key2/vegl.sh.log", 101L, "http://public.url2/vegl.sh.log"),
-                new S3FileInformation("key2/filename3", 102L, "http://public.url2/filename3"),
+        final CloudFileInformation[] jobActiveFiles = new CloudFileInformation[] {
+                new CloudFileInformation("key2/filename", 100L, "http://public.url2/filename"),
+                new CloudFileInformation("key2/vegl.sh.log", 101L, "http://public.url2/vegl.sh.log"),
+                new CloudFileInformation("key2/filename3", 102L, "http://public.url2/filename3"),
         };
-        final S3FileInformation[] jobDoneFiles = new S3FileInformation[] {
-                new S3FileInformation("key3/filename", 100L, "http://public.url3/filename"),
-                new S3FileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
-                new S3FileInformation("key3/filename3", 102L, "http://public.url3/filename3"),
+        final CloudFileInformation[] jobDoneFiles = new CloudFileInformation[] {
+                new CloudFileInformation("key3/filename", 100L, "http://public.url3/filename"),
+                new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
+                new CloudFileInformation("key3/filename3", 102L, "http://public.url3/filename3"),
         };
         
         context.checking(new Expectations() {{

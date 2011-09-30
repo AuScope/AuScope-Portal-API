@@ -2,9 +2,19 @@
 # chkconfig: 2345 90 10
 # description: vegl-bootstrap.sh - Shell Script for managing the download and running of the VEGL portal workflow script
 
+# we want to download our user data string
+userDataHost=`route -n | awk '$4 ~ ".*G.*" {print $2}'`
+userDataUrl="http://$userDataHost:8773/latest/user-data"
+echo "Downloading user data from ${userDataUrl}"
+userDataString=`curl -L "$userDataUrl"`
+
+#Decompose our user data string into the individual parameter strings
+veglShellScript=`echo $userDataString | jsawk 'return this.veglShellScript'`
+
+
 VEGL_BOOTSTRAP_VERSION="1"
 WORKING_DIR="/root"
-WORKFLOW_URL="http://vegl-portal.s3.amazonaws.com/vm/vegl.sh"
+WORKFLOW_URL="${veglShellScript}"
 WORKFLOW_SCRIPT="${WORKING_DIR}/vegl.sh"
 echo "------ VEGL Bootstrap Script ---------"
 echo "                                      "

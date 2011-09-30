@@ -17,36 +17,21 @@ import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONObject;
 
-import org.apache.commons.httpclient.auth.CredentialsProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
-import org.auscope.portal.server.web.service.HttpServiceCaller;
 import org.auscope.portal.server.web.service.JobExecutionService;
 import org.auscope.portal.server.web.service.JobFileService;
 import org.auscope.portal.server.web.service.JobStorageService;
-import org.jets3t.service.impl.rest.httpclient.RestS3Service;
-import org.jets3t.service.model.S3Bucket;
-import org.jets3t.service.model.S3Object;
-import org.jets3t.service.security.ProviderCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.codec.Base64;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.RunInstancesRequest;
-import com.amazonaws.services.ec2.model.RunInstancesResult;
 
 
 /**
@@ -376,10 +361,10 @@ public class GridSubmitController extends BaseVEGLController {
         if (job == null) {
             logger.error("job with id " + jobId + " DNE");
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
-        } else if (job.getS3OutputAccessKey() == null || job.getS3OutputAccessKey().isEmpty() ||
+        } else if (job.getCloudOutputAccessKey() == null || job.getCloudOutputAccessKey().isEmpty() ||
             //Check we have S3 credentials otherwise there is no point in continuing
-            job.getS3OutputSecretKey() == null || job.getS3OutputSecretKey().isEmpty() ||
-            job.getS3OutputBucket() == null || job.getS3OutputBucket().isEmpty()) {
+            job.getCloudOutputSecretKey() == null || job.getCloudOutputSecretKey().isEmpty() ||
+            job.getCloudOutputBucket() == null || job.getCloudOutputBucket().isEmpty()) {
             logger.error("No output S3 credentials found. NOT submitting job!");
 
             job.setStatus(STATUS_FAILED);
@@ -413,10 +398,12 @@ public class GridSubmitController extends BaseVEGLController {
 
         //create our input user data string
         JSONObject encodedUserData = new JSONObject();
-        encodedUserData.put("s3OutputBucket", job.getS3OutputBucket());
-        encodedUserData.put("s3OutputBaseKeyPath", job.getS3OutputBaseKey().replace("//", "/"));
-        encodedUserData.put("s3OutputAccessKey", job.getS3OutputAccessKey());
-        encodedUserData.put("s3OutputSecretKey", job.getS3OutputSecretKey());
+        encodedUserData.put("s3OutputBucket", job.getCloudOutputBucket());
+        encodedUserData.put("s3OutputBaseKeyPath", job.getCloudOutputBaseKey().replace("//", "/"));
+        encodedUserData.put("s3OutputAccessKey", job.getCloudOutputAccessKey());
+        encodedUserData.put("s3OutputSecretKey", job.getCloudOutputSecretKey());
+        encodedUserData.put("veglShellScript", hostConfigurer.resolvePlaceholder("vm.sh"));
+        encodedUserData.put("storageEndpoint", hostConfigurer.resolvePlaceholder("storage.endpoint"));
         String userDataString = encodedUserData.toString();
 
         // launch the ec2 instance
@@ -476,7 +463,7 @@ public class GridSubmitController extends BaseVEGLController {
         job.setVmSubsetFilePath(ERRDAP_SUBSET_VM_FILE_PATH);
         job.setEc2AMI(hostConfigurer.resolvePlaceholder("ami.id"));
         job.setEc2Endpoint(hostConfigurer.resolvePlaceholder("ec2.endpoint"));
-        job.setS3OutputBucket("vegl-portal");
+        job.setCloudOutputBucket("vegl-portal");
         job.setName("VEGL-Job");
         job.setDescription("");
         job.setStatus(STATUS_UNSUBMITTED);
@@ -488,7 +475,7 @@ public class GridSubmitController extends BaseVEGLController {
         fileStorageId = fileStorageId.replaceAll("[=/\\, @:]", "_"); //get rid of some obvious nasty characters
         job.setFileStorageId(fileStorageId);
 
-        job.setS3OutputBaseKey(job.getFileStorageId());
+        job.setCloudOutputBaseKey(job.getFileStorageId());
 
         return job;
     }

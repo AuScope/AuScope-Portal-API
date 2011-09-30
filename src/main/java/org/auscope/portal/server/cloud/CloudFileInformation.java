@@ -14,20 +14,20 @@ import java.io.Serializable;
  * @author Cihan Altinay
  * @author Joshua Vote
  */
-public class S3FileInformation implements Serializable {
+public class CloudFileInformation implements Serializable {
 	private static final long serialVersionUID = 6240194652206852285L;
 	/** The file size in bytes */
     private long size;
     /** AWS S3 storage key */
-    private String s3Key = "";
+    private String cloudKey = "";
     /** URL where the file can be accessed by anyone (only valid if file is publicly readable) */
     private String publicUrl = "";
 
     /**
      * Constructor with name and size
      */
-    public S3FileInformation(String s3Key, long size, String publicUrl) {
-        this.s3Key = s3Key;
+    public CloudFileInformation(String cloudKey, long size, String publicUrl) {
+        this.cloudKey = cloudKey;
         this.size = size;
         this.publicUrl = publicUrl;
     }
@@ -38,7 +38,7 @@ public class S3FileInformation implements Serializable {
      * @return The filename.
      */
     public String getName() {
-    	String [] keyParts = s3Key.split("/");
+    	String [] keyParts = cloudKey.split("/");
     	return keyParts[keyParts.length-1];
     }
 
@@ -56,16 +56,16 @@ public class S3FileInformation implements Serializable {
 	 * Gets the underlying S3 key representing this file
 	 * @return
 	 */
-	public String getS3Key() {
-		return s3Key;
+	public String getCloudKey() {
+		return cloudKey;
 	}
 
 	/**
 	 * Sets the underlying S3 key representing this file
-	 * @param s3Key
+	 * @param cloudKey
 	 */
-	public void setS3Key(String s3Key) {
-		this.s3Key = s3Key;
+	public void setCloudKey(String cloudKey) {
+		this.cloudKey = cloudKey;
 	}
 
 	/**

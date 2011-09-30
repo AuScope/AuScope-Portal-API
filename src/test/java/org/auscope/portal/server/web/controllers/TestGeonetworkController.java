@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.auscope.portal.csw.record.CSWRecord;
-import org.auscope.portal.server.cloud.S3FileInformation;
+import org.auscope.portal.server.cloud.CloudFileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
@@ -19,7 +19,6 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -61,10 +60,10 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
         final HttpSession mockSession = context.mock(HttpSession.class);
         final ServletContext mockContext = context.mock(ServletContext.class);
-        final S3FileInformation[] outputFileInfo = new S3FileInformation[] {
-                new S3FileInformation("my/key1", 100L, "http://public.url1"),
-                new S3FileInformation("my/key2", 200L, "http://public.url2"),
-                new S3FileInformation("my/key3", 300L, "http://public.url3")
+        final CloudFileInformation[] outputFileInfo = new CloudFileInformation[] {
+                new CloudFileInformation("my/key1", 100L, "http://public.url1"),
+                new CloudFileInformation("my/key2", 200L, "http://public.url2"),
+                new CloudFileInformation("my/key3", 300L, "http://public.url3")
         };
 
         //We want to ensure our job is set values BEFORE saving it
@@ -81,7 +80,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getName();will(returnValue("name"));
             allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
-            allowing(mockJob).getS3OutputBucket();will(returnValue("s3-output-bucket"));
+            allowing(mockJob).getCloudOutputBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
 
             //Our series configuration
@@ -200,10 +199,10 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
         final HttpSession mockSession = context.mock(HttpSession.class);
         final ServletContext mockContext = context.mock(ServletContext.class);
-        final S3FileInformation[] outputFileInfo = new S3FileInformation[] {
-                new S3FileInformation("my/key1", 100L, "http://public.url1"),
-                new S3FileInformation("my/key2", 200L, "http://public.url2"),
-                new S3FileInformation("my/key3", 300L, "http://public.url3")
+        final CloudFileInformation[] outputFileInfo = new CloudFileInformation[] {
+                new CloudFileInformation("my/key1", 100L, "http://public.url1"),
+                new CloudFileInformation("my/key2", 200L, "http://public.url2"),
+                new CloudFileInformation("my/key3", 300L, "http://public.url3")
         };
 
         context.checking(new Expectations() {{
@@ -217,7 +216,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getName();will(returnValue("name"));
             allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
-            allowing(mockJob).getS3OutputBucket();will(returnValue("s3-output-bucket"));
+            allowing(mockJob).getCloudOutputBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
 
             //Our series configuration

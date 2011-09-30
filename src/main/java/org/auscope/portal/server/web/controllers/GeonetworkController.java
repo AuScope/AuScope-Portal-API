@@ -23,13 +23,13 @@ import org.auscope.portal.csw.record.CSWOnlineResource;
 import org.auscope.portal.csw.record.CSWOnlineResourceImpl;
 import org.auscope.portal.csw.record.CSWRecord;
 import org.auscope.portal.csw.record.CSWResponsibleParty;
-import org.auscope.portal.server.cloud.S3FileInformation;
+import org.auscope.portal.server.cloud.CloudFileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.web.service.CloudStorageException;
 import org.auscope.portal.server.web.service.GeonetworkService;
 import org.auscope.portal.server.web.service.JobStorageService;
-import org.jets3t.service.S3ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,14 +66,14 @@ public class GeonetworkController extends BaseVEGLController {
      * @param job
      * @return
      * @throws MalformedURLException
-     * @throws S3ServiceException
+     * @throws CloudStorageException
      */
-    private CSWRecord jobToCSWRecord(HttpServletRequest request, VEGLJob job, VEGLSeries series) throws MalformedURLException, S3ServiceException {
-        S3FileInformation[] outputFiles = jobStorageService.getOutputFileDetails(job);
+    private CSWRecord jobToCSWRecord(HttpServletRequest request, VEGLJob job, VEGLSeries series) throws MalformedURLException, CloudStorageException {
+        CloudFileInformation[] outputFiles = jobStorageService.getOutputFileDetails(job);
         List<CSWOnlineResource> onlineResources = new ArrayList<CSWOnlineResource>();
 
         if (outputFiles != null) {
-            for (S3FileInformation obj : outputFiles) {
+            for (CloudFileInformation obj : outputFiles) {
                 onlineResources.add(new CSWOnlineResourceImpl(new URL(obj.getPublicUrl()), "WWW:DOWNLOAD-1.0-ftp--download", obj.getName(), obj.getName()));
             }
         }

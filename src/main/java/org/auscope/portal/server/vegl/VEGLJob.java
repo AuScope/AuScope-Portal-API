@@ -11,10 +11,10 @@ import org.auscope.portal.server.cloud.CloudJob;
  */
 public class VEGLJob extends CloudJob {
 
-	private String s3OutputAccessKey;
-    private String s3OutputSecretKey;
-    private String s3OutputBucket;    
-    private String s3OutputBaseKey;
+	private String cloudOutputAccessKey;
+    private String cloudOutputSecretKey;
+    private String cloudOutputBucket;    
+    private String cloudOutputBaseKey;
     private String registeredUrl;
     private Integer seriesId;
     private String fileStorageId;
@@ -39,10 +39,10 @@ public class VEGLJob extends CloudJob {
     public VEGLJob() {
     	super();
     	
-    	this.s3OutputAccessKey = "";
-		this.s3OutputSecretKey = "";
-		this.s3OutputBucket = "";
-		this.s3OutputBaseKey = "";
+    	this.cloudOutputAccessKey = "";
+		this.cloudOutputSecretKey = "";
+		this.cloudOutputBucket = "";
+		this.cloudOutputBaseKey = "";
 		this.registeredUrl = "";
 		this.seriesId = 0;
 		this.fileStorageId = "";
@@ -74,24 +74,24 @@ public class VEGLJob extends CloudJob {
 	 * @param ec2InstanceId The ID of the running AMI instance (not the actual AMI ID).
 	 * @param ec2Endpoint The endpoint for the elastic compute cloud
 	 * @param ec2AMI The Amazon Machine Instance ID of the VM type that will run this job
-	 * @param s3OutputAccessKey the access key used to connect to amazon S3 for storing output
-	 * @param s3OutputSecretKey the secret key used to connect to amazon S3 for storing output 
-	 * @param s3OutputBucket the S3 bucket name where output will be stored
-	 * @param s3OutputBaseKey the base key path (folder name) for all S3 output
+	 * @param cloudOutputAccessKey the access key used to connect to amazon S3 for storing output
+	 * @param cloudOutputSecretKey the secret key used to connect to amazon S3 for storing output 
+	 * @param cloudOutputBucket the S3 bucket name where output will be stored
+	 * @param cloudOutputBaseKey the base key path (folder name) for all S3 output
 	 * @param registeredUrl Where this job has been registered for future reference
 	 * @param fileStorageId The ID of this job that is used for storing input/output files
 	 * @param vmSubsetFilePath The File path (on the VM) where the job should look for its input subset file
 	 */
     public VEGLJob(Integer id, String name, String description, String user, String emailAddress, String submitDate,
-			String status, String ec2InstanceId, String ec2Endpoint, String ec2AMI, String s3OutputAccessKey,
-			String s3OutputSecretKey, String s3OutputBucket,
-			String s3OutputBaseKey, String registeredUrl, Integer seriesId, String fileStorageId, String vmSubsetFilePath) {
+			String status, String ec2InstanceId, String ec2Endpoint, String ec2AMI, String cloudOutputAccessKey,
+			String cloudOutputSecretKey, String cloudOutputBucket,
+			String cloudOutputBaseKey, String registeredUrl, Integer seriesId, String fileStorageId, String vmSubsetFilePath) {
 		super(id,name, description, user, emailAddress, submitDate, status, ec2InstanceId, ec2AMI, ec2Endpoint);
 		
-		this.s3OutputAccessKey = s3OutputAccessKey;
-		this.s3OutputSecretKey = s3OutputSecretKey;
-		this.s3OutputBucket = s3OutputBucket;
-		this.s3OutputBaseKey = s3OutputBaseKey;
+		this.cloudOutputAccessKey = cloudOutputAccessKey;
+		this.cloudOutputSecretKey = cloudOutputSecretKey;
+		this.cloudOutputBucket = cloudOutputBucket;
+		this.cloudOutputBaseKey = cloudOutputBaseKey;
 		this.registeredUrl = registeredUrl;
 		this.seriesId = seriesId;
 		this.fileStorageId = fileStorageId;
@@ -102,64 +102,64 @@ public class VEGLJob extends CloudJob {
 	 * Gets the access key used to connect to amazon S3 for storing output
 	 * @return
 	 */
-	public String getS3OutputAccessKey() {
-		return s3OutputAccessKey;
+	public String getCloudOutputAccessKey() {
+		return cloudOutputAccessKey;
 	}
 
 	/**
 	 * Sets the access key used to connect to amazon S3 for storing output
-	 * @param s3OutputAccessKey
+	 * @param cloudOutputAccessKey
 	 */
-	public void setS3OutputAccessKey(String s3OutputAccessKey) {
-		this.s3OutputAccessKey = s3OutputAccessKey;
+	public void setCloudOutputAccessKey(String cloudOutputAccessKey) {
+		this.cloudOutputAccessKey = cloudOutputAccessKey;
 	}
 
 	/**
 	 * Gets the secret key used to connect to amazon S3 for storing output 
 	 * @return
 	 */
-	public String getS3OutputSecretKey() {
-		return s3OutputSecretKey;
+	public String getCloudOutputSecretKey() {
+		return cloudOutputSecretKey;
 	}
 
 	/**
 	 * Sets the secret key used to connect to amazon S3 for storing output
-	 * @param s3OutputSecretKey
+	 * @param cloudOutputSecretKey
 	 */
-	public void setS3OutputSecretKey(String s3OutputSecretKey) {
-		this.s3OutputSecretKey = s3OutputSecretKey;
+	public void setCloudOutputSecretKey(String cloudOutputSecretKey) {
+		this.cloudOutputSecretKey = cloudOutputSecretKey;
 	}
 
 	/**
 	 * Gets the bucket name where output will be stored
 	 * @return
 	 */
-	public String getS3OutputBucket() {
-		return s3OutputBucket;
+	public String getCloudOutputBucket() {
+		return cloudOutputBucket;
 	}
 
 	/**
 	 * Sets the bucket name where output will be stored
-	 * @param s3OutputBucket
+	 * @param cloudOutputBucket
 	 */
-	public void setS3OutputBucket(String s3OutputBucket) {
-		this.s3OutputBucket = s3OutputBucket;
+	public void setCloudOutputBucket(String cloudOutputBucket) {
+		this.cloudOutputBucket = cloudOutputBucket;
 	}
 
 	/**
 	 * Gets the base key path (folder name) for all S3 output
 	 * @return
 	 */
-	public String getS3OutputBaseKey() {
-		return s3OutputBaseKey;
+	public String getCloudOutputBaseKey() {
+		return cloudOutputBaseKey;
 	}
 
 	/**
 	 * Sets the base key path (folder name) for all S3 output
-	 * @param s3OutputBaseKey
+	 * @param cloudOutputBaseKey
 	 */
-	public void setS3OutputBaseKey(String s3OutputBaseKey) {
-		this.s3OutputBaseKey = s3OutputBaseKey;
+	public void setCloudOutputBaseKey(String cloudOutputBaseKey) {
+		this.cloudOutputBaseKey = cloudOutputBaseKey;
 	}
 
 	
@@ -452,7 +452,7 @@ public class VEGLJob extends CloudJob {
 				+ ", paddingMinEasting=" + paddingMinEasting
 				+ ", paddingMinNorthing=" + paddingMinNorthing
 				+ ", registeredUrl=" + registeredUrl + ", s3OutputBaseKey="
-				+ s3OutputBaseKey + ", s3OutputBucket=" + s3OutputBucket
+				+ cloudOutputBaseKey + ", s3OutputBucket=" + cloudOutputBucket
 				+ ", selectionMaxEasting=" + selectionMaxEasting
 				+ ", selectionMaxNorthing=" + selectionMaxNorthing
 				+ ", selectionMinEasting=" + selectionMinEasting

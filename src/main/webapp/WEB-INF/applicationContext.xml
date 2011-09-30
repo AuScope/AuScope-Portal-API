@@ -6,7 +6,7 @@
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-	<!-- This is very important - it will selectively load our beans for the (machine specified) profile
+    <!-- This is very important - it will selectively load our beans for the (machine specified) profile
     or use the default profile if none is specified. See AUS-1932
     <import resource="profile-${AUSCOPE_PORTAL_PROFILE:portal-test}.xml" />-->
 
@@ -35,15 +35,15 @@
         <property name="soTimeout" value="900000"/> <!--  15 minutes -->
    </bean>
 
-	<bean id="cswVEGLDev" class="org.auscope.portal.server.web.service.CSWServiceItem">
+    <bean id="cswVEGLDev" class="org.auscope.portal.server.web.service.CSWServiceItem">
         <constructor-arg index="0" value="http://siss1.anu.edu.au/geonetwork/srv/en/csw"/>
     </bean>
 
-	<bean id="cswVEGLTest" class="org.auscope.portal.server.web.service.CSWServiceItem">
-		<constructor-arg index="0" value="http://siss1.anu.edu.au/geonetwork/srv/en/csw"/>
-	</bean>
+    <bean id="cswVEGLTest" class="org.auscope.portal.server.web.service.CSWServiceItem">
+        <constructor-arg index="0" value="http://siss1.anu.edu.au/geonetwork/srv/en/csw"/>
+    </bean>
 
-	<bean id="cswVEGLProduction" class="org.auscope.portal.server.web.service.CSWServiceItem">
+    <bean id="cswVEGLProduction" class="org.auscope.portal.server.web.service.CSWServiceItem">
         <constructor-arg index="0" value="http://siss1.anu.edu.au/geonetwork/srv/en/csw"/>
     </bean>
 
@@ -72,7 +72,7 @@
    </bean>
 
     <bean id="stagingInfo" class="org.auscope.portal.server.cloud.StagingInformation">
-    	<property name="stageInDirectory" value="${HOST.localStageInDir}"></property>
+        <property name="stageInDirectory" value="${HOST.localStageInDir}"></property>
     </bean>
 
     <bean id="veglJobManager" class="org.auscope.portal.server.vegl.VEGLJobManager">
@@ -104,4 +104,22 @@
     <bean id="multipartResolver"
         class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
    </bean>
+
+    <bean id="blobStoreContextFactory"
+        class="org.jclouds.blobstore.BlobStoreContextFactory">
+   </bean>
+<!--
+    <bean id="jCloudSwiftStorageService"
+        class="org.auscope.portal.server.web.service.JCloudSwiftStorageService">
+         <constructor-arg name="hostConfigurer" ref="propertyConfigurer"/>
+         <constructor-arg name="blobStoreContextFactory" ref="blobStoreContextFactory"/>
+    </bean>
+-->
+
+
+    <bean id="s3JobStorageService"
+        class="org.auscope.portal.server.web.service.S3JobStorageService">
+    </bean>
+
+
 </beans>

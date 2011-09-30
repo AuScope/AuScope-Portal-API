@@ -19,10 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.server.cloud.S3FileInformation;
+import org.auscope.portal.server.cloud.CloudFileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.web.service.CloudStorageException;
 import org.auscope.portal.server.web.service.JobExecutionService;
 import org.auscope.portal.server.web.service.JobFileService;
 import org.auscope.portal.server.web.service.JobStorageService;
@@ -347,11 +348,11 @@ public class JobListController extends BaseVEGLController  {
     	    return generateJSONResponseMAV(false, null, "The requested job was not found.");
     	}
     	
-    	S3FileInformation[] fileDetails = null;
+    	CloudFileInformation[] fileDetails = null;
         try {
             fileDetails = jobStorageService.getOutputFileDetails(job);
             logger.info(fileDetails.length + " job files located");
-        } catch (S3ServiceException e) {
+        } catch (CloudStorageException e) {
             logger.warn("Error fetching output directory information.", e);
             return generateJSONResponseMAV(false, null, "Error fetching output directory information");
         }
@@ -486,7 +487,7 @@ public class JobListController extends BaseVEGLController  {
 
         } catch (IOException e) {
             logger.warn("Could not create ZIP file", e);
-        } catch (ServiceException e) {
+        } catch (CloudStorageException e) {
             logger.warn("Error getting S3Object data", e);
         }
         
@@ -578,17 +579,17 @@ public class JobListController extends BaseVEGLController  {
         for (VEGLJob job : seriesJobs) {
             //Don't lookup files for jobs that haven't been submitted
             if (!job.getStatus().equals(GridSubmitController.STATUS_UNSUBMITTED)) {
-                S3FileInformation[] results = null;
+                CloudFileInformation[] results = null;
                 try {
                     results = jobStorageService.getOutputFileDetails(job);
-                } catch (S3ServiceException e) {
+                } catch (CloudStorageException e) {
                     logger.error("Unable to list output job files", e);
                 }
                 
                 if (job.getStatus().equals(GridSubmitController.STATUS_ACTIVE) && results != null && results.length > 0) {
                     //The final processing step is uploading the log
                     //It is uploaded to "vegl.sh.log"
-                    for (S3FileInformation result : results) {
+                    for (CloudFileInformation result : results) {
                         if (result.getName().endsWith("vegl.sh.log") && result.getSize() > 0) {
                             job.setStatus(GridSubmitController.STATUS_DONE);
                         }
