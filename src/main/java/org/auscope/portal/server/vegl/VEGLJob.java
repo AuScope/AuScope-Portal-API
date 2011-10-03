@@ -5,7 +5,7 @@ import org.auscope.portal.server.cloud.CloudJob;
 /**
  * A specialisation of a generic cloud job for the VEGL Portal
  * 
- * A VEGL job is assumed to write all output to a specific S3 location
+ * A VEGL job is assumed to write all output to a specific cloud location
  * @author Josh Vote
  *
  */
@@ -74,10 +74,10 @@ public class VEGLJob extends CloudJob {
 	 * @param ec2InstanceId The ID of the running AMI instance (not the actual AMI ID).
 	 * @param ec2Endpoint The endpoint for the elastic compute cloud
 	 * @param ec2AMI The Amazon Machine Instance ID of the VM type that will run this job
-	 * @param cloudOutputAccessKey the access key used to connect to amazon S3 for storing output
-	 * @param cloudOutputSecretKey the secret key used to connect to amazon S3 for storing output 
-	 * @param cloudOutputBucket the S3 bucket name where output will be stored
-	 * @param cloudOutputBaseKey the base key path (folder name) for all S3 output
+	 * @param cloudOutputAccessKey the access key used to connect to amazon cloud for storing output
+	 * @param cloudOutputSecretKey the secret key used to connect to amazon cloud for storing output 
+	 * @param cloudOutputBucket the cloud bucket name where output will be stored
+	 * @param cloudOutputBaseKey the base key path (folder name) for all cloud output
 	 * @param registeredUrl Where this job has been registered for future reference
 	 * @param fileStorageId The ID of this job that is used for storing input/output files
 	 * @param vmSubsetFilePath The File path (on the VM) where the job should look for its input subset file
@@ -99,7 +99,7 @@ public class VEGLJob extends CloudJob {
 	}
     
     /**
-	 * Gets the access key used to connect to amazon S3 for storing output
+	 * Gets the access key used to connect to amazon cloud for storing output
 	 * @return
 	 */
 	public String getCloudOutputAccessKey() {
@@ -107,7 +107,7 @@ public class VEGLJob extends CloudJob {
 	}
 
 	/**
-	 * Sets the access key used to connect to amazon S3 for storing output
+	 * Sets the access key used to connect to amazon cloud for storing output
 	 * @param cloudOutputAccessKey
 	 */
 	public void setCloudOutputAccessKey(String cloudOutputAccessKey) {
@@ -115,7 +115,7 @@ public class VEGLJob extends CloudJob {
 	}
 
 	/**
-	 * Gets the secret key used to connect to amazon S3 for storing output 
+	 * Gets the secret key used to connect to amazon cloud for storing output 
 	 * @return
 	 */
 	public String getCloudOutputSecretKey() {
@@ -123,7 +123,7 @@ public class VEGLJob extends CloudJob {
 	}
 
 	/**
-	 * Sets the secret key used to connect to amazon S3 for storing output
+	 * Sets the secret key used to connect to amazon cloud for storing output
 	 * @param cloudOutputSecretKey
 	 */
 	public void setCloudOutputSecretKey(String cloudOutputSecretKey) {
@@ -147,7 +147,7 @@ public class VEGLJob extends CloudJob {
 	}
 
 	/**
-	 * Gets the base key path (folder name) for all S3 output
+	 * Gets the base key path (folder name) for all cloud output
 	 * @return
 	 */
 	public String getCloudOutputBaseKey() {
@@ -155,7 +155,7 @@ public class VEGLJob extends CloudJob {
 	}
 
 	/**
-	 * Sets the base key path (folder name) for all S3 output
+	 * Sets the base key path (folder name) for all cloud output
 	 * @param cloudOutputBaseKey
 	 */
 	public void setCloudOutputBaseKey(String cloudOutputBaseKey) {
@@ -451,8 +451,8 @@ public class VEGLJob extends CloudJob {
 				+ ", paddingMaxNorthing=" + paddingMaxNorthing
 				+ ", paddingMinEasting=" + paddingMinEasting
 				+ ", paddingMinNorthing=" + paddingMinNorthing
-				+ ", registeredUrl=" + registeredUrl + ", s3OutputBaseKey="
-				+ cloudOutputBaseKey + ", s3OutputBucket=" + cloudOutputBucket
+				+ ", registeredUrl=" + registeredUrl + ", cloudOutputBaseKey="
+				+ cloudOutputBaseKey + ", cloudOutputBucket=" + cloudOutputBucket
 				+ ", selectionMaxEasting=" + selectionMaxEasting
 				+ ", selectionMaxNorthing=" + selectionMaxNorthing
 				+ ", selectionMinEasting=" + selectionMinEasting

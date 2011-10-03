@@ -391,8 +391,8 @@ public class JobListController extends BaseVEGLController  {
         try {
             is = jobStorageService.getJobFileData(job, key);
         } catch (Exception ex) {
-            logger.warn(String.format("Unable to access '%1$s' from S3", key), ex);
-            return generateJSONResponseMAV(false, null, "Unable to access file from S3");
+            logger.warn(String.format("Unable to access '%1$s' from the cloud", key), ex);
+            return generateJSONResponseMAV(false, null, "Unable to access file from the cloud");
         }
         
         //start writing our output stream
@@ -488,7 +488,7 @@ public class JobListController extends BaseVEGLController  {
         } catch (IOException e) {
             logger.warn("Could not create ZIP file", e);
         } catch (CloudStorageException e) {
-            logger.warn("Error getting S3Object data", e);
+            logger.warn("Error getting cloudObject data", e);
         }
         
         return null;

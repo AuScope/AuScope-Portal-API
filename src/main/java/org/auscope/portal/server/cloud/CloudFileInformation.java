@@ -9,7 +9,7 @@ package org.auscope.portal.server.cloud;
 import java.io.Serializable;
 
 /**
- * Simple bean class that stores information about a file in S3.
+ * Simple bean class that stores information about a file in a cloud.
  *
  * @author Cihan Altinay
  * @author Joshua Vote
@@ -18,7 +18,7 @@ public class CloudFileInformation implements Serializable {
 	private static final long serialVersionUID = 6240194652206852285L;
 	/** The file size in bytes */
     private long size;
-    /** AWS S3 storage key */
+    /** cloud storage key */
     private String cloudKey = "";
     /** URL where the file can be accessed by anyone (only valid if file is publicly readable) */
     private String publicUrl = "";
@@ -53,7 +53,7 @@ public class CloudFileInformation implements Serializable {
     }
 
 	/**
-	 * Gets the underlying S3 key representing this file
+	 * Gets the underlying cloud key representing this file
 	 * @return
 	 */
 	public String getCloudKey() {
@@ -61,7 +61,7 @@ public class CloudFileInformation implements Serializable {
 	}
 
 	/**
-	 * Sets the underlying S3 key representing this file
+	 * Sets the underlying cloud key representing this file
 	 * @param cloudKey
 	 */
 	public void setCloudKey(String cloudKey) {

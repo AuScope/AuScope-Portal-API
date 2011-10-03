@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * A service class for interacting with a Simple Storage Service (S3)
+ * A service class for interacting with a cloud storage
  *
  * @author Josh Vote
  *
@@ -41,7 +41,7 @@ public class JobStorageService {
      * @param key
      *            The key of the file to download
      * @return
-     * @throws Exception
+     * @throws CloudStorageException
      */
     public InputStream getJobFileData(VEGLJob job, String key)
             throws CloudStorageException {
@@ -54,7 +54,7 @@ public class JobStorageService {
      * @param job
      *            The job to examine
      * @return
-     * @throws Exception
+     * @throws CloudStorageException
      */
     public CloudFileInformation[] getOutputFileDetails(VEGLJob job)
             throws CloudStorageException {
@@ -68,7 +68,7 @@ public class JobStorageService {
      *            The job who will 'own' these input files
      * @param files
      *            The input files to be uploaded.
-     * @throws Exception
+     * @throws CloudStorageException
      */
     public void uploadInputJobFiles(VEGLJob job, File[] files)
             throws CloudStorageException, NoSuchAlgorithmException, IOException {

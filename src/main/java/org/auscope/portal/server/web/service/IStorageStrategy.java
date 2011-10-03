@@ -22,7 +22,7 @@ public interface IStorageStrategy {
      * @param key
      *            The key of the file to download
      * @return
-     * @throws ServiceException
+     * @throws CloudStorageException
      */
     public InputStream getJobFileData(VEGLJob job, String key)
             throws CloudStorageException;
@@ -33,7 +33,7 @@ public interface IStorageStrategy {
      * @param job
      *            The job to examine
      * @return
-     * @throws S3ServiceException
+     * @throws CloudStorageException
      */
     public CloudFileInformation[] getOutputFileDetails(VEGLJob job)
             throws CloudStorageException;
@@ -45,7 +45,7 @@ public interface IStorageStrategy {
      *            The job who will 'own' these input files
      * @param files
      *            The input files to be uploaded.
-     * @throws S3ServiceException
+     * @throws CloudStorageException
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
