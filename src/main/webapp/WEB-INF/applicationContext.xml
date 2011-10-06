@@ -108,18 +108,18 @@
     <bean id="blobStoreContextFactory"
         class="org.jclouds.blobstore.BlobStoreContextFactory">
    </bean>
-<!--
+
     <bean id="jCloudSwiftStorageService"
         class="org.auscope.portal.server.web.service.JCloudSwiftStorageService">
          <constructor-arg name="hostConfigurer" ref="propertyConfigurer"/>
          <constructor-arg name="blobStoreContextFactory" ref="blobStoreContextFactory"/>
     </bean>
--->
 
 
+<!--
     <bean id="s3JobStorageService"
         class="org.auscope.portal.server.web.service.S3JobStorageService">
     </bean>
-
+-->
 
 </beans>

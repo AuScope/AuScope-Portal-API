@@ -80,6 +80,9 @@ export S3_BASE_KEY_PATH="$s3BaseKeyPath"
 #Write our secret key to our secret key file
 echo -e "${AWS_ACCESS_KEY_ID}\n${AWS_SECRET_ACCESS_KEY}\n" > "/root/.awssecret"
 
+#Write storage information for abstract cloud usage
+echo -e "StorageType=aws\ncloudStorageAccessKey=${AWS_ACCESS_KEY_ID}\ncloudStorageSecretKey=${AWS_SECRET_ACCESS_KEY}" > "/root/.jobInfo"
+
 #Download our input files from S3 and load them into files in the current working directory
 echo "Downloading inputfiles from S3..."
 downloadInputFilesBase=`echo "${s3Bucket}/${s3BaseKeyPath}" | sed "s/\/\/*/\//g"`

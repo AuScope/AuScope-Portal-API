@@ -78,6 +78,8 @@ export ST_AUTH="$storageEndpoint"
 export ST_USER="$s3AccessKey"
 export ST_KEY="$s3SecretKey"
 
+#Write storage information for abstract cloud usage
+echo -e "StorageType=swift\ncloudStorageAccessKey=${s3AccessKey}\ncloudStorageSecretKey=${s3SecretKey}\ncloudStorageEndPoint=${storageEndpoint}" > "/root/.jobInfo"
 
 #Download our input files from swift storage and load them into files in the current working directory
 echo "Downloading inputfiles from S3..."
@@ -104,6 +106,7 @@ cd $WORKING_DIR
 #Finally upload our logs for debug purposes
 echo "About to upload output log..."
 uploadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}" | sed "s/\/\/*/\//g"`
+echo "swift upload ${uploadQueryPath} vegl.sh.log"
 swift upload "${uploadQueryPath}" "vegl.sh.log"
 
 #At this point we can give developers a grace period in which they can login to the VM for debugging
