@@ -1,7 +1,7 @@
 {
   xtype: "form",
-  id: "AWSUtilsForm",
-  nclass: AWSUtilsNode,
+  id: "CloudUtilsForm",
+  nclass: CloudUtilsNode,
   bodyStyle: "padding:5px;",
   labelWidth: 150,
   defaults: { anchor: "100%" },

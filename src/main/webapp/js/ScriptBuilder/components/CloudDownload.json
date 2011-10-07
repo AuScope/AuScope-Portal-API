@@ -1,17 +1,11 @@
 {
   xtype: "form",
-  id: "AWSUploadForm",
-  nclass: AWSUploadNode,
+  id: "CloudDownloadForm",
+  nclass: CloudDownloadNode,
   bodyStyle: "padding:5px;",
   labelWidth: 150,
   defaults: { anchor: "100%" },
   items: [{
-    xtype: "textfield",
-    name: "inputFilePath",
-    value: "",
-    fieldLabel: "Input filepath",
-    allowBlank: false
-  },{
     xtype: "textfield",
     name: "bucketName",
     value: "vegl-portal",
@@ -22,6 +16,12 @@
     name: "keyPath",
     value: "",
     fieldLabel: "S3 Key Path",
+    allowBlank: false
+  },{
+    xtype: "textfield",
+    name: "outputFilePath",
+    value: "",
+    fieldLabel: "Output filepath",
     allowBlank: false
   }]
 }

@@ -15,15 +15,28 @@ export ST_USER="$st_user"
 export ST_KEY="$st_key"
 
 
-#wrapper for swift upload
+#wrapper for swift upload. Swift tool uses the file name as key
 if [ "$storageType" == "swift" ] && [ "$1" == "upload" ]
 then
-        swift upload ${2}/${3} ${4}
+        swift upload ${2}/${3} ${5}
 fi
 
 
 #wrapper for aws upload
 if [ "$storageType" == "aws" ] && [ "$1" == "upload" ]
 then
-        aws put ${2}/${3}/${4} ${4}
+        aws put ${2}/${3}/${4} ${5}
+fi
+
+#wrapper for swift download
+if [ "$storageType" == "swift" ] && [ "$1" == "download" ]
+then
+        swift download -o ${5} ${2} ${3}/${4}
+fi
+
+
+#wrapper for aws download
+if [ "$storageType" == "aws" ] && [ "$1" == "download" ]
+then
+        aws get ${2}/${3}/${4} ${5}
 fi

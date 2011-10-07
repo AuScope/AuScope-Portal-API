@@ -28,7 +28,7 @@ echo "WORKFLOW_SCRIPT = ${WORKFLOW_SCRIPT}"
 echo "--------------------------------------"
 
 #Download our cloud storage tool wrapper and make it executable
-echo "Downloading workflow script from ${WRAPPER_URL} and storing it at /bin/cloud"
+echo "Downloading wrapper script from ${WRAPPER_URL} and storing it at /bin/cloud"
 curl -L "${WRAPPER_URL}" > "/bin/cloud"
 echo "Making /bin/cloud executable"
 chmod +x "/bin/cloud"

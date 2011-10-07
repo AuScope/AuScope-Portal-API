@@ -5,16 +5,16 @@
  * Licensed under the terms of the GNU Lesser General Public License.
  */
 Ext.namespace("ScriptBuilder");
-Ext.ux.ComponentLoader.load( {url : ScriptBuilder.componentPath + "AWSUtils.json"});
+Ext.ux.ComponentLoader.load( {url : ScriptBuilder.componentPath + "CloudUtils.json"});
 
-AWSUtilsNode = Ext.extend(ScriptBuilder.BasePythonComponent, {
+CloudUtilsNode = Ext.extend(ScriptBuilder.BasePythonComponent, {
 
     constructor : function(container) {
-        AWSUtilsNode.superclass.constructor.apply(this, [ container,
-                "AWS Utils Object", "AWSUtils", "s" ]);
+        CloudUtilsNode.superclass.constructor.apply(this, [ container,
+                "Cloud Utils Object", "CloudUtils", "s" ]);
 
         var numShells = container.getShellCommands().length;
-        this.values.uniqueName = "AWSUtils" + numShells;
+        this.values.uniqueName = "CloudUtils" + numShells;
     },
 
     /**
