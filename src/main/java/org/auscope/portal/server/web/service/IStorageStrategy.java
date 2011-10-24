@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.server.cloud.CloudFileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
-import org.springframework.stereotype.Service;
+
 
 
 public interface IStorageStrategy {

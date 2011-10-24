@@ -15,12 +15,15 @@ import java.io.Serializable;
  * @author Joshua Vote
  */
 public class CloudFileInformation implements Serializable {
-	private static final long serialVersionUID = 6240194652206852285L;
-	/** The file size in bytes */
+    private static final long serialVersionUID = 6240194652206852285L;
+    /** The file size in bytes */
     private long size;
     /** cloud storage key */
     private String cloudKey = "";
-    /** URL where the file can be accessed by anyone (only valid if file is publicly readable) */
+    /**
+     * URL where the file can be accessed by anyone (only valid if file is
+     * publicly readable)
+     */
     private String publicUrl = "";
 
     /**
@@ -31,17 +34,16 @@ public class CloudFileInformation implements Serializable {
         this.size = size;
         this.publicUrl = publicUrl;
     }
-    
+
     /**
      * Returns the filename.
      *
      * @return The filename.
      */
     public String getName() {
-    	String [] keyParts = cloudKey.split("/");
-    	return keyParts[keyParts.length-1];
+        String[] keyParts = cloudKey.split("/");
+        return keyParts[keyParts.length - 1];
     }
-
 
     /**
      * Returns the file size.
@@ -52,34 +54,38 @@ public class CloudFileInformation implements Serializable {
         return size;
     }
 
-	/**
-	 * Gets the underlying cloud key representing this file
-	 * @return
-	 */
-	public String getCloudKey() {
-		return cloudKey;
-	}
+    /**
+     * Gets the underlying cloud key representing this file
+     *
+     * @return
+     */
+    public String getCloudKey() {
+        return cloudKey;
+    }
 
-	/**
-	 * Sets the underlying cloud key representing this file
-	 * @param cloudKey
-	 */
-	public void setCloudKey(String cloudKey) {
-		this.cloudKey = cloudKey;
-	}
+    /**
+     * Sets the underlying cloud key representing this file
+     *
+     * @param cloudKey
+     */
+    public void setCloudKey(String cloudKey) {
+        this.cloudKey = cloudKey;
+    }
 
-	/**
-	 * Gets the public URL where this file can be accessed (assuming the file has its ACL set
-	 * to public read)
-	 * @return
-	 */
+    /**
+     * Gets the public URL where this file can be accessed (assuming the file
+     * has its ACL set to public read)
+     *
+     * @return
+     */
     public String getPublicUrl() {
         return publicUrl;
     }
 
     /**
-     * Sets the public URL where this file can be accessed (assuming the file has its ACL set
-     * to public read)
+     * Sets the public URL where this file can be accessed (assuming the file
+     * has its ACL set to public read)
+     *
      * @param publicUrl
      */
     public void setPublicUrl(String publicUrl) {
@@ -87,4 +93,3 @@ public class CloudFileInformation implements Serializable {
     }
 
 }
-
