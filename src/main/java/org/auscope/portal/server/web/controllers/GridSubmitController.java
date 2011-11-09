@@ -506,6 +506,8 @@ public class GridSubmitController extends BaseVEGLController {
 
                 // add the command for making the subset request
                 out.write(String.format("curl -L '%1$s' > \"%2$s\"\n", url, ERRDAP_SUBSET_VM_FILE_PATH));
+
+                job.setVmSubsetUrl(url);
             }
 
             out.close();

@@ -64,7 +64,7 @@ public class TestGridSubmitController {
                 "user@email.com", null, null, "ec2InstanceId",
                 "http://ec2.endpoint", "ec2Ami", "s3AccessKey", "s3SecretKey",
                 "s3Bucket", "s3BaseKey", null, new Integer(45),
-                "file-storage-id", "vm-subset-filepath");
+                "file-storage-id", "vm-subset-filepath", "http://vm.subset.url");
         final File[] stageInFiles = new File[] {context.mock(File.class, "MockFile1"), context.mock(File.class, "MockFile2")};
         final String instanceId = "new-instance-id";
 
@@ -118,7 +118,7 @@ public class TestGridSubmitController {
                 "user@email.com", null, null, "ec2InstanceId",
                 "http://ec2.endpoint", "ec2Ami", "", "",
                 "s3Bucket", "s3BaseKey", null, new Integer(45),
-                "file-storage-id", "vm-subset-filepath");
+                "file-storage-id", "vm-subset-filepath", "http://vm.subset.url");
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -143,7 +143,7 @@ public class TestGridSubmitController {
                 "user@email.com", null, null, "ec2InstanceId",
                 "http://ec2.endpoint", "ec2Ami", "s3AccessKey", "s3SecretKey",
                 "s3Bucket", "s3BaseKey", null, new Integer(45),
-                "file-storage-id", "vm-subset-filepath");
+                "file-storage-id", "vm-subset-filepath", "http://vm.subset.url");
         final File[] stageInFiles = new File[] {context.mock(File.class, "MockFile1"), context.mock(File.class, "MockFile2")};
 
         context.checking(new Expectations() {{
@@ -175,7 +175,7 @@ public class TestGridSubmitController {
                 "user@email.com", null, null, "ec2InstanceId",
                 "http://ec2.endpoint", "ec2Ami", "s3AccessKey", "s3SecretKey",
                 "s3Bucket", "s3BaseKey", null, new Integer(45),
-                "file-storage-id", "vm-subset-filepath");
+                "file-storage-id", "vm-subset-filepath", "http://vm.subset.url");
         final File[] stageInFiles = new File[] {context.mock(File.class, "MockFile1"), context.mock(File.class, "MockFile2")};
 
         context.checking(new Expectations() {{

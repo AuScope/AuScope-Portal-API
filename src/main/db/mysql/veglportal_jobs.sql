@@ -56,6 +56,7 @@ CREATE TABLE `jobs` (
   `cellZ` int(11) DEFAULT NULL,
   `inversionDepth` int(11) DEFAULT NULL,
   `vmSubsetFilePath` varchar(255) DEFAULT NULL,
+  `vmSubsetUrl` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `SERIES` (`seriesId`),
   KEY `USER` (`user`)

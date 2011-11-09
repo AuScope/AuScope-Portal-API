@@ -36,6 +36,7 @@
         <property name="cellZ"/>
         <property name="inversionDepth"/>
         <property name="vmSubsetFilePath"/>
+        <property name="vmSubsetUrl"/>
 
     </class>
 </hibernate-mapping>

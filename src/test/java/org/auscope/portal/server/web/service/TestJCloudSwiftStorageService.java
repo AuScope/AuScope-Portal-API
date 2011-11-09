@@ -60,7 +60,7 @@ public class TestJCloudSwiftStorageService {
                 "user@email.com", null, null, "ec2InstanceId",
                 "http://ec2.endpoint", "ec2Ami", "s3AccessKey", "s3SecretKey",
                 "s3Bucket", "s3BaseKey", null, new Integer(45),
-                "file-storage-id", "vm-subset-filepath");
+                "file-storage-id", "vm-subset-filepath", "http://vm.subset.url");
 
         context.checking(new Expectations() {{
            oneOf(mockConfigurer).resolvePlaceholder("storage.endpoint");will(returnValue("http://example.com"));

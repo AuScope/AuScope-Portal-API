@@ -72,10 +72,17 @@ public class GeonetworkController extends BaseVEGLController {
         CloudFileInformation[] outputFiles = jobStorageService.getOutputFileDetails(job);
         List<CSWOnlineResource> onlineResources = new ArrayList<CSWOnlineResource>();
 
+        //Add any output files to our online resources tab
         if (outputFiles != null) {
             for (CloudFileInformation obj : outputFiles) {
                 onlineResources.add(new CSWOnlineResourceImpl(new URL(obj.getPublicUrl()), "WWW:DOWNLOAD-1.0-ftp--download", obj.getName(), obj.getName()));
             }
+        }
+
+        //Add our source WCS to the online resources tab
+        String dataUrl = job.getVmSubsetUrl();
+        if (dataUrl != null && !dataUrl.isEmpty()) {
+            onlineResources.add(new CSWOnlineResourceImpl(new URL(dataUrl), "WWW:LINK-1.0-http--link", "ERDAP Subset Data", "ERDAP Subset Data"));
         }
 
         //Generate our contact details
