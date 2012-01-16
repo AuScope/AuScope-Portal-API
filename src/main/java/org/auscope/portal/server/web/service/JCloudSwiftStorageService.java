@@ -28,8 +28,6 @@ public class JCloudSwiftStorageService implements IStorageStrategy {
     private BlobStoreContextFactory blobStoreContextFactory;
     Properties swiftBlobStore;
 
-    private PortalPropertyPlaceholderConfigurer hostConfigurer;
-
     public JCloudSwiftStorageService(
             PortalPropertyPlaceholderConfigurer hostConfigurer,
             BlobStoreContextFactory blobStoreContextFactory) {

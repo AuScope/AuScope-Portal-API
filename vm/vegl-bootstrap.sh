@@ -11,12 +11,9 @@ userDataString=`curl -L "$userDataUrl"`
 #Decompose our user data string into the individual parameter strings
 veglShellScript=`echo $userDataString | jsawk 'return this.veglShellScript'`
 
-
 VEGL_BOOTSTRAP_VERSION="1"
 WORKING_DIR="/root"
 WORKFLOW_URL="${veglShellScript}"
-#cloud storage tool wrapper url
-WRAPPER_URL="http://vegl-portal.s3.amazonaws.com/vm/cloud.sh"
 WORKFLOW_SCRIPT="${WORKING_DIR}/vegl.sh"
 echo "------ VEGL Bootstrap Script ---------"
 echo "                                      "
@@ -27,12 +24,6 @@ echo "WORKFLOW_URL = ${WORKFLOW_URL}"
 echo "WORKFLOW_SCRIPT = ${WORKFLOW_SCRIPT}"
 echo "--------------------------------------"
 
-#Download our cloud storage tool wrapper and make it executable
-echo "Downloading wrapper script from ${WRAPPER_URL} and storing it at /bin/cloud"
-curl -L "${WRAPPER_URL}" > "/bin/cloud"
-echo "Making /bin/cloud executable"
-chmod +x "/bin/cloud"
-echo "chmod result $?"
 
 #Download our workflow and make it executable
 echo "Downloading workflow script from ${WORKFLOW_URL} and storing it at ${WORKFLOW_SCRIPT}"

@@ -14,6 +14,8 @@ INITIAL_SLEEP_LENGTH="30s"
 FINAL_SLEEP_LENGTH="15m"
 NTP_DATE_SERVER="pool.ntp.org"
 VEGL_WORKFLOW_VERSION="1"
+#cloud storage tool wrapper url
+WRAPPER_URL="http://vegl-portal.s3.amazonaws.com/vm/cloud.sh"
 export VEGL_SCRIPT_PATH="${WORKING_DIR}/vegl_script.py"
 export SUBSET_REQUEST_PATH="${WORKING_DIR}/subset_request.sh"
 ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
@@ -50,6 +52,13 @@ cd $WORKING_DIR
 #We NEED the time to be up to date otherwise AWS requests will fail
 echo "Synchronising date with ${NTP_DATE_SERVER}"
 ntpdate "$NTP_DATE_SERVER"
+
+#Download our cloud storage tool wrapper and make it executable
+echo "Downloading wrapper script from ${WRAPPER_URL} and storing it at /bin/cloud"
+curl -L "${WRAPPER_URL}" > "/bin/cloud"
+echo "Making /bin/cloud executable"
+chmod +x "/bin/cloud"
+echo "chmod result $?"
 
 #next we download our AWS metadata script which allows us to fetch information
 #about our instance
