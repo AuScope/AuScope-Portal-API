@@ -82,8 +82,10 @@ veglShellScript=`echo $userDataString | jsawk 'return this.veglShellScript'`
 
 echo "------ Printing SVN FILE INFO---------"
 echo "svn info ${veglShellScript}"
+svn info ${veglShellScript}
 echo "                                      "
 echo "svn info ${WRAPPER_URL}"
+svn info ${WRAPPER_URL}
 echo "--------------------------------------"
 
 echo "s3Bucket = ${s3Bucket}"
