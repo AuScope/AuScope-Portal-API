@@ -15,7 +15,8 @@ FINAL_SLEEP_LENGTH="15m"
 NTP_DATE_SERVER="pool.ntp.org"
 VEGL_WORKFLOW_VERSION="1"
 #cloud storage tool wrapper url
-WRAPPER_URL="http://vegl-portal.s3.amazonaws.com/vm/cloud.sh"
+#WRAPPER_URL="http://vegl-portal.s3.amazonaws.com/vm/cloud.sh"
+WRAPPER_URL=https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk/vm/cloud.sh
 export VEGL_SCRIPT_PATH="${WORKING_DIR}/vegl_script.py"
 export SUBSET_REQUEST_PATH="${WORKING_DIR}/subset_request.sh"
 ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
@@ -77,6 +78,13 @@ s3BaseKeyPath=`echo $userDataString | jsawk 'return this.s3OutputBaseKeyPath'`
 s3AccessKey=`echo $userDataString | jsawk 'return this.s3OutputAccessKey'`
 s3SecretKey=`echo $userDataString | jsawk 'return this.s3OutputSecretKey'`
 storageEndpoint=`echo $userDataString | jsawk 'return this.storageEndpoint'`
+veglShellScript=`echo $userDataString | jsawk 'return this.veglShellScript'`
+
+echo "------ Printing SVN FILE INFO---------"
+echo "svn info ${veglShellScript}"
+echo "                                      "
+echo "svn info ${WRAPPER_URL}"
+echo "--------------------------------------"
 
 echo "s3Bucket = ${s3Bucket}"
 echo "s3BaseKeyPath = ${s3BaseKeyPath}"

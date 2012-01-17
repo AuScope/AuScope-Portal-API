@@ -76,6 +76,13 @@ s3Bucket=`echo $userDataString | jsawk 'return this.s3OutputBucket'`
 s3BaseKeyPath=`echo $userDataString | jsawk 'return this.s3OutputBaseKeyPath'`
 s3AccessKey=`echo $userDataString | jsawk 'return this.s3OutputAccessKey'`
 s3SecretKey=`echo $userDataString | jsawk 'return this.s3OutputSecretKey'`
+veglShellScript=`echo $userDataString | jsawk 'return this.veglShellScript'`
+
+echo "------ Printing SVN FILE INFO---------"
+echo "svn info ${veglShellScript}"
+echo "                                      "
+echo "svn info ${WRAPPER_URL}"
+echo "--------------------------------------"
 
 echo "s3Bucket = ${s3Bucket}"
 echo "s3BaseKeyPath = ${s3BaseKeyPath}"
