@@ -16,7 +16,7 @@ NTP_DATE_SERVER="pool.ntp.org"
 VEGL_WORKFLOW_VERSION="1"
 #cloud storage tool wrapper url
 #WRAPPER_URL="http://vegl-portal.s3.amazonaws.com/vm/cloud.sh"
-WRAPPER_URL=https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk/vm/cloud.sh
+WRAPPER_URL="https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk/vm/cloud.sh"
 export VEGL_SCRIPT_PATH="${WORKING_DIR}/vegl_script.py"
 export SUBSET_REQUEST_PATH="${WORKING_DIR}/subset_request.sh"
 ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
