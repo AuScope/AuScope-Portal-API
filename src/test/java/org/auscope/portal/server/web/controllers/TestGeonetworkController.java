@@ -82,6 +82,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getCloudOutputBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
+            allowing(mockJob).getVmSubsetUrl();will(returnValue(null));
 
             //Our series configuration
             allowing(mockSeries).getName();will(returnValue("seriesName"));
@@ -218,6 +219,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getCloudOutputBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
+            allowing(mockJob).getVmSubsetUrl();will(returnValue(null));
 
             //Our series configuration
             allowing(mockSeries).getName();will(returnValue("seriesName"));
