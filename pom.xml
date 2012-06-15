@@ -132,17 +132,10 @@
     <!-- Project properties -->
     <properties>
         <jetty.version>6.1.26</jetty.version>
-        <log4j.version>1.2.16</log4j.version>
         <spring.version>3.0.5.RELEASE</spring.version>
-        <geotools.version>2.6.1</geotools.version>
     </properties>
 
     <repositories>
-        <repository>
-              <id>maven 2 central repository</id>
-              <name>maven 2 central repository</name>
-              <url>http://repo1.maven.org/maven2</url>
-        </repository>
         <repository>
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
@@ -154,113 +147,59 @@
             <url>http://maven.geotoolkit.org/</url>
         </repository>
         <repository>
-              <name>jets3t</name>
-              <id>jets3t</id>
-              <url>http://jets3t.s3.amazonaws.com/maven2</url>
-        </repository>
-        <repository>
-            <id>mygrid-repository</id>
-            <name>myGrid repository</name>
-            <url>http://www.mygrid.org.uk/maven/repository</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <!-- The new home of RESTPROXY - its world readable -->
-        <repository>
             <id>cgsrv8.arrc.csiro.au</id>
-            <name>cgsrv8.arrc.csiro.au-releases</name>
+            <name>AuScope Artifactory - PortalRepo</name>
             <url>https://cgsrv8.arrc.csiro.au/artifactory/PortalRepo</url>
         </repository>
-    </repositories>
 
+    </repositories>
     <!-- Dependencies -->
     <dependencies>
-        <!-- Servlets 2.4 - JSTL 1.1 -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
+            <groupId>org.auscope.portal</groupId>
+            <artifactId>portal-core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.1.2</version>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
         </dependency>
         <dependency>
-            <groupId>taglibs</groupId>
-            <artifactId>standard</artifactId>
-            <version>1.1.2</version>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
         </dependency>
-
-        <!-- Spring framework -->
-        <!--
-        Core utilities used by other modules.
-        Define this if you use Spring Utility APIs
-        (org.springframework.core.*/org.springframework.util.*)
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
-            <scope>compile</scope>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
         </dependency>
-        -->
-        <!--
-        Bean Factory and JavaBeans utilities (depends on spring-core)
-        Define this if you use Spring Bean APIs (org.springframework.beans.*)
-        -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
-            <scope>compile</scope>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.0.1</version>
         </dependency>
-
-        <!--
-        Application Context (depends on spring-core, spring-expression, spring-aop, spring-beans)
-        This is the central artifact for Spring's Dependency Injection Container and is generally
-        always defined
-        (org.springframework.stereotype.*, org.springframework.ui.*)
-        -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-            <scope>compile</scope>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
         </dependency>
-
-        <!--
-        Web application development utilities applicable to both Servlet and Portlet Environments
-        (depends on spring-core, spring-beans, spring-context)
-        Define this if you use Spring MVC, or wish to use Struts, JSF, or another web framework
-        with Spring (org.springframework.web.*)
-        -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-            <scope>compile</scope>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>3.2.7.ga</version>
         </dependency>
-
-        <!--
-        Spring MVC for Servlet Environments (depends on spring-core, spring-beans, spring-context,
-        spring-web)
-        Define this if you use Spring MVC with a Servlet Container such as Apache Tomcat
-        (org.springframework.web.servlet.*)
-        -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
-            <scope>compile</scope>
+          <groupId>com.jhlabs</groupId>
+          <artifactId>javaproj</artifactId>
+          <version>1.0</version>
         </dependency>
-
-        <!--
-        Required by any application which uses Spring Security. -->
+        <dependency>
+            <groupId>uk.org.mygrid.resources.jcoord</groupId>
+            <artifactId>jcoord</artifactId>
+            <version>1.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
@@ -283,48 +222,32 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!--
-        The security namespace parsing code (and hence nothing that you are
-        likely to use directly in your application). You need it if you are
-        using the Spring Security XML namespace for configuration. The main
-        package is org.springframework.security.config.Namespace parsing code -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
             <scope>compile</scope>
         </dependency>
-
-        <dependency>
-           <groupId>org.springframework</groupId>
-           <artifactId>spring-orm</artifactId>
-           <version>${spring.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-openid</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <!-- Added for Openid -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-mock</artifactId>
-            <version>2.0.8</version>
+            <groupId>org.openid4java</groupId>
+            <!--artifactId>openid4java-server</artifactId-->
+            <!--artifactId>openid4java-infocard</artifactId-->
+            <!--artifactId>openid4java-xri</artifactId-->
+            <artifactId>openid4java-consumer</artifactId>
+            <version>0.9.6</version>
+            <type>pom</type>
         </dependency>
-
-
-        <!--
-        JDBC Data Access Library (depends on spring-core, spring-beans, spring-context, spring-tx)
-        Define this if you use Spring's JdbcTemplate API (org.springframework.jdbc.*)
-        -->
-
-
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
@@ -336,145 +259,7 @@
             <artifactId>json-lib-ext-spring</artifactId>
             <version>1.0.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-wfs</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-wms</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-xom</artifactId>
-            <version>8.7</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-xpath</artifactId>
-            <version>8.7</version>
-            <optional>false</optional>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-dom</artifactId>
-            <version>8.7</version>
-            <optional>false</optional>
-        </dependency>
-        <dependency>
-            <groupId>RestProxy</groupId>
-            <artifactId>RestProxy</artifactId>
-            <version>1.1</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.jms</groupId>
-                    <artifactId>jms</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.jdmk</groupId>
-                    <artifactId>jmxtools</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.jmx</groupId>
-                    <artifactId>jmxri</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.jmock</groupId>
-            <artifactId>jmock-junit4</artifactId>
-            <version>2.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jmock</groupId>
-            <artifactId>jmock-legacy</artifactId>
-            <version>2.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>1.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
-            <version>1.2.1</version>
-        </dependency>
 
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>2.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.16</version>
-        </dependency>
-        <dependency>
-            <groupId>xom</groupId>
-            <artifactId>xom</artifactId>
-            <version>1.2.5</version>
-        </dependency>
-        <!-- Added for Job Submission -->
-        <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>1.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate</artifactId>
-            <version>3.2.7.ga</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.6</version>
-            <optional>false</optional>
-        </dependency>
         <dependency>
             <groupId>edu.ucar</groupId>
             <artifactId>netcdf</artifactId>
@@ -487,78 +272,7 @@
             <artifactId>aws-java-sdk</artifactId>
             <version>1.2.2</version>
         </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>1.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>stax</groupId>
-            <artifactId>stax</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>stax</groupId>
-            <artifactId>stax-api</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-jaxws</artifactId>
-            <version>1.4.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-adb</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-        <dependency>
-              <groupId>net.java.dev.jets3t</groupId>
-              <artifactId>jets3t</artifactId>
-              <version>0.8.0</version>
-        </dependency>
-        <!-- Added for Openid -->
-        <dependency>
-            <groupId>org.openid4java</groupId>
-            <!--artifactId>openid4java-server</artifactId-->
-            <!--artifactId>openid4java-infocard</artifactId-->
-            <!--artifactId>openid4java-xri</artifactId-->
-            <artifactId>openid4java-consumer</artifactId>
-            <version>0.9.6</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.google.code.guice</groupId>
-					<artifactId>guice</artifactId>					
-				</exclusion>
-			</exclusions>
-            <type>pom</type> 
-        </dependency>
 
-        <!-- mapping projection -->
-        <dependency>
-          <groupId>com.jhlabs</groupId>
-          <artifactId>javaproj</artifactId>
-          <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>uk.org.mygrid.resources.jcoord</groupId>
-            <artifactId>jcoord</artifactId>
-            <version>1.0</version>
-        </dependency>
-		<dependency>
-			<groupId>org.jclouds</groupId>
-			<artifactId>jclouds-allblobstore</artifactId>
-			<version>1.1.1</version>
-		</dependency>
+
     </dependencies>
 </project>

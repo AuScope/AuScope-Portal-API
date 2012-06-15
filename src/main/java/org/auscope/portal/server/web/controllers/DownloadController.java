@@ -1,26 +1,33 @@
 package org.auscope.portal.server.web.controllers;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONNull;
+import net.sf.json.JSONObject;
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.server.http.HttpServiceCaller;
+import org.auscope.portal.core.server.http.download.DownloadResponse;
+import org.auscope.portal.core.server.http.download.ServiceDownloadManager;
+import org.auscope.portal.core.util.MimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.Header;
-
-import org.auscope.portal.server.web.service.HttpServiceCaller;
-
-import javax.servlet.http.HttpServletResponse;
-
-import java.text.SimpleDateFormat;
-import java.util.zip.ZipOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.Date;
-
-import net.sf.json.JSONObject;
 
 /**
  * User: Mathew Wyatt
@@ -29,17 +36,17 @@ import net.sf.json.JSONObject;
  */
 
 @Controller
-public class DownloadController {
-    protected final Log logger = LogFactory.getLog(getClass());
+public class DownloadController extends BasePortalController {
+    private final Log logger = LogFactory.getLog(getClass());
     private HttpServiceCaller serviceCaller;
 
     @Autowired
     public DownloadController(HttpServiceCaller serviceCaller) {
-        this.serviceCaller = serviceCaller;        
+        this.serviceCaller = serviceCaller;
     }
 
     /**
-     * Given a list of URls, this function will collate the responses 
+     * Given a list of URls, this function will collate the responses
      * into a zip file and send the response back to the browser.
      *
      * @param serviceUrls
@@ -47,99 +54,105 @@ public class DownloadController {
      * @throws Exception
      */
     @RequestMapping("/downloadGMLAsZip.do")
-    public void downloadGMLAsZip( @RequestParam("serviceUrls") final String[] serviceUrls,
-                                  HttpServletResponse response) throws Exception {
+    public void downloadGMLAsZip(
+            @RequestParam("serviceUrls") final String[] serviceUrls,
+            HttpServletResponse response) throws Exception {
+        ExecutorService pool = Executors.newCachedThreadPool();
+        downloadGMLAsZip(serviceUrls,response,pool);
+    }
 
-        //set the content type for zip files
+
+    public void downloadGMLAsZip(
+            @RequestParam("serviceUrls") final String[] serviceUrls,
+            HttpServletResponse response,ExecutorService threadpool) throws Exception {
+
+        // set the content type for zip files
         response.setContentType("application/zip");
-        response.setHeader("Content-Disposition","inline; filename=GMLDownload.zip;");
+        response.setHeader("Content-Disposition",
+                "inline; filename=GMLDownload.zip;");
 
-        //create the output stream
+        // create the output stream
         ZipOutputStream zout = new ZipOutputStream(response.getOutputStream());
 
         logger.trace("No. of serviceUrls: " + serviceUrls.length);
-
-        for(int i=0; i<serviceUrls.length; i++) {
-
-            GetMethod method = new GetMethod(serviceUrls[i]);
-            HttpClient client = serviceCaller.getHttpClient();
-
-            logger.trace("Calling service: " + serviceUrls[i]);
-
-            //Our request may fail (due to timeout or otherwise)
-            String responseString = null;
-            JSONObject jsonObject = null;
-            try {
-                responseString = serviceCaller.getMethodResponseAsString(method, client);
-                
-                logger.trace("Response: " + responseString);
-
-                jsonObject = JSONObject.fromObject( responseString );
-            } catch (Exception ex) {
-                //Replace a failure exception with a JSONObject representing that exception
-                logger.error(ex, ex);
-                jsonObject = new JSONObject();
-                jsonObject.put("msg", ex.getMessage());
-                jsonObject.put("success", false);
-                responseString = ex.toString();
-            }
-
-            //Extract our data (if it exists)
-            byte[] gmlBytes = new byte[] {}; //The error response is an empty array
-            Object dataObject = jsonObject.get("data");
-            Object messageObject = jsonObject.get("msg"); //This will be used as an error string
-            if (messageObject == null) {
-            	messageObject = ""; 
-            }
-            if (dataObject != null) {
-            	Object gmlResponseObject = JSONObject.fromObject(dataObject).get("gml");
-            	
-            	if (gmlResponseObject != null) {
-            		gmlBytes = gmlResponseObject.toString().getBytes();
-            	}
-            }
-
-            logger.trace(gmlBytes.length);
-
-            if(jsonObject.get("success").toString().equals("false")) {
-            	//The server may have returned an error message, if so, lets include it in the filename
-            	String messageString = messageObject.toString();
-            	if (messageString.length() == 0)
-            		messageString = "operation-failed";
-            	
-            	//"Tidy" up the message
-            	messageString = messageString.replace(' ', '_').replace(".", "");
-            	
-            	zout.putNextEntry(new ZipEntry(new SimpleDateFormat((i+1) + "_yyyyMMdd_HHmmss").format(new Date()) + "-" + messageString + ".xml"));
-            } else {
-                //create a new entry in the zip file with a timestamped name 
-            	zout.putNextEntry(new ZipEntry(new SimpleDateFormat((i+1) + "_yyyyMMdd_HHmmss").format(new Date()) + ".xml"));               
-            }
-
-            zout.write(gmlBytes);
-            zout.closeEntry();
-        }
+        ServiceDownloadManager downloadManager = new ServiceDownloadManager(serviceUrls, serviceCaller,threadpool);
+        //VT: threadpool is closed within downloadAll();
+        ArrayList<DownloadResponse> gmlDownloads=downloadManager.downloadAll();
+        writeResponseToZip(gmlDownloads,zout);
 
         zout.finish();
         zout.flush();
         zout.close();
     }
 
+    private void writeResponseToZip(ArrayList<DownloadResponse> gmlDownloads,ZipOutputStream zout) throws IOException{
+        StringBuilder errorMsg=new StringBuilder();
+
+        for(int i=0;i<gmlDownloads.size();i++){
+            DownloadResponse download=gmlDownloads.get(i);
+            //Check that attempt to request is successful
+            if(!download.hasException()){
+                JSONObject jsonObject = JSONObject.fromObject(download.getResponseAsString());
+                //check that JSON reply is successful
+                if (jsonObject.get("success").toString().equals("false")) {
+                    errorMsg.append("Unsuccessful JSON reply from: " + download.getRequestURL() + "\n");
+
+                    Object messageObject = jsonObject.get("msg");
+                    if(messageObject==null || messageObject.toString().length()==0){
+                        errorMsg.append("No error message\n\n");
+                    }else{
+                        errorMsg.append(messageObject.toString() + "\n\n");
+                    }
+                }else{
+                    byte[] gmlBytes = new byte[] {};
+                    Object dataObject = jsonObject.get("data");
+                    if (dataObject != null && !JSONNull.getInstance().equals(dataObject)) {
+                        Object gmlResponseObject = JSONObject.fromObject(dataObject)
+                                .get("gml");
+
+                        if (gmlResponseObject != null) {
+                            gmlBytes = gmlResponseObject.toString().getBytes();
+                        }
+                    }
+
+                    zout.putNextEntry(new ZipEntry(new SimpleDateFormat(
+                            (i + 1) + "_yyyyMMdd_HHmmss").format(new Date())
+                            + ".xml"));
+                    zout.write(gmlBytes);
+                    zout.closeEntry();
+                }
+
+            }else{
+                errorMsg.append("Exception thrown while attempting to download from: " + download.getRequestURL() + "\n");
+                errorMsg.append(download.getExceptionAsString()+ "\n\n");
+            }
+        }
+        if(errorMsg.length()!=0){
+            zout.putNextEntry(new ZipEntry("downloadInfo.txt"));
+            zout.write(errorMsg.toString().getBytes());
+            zout.closeEntry();
+        }
+    }
+
     /**
-     * Given a list of WMS URL's, this function will collate the responses 
+     * Given a list of WMS URL's, this function will collate the responses
      * into a zip file and send the response back to the browser.
-     * 
+     *
      * @param serviceUrls
+     * @param filename
      * @param response
      * @throws Exception
      */
-    @RequestMapping("/downloadWMSAsZip.do")
-    public void downloadWMSAsZip( @RequestParam("serviceUrls") final String[] serviceUrls,
+    @RequestMapping("/downloadDataAsZip.do")
+    public void downloadDataAsZip( @RequestParam("serviceUrls") final String[] serviceUrls,
+                                  @RequestParam("filename") final String filename,
                                   HttpServletResponse response) throws Exception {
+
+        String filenameStr = filename == null || filename.length() < 0 ? "DataDownload" : filename;
 
         //set the content type for zip files
         response.setContentType("application/zip");
-        response.setHeader("Content-Disposition","inline; filename=PNGDownload.zip;");
+        response.setHeader("Content-Disposition","inline; filename=" + filenameStr + ".zip;");
 
         //create the output stream
         ZipOutputStream zout = new ZipOutputStream(response.getOutputStream());
@@ -147,17 +160,20 @@ public class DownloadController {
         for(int i=0; i<serviceUrls.length; i++) {
 
             GetMethod method = new GetMethod(serviceUrls[i]);
-            HttpClient client = serviceCaller.getHttpClient();
-
-            byte[] responseBytes = serviceCaller.getMethodResponseInBytes(method, client);
-
-            Header contentType = serviceCaller.getResponseHeader(method, "Content-Type");
+            byte[] responseBytes = serviceCaller.getMethodResponseAsBytes(method);
+            Header contentType = method.getResponseHeader("Content-Type");
 
             //create a new entry in the zip file with a timestamped name
-            if(contentType.getValue().contains("xml"))
-                zout.putNextEntry(new ZipEntry(new SimpleDateFormat((i+1) + "_yyyyMMdd_HHmmss").format(new Date()) + ".xml"));
-            else
-                zout.putNextEntry(new ZipEntry(new SimpleDateFormat((i+1) + "_yyyyMMdd_HHmmss").format(new Date()) + ".png"));
+            String mime = null;
+            if (contentType != null) {
+                mime = contentType.getValue();
+            }
+            String fileExtension = MimeUtil.mimeToFileExtension(mime);
+            if (fileExtension != null && !fileExtension.isEmpty()) {
+                fileExtension = "." + fileExtension;
+            }
+            zout.putNextEntry(new ZipEntry(new SimpleDateFormat((i + 1) + "_yyyyMMdd_HHmmss").format(new Date()) + fileExtension));
+
 
             zout.write(responseBytes);
             zout.closeEntry();

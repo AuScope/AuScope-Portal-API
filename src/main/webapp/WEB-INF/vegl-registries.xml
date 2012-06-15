@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+    <bean id="cswVeglProduction" class="org.auscope.portal.core.services.csw.CSWServiceItem">
+        <constructor-arg name="id" value="cswVeglProduction"/>
+        <constructor-arg name="title" value="SISS ANU Geonetwork"/>
+        <constructor-arg name="serviceUrl" value="http://siss1.anu.edu.au/geonetwork/srv/en/csw"/>
+        <constructor-arg name="recordInformationUrl" value="http://siss1.anu.edu.au/geonetwork/srv/en/main.home?uuid=%1$s"/>
+        <property name="userName" value="${env.outputgeonetwork.user}"/>
+        <property name="password" value="${env.outputgeonetwork.password}"/>
+    </bean>
+
+</beans>

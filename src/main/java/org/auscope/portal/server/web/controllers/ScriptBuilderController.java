@@ -17,9 +17,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
-import org.auscope.portal.server.web.service.JobFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,18 +36,18 @@ import org.springframework.web.servlet.view.RedirectView;
  * @author Josh Vote - modified for usage with VEGL
  */
 @Controller
-public class ScriptBuilderController extends BaseVEGLController {
+public class ScriptBuilderController extends BasePortalController {
 
-	public static final String SCRIPT_FILE_NAME = "vegl_script.py";  
-	
+    public static final String SCRIPT_FILE_NAME = "vegl_script.py";
+
     private final Log logger = LogFactory.getLog(getClass());
 
     @Autowired
-    private JobFileService jobFileService;
-    
+    private FileStagingService jobFileService;
+
     @Autowired
     private VEGLJobManager jobManager;
-    
+
     /**
      * Writes provided script text to a file in the specified jobs stage in directory
      *
@@ -56,23 +57,23 @@ public class ScriptBuilderController extends BaseVEGLController {
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
                                   @RequestParam("sourceText") String sourceText) {
 
-        
-    	if (sourceText == null || sourceText.isEmpty()) {
-    		return generateJSONResponseMAV(false, null, "No source text specified");
-    	}
-    	
-    	//Lookup our job
-    	VEGLJob job = null;
-    	try {
-    		job = jobManager.getJobById(Integer.parseInt(jobId));
-    	} catch (Exception ex) {
-    		logger.warn("Unable to lookup job with id " + jobId, ex);
-    		return generateJSONResponseMAV(false, null, "Unable to lookup jobId");
-    	}
-    	
-    	//Apply text contents to job stage in directory
+
+        if (sourceText == null || sourceText.isEmpty()) {
+            return generateJSONResponseMAV(false, null, "No source text specified");
+        }
+
+        //Lookup our job
+        VEGLJob job = null;
         try {
-        	File scriptFile = jobFileService.createStageInDirectoryFile(job, SCRIPT_FILE_NAME);
+            job = jobManager.getJobById(Integer.parseInt(jobId));
+        } catch (Exception ex) {
+            logger.warn("Unable to lookup job with id " + jobId, ex);
+            return generateJSONResponseMAV(false, null, "Unable to lookup jobId");
+        }
+
+        //Apply text contents to job stage in directory
+        try {
+            File scriptFile = jobFileService.createStageInDirectoryFile(job, SCRIPT_FILE_NAME);
             PrintWriter writer = new PrintWriter(scriptFile);
             writer.print(sourceText);
             writer.close();

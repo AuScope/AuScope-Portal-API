@@ -10,9 +10,9 @@ import org.springframework.security.core.userdetails.User;
  *
  */
 public class PortalUser extends User {
-	
-	public PortalUser(String name, String credentials, String grantedAuthority) {
-		super(name,credentials,true,true,true,true,new GrantedAuthority[] {new GrantedAuthorityImpl(grantedAuthority)});
-	}
+
+    public PortalUser(String name, String credentials, String grantedAuthority) {
+        super(name,credentials,true,true,true,true,new GrantedAuthority[] {new GrantedAuthorityImpl(grantedAuthority)});
+    }
 
 }

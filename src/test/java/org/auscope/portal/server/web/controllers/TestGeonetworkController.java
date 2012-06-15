@@ -1,17 +1,19 @@
 package org.auscope.portal.server.web.controllers;
 
+import java.util.Date;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.auscope.portal.csw.record.CSWRecord;
-import org.auscope.portal.server.cloud.CloudFileInformation;
+import org.auscope.portal.core.cloud.CloudFileInformation;
+import org.auscope.portal.core.services.GeonetworkService;
+import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
-import org.auscope.portal.server.web.service.GeonetworkService;
-import org.auscope.portal.server.web.service.JobStorageService;
-import org.jets3t.service.S3ServiceException;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
@@ -33,7 +35,7 @@ public class TestGeonetworkController {
 
     private VEGLJobManager mockJobManager;
     private GeonetworkService mockGNService;
-    private JobStorageService mockJobStorageService;
+    private CloudStorageService cloudStorageService;
 
     private GeonetworkController controller;
 
@@ -41,9 +43,9 @@ public class TestGeonetworkController {
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockGNService = context.mock(GeonetworkService.class);
-        mockJobStorageService = context.mock(JobStorageService.class);
+        cloudStorageService = context.mock(CloudStorageService.class);
 
-        controller = new GeonetworkController(mockJobManager, mockGNService, mockJobStorageService);
+        controller = new GeonetworkController(mockJobManager, mockGNService, cloudStorageService);
     }
 
     /**
@@ -76,11 +78,11 @@ public class TestGeonetworkController {
             allowing(mockJob).getSelectionMaxNorthing();will(returnValue(3.0));
             allowing(mockJob).getSelectionMinNorthing();will(returnValue(4.0));
             allowing(mockJob).getDescription();will(returnValue("description"));
-            allowing(mockJob).getSubmitDate();will(returnValue("20110713_105730"));
+            allowing(mockJob).getSubmitDate();will(returnValue(new Date()));
             allowing(mockJob).getName();will(returnValue("name"));
             allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
-            allowing(mockJob).getCloudOutputBucket();will(returnValue("s3-output-bucket"));
+            allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
             allowing(mockJob).getVmSubsetUrl();will(returnValue(null));
 
@@ -93,7 +95,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
             //Only 1 call to the job storage service for files
-            oneOf(mockJobStorageService).getOutputFileDetails(mockJob);will(returnValue(outputFileInfo));
+            oneOf(cloudStorageService).listJobFiles(mockJob);will(returnValue(outputFileInfo));
 
             //Only 1 call to save our newly created record
             oneOf(mockGNService).makeCSWRecordInsertion(with(any(CSWRecord.class)));will(returnValue(registeredUrl));
@@ -179,7 +181,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
             //Only 1 call to the job storage service for files
-            oneOf(mockJobStorageService).getOutputFileDetails(mockJob);will(throwException(new S3ServiceException()));
+            oneOf(cloudStorageService).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
         }});
 
         ModelAndView mav = controller.insertRecord(jobId, mockRequest);
@@ -217,7 +219,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getName();will(returnValue("name"));
             allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
-            allowing(mockJob).getCloudOutputBucket();will(returnValue("s3-output-bucket"));
+            allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
             allowing(mockJob).getVmSubsetUrl();will(returnValue(null));
 
@@ -230,7 +232,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
             //Only 1 call to the job storage service for files
-            oneOf(mockJobStorageService).getOutputFileDetails(mockJob);will(returnValue(outputFileInfo));
+            oneOf(cloudStorageService).listJobFiles(mockJob);will(returnValue(outputFileInfo));
 
             //Only 1 call to save our newly created record
             oneOf(mockGNService).makeCSWRecordInsertion(with(any(CSWRecord.class)));will(throwException(new Exception()));

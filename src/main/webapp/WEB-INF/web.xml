@@ -4,16 +4,16 @@
     xmlns="http://java.sun.com/xml/ns/j2ee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
-						http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+                        http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
     version="2.4">
 
-   <display-name>AuScope Portal</display-name>
+   <display-name>VGL Portal</display-name>
 
     <!-- This is so our our profile 'magic' context is utilised -->
     <context-param>
         <param-name>contextClass</param-name>
         <param-value>
-            org.auscope.portal.server.util.PortalProfileXmlWebApplicationContext
+            org.auscope.portal.server.VeglWebAppContext
         </param-value>
     </context-param>
 
@@ -30,16 +30,6 @@
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
-
-   <servlet>
-      <servlet-name>RestProxy</servlet-name>
-      <servlet-class>com.jsos.restproxy.RestProxyServlet</servlet-class>
-   </servlet>
-
-   <servlet-mapping>
-      <servlet-name>RestProxy</servlet-name>
-      <url-pattern>/restproxy</url-pattern>
-   </servlet-mapping>
 
    <servlet>
       <servlet-name>annotationsDispatcher</servlet-name>

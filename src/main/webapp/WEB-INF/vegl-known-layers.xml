@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+   <bean id="knownTypeBouguerGeodetic" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="ga-onshore-bouguer-geodetic"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="onshore_only_Bouguer_geodetic"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="Onshore Only Bouguer Geodetic"/>
+        <property name="description" value=""/>
+    </bean>
+
+    <bean id="knownTypeGravAnomalyGeodetic" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="ga-grav-anom-geo"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="onshore_and_offshore_gravity_anomaly_geodetic"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="Onshore and Offshore Gravity Anomaly Geodetic"/>
+        <property name="description" value=""/>
+    </bean>
+
+    <bean id="knownTypeMagMap" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="ga-magmap-v5-2010"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="magmap_V5_2010"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="MagMap V5 2010"/>
+        <property name="description" value=""/>
+    </bean>
+
+    <bean id="knownTypeRadMapTotaldose" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="ga-radmap-totaldose"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="radmap10_filtered_totaldose"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="RadMap Totaldose"/>
+        <property name="description" value=""/>
+    </bean>
+</beans>

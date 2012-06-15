@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
@@ -35,7 +35,7 @@ public class MenuController {
    @Autowired
    @Qualifier(value = "propertyConfigurer")
    private PortalPropertyPlaceholderConfigurer hostConfigurer;
-   
+
 
    /* Commented out, for the time being we are redirecting Home link to AuScope site
    @RequestMapping("/home.html")
@@ -47,12 +47,12 @@ public class MenuController {
 
    @RequestMapping("/genericparser.html")
    public ModelAndView genericParser() {
-	   String googleKey = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
+       String googleKey = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
 
-	   ModelAndView mav = new ModelAndView("genericparser");
-	      mav.addObject("googleKey", googleKey);
+       ModelAndView mav = new ModelAndView("genericparser");
+          mav.addObject("googleKey", googleKey);
 
-	   return mav;
+       return mav;
    }
 
    @RequestMapping("/gmap.html")
@@ -138,23 +138,23 @@ public class MenuController {
       }
       return mav;
    }
-   
+
    private ModelAndView setCloudCredentials(HttpServletRequest request,String redirectViewName) {
-	   return new ModelAndView(redirectViewName);
+       return new ModelAndView(redirectViewName);
    }
- 
+
    @RequestMapping("/jobbuilder.html")
    public ModelAndView jobbuilder(HttpServletRequest request) {
        // Ensure user has valid grid credentials
-	   //return doShibbolethAndSLCSLogin(request, "gridsubmit", "/gridsubmit.html");
-	   return setCloudCredentials(request, "jobbuilder");
-	   //return new ModelAndView("gridsubmit");
+       //return doShibbolethAndSLCSLogin(request, "gridsubmit", "/gridsubmit.html");
+       return setCloudCredentials(request, "jobbuilder");
+       //return new ModelAndView("gridsubmit");
    }
-   
+
    @RequestMapping("/joblist.html")
    public ModelAndView joblist(HttpServletRequest request) {
-	   //return doShibbolethAndSLCSLogin(request, "joblist", "/joblist.html");
-	   return setCloudCredentials(request, "joblist");
-	   //return new ModelAndView("joblist");
+       //return doShibbolethAndSLCSLogin(request, "joblist", "/joblist.html");
+       return setCloudCredentials(request, "joblist");
+       //return new ModelAndView("joblist");
    }
 }

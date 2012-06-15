@@ -6,13 +6,9 @@
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-    <!-- This is very important - it will selectively load our beans for the (machine specified) profile
-    or use the default profile if none is specified. See AUS-1932
-    <import resource="profile-${AUSCOPE_PORTAL_PROFILE:portal-test}.xml" />-->
-
    <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
    <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->
-   <bean id="propertyConfigurer" class="org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer">
+   <bean id="propertyConfigurer" class="org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer">
       <property name="locations">
          <list>
             <value>classpath:config.properties</value>
@@ -22,58 +18,98 @@
       </property>
    </bean>
 
-
-
-   <bean id="geonetworkCredentials" class="org.auscope.portal.server.web.GeonetworkDetails">
-        <property name="url" value="${env.outputgeonetwork.baseurl}"/>
-        <property name="user" value="${env.outputgeonetwork.user}"/>
-        <property name="password" value="${env.outputgeonetwork.password}"/>
+   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <property name="driverClassName" value="${jdbc.driverClass}"/>
+      <property name="url" value="${HOST.jdbc.url}"/>
+      <property name="username" value="${env.jdbc.user}"/>
+      <property name="password" value="${env.jdbc.password}"/>
    </bean>
 
-   <bean id="connectionParams" class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
-        <property name="connectionTimeout" value="900000"/> <!--  15 minutes -->
-        <property name="soTimeout" value="900000"/> <!--  15 minutes -->
-   </bean>
-
-    <bean id="cswVEGLDev" class="org.auscope.portal.server.web.service.CSWServiceItem">
-        <constructor-arg index="0" value="http://siss1.anu.edu.au/geonetwork/srv/en/csw"/>
+   <!-- This is the core threadpool shared by object instances throughout the portal -->
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="5" />
+        <property name="maxPoolSize" value="5" />
+        <property name="queueCapacity" value="25" />
     </bean>
 
-    <bean id="cswVEGLTest" class="org.auscope.portal.server.web.service.CSWServiceItem">
-        <constructor-arg index="0" value="http://siss1.anu.edu.au/geonetwork/srv/en/csw"/>
+
+    <bean id="httpServiceCaller" class="org.auscope.portal.core.server.http.HttpServiceCaller">
+        <constructor-arg name="clientParams">
+            <bean class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
+                <!--  15 minutes -->
+                <property name="connectionTimeout" value="900000"/>
+                <!--  15 minutes -->
+                <property name="soTimeout" value="900000"/>
+            </bean>
+        </constructor-arg>
     </bean>
 
-    <bean id="cswVEGLProduction" class="org.auscope.portal.server.web.service.CSWServiceItem">
-        <constructor-arg index="0" value="http://siss1.anu.edu.au/geonetwork/srv/en/csw"/>
+    <bean id="viewCswRecordFactory" class="org.auscope.portal.core.view.ViewCSWRecordFactory">
     </bean>
 
-   <bean id="knownTypeBouguerGeodetic" class="org.auscope.portal.server.web.KnownLayerWMS">
-       <constructor-arg name="title" value="Onshore Only Bouguer Geodetic"/>
-       <constructor-arg name="description" value=""/>
-       <constructor-arg name="layerName" value="onshore_only_Bouguer_geodetic"/>
-   </bean>
-
-   <bean id="knownTypeGravAnomalyGeodetic" class="org.auscope.portal.server.web.KnownLayerWMS">
-       <constructor-arg name="title" value="Onshore and Offshore Gravity Anomaly Geodetic"/>
-       <constructor-arg name="description" value=""/>
-       <constructor-arg name="layerName" value="onshore_and_offshore_gravity_anomaly_geodetic"/>
-   </bean>
-
-   <bean id="knownTypeMagMap" class="org.auscope.portal.server.web.KnownLayerWMS">
-       <constructor-arg name="title" value="MagMap V5 2010"/>
-       <constructor-arg name="description" value=""/>
-       <constructor-arg name="layerName" value="magmap_V5_2010"/>
-   </bean>
-
-   <bean id="knownTypeRadMapTotaldose" class="org.auscope.portal.server.web.KnownLayerWMS">
-       <constructor-arg name="title" value="RadMap Totaldose"/>
-       <constructor-arg name="description" value=""/>
-       <constructor-arg name="layerName" value="radmap10_filtered_totaldose"/>
-   </bean>
-
-    <bean id="stagingInfo" class="org.auscope.portal.server.cloud.StagingInformation">
-        <property name="stageInDirectory" value="${HOST.localStageInDir}"></property>
+    <bean id="viewKnownLayerFactory" class="org.auscope.portal.core.view.ViewKnownLayerFactory">
     </bean>
+
+    <bean id="cswCacheService" class="org.auscope.portal.core.services.CSWCacheService">
+        <constructor-arg name="executor" ref="taskExecutor"/>
+        <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="cswServiceList" ref="cswServiceList"/> <!-- This is pulled from the profile xml -->
+    </bean>
+
+    <bean id="cswKnownLayerService" class="org.auscope.portal.core.services.KnownLayerService">
+        <constructor-arg name="knownTypes" ref="knownTypes"/> <!-- This is pulled from the profile xml -->
+        <constructor-arg name="cswCacheService" ref="cswCacheService"/>
+    </bean>
+
+    <bean id="wcsService" class="org.auscope.portal.core.services.WCSService">
+        <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="methodMaker">
+            <bean class="org.auscope.portal.core.services.methodmakers.WCSMethodMaker">
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="opendapService" class="org.auscope.portal.core.services.OpendapService">
+        <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="getDataMethodMaker">
+            <bean class="org.auscope.portal.core.services.methodmakers.OPeNDAPGetDataMethodMaker">
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="wmsService" class="org.auscope.portal.core.services.WMSService">
+        <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="methodMaker">
+            <bean class="org.auscope.portal.core.services.methodmakers.WMSMethodMaker">
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="cloudStorageService" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+        <property name="relaxHostName" value="true"/>
+    </bean>
+
+    <bean id="cloudComputeService" class="org.auscope.portal.core.services.cloud.CloudComputeService">
+        <constructor-arg name="endpoint" value="${ec2.endpoint}"/>
+        <constructor-arg name="credentials">
+            <bean class="com.amazonaws.auth.BasicAWSCredentials">
+                <constructor-arg name="accessKey" value="${ec2.accesskey}"/>
+                <constructor-arg name="secretKey" value="${ec2.secretkey}"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="fileStagingService" class="org.auscope.portal.core.services.cloud.FileStagingService">
+        <constructor-arg name="stagingInformation">
+            <bean class="org.auscope.portal.core.cloud.StagingInformation">
+                <constructor-arg name="stageInDirectory" value="${HOST.localStageInDir}"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+   </bean>
 
     <bean id="veglJobManager" class="org.auscope.portal.server.vegl.VEGLJobManager">
         <property name="veglJobDao" ref="veglJobDao"/>
@@ -100,26 +136,5 @@
             <value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>
         </property>
     </bean>
-
-    <bean id="multipartResolver"
-        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-   </bean>
-
-    <bean id="blobStoreContextFactory"
-        class="org.jclouds.blobstore.BlobStoreContextFactory">
-   </bean>
-
-    <bean id="jCloudSwiftStorageService"
-        class="org.auscope.portal.server.web.service.JCloudSwiftStorageService">
-         <constructor-arg name="hostConfigurer" ref="propertyConfigurer"/>
-         <constructor-arg name="blobStoreContextFactory" ref="blobStoreContextFactory"/>
-    </bean>
-
-
-<!--
-    <bean id="s3JobStorageService"
-        class="org.auscope.portal.server.web.service.S3JobStorageService">
-    </bean>
--->
 
 </beans>

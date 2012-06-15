@@ -19,13 +19,14 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.server.gridjob.FileInformation;
-import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
-import org.auscope.portal.server.web.service.JobExecutionService;
-import org.auscope.portal.server.web.service.JobFileService;
-import org.auscope.portal.server.web.service.JobStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +43,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Josh Vote
  */
 @Controller
-public class GridSubmitController extends BaseVEGLController {
+public class GridSubmitController extends BasePortalController {
 
 
 
@@ -50,10 +51,10 @@ public class GridSubmitController extends BaseVEGLController {
     private final Log logger = LogFactory.getLog(getClass());
 
     private VEGLJobManager jobManager;
-    private JobFileService jobFileService;
+    private FileStagingService fileStagingService;
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
-    private JobStorageService jobStorageService;
-    private JobExecutionService jobExecutionService;
+    private CloudStorageService cloudStorageService;
+    private CloudComputeService cloudComputeService;
 
     //This is a file path for a CENTOS VM
     private static final String ERRDAP_SUBSET_VM_FILE_PATH = "/tmp/vegl-subset.csv";
@@ -67,14 +68,14 @@ public class GridSubmitController extends BaseVEGLController {
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
     @Autowired
-    public GridSubmitController(VEGLJobManager jobManager, JobFileService jobFileService,
-            PortalPropertyPlaceholderConfigurer hostConfigurer, JobStorageService jobStorageService,
-            JobExecutionService jobExecutionService) {
+    public GridSubmitController(VEGLJobManager jobManager, FileStagingService fileStagingService,
+            PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService cloudStorageService,
+            CloudComputeService cloudComputeService) {
         this.jobManager = jobManager;
-        this.jobFileService = jobFileService;
+        this.fileStagingService = fileStagingService;
         this.hostConfigurer = hostConfigurer;
-        this.jobStorageService = jobStorageService;
-        this.jobExecutionService = jobExecutionService;
+        this.cloudStorageService = cloudStorageService;
+        this.cloudComputeService = cloudComputeService;
     }
 
     /**
@@ -110,7 +111,7 @@ public class GridSubmitController extends BaseVEGLController {
 
         //Generate our stage in directory
         try {
-            jobFileService.generateStageInDirectory(newJob);
+            fileStagingService.generateStageInDirectory(newJob);
         } catch (Exception ex) {
             logger.error("Error creating input dir", ex);
             return generateJSONResponseMAV(false, null, "Error creating input directory");
@@ -130,7 +131,7 @@ public class GridSubmitController extends BaseVEGLController {
             return generateJSONResponseMAV(true, newJob, "");
         } catch (Exception ex) {
             //On failure make sure we delete the new directory
-            jobFileService.deleteStageInDirectory(newJob);
+            fileStagingService.deleteStageInDirectory(newJob);
             logger.error("Error saving newly created job", ex);
             return generateJSONResponseMAV(false, null, "Error saving newly created job");
         }
@@ -161,8 +162,8 @@ public class GridSubmitController extends BaseVEGLController {
         //Get our files
         File[] files = null;
         try {
-            files = jobFileService.listStageInDirectoryFiles(job);
-        } catch (IOException ex) {
+            files = fileStagingService.listStageInDirectoryFiles(job);
+        } catch (Exception ex) {
             logger.error("Error listing job stage in directory", ex);
             return generateJSONResponseMAV(false, null, "Error reading job stage in directory");
         }
@@ -193,7 +194,7 @@ public class GridSubmitController extends BaseVEGLController {
 
         //Lookup our job and download the specified files (any exceptions will return a HTTP 503)
         VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
-        jobFileService.handleFileDownload(job, filename, response);
+        fileStagingService.handleFileDownload(job, filename, response);
         return null;
     }
 
@@ -224,8 +225,8 @@ public class GridSubmitController extends BaseVEGLController {
         //Handle incoming file
         File file = null;
         try {
-            file = jobFileService.handleFileUpload(job, (MultipartHttpServletRequest) request);
-        } catch (IOException ex) {
+            file = fileStagingService.handleFileUpload(job, (MultipartHttpServletRequest) request);
+        } catch (Exception ex) {
             logger.error("Error uploading file", ex);
             return generateJSONResponseMAV(false, null, "Error uploading file");
         }
@@ -259,7 +260,7 @@ public class GridSubmitController extends BaseVEGLController {
         }
 
         for (String fileName : fileNames) {
-            boolean success = jobFileService.deleteStageInFile(job, fileName);
+            boolean success = fileStagingService.deleteStageInFile(job, fileName);
             logger.debug("Deleting " + fileName + " success=" + success);
         }
 
@@ -310,7 +311,7 @@ public class GridSubmitController extends BaseVEGLController {
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
 
-        boolean success = jobFileService.deleteStageInDirectory(job);
+        boolean success = fileStagingService.deleteStageInDirectory(job);
         return generateJSONResponseMAV(success, null, "");
     }
 
@@ -361,10 +362,11 @@ public class GridSubmitController extends BaseVEGLController {
         if (job == null) {
             logger.error("job with id " + jobId + " DNE");
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
-        } else if (job.getCloudOutputAccessKey() == null || job.getCloudOutputAccessKey().isEmpty() ||
-            //Check we have S3 credentials otherwise there is no point in continuing
-            job.getCloudOutputSecretKey() == null || job.getCloudOutputSecretKey().isEmpty() ||
-            job.getCloudOutputBucket() == null || job.getCloudOutputBucket().isEmpty()) {
+        } else if (job.getStorageAccessKey() == null || job.getStorageAccessKey().isEmpty() ||
+            job.getStorageSecretKey() == null || job.getStorageSecretKey().isEmpty() ||
+            job.getStorageBucket() == null || job.getStorageBucket().isEmpty()) {
+
+          //Check we have S3 credentials otherwise there is no point in continuing
             logger.error("No output S3 credentials found. NOT submitting job!");
 
             job.setStatus(STATUS_FAILED);
@@ -379,7 +381,7 @@ public class GridSubmitController extends BaseVEGLController {
         try {
 
             // get job files from local directory
-            File[] files = jobFileService.listStageInDirectoryFiles(job);
+            File[] files = fileStagingService.listStageInDirectoryFiles(job);
             if (files.length == 0) {
                 job.setStatus(STATUS_FAILED);
                 jobManager.saveJob(job);
@@ -387,7 +389,7 @@ public class GridSubmitController extends BaseVEGLController {
             }
 
             //Upload them to storage
-            jobStorageService.uploadInputJobFiles(job, files);
+            cloudStorageService.uploadJobFiles(job, files);
         } catch (Exception e) {
             //We failed uploading
             logger.error("Job submission failed.", e);
@@ -398,10 +400,10 @@ public class GridSubmitController extends BaseVEGLController {
 
         //create our input user data string
         JSONObject encodedUserData = new JSONObject();
-        encodedUserData.put("s3OutputBucket", job.getCloudOutputBucket());
-        encodedUserData.put("s3OutputBaseKeyPath", job.getCloudOutputBaseKey().replace("//", "/"));
-        encodedUserData.put("s3OutputAccessKey", job.getCloudOutputAccessKey());
-        encodedUserData.put("s3OutputSecretKey", job.getCloudOutputSecretKey());
+        encodedUserData.put("s3OutputBucket", job.getStorageBucket());
+        encodedUserData.put("s3OutputBaseKeyPath", job.getStorageBaseKey().replace("//", "/"));
+        encodedUserData.put("s3OutputAccessKey", job.getStorageAccessKey());
+        encodedUserData.put("s3OutputSecretKey", job.getStorageSecretKey());
         encodedUserData.put("veglShellScript", hostConfigurer.resolvePlaceholder("vm.sh"));
         encodedUserData.put("storageEndpoint", hostConfigurer.resolvePlaceholder("storage.endpoint"));
         String userDataString = encodedUserData.toString();
@@ -409,7 +411,7 @@ public class GridSubmitController extends BaseVEGLController {
         // launch the ec2 instance
         String instanceId = null;
         try {
-            instanceId = jobExecutionService.executeJob(job, userDataString);
+            instanceId = cloudComputeService.executeJob(job, userDataString);
         } catch (Exception ex) {
             logger.error("Failed to launch instance to run job " + job.getId(), ex);
             job.setStatus(STATUS_FAILED);
@@ -426,7 +428,7 @@ public class GridSubmitController extends BaseVEGLController {
         logger.info("Launched instance: " + instanceId);
 
         // set reference as instanceId for use when killing a job
-        job.setEc2InstanceId(instanceId);
+        job.setComputeInstanceId(instanceId);
         job.setStatus(STATUS_ACTIVE);
         job.setSubmitDate(new Date());
         jobManager.saveJob(job);
@@ -461,9 +463,8 @@ public class GridSubmitController extends BaseVEGLController {
         job.setInversionDepth((Integer) session.getAttribute(ERRDAPController.SESSION_INVERSION_DEPTH));
 
         job.setVmSubsetFilePath(ERRDAP_SUBSET_VM_FILE_PATH);
-        job.setEc2AMI(hostConfigurer.resolvePlaceholder("ami.id"));
-        job.setEc2Endpoint(hostConfigurer.resolvePlaceholder("ec2.endpoint"));
-        job.setCloudOutputBucket("vegl-portal");
+        job.setComputeVmId(hostConfigurer.resolvePlaceholder("ami.id"));
+        job.setStorageBucket("vegl-portal");
         job.setName("VEGL-Job");
         job.setDescription("");
         job.setStatus(STATUS_UNSUBMITTED);
@@ -473,9 +474,7 @@ public class GridSubmitController extends BaseVEGLController {
         Date date = new Date(); //Use the current date to generate an id
         String fileStorageId = String.format("VEGL-%1$s-%2$s", job.getUser(), sdf.format(date));
         fileStorageId = fileStorageId.replaceAll("[=/\\, @:]", "_"); //get rid of some obvious nasty characters
-        job.setFileStorageId(fileStorageId);
-
-        job.setCloudOutputBaseKey(job.getFileStorageId());
+        job.setStorageBaseKey(fileStorageId);
 
         return job;
     }
@@ -489,7 +488,7 @@ public class GridSubmitController extends BaseVEGLController {
      */
     private boolean createSubsetScriptFile(VEGLJob job, HashMap<String,String> erddapUrlMap) {
         // create new subset request script file
-        File subsetRequestScript = jobFileService.createStageInDirectoryFile(job, "subset_request.sh");
+        File subsetRequestScript = fileStagingService.createStageInDirectoryFile(job, "subset_request.sh");
 
         // iterate through the map of subset request URL's
         Set<String> keys = erddapUrlMap.keySet();

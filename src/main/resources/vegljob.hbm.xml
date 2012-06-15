@@ -8,20 +8,22 @@
         </id>
         <property name="name"/>
         <property name="description"/>
-        <property name="submitDate"/>
-        <property name="ec2AMI"/>
-        <property name="ec2InstanceId"/>
-        <property name="ec2Endpoint"/>
-        <property name="cloudOutputAccessKey"/>
-        <property name="cloudOutputSecretKey"/>
-        <property name="cloudOutputBucket"/>
-        <property name="cloudOutputBaseKey"/>
-        <property name="registeredUrl"/>
         <property name="emailAddress"/>
-        <property name="status"/>
-        <property name="seriesId"/>
         <property name="user"/>
-        <property name="fileStorageId"/>
+        <property name="submitDate"/>
+        <property name="status"/>
+        <property name="computeVmId"/>
+        <property name="computeInstanceId"/>
+        <property name="computeInstanceType"/>
+        <property name="computeInstanceKey"/>
+        <property name="storageEndpoint"/>
+        <property name="storageBucket"/>
+        <property name="storageAccessKey"/>
+        <property name="storageSecretKey"/>
+        <property name="registeredUrl"/>
+        <property name="seriesId"/>
+        <property name="vmSubsetFilePath"/>
+        <property name="vmSubsetUrl"/>
         <property name="paddingMinEasting"/>
         <property name="paddingMaxEasting"/>
         <property name="paddingMinNorthing"/>
@@ -35,9 +37,8 @@
         <property name="cellY"/>
         <property name="cellZ"/>
         <property name="inversionDepth"/>
-        <property name="vmSubsetFilePath"/>
-        <property name="vmSubsetUrl"/>
-
+        <property name="storageBaseKey"/>
+        <property name="storageProvider"/>
     </class>
 </hibernate-mapping>
 

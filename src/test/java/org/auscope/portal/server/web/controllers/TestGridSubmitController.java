@@ -5,13 +5,13 @@ import java.io.File;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auscope.portal.server.util.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
-import org.auscope.portal.server.web.service.JobExecutionService;
-import org.auscope.portal.server.web.service.JobFileService;
-import org.auscope.portal.server.web.service.JobStorageService;
-import org.jets3t.service.S3ServiceException;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -31,10 +31,10 @@ public class TestGridSubmitController {
     }};
 
     private VEGLJobManager mockJobManager;
-    private JobFileService mockJobFileService;
-    private JobStorageService mockJobStorageService;
+    private FileStagingService mockFileStagingService;
+    private CloudStorageService mockCloudStorageService;
     private PortalPropertyPlaceholderConfigurer mockHostConfigurer;
-    private JobExecutionService mockJobExecutionService;
+    private CloudComputeService mockCloudComputeService;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
 
@@ -43,14 +43,14 @@ public class TestGridSubmitController {
     @Before
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
-        mockJobFileService = context.mock(JobFileService.class);
+        mockFileStagingService = context.mock(FileStagingService.class);
         mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
-        mockJobStorageService = context.mock(JobStorageService.class);
-        mockJobExecutionService = context.mock(JobExecutionService.class);
+        mockCloudStorageService = context.mock(CloudStorageService.class);
+        mockCloudComputeService = context.mock(CloudComputeService.class);
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);
 
-        controller = new GridSubmitController(mockJobManager, mockJobFileService, mockHostConfigurer, mockJobStorageService, mockJobExecutionService);
+        controller = new GridSubmitController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageService, mockCloudComputeService);
     }
 
     /**
@@ -60,13 +60,16 @@ public class TestGridSubmitController {
     @Test
     public void testJobSubmission() throws Exception {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(new Integer(13), "jobName", "jobDesc", "user",
-                "user@email.com", null, null, "ec2InstanceId",
-                "http://ec2.endpoint", "ec2Ami", "s3AccessKey", "s3SecretKey",
-                "s3Bucket", "s3BaseKey", null, new Integer(45),
-                "file-storage-id", "vm-subset-filepath", "http://vm.subset.url");
+        final VEGLJob jobObj = new VEGLJob(new Integer(13));
         final File[] stageInFiles = new File[] {context.mock(File.class, "MockFile1"), context.mock(File.class, "MockFile2")};
         final String instanceId = "new-instance-id";
+
+        jobObj.setStorageBaseKey("base/key");
+        jobObj.setStorageAccessKey("accessKey");
+        jobObj.setStorageBucket("bucket");
+        jobObj.setStorageEndpoint("http://example.com/storage");
+        jobObj.setStorageProvider("example-storage-provider");
+        jobObj.setStorageSecretKey("secretKey");
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -74,21 +77,21 @@ public class TestGridSubmitController {
             oneOf(mockJobManager).saveJob(jobObj);
 
             //We should have 1 call to get our stage in files
-            oneOf(mockJobFileService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
+            oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
 
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             //And one call to upload them
-            oneOf(mockJobStorageService).uploadInputJobFiles(jobObj, stageInFiles);
+            oneOf(mockCloudStorageService).uploadJobFiles(jobObj, stageInFiles);
 
             //And finally 1 call to execute the job
-            oneOf(mockJobExecutionService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(instanceId));
+            oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(instanceId));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
-        Assert.assertEquals(instanceId, jobObj.getEc2InstanceId());
+        Assert.assertEquals(instanceId, jobObj.getComputeInstanceId());
     }
 
     /**
@@ -114,11 +117,7 @@ public class TestGridSubmitController {
     @Test
     public void testJobSubmission_JobNoCredentials() throws Exception {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(new Integer(13), "jobName", "jobDesc", "user",
-                "user@email.com", null, null, "ec2InstanceId",
-                "http://ec2.endpoint", "ec2Ami", "", "",
-                "s3Bucket", "s3BaseKey", null, new Integer(45),
-                "file-storage-id", "vm-subset-filepath", "http://vm.subset.url");
+        final VEGLJob jobObj = new VEGLJob(13);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -139,11 +138,7 @@ public class TestGridSubmitController {
     @Test
     public void testJobSubmission_S3Failure() throws Exception {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(new Integer(13), "jobName", "jobDesc", "user",
-                "user@email.com", null, null, "ec2InstanceId",
-                "http://ec2.endpoint", "ec2Ami", "s3AccessKey", "s3SecretKey",
-                "s3Bucket", "s3BaseKey", null, new Integer(45),
-                "file-storage-id", "vm-subset-filepath", "http://vm.subset.url");
+        final VEGLJob jobObj = new VEGLJob(13);
         final File[] stageInFiles = new File[] {context.mock(File.class, "MockFile1"), context.mock(File.class, "MockFile2")};
 
         context.checking(new Expectations() {{
@@ -152,10 +147,10 @@ public class TestGridSubmitController {
             oneOf(mockJobManager).saveJob(jobObj);
 
             //We should have 1 call to get our stage in files
-            oneOf(mockJobFileService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
+            oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
 
             //And one call to upload them (which we will mock as failing)
-            oneOf(mockJobStorageService).uploadInputJobFiles(jobObj, stageInFiles);will(throwException(new S3ServiceException()));
+            oneOf(mockCloudStorageService).uploadJobFiles(jobObj, stageInFiles);will(throwException(new PortalServiceException("")));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
@@ -171,11 +166,7 @@ public class TestGridSubmitController {
     @Test
     public void testJobSubmission_ExecuteFailure() throws Exception {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(new Integer(13), "jobName", "jobDesc", "user",
-                "user@email.com", null, null, "ec2InstanceId",
-                "http://ec2.endpoint", "ec2Ami", "s3AccessKey", "s3SecretKey",
-                "s3Bucket", "s3BaseKey", null, new Integer(45),
-                "file-storage-id", "vm-subset-filepath", "http://vm.subset.url");
+        final VEGLJob jobObj = new VEGLJob(13);
         final File[] stageInFiles = new File[] {context.mock(File.class, "MockFile1"), context.mock(File.class, "MockFile2")};
 
         context.checking(new Expectations() {{
@@ -184,16 +175,16 @@ public class TestGridSubmitController {
             oneOf(mockJobManager).saveJob(jobObj);
 
             //We should have 1 call to get our stage in files
-            oneOf(mockJobFileService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
+            oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
 
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             //And one call to upload them
-            oneOf(mockJobStorageService).uploadInputJobFiles(jobObj, stageInFiles);
+            oneOf(mockCloudStorageService).uploadJobFiles(jobObj, stageInFiles);
 
             //And finally 1 call to execute the job (which will return null indicating failure)
-            oneOf(mockJobExecutionService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(null));
+            oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(null));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());

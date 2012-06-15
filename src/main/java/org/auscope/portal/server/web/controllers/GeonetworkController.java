@@ -16,20 +16,19 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.csw.record.CSWContact;
-import org.auscope.portal.csw.record.CSWGeographicBoundingBox;
-import org.auscope.portal.csw.record.CSWGeographicElement;
-import org.auscope.portal.csw.record.CSWOnlineResource;
-import org.auscope.portal.csw.record.CSWOnlineResourceImpl;
-import org.auscope.portal.csw.record.CSWRecord;
-import org.auscope.portal.csw.record.CSWResponsibleParty;
-import org.auscope.portal.server.cloud.CloudFileInformation;
+import org.auscope.portal.core.cloud.CloudFileInformation;
+import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.GeonetworkService;
+import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.responses.csw.CSWContact;
+import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
+import org.auscope.portal.core.services.responses.csw.CSWGeographicElement;
+import org.auscope.portal.core.services.responses.csw.CSWOnlineResourceImpl;
+import org.auscope.portal.core.services.responses.csw.CSWRecord;
+import org.auscope.portal.core.services.responses.csw.CSWResponsibleParty;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
-import org.auscope.portal.server.web.service.CloudStorageException;
-import org.auscope.portal.server.web.service.GeonetworkService;
-import org.auscope.portal.server.web.service.JobStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,19 +41,19 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 @Controller
-public class GeonetworkController extends BaseVEGLController {
+public class GeonetworkController extends BasePortalController {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
     private VEGLJobManager jobManager;
     private GeonetworkService gnService;
-    private JobStorageService jobStorageService;
+    private CloudStorageService cloudStorageService;
 
     @Autowired
-    public GeonetworkController(VEGLJobManager jobManager, GeonetworkService gnService, JobStorageService jobStorageService) {
+    public GeonetworkController(VEGLJobManager jobManager, GeonetworkService gnService, CloudStorageService cloudStorageService) {
         this.jobManager = jobManager;
         this.gnService = gnService;
-        this.jobStorageService = jobStorageService;
+        this.cloudStorageService = cloudStorageService;
     }
 
 
@@ -68,9 +67,9 @@ public class GeonetworkController extends BaseVEGLController {
      * @throws MalformedURLException
      * @throws CloudStorageException
      */
-    private CSWRecord jobToCSWRecord(HttpServletRequest request, VEGLJob job, VEGLSeries series) throws MalformedURLException, CloudStorageException {
-        CloudFileInformation[] outputFiles = jobStorageService.getOutputFileDetails(job);
-        List<CSWOnlineResource> onlineResources = new ArrayList<CSWOnlineResource>();
+    private CSWRecord jobToCSWRecord(HttpServletRequest request, VEGLJob job, VEGLSeries series) throws Exception {
+        CloudFileInformation[] outputFiles = cloudStorageService.listJobFiles(job);
+        List<CSWOnlineResourceImpl> onlineResources = new ArrayList<CSWOnlineResourceImpl>();
 
         //Add any output files to our online resources tab
         if (outputFiles != null) {
@@ -106,25 +105,20 @@ public class GeonetworkController extends BaseVEGLController {
         CSWGeographicElement[] geoEls = new CSWGeographicElement[] {new CSWGeographicBoundingBox(job.getSelectionMinEasting(), job.getSelectionMaxEasting(), job.getSelectionMinNorthing(), job.getSelectionMaxNorthing())};
 
         //Build our CSW Record
-        CSWRecord rec = new CSWRecord();
+        CSWRecord rec = new CSWRecord(null);
         rec.setContact(rp);
         rec.setCSWGeographicElements(geoEls);
         rec.setConstraints(new String[] {
                 "Copyright Commonwealth of Australia. This work is copyright. Unless otherwise specified on this website, you may display, print and reproduce this material in unaltered form only (retaining this notice) for your personal, non-commercial use, use within your organisation or, if you are an educational institution, use for educational purposes. Apart from any use as permitted under the Copyright Act 1968 or as otherwise specified on this website, all other rights are reserved. Requests and enquiries concerning copyright in the work should be addressed to the Information Services Branch, Geoscience Australia, GPO Box 378, CANBERRA, ACT, 2601 or email: copyright@ga.gov.au. See also http://www.ga.gov.au/about/copyright.jsp, and http://www.osdm.gov.au/OSDM/Policies+and+Guidelines/Spatial+Data+Access+and+Pricing/OSDM+Licence+Internet+-+no+registration/default.aspx"
         });
         rec.setDataIdentificationAbstract(job.getDescription());
-        SimpleDateFormat sdf = new SimpleDateFormat(GridSubmitController.SUBMIT_DATE_FORMAT_STRING);
-        try {
-            rec.setDate(sdf.parse(job.getSubmitDate()));
-        } catch (ParseException e) {
-            logger.debug("Unable to parse date", e);
-        }
+        rec.setDate(job.getSubmitDate());
         rec.setDescriptiveKeywords(new String[] {
            "VEGL",
            "GA",
            "NCI"
         });
-        rec.setOnlineResources(onlineResources.toArray(new CSWOnlineResource[onlineResources.size()]));
+        rec.setOnlineResources(onlineResources.toArray(new CSWOnlineResourceImpl[onlineResources.size()]));
         rec.setResourceProvider("Geoscience Australia");
         rec.setServiceName(job.getName());
         rec.setSupplementalInformation(String.format("User: %1$s\nSeries: %2$s\nDescription: %3$s",job.getUser(), series.getName(), series.getDescription()));

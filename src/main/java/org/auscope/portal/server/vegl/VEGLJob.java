@@ -1,6 +1,6 @@
 package org.auscope.portal.server.vegl;
 
-import org.auscope.portal.server.cloud.CloudJob;
+import org.auscope.portal.core.cloud.CloudJob;
 
 /**
  * A specialisation of a generic cloud job for the VEGL Portal
@@ -10,14 +10,11 @@ import org.auscope.portal.server.cloud.CloudJob;
  *
  */
 public class VEGLJob extends CloudJob {
+    private static final long serialVersionUID = -57851899164623641L;
 
-    private String cloudOutputAccessKey;
-    private String cloudOutputSecretKey;
-    private String cloudOutputBucket;
-    private String cloudOutputBaseKey;
     private String registeredUrl;
     private Integer seriesId;
-    private String fileStorageId;
+
     private String vmSubsetFilePath;
     private String vmSubsetUrl;
     private Double paddingMinEasting;
@@ -39,29 +36,6 @@ public class VEGLJob extends CloudJob {
      */
     public VEGLJob() {
         super();
-
-        this.cloudOutputAccessKey = "";
-        this.cloudOutputSecretKey = "";
-        this.cloudOutputBucket = "";
-        this.cloudOutputBaseKey = "";
-        this.registeredUrl = "";
-        this.seriesId = 0;
-        this.fileStorageId = "";
-        this.vmSubsetFilePath = "";
-
-        this.paddingMinEasting = 0.0;
-        this.paddingMaxEasting = 0.0;
-        this.paddingMinNorthing = 0.0;
-        this.paddingMaxNorthing = 0.0;
-        this.selectionMinEasting = 0.0;
-        this.selectionMaxEasting = 0.0;
-        this.selectionMinNorthing = 0.0;
-        this.selectionMaxNorthing = 0.0;
-        this.mgaZone = "";
-        this.cellX = 0;
-        this.cellY = 0;
-        this.cellZ = 0;
-        this.inversionDepth = 0;
     }
 
     /**
@@ -84,87 +58,9 @@ public class VEGLJob extends CloudJob {
      * @param vmSubsetFilePath The File path (on the VM) where the job should look for its input subset file
      * @param vmSubsetUrl The URL of the actual input subset file
      */
-    public VEGLJob(Integer id, String name, String description, String user, String emailAddress, String submitDate,
-            String status, String ec2InstanceId, String ec2Endpoint, String ec2AMI, String cloudOutputAccessKey,
-            String cloudOutputSecretKey, String cloudOutputBucket,
-            String cloudOutputBaseKey, String registeredUrl, Integer seriesId, String fileStorageId, String vmSubsetFilePath, String vmSubsetUrl) {
-        super(id,name, description, user, emailAddress, submitDate, status, ec2InstanceId, ec2AMI, ec2Endpoint);
-
-        this.cloudOutputAccessKey = cloudOutputAccessKey;
-        this.cloudOutputSecretKey = cloudOutputSecretKey;
-        this.cloudOutputBucket = cloudOutputBucket;
-        this.cloudOutputBaseKey = cloudOutputBaseKey;
-        this.registeredUrl = registeredUrl;
-        this.seriesId = seriesId;
-        this.fileStorageId = fileStorageId;
-        this.vmSubsetFilePath = vmSubsetFilePath;
-        this.vmSubsetUrl = vmSubsetUrl;
+    public VEGLJob(Integer id) {
+        super(id);
     }
-
-    /**
-     * Gets the access key used to connect to amazon cloud for storing output
-     * @return
-     */
-    public String getCloudOutputAccessKey() {
-        return cloudOutputAccessKey;
-    }
-
-    /**
-     * Sets the access key used to connect to amazon cloud for storing output
-     * @param cloudOutputAccessKey
-     */
-    public void setCloudOutputAccessKey(String cloudOutputAccessKey) {
-        this.cloudOutputAccessKey = cloudOutputAccessKey;
-    }
-
-    /**
-     * Gets the secret key used to connect to amazon cloud for storing output
-     * @return
-     */
-    public String getCloudOutputSecretKey() {
-        return cloudOutputSecretKey;
-    }
-
-    /**
-     * Sets the secret key used to connect to amazon cloud for storing output
-     * @param cloudOutputSecretKey
-     */
-    public void setCloudOutputSecretKey(String cloudOutputSecretKey) {
-        this.cloudOutputSecretKey = cloudOutputSecretKey;
-    }
-
-    /**
-     * Gets the bucket name where output will be stored
-     * @return
-     */
-    public String getCloudOutputBucket() {
-        return cloudOutputBucket;
-    }
-
-    /**
-     * Sets the bucket name where output will be stored
-     * @param cloudOutputBucket
-     */
-    public void setCloudOutputBucket(String cloudOutputBucket) {
-        this.cloudOutputBucket = cloudOutputBucket;
-    }
-
-    /**
-     * Gets the base key path (folder name) for all cloud output
-     * @return
-     */
-    public String getCloudOutputBaseKey() {
-        return cloudOutputBaseKey;
-    }
-
-    /**
-     * Sets the base key path (folder name) for all cloud output
-     * @param cloudOutputBaseKey
-     */
-    public void setCloudOutputBaseKey(String cloudOutputBaseKey) {
-        this.cloudOutputBaseKey = cloudOutputBaseKey;
-    }
-
 
     /**
      * Gets where this job has been registered
@@ -197,23 +93,6 @@ public class VEGLJob extends CloudJob {
      */
     public void setSeriesId(Integer seriesId) {
         this.seriesId = seriesId;
-    }
-
-
-    /**
-     * Gets the ID that is used for storing job input/output files
-     * @return
-     */
-    public String getFileStorageId() {
-        return fileStorageId;
-    }
-
-    /**
-     * Sets the ID that is used for storing job input/output files
-     * @param fileStorageId
-     */
-    public void setFileStorageId(String fileStorageId) {
-        this.fileStorageId = fileStorageId;
     }
 
 
@@ -458,31 +337,10 @@ public class VEGLJob extends CloudJob {
         this.vmSubsetUrl = vmSubsetUrl;
     }
 
-    /**
-     * Prints the NON SENSITIVE information associated with this job to a string
-     */
     @Override
     public String toString() {
-        return "VEGLJob [cellX=" + cellX + ", cellY=" + cellY + ", cellZ="
-                + cellZ + ", fileStorageId=" + fileStorageId
-                + ", inversionDepth=" + inversionDepth + ", mgaZone=" + mgaZone
-                + ", paddingMaxEasting=" + paddingMaxEasting
-                + ", paddingMaxNorthing=" + paddingMaxNorthing
-                + ", paddingMinEasting=" + paddingMinEasting
-                + ", paddingMinNorthing=" + paddingMinNorthing
-                + ", registeredUrl=" + registeredUrl + ", cloudOutputBaseKey="
-                + cloudOutputBaseKey + ", cloudOutputBucket=" + cloudOutputBucket
-                + ", selectionMaxEasting=" + selectionMaxEasting
-                + ", selectionMaxNorthing=" + selectionMaxNorthing
-                + ", selectionMinEasting=" + selectionMinEasting
-                + ", selectionMinNorthing=" + selectionMinNorthing
-                + ", seriesId=" + seriesId + ", getDescription()="
-                + getDescription() + ", getEc2AMI()=" + getEc2AMI()
-                + ", getEc2Endpoint()=" + getEc2Endpoint()
-                + ", getEc2InstanceId()=" + getEc2InstanceId()
-                + ", getEmailAddress()=" + getEmailAddress() + ", getId()="
-                + getId() + ", getName()=" + getName() + ", getStatus()="
-                + getStatus() + ", getSubmitDate()=" + getSubmitDate()
-                + ", getUser()=" + getUser() + "]";
+        return "VEGLJob [registeredUrl=" + registeredUrl + ", seriesId="
+                + seriesId + ", id=" + id + ", name=" + name + ", description="
+                + description + "]";
     }
 }

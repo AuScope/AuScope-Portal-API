@@ -22,9 +22,18 @@
     <bean id="cswServiceList" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-                <ref bean="cswVEGLTest" />
+                <ref bean="cswVeglProduction" />
             </list>
         </constructor-arg>
+    </bean>
+
+    <bean id="geonetworkService" class="org.auscope.portal.core.services.GeonetworkService">
+        <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="gnMethodMaker">
+            <bean class="org.auscope.portal.core.services.methodmakers.GeonetworkMethodMaker">
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="cswServiceItem" ref="cswVeglProduction"/>
     </bean>
 
 </beans>
