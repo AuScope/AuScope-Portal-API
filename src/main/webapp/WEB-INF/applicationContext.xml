@@ -54,6 +54,7 @@
         <constructor-arg name="executor" ref="taskExecutor"/>
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
         <constructor-arg name="cswServiceList" ref="cswServiceList"/> <!-- This is pulled from the profile xml -->
+        <property name="forceGetMethods" value="true"/>
     </bean>
 
     <bean id="cswKnownLayerService" class="org.auscope.portal.core.services.KnownLayerService">
