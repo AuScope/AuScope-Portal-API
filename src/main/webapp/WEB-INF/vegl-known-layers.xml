@@ -15,6 +15,7 @@
         </constructor-arg>
         <property name="name" value="Onshore Only Bouguer Geodetic"/>
         <property name="description" value=""/>
+        <property name="group" value="Geoscience Australia Coverages"/>
     </bean>
 
     <bean id="knownTypeGravAnomalyGeodetic" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
@@ -26,6 +27,7 @@
         </constructor-arg>
         <property name="name" value="Onshore and Offshore Gravity Anomaly Geodetic"/>
         <property name="description" value=""/>
+        <property name="group" value="Geoscience Australia Coverages"/>
     </bean>
 
     <bean id="knownTypeMagMap" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
@@ -37,6 +39,7 @@
         </constructor-arg>
         <property name="name" value="MagMap V5 2010"/>
         <property name="description" value=""/>
+        <property name="group" value="Geoscience Australia Coverages"/>
     </bean>
 
     <bean id="knownTypeRadMapTotaldose" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
@@ -48,5 +51,6 @@
         </constructor-arg>
         <property name="name" value="RadMap Totaldose"/>
         <property name="description" value=""/>
+        <property name="group" value="Geoscience Australia Coverages"/>
     </bean>
 </beans>
