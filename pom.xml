@@ -254,27 +254,12 @@
             <artifactId>openid4java-consumer</artifactId>
             <version>0.9.6</version>
             <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.4</version>
-            <classifier>jdk15</classifier>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib-ext-spring</artifactId>
-            <version>1.0.2</version>
             <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-webmvc</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context-support</artifactId>
-                </exclusion>
-            </exclusions>
+				<exclusion>
+					<groupId>com.google.code.guice</groupId>
+					<artifactId>guice</artifactId>					
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>edu.ucar</groupId>

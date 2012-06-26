@@ -14,34 +14,27 @@
         background: url( "img/navigation.gif" ) -200px -38px no-repeat;
       }
     </style>
-    <link rel="stylesheet" type="text/css" href="js/external/extjs/resources/css/ext-all.css">
-    <script type="text/javascript" src="js/external/extjs/adapter/ext/ext-base.js"></script>
-    <script type="text/javascript" src="js/external/extjs/ext-all.js"></script>
 
-    <script type="text/javascript" src="js/ScriptBuilder/ComponentLoader.js"></script>
-    <script type="text/javascript" src="js/ScriptBuilder/XmlTreeLoader.js"></script>
+    <!-- Portal Core Includes -->
+    <link rel="stylesheet" type="text/css" href="portal-core/js/extjs-4.1.0-rc1/resources/css/ext-all.css">
+    <link rel="stylesheet" type="text/css" href="portal-core/js/extjs-4.1.0-rc1/examples/ux/css/CheckHeader.css">
+    <script type="text/javascript" src="portal-core/js/extjs-4.1.0-rc1/ext-all-debug.js"></script>
+    <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
 
     <!-- component includes -->
-    <%
-    String[] comps = { "BaseComponent", "BasePythonComponent", "SimContainer", "CloudUpload", "CloudDownload", "MPIRun",
-            "ChangeDir", "VEGLJobObject", "VEGLUtils", "CloudUtils", "VEGLStep1", "VEGLStep2", "VEGLStep3", "VEGLStep4", "VEGLStep5",
-            "VEGLStep6", "VEGLStep7", "VEGLStep8", "VEGLStep9", "DefinePythonFunc", "DefineMainFunc" };
-    for (String c : comps) {
-    %>
-    <script type="text/javascript" src="js/ScriptBuilder/components/<%= c %>.js"></script>
-    <%
-    }
-    %>
+    <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
+    <script type="text/javascript" src="js/vegl/models/Job.js"></script>
+    <script type="text/javascript" src="js/vegl/models/Series.js"></script>
 
-    <script type="text/javascript" src="js/JobWizard/forms/BaseJobWizardForm.js"></script>
-    <script type="text/javascript" src="js/JobWizard/forms/JobObjectForm.js"></script>
-    <script type="text/javascript" src="js/JobWizard/forms/JobSeriesForm.js"></script>
-    <script type="text/javascript" src="js/JobWizard/forms/JobUploadForm.js"></script>
-    <script type="text/javascript" src="js/JobWizard/forms/ScriptBuilderForm.js"></script>
-    <script type="text/javascript" src="js/JobWizard/forms/JobSubmitForm.js"></script>
-    <script type="text/javascript" src="js/JobWizard/JobWizard.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/forms/BaseJobWizardForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/forms/JobObjectForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/forms/JobSeriesForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/forms/JobUploadForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/forms/ScriptBuilderForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/forms/JobSubmitForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/JobWizard.js"></script>
 
-    <script type="text/javascript" src="js/JobBuilder.js"></script>
+    <script type="text/javascript" src="js/vegl/JobBuilder.js"></script>
 </head>
 
 <body>

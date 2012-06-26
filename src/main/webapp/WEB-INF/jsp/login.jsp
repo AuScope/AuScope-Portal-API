@@ -4,11 +4,10 @@
 <html>
 
 <head>
-	<title>VEGL Portal - OpenID Login</title>
-	<link rel="stylesheet" type="text/css" href="css/styles.css"> 
+    <title>VEGL Portal - OpenID Login</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
     <link rel="stylesheet" type="text/css" href="css/menu.css">
-    <link rel="stylesheet" type="text/css" href="js/external/extjs/resources/css/ext-all.css">
-	
+
 </head>
 <body>
     <div id="header-container">
@@ -18,16 +17,16 @@
          </h1>
       </div>
     </div>
-	<div>
-		<form action="j_spring_openid_security_check" method="post" class="openid_form">
-			<table align="center" style="margin-top: 100px"><tr><td>
-				<div>
-					<p>Sign in with OpenID</p>
-					<input type="text" name="openid_identifier" class="openid_identifier" />
-					<input type="submit" name="login" value="Login" />
-				</div>
-			</td></tr></table>
-		</form>
-	</div>
+    <div>
+        <form action="j_spring_openid_security_check" method="post" class="openid_form">
+            <table align="center" style="margin-top: 100px"><tr><td>
+                <div>
+                    <p>Sign in with OpenID</p>
+                    <input type="text" name="openid_identifier" class="openid_identifier" />
+                    <input type="submit" name="login" value="Login" />
+                </div>
+            </td></tr></table>
+        </form>
+    </div>
 </body>
 </html>

@@ -9,6 +9,7 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -548,7 +549,7 @@ public class JobListController extends BasePortalController  {
             return generateJSONResponseMAV(false, null, "Failure saving series");
         }
 
-        return generateJSONResponseMAV(true, series, "");
+        return generateJSONResponseMAV(true, Arrays.asList(series), "");
     }
 
     /**

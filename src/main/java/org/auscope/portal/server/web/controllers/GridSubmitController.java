@@ -3,8 +3,10 @@ package org.auscope.portal.server.web.controllers;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,6 +21,7 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
@@ -28,7 +31,10 @@ import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -107,7 +113,13 @@ public class GridSubmitController extends BasePortalController {
     public ModelAndView createJobObject(HttpServletRequest request) {
 
         //Create our initial job object
-        VEGLJob newJob = createDefaultVEGLJob(request.getSession());
+        VEGLJob newJob = null;
+        try {
+             newJob = createDefaultVEGLJob(request.getSession());
+        } catch (Exception ex) {
+            logger.error("Error saving newly created job", ex);
+            return generateJSONResponseMAV(false, null, "Error saving newly created job");
+        }
 
         //Generate our stage in directory
         try {
@@ -125,15 +137,15 @@ public class GridSubmitController extends BasePortalController {
             logger.warn("No subset area selected in session!");
         }
 
-        //Save our job to the database before returning it to the user
+        //Save our job to the database before setting up staging directories (we need an ID!!)
         try {
             jobManager.saveJob(newJob);
-            return generateJSONResponseMAV(true, newJob, "");
+            return generateJSONResponseMAV(true, Arrays.asList(newJob), "");
         } catch (Exception ex) {
             //On failure make sure we delete the new directory
             fileStagingService.deleteStageInDirectory(newJob);
-            logger.error("Error saving newly created job", ex);
-            return generateJSONResponseMAV(false, null, "Error saving newly created job");
+            logger.error("Error saving edited job", ex);
+            return generateJSONResponseMAV(false, null, "Error saving edited job");
         }
     }
 
@@ -235,7 +247,7 @@ public class GridSubmitController extends BasePortalController {
         //We have to use a HTML response due to ExtJS's use of a hidden iframe for file uploads
         //Failure to do this will result in the upload working BUT the user will also get prompted
         //for a file download containing the encoded response from this function (which we don't want).
-        return generateHTMLResponseMAV(true, fileInfo, "");
+        return generateHTMLResponseMAV(true, Arrays.asList(fileInfo), "");
     }
 
     /**
@@ -316,6 +328,19 @@ public class GridSubmitController extends BasePortalController {
     }
 
     /**
+     * This is for converting our String dates (frontend) to actual data objects (backend).
+     *
+     * Date format will match CloudJob.DATE_FORMAT, null/empty strings will be bound as NULL
+     * @param binder
+     */
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        CustomDateEditor editor = new CustomDateEditor(new SimpleDateFormat(CloudJob.DATE_FORMAT), true);
+        binder.registerCustomEditor(Date.class, editor);
+    }
+
+
+    /**
      * Given an entire job object this function attempts to save the specified job with ID
      * to the internal database.
      *
@@ -323,9 +348,80 @@ public class GridSubmitController extends BasePortalController {
      *         the job was successfully updated.
      * @param job
      * @return
+     * @throws ParseException
      */
     @RequestMapping("/updateJob.do")
-    public ModelAndView updateJob(VEGLJob job) {
+    public ModelAndView updateJob(@RequestParam(value="id", required=true) Integer id,  //The integer ID is the only required value
+            @RequestParam(value="name", required=false) String name,
+            @RequestParam(value="description", required=false) String description,
+            @RequestParam(value="emailAddress", required=false) String emailAddress,
+            @RequestParam(value="seriesId", required=false) Integer seriesId,
+            @RequestParam(value="status", required=false) String status,
+            @RequestParam(value="submitDate", required=false) Date submitDate,
+            @RequestParam(value="user", required=false) String user,
+            @RequestParam(value="computeInstanceId", required=false) String computeInstanceId,
+            @RequestParam(value="computeInstanceKey", required=false) String computeInstanceKey,
+            @RequestParam(value="computeInstanceType", required=false) String computeInstanceType,
+            @RequestParam(value="computeVmId", required=false) String computeVmId,
+            @RequestParam(value="storageAccessKey", required=false) String storageAccessKey,
+            @RequestParam(value="storageBaseKey", required=false) String storageBaseKey,
+            @RequestParam(value="storageBucket", required=false) String storageBucket,
+            @RequestParam(value="storageEndpoint", required=false) String storageEndpoint,
+            @RequestParam(value="storageProvider", required=false) String storageProvider,
+            @RequestParam(value="storageSecretKey", required=false) String storageSecretKey,
+            @RequestParam(value="cellX", required=false) Integer cellX,
+            @RequestParam(value="cellY", required=false) Integer cellY,
+            @RequestParam(value="cellZ", required=false) Integer cellZ,
+            @RequestParam(value="inversionDepth", required=false) Integer inversionDepth,
+            @RequestParam(value="mgaZone", required=false) String mgaZone,
+            @RequestParam(value="registeredUrl", required=false) String registeredUrl,
+            @RequestParam(value="paddingMaxEasting", required=false) Double paddingMaxEasting,
+            @RequestParam(value="paddingMaxNorthing", required=false) Double paddingMaxNorthing,
+            @RequestParam(value="paddingMinEasting", required=false) Double paddingMinEasting,
+            @RequestParam(value="paddingMinNorthing", required=false) Double paddingMinNorthing,
+            @RequestParam(value="selectionMaxEasting", required=false) Double selectionMaxEasting,
+            @RequestParam(value="selectionMaxNorthing", required=false) Double selectionMaxNorthing,
+            @RequestParam(value="selectionMinEasting", required=false) Double selectionMinEasting,
+            @RequestParam(value="selectionMinNorthing", required=false) Double selectionMinNorthing,
+            @RequestParam(value="vmSubsetFilePath", required=false) String vmSubsetFilePath,
+            @RequestParam(value="vmSubsetUrl", required=false) String vmSubsetUrl) throws ParseException {
+
+        //Build our VEGLJob from all of the specified parameters
+        VEGLJob job = new VEGLJob(id);
+        job.setCellX(cellX);
+        job.setCellY(cellY);
+        job.setCellZ(cellZ);
+        job.setComputeInstanceId(computeInstanceId);
+        job.setComputeInstanceKey(computeInstanceKey);
+        job.setComputeInstanceType(computeInstanceType);
+        job.setComputeVmId(computeVmId);
+        job.setDescription(description);
+        job.setEmailAddress(emailAddress);
+        job.setInversionDepth(inversionDepth);
+        job.setMgaZone(mgaZone);
+        job.setPaddingMaxEasting(paddingMaxEasting);
+        job.setPaddingMaxNorthing(paddingMaxNorthing);
+        job.setPaddingMinEasting(paddingMinEasting);
+        job.setPaddingMinNorthing(paddingMinNorthing);
+        job.setRegisteredUrl(registeredUrl);
+        job.setSelectionMaxEasting(selectionMaxEasting);
+        job.setSelectionMaxNorthing(selectionMaxNorthing);
+        job.setSelectionMinEasting(selectionMinEasting);
+        job.setSelectionMinNorthing(selectionMinNorthing);
+        job.setSeriesId(seriesId);
+        job.setStatus(status);
+        job.setStorageAccessKey(storageAccessKey);
+        job.setStorageBaseKey(storageBaseKey);
+        job.setStorageBucket(storageBucket);
+        job.setStorageEndpoint(storageEndpoint);
+        job.setStorageProvider(storageProvider);
+        job.setStorageSecretKey(storageSecretKey);
+        job.setSubmitDate(submitDate);
+        job.setUser(user);
+        job.setVmSubsetFilePath(vmSubsetFilePath);
+        job.setVmSubsetUrl(vmSubsetUrl);
+
+        //Save the VEGL job
         try {
             jobManager.saveJob(job);
         } catch (Exception ex) {
@@ -445,6 +541,10 @@ public class GridSubmitController extends BasePortalController {
     private VEGLJob createDefaultVEGLJob(HttpSession session) {
         VEGLJob job = new VEGLJob();
 
+        //Start by saving our job to set its ID
+        jobManager.saveJob(job);
+        log.debug(String.format("Created a new job row id=%1$s", job.getId()));
+
         //Load details from
         job.setUser((String) session.getAttribute("openID-Email"));
         job.setEmailAddress((String) session.getAttribute("openID-Email"));
@@ -464,16 +564,18 @@ public class GridSubmitController extends BasePortalController {
 
         job.setVmSubsetFilePath(ERRDAP_SUBSET_VM_FILE_PATH);
         job.setComputeVmId(hostConfigurer.resolvePlaceholder("ami.id"));
+        job.setComputeInstanceType("m1.large");
+        job.setComputeInstanceKey("vegl-test-key");
+        job.setStorageProvider(hostConfigurer.resolvePlaceholder("storage.provider"));
+        job.setStorageEndpoint(hostConfigurer.resolvePlaceholder("storage.endpoint"));
         job.setStorageBucket("vegl-portal");
         job.setName("VEGL-Job");
         job.setDescription("");
         job.setStatus(STATUS_UNSUBMITTED);
 
         //We need an ID for storing our job file that won't collide with other storage ID's
-        SimpleDateFormat sdf = new SimpleDateFormat(SUBMIT_DATE_FORMAT_STRING);
-        Date date = new Date(); //Use the current date to generate an id
-        String fileStorageId = String.format("VEGL-%1$s-%2$s", job.getUser(), sdf.format(date));
-        fileStorageId = fileStorageId.replaceAll("[=/\\, @:]", "_"); //get rid of some obvious nasty characters
+        String fileStorageId = String.format("VEGL-%1$s-%2$s", job.getUser(), job.getId());
+        fileStorageId = fileStorageId.replaceAll("[^a-zA-Z0-9_\\-]", "_"); //get rid of some obvious nasty characters
         job.setStorageBaseKey(fileStorageId);
 
         return job;

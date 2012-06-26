@@ -3,9 +3,9 @@
  *
  * Author - Josh Vote
  */
-Ext.namespace("JobBuilder");
 
-JobObjectForm =  Ext.extend(BaseJobWizardForm, {
+Ext.define('vegl.jobwizard.forms.JobObjectForm', {
+    extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
     jobObjectCreated : false,
 
@@ -17,7 +17,7 @@ JobObjectForm =  Ext.extend(BaseJobWizardForm, {
 
         jobObjectFrm.jobObjectCreated = false;
 
-        JobObjectForm.superclass.constructor.call(this, {
+        this.callParent([{
             wizardState : wizardState,
             bodyStyle: 'padding:10px;',
             frame: true,
@@ -31,26 +31,21 @@ JobObjectForm =  Ext.extend(BaseJobWizardForm, {
                         jobObjectFrm.getForm().load({
                             url : 'createJobObject.do',
                             waitMsg : 'Creating Job Object...',
-                            failure : jobObjectFrm.fireEvent.createDelegate(jobObjectFrm, ['jobWizardLoadException']),
+                            failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
                             success : function(frm, action) {
-                                jobObjectFrm.jobObjectCreated = true;
-                                jobObjectFrm.wizardState.jobId = frm.getValues().id;
+                                var responseObj = Ext.JSON.decode(action.response.responseText);
+
+                                if (responseObj.success) {
+                                    frm.setValues(responseObj.data[0]);
+                                    jobObjectFrm.jobObjectCreated = true;
+                                    jobObjectFrm.wizardState.jobId = frm.getValues().id;
+                                }
                             }
                         });
                     }
                 }
             },
             items: [{
-                xtype: 'textfield',
-                name: 'ec2Endpoint',
-                fieldLabel: 'EC2 Endpoint',
-                readOnly : true
-            }, {
-                xtype: 'textfield',
-                name: 'ec2AMI',
-                fieldLabel: 'EC2 Machine Instance',
-                readOnly : true
-            },{
                 xtype: 'textfield',
                 name: 'name',
                 fieldLabel: 'Job Name',
@@ -64,23 +59,20 @@ JobObjectForm =  Ext.extend(BaseJobWizardForm, {
                 allowBlank: true
             },{
                 xtype: 'textfield',
-                id: 'cloudOutputBucket',
-                name: 'cloudOutputBucket',
+                name: 'storageBucket',
                 emptyText: 'Enter a cloud storage container where your job results will be stored',
                 fieldLabel: 'Storage Container',
                 value : 'vegl-portal',
                 allowBlank: false
             },{
                 xtype: 'textfield',
-                id: 'cloudOutputAccessKey',
-                name: 'cloudOutputAccessKey',
+                name: 'storageAccessKey',
                 emptyText: 'Enter a cloud storage access key that will be used to store your job outputs',
                 fieldLabel: 'Storage Access Key',
                 allowBlank: false
             }, {
                 xtype: 'textfield',
-                id: 'cloudOutputSecretKey',
-                name: 'cloudOutputSecretKey',
+                name: 'storageSecretKey',
                 inputType: 'password',
                 fieldLabel: 'Storage Secret Key',
                 allowBlank: false
@@ -90,9 +82,13 @@ JobObjectForm =  Ext.extend(BaseJobWizardForm, {
             { xtype: 'hidden', name: 'user' },
             { xtype: 'hidden', name: 'submitDate' },
             { xtype: 'hidden', name: 'status' },
-            { xtype: 'hidden', name: 'ec2InstanceId' },
-            { xtype: 'hidden', name: 'cloudOutputBaseKey' },
-            { xtype: 'hidden', name: 'fileStorageId' },
+            { xtype: 'hidden', name: 'computeVmId' },
+            { xtype: 'hidden', name: 'computeInstanceId' },
+            { xtype: 'hidden', name: 'computeInstanceType' },
+            { xtype: 'hidden', name: 'computeInstanceKey' },
+            { xtype: 'hidden', name: 'storageProvider' },
+            { xtype: 'hidden', name: 'storageEndpoint' },
+            { xtype: 'hidden', name: 'storageBaseKey' },
             { xtype: 'hidden', name: 'registeredUrl' },
             { xtype: 'hidden', name: 'paddingMinEasting' },
             { xtype: 'hidden', name: 'paddingMaxEasting' },
@@ -110,7 +106,7 @@ JobObjectForm =  Ext.extend(BaseJobWizardForm, {
             { xtype: 'hidden', name: 'vmSubsetFilePath' },
             { xtype: 'hidden', name: 'vmSubsetUrl' }
             ]
-        });
+        }]);
     },
 
     getTitle : function() {

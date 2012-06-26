@@ -13,17 +13,21 @@
         background: url( "img/navigation.gif" ) 0px -38px no-repeat;
       }
     </style>
-    <link rel="stylesheet" type="text/css" href="js/external/extjs/resources/css/ext-all.css">
-    <script type="text/javascript" src="js/external/extjs/adapter/ext/ext-base.js"></script>
-    <script type="text/javascript" src="js/external/extjs/ext-all.js"></script>
-    <script type="text/javascript" src="js/GridJob/JobList.js"></script>
-    <script src="js/geoscimlwfs/global_variables.js" type="text/javascript"></script>
-    <c:if test='${error != null}'>
-    <script type="text/javascript">
-        JobList.error = "${error}";
-    </script>
-    </c:if>
-    
+    <!-- Portal Core Includes -->
+    <link rel="stylesheet" type="text/css" href="portal-core/js/extjs-4.1.0-rc1/resources/css/ext-all.css">
+    <link rel="stylesheet" type="text/css" href="portal-core/js/extjs-4.1.0-rc1/examples/ux/css/CheckHeader.css">
+    <script type="text/javascript" src="portal-core/js/extjs-4.1.0-rc1/ext-all-debug.js"></script>
+    <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
+
+    <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
+    <script type="text/javascript" src="js/vegl/models/Job.js"></script>
+    <script type="text/javascript" src="js/vegl/models/Series.js"></script>
+
+    <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/SeriesPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/JobList.js"></script>
 </head>
 
 <body>
