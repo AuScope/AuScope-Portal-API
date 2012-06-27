@@ -399,6 +399,7 @@ public class GridSubmitController extends BasePortalController {
         job.setEmailAddress(emailAddress);
         job.setInversionDepth(inversionDepth);
         job.setMgaZone(mgaZone);
+        job.setName(name);
         job.setPaddingMaxEasting(paddingMaxEasting);
         job.setPaddingMaxNorthing(paddingMaxNorthing);
         job.setPaddingMinEasting(paddingMinEasting);
