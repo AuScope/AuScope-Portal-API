@@ -5,21 +5,27 @@
  * Licensed under the terms of the GNU Lesser General Public License.
  */
 
-Ext.namespace("ScriptBuilder");
-Ext.ux.ComponentLoader.load({url: ScriptBuilder.componentPath+"ChangeDir.json"});
+Ext.define('ScriptBuilder.components.ChangeDir', {
+    extend : 'ScriptBuilder.components.BaseComponent',
 
-ChangeDirNode = Ext.extend(ScriptBuilder.BaseComponent, {
-  constructor: function(container) {
-	ChangeDirNode.superclass.constructor.apply(this,
-        [container, "Shell - cd", "ChangeDir", "s"]
-    );
+    constructor: function(config) {
+        Ext.apply(config, {
+            bodyStyle: "padding:5px;",
+            labelWidth: 150,
+            defaults: { anchor: "100%" },
+            items: [{
+                xtype: "textfield",
+                name: "directory",
+                fieldLabel: "Directory",
+                allowBlank: false
+            }]
+        });
 
-	var numShells = container.getShellCommands().length;
-    this.values.uniqueName = "shell"+numShells;
-  },
+        this.callParent(arguments);
+    },
 
-  getScript: function() {
-	return 'cd "' + this.values.directory + '"\n';
-  }
+    getScript: function() {
+        return 'cd "' + this.getValues().directory + '"\n';
+    }
 });
 

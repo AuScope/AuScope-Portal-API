@@ -785,7 +785,7 @@ public class TestJobListController {
         //Returns MAV on failure
         ModelAndView mav = controller.createSeries(mockRequest, qName, qDescription);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        VEGLSeries actualSeries = (VEGLSeries) mav.getModel().get("data");
+        VEGLSeries actualSeries = ((List<VEGLSeries>) mav.getModel().get("data")).get(0);
         Assert.assertNotNull(actualSeries);
         Assert.assertEquals(userEmail, actualSeries.getUser());
         Assert.assertEquals(qName, actualSeries.getName());

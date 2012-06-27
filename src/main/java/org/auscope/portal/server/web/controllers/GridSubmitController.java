@@ -97,7 +97,7 @@ public class GridSubmitController extends BasePortalController {
     public ModelAndView getJobObject(@RequestParam("jobId") String jobId) {
         try {
             VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
-            return generateJSONResponseMAV(true, job, "");
+            return generateJSONResponseMAV(true, Arrays.asList(job), "");
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);

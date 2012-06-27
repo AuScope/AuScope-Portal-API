@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="css/styles.css">
     <link rel="stylesheet" type="text/css" href="css/menu.css">
     <link rel="stylesheet" type="text/css" href="css/grid-examples.css">
+    <link rel="stylesheet" type="text/css" href="portal-core/css/styles.css">
 
     <style type="text/css">
       #sitenav-03 a {
@@ -25,6 +26,36 @@
     <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
     <script type="text/javascript" src="js/vegl/models/Job.js"></script>
     <script type="text/javascript" src="js/vegl/models/Series.js"></script>
+
+    <script src="portal-core/js/portal/util/UnimplementedFunction.js" type="text/javascript"></script>
+
+    <script src="js/ScriptBuilder/components/BaseComponent.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/BasePythonComponent.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/ChangeDir.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/CloudDownload.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/CloudUpload.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/CloudUtils.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/DefineMainFunc.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/DefinePythonFunc.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/MPIRun.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/PythonHeader.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLJobObject.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLStep1.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLStep2.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLStep3.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLStep4.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLStep5.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLStep6.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLStep7.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLStep8.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLStep9.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/components/VEGLUtils.js" type="text/javascript"></script>
+
+    <script src="js/ScriptBuilder/ActiveComponentModel.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/ActiveComponentTreePanel.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/Components.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/ComponentTreePanel.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/ScriptBuilder.js" type="text/javascript"></script>
 
     <script type="text/javascript" src="js/vegl/jobwizard/forms/BaseJobWizardForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobObjectForm.js"></script>

@@ -4,24 +4,28 @@
  *
  * Licensed under the terms of the GNU Lesser General Public License.
  */
-Ext.namespace("ScriptBuilder");
-Ext.ux.ComponentLoader.load( {url : ScriptBuilder.componentPath + "VEGLUtils.json"});
+Ext.define('ScriptBuilder.components.VEGLUtils', {
+    extend : 'ScriptBuilder.components.BasePythonComponent',
 
-VEGLUtilsNode = Ext.extend(ScriptBuilder.BasePythonComponent, {
+    constructor: function(config) {
+        Ext.apply(config, {
+            bodyStyle: "padding:5px;",
+            labelWidth: 150,
+            defaults: { anchor: "100%" },
+            items: [{
+                xtype: "label",
+                text: "Press OK to load these utility functions."
+            }]
+        });
 
-    constructor : function(container) {
-        VEGLUtilsNode.superclass.constructor.apply(this, [ container,
-                "VEGL Utilities", "VEGLUtils", "s" ]);
-
-        var numShells = container.getShellCommands().length;
-        this.values.uniqueName = "shell" + numShells;
+        this.callParent(arguments);
     },
-    
+
     //This is only a SHORT TERM solution. At first opportunity replace this file with an external
     //library reference
     getScript : function() {
         var text = '';
-        
+
         text += "#------------------------------------------------------------------------------"  + this._newLine;
         text += "# supporting methods (and dragons, too) go here"  + this._newLine;
         text += "#------------------------------------------------------------------------------"  + this._newLine;
@@ -378,7 +382,7 @@ VEGLUtilsNode = Ext.extend(ScriptBuilder.BasePythonComponent, {
         text += this._tab + "mnt,sec = divmod(dd*3600,60)" + this._newLine;
         text += this._tab + "deg,mnt = divmod(mnt,60)" + this._newLine;
         text += this._tab + "return deg,mnt,sec" + this._newLine;
-        
+
         return text;
     }
 });

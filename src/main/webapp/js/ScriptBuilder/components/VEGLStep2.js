@@ -5,32 +5,40 @@
  * Licensed under the terms of the GNU Lesser General Public License.
  */
 
-Ext.namespace("ScriptBuilder");
-Ext.ux.ComponentLoader.load({url: ScriptBuilder.componentPath+"VEGLStep2.json"});
+Ext.define('ScriptBuilder.components.VEGLStep2', {
+    extend : 'ScriptBuilder.components.BasePythonComponent',
 
-VEGLStep2Node = Ext.extend(ScriptBuilder.BasePythonComponent, {
-  constructor: function(container) {
-    VEGLStep2Node.superclass.constructor.apply(this,
-      [container, "VEGL - Step2", "VEGLStep2", "s"]
-    );
+    constructor: function(config) {
+        Ext.apply(config, {
+            bodyStyle: "padding:5px;",
+            labelWidth: 150,
+            defaults: { anchor: "100%" },
+            items: [{
+                xtype: "textfield",
+                name: "paramsObj",
+                value: "VEGLParams",
+                fieldLabel: "Python VEGL Parameters Class",
+                allowBlank: false
+            }]
+        });
 
-    var numShells = container.getShellCommands().length;
-    this.values.uniqueName = "VEGLStep2-i"+numShells;
-  },
+        this.callParent(arguments);
+    },
 
-  getScript: function() {
-    var text = '';
+    getScript: function() {
+        var text = '';
+        var values = this.getValues();
 
-    text = this._tab + 'VEGLPaddedBox = VEGLParams.getPaddedBounds()' + this._newLine;
-    text += this._tab + 'zone = int(VEGLPaddedBox.getSrs())' + this._newLine;
-    text += this._tab + 'temp_data = []' + this._newLine;
-    text += this._tab + 'for x, y, z in data:' + this._newLine;
-    text += this._tab + this._tab +'newX, newY = project(x, y, zone)' + this._newLine;
-    text += this._tab + this._tab +'temp_data.append([newX, newY, z])' + this._newLine;
-    text += this._tab + 'data = temp_data' + this._newLine;
-    text += this._newLine;
+        text = this._tab + 'VEGLPaddedBox = VEGLParams.getPaddedBounds()' + this._newLine;
+        text += this._tab + 'zone = int(VEGLPaddedBox.getSrs())' + this._newLine;
+        text += this._tab + 'temp_data = []' + this._newLine;
+        text += this._tab + 'for x, y, z in data:' + this._newLine;
+        text += this._tab + this._tab +'newX, newY = project(x, y, zone)' + this._newLine;
+        text += this._tab + this._tab +'temp_data.append([newX, newY, z])' + this._newLine;
+        text += this._tab + 'data = temp_data' + this._newLine;
+        text += this._newLine;
 
-    return text;
-  }
+        return text;
+    }
 });
 

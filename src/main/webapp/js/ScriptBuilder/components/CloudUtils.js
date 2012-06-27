@@ -4,17 +4,21 @@
  *
  * Licensed under the terms of the GNU Lesser General Public License.
  */
-Ext.namespace("ScriptBuilder");
-Ext.ux.ComponentLoader.load( {url : ScriptBuilder.componentPath + "CloudUtils.json"});
+Ext.define('ScriptBuilder.components.CloudUtils', {
+    extend : 'ScriptBuilder.components.BasePythonComponent',
 
-CloudUtilsNode = Ext.extend(ScriptBuilder.BasePythonComponent, {
+    constructor: function(config) {
+        Ext.apply(config, {
+            bodyStyle: "padding:5px;",
+            labelWidth: 150,
+            defaults: { anchor: "100%" },
+            items: [{
+                xtype: "label",
+                text: "Press OK to load these utility functions."
+            }]
+        });
 
-    constructor : function(container) {
-        CloudUtilsNode.superclass.constructor.apply(this, [ container,
-                "Cloud Utils Object", "CloudUtils", "s" ]);
-
-        var numShells = container.getShellCommands().length;
-        this.values.uniqueName = "CloudUtils" + numShells;
+        this.callParent(arguments);
     },
 
     /**

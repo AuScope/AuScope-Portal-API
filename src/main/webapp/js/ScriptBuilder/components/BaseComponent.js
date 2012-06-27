@@ -1,84 +1,48 @@
-/*
- * This file is part of the AuScope Virtual Rock Lab (VRL) project.
- * Copyright (c) 2009 ESSCC, The University of Queensland
+/**
+ * The base component that all other ScriptBuilder components should inherit from.
  *
- * Licensed under the terms of the GNU Lesser General Public License.
+ * A script builder component is a GUI widget coupled with logic to generate a script
  */
+Ext.define('ScriptBuilder.components.BaseComponent', {
+    extend : 'Ext.form.Panel',
 
-Ext.namespace("ScriptBuilder");
+    description : null,
+    name : null,
 
-ScriptBuilder.componentPath = "js/ScriptBuilder/components/";
+    constructor : function(config) {
+        this.description = config.description ? config.description : '';
+        this.name = config.name ? config.name : '';
 
-ScriptBuilder.BaseComponent = Ext.extend(Ext.tree.TreeNode, {
+        this.callParent(arguments);
+    },
 
-  //
-  // Constructor with simulation container (will be the parent node after
-  // adding to the tree), title (will be displayed in the tree), component ID
-  // (will be used to call correct form etc) and type.
-  //
-  constructor: function(container, compTitle, compId, compType) {
-    ScriptBuilder.BaseComponent.superclass.constructor.apply(this);
-    this.container = container;
-    this.compId = compId;
-    this.compTitle = compTitle;
-    this.type = compType;
-    this.values = { uniqueName: "" };
-    this.setText(this.getUniqueName()+" ("+this.compTitle+")");
-  },
+    /**
+     * Function for validating the currently entered values
+     */
+    validateValues : function() {
+        return this.getForm().isValid();
+    },
 
-  //
-  // Returns stored values
-  //
-  getValues: function() {
-    return this.values;
-  },
+    /**
+     * Function for returning a javascript object representing the state or set of values of this component
+     */
+    getValues : function() {
+        return this.getForm().getValues();
+    },
 
-  setValuesObject: function(obj) {
-	// if the name has changed check for an existing node with the same name
-    // and force changing
-    if (this.container && obj.uniqueName &&
-        this.getUniqueName() != obj.uniqueName &&
-        this.container.findByName(obj.uniqueName) != null) {
-      Ext.Msg.alert("Name not unique", "Please use a unique name for this component.");
-      return false;
-    } else {
-      this.setText(this.getUniqueName()+" ("+this.compTitle+")");
+    /**
+     * Function for restoring the state of the base component from a simple object
+     */
+    setValues : function(values) {
+        this.getForm().setValues(values);
+    },
 
-      // THis should be a merge operation - but its not....
-      this.values = Ext.apply(this.values, obj, {});
-      return true;
-    }
-  },
-
-  //
-  // Retrieves values from the given form after checking uniqueness of the
-  // component name. Returns false if the name is not unique.
-  //
-  setValues: function(form) {
-    var tmpVals = form.getValues(false);
-    return this.setValuesObject(tmpVals);
-  },
-
-  //
-  // Uses current values to fill given form
-  //
-  fillFormValues: function(form) {
-    form.setValues(this.values);
-  },
-
-  //
-  // Returns a unique ID for this instance
-  //
-  getUniqueName: function() {
-    return this.values.uniqueName;
-  },
-
-  //
-  // Returns the script fragment for this component
-  //
-  getScript: function() {
-    return "";
-  }
+    /**
+     * Function for generating a script snippet (string) representing this components values
+     *
+     * function() - returns String
+     */
+    getScript : portal.util.UnimplementedFunction
 
 });
 

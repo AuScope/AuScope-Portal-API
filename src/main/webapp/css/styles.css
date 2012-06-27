@@ -15,27 +15,27 @@
         width: 531px;
         height: 100px;
     }
-    
+
     #logo h1 {
         float: left;
         margin: 0;
         padding: 0;
         width: 531px;
     }
-    
+
     #logo h1 a {
         padding: 0;
         margin: 0;
         width: 531px;
         height: 100px;
         display: block;
-        background: url( "../img/img-auscope-banner.gif" ) no-repeat top left;	    
+        background: url( "../img/img-auscope-banner.gif" ) no-repeat top left;
     }
-        
+
     #logo h1 a span {
         display: none;
     }
-    
+
 .jobdesc-title {
     font-weight: bold;
     font-size: medium;
@@ -66,6 +66,10 @@
     background-image: url("../img/refresh.png") !important
 }
 
+.settings-icon {
+    background-image: url("../img/settings.png") !important
+}
+
 .find-icon {
     background-image: url("../img/find.png") !important
 }
@@ -74,32 +78,32 @@
     background-image: url("../img/delete.gif") !important
 }
 
-.openid_form p { 
-	text-align: left; 
-	color: #f93; 
-	font: bold 14px Verdana; 
-	padding-bottom: 5px;
+.openid_form p {
+    text-align: left;
+    color: #f93;
+    font: bold 14px Verdana;
+    padding-bottom: 5px;
 }
 
-.openid_form td { 
-	border: solid 1px #999;
-	padding: 40px;
-	padding-top: 30px;
-	background-color: #fafafa;
+.openid_form td {
+    border: solid 1px #999;
+    padding: 40px;
+    padding-top: 30px;
+    background-color: #fafafa;
 }
 
-.openid_form input { 
-	padding: 1px 6px;;
+.openid_form input {
+    padding: 1px 6px;;
 }
 
-.openid_identifier { 
-	width:300px; 
-	background-image: url("../img/openid.png");
-	background-repeat: no-repeat;
-	background-position: 4px 4px;
-	height: 22px;
-	line-height: 22px;
-	padding-left: 25px !important;
+.openid_identifier {
+    width:300px;
+    background-image: url("../img/openid.png");
+    background-repeat: no-repeat;
+    background-position: 4px 4px;
+    height: 22px;
+    line-height: 22px;
+    padding-left: 25px !important;
 }
 
     /*#menu {
@@ -187,4 +191,3 @@
         background: url( "../img/navigation.gif" ) -200px -38px no-repeat;
     }
 */
-   

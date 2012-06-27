@@ -4,28 +4,46 @@
  *
  * Licensed under the terms of the GNU Lesser General Public License.
  */
+Ext.define('ScriptBuilder.components.CloudUpload', {
+    extend : 'ScriptBuilder.components.BaseComponent',
 
-Ext.namespace("ScriptBuilder");
-Ext.ux.ComponentLoader.load({url: ScriptBuilder.componentPath+"CloudUpload.json"});
+    constructor: function(config) {
+        Ext.apply(config, {
+            bodyStyle: "padding:5px;",
+            labelWidth: 150,
+            defaults: { anchor: "100%" },
+            items: [{
+                xtype: "textfield",
+                name: "inputFilePath",
+                value: "",
+                fieldLabel: "Input filepath",
+                allowBlank: false
+              },{
+                xtype: "textfield",
+                name: "bucketName",
+                value: "vegl-portal",
+                fieldLabel: "S3 bucket",
+                allowBlank: false
+              },{
+                xtype: "textfield",
+                name: "keyPath",
+                value: "",
+                fieldLabel: "S3 Key Path",
+                allowBlank: false
+              }]
+        });
 
-CloudUploadNode = Ext.extend(ScriptBuilder.BaseComponent, {
-  constructor: function(container) {
-    CloudUploadNode.superclass.constructor.apply(this,
-        [container, "Cloud - upload", "CloudUpload", "s"]
-    );
+        this.callParent(arguments);
+    },
 
-    var numShells = container.getShellCommands().length;
-    this.values.uniqueName = "CloudUpload"+numShells;
-  },
+    getScript: function() {
+        var values = this.getValues();
+        var queryPath = values.bucketName + "/" + values.keyPath;
+        queryPath = queryPath.replace(/\/\/*/g, " ");
 
-  getScript: function() {
-    var queryPath = this.values.bucketName + "/" + this.values.keyPath;
-    queryPath = queryPath.replace(/\/\/*/g, " ");
+        var ret = 'QUERY_PATH=`echo "' + queryPath + '" | sed "s/\\/\\/*/\\//g"`\n';
+        ret += 'cloud upload "${QUERY_PATH}" "' + values.inputFilePath + '" --set-acl=public-read\n';
+        return ret;
+    }
 
-    var ret = 'QUERY_PATH=`echo "' + queryPath + '" | sed "s/\\/\\/*/\\//g"`\n';
-    ret += 'cloud upload "${QUERY_PATH}" "' + this.values.inputFilePath + '" --set-acl=public-read\n';
-    //`echo "${s3Bucket}/${s3BaseKeyPath}/subset_request.sh" | sed "s/\/\/*/\//g"`
-    return ret;
-  }
 });
-

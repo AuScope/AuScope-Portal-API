@@ -12,48 +12,29 @@
 Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
-    textEditMode : false,
-
-    ControllerURL : "scriptbuilder.html",
-
-    // default content of the component description panel
-    compDescText : '<p class="desc-info">Select a component to see its description, double-click to add it to the script.<br/><br/>Double-click the Simulation Container to change simulation settings.</p>',
-    // content of the component description panel in text editor mode
-    compDescTextEditor : '<p class="desc-info">Select a component to see its description.<br/></p>',
+    scriptBuilderFrm : null,
 
     /**
      * Creates a new ScriptBuilderForm form configured to write/read to the specified global state
      */
     constructor: function(wizardState) {
-        var scriptBuilderFrm = this;
+        this.scriptBuilderFrm = Ext.create('ScriptBuilder.ScriptBuilder', {
+            wizardState : wizardState
+        });
 
+        this.scriptBuilderFrm.activeComponentsPanel.addActiveComponent('ScriptBuilder.components.PythonHeader', 'Python Script File Header', 'The file header to identify the script as being executable using python.', true);
 
         // Finally, build the main layout once all the pieces are ready.
         this.callParent([{
             wizardState : wizardState,
             layout : 'fit',
-            id : 'scriptbuilder-form',
-            title : 'Current Script',
-            items: [{
-                id: 'sourcetext',
-                xtype: 'textarea',
-                border : false,
-                width: '100%',
-                height: '100%',
-                style : {
-                    'font-family' : 'monospace'
-                }
-            }]
+            items: [this.scriptBuilderFrm]
         }]);
     },
 
     // submit script source for storage at the server
     beginValidation : function(callback) {
-        var scriptBuilderFrm = this;
-        var sourceTextCmp = Ext.getCmp('sourcetext');
-        var sourceText = null;
-
-        sourceText = sourceTextCmp.getValue();
+        sourceText = this.scriptBuilderFrm.getScript();
 
         Ext.Ajax.request({
             url: 'saveScript.do',
@@ -66,7 +47,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
             },
             params: {
                 'sourceText': sourceText,
-                'jobId': scriptBuilderFrm.wizardState.jobId
+                'jobId': this.wizardState.jobId
             }
         });
     },
