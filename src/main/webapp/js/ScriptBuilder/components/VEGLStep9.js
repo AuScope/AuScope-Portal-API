@@ -89,12 +89,12 @@ Ext.define('ScriptBuilder.components.VEGLStep9', {
         text += this._tab + "print 'inversion returned: ' + str(retcode)" + this._newLine;
         text += this._tab + "sys.stdout.flush()" + this._newLine;
         text += this._tab + "# Upload our logging outs" + this._newLine;
-        text += this._tab + "cloudUpload(sns_out, " + values.paramsInstance + ".getCloudOutputBucket(), " + values.paramsInstance + ".getCloudOutputBaseKey(), sns_out)" + this._newLine;
-        text += this._tab + "cloudUpload(inv_out, " + values.paramsInstance + ".getCloudOutputBucket(), " + values.paramsInstance + ".getCloudOutputBaseKey(), inv_out)" + this._newLine;
+        text += this._tab + "cloudUpload(sns_out, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), sns_out)" + this._newLine;
+        text += this._tab + "cloudUpload(inv_out, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), inv_out)" + this._newLine;
         text += this._tab + "# Upload the mesh file" + this._newLine;
-        text += this._tab + "cloudUpload(mesh, " + values.paramsInstance + ".getCloudOutputBucket(), " + values.paramsInstance + ".getCloudOutputBaseKey(), mesh)" + this._newLine;
+        text += this._tab + "cloudUpload(mesh, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), mesh)" + this._newLine;
         text += this._tab + "# Upload gravity or magnetic data file" + this._newLine;
-        text += this._tab + "cloudUpload('" + filename + "', " + values.paramsInstance + ".getCloudOutputBucket(), " + values.paramsInstance + ".getCloudOutputBaseKey(), '" + filename + "')" + this._newLine;
+        text += this._tab + "cloudUpload('" + filename + "', " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), '" + filename + "')" + this._newLine;
         text += this._newLine;
         return text;
     }
