@@ -166,9 +166,9 @@
             <version>1.1.2</version>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -255,11 +255,11 @@
             <version>0.9.6</version>
             <type>pom</type>
             <exclusions>
-				<exclusion>
-					<groupId>com.google.code.guice</groupId>
-					<artifactId>guice</artifactId>					
-				</exclusion>
-			</exclusions>
+                <exclusion>
+                    <groupId>com.google.code.guice</groupId>
+                    <artifactId>guice</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>edu.ucar</groupId>
