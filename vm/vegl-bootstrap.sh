@@ -2,6 +2,11 @@
 # chkconfig: 2345 90 10
 # description: vegl-bootstrap.sh - Shell Script for managing the download and running of the VEGL portal workflow script
 
+#Start by waiting until the system starts up
+INITIAL_SLEEP_LENGTH="30s"
+echo "Sleeping for ${INITIAL_SLEEP_LENGTH}"
+sleep "$INITIAL_SLEEP_LENGTH"
+
 # we want to download our user data string
 userDataHost=`route -n | awk '$4 ~ ".*G.*" {print $2}'`
 userDataUrl="http://$userDataHost:8773/latest/user-data"

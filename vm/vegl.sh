@@ -10,7 +10,7 @@ export WORKING_DIR="/root"
 export EXAMPLE_DATA_DIR="${WORKING_DIR}/ubc-example-data"
 export VEGL_LOG_FILE="${WORKING_DIR}/vegl.sh.log"
 export EC2_METADATA_SCRIPT="${WORKING_DIR}/ec2-metadata"
-INITIAL_SLEEP_LENGTH="30s"
+
 FINAL_SLEEP_LENGTH="15m"
 NTP_DATE_SERVER="pool.ntp.org"
 VEGL_WORKFLOW_VERSION="1"
@@ -34,17 +34,12 @@ echo "WORKING_DIR = ${WORKING_DIR}"
 echo "EXAMPLE_DATA_DIR = ${EXAMPLE_DATA_DIR}"
 echo "VEGL_LOG_FILE = ${VEGL_LOG_FILE}"
 echo "EC2_METADATA_SCRIPT = ${EC2_METADATA_SCRIPT}"
-echo "INITIAL_SLEEP_LENGTH = ${INITIAL_SLEEP_LENGTH}"
 echo "FINAL_SLEEP_LENGTH = ${FINAL_SLEEP_LENGTH}"
 echo "NTP_DATE_SERVER = ${NTP_DATE_SERVER}"
 echo "SUBSET_REQUEST_PATH = ${SUBSET_REQUEST_PATH}"
 echo "VEGL_SCRIPT_PATH = ${VEGL_SCRIPT_PATH}"
 echo "ABORT_SHUTDOWN_PATH = ${ABORT_SHUTDOWN_PATH}"
 echo "--------------------------------------"
-
-#Start by waiting until the system starts up
-echo "Sleeping for ${INITIAL_SLEEP_LENGTH}"
-sleep "$INITIAL_SLEEP_LENGTH"
 
 #Lets get started by moving to our working directory
 cd $WORKING_DIR
