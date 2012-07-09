@@ -76,12 +76,6 @@ storageEndpoint=`echo $userDataString | jsawk 'return this.storageEndpoint'`
 veglShellScript=`echo $userDataString | jsawk 'return this.veglShellScript'`
 uploadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}" | sed "s/\/\/*/\//g"`
 
-#Upload a file indicating that work has started
-echo "Uploading init file to indicate work starting..."
-echo "${VEGL_WORKFLOW_VERSION}" > workflow-version.txt
-echo "swift upload ${uploadQueryPath} workflow-version.txt"
-swift upload "${uploadQueryPath}" "workflow-version.txt"
-
 echo "------ Printing SVN FILE INFO---------"
 echo "svn info ${veglShellScript}"
 svn info ${veglShellScript}
@@ -93,11 +87,16 @@ echo "--------------------------------------"
 echo "s3Bucket = ${s3Bucket}"
 echo "s3BaseKeyPath = ${s3BaseKeyPath}"
 
-
 #Configure our swift storage environment variables
 export ST_AUTH="$storageEndpoint"
 export ST_USER="$s3AccessKey"
 export ST_KEY="$s3SecretKey"
+
+#Upload a file indicating that work has started
+echo "Uploading script version file..."
+echo "${VEGL_WORKFLOW_VERSION}" > workflow-version.txt
+echo "swift upload ${uploadQueryPath} workflow-version.txt"
+swift upload "${uploadQueryPath}" "workflow-version.txt"
 
 #Write storage information for abstract cloud usage
 echo -e "StorageType=swift\ncloudStorageAccessKey=${s3AccessKey}\ncloudStorageSecretKey=${s3SecretKey}\ncloudStorageEndPoint=${storageEndpoint}" > "/root/.jobInfo"
