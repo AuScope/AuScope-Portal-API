@@ -8,6 +8,7 @@ Ext.define('vegl.models.Job', {
     statics : {
         STATUS_FAILED : "Failed",
         STATUS_ACTIVE : "Active",
+        STATUS_PENDING : "Pending",
         STATUS_DONE : "Done",
         STATUS_CANCELLED : "Cancelled",
         STATUS_UNSUBMITTED : "Unsubmitted"

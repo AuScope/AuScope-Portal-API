@@ -66,6 +66,7 @@ public class GridSubmitController extends BasePortalController {
     private static final String ERRDAP_SUBSET_VM_FILE_PATH = "/tmp/vegl-subset.csv";
 
     public static final String STATUS_FAILED = "Failed";
+    public static final String STATUS_PENDING = "Pending";
     public static final String STATUS_ACTIVE = "Active";
     public static final String STATUS_DONE = "Done";
     public static final String STATUS_CANCELLED = "Cancelled";
@@ -463,7 +464,7 @@ public class GridSubmitController extends BasePortalController {
             job.getStorageSecretKey() == null || job.getStorageSecretKey().isEmpty() ||
             job.getStorageBucket() == null || job.getStorageBucket().isEmpty()) {
 
-          //Check we have S3 credentials otherwise there is no point in continuing
+            //Check we have S3 credentials otherwise there is no point in continuing
             logger.error("No output S3 credentials found. NOT submitting job!");
 
             job.setStatus(STATUS_FAILED);
@@ -526,7 +527,7 @@ public class GridSubmitController extends BasePortalController {
 
         // set reference as instanceId for use when killing a job
         job.setComputeInstanceId(instanceId);
-        job.setStatus(STATUS_ACTIVE);
+        job.setStatus(STATUS_PENDING);
         job.setSubmitDate(new Date());
         jobManager.saveJob(job);
 

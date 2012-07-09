@@ -553,6 +553,68 @@ public class JobListController extends BasePortalController  {
     }
 
     /**
+     * Tests whether the specified list of files contain a non empty file with the specified file name
+     * @param files
+     * @param fileName
+     * @return
+     */
+    private boolean containsFile(CloudFileInformation[] files, String fileName) {
+        if (files == null) {
+            return false;
+        }
+
+        for (CloudFileInformation file : files) {
+            if (file.getName().endsWith(fileName) && file.getSize() > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Looks at the specified job and determines what status the job should be in
+     * based upon uploaded files.
+     * @param job
+     */
+    private void updateJobStatus(VEGLJob job) {
+        String status = job.getStatus();
+        if (status == null) {
+            status = "";
+        }
+
+        //Don't lookup files for jobs that haven't been submitted
+        if (status.equals(GridSubmitController.STATUS_UNSUBMITTED)) {
+            return;
+        }
+
+        //Get the output files for this job
+        CloudFileInformation[] results = null;
+        try {
+            results = cloudStorageService.listJobFiles(job);
+        } catch (Exception e) {
+            logger.error("Unable to list output job files", e);
+        }
+
+        boolean jobStarted = containsFile(results, "workflow-version.txt");
+        boolean jobFinished = containsFile(results, "vegl.sh.log");
+
+        String newStatus = status;
+        if (jobFinished) {
+            newStatus = GridSubmitController.STATUS_DONE;
+        } else if (jobStarted) {
+            newStatus = GridSubmitController.STATUS_ACTIVE;
+        } else {
+            newStatus = GridSubmitController.STATUS_PENDING;
+        }
+
+        if (!newStatus.equals(status)) {
+            job.setStatus(newStatus);
+            jobManager.saveJob(job);
+        }
+    }
+
+    /**
      * Returns a JSON object containing an array of jobs for the given series.
      *
      * @param request The servlet request including a seriesId parameter
@@ -576,27 +638,7 @@ public class JobListController extends BasePortalController  {
         }
 
         for (VEGLJob job : seriesJobs) {
-            //Don't lookup files for jobs that haven't been submitted
-            if (!job.getStatus().equals(GridSubmitController.STATUS_UNSUBMITTED)) {
-                CloudFileInformation[] results = null;
-                try {
-                    results = cloudStorageService.listJobFiles(job);
-                } catch (Exception e) {
-                    logger.error("Unable to list output job files", e);
-                }
-
-                if (job.getStatus().equals(GridSubmitController.STATUS_ACTIVE) && results != null && results.length > 0) {
-                    //The final processing step is uploading the log
-                    //It is uploaded to "vegl.sh.log"
-                    for (CloudFileInformation result : results) {
-                        if (result.getName().endsWith("vegl.sh.log") && result.getSize() > 0) {
-                            job.setStatus(GridSubmitController.STATUS_DONE);
-                        }
-                    }
-
-                    jobManager.saveJob(job);
-                }
-            }
+            updateJobStatus(job);
         }
         return generateJSONResponseMAV(true, seriesJobs, "");
     }

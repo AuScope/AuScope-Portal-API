@@ -837,16 +837,21 @@ public class TestJobListController {
         final List<VEGLJob> mockJobs = Arrays.asList(
                 context.mock(VEGLJob.class, "mockJobActive"),
                 context.mock(VEGLJob.class, "mockJobUnsubmitted"),
-                context.mock(VEGLJob.class, "mockJobDone"));
+                context.mock(VEGLJob.class, "mockJobDone"),
+                context.mock(VEGLJob.class, "mockJobPending"));
         final CloudFileInformation[] jobActiveFiles = new CloudFileInformation[] {
                 new CloudFileInformation("key2/filename", 100L, "http://public.url2/filename"),
-                new CloudFileInformation("key2/vegl.sh.log", 101L, "http://public.url2/vegl.sh.log"),
                 new CloudFileInformation("key2/filename3", 102L, "http://public.url2/filename3"),
+                new CloudFileInformation("key2/workflow-version.txt", 102L, "http://public.url2/filename3"),
         };
-        final CloudFileInformation[] jobDoneFiles = new CloudFileInformation[] {
+        final CloudFileInformation[] jobPendingFiles = new CloudFileInformation[] {
                 new CloudFileInformation("key3/filename", 100L, "http://public.url3/filename"),
                 new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
-                new CloudFileInformation("key3/filename3", 102L, "http://public.url3/filename3"),
+        };
+        final CloudFileInformation[] jobDoneFiles = new CloudFileInformation[] {
+                new CloudFileInformation("key3/workflow-version.txt", 100L, "http://public.url3/filename"),
+                new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
+                new CloudFileInformation("key3/vegl.sh.log", 102L, "http://public.url3/filename3"),
         };
 
         context.checking(new Expectations() {{
@@ -862,13 +867,16 @@ public class TestJobListController {
             allowing(mockJobs.get(0)).getStatus();will(returnValue(GridSubmitController.STATUS_ACTIVE));
             allowing(mockJobs.get(1)).getStatus();will(returnValue(GridSubmitController.STATUS_UNSUBMITTED));
             allowing(mockJobs.get(2)).getStatus();will(returnValue(GridSubmitController.STATUS_DONE));
+            allowing(mockJobs.get(3)).getStatus();will(returnValue(GridSubmitController.STATUS_PENDING));
 
             //Output files for each job
             oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(0)));will(returnValue(jobActiveFiles));
             oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(2)));will(returnValue(jobDoneFiles));
+            oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(3)));will(returnValue(jobPendingFiles));
 
             //Update our running job to done (due to presence of vegl.sh.log)
             oneOf(mockJobs.get(0)).setStatus(GridSubmitController.STATUS_DONE);
+            oneOf(mockJobs.get(3)).setStatus(GridSubmitController.STATUS_PENDING);
             oneOf(mockJobManager).saveJob(mockJobs.get(0));
         }});
 

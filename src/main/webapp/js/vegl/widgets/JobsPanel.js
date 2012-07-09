@@ -148,12 +148,14 @@ Ext.define('vegl.widgets.JobsPanel', {
     },
 
     _jobStatusRenderer : function(value, cell, record) {
-        if (value == "Failed") {
+        if (value === vegl.models.Job.STATUS_FAILED) {
             return '<span style="color:red;">' + value + '</span>';
-        } else if (value == "Active") {
+        } else if (value === vegl.models.Job.STATUS_ACTIVE) {
             return '<span style="color:green;">' + value + '</span>';
-        } else if (value == "Done") {
+        } else if (value === vegl.models.Job.STATUS_DONE) {
             return '<span style="color:blue;">' + value + '</span>';
+        } else if (value === vegl.models.Job.STATUS_PENDING) {
+            return '<span style="color:yellow;">' + value + '</span>';
         }
         return value;
     },
