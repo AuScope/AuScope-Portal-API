@@ -13,7 +13,7 @@ export EC2_METADATA_SCRIPT="${WORKING_DIR}/ec2-metadata"
 INITIAL_SLEEP_LENGTH="30s"
 FINAL_SLEEP_LENGTH="15m"
 NTP_DATE_SERVER="pool.ntp.org"
-VEGL_WORKFLOW_VERSION="1"
+VEGL_WORKFLOW_VERSION="2"
 #cloud storage tool wrapper url
 WRAPPER_URL="https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk/vm/cloud.sh"
 export VEGL_SCRIPT_PATH="${WORKING_DIR}/vegl_script.py"
@@ -41,10 +41,6 @@ echo "SUBSET_REQUEST_PATH = ${SUBSET_REQUEST_PATH}"
 echo "VEGL_SCRIPT_PATH = ${VEGL_SCRIPT_PATH}"
 echo "ABORT_SHUTDOWN_PATH = ${ABORT_SHUTDOWN_PATH}"
 echo "--------------------------------------"
-
-#Start by waiting until the system starts up
-echo "Sleeping for ${INITIAL_SLEEP_LENGTH}"
-sleep "$INITIAL_SLEEP_LENGTH"
 
 #Lets get started by moving to our working directory
 cd $WORKING_DIR
@@ -78,6 +74,13 @@ s3AccessKey=`echo $userDataString | jsawk 'return this.s3OutputAccessKey'`
 s3SecretKey=`echo $userDataString | jsawk 'return this.s3OutputSecretKey'`
 storageEndpoint=`echo $userDataString | jsawk 'return this.storageEndpoint'`
 veglShellScript=`echo $userDataString | jsawk 'return this.veglShellScript'`
+uploadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}" | sed "s/\/\/*/\//g"`
+
+#Upload a file indicating that work has started
+echo "Uploading init file to indicate work starting..."
+echo "${VEGL_WORKFLOW_VERSION}" > workflow-version.txt
+echo "swift upload ${uploadQueryPath} workflow-version.txt"
+swift upload "${uploadQueryPath}" "workflow-version.txt"
 
 echo "------ Printing SVN FILE INFO---------"
 echo "svn info ${veglShellScript}"
@@ -123,7 +126,6 @@ cd $WORKING_DIR
 
 #Finally upload our logs for debug purposes
 echo "About to upload output log..."
-uploadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}" | sed "s/\/\/*/\//g"`
 echo "swift upload ${uploadQueryPath} vegl.sh.log"
 swift upload "${uploadQueryPath}" "vegl.sh.log"
 
@@ -134,6 +136,6 @@ sleep "${FINAL_SLEEP_LENGTH}"
 if [ -f $ABORT_SHUTDOWN_PATH ]; then
     echo 'Instance shutdown has been aborted'
 else
-	echo 'Shutting down this instance...'
+    echo 'Shutting down this instance...'
     shutdown -h now
 fi
