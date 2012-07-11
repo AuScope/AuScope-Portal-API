@@ -63,7 +63,7 @@ Ext.define('ScriptBuilder.components.VEGLStep8', {
         text += this._tab + this._tab + "f.write('null !active cell file\\n')" + this._newLine;
         text += this._tab + this._tab + "f.write('null !lower, upper bounds\\n')" + this._newLine;
         text += this._tab + this._tab + "f.write('null Le, Ln, Lz\\n')" + this._newLine;
-        text += this._tab + this._tab + "f.write('SMOOTH_MOD_DIF\\n')" + this._newLine;
+        text += this._tab + this._tab + "f.write('SMOOTH_MOD\\n')" + this._newLine;
         text += this._tab + this._tab + "f.write('null !weighting file\\n')" + this._newLine;
         text += this._tab + this._tab + "f.write('0\\n')" + this._newLine;
         text += this._tab + this._tab + "f.close()" + this._newLine;
