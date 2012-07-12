@@ -1,5 +1,7 @@
 package org.auscope.portal.server.vegl;
 
+import java.util.Date;
+
 import org.auscope.portal.core.cloud.CloudJob;
 
 /**
@@ -9,7 +11,7 @@ import org.auscope.portal.core.cloud.CloudJob;
  * @author Josh Vote
  *
  */
-public class VEGLJob extends CloudJob {
+public class VEGLJob extends CloudJob implements Cloneable {
     private static final long serialVersionUID = -57851899164623641L;
 
     private String registeredUrl;
@@ -335,6 +337,24 @@ public class VEGLJob extends CloudJob {
      */
     public void setVmSubsetUrl(String vmSubsetUrl) {
         this.vmSubsetUrl = vmSubsetUrl;
+    }
+
+    /**
+     * Creates a clone of this VEGLJob. Fields with references to immutable objects (Integer, String, Double) will remain
+     * the same, everything else will be given a new reference
+     */
+    public VEGLJob clone() {
+       VEGLJob clone;
+        try {
+            clone = (VEGLJob) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+       if (clone.submitDate != null) {
+           clone.submitDate = new Date(this.submitDate.getTime());
+       }
+
+       return clone;
     }
 
     @Override

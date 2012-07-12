@@ -576,9 +576,7 @@ public class GridSubmitController extends BasePortalController {
         job.setStatus(STATUS_UNSUBMITTED);
 
         //We need an ID for storing our job file that won't collide with other storage ID's
-        String fileStorageId = String.format("VEGL-%1$s-%2$s", job.getUser(), job.getId());
-        fileStorageId = fileStorageId.replaceAll("[^a-zA-Z0-9_\\-]", "_"); //get rid of some obvious nasty characters
-        job.setStorageBaseKey(fileStorageId);
+        job.setStorageBaseKey(cloudStorageService.generateBaseKey(job));
 
         return job;
     }

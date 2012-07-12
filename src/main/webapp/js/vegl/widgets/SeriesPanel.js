@@ -11,6 +11,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
 
     cancelSeriesAction : null,
     deleteSeriesAction : null,
+    contextMenu : null,
 
     constructor : function(config) {
 
@@ -41,6 +42,12 @@ Ext.define('vegl.widgets.SeriesPanel', {
         });
 
         Ext.apply(config, {
+            plugins : [{
+                ptype : 'rowcontextmenu',
+                contextMenu : Ext.create('Ext.menu.Menu', {
+                    items: [this.cancelSeriesAction, this.deleteSeriesAction]
+                })
+            }],
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.models.Series',
                 proxy : {

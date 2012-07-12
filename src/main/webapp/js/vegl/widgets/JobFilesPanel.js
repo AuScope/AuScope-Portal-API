@@ -55,6 +55,12 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         });
 
         Ext.apply(config, {
+            plugins : [{
+                ptype : 'rowcontextmenu',
+                contextMenu : Ext.create('Ext.menu.Menu', {
+                    items: [this.downloadAction, this.downloadZipAction]
+                })
+            }],
             multiSelect : true,
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.models.FileRecord',
@@ -79,7 +85,15 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         this.callParent(arguments);
 
         this.on('selectionchange', this._onSelectionChange, this);
+        this.on('celldblclick', this._onDblClick, this);
 
+    },
+
+    _onDblClick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+        var sm = this.getSelectionModel();
+
+        this.getSelectionModel().select([record], false);
+        this.downloadAction.execute();
     },
 
     _onSelectionChange : function(sm) {

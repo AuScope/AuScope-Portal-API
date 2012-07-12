@@ -7,15 +7,11 @@
 Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
-    jobObjectCreated : false,
-
     /**
      * Creates a new JobObjectForm form configured to write/read to the specified global state
      */
     constructor: function(wizardState) {
         var jobObjectFrm = this;
-
-        jobObjectFrm.jobObjectCreated = false;
 
         this.callParent([{
             wizardState : wizardState,
@@ -27,22 +23,35 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             listeners : {
                 //The first time this form is active create a new job object
                 jobWizardActive : function() {
-                    if (!jobObjectFrm.jobObjectCreated) {
-                        jobObjectFrm.getForm().load({
-                            url : 'createJobObject.do',
-                            waitMsg : 'Creating Job Object...',
-                            failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
-                            success : function(frm, action) {
-                                var responseObj = Ext.JSON.decode(action.response.responseText);
+                    var params = {};
+                    var url = '';
+                    var msg = '';
 
-                                if (responseObj.success) {
-                                    frm.setValues(responseObj.data[0]);
-                                    jobObjectFrm.jobObjectCreated = true;
-                                    jobObjectFrm.wizardState.jobId = frm.getValues().id;
-                                }
-                            }
-                        });
+                    //If we have a jobId, load that, OTHERWISE create a job object
+                    if (jobObjectFrm.wizardState.jobId) {
+                        url = 'getJobObject.do';
+                        msg = 'Loading Job Object...';
+                        params.jobId = jobObjectFrm.wizardState.jobId;
+                    } else {
+                        url = 'createJobObject.do';
+                        msg = 'Creating Job Object...';
                     }
+
+                    //Load the job object into the form
+                    jobObjectFrm.getForm().load({
+                        url : url,
+                        waitMsg : msg,
+                        params : params,
+                        failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
+                        success : function(frm, action) {
+                            var responseObj = Ext.JSON.decode(action.response.responseText);
+
+                            if (responseObj.success) {
+                                frm.setValues(responseObj.data[0]);
+                                jobObjectFrm.wizardState.jobId = frm.getValues().id;
+                            }
+                        }
+                    });
                 }
             },
             items: [{

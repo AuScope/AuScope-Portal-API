@@ -18,7 +18,13 @@ Ext.application({
                 region: 'center',
                 margins: '2 2 2 0',
                 layout: 'fit',
-                items: [ Ext.create('vegl.jobwizard.JobWizard', {}) ]
+                items: [ Ext.create('vegl.jobwizard.JobWizard', {
+                    forms : ['vegl.jobwizard.forms.JobSeriesForm',
+                             'vegl.jobwizard.forms.JobObjectForm',
+                             'vegl.jobwizard.forms.JobUploadForm',
+                             'vegl.jobwizard.forms.ScriptBuilderForm',
+                             'vegl.jobwizard.forms.JobSubmitForm']
+                }) ]
             }]
         });
     }

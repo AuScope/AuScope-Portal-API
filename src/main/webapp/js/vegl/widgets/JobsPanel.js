@@ -9,11 +9,12 @@
  */
 Ext.define('vegl.widgets.JobsPanel', {
     extend : 'Ext.grid.Panel',
-    alias : 'widgets.jobspanel',
+    alias : 'widget.jobspanel',
 
     currentSeries : null,
     cancelJobAction : null,
     deleteJobAction : null,
+    duplicateJobAction : null,
 
     constructor : function(config) {
         this.cancelJobAction = new Ext.Action({
@@ -24,7 +25,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             handler: function() {
                 var selection = this.getSelectionModel().getSelection();
                 if (selection.length > 0) {
-                    this.cancelJob(selection[0])
+                    this.cancelJob(selection[0]);
                 }
             }
         });
@@ -37,12 +38,31 @@ Ext.define('vegl.widgets.JobsPanel', {
             handler: function() {
                 var selection = this.getSelectionModel().getSelection();
                 if (selection.length > 0) {
-                    this.deleteJob(selection[0])
+                    this.deleteJob(selection[0]);
+                }
+            }
+        });
+
+        this.duplicateJobAction = new Ext.Action({
+            text: 'Repeat job',
+            iconCls: 'refresh-icon',
+            scope : this,
+            disabled : true,
+            handler: function() {
+                var selection = this.getSelectionModel().getSelection();
+                if (selection.length > 0) {
+                    this.repeatJob(selection[0]);
                 }
             }
         });
 
         Ext.apply(config, {
+            plugins : [{
+                ptype : 'rowcontextmenu',
+                contextMenu : Ext.create('Ext.menu.Menu', {
+                    items: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction]
+                })
+            }],
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.models.Job',
                 proxy : {
@@ -74,7 +94,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             tbar: [{
                 text: 'Actions',
                 iconCls: 'folder-icon',
-                menu: [ this.cancelJobAction, this.deleteJobAction]
+                menu: [ this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction]
             }]
         });
 
@@ -95,13 +115,18 @@ Ext.define('vegl.widgets.JobsPanel', {
         if (selections.length == 0) {
             this.cancelJobAction.setDisabled(true);
             this.deleteJobAction.setDisabled(true);
+            this.duplicateJobAction.setDisabled(true);
         } else {
             this.cancelJobAction.setDisabled(false);
             this.deleteJobAction.setDisabled(false);
+            this.duplicateJobAction.setDisabled(false);
 
             switch(selections[0].get('status')) {
             case vegl.models.Job.STATUS_ACTIVE:
                 this.deleteJobAction.setDisabled(true);
+                break;
+            case vegl.models.Job.STATUS_UNSUBMITTED:
+                this.duplicateJobAction.setDisabled(true);
                 break;
             default:
                 this.cancelJobAction.setDisabled(true);
@@ -155,7 +180,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         } else if (value === vegl.models.Job.STATUS_DONE) {
             return '<span style="color:blue;">' + value + '</span>';
         } else if (value === vegl.models.Job.STATUS_PENDING) {
-            return '<span style="color:yellow;">' + value + '</span>';
+            return '<span style="color:#e59900;">' + value + '</span>';
         }
         return value;
     },
@@ -239,5 +264,26 @@ Ext.define('vegl.widgets.JobsPanel', {
                 }
             }
         });
+    },
+
+    repeatJob : function(job) {
+        var popup = Ext.create('Ext.window.Window', {
+            width : 800,
+            height : 600,
+            modal : true,
+            layout : 'fit',
+            title : 'Repeat Job Wizard',
+            items :[{
+                xtype : 'jobwizard',
+                border : false,
+                wizardState : {
+                    duplicateJobId : job.get('id')
+                },
+                forms : ['vegl.jobwizard.forms.DuplicateJobForm',
+                         'vegl.jobwizard.forms.JobObjectForm',
+                         'vegl.jobwizard.forms.JobSubmitForm']
+            }]
+        });
+        popup.show();
     }
 });

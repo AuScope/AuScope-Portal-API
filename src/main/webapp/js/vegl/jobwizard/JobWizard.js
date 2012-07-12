@@ -6,6 +6,8 @@
 
 Ext.define('vegl.jobwizard.JobWizard', {
     extend : 'Ext.Panel',
+    alias : 'widget.jobwizard',
+
     /**
      * The internal state of the wizard (managed by internal forms)
      */
@@ -13,15 +15,20 @@ Ext.define('vegl.jobwizard.JobWizard', {
 
     /**
      * Creates a new JobObjectForm form configured to write/read to the specified global state
+     *
+     * {
+     *  wizardState : Object - [Optional] The initial state to apply to all forms
+     *  forms : String[] - An array of class names of various vegl.jobwizard.forms.BaseJobWizardForm implementations
+     * }
      */
-    constructor: function() {
+    constructor: function(config) {
         var jobWizard = this;
-        jobWizard.wizardState = {};
-        var baseJobWizardForms = [Ext.create('vegl.jobwizard.forms.JobSeriesForm', jobWizard.wizardState),
-                                  Ext.create('vegl.jobwizard.forms.JobObjectForm', jobWizard.wizardState),
-                                  Ext.create('vegl.jobwizard.forms.JobUploadForm', jobWizard.wizardState),
-                                  Ext.create('vegl.jobwizard.forms.ScriptBuilderForm', jobWizard.wizardState),
-                                  Ext.create('vegl.jobwizard.forms.JobSubmitForm', jobWizard.wizardState)];
+        jobWizard.wizardState = config.wizardState ? config.wizardState : {};
+
+        var baseJobWizardForms = [];
+        for (var i = 0; i < config.forms.length; i++) {
+            baseJobWizardForms.push(Ext.create(config.forms[i], jobWizard.wizardState));
+        }
 
         //Handler for whenever a form can't load data
         var loadingError = function() {
@@ -93,19 +100,18 @@ Ext.define('vegl.jobwizard.JobWizard', {
 
         var startingJobIndex = 0;
 
-        this.callParent([{
+        Ext.apply(config, {
             layout: 'card',
             activeItem: startingJobIndex,
             defaults: { layout:'fit', frame: true, buttonAlign: 'right' },
-            //bodyStyle: 'padding:20px 200px;',
-            items: items,
-            listeners: {
-                //When we load init our first card with the 'active' event
-                render : function() {
-                    var activeItem = baseJobWizardForms[startingJobIndex];
-                    activeItem.fireEvent('jobWizardActive');
-                }
-            }
-        }]);
+            items: items
+        });
+
+        this.callParent(arguments);
+
+        this.on('render', function() {
+            var activeItem = baseJobWizardForms[startingJobIndex];
+            activeItem.fireEvent('jobWizardActive');
+        });
     }
 });

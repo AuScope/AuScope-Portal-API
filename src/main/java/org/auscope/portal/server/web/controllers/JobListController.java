@@ -6,10 +6,13 @@
  */
 package org.auscope.portal.server.web.controllers;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -22,9 +25,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
@@ -641,6 +646,101 @@ public class JobListController extends BasePortalController  {
             updateJobStatus(job);
         }
         return generateJSONResponseMAV(true, seriesJobs, "");
+    }
+
+    /**
+     * Tests whether the specified cloud file appears in a list of fileNames
+     *
+     * If fileNames is null, true will be returned
+     * @param files
+     * @param fileName
+     * @return
+     */
+    private boolean cloudFileIncluded(String[] fileNames, CloudFileInformation cloudFile) {
+        if (fileNames == null) {
+            return false;
+        }
+
+        for (String fileName : fileNames) {
+            if (cloudFile.getName().endsWith(fileName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Duplicates the job given by its reference, the new job object is returned.
+     *
+     * Job files will be duplicated in LOCAL staging only. The files duplicated can be
+     * controlled by a list of file names
+     */
+    @RequestMapping("/duplicateJob.do")
+    public ModelAndView duplicateJob(HttpServletRequest request,
+                                HttpServletResponse response,
+                                @RequestParam("jobId") Integer jobId,
+                                @RequestParam(required=false, value="file") String[] files) {
+
+        //Lookup the job we are cloning
+        VEGLJob oldJob = attemptGetJob(jobId, request);
+        if (oldJob == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup job to duplicate.");
+        }
+
+        //Create a cloned job but make it 'unsubmitted'
+        VEGLJob newJob = oldJob.clone();
+        newJob.setId(null);
+        newJob.setStatus(GridSubmitController.STATUS_UNSUBMITTED);
+        newJob.setSubmitDate((Date)null);
+        newJob.setRegisteredUrl(null);
+
+        //Attempt to save the new job to the DB
+        try {
+            jobManager.saveJob(newJob);
+
+            //This needs to be set AFTER we first save the job (the ID will form part of the key)
+            newJob.setStorageBaseKey(cloudStorageService.generateBaseKey(newJob));
+            jobManager.saveJob(newJob);
+        } catch (Exception ex) {
+            log.error("Unable to save job to database: " + ex.getMessage());
+            log.debug("Exception:", ex);
+            return generateJSONResponseMAV(false, null, "Unable to save new job.");
+        }
+
+        try {
+            //Lets setup a staging area for the input files
+            fileStagingService.generateStageInDirectory(newJob);
+
+            //Write every file to the local staging area
+            CloudFileInformation[] cloudFiles = cloudStorageService.listJobFiles(oldJob);
+            for (CloudFileInformation cloudFile : cloudFiles) {
+                if (cloudFileIncluded(files, cloudFile)) {
+                    InputStream is = cloudStorageService.getJobFile(oldJob, cloudFile.getName());
+                    FileOutputStream os = null;
+                    try {
+                        File stagingFile = fileStagingService.createStageInDirectoryFile(newJob, cloudFile.getName());
+                        os = new FileOutputStream(stagingFile);
+
+                        writeInputToOutputStream(is, os, 1024 * 1024, false);
+                    } finally {
+                        FileIOUtil.closeQuietly(os);
+                        FileIOUtil.closeQuietly(is);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Unable to duplicate input files: " + ex.getMessage());
+            log.debug("Exception:", ex);
+
+            //Tidy up after ourselves
+            fileStagingService.deleteStageInDirectory(newJob);
+            jobManager.deleteJob(newJob);
+
+            return generateJSONResponseMAV(false, null, "Unable to save new job.");
+        }
+
+        return generateJSONResponseMAV(true, Arrays.asList(newJob), "");
     }
 
 

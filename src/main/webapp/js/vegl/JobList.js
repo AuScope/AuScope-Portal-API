@@ -36,9 +36,7 @@ Ext.application({
 
         var jobsPanel = Ext.create('vegl.widgets.JobsPanel', {
             title: 'Jobs of selected series',
-            region: 'south',
-            split: true,
-            height: 200,
+            region: 'center',
             stripeRows: true,
             listeners : {
                 selectjob : function(panel, job) {
@@ -64,8 +62,9 @@ Ext.application({
 
         var seriesPanel = Ext.create('vegl.widgets.SeriesPanel', {
             title: 'Series List',
-            region: 'center',
+            region: 'north',
             height: 250,
+            split: true,
             stripeRows: true,
             listeners : {
                 selectseries : function(panel, series) {
