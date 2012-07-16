@@ -4,7 +4,7 @@
 <html>
 
 <head>
-    <title>VEGL Portal - OpenID Login</title>
+    <title>VGL Portal - OpenID Login</title>
     <link rel="stylesheet" type="text/css" href="css/styles.css">
     <link rel="stylesheet" type="text/css" href="css/menu.css">
 

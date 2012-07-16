@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auscope.portal</groupId>
-    <artifactId>VEGL-Portal</artifactId>
+    <artifactId>VGL-Portal</artifactId>
     <packaging>war</packaging>
     <version>2.8.2</version>
-    <name>VEGL-Portal</name>
+    <name>VGL-Portal</name>
     <url>https://www.seegrid.csiro.au/wiki/bin/view/ASRDC/VEGLProject</url>
     <scm>
         <connection>scm:svn:https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk</connection>
@@ -19,7 +19,7 @@
         <url>http://www.auscope.org</url>
     </organization>
     <build>
-        <finalName>VEGL-Portal</finalName>
+        <finalName>VGL-Portal</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
