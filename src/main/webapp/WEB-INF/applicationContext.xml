@@ -94,8 +94,8 @@
         <constructor-arg name="endpoint" value="${ec2.endpoint}"/>
         <constructor-arg name="credentials">
             <bean class="com.amazonaws.auth.BasicAWSCredentials">
-                <constructor-arg name="accessKey" value="${ec2.accesskey}"/>
-                <constructor-arg name="secretKey" value="${ec2.secretkey}"/>
+                <constructor-arg name="accessKey" value="${env.ec2.accesskey}"/>
+                <constructor-arg name="secretKey" value="${env.ec2.secretkey}"/>
             </bean>
         </constructor-arg>
     </bean>
