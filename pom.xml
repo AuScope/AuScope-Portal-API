@@ -133,6 +133,7 @@
     <properties>
         <jetty.version>6.1.26</jetty.version>
         <spring.version>3.0.5.RELEASE</spring.version>
+        <log4j.version>1.2.16</log4j.version>
     </properties>
 
     <repositories>
