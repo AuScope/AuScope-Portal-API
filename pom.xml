@@ -143,6 +143,11 @@
             <url>http://download.osgeo.org/webdav/geotools</url>
         </repository>
         <repository>
+            <id>mygrid</id>
+            <name>MyGrid Repository</name>
+            <url>http://build.mygrid.org.uk/maven/repository/</url>
+        </repository>
+        <repository>
             <id>geotoolkit</id>
             <name>Geo Toolkit Repository</name>
             <url>http://maven.geotoolkit.org/</url>
