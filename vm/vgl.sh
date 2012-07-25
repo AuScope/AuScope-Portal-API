@@ -107,7 +107,7 @@ cd $WORKING_DIR
 #Finally upload our logs for debug purposes
 echo "About to upload output log..."
 echo "cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH $VEGL_LOG_FILE_NAME $VEGL_LOG_FILE"
-cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH $VEGL_LOG_FILE_NAME $VEGL_LOG_FILE
+cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH $VEGL_LOG_FILE_NAME $VEGL_LOG_FILE_NAME
 
 #At this point we can give developers a grace period in which they can login to the VM for debugging
 echo "Sleeping for ${FINAL_SLEEP_LENGTH} before shutting down"
