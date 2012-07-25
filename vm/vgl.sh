@@ -90,8 +90,8 @@ export ST_KEY="$s3SecretKey"
 #Upload a file indicating that work has started
 echo "Uploading script version file..."
 echo "${VEGL_WORKFLOW_VERSION}" > workflow-version.txt
-echo "swift upload ${uploadQueryPath} workflow-version.txt"
-swift upload "${uploadQueryPath}" "workflow-version.txt"
+echo "cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH workflow-version.txt workflow-version.txt"
+cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH workflow-version.txt workflow-version.txt
 
 #Write storage information for abstract cloud usage
 echo -e "StorageType=swift\ncloudStorageAccessKey=${s3AccessKey}\ncloudStorageSecretKey=${s3SecretKey}\ncloudStorageEndPoint=${storageEndpoint}" > "/root/.jobInfo"
