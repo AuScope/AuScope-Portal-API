@@ -72,7 +72,8 @@ elif head -1 $user_data_file | egrep -v '^#!'; then
 else
   $logger "Running user-data"
   echo "user-data has already been run on this instance" > $been_run_file
-  $user_data_file 2>&1 | logger -t "user-data"
+  chmod +x $user_data_file
+  $user_data_file
   $logger "user-data exit code: $?"
 fi
 rm -f $user_data_file
