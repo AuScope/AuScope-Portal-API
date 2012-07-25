@@ -1,45 +1,45 @@
 #!/usr/bin/env bash
 # chkconfig: 2345 90 10
-# description: vegl.sh - Shell Script performing the "workflow" of the VEGL VM
+# description: vgl.sh - Shell Script performing the "workflow" of the VGL VM
 # NOTE: Please ensure that VEGL_WORKFLOW_VERSION gets incremented with any changes
 
 #configure our environment
-export PATH="/usr/lib64/openmpi/1.4-gcc/bin:/opt/ubc:$PATH"
-export LD_LIBRARY_PATH="/usr/lib64/openmpi/1.4-gcc/lib:/opt/intel64"
-export WORKING_DIR="/root"
-export EXAMPLE_DATA_DIR="${WORKING_DIR}/ubc-example-data"
-export VEGL_LOG_FILE="${WORKING_DIR}/vegl.sh.log"
+export VGL_WORKFLOW_VERSION="1"
+export VEGL_LOG_FILE_NAME="vegl.sh.log"
+export VEGL_LOG_FILE="${WORKING_DIR}/$VEGL_LOG_FILE_NAME"
 export EC2_METADATA_SCRIPT="${WORKING_DIR}/ec2-metadata"
-INITIAL_SLEEP_LENGTH="30s"
-FINAL_SLEEP_LENGTH="15m"
-NTP_DATE_SERVER="pool.ntp.org"
-VEGL_WORKFLOW_VERSION="2"
-#cloud storage tool wrapper url
-WRAPPER_URL="https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk/vm/cloud.sh"
+export FINAL_SLEEP_LENGTH="15m"
+export NTP_DATE_SERVER="pool.ntp.org"
+export CLOUD_STORAGE_CLOUD_STORAGE_WRAPPER_URL="https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk/vm/cloud.sh"
 export VEGL_SCRIPT_PATH="${WORKING_DIR}/vegl_script.py"
 export SUBSET_REQUEST_PATH="${WORKING_DIR}/subset_request.sh"
-ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
+export ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
 
 echo "VEGL Workflow Script... starting"
 echo "All future console output will be redirected to ${VEGL_LOG_FILE}"
 exec &> "$VEGL_LOG_FILE"
 
+# Print environment variables (don't print any credentials here)
 echo "------ VEGL Workflow Script ----------"
 echo "                                      "
 echo "------ Printing Environment ----------"
-echo "VEGL_WORKFLOW_VERSION = ${VEGL_WORKFLOW_VERSION}"
+echo "VGL_WORKFLOW_VERSION = ${VGL_WORKFLOW_VERSION}"
 echo "PATH = ${PATH}"
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 echo "WORKING_DIR = ${WORKING_DIR}"
-echo "EXAMPLE_DATA_DIR = ${EXAMPLE_DATA_DIR}"
 echo "VEGL_LOG_FILE = ${VEGL_LOG_FILE}"
 echo "EC2_METADATA_SCRIPT = ${EC2_METADATA_SCRIPT}"
-echo "INITIAL_SLEEP_LENGTH = ${INITIAL_SLEEP_LENGTH}"
 echo "FINAL_SLEEP_LENGTH = ${FINAL_SLEEP_LENGTH}"
 echo "NTP_DATE_SERVER = ${NTP_DATE_SERVER}"
 echo "SUBSET_REQUEST_PATH = ${SUBSET_REQUEST_PATH}"
-echo "VEGL_SCRIPT_PATH = ${VEGL_SCRIPT_PATH}"
 echo "ABORT_SHUTDOWN_PATH = ${ABORT_SHUTDOWN_PATH}"
+echo "--------------------------------------"
+echo "--- Printing Bootstrap Environment ---"
+echo "STORAGE_BUCKET = ${STORAGE_BUCKET}"
+echo "STORAGE_ENDPOINT = ${STORAGE_ENDPOINT}"
+echo "STORAGE_BASE_KEY_PATH = ${STORAGE_BASE_KEY_PATH}"
+echo "WORKFLOW_URL = ${WORKFLOW_URL}"
+echo "STORAGE_ENDPOINT = ${STORAGE_ENDPOINT}"
 echo "--------------------------------------"
 
 #Lets get started by moving to our working directory
@@ -50,42 +50,37 @@ echo "Synchronising date with ${NTP_DATE_SERVER}"
 ntpdate "$NTP_DATE_SERVER"
 
 #Download our cloud storage tool wrapper and make it executable
-echo "Downloading wrapper script from ${WRAPPER_URL} and storing it at /bin/cloud"
-curl -L "${WRAPPER_URL}" > "/bin/cloud"
+echo "Downloading wrapper script from ${CLOUD_STORAGE_WRAPPER_URL} and storing it at /bin/cloud"
+curl -L "${CLOUD_STORAGE_WRAPPER_URL}" > "/bin/cloud"
 echo "Making /bin/cloud executable"
 chmod +x "/bin/cloud"
 echo "chmod result $?"
+
+#Configure variables for our cloud storage wrapper
+export STORAGE_TYPE="swift"
+export ST_AUTH="$STORAGE_ENDPOINT"
+export ST_USER="$STORAGE_ACCESS_KEY"
+export ST_KEY="$STORAGE_SECRET_KEY"
+echo "Configured storage wrapper to use: $STORAGE_TYPE"
 
 #next we download our AWS metadata script which allows us to fetch information
 #about our instance
 curl -L http://s3.amazonaws.com/ec2metadata/ec2-metadata > "${EC2_METADATA_SCRIPT}"
 chmod +x "${EC2_METADATA_SCRIPT}"
 
-#next we want to download our user data string
-userDataHost=`route -n | awk '$4 ~ ".*G.*" {print $2}'`
-userDataUrl="http://$userDataHost:8773/latest/user-data"
-echo "Downloading user data from ${userDataUrl}"
-userDataString=`curl -L "$userDataUrl"`
 
-#Decompose our user data string into the individual parameter strings
-s3Bucket=`echo $userDataString | jsawk 'return this.s3OutputBucket'`
-s3BaseKeyPath=`echo $userDataString | jsawk 'return this.s3OutputBaseKeyPath'`
-s3AccessKey=`echo $userDataString | jsawk 'return this.s3OutputAccessKey'`
-s3SecretKey=`echo $userDataString | jsawk 'return this.s3OutputSecretKey'`
-storageEndpoint=`echo $userDataString | jsawk 'return this.storageEndpoint'`
-veglShellScript=`echo $userDataString | jsawk 'return this.veglShellScript'`
-uploadQueryPath=`echo "${s3Bucket}/${s3BaseKeyPath}" | sed "s/\/\/*/\//g"`
+uploadQueryPath=`echo "${STORAGE_BUCKET}/${STORAGE_BASE_KEY_PATH}" | sed "s/\/\/*/\//g"`
 
 echo "------ Printing SVN FILE INFO---------"
-echo "svn info ${veglShellScript}"
-svn info ${veglShellScript}
+echo "svn info ${WORKFLOW_URL}"
+svn info ${WORKFLOW_URL}
 echo "                                      "
-echo "svn info ${WRAPPER_URL}"
-svn info ${WRAPPER_URL}
+echo "svn info ${CLOUD_STORAGE_WRAPPER_URL}"
+svn info ${CLOUD_STORAGE_WRAPPER_URL}
 echo "--------------------------------------"
 
-echo "s3Bucket = ${s3Bucket}"
-echo "s3BaseKeyPath = ${s3BaseKeyPath}"
+echo "STORAGE_BUCKET = ${STORAGE_BUCKET}"
+echo "STORAGE_BASE_KEY_PATH = ${STORAGE_BASE_KEY_PATH}"
 
 #Configure our swift storage environment variables
 export ST_AUTH="$storageEndpoint"
@@ -103,11 +98,11 @@ echo -e "StorageType=swift\ncloudStorageAccessKey=${s3AccessKey}\ncloudStorageSe
 
 #Download our input files from swift storage and load them into files in the current working directory
 echo "Downloading inputfiles from S3..."
-echo "swift list ${s3Bucket} -p ${s3BaseKeyPath}"
-for line in `swift list ${s3Bucket} -p ${s3BaseKeyPath}`;do
+echo "cloud list ${STORAGE_BUCKET} ${STORAGE_BASE_KEY_PATH}"
+for line in `cloud list ${STORAGE_BUCKET} ${STORAGE_BASE_KEY_PATH}`;do
        downloadOutputFile=`basename "${line}"`
-       echo "swift download -o ${downloadOutputFile} ${s3Bucket} ${line}"
-       swift download -o ${downloadOutputFile} ${s3Bucket} ${line}
+       echo "cloud download -o ${STORAGE_BUCKET} ${STORAGE_BASE_KEY_PATH} ${downloadOutputFile} ${downloadOutputFile} ${downloadOutputFile}"
+       cloud download ${STORAGE_BUCKET} ${STORAGE_BASE_KEY_PATH} ${downloadOutputFile} ${downloadOutputFile} ${downloadOutputFile}
 done
 echo "... finished downloading input files"
 
@@ -125,8 +120,8 @@ cd $WORKING_DIR
 
 #Finally upload our logs for debug purposes
 echo "About to upload output log..."
-echo "swift upload ${uploadQueryPath} vegl.sh.log"
-swift upload "${uploadQueryPath}" "vegl.sh.log"
+echo "cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH $VEGL_LOG_FILE_NAME $VEGL_LOG_FILE"
+cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH $VEGL_LOG_FILE_NAME $VEGL_LOG_FILE
 
 #At this point we can give developers a grace period in which they can login to the VM for debugging
 echo "Sleeping for ${FINAL_SLEEP_LENGTH} before shutting down"
