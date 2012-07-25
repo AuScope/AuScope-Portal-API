@@ -68,9 +68,6 @@ echo "Configured storage wrapper to use: $STORAGE_TYPE"
 curl -L http://s3.amazonaws.com/ec2metadata/ec2-metadata > "${EC2_METADATA_SCRIPT}"
 chmod +x "${EC2_METADATA_SCRIPT}"
 
-
-uploadQueryPath=`echo "${STORAGE_BUCKET}/${STORAGE_BASE_KEY_PATH}" | sed "s/\/\/*/\//g"`
-
 echo "------ Printing SVN FILE INFO---------"
 echo "svn info ${WORKFLOW_URL}"
 svn info ${WORKFLOW_URL}
@@ -79,22 +76,11 @@ echo "svn info ${CLOUD_STORAGE_WRAPPER_URL}"
 svn info ${CLOUD_STORAGE_WRAPPER_URL}
 echo "--------------------------------------"
 
-echo "STORAGE_BUCKET = ${STORAGE_BUCKET}"
-echo "STORAGE_BASE_KEY_PATH = ${STORAGE_BASE_KEY_PATH}"
-
-#Configure our swift storage environment variables
-export ST_AUTH="$storageEndpoint"
-export ST_USER="$s3AccessKey"
-export ST_KEY="$s3SecretKey"
-
 #Upload a file indicating that work has started
 echo "Uploading script version file..."
 echo "${VEGL_WORKFLOW_VERSION}" > workflow-version.txt
 echo "cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH workflow-version.txt workflow-version.txt"
 cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH workflow-version.txt workflow-version.txt
-
-#Write storage information for abstract cloud usage
-echo -e "StorageType=swift\ncloudStorageAccessKey=${s3AccessKey}\ncloudStorageSecretKey=${s3SecretKey}\ncloudStorageEndPoint=${storageEndpoint}" > "/root/.jobInfo"
 
 #Download our input files from swift storage and load them into files in the current working directory
 echo "Downloading inputfiles from S3..."
