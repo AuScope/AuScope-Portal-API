@@ -1,6 +1,8 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +12,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.jmock.Expectations;
@@ -191,5 +194,70 @@ public class TestGridSubmitController {
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(GridSubmitController.STATUS_FAILED, jobObj.getStatus());
+    }
+
+    /**
+     * Tests that the bootstrap resource is not too long and has unix line endings and other such
+     * conditions.
+     * @throws Exception
+     */
+    @Test
+    public void testBootstrapResource() throws Exception {
+        //see - http://docs.amazonwebservices.com/AutoScaling/latest/APIReference/API_CreateLaunchConfiguration.html
+        final int maxFileSize = 21847;
+        final int safeFileSize = maxFileSize - 1024; //arbitrary number to account for long strings being injected into bootstrap
+
+        String contents = ResourceUtil.loadResourceAsString("org/auscope/portal/server/web/controllers/vgl-bootstrap.sh");
+
+        Assert.assertNotNull(contents);
+        Assert.assertTrue("Bootstrap is empty!", contents.length() > 0);
+        Assert.assertTrue("Bootstrap is too big!", contents.length() < safeFileSize);
+        Assert.assertFalse("Boostrap needs Unix style line endings!", contents.contains("\r"));
+        Assert.assertEquals("Boostrap must start with '#'", '#', contents.charAt(0));
+
+        //We can't use variables in the form ${name} as the {} conflict with java MessageFormat
+        Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+        Matcher matcher = pattern.matcher(contents);
+        while (matcher.find()) {
+
+            if (matcher.groupCount() != 1) {
+                continue;
+            }
+            String name = matcher.group(1);
+
+            try {
+                Integer.parseInt(name);
+            } catch (NumberFormatException ex) {
+                Assert.fail(String.format("The variable ${%1$s} conflicts with java MessageFormat variables. Get rid of curly braces", name));
+            }
+        }
+    }
+
+    /**
+     * Tests that Grid Submit Controller's usage of the bootstrap template
+     * @throws Exception
+     */
+    @Test
+    public void testCreateBootstrapForJob() throws Exception {
+        final VEGLJob job = new VEGLJob(1234);
+
+        context.checking(new Expectations() {{
+            //We allow calls to the Configurer which simply extract values from our property file
+            allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
+        }});
+
+        job.setStorageBucket("stora124e-Bucket");
+        job.setStorageAccessKey("213-asd-54");
+        job.setStorageBaseKey("test/key");
+        job.setStorageSecretKey("tops3cret");
+
+        String contents = controller.createBootstrapForJob(job);
+        Assert.assertNotNull(contents);
+        Assert.assertTrue("Bootstrap is empty!", contents.length() > 0);
+        Assert.assertFalse("Boostrap needs Unix style line endings!", contents.contains("\r"));
+        Assert.assertTrue(contents.contains(job.getStorageBucket()));
+        Assert.assertTrue(contents.contains(job.getStorageAccessKey()));
+        Assert.assertTrue(contents.contains(job.getStorageBaseKey()));
+        Assert.assertTrue(contents.contains(job.getStorageSecretKey()));
     }
 }

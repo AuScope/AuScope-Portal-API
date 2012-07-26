@@ -3,6 +3,9 @@ package org.auscope.portal.server.web.controllers;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
@@ -27,6 +31,7 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -435,6 +440,40 @@ public class GridSubmitController extends BasePortalController {
     }
 
     /**
+     * Loads the bootstrap shell script template as a string.
+     * @return
+     * @throws IOException
+     */
+    private String getBootstrapTemplate() throws IOException {
+        InputStream is = this.getClass().getResourceAsStream("vgl-bootstrap.sh");
+        String template = IOUtils.toString(is);
+        return template.replaceAll("\r", ""); //Windows style file endings have a tendency to sneak in via StringWriter and the like
+    }
+
+    /**
+     * Creates a bootstrap shellscript for job that will be sent to
+     * cloud VM instance to kick start the work for job.
+     * @param job
+     * @return
+     * @throws IOException
+     */
+    public String createBootstrapForJob(VEGLJob job) throws IOException {
+        String bootstrapTemplate = getBootstrapTemplate();
+
+        Object[] arguments = new Object[] {
+            job.getStorageBucket(),
+            job.getStorageBaseKey().replace("//", "/"),
+            job.getStorageAccessKey(),
+            job.getStorageSecretKey(),
+            hostConfigurer.resolvePlaceholder("vm.sh"),
+            hostConfigurer.resolvePlaceholder("storage.endpoint")
+        };
+
+        String result = MessageFormat.format(bootstrapTemplate, arguments);
+        return result;
+    }
+
+    /**
      * Processes a job submission request.
      *
      * @param request The servlet request
@@ -473,8 +512,6 @@ public class GridSubmitController extends BasePortalController {
             return generateJSONResponseMAV(false, null, "No output S3 credentials found. NOT submitting job!");
         }
 
-        logger.info("Submitting job " + job);
-
         // copy files to S3 storage for processing
         try {
 
@@ -497,14 +534,16 @@ public class GridSubmitController extends BasePortalController {
         }
 
         //create our input user data string
-        JSONObject encodedUserData = new JSONObject();
-        encodedUserData.put("s3OutputBucket", job.getStorageBucket());
-        encodedUserData.put("s3OutputBaseKeyPath", job.getStorageBaseKey().replace("//", "/"));
-        encodedUserData.put("s3OutputAccessKey", job.getStorageAccessKey());
-        encodedUserData.put("s3OutputSecretKey", job.getStorageSecretKey());
-        encodedUserData.put("veglShellScript", hostConfigurer.resolvePlaceholder("vm.sh"));
-        encodedUserData.put("storageEndpoint", hostConfigurer.resolvePlaceholder("storage.endpoint"));
-        String userDataString = encodedUserData.toString();
+        String userDataString = null;
+        try {
+            userDataString = createBootstrapForJob(job);
+        } catch (IOException e) {
+            logger.error("Job bootstrap creation failed." + e.getMessage());
+            logger.debug("Exception: ", e);
+            job.setStatus(STATUS_FAILED);
+            jobManager.saveJob(job);
+            return generateJSONResponseMAV(false, null, "Failed creating startup script.");
+        }
 
         // launch the ec2 instance
         String instanceId = null;
