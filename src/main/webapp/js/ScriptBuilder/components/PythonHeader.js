@@ -29,7 +29,7 @@ Ext.define('ScriptBuilder.components.PythonHeader', {
 #!/usr/bin/env python\n\n\
 # VEGL processing script.\n\
 # Please load the Job Object before you load other components\n\n\
-import subprocess, csv, math, os, sys, urllib;\n\n";
+import subprocess, csv, math, os, sys, urllib, glob;\n\n";
 
         return scriptHeader;
     }

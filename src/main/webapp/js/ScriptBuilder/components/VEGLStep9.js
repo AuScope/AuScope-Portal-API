@@ -37,18 +37,45 @@ Ext.define('ScriptBuilder.components.VEGLStep9', {
                 fieldLabel: "MCA Arguments (key value)",
                 allowBlank: false
             },{
-                xtype      : 'radio',
-                fieldLabel : "",
-                boxLabel   : 'Gravity',
-                name       : 'invType',
-                inputValue : 'grav'
+                xtype: 'radiogroup',
+                columns : 1,
+                fieldLabel: 'Inversion Type',
+                items : [{
+                    xtype      : 'radio',
+                    boxLabel   : 'Gravity',
+                    name       : 'invType',
+                    inputValue : 'grav'
+                },{
+                    xtype          : 'radio',
+                    boxLabel       : 'Magnetic',
+                    name           : 'invType',
+                    inputValue     : 'mag'
+                }]
             },{
-                xtype          : 'radio',
-                fieldLabel     : "",
-                labelSeparator : ' ',
-                boxLabel       : 'Magnetic',
-                name           : 'invType',
-                inputValue     : 'mag'
+                xtype: 'radiogroup',
+                columns : 1,
+                fieldLabel: 'Results Upload',
+                items : [{
+                    xtype      : 'radio',
+                    boxLabel   : 'Upload all model files',
+                    name       : 'uploadType',
+                    inputValue : 'model'
+                },{
+                    xtype      : 'radio',
+                    boxLabel   : 'Upload all model and predicted files',
+                    name       : 'uploadType',
+                    inputValue : 'all'
+                },{
+                    xtype      : 'radio',
+                    boxLabel   : 'Upload final model file',
+                    name       : 'uploadType',
+                    inputValue : 'finalModel'
+                },{
+                    xtype      : 'radio',
+                    boxLabel   : 'Upload final model and predicted files',
+                    name       : 'uploadType',
+                    inputValue : 'finalAll'
+                }]
             }]
         });
 
@@ -63,12 +90,6 @@ Ext.define('ScriptBuilder.components.VEGLStep9', {
         var text = '';
         var filename = '';
         var values = this.getValues();
-
-        if (values.invType === "grav") {
-            filename = 'gzinv3d.den';
-        } else {
-            filename = 'mzinv3d.den';
-        }
 
         text += this._tab + "# step 9: finalise stuff - I guess this is where we execute two commands" + this._newLine;
         text += this._tab + "# At a guess, they are the two commented-out lines below?" + this._newLine;
@@ -93,8 +114,51 @@ Ext.define('ScriptBuilder.components.VEGLStep9', {
         text += this._tab + "cloudUpload(inv_out, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), inv_out)" + this._newLine;
         text += this._tab + "# Upload the mesh file" + this._newLine;
         text += this._tab + "cloudUpload(mesh, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), mesh)" + this._newLine;
+
+        //The final file upload is a little tricky and depends on user selection
+        //There will be a ton of files matching - gzinv3d_XXX.den, gzinv3d_XXX.pre where XXX is a number from [0-999]
+        //We only upload a subset of the files depending on configuration
         text += this._tab + "# Upload gravity or magnetic data file" + this._newLine;
-        text += this._tab + "cloudUpload('" + filename + "', " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), '" + filename + "')" + this._newLine;
+        text += this._tab + "denFiles = glob.glob('*zinv3d*.den')" + this._newLine;
+        text += this._tab + "preFiles = glob.glob('*zinv3d*.pre')" + this._newLine;
+
+        switch(values.uploadType) {
+        case 'model':
+            text += this._tab + "# Upload All Models" + this._newLine;
+            text += this._tab + "print 'Uploading all model files'" + this._newLine;
+            text += this._tab + "invFilesToUpload = denFiles" + this._newLine;
+            break;
+        case 'all':
+            text += this._tab + "# Upload everything" + this._newLine;
+            text += this._tab + "print 'Uploading all model and prediction files'" + this._newLine;
+            text += this._tab + "denFiles.extend(preFiles)" + this._newLine;
+            text += this._tab + "invFilesToUpload = denFiles" + this._newLine;
+            break;
+        case 'finalModel':
+            text += this._tab + "# Upload Final Model" + this._newLine;
+            text += this._tab + "print 'Uploading final model file'" + this._newLine;
+            text += this._tab + "invFilesToUpload = []" + this._newLine;
+            text += this._tab + "if len(denFiles) > 0:" + this._newLine;
+            text += this._tab + this._tab + "denFiles.sort()" + this._newLine;
+            text += this._tab + this._tab + "invFilesToUpload.append(denFiles[len(denFiles) - 1])" + this._newLine;
+            break;
+        case 'finalAll':
+            text += this._tab + "# Upload Final Model + Prediction" + this._newLine;
+            text += this._tab + "print 'Uploading final model and prediction'" + this._newLine;
+            text += this._tab + "invFilesToUpload = []" + this._newLine;
+            text += this._tab + "if len(denFiles) > 0:" + this._newLine;
+            text += this._tab + this._tab + "denFiles.sort()" + this._newLine;
+            text += this._tab + this._tab + "invFilesToUpload.append(denFiles[len(denFiles) - 1])" + this._newLine;
+            text += this._tab + "if len(preFiles) > 0:" + this._newLine;
+            text += this._tab + this._tab + "preFiles.sort()" + this._newLine;
+            text += this._tab + this._tab + "invFilesToUpload.append(preFiles[len(preFiles) - 1])" + this._newLine;
+            break;
+        }
+
+        text += this._tab + "print 'About to upload the following files:'" + this._newLine;
+        text += this._tab + "print invFilesToUpload" + this._newLine;
+        text += this._tab + "for invFile in invFilesToUpload:" + this._newLine;
+        text += this._tab + this._tab + "cloudUpload(invFile, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), invFile)" + this._newLine;
         text += this._newLine;
         return text;
     }
