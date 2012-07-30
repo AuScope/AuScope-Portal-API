@@ -50,8 +50,8 @@ Ext.define('ScriptBuilder.components.VEGLStep4', {
             text += this._tab + "# General convention is to assign the magnetic properties associated with the" + this._newLine;
             text += this._tab + "# middle of the inversion area." + this._newLine;
             text += this._tab + "#" + this._newLine;
-            text += this._tab + "central_lat = (VEGLSelectedBox.getMaxNorthing() - VEGLSelectedBox.getMinNorthing()) / 2" + this._newLine;
-            text += this._tab + "central_lon = (VEGLSelectedBox.getMaxEasting() - VEGLSelectedBox.getMinEasting()) / 2" + this._newLine;
+            text += this._tab + "central_lat = (VEGLSelectedBox.getMaxNorthing() + VEGLSelectedBox.getMinNorthing()) / 2" + this._newLine;
+            text += this._tab + "central_lon = (VEGLSelectedBox.getMaxEasting() + VEGLSelectedBox.getMinEasting()) / 2" + this._newLine;
             text += this._tab + "declination,inclination,intensity = get_mag_field_data(central_lat, central_lon,2010,01,01)" + this._newLine +  this._newLine;
         }
         return text;

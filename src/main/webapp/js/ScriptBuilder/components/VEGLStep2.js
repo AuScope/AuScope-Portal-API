@@ -29,7 +29,8 @@ Ext.define('ScriptBuilder.components.VEGLStep2', {
         var text = '';
         var values = this.getValues();
 
-        text = this._tab + 'VEGLPaddedBox = VEGLParams.getPaddedBounds()' + this._newLine;
+        text = this._tab + 'VEGLPaddedBox = ' + values.paramsObj + '.getPaddedBounds()' + this._newLine;
+        text += this._tab + 'VEGLSelectedBox = ' + values.paramsObj + '.getSelectedBounds()' + this._newLine;
         text += this._tab + 'zone = int(VEGLPaddedBox.getSrs())' + this._newLine;
         text += this._tab + 'temp_data = []' + this._newLine;
         text += this._tab + 'for x, y, z in data:' + this._newLine;
