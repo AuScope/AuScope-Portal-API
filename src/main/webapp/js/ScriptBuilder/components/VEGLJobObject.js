@@ -89,9 +89,23 @@ Ext.define('ScriptBuilder.components.VEGLJobObject', {
         classText += this._newLine;
 
         //Iterate our fields to figure out which ones we want to include
-        var blacklistedFields = { //some fields should not be encoded (eg credentials). This script will be publicly available.
+        var blacklistedFields = {
+            //some fields should not be encoded (eg credentials). This script will be publicly available.
+            //Other fields could cause the script to lose it's portability (scripts should be re-runnable in different jobs)
+            //Most of these blacklisted fields will be encoded into the vgl-bootstrap
+            'storageProvider' : true,
+            'storageEndpoint' : true,
+            'storageBucket' : true,
             'storageSecretKey' : true,
-            'storageAccessKey' : true
+            'storageAccessKey' : true,
+
+            'computeVmId' : true,
+            'computeInstanceId' : true,
+            'computeInstanceType' : true,
+            'computeInstanceKey' : true,
+
+            'status' : true,
+            'registeredUrl' : true
         };
         var fieldsToInclude = [];
         for (var field in values) {

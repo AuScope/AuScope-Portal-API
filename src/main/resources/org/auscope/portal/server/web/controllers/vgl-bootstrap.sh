@@ -15,6 +15,7 @@ export STORAGE_ACCESS_KEY="{2}"
 export STORAGE_SECRET_KEY="{3}"
 export WORKFLOW_URL="{4}"
 export STORAGE_ENDPOINT="{5}"
+export STORAGE_TYPE="{6}"
 
 # Load our profile so this run is the same as a regular user login (to make debugging easier)
 source /etc/profile
@@ -27,7 +28,9 @@ echo "WORKING_DIR = $WORKING_DIR"
 echo "WORKFLOW_URL = $WORKFLOW_URL"
 echo "WORKFLOW_SCRIPT = $WORKFLOW_SCRIPT"
 echo "PATH = $PATH"
-echo "LD_LIBRARY_PATH = $LD_LIBRARY_PATH"
+echo "LD_LIBRARY_PATH = $LD_LIBRARY_PATH"v
+echo "STORAGE_ENDPOINT = $STORAGE_ENDPOINT"
+echo "STORAGE_TYPE = $STORAGE_TYPE"
 echo "--------------------------------------"
 
 

@@ -461,12 +461,13 @@ public class GridSubmitController extends BasePortalController {
         String bootstrapTemplate = getBootstrapTemplate();
 
         Object[] arguments = new Object[] {
-            job.getStorageBucket(),
-            job.getStorageBaseKey().replace("//", "/"),
-            job.getStorageAccessKey(),
-            job.getStorageSecretKey(),
-            hostConfigurer.resolvePlaceholder("vm.sh"),
-            hostConfigurer.resolvePlaceholder("storage.endpoint")
+            job.getStorageBucket(), //STORAGE_BUCKET
+            job.getStorageBaseKey().replace("//", "/"), //STORAGE_BASE_KEY_PATH
+            job.getStorageAccessKey(), //STORAGE_ACCESS_KEY
+            job.getStorageSecretKey(), //STORAGE_SECRET_KEY
+            hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
+            hostConfigurer.resolvePlaceholder("storage.endpoint"), //STORAGE_ENDPOINT
+            "swift" //STORAGE_TYPE
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);

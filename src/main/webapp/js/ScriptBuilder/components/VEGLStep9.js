@@ -110,10 +110,10 @@ Ext.define('ScriptBuilder.components.VEGLStep9', {
         text += this._tab + "print 'inversion returned: ' + str(retcode)" + this._newLine;
         text += this._tab + "sys.stdout.flush()" + this._newLine;
         text += this._tab + "# Upload our logging outs" + this._newLine;
-        text += this._tab + "cloudUpload(sns_out, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), sns_out)" + this._newLine;
-        text += this._tab + "cloudUpload(inv_out, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), inv_out)" + this._newLine;
+        text += this._tab + "cloudUpload(sns_out)" + this._newLine;
+        text += this._tab + "cloudUpload(inv_out)" + this._newLine;
         text += this._tab + "# Upload the mesh file" + this._newLine;
-        text += this._tab + "cloudUpload(mesh, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), mesh)" + this._newLine;
+        text += this._tab + "cloudUpload(mesh)" + this._newLine;
 
         //The final file upload is a little tricky and depends on user selection
         //There will be a ton of files matching - gzinv3d_XXX.den, gzinv3d_XXX.pre where XXX is a number from [0-999]
@@ -158,7 +158,7 @@ Ext.define('ScriptBuilder.components.VEGLStep9', {
         text += this._tab + "print 'About to upload the following files:'" + this._newLine;
         text += this._tab + "print invFilesToUpload" + this._newLine;
         text += this._tab + "for invFile in invFilesToUpload:" + this._newLine;
-        text += this._tab + this._tab + "cloudUpload(invFile, " + values.paramsInstance + ".getStorageBucket(), " + values.paramsInstance + ".getStorageBaseKey(), invFile)" + this._newLine;
+        text += this._tab + this._tab + "cloudUpload(invFile)" + this._newLine;
         text += this._newLine;
         return text;
     }

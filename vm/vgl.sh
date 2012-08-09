@@ -57,11 +57,10 @@ chmod +x "/bin/cloud"
 echo "chmod result $?"
 
 #Configure variables for our cloud storage wrapper
-export STORAGE_TYPE="swift"
 export ST_AUTH="$STORAGE_ENDPOINT"
 export ST_USER="$STORAGE_ACCESS_KEY"
 export ST_KEY="$STORAGE_SECRET_KEY"
-echo "Configured storage wrapper to use: $STORAGE_TYPE"
+echo "Storage wrapper configured to use: $STORAGE_TYPE"
 
 #next we download our AWS metadata script which allows us to fetch information
 #about our instance
