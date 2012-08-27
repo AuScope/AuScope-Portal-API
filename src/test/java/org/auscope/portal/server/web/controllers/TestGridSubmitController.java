@@ -17,6 +17,7 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.Sequence;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
 import org.junit.Before;
@@ -66,6 +67,7 @@ public class TestGridSubmitController {
         final VEGLJob jobObj = new VEGLJob(new Integer(13));
         final File[] stageInFiles = new File[] {context.mock(File.class, "MockFile1"), context.mock(File.class, "MockFile2")};
         final String instanceId = "new-instance-id";
+        final Sequence jobFileSequence = context.sequence("jobFileSequence"); //this makes sure we aren't deleting directories before uploading (and other nonsense)
 
         jobObj.setStorageBaseKey("base/key");
         jobObj.setStorageAccessKey("accessKey");
@@ -81,15 +83,21 @@ public class TestGridSubmitController {
 
             //We should have 1 call to get our stage in files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
+            inSequence(jobFileSequence);
 
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             //And one call to upload them
             oneOf(mockCloudStorageService).uploadJobFiles(jobObj, stageInFiles);
+            inSequence(jobFileSequence);
 
             //And finally 1 call to execute the job
             oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(instanceId));
+
+            //This MUST occur - it cleans up after upload
+            oneOf(mockFileStagingService).deleteStageInDirectory(jobObj);will(returnValue(true));
+            inSequence(jobFileSequence);
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());

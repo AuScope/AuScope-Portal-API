@@ -573,6 +573,17 @@ public class GridSubmitController extends BasePortalController {
         job.setSubmitDate(new Date());
         jobManager.saveJob(job);
 
+        //Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
+        //Failure here is NOT fatal - it will just result in some residual files
+        try {
+            if (!fileStagingService.deleteStageInDirectory(job)) {
+                logger.error(String.format("There was a problem wiping the stage in directory for job:  %1$s", job));
+            }
+        } catch (Exception ex) {
+            logger.error(String.format("There was a problem wiping the stage in directory for job:  %1$s", job), ex);
+        }
+
+
         // Save in session for status update request for this job.
         return generateJSONResponseMAV(true, null, "");
     }
