@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +33,7 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.ResourceUtil;
+import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -633,30 +635,29 @@ public class GridSubmitController extends BasePortalController {
         File subsetRequestScript = fileStagingService.createStageInDirectoryFile(job, "subset_request.sh");
 
         // iterate through the map of subset request URL's
-        Set<String> keys = erddapUrlMap.keySet();
-        Iterator<String> i = keys.iterator();
+        Set<Entry<String, String>> entrySet = erddapUrlMap.entrySet();
+        Iterator<Entry<String,String>> i = entrySet.iterator();
 
+        FileWriter out = null;
         try {
-            FileWriter out = new FileWriter(subsetRequestScript);
+            out = new FileWriter(subsetRequestScript);
 
             while (i.hasNext()) {
 
                 // get the ERDDAP subset request url and layer name
-                String fileName = (String)i.next();
-                String url = (String)erddapUrlMap.get(fileName);
+                String url = i.next().getValue();
 
                 // add the command for making the subset request
                 out.write(String.format("curl -L '%1$s' > \"%2$s\"\n", url, ERRDAP_SUBSET_VM_FILE_PATH));
 
                 job.setVmSubsetUrl(url);
             }
-
-            out.close();
-
         } catch (IOException e) {
             // TODO Auto-generated catch block
             logger.error("Error creating subset request script", e);
             return false;
+        } finally {
+            FileIOUtil.closeQuietly(out);
         }
 
         return true;

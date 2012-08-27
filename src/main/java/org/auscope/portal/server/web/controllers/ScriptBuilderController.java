@@ -74,7 +74,7 @@ public class ScriptBuilderController extends BasePortalController {
         //Apply text contents to job stage in directory
         try {
             File scriptFile = jobFileService.createStageInDirectoryFile(job, SCRIPT_FILE_NAME);
-            PrintWriter writer = new PrintWriter(scriptFile);
+            PrintWriter writer = new PrintWriter(scriptFile, "utf-8");
             writer.print(sourceText);
             writer.close();
         } catch (IOException e) {

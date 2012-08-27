@@ -111,7 +111,7 @@ public class DownloadController extends BasePortalController {
                                 .get("gml");
 
                         if (gmlResponseObject != null) {
-                            gmlBytes = gmlResponseObject.toString().getBytes();
+                            gmlBytes = gmlResponseObject.toString().getBytes("utf-8");
                         }
                     }
 
