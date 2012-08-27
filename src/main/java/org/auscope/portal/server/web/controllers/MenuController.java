@@ -57,17 +57,20 @@ public class MenuController {
 
    @RequestMapping("/gmap.html")
    public ModelAndView gmap() {
-      String googleKey
-         = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
-      String vocabServiceUrl
-         = hostConfigurer.resolvePlaceholder("HOST.vocabService.url");
+      String googleKey = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
+      String vocabServiceUrl = hostConfigurer.resolvePlaceholder("HOST.vocabService.url");
+      String analyticKey = hostConfigurer.resolvePlaceholder("HOST.google.analytics.key");
 
       logger.debug("googleKey: " + googleKey);
       logger.debug("vocabServiceUrl: " + vocabServiceUrl);
+      logger.debug("analyticKey:" + analyticKey);
 
       ModelAndView mav = new ModelAndView("gmap");
       mav.addObject("googleKey", googleKey);
       mav.addObject("vocabServiceUrl", vocabServiceUrl);
+      if (analyticKey != null && !analyticKey.isEmpty()) {
+          mav.addObject("analyticKey", analyticKey);
+      }
       return mav;
    }
 
@@ -140,7 +143,15 @@ public class MenuController {
    }
 
    private ModelAndView setCloudCredentials(HttpServletRequest request,String redirectViewName) {
-       return new ModelAndView(redirectViewName);
+       ModelAndView mav = new ModelAndView(redirectViewName);
+
+       String analyticKey = hostConfigurer.resolvePlaceholder("HOST.google.analytics.key");
+
+       if (analyticKey != null && !analyticKey.isEmpty()) {
+           mav.addObject("analyticKey", analyticKey);
+       }
+
+       return mav;
    }
 
    @RequestMapping("/jobbuilder.html")
