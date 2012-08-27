@@ -29,7 +29,10 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
             wizardState : wizardState,
             bodyStyle: 'padding:10px;',
             frame: true,
-            defaults: { anchor: "100%" },
+            layout : {
+                type : 'vbox',
+                align : 'stretch'
+            },
             monitorValid: true,
             items: [{
                 xtype: 'label',
@@ -55,8 +58,11 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                 itemId: 'seriesProperties',
                 title: 'Series properties',
                 collapsible: false,
-                anchor: '100% -80',
-                defaults: { anchor: '100%' },
+                layout : {
+                    type : 'vbox',
+                    align : 'stretch'
+                },
+                flex : 1,
                 items: [{
                     xtype: 'combo',
                     itemId: 'seriesCombo',
@@ -76,20 +82,33 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                                 var record = records[0];
                                 var descArea = jobSeriesObj.getSeriesDesc();
                                 descArea.setRawValue(record.get('description'));
+
                                 jobSeriesObj.wizardState.seriesId = record.get('id');
+                                combo.ownerCt.ownerCt.getComponent('jobspanel-seriesjobs').listJobsForSeries(record);
                             }
                         }
                     }
-                }, {
+                },{
                     xtype: 'textarea',
                     itemId: 'seriesDesc',
                     name: 'seriesDesc',
-                    anchor: '100% -30',
+                    anchor: '100%',
+                    height : 200,
                     disabled: true,
                     fieldLabel: 'Description',
                     blankText: 'Please provide a meaningful description...',
                     allowBlank: false
                 }]
+            },{
+                xtype : 'jobspanel',
+                itemId : 'jobspanel-seriesjobs',
+                title : 'Other Jobs in selected series',
+                hideRegisterButton : true,
+                flex : 1,
+                viewConfig : {
+                    deferEmptyText : false,
+                    emptyText : '<p class="centeredlabel">The selected series doesn\'t have any jobs.</p>'
+                }
             }]
         }]);
     },
@@ -108,7 +127,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
         if (checked) {
             combo.reset();
             combo.setEditable(false);
-            combo.getStore().reload();
+            combo.getStore().load();
             descText.setDisabled(true);
             descText.reset();
         } else {

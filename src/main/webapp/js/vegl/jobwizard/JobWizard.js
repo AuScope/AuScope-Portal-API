@@ -78,6 +78,12 @@ Ext.define('vegl.jobwizard.JobWizard', {
                 });
             }
 
+            if (frm.additionalButtons) {
+                for (var j = 0; j < frm.additionalButtons.length; j++) {
+                    buttons.push(frm.additionalButtons[j]);
+                }
+            }
+
             //Always show our "next step" but set it to < 0 if there is no more cards
             //This way the last card can still be validated and submitted. (it can
             //decide what to do from there)

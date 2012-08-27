@@ -16,6 +16,11 @@ Ext.define('vegl.widgets.JobsPanel', {
     deleteJobAction : null,
     duplicateJobAction : null,
 
+    /**
+     * Accepts the config for a Ext.grid.Panel along with the following additions:
+     *
+     * hideRegisterButton : Boolean - if true the 'register to geonetwork' button will be hidden
+     */
     constructor : function(config) {
         this.cancelJobAction = new Ext.Action({
             text: 'Cancel job',
@@ -56,11 +61,24 @@ Ext.define('vegl.widgets.JobsPanel', {
             }
         });
 
+        this.submitJobAction = new Ext.Action({
+            text: 'Submit job',
+            iconCls: 'submit-icon',
+            scope : this,
+            disabled : true,
+            handler: function() {
+                var selection = this.getSelectionModel().getSelection();
+                if (selection.length > 0) {
+                    this.submitJob(selection[0]);
+                }
+            }
+        });
+
         Ext.apply(config, {
             plugins : [{
                 ptype : 'rowcontextmenu',
                 contextMenu : Ext.create('Ext.menu.Menu', {
-                    items: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction]
+                    items: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.submitJobAction]
                 })
             }],
             store : Ext.create('Ext.data.Store', {
@@ -82,6 +100,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                 text: 'Register to GeoNetwork',
                 itemId : 'btnRegister',
                 disabled : true,
+                hidden : config.hideRegisterButton,
                 tooltip: 'Register the job result into GeoNetwork',
                 handler: Ext.bind(this._onRegisterToGeonetwork, this)
             },{
@@ -94,7 +113,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             tbar: [{
                 text: 'Actions',
                 iconCls: 'folder-icon',
-                menu: [ this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction]
+                menu: [ this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.submitJobAction]
             }]
         });
 
@@ -116,10 +135,12 @@ Ext.define('vegl.widgets.JobsPanel', {
             this.cancelJobAction.setDisabled(true);
             this.deleteJobAction.setDisabled(true);
             this.duplicateJobAction.setDisabled(true);
+            this.submitJobAction.setDisabled(true);
         } else {
             this.cancelJobAction.setDisabled(false);
             this.deleteJobAction.setDisabled(false);
             this.duplicateJobAction.setDisabled(false);
+            this.submitJobAction.setDisabled(true);
 
             switch(selections[0].get('status')) {
             case vegl.models.Job.STATUS_ACTIVE:
@@ -127,6 +148,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                 break;
             case vegl.models.Job.STATUS_UNSUBMITTED:
                 this.duplicateJobAction.setDisabled(true);
+                this.submitJobAction.setDisabled(false);
                 break;
             default:
                 this.cancelJobAction.setDisabled(true);
@@ -186,7 +208,9 @@ Ext.define('vegl.widgets.JobsPanel', {
     },
 
     /**
-     * Reloads this store with all the jobs for the specified series
+     * Reloads this store with all the jobs for the specified series.
+     *
+     * series - either a vegl.models.Series object
      */
     listJobsForSeries : function(series) {
         this.currentSeries = series;
@@ -285,5 +309,43 @@ Ext.define('vegl.widgets.JobsPanel', {
             }]
         });
         popup.show();
+    },
+
+    /**
+     * Submits the specified job to the cloud for processing
+     *
+     * job - A vegl.models.Job object that will be submitted
+     */
+    submitJob : function(job) {
+        var loadMask = new Ext.LoadMask(Ext.getBody(), {
+            msg : 'Submitting Job...',
+            removeMask : true
+        });
+        loadMask.show();
+        Ext.Ajax.request({
+            url : 'submitJob.do',
+            params : {
+                jobId : job.get('id')
+            },
+            timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
+            scope : this,
+            callback : function(options, success, response) {
+                loadMask.hide();
+                var msg = '';
+                var error = true;
+                if (success) {
+                    var responseObj = Ext.JSON.decode(response.responseText);
+                    if (responseObj.success) {
+                        msg = responseObj.msg;
+                        error = false;
+                    }
+                }
+
+                this.listJobsForSeries(this.currentSeries);
+                if (error) {
+                    Ext.Msg.alert('Failure', 'There was a problem submitting your job. Please try again in a few minutes. ' + msg);
+                }
+            }
+        });
     }
 });

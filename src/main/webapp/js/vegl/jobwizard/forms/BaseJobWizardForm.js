@@ -20,6 +20,11 @@ Ext.define('vegl.jobwizard.forms.BaseJobWizardForm', {
      */
     noWindowUnloadWarning : false,
 
+    /**
+     * An array of button objects/config objects that will be inserted between the previous and next buttons.
+     */
+    additionalButtons : null,
+
     constructor: function(obj) {
         this.callParent(arguments);
 

@@ -78,6 +78,10 @@
     background-image: url("../img/delete.gif") !important
 }
 
+.submit-icon {
+    background-image: url("../img/submit.png") !important
+}
+
 .openid_form p {
     text-align: left;
     color: #f93;

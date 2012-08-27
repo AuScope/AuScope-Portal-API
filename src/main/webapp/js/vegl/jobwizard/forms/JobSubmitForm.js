@@ -10,6 +10,12 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
      * Creates a new JobObjectForm form configured to write/read to the specified global state
      */
     constructor: function(wizardState) {
+        this.additionalButtons = [{
+            text : 'Save Job',
+            qtip : 'Save this job for later submission',
+            handler : Ext.bind(this.saveJob, this)
+        }];
+
         this.callParent(arguments);
     },
 
@@ -51,5 +57,12 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
 
     getNextText : function() {
         return 'Submit Job';
+    },
+
+    saveJob : function() {
+        //This is a giant misdirection - the job was already saved way back in the Job Object form. This part is just
+        //making the user feel more involved in the process
+        this.noWindowUnloadWarning = true;
+        Ext.Msg.alert('Job Saved', 'Your job has been saved for later submission. You can attempt submission later from the <a href="joblist.html">Monitor Jobs</a> page. It is now safe to close this window.');
     }
 });
