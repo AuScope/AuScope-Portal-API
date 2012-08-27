@@ -13,6 +13,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
         this.additionalButtons = [{
             text : 'Save Job',
             qtip : 'Save this job for later submission',
+            iconCls : 'disk-icon',
             handler : Ext.bind(this.saveJob, this)
         }];
 
@@ -57,6 +58,10 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
 
     getNextText : function() {
         return 'Submit Job';
+    },
+
+    getNextIconClass : function() {
+        return 'submit-icon';
     },
 
     saveJob : function() {

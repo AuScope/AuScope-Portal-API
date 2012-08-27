@@ -80,9 +80,23 @@ Ext.define('vegl.jobwizard.forms.BaseJobWizardForm', {
     },
 
     /**
+     * Gets the Icon class to use for the 'Previous' button
+     */
+    getPreviousIconClass : function() {
+        return undefined;
+    },
+
+    /**
      * Gets the text to show on the 'Next' button
      */
     getNextText : function() {
         return 'Next &raquo;';
+    },
+
+    /**
+     * Gets the Icon class to use for the 'next' button
+     */
+    getNextIconClass : function() {
+        return undefined;
     }
 });

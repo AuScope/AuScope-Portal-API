@@ -74,6 +74,7 @@ Ext.define('vegl.jobwizard.JobWizard', {
             if (i != 0) {
                 buttons.push({
                     text: frm.getPreviousText(),
+                    iconCls : frm.getPreviousIconClass(),
                     handler: Ext.bind(gotoStep, this, [i - 1, false])
                 });
             }
@@ -93,6 +94,7 @@ Ext.define('vegl.jobwizard.JobWizard', {
             }
             buttons.push({
                 text: frm.getNextText(),
+                iconCls : frm.getNextIconClass(),
                 handler: Ext.bind(gotoStep, this, [nextStep, true])
             });
 
