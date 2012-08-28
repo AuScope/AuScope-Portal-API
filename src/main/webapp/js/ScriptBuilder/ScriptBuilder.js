@@ -16,13 +16,23 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         var scriptBuilderFrm = this;
         this.wizardState = config.wizardState;
 
-        this.sourceText = Ext.create('Ext.form.field.TextArea', {
+        this.sourceText = Ext.create('Ext.ux.form.field.CodeMirror', {
             title : 'Script Source',
             region : 'center',
+            cls : 'prettyprint',
             readOnly : true,
-            fieldStyle : {
-                'font-family' : 'monospace'
-            }
+            mode : 'text/x-python',
+            showAutoIndent : false,
+            showLineNumbers : true,
+            listModes : [{text: "Python", mime: "text/x-python"},
+                         {text: "Plain text", mime: "text/plain"}],
+            modes: [{
+                mime:           ['text/plain'],
+                dependencies:   []
+            },{
+                mime:           ['text/x-python', 'python'],
+                dependencies:   ['CodeMirror-2.33/lib/python/python.js']
+            }]
         });
 
         this.activeComponentsPanel = Ext.create('ScriptBuilder.ActiveComponentTreePanel', {

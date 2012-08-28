@@ -18,6 +18,13 @@
       }
     </style>
 
+    <%-- Code Mirror inclusions --%>
+    <link href="CodeMirror-2.33/lib/codemirror.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="CodeMirror-2.33/lib/codemirror.js"></script>
+    <script type="text/javascript" src="CodeMirror-2.33/mode/python/python.js"></script>
+    <script type="text/javascript" src="CodeMirror-2.33/lib/util/formatting.js"></script>
+    <script type="text/javascript" src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
+
     <%-- Google Analytics --%>
       <c:if test="${not empty analyticKey}">
           <script type="text/javascript">
@@ -41,7 +48,10 @@
     <script type="text/javascript" src="portal-core/js/extjs-4.1.0-rc1/ext-all-debug.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
 
+
     <!-- component includes -->
+    <script type="text/javascript" src="mzExt/ux/form/field/Ext.ux.form.field.CodeMirror.411.js"></script>
+
     <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
     <script type="text/javascript" src="js/vegl/models/Job.js"></script>
     <script type="text/javascript" src="js/vegl/models/Series.js"></script>
