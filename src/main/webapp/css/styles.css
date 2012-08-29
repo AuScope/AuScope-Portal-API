@@ -54,6 +54,14 @@
     background-image: url("../img/disk.png") !important
 }
 
+.download-icon {
+    background-image: url("../img/download.png") !important
+}
+
+.upload-icon {
+    background-image: url("../img/upload.png") !important
+}
+
 .folder-icon {
     background-image: url("../img/folder.png") !important
 }

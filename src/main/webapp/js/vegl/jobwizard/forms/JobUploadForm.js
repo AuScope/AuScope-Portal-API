@@ -18,7 +18,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
         var uploadAction = new Ext.Action({
             text: 'Upload File',
             disabled: false,
-            iconCls: 'disk-icon',
+            iconCls: 'upload-icon',
             handler: Ext.bind(this.uploadFile, jobUploadFrm)
         });
 
@@ -33,7 +33,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
         var downloadAction = new Ext.Action({
             text: 'Download',
             disabled: true,
-            iconCls: 'disk-icon',
+            iconCls: 'download-icon',
             handler: Ext.bind(jobUploadFrm.downloadFile, jobUploadFrm)
         });
 
