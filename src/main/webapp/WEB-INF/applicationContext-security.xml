@@ -66,7 +66,7 @@
             <beans:list>
                 <!-- Josh.Vote@csiro.au -->
                 <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                <beans:constructor-arg index="0" value="v04hL1lRsd91/d/HCDWBYqf2bYo="/>
+                <beans:constructor-arg index="0" value="http://joshvote.myopenid.com/"/>
                 <beans:constructor-arg index="1" value=""/>
                 <beans:constructor-arg index="2" value="ROLE_ADMINISTRATOR"/>
             </beans:bean>
@@ -110,10 +110,12 @@
       <beans:property name="authenticationManager" ref="authenticationManager" />
    </beans:bean>
 
-      <http auto-config='true' >
-           <intercept-url pattern="/gridsubmit.html" access="ROLE_USER"/>
-           <intercept-url pattern="/jobbuilder.html" access="ROLE_USER"/>
+   <http auto-config='true' >
+        <intercept-url pattern="/gridsubmit.html" access="ROLE_USER"/>
+        <intercept-url pattern="/jobbuilder.html" access="ROLE_USER"/>
         <intercept-url pattern="/joblist.html" access="ROLE_USER"/>
+        <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR"/>
+        <intercept-url pattern="/*.diag" access="ROLE_ADMINISTRATOR"/>
         <intercept-url pattern="/login.html*" filters="none"/>
         <custom-filter ref="preAuthenticatedProcessingFilter" position="PRE_AUTH_FILTER" />
         <logout/>
