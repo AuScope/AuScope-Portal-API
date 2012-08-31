@@ -40,7 +40,7 @@
     <script type="text/javascript" src="portal-core/js/extjs-4.1.0-rc1/ext-all-debug.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
     <script src="portal-core/js/portal/widgets/grid/plugin/RowContextMenu.js" type="text/javascript"></script>
-
+	<script type="text/javascript" src="portal-core/js/portal/widgets/window/ErrorWindow.js"></script>
 
     <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
     <script type="text/javascript" src="js/vegl/models/Job.js"></script>

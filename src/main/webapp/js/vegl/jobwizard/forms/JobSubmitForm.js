@@ -35,9 +35,11 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
             },
             timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
             callback : function(options, success, response) {
+                var msg;
                 loadMask.hide();
                 if (success) {
                     var responseObj = Ext.JSON.decode(response.responseText);
+                    msg = responseObj.msg;
                     if (responseObj.success) {
                         jobSubmitFrm.noWindowUnloadWarning = true;
                         callback(true);
@@ -46,7 +48,18 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
                     }
                 }
 
-                Ext.Msg.alert('Failure', 'There was a problem submitting your job. Please try again in a few minutes.');
+                //Create an error object and pass it to custom error window
+                var errorObj = {
+                    title : 'Failure',
+                    message : responseObj.msg,
+                    info : responseObj.debugInfo
+                };
+
+                var errorWin = Ext.create('portal.widgets.window.ErrorWindow', {
+                    errorObj : errorObj
+                });
+                errorWin.show();
+
                 callback(false);
             }
         });

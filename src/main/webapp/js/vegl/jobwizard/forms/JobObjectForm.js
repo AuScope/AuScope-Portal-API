@@ -138,7 +138,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             },
             waitMsg : 'Saving Job state...',
             failure : function() {
-                Ext.Msg.alert('Internal Error', 'There was an error saving these job details. Please try again in a few minutes.');
+                Ext.Msg.alert('Input Error', 'Storage container, storage access key and storage secret key must not be blank.');
                 callback(false);
             },
             success : function() {

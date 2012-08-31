@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
@@ -37,6 +38,8 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.jclouds.logging.Logger;
+import org.jclouds.rest.AuthorizationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -46,6 +49,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.amazonaws.AmazonServiceException;
 
 
 /**
@@ -57,7 +62,6 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class GridSubmitController extends BasePortalController {
-
 
 
     /** Logger for this class */
@@ -80,6 +84,7 @@ public class GridSubmitController extends BasePortalController {
     public static final String STATUS_UNSUBMITTED = "Unsubmitted";
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
+
 
     @Autowired
     public GridSubmitController(VEGLJobManager jobManager, FileStagingService fileStagingService,
@@ -489,51 +494,42 @@ public class GridSubmitController extends BasePortalController {
     public ModelAndView submitJob(HttpServletRequest request,
                                   HttpServletResponse response,
                                   @RequestParam("jobId") String jobId) {
-        //Get our job
+        // Get our job
         VEGLJob job = null;
         try {
             job = jobManager.getJobById(Integer.parseInt(jobId));
+            if (job == null) {
+                throw new Exception("Job not found.");
+            }
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
-            return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
-        }
-
-        //Do a quick couple of checks on our job object
-        if (job == null) {
-            logger.error("job with id " + jobId + " DNE");
-            return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
-        } else if (job.getStorageAccessKey() == null || job.getStorageAccessKey().isEmpty() ||
-            job.getStorageSecretKey() == null || job.getStorageSecretKey().isEmpty() ||
-            job.getStorageBucket() == null || job.getStorageBucket().isEmpty()) {
-
-            //Check we have S3 credentials otherwise there is no point in continuing
-            logger.error("No output S3 credentials found. NOT submitting job!");
-
-            job.setStatus(STATUS_FAILED);
-            jobManager.saveJob(job);
-
-            return generateJSONResponseMAV(false, null, "No output S3 credentials found. NOT submitting job!");
+            return generateJSONResponseMAV(false, null, "There was a problem retrieving your job from the database.",
+                    "Please try again in a few minutes or report it to cg-admin@csiro.au.");
         }
 
         // copy files to S3 storage for processing
         try {
-
             // get job files from local directory
             File[] files = fileStagingService.listStageInDirectoryFiles(job);
             if (files.length == 0) {
                 job.setStatus(STATUS_FAILED);
                 jobManager.saveJob(job);
-                return generateJSONResponseMAV(false, null, "No input files found. NOT submitting job!");
+                return generateJSONResponseMAV(false, null, "There was a problem submitting your job for processing.",
+                        "Please upload your input files and try again.");
             }
-
             //Upload them to storage
             cloudStorageService.uploadJobFiles(job, files);
+        } catch (PortalServiceException e) {
+            logger.error("Files upload failed.", e);
+            job.setStatus(STATUS_FAILED);
+            return generateJSONResponseMAV(false, null, "There was a problem uploading files to S3 cloud storage.",
+                    e.getMessage());
         } catch (Exception e) {
-            //We failed uploading
-            logger.error("Job submission failed.", e);
+            logger.error("Files upload failed.", e);
             job.setStatus(STATUS_FAILED);
             jobManager.saveJob(job);
-            return generateJSONResponseMAV(false, null, "Failed uploading files to S3");
+            return generateJSONResponseMAV(false, null, "There was a problem uploading files to S3 cloud storage.",
+                    "Please report this error to cg_admin@csiro.au");
         }
 
         //create our input user data string
@@ -541,28 +537,23 @@ public class GridSubmitController extends BasePortalController {
         try {
             userDataString = createBootstrapForJob(job);
         } catch (IOException e) {
-            logger.error("Job bootstrap creation failed." + e.getMessage());
-            logger.debug("Exception: ", e);
+            logger.error("Job bootstrap creation failed." + e.getMessage(), e);
             job.setStatus(STATUS_FAILED);
             jobManager.saveJob(job);
-            return generateJSONResponseMAV(false, null, "Failed creating startup script.");
+            return generateJSONResponseMAV(false, null, "There was a problem creating startup script.",
+                    "Please report this error to cg_admin@csiro.au");
         }
 
         // launch the ec2 instance
         String instanceId = null;
         try {
             instanceId = cloudComputeService.executeJob(job, userDataString);
-        } catch (Exception ex) {
+        } catch (PortalServiceException ex) {
             logger.error("Failed to launch instance to run job " + job.getId(), ex);
             job.setStatus(STATUS_FAILED);
             jobManager.saveJob(job);
-            return generateJSONResponseMAV(false, null, "Failed submitting to EC2");
-        }
-        if (instanceId == null || instanceId.isEmpty()) {
-            logger.error("Failed to launch instance to run job " + job.getId());
-            job.setStatus(STATUS_FAILED);
-            jobManager.saveJob(job);
-            return generateJSONResponseMAV(false, null, "Failed submitting to EC2");
+            return generateJSONResponseMAV(false, null, "There was a problem submitting your job for processing.",
+                    ex.getMessage());
         }
 
         logger.info("Launched instance: " + instanceId);
@@ -582,7 +573,6 @@ public class GridSubmitController extends BasePortalController {
         } catch (Exception ex) {
             logger.error(String.format("There was a problem wiping the stage in directory for job:  %1$s", job), ex);
         }
-
 
         // Save in session for status update request for this job.
         return generateJSONResponseMAV(true, null, "");
