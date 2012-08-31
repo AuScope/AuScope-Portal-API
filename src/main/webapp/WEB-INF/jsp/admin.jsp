@@ -23,10 +23,10 @@
         <script type="text/javascript" src="portal-core/js/admin/tests/TestStatus.js"></script>
         <script type="text/javascript" src="portal-core/js/admin/tests/BaseTest.js"></script>
         <script type="text/javascript" src="portal-core/js/admin/tests/SingleAJAXTest.js"></script>
-        <script type="text/javascript" src="portal-core/js/admin/tests/ExternalConnectivity.js"></script>
-        <script type="text/javascript" src="portal-core/js/admin/tests/RegistryConnectivity.js"></script>
-        <script type="text/javascript" src="portal-core/js/admin/tests/KnownLayerWFS.js"></script>
-        <script type="text/javascript" src="portal-core/js/admin/tests/KnownLayerWMS.js"></script>
+        <script type="text/javascript" src="js/admin/tests/ExternalConnectivity.js"></script>
+        <script type="text/javascript" src="js/admin/tests/RegistryConnectivity.js"></script>
+        <script type="text/javascript" src="js/admin/tests/KnownLayerWFS.js"></script>
+        <script type="text/javascript" src="js/admin/tests/KnownLayerWMS.js"></script>
         <script type="text/javascript" src="portal-core/js/admin/tests/TestStatus.js"></script>
         <script type="text/javascript" src="portal-core/js/admin/TestResultsPanel.js"></script>
         <script type="text/javascript" src="portal-core/js/admin/DiagnosticFunction.js"></script>
