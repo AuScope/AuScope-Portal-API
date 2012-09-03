@@ -522,6 +522,7 @@ public class GridSubmitController extends BasePortalController {
         } catch (PortalServiceException e) {
             logger.error("Files upload failed.", e);
             job.setStatus(STATUS_FAILED);
+            jobManager.saveJob(job);
             return generateJSONResponseMAV(false, null, "There was a problem uploading files to S3 cloud storage.",
                     e.getMessage());
         } catch (Exception e) {

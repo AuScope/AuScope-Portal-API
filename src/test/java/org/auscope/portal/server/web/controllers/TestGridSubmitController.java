@@ -122,27 +122,6 @@ public class TestGridSubmitController {
     }
 
     /**
-     * Tests that job submission correctly interacts with all dependencies
-     * @throws Exception
-     */
-    @Test
-    public void testJobSubmission_JobNoCredentials() throws Exception {
-        //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(13);
-
-        context.checking(new Expectations() {{
-            //We should have 1 call to our job manager to get our job object and 1 call to save it
-            oneOf(mockJobManager).getJobById(jobObj.getId());will(returnValue(jobObj));
-            oneOf(mockJobManager).saveJob(jobObj);
-        }});
-
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
-
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
-        Assert.assertEquals(GridSubmitController.STATUS_FAILED, jobObj.getStatus());
-    }
-
-    /**
      * Tests that job submission fails correctly when files cannot be uploaded to S3
      * @throws Exception
      */
@@ -178,6 +157,9 @@ public class TestGridSubmitController {
     public void testJobSubmission_ExecuteFailure() throws Exception {
         //Instantiate our job object
         final VEGLJob jobObj = new VEGLJob(13);
+        //As submitJob method no longer explicitly checks for empty storage credentials,
+        //we need to manually set the storageBaseKey property to avoid NullPointerException 
+        jobObj.setStorageBaseKey("storageBaseKey");
         final File[] stageInFiles = new File[] {context.mock(File.class, "MockFile1"), context.mock(File.class, "MockFile2")};
 
         context.checking(new Expectations() {{
@@ -194,8 +176,8 @@ public class TestGridSubmitController {
             //And one call to upload them
             oneOf(mockCloudStorageService).uploadJobFiles(jobObj, stageInFiles);
 
-            //And finally 1 call to execute the job (which will return null indicating failure)
-            oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(null));
+            //And finally 1 call to execute the job (which will throw PortalServiceException indicating failure)
+            oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(new PortalServiceException("")));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
