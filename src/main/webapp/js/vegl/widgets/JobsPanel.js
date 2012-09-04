@@ -342,8 +342,19 @@ Ext.define('vegl.widgets.JobsPanel', {
                 }
 
                 this.listJobsForSeries(this.currentSeries);
+                
                 if (error) {
-                    Ext.Msg.alert('Failure', 'There was a problem submitting your job. Please try again in a few minutes. ' + msg);
+                    //Create an error object and pass it to custom error window
+                    var errorObj = {
+                        title : 'Failure',
+                        message : responseObj.msg,
+                        info : responseObj.debugInfo
+                    };
+
+                    var errorWin = Ext.create('portal.widgets.window.ErrorWindow', {
+                        errorObj : errorObj
+                    });
+                    errorWin.show();
                 }
             }
         });
