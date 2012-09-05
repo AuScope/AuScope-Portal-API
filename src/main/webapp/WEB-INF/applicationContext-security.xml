@@ -66,9 +66,14 @@
             <beans:list>
                 <!-- Josh.Vote@csiro.au -->
                 <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                <beans:constructor-arg index="0" value="http://joshvote.myopenid.com/"/>
-                <beans:constructor-arg index="1" value=""/>
-                <beans:constructor-arg index="2" value="ROLE_ADMINISTRATOR"/>
+                <beans:constructor-arg name="name" value="http://joshvote.myopenid.com/"/>
+                <beans:constructor-arg name="credentials" value=""/>
+                <beans:constructor-arg name="grantedAuthorities">
+                    <beans:list>
+                        <beans:value>ROLE_USER</beans:value>
+                        <beans:value>ROLE_ADMINISTRATOR</beans:value>
+                    </beans:list>
+                </beans:constructor-arg>
             </beans:bean>
             </beans:list>
         </beans:constructor-arg>
