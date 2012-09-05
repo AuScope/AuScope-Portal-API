@@ -119,6 +119,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         var ajaxProxy = store.getProxy();
         ajaxProxy.extraParams.jobId = job.get('id');
         this.currentJob = job;
+        store.removeAll(false);
         store.load();
     }
 });
