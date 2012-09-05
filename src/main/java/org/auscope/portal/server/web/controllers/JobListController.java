@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.server.controllers.BasePortalController;
-import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
@@ -588,8 +587,8 @@ public class JobListController extends BasePortalController  {
             status = "";
         }
 
-        //Don't lookup files for jobs that haven't been submitted
-        if (status.equals(GridSubmitController.STATUS_UNSUBMITTED)) {
+        //Don't lookup files for jobs that haven't been submitted or failed
+        if (status.equals(GridSubmitController.STATUS_UNSUBMITTED) || status.equals(GridSubmitController.STATUS_FAILED)) {
             return;
         }
 
@@ -609,8 +608,6 @@ public class JobListController extends BasePortalController  {
             newStatus = GridSubmitController.STATUS_DONE;
         } else if (jobStarted) {
             newStatus = GridSubmitController.STATUS_ACTIVE;
-        } else {
-            newStatus = GridSubmitController.STATUS_PENDING;
         }
 
         if (!newStatus.equals(status)) {

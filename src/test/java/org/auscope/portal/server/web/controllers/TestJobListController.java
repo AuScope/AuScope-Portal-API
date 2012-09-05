@@ -882,7 +882,9 @@ public class TestJobListController {
                 context.mock(VEGLJob.class, "mockJobActive"),
                 context.mock(VEGLJob.class, "mockJobUnsubmitted"),
                 context.mock(VEGLJob.class, "mockJobDone"),
-                context.mock(VEGLJob.class, "mockJobPending"));
+                context.mock(VEGLJob.class, "mockJobPending"),
+                context.mock(VEGLJob.class, "mockJobFailed")
+        );
         final CloudFileInformation[] jobActiveFiles = new CloudFileInformation[] {
                 new CloudFileInformation("key2/filename", 100L, "http://public.url2/filename"),
                 new CloudFileInformation("key2/filename3", 102L, "http://public.url2/filename3"),
@@ -912,6 +914,7 @@ public class TestJobListController {
             allowing(mockJobs.get(1)).getStatus();will(returnValue(GridSubmitController.STATUS_UNSUBMITTED));
             allowing(mockJobs.get(2)).getStatus();will(returnValue(GridSubmitController.STATUS_DONE));
             allowing(mockJobs.get(3)).getStatus();will(returnValue(GridSubmitController.STATUS_PENDING));
+            allowing(mockJobs.get(4)).getStatus();will(returnValue(GridSubmitController.STATUS_FAILED));
 
             //Output files for each job
             oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(0)));will(returnValue(jobActiveFiles));
