@@ -1,7 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@ include file="include.jsp" %>
 
 <html>
 
@@ -24,23 +22,6 @@
     <script type="text/javascript" src="CodeMirror-2.33/mode/python/python.js"></script>
     <script type="text/javascript" src="CodeMirror-2.33/lib/util/formatting.js"></script>
     <script type="text/javascript" src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
-
-    <%-- Google Analytics --%>
-      <c:if test="${not empty analyticKey}">
-          <script type="text/javascript">
-
-          var _gaq = _gaq || [];
-          _gaq.push(['_setAccount', '${analyticKey}']);
-          _gaq.push(['_trackPageview']);
-
-            (function() {
-                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-              })();
-
-          </script>
-      </c:if>
 
     <!-- Portal Core Includes -->
     <link rel="stylesheet" type="text/css" href="portal-core/js/extjs-4.1.0-rc1/resources/css/ext-all.css">
@@ -104,6 +85,7 @@
 <body>
     <%@ include file="page_header.jsp" %>
     <div id="body"></div>
+    <%@ include file="page_footer.jsp" %>
 </body>
 
 </html>

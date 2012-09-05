@@ -8,7 +8,9 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
@@ -26,98 +28,43 @@ import com.amazonaws.auth.PropertiesCredentials;
  * Controller that handles all {@link Menu}-related requests,
  *
  * @author Jarek Sanders
+ * @author Josh Vote
  */
 @Controller
 public class MenuController {
 
    protected final Log logger = LogFactory.getLog(getClass());
 
-   @Autowired
-   @Qualifier(value = "propertyConfigurer")
    private PortalPropertyPlaceholderConfigurer hostConfigurer;
 
-
-   /* Commented out, for the time being we are redirecting Home link to AuScope site
-   @RequestMapping("/home.html")
-   public ModelAndView menu() {
-      logger.info("menu controller started!");
-      return new ModelAndView("home");
+   @Autowired
+   public MenuController(PortalPropertyPlaceholderConfigurer hostConfigurer) {
+       this.hostConfigurer = hostConfigurer;
    }
-   */
 
-   @RequestMapping("/genericparser.html")
-   public ModelAndView genericParser() {
+   /**
+    * Adds the google maps/analytics keys to the specified model
+    * @param mav
+    */
+   private void addGoogleKeys(ModelAndView mav) {
        String googleKey = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
+       String analyticKey = hostConfigurer.resolvePlaceholder("HOST.google.analytics.key");
 
-       ModelAndView mav = new ModelAndView("genericparser");
-          mav.addObject("googleKey", googleKey);
-
-       return mav;
+       mav.addObject("googleKey", googleKey);
+       if (analyticKey != null && !analyticKey.isEmpty()) {
+           mav.addObject("analyticKey", analyticKey);;
+       }
    }
 
-   @RequestMapping("/gmap.html")
-   public ModelAndView gmap() {
-      String googleKey = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
-      String vocabServiceUrl = hostConfigurer.resolvePlaceholder("HOST.vocabService.url");
-      String analyticKey = hostConfigurer.resolvePlaceholder("HOST.google.analytics.key");
-
-      logger.debug("googleKey: " + googleKey);
-      logger.debug("vocabServiceUrl: " + vocabServiceUrl);
-      logger.debug("analyticKey:" + analyticKey);
-
-      ModelAndView mav = new ModelAndView("gmap");
-      mav.addObject("googleKey", googleKey);
-      mav.addObject("vocabServiceUrl", vocabServiceUrl);
-      if (analyticKey != null && !analyticKey.isEmpty()) {
-          mav.addObject("analyticKey", analyticKey);
-      }
-      return mav;
-   }
-
-   @RequestMapping("/mosaic_image.html")
-   public ModelAndView mosaic_image() {
-      String googleKey
-         = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
-      logger.debug(googleKey);
-
-      ModelAndView mav = new ModelAndView("mosaic_image");
-      mav.addObject("googleKey",googleKey);
-      return mav;
-   }
-
-   @RequestMapping("/plotted_images.html")
-   public ModelAndView plotted_images() {
-      String googleKey
-         = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
-      logger.debug(googleKey);
-
-      ModelAndView mav = new ModelAndView("plotted_images");
-      mav.addObject("googleKey",googleKey);
-      return mav;
-   }
-
-   @RequestMapping("/login.html")
-   public ModelAndView login(HttpServletRequest request) {
-
-      return new ModelAndView("login");
-      //return new ModelAndView("redirect:/gmap.html");
-   }
-
-   @RequestMapping("/admin.html")
-   public ModelAndView admin(HttpServletRequest request) {
-       return generateViewFromManifest(request, "admin");
-   }
-
-   @RequestMapping("/about.html")
-   public ModelAndView about(HttpServletRequest request) {
-       return generateViewFromManifest(request, "about");
-   }
-
-   private ModelAndView generateViewFromManifest(HttpServletRequest request, String viewName) {
+   /**
+    * Adds a number of manifest specific variables to the model
+    * @param mav
+    * @param request
+    */
+   private void addManifest(ModelAndView mav, HttpServletRequest request) {
        String appServerHome = request.getSession().getServletContext().getRealPath("/");
        File manifestFile = new File(appServerHome,"META-INF/MANIFEST.MF");
        Manifest mf = new Manifest();
-       ModelAndView mav = new ModelAndView(viewName);
        try {
           mf.read(new FileInputStream(manifestFile));
           Attributes atts = mf.getMainAttributes();
@@ -142,36 +89,44 @@ public class MenuController {
              mav.addObject("serverOsVersion", System.getProperty("os.version"));
           }
        } catch (IOException e) {
-          /* ignore, since we'll just leave an empty form */
-           logger.debug(e.getMessage());
+           /* ignore, since we'll just leave an empty form */
+           logger.info("Error accessing manifest: " + e.getMessage());
+           logger.debug("Exception:", e);
        }
-       return mav;
    }
 
-   private ModelAndView setCloudCredentials(HttpServletRequest request,String redirectViewName) {
-       ModelAndView mav = new ModelAndView(redirectViewName);
+   /**
+    * Handles all HTML page requests by mapping them to an appropriate view (and adding other details).
+    * @param request
+    * @param response
+    * @return
+    * @throws IOException
+    */
+   @RequestMapping("/*.html")
+   public ModelAndView handleHtmlToView(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-       String analyticKey = hostConfigurer.resolvePlaceholder("HOST.google.analytics.key");
+       //Decode our request to get the view name we are actually requesting
+       String requestUri = request.getRequestURI();
+       String[] requestComponents = requestUri.split("/");
+       if (requestComponents.length == 0) {
+           logger.debug(String.format("request '%1$s' doesnt contain any extractable components", requestUri));
+           response.sendError(HttpStatus.SC_NOT_FOUND, "Resource not found : " + requestUri);
+           return null;
+       }
+       String requestedResource = requestComponents[requestComponents.length - 1];
+       String resourceName = requestedResource.replace(".html", "");
 
-       if (analyticKey != null && !analyticKey.isEmpty()) {
-           mav.addObject("analyticKey", analyticKey);
+       logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
+
+       //Give the user the view they are actually requesting
+       ModelAndView mav = new ModelAndView(resourceName);
+
+       //Customise the model as required
+       addGoogleKeys(mav); //always add the google keys
+       if (resourceName.equals("about") || resourceName.equals("admin")) {
+           addManifest(mav, request); //The manifest details aren't really required by much
        }
 
        return mav;
-   }
-
-   @RequestMapping("/jobbuilder.html")
-   public ModelAndView jobbuilder(HttpServletRequest request) {
-       // Ensure user has valid grid credentials
-       //return doShibbolethAndSLCSLogin(request, "gridsubmit", "/gridsubmit.html");
-       return setCloudCredentials(request, "jobbuilder");
-       //return new ModelAndView("gridsubmit");
-   }
-
-   @RequestMapping("/joblist.html")
-   public ModelAndView joblist(HttpServletRequest request) {
-       //return doShibbolethAndSLCSLogin(request, "joblist", "/joblist.html");
-       return setCloudCredentials(request, "joblist");
-       //return new ModelAndView("joblist");
    }
 }

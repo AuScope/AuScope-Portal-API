@@ -106,6 +106,8 @@
             });
         });
         </script>
+
+        <%@ include file="page_footer.jsp" %>
    </body>
 
 </html>
