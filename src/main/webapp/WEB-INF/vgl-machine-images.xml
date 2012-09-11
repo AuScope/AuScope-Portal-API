@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+    <bean id="vglImageList" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ami-0000000b"/>
+                    <property name="name" value="UBC-GIF"/>
+                    <property name="description"><value>A Centos 6 machine with the University of British Columbia's Geophysical inversion facility already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>ubc-gif</value>
+                            <value>centos6</value>
+                        </array>
+                    </property>
+                </bean>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ami-00000011"/>
+                    <property name="name" value="eScript"/>
+                    <property name="description"><value>A Centos 6 machine with eScript already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>eScript</value>
+                            <value>centos6</value>
+                        </array>
+                    </property>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+</beans>

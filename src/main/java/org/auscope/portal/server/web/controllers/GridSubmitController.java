@@ -38,6 +38,8 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VglMachineImage;
+import org.auscope.portal.server.web.service.VglMachineImageService;
 import org.jclouds.logging.Logger;
 import org.jclouds.rest.AuthorizationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +74,7 @@ public class GridSubmitController extends BasePortalController {
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
     private CloudStorageService cloudStorageService;
     private CloudComputeService cloudComputeService;
+    private VglMachineImageService vglImageService;
 
     //This is a file path for a CENTOS VM
     private static final String ERRDAP_SUBSET_VM_FILE_PATH = "/tmp/vegl-subset.csv";
@@ -89,12 +92,13 @@ public class GridSubmitController extends BasePortalController {
     @Autowired
     public GridSubmitController(VEGLJobManager jobManager, FileStagingService fileStagingService,
             PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService cloudStorageService,
-            CloudComputeService cloudComputeService) {
+            CloudComputeService cloudComputeService, VglMachineImageService imageService) {
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.hostConfigurer = hostConfigurer;
         this.cloudStorageService = cloudStorageService;
         this.cloudComputeService = cloudComputeService;
+        this.vglImageService = imageService;
     }
 
     /**
@@ -663,5 +667,22 @@ public class GridSubmitController extends BasePortalController {
         }
 
         return true;
+    }
+
+    /**
+     * Gets the set of cloud images available for use by a particular user
+     * @param request
+     * @return
+     */
+    @RequestMapping("/getVmImages.do")
+    public ModelAndView getImagesForUser(HttpServletRequest request) {
+        try {
+            VglMachineImage[] images = vglImageService.getAllImages();
+            return generateJSONResponseMAV(true, Arrays.asList(images), "");
+        } catch (Exception ex) {
+            log.error("Unable to access image list:" + ex.getMessage());
+            log.debug("Exception:", ex);
+            return generateJSONResponseMAV(false);
+        }
     }
 }

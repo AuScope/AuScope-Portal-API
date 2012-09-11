@@ -14,10 +14,11 @@ public class VeglWebAppContext extends PortalProfileXmlWebApplicationContext {
     protected String[] getDefaultConfigLocations() {
         String[] locations = super.getDefaultConfigLocations();
 
-        String[] auscopeLocations = Arrays.copyOf(locations, locations.length + 3);
+        String[] auscopeLocations = Arrays.copyOf(locations, locations.length + 4);
         auscopeLocations[auscopeLocations.length - 1] = DEFAULT_CONFIG_LOCATION_PREFIX + "vegl-known-layers.xml";
         auscopeLocations[auscopeLocations.length - 2] = DEFAULT_CONFIG_LOCATION_PREFIX + "vegl-registries.xml";
         auscopeLocations[auscopeLocations.length - 3] = DEFAULT_CONFIG_LOCATION_PREFIX + "applicationContext-security.xml";
+        auscopeLocations[auscopeLocations.length - 4] = DEFAULT_CONFIG_LOCATION_PREFIX + "vgl-machine-images.xml";
         return auscopeLocations;
     }
 }

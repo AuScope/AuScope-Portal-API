@@ -1,6 +1,7 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +16,8 @@ import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VglMachineImage;
+import org.auscope.portal.server.web.service.VglMachineImageService;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
@@ -41,6 +44,7 @@ public class TestGridSubmitController {
     private CloudComputeService mockCloudComputeService;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
+    private VglMachineImageService mockImageService;
 
     private GridSubmitController controller;
 
@@ -53,8 +57,9 @@ public class TestGridSubmitController {
         mockCloudComputeService = context.mock(CloudComputeService.class);
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);
+        mockImageService = context.mock(VglMachineImageService.class);
 
-        controller = new GridSubmitController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageService, mockCloudComputeService);
+        controller = new GridSubmitController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageService, mockCloudComputeService, mockImageService);
     }
 
     /**
@@ -158,7 +163,7 @@ public class TestGridSubmitController {
         //Instantiate our job object
         final VEGLJob jobObj = new VEGLJob(13);
         //As submitJob method no longer explicitly checks for empty storage credentials,
-        //we need to manually set the storageBaseKey property to avoid NullPointerException 
+        //we need to manually set the storageBaseKey property to avoid NullPointerException
         jobObj.setStorageBaseKey("storageBaseKey");
         final File[] stageInFiles = new File[] {context.mock(File.class, "MockFile1"), context.mock(File.class, "MockFile2")};
 
@@ -249,5 +254,41 @@ public class TestGridSubmitController {
         Assert.assertTrue(contents.contains(job.getStorageAccessKey()));
         Assert.assertTrue(contents.contains(job.getStorageBaseKey()));
         Assert.assertTrue(contents.contains(job.getStorageSecretKey()));
+    }
+
+    /**
+     * Tests that listing job images for a user works as expected
+     * @throws Exception
+     */
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void testListImages() throws Exception {
+        final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        context.checking(new Expectations() {{
+            //We allow calls to the Configurer which simply extract values from our property file
+            oneOf(mockImageService).getAllImages();will(returnValue(images));
+        }});
+
+        ModelAndView mav = controller.getImagesForUser(mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Assert.assertNotNull(mav.getModel().get("data"));
+        Assert.assertEquals(images.length, ((List) mav.getModel().get("data")).size());
+    }
+
+    /**
+     * Tests that listing job images for a user fails as expected
+     * @throws Exception
+     */
+    @Test
+    public void testListImagesError() throws Exception {
+        context.checking(new Expectations() {{
+            //We allow calls to the Configurer which simply extract values from our property file
+            oneOf(mockImageService).getAllImages();will(throwException(new PortalServiceException("error")));
+        }});
+
+        ModelAndView mav = controller.getImagesForUser(mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 }
