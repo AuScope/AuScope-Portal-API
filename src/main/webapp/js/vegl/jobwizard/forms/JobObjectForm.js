@@ -67,6 +67,20 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 emptyText : 'Enter an optional description for your job here.',
                 allowBlank: true
             },{
+                xtype : 'machineimagecombo',
+                fieldLabel : 'Toolbox',
+                name: 'computeVmId',
+                emptyText : 'Select a set of tools to help run your job.',
+                allowBlank: false,
+                queryMode: 'local',
+                triggerAction: 'all',
+                typeAhead: true,
+                forceSelection: true,
+                listConfig : {
+                    loadingText: 'Getting tools...',
+                    emptyText: 'No matching toolboxes found.'
+                }
+            },{
                 xtype: 'textfield',
                 name: 'storageBucket',
                 emptyText: 'Enter a cloud storage container where your job results will be stored',
@@ -91,7 +105,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             { xtype: 'hidden', name: 'user' },
             { xtype: 'hidden', name: 'submitDate' },
             { xtype: 'hidden', name: 'status' },
-            { xtype: 'hidden', name: 'computeVmId' },
             { xtype: 'hidden', name: 'computeInstanceId' },
             { xtype: 'hidden', name: 'computeInstanceType' },
             { xtype: 'hidden', name: 'computeInstanceKey' },

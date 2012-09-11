@@ -23,24 +23,21 @@ Ext.define('vegl.widgets.MachineImageCombo', {
             }
         });
 
+        var listCfg = config.listConfig ? config.listConfig : {};
+        listCfg.getInnerTpl = function() {
+            // Custom rendering template for each item
+            return '<h3>{name}</h3>' +
+                   '{description}<br/>' +
+                   '<ul>' +
+                       '<tpl for="keywords"><li style="list-style:disc inside none;">{.}</li></tpl>' +
+                   '</ul>';
+        };
+
         Ext.apply(config, {
             store: ds,
             displayField: 'name',
             valueField : 'imageId',
-            typeAhead: false,
-            listConfig: {
-                loadingText: 'Getting images...',
-                emptyText: 'You are not authorised to use any images.',
-
-                // Custom rendering template for each item
-                getInnerTpl: function() {
-                    return '<h3>{name}</h3>' +
-                           '{description}<br/>' +
-                           '<ul>' +
-                               '<tpl for="keywords"><li style="list-style:disc inside none;">{.}</li></tpl>' +
-                           '</ul>';
-                }
-            },
+            listConfig: listCfg,
         });
 
         this.callParent(arguments);

@@ -613,7 +613,6 @@ public class GridSubmitController extends BasePortalController {
         job.setInversionDepth((Integer) session.getAttribute(ERRDAPController.SESSION_INVERSION_DEPTH));
 
         job.setVmSubsetFilePath(ERRDAP_SUBSET_VM_FILE_PATH);
-        job.setComputeVmId(hostConfigurer.resolvePlaceholder("ami.id"));
         job.setComputeInstanceType("m1.large");
         job.setComputeInstanceKey("vegl-test-key");
         job.setStorageProvider(hostConfigurer.resolvePlaceholder("storage.provider"));

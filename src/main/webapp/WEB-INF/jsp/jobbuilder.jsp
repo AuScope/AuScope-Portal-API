@@ -37,6 +37,7 @@
     <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
     <script type="text/javascript" src="js/vegl/models/Job.js"></script>
     <script type="text/javascript" src="js/vegl/models/Series.js"></script>
+    <script type="text/javascript" src="js/vegl/models/MachineImage.js"></script>
 
     <script src="portal-core/js/portal/util/UnimplementedFunction.js" type="text/javascript"></script>
     <script src="portal-core/js/portal/widgets/grid/plugin/RowContextMenu.js" type="text/javascript"></script>
@@ -78,6 +79,7 @@
     <script type="text/javascript" src="js/vegl/jobwizard/forms/DuplicateJobForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/JobWizard.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>
 
     <script type="text/javascript" src="js/vegl/JobBuilder.js"></script>
 </head>
