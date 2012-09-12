@@ -614,7 +614,7 @@ public class GridSubmitController extends BasePortalController {
 
         job.setVmSubsetFilePath(ERRDAP_SUBSET_VM_FILE_PATH);
         job.setComputeInstanceType("m1.large");
-        job.setComputeInstanceKey("vegl-test-key");
+        job.setComputeInstanceKey("vgl-developers");
         job.setStorageProvider(hostConfigurer.resolvePlaceholder("storage.provider"));
         job.setStorageEndpoint(hostConfigurer.resolvePlaceholder("storage.endpoint"));
         job.setStorageBucket("vegl-portal");
