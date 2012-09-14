@@ -131,6 +131,7 @@
             <list>
                 <value>vegljob.hbm.xml</value>
                 <value>veglseries.hbm.xml</value>
+                <value>vglparameter.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

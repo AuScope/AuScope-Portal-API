@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -20,8 +20,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import net.sf.json.JSONObject;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -33,15 +31,13 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
-import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VglMachineImage;
+import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 import org.auscope.portal.server.web.service.VglMachineImageService;
-import org.jclouds.logging.Logger;
-import org.jclouds.rest.AuthorizationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -51,8 +47,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.amazonaws.AmazonServiceException;
 
 
 /**
@@ -114,6 +108,7 @@ public class GridSubmitController extends BasePortalController {
     public ModelAndView getJobObject(@RequestParam("jobId") String jobId) {
         try {
             VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
+
             return generateJSONResponseMAV(true, Arrays.asList(job), "");
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
@@ -131,8 +126,9 @@ public class GridSubmitController extends BasePortalController {
 
         //Create our initial job object
         VEGLJob newJob = null;
+        HttpSession session = request.getSession();
         try {
-             newJob = createDefaultVEGLJob(request.getSession());
+             newJob = createDefaultVEGLJob(session);
         } catch (Exception ex) {
             logger.error("Error saving newly created job", ex);
             return generateJSONResponseMAV(false, null, "Error saving newly created job");
@@ -147,7 +143,7 @@ public class GridSubmitController extends BasePortalController {
         }
 
         //Create the subset file and dump it in our stage in directory
-        HashMap<String,String> erdapUrlMap = (HashMap) request.getSession().getAttribute(ERRDAPController.SESSION_ERRDAP_URL_MAP);
+        HashMap<String,String> erdapUrlMap = (HashMap) session.getAttribute(ERRDAPController.SESSION_ERRDAP_URL_MAP);
         if (erdapUrlMap != null) {
             createSubsetScriptFile(newJob, erdapUrlMap);
         } else {
@@ -386,46 +382,20 @@ public class GridSubmitController extends BasePortalController {
             @RequestParam(value="storageEndpoint", required=false) String storageEndpoint,
             @RequestParam(value="storageProvider", required=false) String storageProvider,
             @RequestParam(value="storageSecretKey", required=false) String storageSecretKey,
-            @RequestParam(value="cellX", required=false) Integer cellX,
-            @RequestParam(value="cellY", required=false) Integer cellY,
-            @RequestParam(value="cellZ", required=false) Integer cellZ,
-            @RequestParam(value="inversionDepth", required=false) Integer inversionDepth,
-            @RequestParam(value="mgaZone", required=false) String mgaZone,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
-            @RequestParam(value="paddingMaxEasting", required=false) Double paddingMaxEasting,
-            @RequestParam(value="paddingMaxNorthing", required=false) Double paddingMaxNorthing,
-            @RequestParam(value="paddingMinEasting", required=false) Double paddingMinEasting,
-            @RequestParam(value="paddingMinNorthing", required=false) Double paddingMinNorthing,
-            @RequestParam(value="selectionMaxEasting", required=false) Double selectionMaxEasting,
-            @RequestParam(value="selectionMaxNorthing", required=false) Double selectionMaxNorthing,
-            @RequestParam(value="selectionMinEasting", required=false) Double selectionMinEasting,
-            @RequestParam(value="selectionMinNorthing", required=false) Double selectionMinNorthing,
             @RequestParam(value="vmSubsetFilePath", required=false) String vmSubsetFilePath,
             @RequestParam(value="vmSubsetUrl", required=false) String vmSubsetUrl) throws ParseException {
 
         //Build our VEGLJob from all of the specified parameters
         VEGLJob job = new VEGLJob(id);
-        job.setCellX(cellX);
-        job.setCellY(cellY);
-        job.setCellZ(cellZ);
         job.setComputeInstanceId(computeInstanceId);
         job.setComputeInstanceKey(computeInstanceKey);
         job.setComputeInstanceType(computeInstanceType);
         job.setComputeVmId(computeVmId);
         job.setDescription(description);
         job.setEmailAddress(emailAddress);
-        job.setInversionDepth(inversionDepth);
-        job.setMgaZone(mgaZone);
         job.setName(name);
-        job.setPaddingMaxEasting(paddingMaxEasting);
-        job.setPaddingMaxNorthing(paddingMaxNorthing);
-        job.setPaddingMinEasting(paddingMinEasting);
-        job.setPaddingMinNorthing(paddingMinNorthing);
         job.setRegisteredUrl(registeredUrl);
-        job.setSelectionMaxEasting(selectionMaxEasting);
-        job.setSelectionMaxNorthing(selectionMaxNorthing);
-        job.setSelectionMinEasting(selectionMinEasting);
-        job.setSelectionMinNorthing(selectionMinNorthing);
         job.setSeriesId(seriesId);
         job.setStatus(status);
         job.setStorageAccessKey(storageAccessKey);
@@ -595,22 +565,32 @@ public class GridSubmitController extends BasePortalController {
         jobManager.saveJob(job);
         log.debug(String.format("Created a new job row id=%1$s", job.getId()));
 
+        //Iterate over all session variables - set them up as job parameters
+        @SuppressWarnings("rawtypes")
+        Enumeration sessionVariables = session.getAttributeNames();
+        while (sessionVariables.hasMoreElements()) {
+            String variableName = sessionVariables.nextElement().toString();
+            Object variableValue = session.getAttribute(variableName);
+            String variableStringValue = null;
+            ParameterType variableType = null;
+
+            //Only session variables of a number or string will be considered
+            if (variableValue instanceof Integer || variableValue instanceof Double) {
+                variableType = ParameterType.number;
+                variableStringValue = variableValue.toString();
+            } else if (variableValue instanceof String) {
+                variableType = ParameterType.string;
+                variableStringValue = (String) variableValue;
+            } else {
+                continue;//Don't bother with other types
+            }
+
+            job.setJobParameter(variableName, variableStringValue, variableType);
+        }
+
         //Load details from
         job.setUser((String) session.getAttribute("openID-Email"));
         job.setEmailAddress((String) session.getAttribute("openID-Email"));
-        job.setSelectionMinEasting((Double) session.getAttribute(ERRDAPController.SESSION_SELECTION_MIN_EASTING));
-        job.setSelectionMaxEasting((Double) session.getAttribute(ERRDAPController.SESSION_SELECTION_MAX_EASTING));
-        job.setSelectionMinNorthing((Double) session.getAttribute(ERRDAPController.SESSION_SELECTION_MIN_NORTHING));
-        job.setSelectionMaxNorthing((Double) session.getAttribute(ERRDAPController.SESSION_SELECTION_MAX_NORTHING));
-        job.setPaddingMinEasting((Double) session.getAttribute(ERRDAPController.SESSION_PADDED_MIN_EASTING));
-        job.setPaddingMaxEasting((Double) session.getAttribute(ERRDAPController.SESSION_PADDED_MAX_EASTING));
-        job.setPaddingMinNorthing((Double) session.getAttribute(ERRDAPController.SESSION_PADDED_MIN_NORTHING));
-        job.setPaddingMaxNorthing((Double) session.getAttribute(ERRDAPController.SESSION_PADDED_MAX_NORTHING));
-        job.setMgaZone((String)session.getAttribute(ERRDAPController.SESSION_MGA_ZONE));
-        job.setCellX((Integer) session.getAttribute(ERRDAPController.SESSION_CELL_X));
-        job.setCellY((Integer) session.getAttribute(ERRDAPController.SESSION_CELL_Y));
-        job.setCellZ((Integer) session.getAttribute(ERRDAPController.SESSION_CELL_Z));
-        job.setInversionDepth((Integer) session.getAttribute(ERRDAPController.SESSION_INVERSION_DEPTH));
 
         job.setVmSubsetFilePath(ERRDAP_SUBSET_VM_FILE_PATH);
         job.setComputeInstanceType("m1.large");

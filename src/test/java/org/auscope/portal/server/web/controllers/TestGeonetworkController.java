@@ -14,6 +14,7 @@ import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.vegl.VglParameter;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
@@ -67,16 +68,20 @@ public class TestGeonetworkController {
                 new CloudFileInformation("my/key2", 200L, "http://public.url2"),
                 new CloudFileInformation("my/key3", 300L, "http://public.url3")
         };
+        final VglParameter minEasting = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MIN_EASTING, "2.0", "number");
+        final VglParameter maxEasting = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MAX_EASTING, "1.0", "number");
+        final VglParameter maxNorthing = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MAX_NORTHING, "3.0", "number");
+        final VglParameter minNorthing = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MIN_NORTHING, "4.0", "number");
 
         //We want to ensure our job is set values BEFORE saving it
         final Sequence jobSavingSequence = context.sequence("jobSavingSequence");
 
         context.checking(new Expectations() {{
             //Our mock job configuration
-            allowing(mockJob).getSelectionMaxEasting();will(returnValue(1.0));
-            allowing(mockJob).getSelectionMinEasting();will(returnValue(2.0));
-            allowing(mockJob).getSelectionMaxNorthing();will(returnValue(3.0));
-            allowing(mockJob).getSelectionMinNorthing();will(returnValue(4.0));
+            allowing(mockJob).getJobParameter(minEasting.getName());will(returnValue(minEasting));
+            allowing(mockJob).getJobParameter(maxEasting.getName());will(returnValue(maxEasting));
+            allowing(mockJob).getJobParameter(maxNorthing.getName());will(returnValue(maxNorthing));
+            allowing(mockJob).getJobParameter(minNorthing.getName());will(returnValue(minNorthing));
             allowing(mockJob).getDescription();will(returnValue("description"));
             allowing(mockJob).getSubmitDate();will(returnValue(new Date()));
             allowing(mockJob).getName();will(returnValue("name"));
@@ -207,13 +212,17 @@ public class TestGeonetworkController {
                 new CloudFileInformation("my/key2", 200L, "http://public.url2"),
                 new CloudFileInformation("my/key3", 300L, "http://public.url3")
         };
+        final VglParameter minEasting = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MIN_EASTING, "2.0", "number");
+        final VglParameter maxEasting = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MAX_EASTING, "1.0", "number");
+        final VglParameter maxNorthing = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MAX_NORTHING, "3.0", "number");
+        final VglParameter minNorthing = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MIN_NORTHING, "4.0", "number");
 
         context.checking(new Expectations() {{
             //Our mock job configuration
-            allowing(mockJob).getSelectionMaxEasting();will(returnValue(1.0));
-            allowing(mockJob).getSelectionMinEasting();will(returnValue(2.0));
-            allowing(mockJob).getSelectionMaxNorthing();will(returnValue(3.0));
-            allowing(mockJob).getSelectionMinNorthing();will(returnValue(4.0));
+            allowing(mockJob).getJobParameter(minEasting.getName());will(returnValue(minEasting));
+            allowing(mockJob).getJobParameter(maxEasting.getName());will(returnValue(maxEasting));
+            allowing(mockJob).getJobParameter(maxNorthing.getName());will(returnValue(maxNorthing));
+            allowing(mockJob).getJobParameter(minNorthing.getName());will(returnValue(minNorthing));
             allowing(mockJob).getDescription();will(returnValue("description"));
             allowing(mockJob).getSubmitDate();will(returnValue("20110713_105730"));
             allowing(mockJob).getName();will(returnValue("name"));

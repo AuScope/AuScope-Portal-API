@@ -1,8 +1,11 @@
 package org.auscope.portal.server.vegl;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.auscope.portal.core.cloud.CloudJob;
+import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 
 /**
  * A specialisation of a generic cloud job for the VEGL Portal
@@ -19,19 +22,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
 
     private String vmSubsetFilePath;
     private String vmSubsetUrl;
-    private Double paddingMinEasting;
-    private Double paddingMaxEasting;
-    private Double paddingMinNorthing;
-    private Double paddingMaxNorthing;
-    private Double selectionMinEasting;
-    private Double selectionMaxEasting;
-    private Double selectionMinNorthing;
-    private Double selectionMaxNorthing;
-    private String mgaZone;
-    private Integer cellX;
-    private Integer cellY;
-    private Integer cellZ;
-    private Integer inversionDepth;
+
+    /** A map of VglParameter objects keyed by their parameter names*/
+    private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
 
     /**
      * Creates an unitialised VEGLJob
@@ -97,216 +90,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
         this.seriesId = seriesId;
     }
 
-
-    /**
-     * Gets the minimum easting of the padded bounds
-     * @return
-     */
-    public Double getPaddingMinEasting() {
-        return paddingMinEasting;
-    }
-
-    /**
-     * Sets the minimum easting of the padded bounds
-     * @param paddingMinEasting
-     */
-    public void setPaddingMinEasting(Double paddingMinEasting) {
-        this.paddingMinEasting = paddingMinEasting;
-    }
-
-    /**
-     * Gets the maximum easting of the padded bounds
-     * @return
-     */
-    public Double getPaddingMaxEasting() {
-        return paddingMaxEasting;
-    }
-
-    /**
-     * Sets the maximum easting of the padded bounds
-     * @param paddingMaxEasting
-     */
-    public void setPaddingMaxEasting(Double paddingMaxEasting) {
-        this.paddingMaxEasting = paddingMaxEasting;
-    }
-
-    /**
-     * Gets the minimum northing of the padded bounds
-     * @return
-     */
-    public Double getPaddingMinNorthing() {
-        return paddingMinNorthing;
-    }
-
-    /**
-     * Sets the minimum northing of the padded bounds
-     * @param paddingMinNorthing
-     */
-    public void setPaddingMinNorthing(Double paddingMinNorthing) {
-        this.paddingMinNorthing = paddingMinNorthing;
-    }
-
-    /**
-     * Gets the maximum northing of the padded bounds
-     * @return
-     */
-    public Double getPaddingMaxNorthing() {
-        return paddingMaxNorthing;
-    }
-
-    /**
-     * Sets the maximum northing of the padded bounds
-     * @param paddingMaxNorthing
-     */
-    public void setPaddingMaxNorthing(Double paddingMaxNorthing) {
-        this.paddingMaxNorthing = paddingMaxNorthing;
-    }
-
-    /**
-     * Gets the minimum easting of the selected bounds
-     * @return
-     */
-    public Double getSelectionMinEasting() {
-        return selectionMinEasting;
-    }
-
-    /**
-     * Sets the minimum easting of the selected bounds
-     * @param selectionMinEasting
-     */
-    public void setSelectionMinEasting(Double selectionMinEasting) {
-        this.selectionMinEasting = selectionMinEasting;
-    }
-
-    /**
-     * Gets the maximum easting of the selected bounds
-     * @return
-     */
-    public Double getSelectionMaxEasting() {
-        return selectionMaxEasting;
-    }
-
-    /**
-     * Sets the maximum easting of the selected bounds
-     * @param selectionMaxEasting
-     */
-    public void setSelectionMaxEasting(Double selectionMaxEasting) {
-        this.selectionMaxEasting = selectionMaxEasting;
-    }
-
-    /**
-     * Gets the minimum northing of the selected bounds
-     * @return
-     */
-    public Double getSelectionMinNorthing() {
-        return selectionMinNorthing;
-    }
-
-    /**
-     * Sets the minimum northing of the selected bounds
-     * @param selectionMinNorthing
-     */
-    public void setSelectionMinNorthing(Double selectionMinNorthing) {
-        this.selectionMinNorthing = selectionMinNorthing;
-    }
-
-    /**
-     * Gets the maximum northing of the selected bounds
-     * @return
-     */
-    public Double getSelectionMaxNorthing() {
-        return selectionMaxNorthing;
-    }
-
-    /**
-     * Sets the maximum northing of the selected bounds
-     * @param selectionMaxNorthing
-     */
-    public void setSelectionMaxNorthing(Double selectionMaxNorthing) {
-        this.selectionMaxNorthing = selectionMaxNorthing;
-    }
-
-    /**
-     * Gets the selected MGA zone of the padded bounds
-     * @return
-     */
-    public String getMgaZone() {
-        return mgaZone;
-    }
-
-    /**
-     * Sets the selected MGA zone of the padded bounds
-     * @param mgaZone
-     */
-    public void setMgaZone(String mgaZone) {
-        this.mgaZone = mgaZone;
-    }
-
-    /**
-     * Gets the selected cell size in the X direction
-     * @return
-     */
-    public Integer getCellX() {
-        return cellX;
-    }
-
-    /**
-     * Sets the selected cell size in the X direction
-     * @param cellX
-     */
-    public void setCellX(Integer cellX) {
-        this.cellX = cellX;
-    }
-
-    /**
-     * Gets the selected cell size in the Y direction
-     * @return
-     */
-    public Integer getCellY() {
-        return cellY;
-    }
-
-    /**
-     * Sets the selected cell size in the Y direction
-     * @param cellY
-     */
-    public void setCellY(Integer cellY) {
-        this.cellY = cellY;
-    }
-
-    /**
-     * Gets the selected cell size in the Z direction
-     * @return
-     */
-    public Integer getCellZ() {
-        return cellZ;
-    }
-
-    /**
-     * Sets the selected cell size in the Z direction
-     * @param cellZ
-     */
-    public void setCellZ(Integer cellZ) {
-        this.cellZ = cellZ;
-    }
-
-    /**
-     * Gets the selected inversion depth
-     * @return
-     */
-    public Integer getInversionDepth() {
-        return inversionDepth;
-    }
-
-    /**
-     * Sets the selected inversion depth
-     * @param inversionDepth
-     */
-    public void setInversionDepth(Integer inversionDepth) {
-        this.inversionDepth = inversionDepth;
-    }
-
-
     /**
      * Gets the File path (on the VM) where the job should look for its input subset file
      * @return
@@ -337,6 +120,49 @@ public class VEGLJob extends CloudJob implements Cloneable {
      */
     public void setVmSubsetUrl(String vmSubsetUrl) {
         this.vmSubsetUrl = vmSubsetUrl;
+    }
+
+
+    /**
+     * A set of VglJobParameter objects
+     * @return
+     */
+    public Map<String, VglParameter> getJobParameters() {
+        return jobParameters;
+    }
+
+    /** A set of VglJobParameter objects*/
+    public void setJobParameters(Map<String, VglParameter> jobParameters) {
+        this.jobParameters = jobParameters;
+    }
+
+    /**
+     * Sets a single parameter within this job
+     * @param name The name of the parameter (parameters with the same name will be overwritten)
+     * @param value The value of the parameter
+     * @param type The type of the parameter ('number' or 'string')
+     */
+    public void setJobParameter(String name, String value, ParameterType type) {
+        VglParameter param = jobParameters.get(name);
+        if (param == null) {
+            param = new VglParameter();
+        }
+
+        param.setJobId(id);
+        param.setName(name);
+        param.setValue(value);
+        param.setType(type.name());
+
+        jobParameters.put(name, param);
+    }
+
+    /**
+     * Gets the VglParameter with a particular name
+     * @param name
+     * @return
+     */
+    public VglParameter getJobParameter(String name) {
+        return this.jobParameters.get(name);
     }
 
     /**

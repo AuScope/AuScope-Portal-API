@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.Attributes;
@@ -102,7 +100,12 @@ public class GeonetworkController extends BasePortalController {
         rp.setPositionName("Web Operations Manager");
 
         //Build our bounding box
-        CSWGeographicElement[] geoEls = new CSWGeographicElement[] {new CSWGeographicBoundingBox(job.getSelectionMinEasting(), job.getSelectionMaxEasting(), job.getSelectionMinNorthing(), job.getSelectionMaxNorthing())};
+        double selectionMinEasting = Double.parseDouble(job.getJobParameter(ERRDAPController.SESSION_SELECTION_MIN_EASTING).getValue());
+        double selectionMaxEasting = Double.parseDouble(job.getJobParameter(ERRDAPController.SESSION_SELECTION_MAX_EASTING).getValue());
+        double selectionMinNorthing = Double.parseDouble(job.getJobParameter(ERRDAPController.SESSION_SELECTION_MIN_NORTHING).getValue());
+        double selectionMaxNorthing = Double.parseDouble(job.getJobParameter(ERRDAPController.SESSION_SELECTION_MAX_NORTHING).getValue());
+
+        CSWGeographicElement[] geoEls = new CSWGeographicElement[] {new CSWGeographicBoundingBox(selectionMinEasting, selectionMaxEasting, selectionMinNorthing, selectionMaxNorthing)};
 
         //Build our CSW Record
         CSWRecord rec = new CSWRecord(null);

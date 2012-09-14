@@ -1,13 +1,17 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.iterators.IteratorEnumeration;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
@@ -17,6 +21,7 @@ import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VglMachineImage;
+import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.web.service.VglMachineImageService;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -45,6 +50,7 @@ public class TestGridSubmitController {
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
     private VglMachineImageService mockImageService;
+    private HttpSession mockSession;
 
     private GridSubmitController controller;
 
@@ -58,6 +64,7 @@ public class TestGridSubmitController {
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockImageService = context.mock(VglMachineImageService.class);
+        mockSession = context.mock(HttpSession.class);
 
         controller = new GridSubmitController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageService, mockCloudComputeService, mockImageService);
     }
@@ -290,5 +297,84 @@ public class TestGridSubmitController {
         ModelAndView mav = controller.getImagesForUser(mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests the creation of a new job object.
+     * @throws Exception
+     */
+    @Test
+    public void testCreateJobObject() throws Exception {
+        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
+        final Sequence sequence = context.sequence("setup-sequence"); //ensure we dont save the job until AFTER everything is setup
+        final String storageProvider = "swift";
+        final String storageEndpoint = "http://example.org/storage";
+        final String baseKey = "base/key";
+
+
+        sessionVariables.put("doubleValue", 123.45);
+        sessionVariables.put("intValue", 123);
+        sessionVariables.put("openID-Email", "email@example.org");
+        sessionVariables.put("notExtracted", new Object()); //this should NOT be requested
+
+        context.checking(new Expectations() {{
+            //A whole bunch of parameters will be setup based on what session variables are set
+            oneOf(mockRequest).getSession();inSequence(sequence);will(returnValue(mockSession));
+
+            oneOf(mockSession).getAttributeNames();will(returnValue(new IteratorEnumeration(sessionVariables.keySet().iterator())));
+            allowing(mockSession).getAttribute("doubleValue");will(returnValue(sessionVariables.get("doubleValue")));
+            allowing(mockSession).getAttribute("intValue");will(returnValue(sessionVariables.get("intValue")));
+            allowing(mockSession).getAttribute("openID-Email");will(returnValue(sessionVariables.get("openID-Email")));
+            allowing(mockSession).getAttribute("notExtracted");will(returnValue(sessionVariables.get("notExtracted")));
+            allowing(mockSession).getAttribute(ERRDAPController.SESSION_ERRDAP_URL_MAP);will(returnValue(null));
+
+            oneOf(mockCloudStorageService).generateBaseKey(with(any(VEGLJob.class)));will(returnValue(baseKey));
+
+            oneOf(mockHostConfigurer).resolvePlaceholder("storage.provider");will(returnValue(storageProvider));
+            oneOf(mockHostConfigurer).resolvePlaceholder("storage.endpoint");will(returnValue(storageEndpoint));
+
+            oneOf(mockJobManager).saveJob(with(any(VEGLJob.class)));inSequence(sequence); //one save job to get ID
+
+            oneOf(mockFileStagingService).generateStageInDirectory(with(any(VEGLJob.class)));inSequence(sequence);
+
+            oneOf(mockJobManager).saveJob(with(any(VEGLJob.class)));inSequence(sequence); //another to finish off
+        }});
+
+        ModelAndView mav = controller.createJobObject(mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+
+        List<VEGLJob> data = (List<VEGLJob>)mav.getModel().get("data");
+        Assert.assertNotNull(data);
+        Assert.assertEquals(1, data.size());
+
+        VEGLJob newJob = data.get(0);
+        Assert.assertNotNull(newJob);
+        Assert.assertEquals(storageEndpoint, newJob.getStorageEndpoint());
+        Assert.assertEquals(storageProvider, newJob.getStorageProvider());
+        Assert.assertEquals(baseKey, newJob.getStorageBaseKey());
+
+        Map<String, VglParameter> params = newJob.getJobParameters();
+        Assert.assertNotNull(params);
+        Assert.assertEquals(3, params.size());
+
+
+        String paramToTest = "doubleValue";
+        VglParameter param = params.get(paramToTest);
+        Assert.assertNotNull(param);
+        Assert.assertEquals("number", param.getType());
+        Assert.assertEquals(sessionVariables.get(paramToTest).toString(), param.getValue());
+
+        paramToTest = "intValue";
+        param = params.get(paramToTest);
+        Assert.assertNotNull(param);
+        Assert.assertEquals("number", param.getType());
+        Assert.assertEquals(sessionVariables.get(paramToTest).toString(), param.getValue());
+
+        paramToTest = "openID-Email";
+        param = params.get(paramToTest);
+        Assert.assertNotNull(param);
+        Assert.assertEquals("string", param.getType());
+        Assert.assertEquals(sessionVariables.get(paramToTest), param.getValue());
     }
 }

@@ -31,36 +31,42 @@ Ext.define('ScriptBuilder.components.BasePythonComponent', {
     },
 
     /**
-     * Given an array of field names as strings, generate a simple
+     * Given an array of field names as vegl.models.Parameter objects or strings, generate a simple
      * Plain old Python Object (POPO) class that can get the required fields
      */
     _popoClass : function(className, fields) {
         var classText = '';
+        var getName = function(obj) {
+            if (obj instanceof vegl.models.Parameter) {
+                return obj.get('name');
+            }
+            return obj;
+        }
 
         classText += 'class ' + className + ':' + this._newLine;
 
         //Local variables
         for (var i = 0; i < fields.length; i++) {
-            classText += this._tab + '_' + fields[i] + ' = None' + this._newLine;
+            classText += this._tab + '_' + getName(fields[i]) + ' = None' + this._newLine;
         }
         classText += this._newLine;
 
         //Constructor definition
         classText += this._tab + 'def __init__(self';
         for (var i = 0; i < fields.length; i++) {
-            classText += ', ' + fields[i];
+            classText += ', ' + getName(fields[i]);
         }
         classText += '):' + this._newLine;
 
         //Constructor body
         for (var i = 0; i < fields.length; i++) {
-            classText += this._tab + this._tab + 'self._' + fields[i] + ' = ' + fields[i] + this._newLine;
+            classText += this._tab + this._tab + 'self._' + getName(fields[i]) + ' = ' + getName(fields[i]) + this._newLine;
         }
         classText += this._newLine;
 
         //Getter fields
         for (var i = 0; i < fields.length; i++) {
-            classText += this._getPrimitiveFunction(fields[i], 'self._' + fields[i], this._tab, true);
+            classText += this._getPrimitiveFunction(getName(fields[i]), 'self._' + getName(fields[i]), this._tab, true);
         }
         classText += this._newLine;
 

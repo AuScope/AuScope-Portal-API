@@ -7,12 +7,12 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
- * A data access object for VEGLJob 
+ * A data access object for VEGLJob
  * @author Josh Vote
  *
  */
 public class VEGLJobDao extends HibernateDaoSupport {
-	protected final Log logger = LogFactory.getLog(getClass());
+    protected final Log logger = LogFactory.getLog(getClass());
 
     /**
      * Retrieves jobs that are grouped under given series
@@ -29,7 +29,7 @@ public class VEGLJobDao extends HibernateDaoSupport {
      * Retrieves jobs that belong to a specific email
      *
      * @param emailAddress the email whose jobs are to be retrieved
-    
+
      */
     public List<VEGLJob> getJobsByEmail(final String emailAddress) {
         return (List<VEGLJob>) getHibernateTemplate()
@@ -43,8 +43,8 @@ public class VEGLJobDao extends HibernateDaoSupport {
     public VEGLJob get(final int id) {
         return (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
     }
-    
-    
+
+
     /**
      * Deletes the job with given ID.
      */

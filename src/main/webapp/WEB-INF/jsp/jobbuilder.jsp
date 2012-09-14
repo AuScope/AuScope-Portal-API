@@ -35,6 +35,7 @@
     <script type="text/javascript" src="mzExt/ux/form/field/Ext.ux.form.field.CodeMirror.411.js"></script>
 
     <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
+    <script type="text/javascript" src="js/vegl/models/Parameter.js"></script>
     <script type="text/javascript" src="js/vegl/models/Job.js"></script>
     <script type="text/javascript" src="js/vegl/models/Series.js"></script>
     <script type="text/javascript" src="js/vegl/models/MachineImage.js"></script>

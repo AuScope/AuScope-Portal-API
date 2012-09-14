@@ -21,8 +21,6 @@ Ext.define('vegl.models.Job', {
         { name: 'emailAddress', type: 'string'}, //Email who created this series
         { name: 'user', type: 'string'}, //Username who created this series
         { name: 'submitDate', type: 'date', convert: function(value, record) {
-            //var d = new Date(year, month, day, hours, minutes, seconds, milliseconds);
-            //var d = new Date(milliseconds);
             if (!value) {
                 return null;
             } else {
@@ -47,18 +45,17 @@ Ext.define('vegl.models.Job', {
         { name: 'seriesId', type: 'int'},
         { name: 'vmSubsetFilePath', type: 'string'},
         { name: 'vmSubsetUrl', type: 'string'},
-        { name: 'paddingMinEasting', type: 'double'},
-        { name: 'paddingMaxEasting', type: 'double'},
-        { name: 'paddingMinNorthing', type: 'double'},
-        { name: 'paddingMaxNorthing', type: 'double'},
-        { name: 'selectionMinEasting', type: 'double'},
-        { name: 'selectionMaxEasting', type: 'double'},
-        { name: 'selectionMinNorthing', type: 'double'},
-        { name: 'selectionMaxNorthing', type: 'double'},
-        { name: 'mgaZone', type: 'string'},
-        { name: 'cellX', type: 'int'},
-        { name: 'cellY', type: 'int'},
-        { name: 'cellZ', type: 'int'},
-        { name: 'inversionDepth', type: 'int'}
+
+        { name: 'jobParameters', type: 'auto', convert: function(value, record) { //an array of vegl.models.Parameter objects
+            if (!value) {
+                return [];
+            } else {
+                var paramList = [];
+                for (var key in value) {
+                    paramList.push(Ext.create('vegl.models.Parameter', value[key]));
+                }
+                return paramList;
+            }
+        }}
     ]
 });

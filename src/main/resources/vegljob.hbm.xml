@@ -24,21 +24,14 @@
         <property name="seriesId"/>
         <property name="vmSubsetFilePath"/>
         <property name="vmSubsetUrl"/>
-        <property name="paddingMinEasting"/>
-        <property name="paddingMaxEasting"/>
-        <property name="paddingMinNorthing"/>
-        <property name="paddingMaxNorthing"/>
-        <property name="selectionMinEasting"/>
-        <property name="selectionMaxEasting"/>
-        <property name="selectionMinNorthing"/>
-        <property name="selectionMaxNorthing"/>
-        <property name="mgaZone"/>
-        <property name="cellX"/>
-        <property name="cellY"/>
-        <property name="cellZ"/>
-        <property name="inversionDepth"/>
         <property name="storageBaseKey"/>
         <property name="storageProvider"/>
+
+        <map name="jobParameters" lazy="false" cascade="all" inverse="true">
+            <key column="jobId"/>
+            <map-key column="name" type="string"/>
+            <one-to-many class="org.auscope.portal.server.vegl.VglParameter"/>
+        </map>
     </class>
 </hibernate-mapping>
 
