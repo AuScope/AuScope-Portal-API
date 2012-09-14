@@ -20,7 +20,8 @@ Ext.define('vegl.widgets.MachineImageCombo', {
                    type: 'json',
                    root : 'data'
                 }
-            }
+            },
+            autoLoad : true
         });
 
         var listCfg = config.listConfig ? config.listConfig : {};
