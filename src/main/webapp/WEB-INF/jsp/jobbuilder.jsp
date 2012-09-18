@@ -28,6 +28,7 @@
     <link rel="stylesheet" type="text/css" href="portal-core/js/extjs-4.1.0-rc1/examples/ux/css/CheckHeader.css">
     <script type="text/javascript" src="portal-core/js/extjs-4.1.0-rc1/ext-all-debug.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
+    <script type="text/javascript" src="portal-core/js/portal/util/ObservableMap.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/widgets/window/ErrorWindow.js"></script>
 
 
@@ -43,32 +44,12 @@
     <script src="portal-core/js/portal/util/UnimplementedFunction.js" type="text/javascript"></script>
     <script src="portal-core/js/portal/widgets/grid/plugin/RowContextMenu.js" type="text/javascript"></script>
 
-    <script src="js/ScriptBuilder/components/BaseComponent.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/BasePythonComponent.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/ChangeDir.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/CloudDownload.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/CloudUpload.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/CloudUtils.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/DefineMainFunc.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/DefinePythonFunc.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/MPIRun.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/PythonHeader.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLJobObject.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLStep1.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLStep2.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLStep3.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLStep4.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLStep5.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLStep6.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLStep7.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLStep8.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLStep9.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/components/VEGLUtils.js" type="text/javascript"></script>
-
-    <script src="js/ScriptBuilder/ActiveComponentModel.js" type="text/javascript"></script>
-    <script src="js/ScriptBuilder/ActiveComponentTreePanel.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/templates/BaseTemplate.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/templates/UbcGravityTemplate.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/templates/UbcMagneticTemplate.js" type="text/javascript"></script>
     <script src="js/ScriptBuilder/Components.js" type="text/javascript"></script>
     <script src="js/ScriptBuilder/ComponentTreePanel.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/InsertionPromptWindow.js" type="text/javascript"></script>
     <script src="js/ScriptBuilder/ScriptBuilder.js" type="text/javascript"></script>
 
     <script type="text/javascript" src="js/vegl/jobwizard/forms/BaseJobWizardForm.js"></script>

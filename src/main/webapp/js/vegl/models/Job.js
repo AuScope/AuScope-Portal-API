@@ -57,5 +57,20 @@ Ext.define('vegl.models.Job', {
                 return paramList;
             }
         }}
-    ]
+    ],
+
+    /**
+     * Gets the set of Parameters associated with this job encoded as a Key/Value encoded object.
+     *
+     * This object is readonly, changes made to it will NOT affect this Job object
+     */
+    getJobParametersObject : function() {
+        var obj = {};
+        var params = this.get('jobParameters');
+        for (var i = 0; i < jobParameters.length; i++) {
+            obj[params[i].get('name')] = params[i].get('value');
+        }
+
+        return obj;
+    }
 });

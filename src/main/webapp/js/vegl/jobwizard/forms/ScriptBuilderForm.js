@@ -22,8 +22,6 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
             wizardState : wizardState
         });
 
-        this.scriptBuilderFrm.activeComponentsPanel.addActiveComponent('ScriptBuilder.components.PythonHeader', 'Python Script File Header', 'The file header to identify the script as being executable using python.', true);
-
         // Finally, build the main layout once all the pieces are ready.
         this.callParent([{
             wizardState : wizardState,
