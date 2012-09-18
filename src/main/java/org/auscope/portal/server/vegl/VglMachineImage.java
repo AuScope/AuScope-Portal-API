@@ -17,6 +17,8 @@ public class VglMachineImage {
     private String description;
     /** (Possibly empty) List of descriptive keywords for this image*/
     private String[] keywords;
+    /** List of roles that have been given the permission to use this image */
+    private String[] permissions;
 
     /**
      * Creates a new VglMachineImage object
@@ -75,6 +77,22 @@ public class VglMachineImage {
      */
     public void setKeywords(String[] keywords) {
         this.keywords = keywords;
+    }
+
+    /**
+     * List of roles that have been given the permission to use this image
+     * @return
+     */
+    public String[] getPermissions() {
+        return permissions;
+    }
+
+    /**
+     * List of roles that have been given the permission to use this image
+     * @param permissions
+     */
+    public void setPermissions(String[] permissions) {
+        this.permissions = permissions;
     }
 
     /**

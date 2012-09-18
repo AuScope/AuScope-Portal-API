@@ -19,6 +19,12 @@
                             <value>centos6</value>
                         </array>
                     </property>
+                    <property name="permissions">
+                        <array>
+                            <value>ROLE_UBC</value>
+                            <value>ROLE_ADMINISTRATOR</value>
+                        </array>
+                    </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
                     <constructor-arg name="imageId" value="ami-00000011"/>
@@ -28,6 +34,11 @@
                         <array>
                             <value>eScript</value>
                             <value>centos6</value>
+                        </array>
+                    </property>
+                    <property name="permissions">
+                        <array>
+                            <value>ROLE_USER</value>
                         </array>
                     </property>
                 </bean>

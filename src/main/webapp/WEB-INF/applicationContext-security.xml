@@ -54,27 +54,39 @@
 
    -->
 
-   <authentication-manager alias="authenticationManager" >
+   <authentication-manager alias="authenticationManager">
         <authentication-provider ref="preAuthenticatedAuthenticationProvider" user-service-ref="portalUserDetailsService"/>
    </authentication-manager>
 
    <!-- We use our own user details service so that we can assign ROLE_USER to users that authenticate with AAF but are unknown to us
 -->
-    <beans:bean id="portalUserDetailsService" class="org.auscope.portal.server.web.security.PortalUserDetailsService">
-        <beans:constructor-arg index="0" value="ROLE_USER"/>
+    <beans:bean id="portalUserDetailsService"
+        class="org.auscope.portal.server.web.security.PortalUserDetailsService">
+        <beans:constructor-arg index="0" value="ROLE_USER" />
         <beans:constructor-arg index="1">
             <beans:list>
                 <!-- Josh.Vote@csiro.au -->
                 <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                <beans:constructor-arg name="name" value="http://joshvote.myopenid.com/"/>
-                <beans:constructor-arg name="credentials" value=""/>
-                <beans:constructor-arg name="grantedAuthorities">
-                    <beans:list>
-                        <beans:value>ROLE_USER</beans:value>
-                        <beans:value>ROLE_ADMINISTRATOR</beans:value>
-                    </beans:list>
-                </beans:constructor-arg>
-            </beans:bean>
+                    <beans:constructor-arg name="name" value="http://joshvote.myopenid.com/" />
+                    <beans:constructor-arg name="credentials" value="" />
+                    <beans:constructor-arg name="grantedAuthorities">
+                        <beans:list>
+                            <beans:value>ROLE_USER</beans:value>
+                            <beans:value>ROLE_ADMINISTRATOR</beans:value>
+                        </beans:list>
+                    </beans:constructor-arg>
+                </beans:bean>
+                <!-- Richard.Goh@csiro.au -->
+                <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
+                    <beans:constructor-arg name="name" value="http://rgoh.myopenid.com/" />
+                    <beans:constructor-arg name="credentials" value="" />
+                    <beans:constructor-arg name="grantedAuthorities">
+                        <beans:list>
+                            <beans:value>ROLE_USER</beans:value>
+                            <beans:value>ROLE_UBC</beans:value>
+                        </beans:list>
+                    </beans:constructor-arg>
+                </beans:bean>
             </beans:list>
         </beans:constructor-arg>
     </beans:bean>

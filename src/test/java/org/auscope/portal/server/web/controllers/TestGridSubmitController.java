@@ -271,9 +271,15 @@ public class TestGridSubmitController {
     @Test
     public void testListImages() throws Exception {
         final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final String[] userRoles = new String[] {"ROLE_USER", "ROLE_UBC"};
+
         context.checking(new Expectations() {{
-            //We allow calls to the Configurer which simply extract values from our property file
-            oneOf(mockImageService).getAllImages();will(returnValue(images));
+            //We should have a call to getSession method of HttpServlet request object to get http user session
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            //We should have a call to get user-roles in http user session
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(userRoles));
+            //We should have a call to getImageByRoles method in VglMachineImageService object
+            oneOf(mockImageService).getImagesByRoles(userRoles);will(returnValue(images));
         }});
 
         ModelAndView mav = controller.getImagesForUser(mockRequest);
@@ -289,9 +295,14 @@ public class TestGridSubmitController {
      */
     @Test
     public void testListImagesError() throws Exception {
+        final String[] userRoles = new String[] {"ROLE_USER", "ROLE_UBC"};
         context.checking(new Expectations() {{
+            //We should have a call to getSession method of HttpServlet request object to get http user session
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            //We should have a call to get user-roles in http user session
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(userRoles));
             //We allow calls to the Configurer which simply extract values from our property file
-            oneOf(mockImageService).getAllImages();will(throwException(new PortalServiceException("error")));
+            oneOf(mockImageService).getImagesByRoles(userRoles);will(throwException(new PortalServiceException("error")));
         }});
 
         ModelAndView mav = controller.getImagesForUser(mockRequest);

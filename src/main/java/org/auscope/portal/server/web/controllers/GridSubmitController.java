@@ -656,11 +656,12 @@ public class GridSubmitController extends BasePortalController {
     @RequestMapping("/getVmImages.do")
     public ModelAndView getImagesForUser(HttpServletRequest request) {
         try {
-            VglMachineImage[] images = vglImageService.getAllImages();
+            String[] userRoles = (String[])request.getSession().getAttribute("user-roles");
+            VglMachineImage[] images = vglImageService.getImagesByRoles(userRoles);
+
             return generateJSONResponseMAV(true, Arrays.asList(images), "");
         } catch (Exception ex) {
-            log.error("Unable to access image list:" + ex.getMessage());
-            log.debug("Exception:", ex);
+            log.error("Unable to access image list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
         }
     }

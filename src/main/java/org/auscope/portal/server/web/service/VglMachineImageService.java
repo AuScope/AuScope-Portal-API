@@ -1,11 +1,13 @@
 package org.auscope.portal.server.web.service;
 
 import java.util.ArrayList;
-
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.vegl.VglMachineImage;
-import org.jclouds.trmk.vcloud_0_8.endpoints.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -39,5 +41,26 @@ public class VglMachineImageService {
      */
     public VglMachineImage[] getAllImages() throws PortalServiceException {
         return allImages;
+    }
+
+    /**
+     * Gets a list of VglMachine images that are accessible by a list of given roles.
+     * @param roles User roles
+     * @return 
+     * @throws PortalServiceException
+     */
+    public VglMachineImage[] getImagesByRoles(String[] roles) throws PortalServiceException {
+        List<VglMachineImage> selectedImages = new ArrayList<VglMachineImage>();
+        final Set<String> userRoles = new HashSet<String>(Arrays.asList(roles));
+
+        for (VglMachineImage vmi : this.allImages) {
+           Set<String> permissions = new HashSet<String>(Arrays.asList(vmi.getPermissions()));
+           permissions.retainAll(userRoles);
+           if (permissions.size() > 0) {
+               selectedImages.add(vmi);
+           }
+        }
+
+        return selectedImages.toArray(new VglMachineImage[selectedImages.size()]);
     }
 }
