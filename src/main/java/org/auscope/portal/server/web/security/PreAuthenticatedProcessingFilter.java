@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.openid.OpenIDAttribute;
 import org.springframework.security.openid.OpenIDAuthenticationToken;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -32,8 +33,8 @@ public class PreAuthenticatedProcessingFilter extends
             OpenIDAuthenticationToken auth = (OpenIDAuthenticationToken)context.getAuthentication();
 
             // get user granted role(s)
-            PortalUser portalUser = (PortalUser) auth.getPrincipal();
-            Object[] gas = portalUser.getAuthorities().toArray();
+            UserDetails userDetails = (UserDetails) auth.getPrincipal();
+            Object[] gas = userDetails.getAuthorities().toArray();
             String[] userRoles = new String[gas.length];
             for (int i=0; i < gas.length; i++) {
                 userRoles[i] = ((GrantedAuthority)gas[i]).getAuthority();
