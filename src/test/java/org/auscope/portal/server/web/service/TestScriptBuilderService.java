@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.ConnectException;
@@ -31,33 +32,6 @@ public class TestScriptBuilderService extends PortalTestClass {
     private FileStagingService mockFileStagingService = context.mock(FileStagingService.class);
     private VEGLJobManager mockJobManager = context.mock(VEGLJobManager.class);
     private VEGLJob mockJob = context.mock(VEGLJob.class);
-    private static String stagingDirectory;
-
-    /**
-     * This sets up a temporary directory in the target directory
-     * to utilise as a staging area
-     */
-    @BeforeClass
-    public static void setup() {
-        stagingDirectory = String.format(
-                "target%1$sTestScriptBuilderService-%2$s%1$s",
-                File.separator, new Date().getTime());
-
-        File dir = new File(stagingDirectory);
-        Assert.assertTrue("Failed setting up staging directory", dir.mkdirs());
-    }
-
-    /**
-     * This tears down the staging area used by the tests
-     */
-    @AfterClass
-    public static void tearDown() {
-        File dir = new File(stagingDirectory);
-        FileIOUtil.deleteFilesRecursive(dir);
-
-        //Ensure cleanup succeeded
-        Assert.assertFalse(dir.exists());
-    }
 
     @Before
     public void init() {
@@ -72,21 +46,20 @@ public class TestScriptBuilderService extends PortalTestClass {
     public void testSaveScript() throws Exception {
         final String script = "#a pretend script\n";
         final Integer jobId = 123;
-        final File tempFile = new File(stagingDirectory + "testSaveScript");
-
+        
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId);
             will(returnValue(mockJob));
 
-            oneOf(mockFileStagingService).createStageInDirectoryFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
-            will(returnValue(tempFile));
+            oneOf(mockFileStagingService).writeFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
+            will(returnValue(bos));
         }});
 
         service.saveScript(jobId.toString(), script);
-        String actual = FileIOUtil.convertStreamtoString(new FileInputStream(tempFile));
+        String actual = new String(bos.toByteArray());
         Assert.assertEquals(script, actual);
-        Assert.assertTrue("Unit test cleanup failed", tempFile.delete());
     }
 
     /**

@@ -2,17 +2,20 @@ package org.auscope.portal.server.web.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.IllegalFormatConversionException;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,16 +70,19 @@ public class ScriptBuilderService {
         }
 
         //Apply text contents to job stage in directory
+        OutputStream scriptFile = null;
         try {
-            File scriptFile = jobFileService.createStageInDirectoryFile(job, SCRIPT_FILE_NAME);
-            PrintWriter writer = new PrintWriter(scriptFile, "utf-8");
+            scriptFile = jobFileService.writeFile(job, SCRIPT_FILE_NAME);
+            PrintWriter writer = new PrintWriter(scriptFile);
             writer.print(scriptText);
             writer.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Couldn't write script file: " + e.getMessage());
             logger.debug("error: ", e);
 
             throw new PortalServiceException(null, "Couldn't write script file for job with id " + jobId, e);
+        } finally {
+        	FileIOUtil.closeQuietly(scriptFile);
         }
     }
 

@@ -1,12 +1,8 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -15,17 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import net.sf.saxon.expr.DifferenceEnumeration;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.cloud.StagingInformation;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.jmock.ReadableServletOutputStream;
-import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.jmock.VEGLJobMatcher;
 import org.auscope.portal.jmock.VEGLSeriesMatcher;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -34,10 +26,8 @@ import org.auscope.portal.server.vegl.VEGLSeries;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.servlet.ModelAndView;
@@ -51,8 +41,7 @@ public class TestJobListController {
     private Mockery context = new Mockery() {{
         setImposteriser(ClassImposteriser.INSTANCE);
     }};
-
-    private static String scratchDir;
+    
     private VEGLJobManager mockJobManager;
     private CloudStorageService mockCloudStorageService;
     private FileStagingService mockFileStagingService;
@@ -76,30 +65,6 @@ public class TestJobListController {
         mockSession = context.mock(HttpSession.class);
 
         controller = new JobListController(mockJobManager, mockCloudStorageService, mockFileStagingService, mockCloudComputeService);
-    }
-
-    /**
-     * This sets up a temporary directory in the target directory for the JobFileService
-     * to utilise as a staging area
-     */
-    @BeforeClass
-    public static void setup() {
-        scratchDir = String.format("target%1$sTestJobListController-%2$s%1$s",File.separator, new Date().getTime());
-
-        File dir = new File(scratchDir);
-        Assert.assertTrue("Failed setting up staging directory", dir.mkdirs());
-    }
-
-    /**
-     * This tears down the staging area used by the tests
-     */
-    @AfterClass
-    public static void tearDown() {
-        File dir = new File(scratchDir);
-        FileIOUtil.deleteFilesRecursive(dir);
-
-        //Ensure cleanup succeeded
-        Assert.assertFalse(dir.exists());
     }
 
 
@@ -310,7 +275,7 @@ public class TestJobListController {
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
 
             oneOf(mockCloudComputeService).terminateJob(mockJob);
-            oneOf(mockJob).setStatus(GridSubmitController.STATUS_CANCELLED);
+            oneOf(mockJob).setStatus(JobBuilderController.STATUS_CANCELLED);
             oneOf(mockJobManager).saveJob(mockJob);
         }});
 
@@ -388,11 +353,11 @@ public class TestJobListController {
             oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
 
             //Each of our jobs is in a different status
-            allowing(mockJobs.get(0)).getStatus();will(returnValue(GridSubmitController.STATUS_DONE));
-            allowing(mockJobs.get(1)).getStatus();will(returnValue(GridSubmitController.STATUS_FAILED));
-            allowing(mockJobs.get(2)).getStatus();will(returnValue(GridSubmitController.STATUS_CANCELLED));
-            allowing(mockJobs.get(3)).getStatus();will(returnValue(GridSubmitController.STATUS_ACTIVE));
-            allowing(mockJobs.get(4)).getStatus();will(returnValue(GridSubmitController.STATUS_UNSUBMITTED));
+            allowing(mockJobs.get(0)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
+            allowing(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_FAILED));
+            allowing(mockJobs.get(2)).getStatus();will(returnValue(JobBuilderController.STATUS_CANCELLED));
+            allowing(mockJobs.get(3)).getStatus();will(returnValue(JobBuilderController.STATUS_ACTIVE));
+            allowing(mockJobs.get(4)).getStatus();will(returnValue(JobBuilderController.STATUS_UNSUBMITTED));
             allowing(mockJobs.get(0)).getId();will(returnValue(new Integer(0)));
             allowing(mockJobs.get(1)).getId();will(returnValue(new Integer(1)));
             allowing(mockJobs.get(2)).getId();will(returnValue(new Integer(2)));
@@ -401,7 +366,7 @@ public class TestJobListController {
 
             //Only the active job will be cancelled
             oneOf(mockCloudComputeService).terminateJob(mockJobs.get(3));
-            oneOf(mockJobs.get(3)).setStatus(GridSubmitController.STATUS_CANCELLED);
+            oneOf(mockJobs.get(3)).setStatus(JobBuilderController.STATUS_CANCELLED);
             oneOf(mockJobManager).saveJob(mockJobs.get(3));
         }});
 
@@ -910,11 +875,11 @@ public class TestJobListController {
             oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
 
             //Different job statuses are treated differently
-            allowing(mockJobs.get(0)).getStatus();will(returnValue(GridSubmitController.STATUS_ACTIVE));
-            allowing(mockJobs.get(1)).getStatus();will(returnValue(GridSubmitController.STATUS_UNSUBMITTED));
-            allowing(mockJobs.get(2)).getStatus();will(returnValue(GridSubmitController.STATUS_DONE));
-            allowing(mockJobs.get(3)).getStatus();will(returnValue(GridSubmitController.STATUS_PENDING));
-            allowing(mockJobs.get(4)).getStatus();will(returnValue(GridSubmitController.STATUS_FAILED));
+            allowing(mockJobs.get(0)).getStatus();will(returnValue(JobBuilderController.STATUS_ACTIVE));
+            allowing(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_UNSUBMITTED));
+            allowing(mockJobs.get(2)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
+            allowing(mockJobs.get(3)).getStatus();will(returnValue(JobBuilderController.STATUS_PENDING));
+            allowing(mockJobs.get(4)).getStatus();will(returnValue(JobBuilderController.STATUS_FAILED));
 
             //Output files for each job
             oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(0)));will(returnValue(jobActiveFiles));
@@ -922,8 +887,8 @@ public class TestJobListController {
             oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(3)));will(returnValue(jobPendingFiles));
 
             //Update our running job to done (due to presence of vegl.sh.log)
-            oneOf(mockJobs.get(0)).setStatus(GridSubmitController.STATUS_DONE);
-            oneOf(mockJobs.get(3)).setStatus(GridSubmitController.STATUS_PENDING);
+            oneOf(mockJobs.get(0)).setStatus(JobBuilderController.STATUS_DONE);
+            oneOf(mockJobs.get(3)).setStatus(JobBuilderController.STATUS_PENDING);
             oneOf(mockJobManager).saveJob(mockJobs.get(0));
         }});
 
@@ -989,13 +954,14 @@ public class TestJobListController {
                 new CloudFileInformation("long/key/file2.txt", data2.length, "http://example.org/file2"),
                 new CloudFileInformation("long/key/file3.txt", 5L, "http://example.org/file3") //this will not be downloaded
         };
-        final File file1 = new File(scratchDir + File.pathSeparator + "file1");
-        final File file2 = new File(scratchDir + File.pathSeparator + "file2");
 
         final String baseKey = "base-key";
         final VEGLJob existingJob = new VEGLJob(jobId);
         existingJob.setUser(userEmail);
-
+        
+        final ByteArrayOutputStream bos1 = new ByteArrayOutputStream();
+        final ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
+        
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
@@ -1004,8 +970,8 @@ public class TestJobListController {
             allowing(mockJobManager).saveJob(with(aNonMatchingVeglJob(jobId)));
 
             oneOf(mockFileStagingService).generateStageInDirectory(with(aNonMatchingVeglJob(jobId)));
-            oneOf(mockFileStagingService).createStageInDirectoryFile(with(aNonMatchingVeglJob(jobId)), with(cloudFiles[0].getName()));will(returnValue(file1));
-            oneOf(mockFileStagingService).createStageInDirectoryFile(with(aNonMatchingVeglJob(jobId)), with(cloudFiles[1].getName()));will(returnValue(file2));
+            oneOf(mockFileStagingService).writeFile(with(aNonMatchingVeglJob(jobId)), with(cloudFiles[0].getName()));will(returnValue(bos1));
+            oneOf(mockFileStagingService).writeFile(with(aNonMatchingVeglJob(jobId)), with(cloudFiles[1].getName()));will(returnValue(bos2));
 
             oneOf(mockCloudStorageService).generateBaseKey(with(aNonMatchingVeglJob(jobId)));will(returnValue(baseKey));
             oneOf(mockCloudStorageService).listJobFiles(with(aVeglJob(jobId)));will(returnValue(cloudFiles));
@@ -1016,17 +982,8 @@ public class TestJobListController {
         ModelAndView mav = controller.duplicateJob(mockRequest, mockResponse, jobId, files);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
 
-        FileInputStream fis1 = new FileInputStream(file1);
-        byte[] fis1Data = new byte[data1.length];
-        fis1.read(fis1Data);
-        Assert.assertEquals(-1, fis1.read()); //should be empty
-        FileIOUtil.closeQuietly(fis1);
-
-        FileInputStream fis2 = new FileInputStream(file2);
-        byte[] fis2Data = new byte[data2.length];
-        fis2.read(fis2Data);
-        Assert.assertEquals(-1, fis2.read()); //should be empty
-        FileIOUtil.closeQuietly(fis2);
+        byte[] fis1Data = bos1.toByteArray();
+        byte[] fis2Data = bos2.toByteArray();
 
         Assert.assertArrayEquals(data1, fis1Data);
         Assert.assertArrayEquals(data2, fis2Data);

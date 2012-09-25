@@ -22,8 +22,6 @@
         <property name="storageSecretKey"/>
         <property name="registeredUrl"/>
         <property name="seriesId"/>
-        <property name="vmSubsetFilePath"/>
-        <property name="vmSubsetUrl"/>
         <property name="storageBaseKey"/>
         <property name="storageProvider"/>
 
@@ -32,6 +30,11 @@
             <map-key column="name" type="string"/>
             <one-to-many class="org.auscope.portal.server.vegl.VglParameter"/>
         </map>
+
+        <bag name="jobDownloads" lazy="false" cascade="all-delete-orphan" inverse="true">
+            <key column="jobId" />
+            <one-to-many class="org.auscope.portal.server.vegl.VglDownload" />
+        </bag>
     </class>
 </hibernate-mapping>
 

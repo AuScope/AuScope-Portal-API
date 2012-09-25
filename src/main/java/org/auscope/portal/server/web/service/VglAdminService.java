@@ -34,7 +34,7 @@ public class VglAdminService extends AdminService {
      * Starts up a virtual machine and tests whether it gets going or not
      * @return
      */
-    public AdminDiagnosticResponse runTestJob() {
+    /*public AdminDiagnosticResponse runTestJob() {
         AdminDiagnosticResponse response = new AdminDiagnosticResponse();
 
         //Our strategy is to start a job to run an echo script
@@ -60,6 +60,5 @@ public class VglAdminService extends AdminService {
         //Wait for it to start
 
         return response;
-
-    }
+    }*/
 }

@@ -1,7 +1,8 @@
 package org.auscope.portal.server.vegl;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.auscope.portal.core.cloud.CloudJob;
@@ -20,11 +21,10 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private String registeredUrl;
     private Integer seriesId;
 
-    private String vmSubsetFilePath;
-    private String vmSubsetUrl;
-
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
+    /** A list of VglDownload objects associated with this job*/
+    private List<VglDownload> jobDownloads = new ArrayList<VglDownload>();
 
     /**
      * Creates an unitialised VEGLJob
@@ -91,39 +91,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
     }
 
     /**
-     * Gets the File path (on the VM) where the job should look for its input subset file
-     * @return
-     */
-    public String getVmSubsetFilePath() {
-        return vmSubsetFilePath;
-    }
-
-    /**
-     * Sets the File path (on the VM) where the job should look for its input subset file
-     * @param vmSubsetFilePath
-     */
-    public void setVmSubsetFilePath(String vmSubsetFilePath) {
-        this.vmSubsetFilePath = vmSubsetFilePath;
-    }
-
-    /**
-     * Gets the actual URL where the VM should request its input subset file
-     * @return
-     */
-    public String getVmSubsetUrl() {
-        return vmSubsetUrl;
-    }
-
-    /**
-     * Sets the actual URL where the VM should request its input subset file
-     * @param vmSubsetUrl
-     */
-    public void setVmSubsetUrl(String vmSubsetUrl) {
-        this.vmSubsetUrl = vmSubsetUrl;
-    }
-
-
-    /**
      * A set of VglJobParameter objects
      * @return
      */
@@ -134,6 +101,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
     /** A set of VglJobParameter objects*/
     public void setJobParameters(Map<String, VglParameter> jobParameters) {
         this.jobParameters = jobParameters;
+        for (VglParameter params : jobParameters.values()) {
+            params.setParent(this);
+        }
     }
 
     /**
@@ -148,7 +118,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
             param = new VglParameter();
         }
 
-        param.setJobId(id);
+        param.setParent(this);
         param.setName(name);
         param.setValue(value);
         param.setType(type.name());
@@ -165,22 +135,70 @@ public class VEGLJob extends CloudJob implements Cloneable {
         return this.jobParameters.get(name);
     }
 
-    /**
-     * Creates a clone of this VEGLJob. Fields with references to immutable objects (Integer, String, Double) will remain
-     * the same, everything else will be given a new reference
-     */
-    public VEGLJob clone() {
-       VEGLJob clone;
-        try {
-            clone = (VEGLJob) super.clone();
-        } catch (CloneNotSupportedException e) {
-            return null;
-        }
-       if (clone.submitDate != null) {
-           clone.submitDate = new Date(this.submitDate.getTime());
-       }
 
-       return clone;
+    /**
+     * A list of VglDownload objects associated with this job
+     * @return
+     */
+    public List<VglDownload> getJobDownloads() {
+        return jobDownloads;
+    }
+
+    /**
+     * A list of VglDownload objects associated with this job
+     * @param jobDownloads
+     */
+    public void setJobDownloads(List<VglDownload> jobDownloads) {
+        this.jobDownloads = jobDownloads;
+        for (VglDownload dl : jobDownloads) {
+            dl.setParent(this);
+        }
+    }
+
+    /**
+     * Similar to clone but ensures compatibility with hibernate. No IDs or references (except for immutable ones)
+     * will be shared by the clone and this object.
+     * @return
+     */
+    public VEGLJob safeClone() {
+        VEGLJob newJob = new VEGLJob(null);
+        newJob.setComputeInstanceId(this.getComputeInstanceId());
+        newJob.setComputeInstanceKey(this.getComputeInstanceKey());
+        newJob.setComputeInstanceType(this.getComputeInstanceType());
+        newJob.setComputeVmId(this.getComputeVmId());
+        newJob.setDescription(this.getDescription());
+        newJob.setEmailAddress(this.getEmailAddress());
+        newJob.setName(this.getName());
+        newJob.setRegisteredUrl(this.getRegisteredUrl());
+        newJob.setSeriesId(this.getSeriesId());
+        newJob.setStatus(this.getStatus()); //change the status
+        newJob.setStorageAccessKey(this.getStorageAccessKey());
+        newJob.setStorageBaseKey(this.getStorageBaseKey());
+        newJob.setStorageBucket(this.getStorageBucket());
+        newJob.setStorageEndpoint(this.getStorageEndpoint());
+        newJob.setStorageProvider(this.getStorageProvider());
+        newJob.setStorageSecretKey(this.getStorageSecretKey());
+        newJob.setStorageProvider(this.getStorageProvider());
+        newJob.setSubmitDate(this.getSubmitDate()); //this job isn't submitted yet
+        newJob.setUser(this.getUser());
+
+        List<VglDownload> newDownloads = new ArrayList<VglDownload>();
+        for (VglDownload dl : this.getJobDownloads()) {
+            VglDownload dlClone = (VglDownload) dl.clone();
+            dlClone.setId(null);
+            newDownloads.add(dlClone);
+        }
+        newJob.setJobDownloads(newDownloads);
+
+        Map<String, VglParameter> newParams = new HashMap<String, VglParameter>();
+        for (String key : this.jobParameters.keySet()) {
+            VglParameter paramClone = (VglParameter)this.jobParameters.get(key).clone();
+            paramClone.setId(null);
+            newParams.put(key, paramClone);
+        }
+        newJob.setJobParameters(newParams);
+
+        return newJob;
     }
 
     @Override

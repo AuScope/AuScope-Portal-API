@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,11 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
+import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
@@ -35,6 +36,7 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 import org.auscope.portal.server.web.service.VglMachineImageService;
@@ -57,7 +59,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Josh Vote
  */
 @Controller
-public class GridSubmitController extends BasePortalController {
+public class JobBuilderController extends BasePortalController {
 
 
     /** Logger for this class */
@@ -70,8 +72,6 @@ public class GridSubmitController extends BasePortalController {
     private CloudComputeService cloudComputeService;
     private VglMachineImageService vglImageService;
 
-    //This is a file path for a CENTOS VM
-    private static final String ERRDAP_SUBSET_VM_FILE_PATH = "/tmp/vegl-subset.csv";
 
     public static final String STATUS_FAILED = "Failed";
     public static final String STATUS_PENDING = "Pending";
@@ -82,9 +82,10 @@ public class GridSubmitController extends BasePortalController {
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
+    public static final String DOWNLOAD_SCRIPT = "vgl-download.sh";
 
     @Autowired
-    public GridSubmitController(VEGLJobManager jobManager, FileStagingService fileStagingService,
+    public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
             PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService cloudStorageService,
             CloudComputeService cloudComputeService, VglMachineImageService imageService) {
         this.jobManager = jobManager;
@@ -143,11 +144,13 @@ public class GridSubmitController extends BasePortalController {
         }
 
         //Create the subset file and dump it in our stage in directory
-        HashMap<String,String> erdapUrlMap = (HashMap) session.getAttribute(ERRDAPController.SESSION_ERRDAP_URL_MAP);
-        if (erdapUrlMap != null) {
-            createSubsetScriptFile(newJob, erdapUrlMap);
+        @SuppressWarnings("unchecked")
+        List<VglDownload> erddapDownloads = (List<VglDownload>) session.getAttribute(ERRDAPController.SESSION_ERRDAP_DOWNLOAD_LIST);
+        session.setAttribute(ERRDAPController.SESSION_ERRDAP_DOWNLOAD_LIST, null); //ensure we clear the list out in case the user makes more jobs
+        if (erddapDownloads != null) {
+            newJob.setJobDownloads(new ArrayList<VglDownload>(erddapDownloads));
         } else {
-            logger.warn("No subset area selected in session!");
+            logger.warn("No downloads configured for user session!");
         }
 
         //Save our job to the database before setting up staging directories (we need an ID!!)
@@ -162,6 +165,17 @@ public class GridSubmitController extends BasePortalController {
         }
     }
 
+    /**
+     * Utility for converting between a StagedFile and FileInformation object
+     * @param file
+     * @return
+     */
+    private FileInformation stagedFileToFileInformation(StagedFile file) {
+    	File internalFile = file.getFile();
+    	long length = internalFile == null ? 0 : internalFile.length();
+        return new FileInformation(file.getName(), length, false, "");
+    }
+    
     /**
      * Returns a JSON object containing an array of filenames and sizes which
      * are currently in the job's stage in directory.
@@ -185,7 +199,7 @@ public class GridSubmitController extends BasePortalController {
         }
 
         //Get our files
-        File[] files = null;
+        StagedFile[] files = null;
         try {
             files = fileStagingService.listStageInDirectoryFiles(job);
         } catch (Exception ex) {
@@ -193,8 +207,8 @@ public class GridSubmitController extends BasePortalController {
             return generateJSONResponseMAV(false, null, "Error reading job stage in directory");
         }
         List<FileInformation> fileInfos = new ArrayList<FileInformation>();
-        for (File file : files) {
-            fileInfos.add(new FileInformation(file));
+        for (StagedFile file : files) {
+            fileInfos.add(stagedFileToFileInformation(file));
         }
 
         return generateJSONResponseMAV(true, fileInfos, "");
@@ -248,14 +262,14 @@ public class GridSubmitController extends BasePortalController {
         }
 
         //Handle incoming file
-        File file = null;
+        StagedFile file = null;
         try {
             file = fileStagingService.handleFileUpload(job, (MultipartHttpServletRequest) request);
         } catch (Exception ex) {
             logger.error("Error uploading file", ex);
             return generateJSONResponseMAV(false, null, "Error uploading file");
         }
-        FileInformation fileInfo = new FileInformation(file);
+        FileInformation fileInfo = stagedFileToFileInformation(file);
 
         //We have to use a HTML response due to ExtJS's use of a hidden iframe for file uploads
         //Failure to do this will result in the upload working BUT the user will also get prompted
@@ -287,6 +301,49 @@ public class GridSubmitController extends BasePortalController {
         for (String fileName : fileNames) {
             boolean success = fileStagingService.deleteStageInFile(job, fileName);
             logger.debug("Deleting " + fileName + " success=" + success);
+        }
+
+        return generateJSONResponseMAV(true, null, "");
+    }
+
+    /**
+     * Deletes one or more job downloads for the current job.
+     *
+     * @param request The servlet request
+     * @param response The servlet response
+     *
+     * @return A JSON object with a success attribute that indicates whether
+     *         the downloads were successfully deleted.
+     */
+    @RequestMapping("/deleteDownloads.do")
+    public ModelAndView deleteDownloads(@RequestParam("jobId") String jobId,
+                                    @RequestParam("downloadId") Integer[] downloadIds) {
+
+        VEGLJob job = null;
+        try {
+            job = jobManager.getJobById(Integer.parseInt(jobId));
+        } catch (Exception ex) {
+            logger.error("Error fetching job with id " + jobId, ex);
+            return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        }
+
+        //Delete the specified ID's
+        Iterator<VglDownload> dlIterator = job.getJobDownloads().iterator();
+        while (dlIterator.hasNext()) {
+            VglDownload dl = dlIterator.next();
+            for (Integer id : downloadIds) {
+                if (id.equals(dl.getId())) {
+                    dlIterator.remove();
+                    break;
+                }
+            }
+        }
+
+        try {
+            jobManager.saveJob(job);
+        } catch (Exception ex) {
+            logger.error("Error saving job with id " + jobId, ex);
+            return generateJSONResponseMAV(false, null, "Error saving job with id " + jobId);
         }
 
         return generateJSONResponseMAV(true, null, "");
@@ -382,9 +439,7 @@ public class GridSubmitController extends BasePortalController {
             @RequestParam(value="storageEndpoint", required=false) String storageEndpoint,
             @RequestParam(value="storageProvider", required=false) String storageProvider,
             @RequestParam(value="storageSecretKey", required=false) String storageSecretKey,
-            @RequestParam(value="registeredUrl", required=false) String registeredUrl,
-            @RequestParam(value="vmSubsetFilePath", required=false) String vmSubsetFilePath,
-            @RequestParam(value="vmSubsetUrl", required=false) String vmSubsetUrl) throws ParseException {
+            @RequestParam(value="registeredUrl", required=false) String registeredUrl) throws ParseException {
 
         //Build our VEGLJob from all of the specified parameters
         VEGLJob job = new VEGLJob(id);
@@ -406,8 +461,6 @@ public class GridSubmitController extends BasePortalController {
         job.setStorageSecretKey(storageSecretKey);
         job.setSubmitDate(submitDate);
         job.setUser(user);
-        job.setVmSubsetFilePath(vmSubsetFilePath);
-        job.setVmSubsetUrl(vmSubsetUrl);
 
         //Save the VEGL job
         try {
@@ -418,6 +471,90 @@ public class GridSubmitController extends BasePortalController {
         }
 
         return generateJSONResponseMAV(true, null, "");
+    }
+
+    /**
+     * Given a job with specified ID and a list of download objects,
+     * save the download objects to the database.
+     *
+     * The download objects are defined piecewise as an array of name/description/url and localPath values.
+     *
+     * The Nth download object will be defined as a combination of
+     * names[N], descriptions[N], urls[N] and localPaths[N]
+     *
+     * @param append If true, the parsed downloaded will append themselves to the existing job. If false, they will replace all downloads for the existing job
+     * @return
+     * @throws ParseException
+     */
+    @RequestMapping("/updateJobDownloads.do")
+    public ModelAndView updateJobDownloads(@RequestParam("id") Integer id,  //The integer ID is the only required value
+            @RequestParam(required=false, value="append", defaultValue="false") String appendString,
+            @RequestParam("name") String[] names,
+            @RequestParam("description") String[] descriptions,
+            @RequestParam("url") String[] urls,
+            @RequestParam("localPath") String[] localPaths) throws ParseException {
+
+        boolean append = Boolean.parseBoolean(appendString);
+
+        List<VglDownload> parsedDownloads = new ArrayList<VglDownload>();
+        for (int i = 0; i < urls.length && i < names.length && i < descriptions.length && i < localPaths.length; i++) {
+            VglDownload newDl = new VglDownload();
+            newDl.setName(names[i]);
+            newDl.setDescription(descriptions[i]);
+            newDl.setUrl(urls[i]);
+            newDl.setLocalPath(localPaths[i]);
+            parsedDownloads.add(newDl);
+        }
+
+        //Lookup the job
+        VEGLJob job;
+        try {
+            job = jobManager.getJobById(id);
+        } catch (Exception ex) {
+            logger.error("Error looking up job with id " + id + " :" + ex.getMessage());
+            logger.debug("Exception:", ex);
+            return generateJSONResponseMAV(false, null, "Unable to access job");
+        }
+
+        List<VglDownload> existingDownloads = job.getJobDownloads();
+        if (append) {
+            existingDownloads.addAll(parsedDownloads);
+            job.setJobDownloads(existingDownloads);
+        } else {
+            job.setJobDownloads(parsedDownloads);
+        }
+
+        //Save the VEGL job
+        try {
+            jobManager.saveJob(job);
+        } catch (Exception ex) {
+            logger.error("Error updating job downloads" + job, ex);
+            return generateJSONResponseMAV(false, null, "Error saving job");
+        }
+
+        return generateJSONResponseMAV(true, null, "");
+    }
+
+    /**
+     * Given the ID of a job - lookup the appropriate job object and associated list of downloads objects.
+     *
+     * Return them as an array of JSON serialised VglDownload objects.
+     * @param jobId
+     * @return
+     */
+    @RequestMapping("/getJobDownloads.do")
+    public ModelAndView getJobDownloads(@RequestParam("jobId") Integer jobId) {
+        //Lookup the job
+        VEGLJob job;
+        try {
+            job = jobManager.getJobById(jobId);
+        } catch (Exception ex) {
+            logger.error("Error looking up job with id " + jobId + " :" + ex.getMessage());
+            logger.debug("Exception:", ex);
+            return generateJSONResponseMAV(false, null, "Unable to access job");
+        }
+
+        return generateJSONResponseMAV(true, job.getJobDownloads(), "");
     }
 
     /**
@@ -481,17 +618,29 @@ public class GridSubmitController extends BasePortalController {
                     "Please try again in a few minutes or report it to cg-admin@csiro.au.");
         }
 
+        //Right before we submit - pump out a script file for downloading every VglDownload object when the VM starts
+        if (!createDownloadScriptFile(job, DOWNLOAD_SCRIPT)) {
+            logger.error(String.format("Error creating download script '%1$s' for job with id %2$s", DOWNLOAD_SCRIPT, jobId));
+            return generateJSONResponseMAV(false, null, "There was a problem configuring the data download script.",
+                    "Please try again in a few minutes or report it to cg-admin@csiro.au.");
+        }
+
         // copy files to S3 storage for processing
         try {
             // get job files from local directory
-            File[] files = fileStagingService.listStageInDirectoryFiles(job);
-            if (files.length == 0) {
+            StagedFile[] stagedFiles = fileStagingService.listStageInDirectoryFiles(job);
+            if (stagedFiles.length == 0) {
                 job.setStatus(STATUS_FAILED);
                 jobManager.saveJob(job);
                 return generateJSONResponseMAV(false, null, "There was a problem submitting your job for processing.",
                         "Please upload your input files and try again.");
             }
+            
             //Upload them to storage
+            File[] files = new File[stagedFiles.length];
+            for (int i = 0; i < stagedFiles.length; i++) {
+            	files[i] = stagedFiles[i].getFile();
+            }
             cloudStorageService.uploadJobFiles(job, files);
         } catch (PortalServiceException e) {
             logger.error("Files upload failed.", e);
@@ -592,7 +741,6 @@ public class GridSubmitController extends BasePortalController {
         job.setUser((String) session.getAttribute("openID-Email"));
         job.setEmailAddress((String) session.getAttribute("openID-Email"));
 
-        job.setVmSubsetFilePath(ERRDAP_SUBSET_VM_FILE_PATH);
         job.setComputeInstanceType("m1.large");
         job.setComputeInstanceKey("vgl-developers");
         job.setStorageProvider(hostConfigurer.resolvePlaceholder("storage.provider"));
@@ -609,43 +757,36 @@ public class GridSubmitController extends BasePortalController {
     }
 
     /**
-     * Creates a new subset_request.sh script file that will get the subset files for the area selected
-     * on the map and save them to the input directory on the Eucalyptus instance. This script will
-     * be executed on launch of the instance prior to the vegl processing script.
+     * This function creates a file "vgl_download.sh" which contains the bash script
+     * for downloading every VglDownload associated with the specified job.
      *
-     * @param request The HTTPServlet request
+     * The script file will be written to the staging area for job as
+     * @param job The job to generate
+     * @param fileName the file name of the generated script
+     * @return
      */
-    private boolean createSubsetScriptFile(VEGLJob job, HashMap<String,String> erddapUrlMap) {
-        // create new subset request script file
-        File subsetRequestScript = fileStagingService.createStageInDirectoryFile(job, "subset_request.sh");
+    private boolean createDownloadScriptFile(VEGLJob job, String fileName) {
+        
 
-        // iterate through the map of subset request URL's
-        Set<Entry<String, String>> entrySet = erddapUrlMap.entrySet();
-        Iterator<Entry<String,String>> i = entrySet.iterator();
-
-        FileWriter out = null;
+    	OutputStream os = null;
         try {
-            out = new FileWriter(subsetRequestScript);
+        	os = fileStagingService.writeFile(job,  fileName);
+        	OutputStreamWriter out = new OutputStreamWriter(os);
 
-            while (i.hasNext()) {
-
-                // get the ERDDAP subset request url and layer name
-                String url = i.next().getValue();
-
-                // add the command for making the subset request
-                out.write(String.format("curl -L '%1$s' > \"%2$s\"\n", url, ERRDAP_SUBSET_VM_FILE_PATH));
-
-                job.setVmSubsetUrl(url);
+            for (VglDownload dl : job.getJobDownloads()) {
+                out.write(String.format("#Downloading %1$s\n", dl.getName()));
+                out.write(String.format("curl -L '%1$s' > \"%2$s\"\n", dl.getUrl(), dl.getLocalPath()));
             }
-        } catch (IOException e) {
+
+            return true;
+        } catch (Exception e) {
             // TODO Auto-generated catch block
-            logger.error("Error creating subset request script", e);
+            logger.error("Error creating download script" +  e.getMessage());
+            logger.debug("Error:", e);
             return false;
         } finally {
-            FileIOUtil.closeQuietly(out);
+            FileIOUtil.closeQuietly(os);
         }
-
-        return true;
     }
 
     /**

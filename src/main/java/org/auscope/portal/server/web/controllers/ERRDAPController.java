@@ -3,7 +3,9 @@ package org.auscope.portal.server.web.controllers;
 import java.awt.geom.Rectangle2D;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
+import org.auscope.portal.server.vegl.VglDownload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +38,7 @@ import com.jhlabs.map.proj.ProjectionFactory;
 @Controller
 public class ERRDAPController extends BasePortalController {
 
-    public static final String SESSION_ERRDAP_URL_MAP = "errdapUrlMap";
+    public static final String SESSION_ERRDAP_DOWNLOAD_LIST = "errdapDownloadList";
 
     public static final String SESSION_SELECTION_MIN_EASTING = "job-selection-mineast";
     public static final String SESSION_SELECTION_MAX_EASTING = "job-selection-maxeast";
@@ -52,6 +55,9 @@ public class ERRDAPController extends BasePortalController {
     public static final String SESSION_CELL_X = "job-cellx";
     public static final String SESSION_CELL_Y = "job-celly";
     public static final String SESSION_CELL_Z = "job-cellz";
+
+    //This is a file path for a CENTOS VM
+    public static final String ERRDAP_SUBSET_VM_FILE_PATH = "/tmp/vegl-subset.csv";
 
 
     protected final Log logger = LogFactory.getLog(getClass());
@@ -283,16 +289,25 @@ public class ERRDAPController extends BasePortalController {
         String oldErddapUrl = getCoverageSubsetUrl(dataCoords, serviceUrl, layerName, format);
         String erddapUrl = getCoverageSubsetUrl(newDataCoords, serviceUrl, layerName, format);
 
-        // add erddap url to the map or create a new one if it doesn't exist
-        HashMap<String, String> erddapUrlMap = new HashMap<String,String>();;
-        erddapUrlMap.put(layerName+"."+format, erddapUrl);
+        // Append this download list to the existing list of download objects
+        List<VglDownload> erddapUrlList = (List<VglDownload>) request.getSession().getAttribute(SESSION_ERRDAP_DOWNLOAD_LIST);
+        if (erddapUrlList == null) {
+            erddapUrlList = new ArrayList<VglDownload>();
+        }
+        VglDownload newDownload = new VglDownload();
+        newDownload.setName("ERDDAP padded subset request");
+        newDownload.setDescription("This is a request for a coverage in a spatial region. The spatial region has been padded according to the cell size chosen.");
+        newDownload.setLocalPath(ERRDAP_SUBSET_VM_FILE_PATH);
+        newDownload.setUrl(erddapUrl);
+        erddapUrlList.add(newDownload);
+
         logger.debug("oldErddapUrl: " + oldErddapUrl);
         logger.debug("erddapUrl: " + erddapUrl);
 
         //Write out our selection details to the user session for use later
         //(used if the user decides to proceed with job submission)
         CSWGeographicBoundingBox originalSelection = createBoundingBox(dataCoords);
-        request.getSession().setAttribute(SESSION_ERRDAP_URL_MAP, erddapUrlMap);
+        request.getSession().setAttribute(SESSION_ERRDAP_DOWNLOAD_LIST, erddapUrlList);
 
         request.getSession().setAttribute(SESSION_SELECTION_MIN_EASTING, originalSelection.getWestBoundLongitude());
         request.getSession().setAttribute(SESSION_SELECTION_MAX_EASTING, originalSelection.getEastBoundLongitude());

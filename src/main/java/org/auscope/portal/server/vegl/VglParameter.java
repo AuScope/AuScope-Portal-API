@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @author Josh Vote
  *
  */
-public class VglParameter implements Serializable {
+public class VglParameter implements Serializable, Cloneable {
 
     private static final long serialVersionUID = -7474027234400180238L;
 
@@ -28,40 +28,47 @@ public class VglParameter implements Serializable {
 
     /** The primary key for this parameter*/
     private Integer id;
-    /** The id of the job that owns this parameter*/
-    private Integer jobId;
     /** The name of this parameter*/
     private String name;
     /** The value (as a string) of this parameter*/
     private String value;
     /** The 'type' of this parameter. Can be 'number' or 'string'*/
     private String type;
+    /** The job that owns this parameter*/
+    private VEGLJob parent;
 
 
     /**
      * Default constructor
      */
     public VglParameter() {
-        this(null, null, null);
+        this(null, null);
     }
 
     /**
      * Default constructor
      */
-    public VglParameter(Integer id, Integer jobId, String name) {
-        this(id, jobId, name, null, null);
+    public VglParameter(Integer id, String name) {
+        this(id, name, null, null);
     }
 
     /**
      * Construct a fully populated instance
      */
-    public VglParameter(Integer id, Integer jobId, String name, String value, String type) {
+    public VglParameter(Integer id, String name, String value, String type) {
+        this(id, name, value, type, null);
+    }
+
+    /**
+     * Construct a fully populated instance
+     */
+    public VglParameter(Integer id, String name, String value, String type, VEGLJob parent) {
         super();
         this.id = id;
-        this.jobId = jobId;
         this.name = name;
         this.type = type;
         this.value = value;
+        this.parent = parent;
     }
 
     /**
@@ -78,22 +85,6 @@ public class VglParameter implements Serializable {
      */
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    /**
-     * The id of the job that owns this parameter
-     * @return
-     */
-    public Integer getJobId() {
-        return jobId;
-    }
-
-    /**
-     * The id of the job that owns this parameter
-     * @param jobId
-     */
-    public void setJobId(Integer jobId) {
-        this.jobId = jobId;
     }
 
     /**
@@ -145,12 +136,28 @@ public class VglParameter implements Serializable {
     }
 
     /**
+     * The job that owns this parameter
+     * @return
+     */
+    public VEGLJob getParent() {
+        return parent;
+    }
+
+    /**
+     * The job that owns this parameter
+     * @param parent
+     */
+    public void setParent(VEGLJob parent) {
+        this.parent = parent;
+    }
+
+    /**
      * Tests two VglJobParameter objects for equality based on job id and name
      */
     @Override
     public boolean equals(Object o) {
         if (o instanceof VglParameter) {
-            return this.jobId.equals(((VglParameter) o).jobId) && this.name.equals(((VglParameter) o).name);
+            return this.parent.getId().equals(((VglParameter) o).parent.getId()) && this.name.equals(((VglParameter) o).name);
         }
 
         return false;
@@ -161,6 +168,14 @@ public class VglParameter implements Serializable {
      */
     @Override
     public int hashCode() {
-        return name.hashCode() ^ jobId.hashCode();
+        return name.hashCode() ^ parent.getId().hashCode();
+    }
+
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
     }
 }

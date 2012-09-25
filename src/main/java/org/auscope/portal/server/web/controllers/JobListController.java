@@ -11,9 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -32,6 +35,8 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.vegl.VglDownload;
+import org.auscope.portal.server.vegl.VglParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -278,7 +283,7 @@ public class JobListController extends BasePortalController  {
      */
     private void terminateInstance(VEGLJob job) {
         cloudComputeService.terminateJob(job);
-        job.setStatus(GridSubmitController.STATUS_CANCELLED);
+        job.setStatus(JobBuilderController.STATUS_CANCELLED);
         jobManager.saveJob(job);
     }
 
@@ -310,7 +315,7 @@ public class JobListController extends BasePortalController  {
         //Iterate our jobs, terminating as we go (abort iteration on failure)
         for (VEGLJob job : jobs) {
             String oldStatus = job.getStatus();
-            if (!oldStatus.equals(GridSubmitController.STATUS_ACTIVE)) {
+            if (!oldStatus.equals(JobBuilderController.STATUS_ACTIVE)) {
                 logger.debug("Skipping finished job "+job.getId());
                 continue;
             }
@@ -588,7 +593,7 @@ public class JobListController extends BasePortalController  {
         }
 
         //Don't lookup files for jobs that haven't been submitted or failed
-        if (status.equals(GridSubmitController.STATUS_UNSUBMITTED) || status.equals(GridSubmitController.STATUS_FAILED)) {
+        if (status.equals(JobBuilderController.STATUS_UNSUBMITTED) || status.equals(JobBuilderController.STATUS_FAILED)) {
             return;
         }
 
@@ -605,9 +610,9 @@ public class JobListController extends BasePortalController  {
 
         String newStatus = status;
         if (jobFinished) {
-            newStatus = GridSubmitController.STATUS_DONE;
+            newStatus = JobBuilderController.STATUS_DONE;
         } else if (jobStarted) {
-            newStatus = GridSubmitController.STATUS_ACTIVE;
+            newStatus = JobBuilderController.STATUS_ACTIVE;
         }
 
         if (!newStatus.equals(status)) {
@@ -686,10 +691,9 @@ public class JobListController extends BasePortalController  {
         }
 
         //Create a cloned job but make it 'unsubmitted'
-        VEGLJob newJob = oldJob.clone();
-        newJob.setId(null);
-        newJob.setStatus(GridSubmitController.STATUS_UNSUBMITTED);
+        VEGLJob newJob = oldJob.safeClone();
         newJob.setSubmitDate((Date)null);
+        newJob.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
         newJob.setRegisteredUrl(null);
 
         //Attempt to save the new job to the DB
@@ -714,10 +718,9 @@ public class JobListController extends BasePortalController  {
             for (CloudFileInformation cloudFile : cloudFiles) {
                 if (cloudFileIncluded(files, cloudFile)) {
                     InputStream is = cloudStorageService.getJobFile(oldJob, cloudFile.getName());
-                    FileOutputStream os = null;
+                    OutputStream os = null;
                     try {
-                        File stagingFile = fileStagingService.createStageInDirectoryFile(newJob, cloudFile.getName());
-                        os = new FileOutputStream(stagingFile);
+                        os = fileStagingService.writeFile(newJob, cloudFile.getName());
 
                         writeInputToOutputStream(is, os, 1024 * 1024, false);
                     } finally {

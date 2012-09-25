@@ -27,6 +27,7 @@ import org.auscope.portal.core.services.responses.csw.CSWResponsibleParty;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.vegl.VglDownload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,10 +77,17 @@ public class GeonetworkController extends BasePortalController {
             }
         }
 
-        //Add our source WCS to the online resources tab
-        String dataUrl = job.getVmSubsetUrl();
-        if (dataUrl != null && !dataUrl.isEmpty()) {
-            onlineResources.add(new CSWOnlineResourceImpl(new URL(dataUrl), "WWW:LINK-1.0-http--link", "ERDAP Subset Data", "ERDAP Subset Data"));
+        //Add our remote service downloads to the online resources tab
+        for (VglDownload dl : job.getJobDownloads()) {
+            URL url = null;
+            try {
+                url = new URL(dl.getUrl());
+            } catch (Exception ex) {
+                log.warn(String.format("Unable to parse URL '%1$s' for job '%2$s'. It will be skipped", dl.getUrl(), job.getId()));
+                continue;
+            }
+
+            onlineResources.add(new CSWOnlineResourceImpl(url, "WWW:LINK-1.0-http--link", dl.getName(), dl.getDescription()));
         }
 
         //Generate our contact details

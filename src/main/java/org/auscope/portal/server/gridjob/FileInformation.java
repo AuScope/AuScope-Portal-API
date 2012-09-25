@@ -34,7 +34,16 @@ public class FileInformation implements Serializable {
     	this.parentPath = file.getParent();
     }
     
-    /**
+    public FileInformation(String name, long size, boolean directoryFlag,
+			String parentPath) {
+		super();
+		this.name = name;
+		this.size = size;
+		this.directoryFlag = directoryFlag;
+		this.parentPath = parentPath;
+	}
+
+	/**
      * Returns the filename.
      *
      * @return The filename.

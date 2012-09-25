@@ -1,4 +1,4 @@
-CREATE DATABASE  IF NOT EXISTS `veglportal` /*!40100 DEFAULT CHARACTER SET latin1 */;
+CREATE DATABASE  IF NOT EXISTS `veglportaltest` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `veglportal`;
 -- MySQL dump 10.13  Distrib 5.1.40, for Win32 (ia32)
 --
@@ -18,20 +18,20 @@ USE `veglportal`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `parameters`
+-- Table structure for table `downloads`
 --
 
-DROP TABLE IF EXISTS `parameters`;
+DROP TABLE IF EXISTS `downloads`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `parameters` (
+CREATE TABLE `downloads` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `jobId` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `value` varchar(4096) DEFAULT NULL,
-  `type` varchar(45) NOT NULL,
+  `url` varchar(4096) NOT NULL,
+  `localPath` varchar(1024) NOT NULL,
+  `name` varchar(128) DEFAULT NULL,
+  `description` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `jobId` (`jobId`),
-  KEY `jobIdName` (`jobId`,`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+  KEY `jobId` (`jobId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;

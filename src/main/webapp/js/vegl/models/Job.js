@@ -43,9 +43,6 @@ Ext.define('vegl.models.Job', {
 
         { name: 'registeredUrl', type: 'string'},
         { name: 'seriesId', type: 'int'},
-        { name: 'vmSubsetFilePath', type: 'string'},
-        { name: 'vmSubsetUrl', type: 'string'},
-
         { name: 'jobParameters', type: 'auto', convert: function(value, record) { //an array of vegl.models.Parameter objects
             if (!value) {
                 return [];
@@ -53,6 +50,21 @@ Ext.define('vegl.models.Job', {
                 var paramList = [];
                 for (var key in value) {
                     paramList.push(Ext.create('vegl.models.Parameter', value[key]));
+                }
+                return paramList;
+            }
+        }},
+        { name: 'jobDownloads', type: 'auto', convert: function(value, record) { //an array of vegl.models.Download objects
+            if (!value) {
+                return [];
+            } else {
+                var paramList = [];
+                for (var i = 0; i < value.length; i++) {
+                    if (value[i] instanceof vegl.models.Download) {
+                        paramList.push(value[i]);
+                    } else {
+                        paramList.push(Ext.create('vegl.models.Download', value[i]));
+                    }
                 }
                 return paramList;
             }

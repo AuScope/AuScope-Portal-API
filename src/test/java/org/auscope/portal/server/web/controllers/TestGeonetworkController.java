@@ -1,6 +1,8 @@
 package org.auscope.portal.server.web.controllers;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +16,7 @@ import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglParameter;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -68,10 +71,15 @@ public class TestGeonetworkController {
                 new CloudFileInformation("my/key2", 200L, "http://public.url2"),
                 new CloudFileInformation("my/key3", 300L, "http://public.url3")
         };
-        final VglParameter minEasting = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MIN_EASTING, "2.0", "number");
-        final VglParameter maxEasting = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MAX_EASTING, "1.0", "number");
-        final VglParameter maxNorthing = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MAX_NORTHING, "3.0", "number");
-        final VglParameter minNorthing = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MIN_NORTHING, "4.0", "number");
+        final VglDownload download = new VglDownload(5341);
+        final VglParameter minEasting = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MIN_EASTING, "2.0", "number", new VEGLJob(jobId));
+        final VglParameter maxEasting = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MAX_EASTING, "1.0", "number", new VEGLJob(jobId));
+        final VglParameter maxNorthing = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MAX_NORTHING, "3.0", "number", new VEGLJob(jobId));
+        final VglParameter minNorthing = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MIN_NORTHING, "4.0", "number", new VEGLJob(jobId));
+
+        download.setDescription("desc");
+        download.setName("name");
+        download.setUrl("http://example.org/5432");
 
         //We want to ensure our job is set values BEFORE saving it
         final Sequence jobSavingSequence = context.sequence("jobSavingSequence");
@@ -89,7 +97,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
-            allowing(mockJob).getVmSubsetUrl();will(returnValue(null));
+            allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
 
             //Our series configuration
             allowing(mockSeries).getName();will(returnValue("seriesName"));
@@ -212,11 +220,15 @@ public class TestGeonetworkController {
                 new CloudFileInformation("my/key2", 200L, "http://public.url2"),
                 new CloudFileInformation("my/key3", 300L, "http://public.url3")
         };
-        final VglParameter minEasting = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MIN_EASTING, "2.0", "number");
-        final VglParameter maxEasting = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MAX_EASTING, "1.0", "number");
-        final VglParameter maxNorthing = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MAX_NORTHING, "3.0", "number");
-        final VglParameter minNorthing = new VglParameter(1, jobId, ERRDAPController.SESSION_SELECTION_MIN_NORTHING, "4.0", "number");
+        final VglParameter minEasting = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MIN_EASTING, "2.0", "number", new VEGLJob(jobId));
+        final VglParameter maxEasting = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MAX_EASTING, "1.0", "number", new VEGLJob(jobId));
+        final VglParameter maxNorthing = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MAX_NORTHING, "3.0", "number", new VEGLJob(jobId));
+        final VglParameter minNorthing = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MIN_NORTHING, "4.0", "number", new VEGLJob(jobId));
+        final VglDownload download = new VglDownload(5341);
 
+        download.setDescription("desc");
+        download.setName("name");
+        download.setUrl("http://example.org/5432");
         context.checking(new Expectations() {{
             //Our mock job configuration
             allowing(mockJob).getJobParameter(minEasting.getName());will(returnValue(minEasting));
@@ -230,7 +242,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
-            allowing(mockJob).getVmSubsetUrl();will(returnValue(null));
+            allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
 
             //Our series configuration
             allowing(mockSeries).getName();will(returnValue("seriesName"));

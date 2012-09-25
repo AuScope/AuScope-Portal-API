@@ -7,7 +7,7 @@
  */
 Ext.define('vegl.widgets.JobFilesPanel', {
     extend : 'Ext.grid.Panel',
-    alias : 'widgets.jobfilespanel',
+    alias : 'widget.jobfilespanel',
 
     currentJob : null,
     downloadAction : null,

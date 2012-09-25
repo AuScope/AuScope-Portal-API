@@ -12,39 +12,23 @@ public class TestVglJobParameter extends PortalTestClass {
      */
     @Test
     public void testEqualsMatchesHashcode() throws Exception {
-        VglParameter p1 = new VglParameter(1, 42, "name1");
-        VglParameter p2 = new VglParameter(2, 42, "name1");
-        VglParameter p3 = new VglParameter(3, 43, "name1");
-        VglParameter p4 = new VglParameter(4, 42, "name2");
-        VglParameter p5 = new VglParameter(5, 123, "name3");
-
-        p1.setType("number");
-        p2.setType("string");
-        p3.setType("number");
-        p4.setType("string");
-        p5.setType("number");
-
-        p1.setValue("v1");
-        p2.setValue("v2");
-        p3.setValue("v3");
-        p4.setValue("v4");
-        p5.setValue("v5");
+        VglParameter p1 = new VglParameter(1, "name1", "v1", "number", new VEGLJob(1));
+        VglParameter p2 = new VglParameter(2, "name1", "v2", "string", new VEGLJob(1));
+        VglParameter p3 = new VglParameter(3, "name1", "v3", "number", new VEGLJob(2));
+        VglParameter p4 = new VglParameter(4, "name2", "v4", "string", new VEGLJob(1));;
+        VglParameter p5 = new VglParameter(5, "name3", "v5", "number", new VEGLJob(3));;
 
         //Test general equality
-        Assert.assertTrue(p1.equals(p1));
-        Assert.assertTrue(p1.equals(p2));
-        Assert.assertFalse(p1.equals(p3));
-        Assert.assertFalse(p1.equals(p4));
-        Assert.assertFalse(p1.equals(p5));
-        Assert.assertFalse(p2.equals(p3));
-        Assert.assertFalse(p2.equals(p4));
-        Assert.assertFalse(p2.equals(p5));
-        Assert.assertFalse(p3.equals(p4));
-        Assert.assertFalse(p3.equals(p5));
-        Assert.assertFalse(p4.equals(p5));
-
-        //Test hashcode equality
-        Assert.assertEquals(p1.hashCode(), p1.hashCode());
-        Assert.assertEquals(p1.hashCode(), p2.hashCode());
+        Assert.assertTrue(equalsWithHashcode(p1, p1));
+        Assert.assertTrue(equalsWithHashcode(p1, p2));
+        Assert.assertFalse(equalsWithHashcode(p1, p3));
+        Assert.assertFalse(equalsWithHashcode(p1, p4));
+        Assert.assertFalse(equalsWithHashcode(p1, p5));
+        Assert.assertFalse(equalsWithHashcode(p2, p3));
+        Assert.assertFalse(equalsWithHashcode(p2, p4));
+        Assert.assertFalse(equalsWithHashcode(p2, p5));
+        Assert.assertFalse(equalsWithHashcode(p3, p4));
+        Assert.assertFalse(equalsWithHashcode(p3, p5));
+        Assert.assertFalse(equalsWithHashcode(p4, p5));
     }
 }
