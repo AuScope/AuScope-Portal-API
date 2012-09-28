@@ -19,6 +19,9 @@ echo "VEGL Workflow Script... starting"
 echo "All future console output will be redirected to ${VEGL_LOG_FILE}"
 exec &> "$VEGL_LOG_FILE"
 
+echo "Loading system wide profile:"
+source /etc/profile
+
 # Print environment variables (don't print any credentials here)
 echo "------ VEGL Workflow Script ----------"
 echo "                                      "
