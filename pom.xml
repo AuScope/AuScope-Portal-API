@@ -273,11 +273,5 @@
             <version>4.1</version>
             <optional>false</optional>
         </dependency>
-        <!-- Added for Amazon cloud -->
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
-            <version>1.2.2</version>
-        </dependency>
     </dependencies>
 </project>
