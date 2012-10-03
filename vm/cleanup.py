@@ -3,7 +3,7 @@ CSIRO quick evil cleanup script
 
 Designed to delete instances from a endpoint we 'think' are shutdown.
 
-Tuned to work on NCI Diablo release, tested for the VEGL resevation owner @ 31st July 2012
+Tuned to work on NCI Essex release, tested for the VGL resevation owner @ 31st July 2012
 
 Authors: Josh Vote, Terry Rankine
 '''
@@ -21,9 +21,9 @@ logger = logging.getLogger(__name__)
 
 
 openstack = {
-    "owner":"vegl",
-    "aws_access_key_id":"83ea19e7-e6cc-4529-8b97-2b4668f476e5:vegl",
-    "aws_secret_access_key":"CHANGEME!",
+    "owner":"a92448ea8ad34b0691b5669f50485f48",
+    "aws_access_key_id":"SPECIFY_ACCESS_KEY",
+    "aws_secret_access_key":"SPECIFY_SECRET_KEY",
     }
 
 
@@ -35,7 +35,7 @@ def setup():
                         region=region,
                         port=8773,
                         path="/services/Cloud")
-    return connection    
+    return connection
 
 def killthemall(connection):
     reservations = connection.get_all_instances()
@@ -44,7 +44,7 @@ def killthemall(connection):
     for reservation in reservations:
         if reservation.owner_id == openstack["owner"]:
             for instance in reservation.instances:
-                if instance.state_code == 0:
+                if instance.state == unicode('shutoff'):
                     logger.debug("%s\n%s\n\n\n\n" % (instance.id, instance.get_console_output().output))
                     if "Power down." in instance.get_console_output().output \
                             and \
