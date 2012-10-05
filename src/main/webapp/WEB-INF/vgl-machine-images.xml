@@ -27,7 +27,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-00000011"/>
+                    <constructor-arg name="imageId" value="ami-00000022"/>
                     <property name="name" value="eScript"/>
                     <property name="description"><value>A Centos 6 machine with eScript already installed.</value></property>
                     <property name="keywords">

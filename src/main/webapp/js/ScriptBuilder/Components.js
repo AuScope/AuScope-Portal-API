@@ -26,6 +26,12 @@ ScriptBuilder.Components = {
     },{
         text : "eScript Examples",
         type : "category",
-        children : []
+        children : [{
+            id   : "ScriptBuilder.templates.EScriptGravityTemplate",
+            type : "s",
+            text : "Gravity Inversion",
+            qtip : "Perform a gravity inversion using eScript. Expects data in the form of a NetCDF file.",
+            leaf : true
+        }]
     }]
 };
