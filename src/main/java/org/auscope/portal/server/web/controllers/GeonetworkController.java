@@ -78,7 +78,8 @@ public class GeonetworkController extends BasePortalController {
         }
 
         //Add our remote service downloads to the online resources tab
-        for (VglDownload dl : job.getJobDownloads()) {
+        List<VglDownload> jobDownloads = job.getJobDownloads();
+        for (VglDownload dl : jobDownloads) {
             URL url = null;
             try {
                 url = new URL(dl.getUrl());
@@ -107,18 +108,22 @@ public class GeonetworkController extends BasePortalController {
         rp.setOrganisationName("Geoscience Australia");
         rp.setPositionName("Web Operations Manager");
 
-        //Build our bounding box
-        double selectionMinEasting = Double.parseDouble(job.getJobParameter(ERRDAPController.SESSION_SELECTION_MIN_EASTING).getValue());
-        double selectionMaxEasting = Double.parseDouble(job.getJobParameter(ERRDAPController.SESSION_SELECTION_MAX_EASTING).getValue());
-        double selectionMinNorthing = Double.parseDouble(job.getJobParameter(ERRDAPController.SESSION_SELECTION_MIN_NORTHING).getValue());
-        double selectionMaxNorthing = Double.parseDouble(job.getJobParameter(ERRDAPController.SESSION_SELECTION_MAX_NORTHING).getValue());
+        //Build our bounding boxes
+        List<CSWGeographicElement> geoEls = new ArrayList<CSWGeographicElement>();;
+        for (VglDownload dl : jobDownloads) {
 
-        CSWGeographicElement[] geoEls = new CSWGeographicElement[] {new CSWGeographicBoundingBox(selectionMinEasting, selectionMaxEasting, selectionMinNorthing, selectionMaxNorthing)};
+            if ( dl.getEastBoundLongitude()!= null &&
+                    dl.getWestBoundLongitude() != null &&
+                    dl.getNorthBoundLatitude() != null &&
+                    dl.getSouthBoundLatitude() != null) {
+                geoEls.add(new CSWGeographicBoundingBox(dl.getWestBoundLongitude(),  dl.getEastBoundLongitude(), dl.getSouthBoundLatitude(), dl.getNorthBoundLatitude()));
+            }
+        }
 
         //Build our CSW Record
         CSWRecord rec = new CSWRecord(null);
         rec.setContact(rp);
-        rec.setCSWGeographicElements(geoEls);
+        rec.setCSWGeographicElements(geoEls.toArray(new CSWGeographicElement[geoEls.size()]));
         rec.setConstraints(new String[] {
                 "Copyright Commonwealth of Australia. This work is copyright. Unless otherwise specified on this website, you may display, print and reproduce this material in unaltered form only (retaining this notice) for your personal, non-commercial use, use within your organisation or, if you are an educational institution, use for educational purposes. Apart from any use as permitted under the Copyright Act 1968 or as otherwise specified on this website, all other rights are reserved. Requests and enquiries concerning copyright in the work should be addressed to the Information Services Branch, Geoscience Australia, GPO Box 378, CANBERRA, ACT, 2601 or email: copyright@ga.gov.au. See also http://www.ga.gov.au/about/copyright.jsp, and http://www.osdm.gov.au/OSDM/Policies+and+Guidelines/Spatial+Data+Access+and+Pricing/OSDM+Licence+Internet+-+no+registration/default.aspx"
         });

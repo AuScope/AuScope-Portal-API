@@ -72,10 +72,10 @@ public class TestGeonetworkController {
                 new CloudFileInformation("my/key3", 300L, "http://public.url3")
         };
         final VglDownload download = new VglDownload(5341);
-        final VglParameter minEasting = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MIN_EASTING, "2.0", "number", new VEGLJob(jobId));
-        final VglParameter maxEasting = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MAX_EASTING, "1.0", "number", new VEGLJob(jobId));
-        final VglParameter maxNorthing = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MAX_NORTHING, "3.0", "number", new VEGLJob(jobId));
-        final VglParameter minNorthing = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MIN_NORTHING, "4.0", "number", new VEGLJob(jobId));
+        download.setNorthBoundLatitude(4.0);
+        download.setSouthBoundLatitude(3.0);
+        download.setEastBoundLongitude(2.0);
+        download.setWestBoundLongitude(1.0);
 
         download.setDescription("desc");
         download.setName("name");
@@ -86,10 +86,6 @@ public class TestGeonetworkController {
 
         context.checking(new Expectations() {{
             //Our mock job configuration
-            allowing(mockJob).getJobParameter(minEasting.getName());will(returnValue(minEasting));
-            allowing(mockJob).getJobParameter(maxEasting.getName());will(returnValue(maxEasting));
-            allowing(mockJob).getJobParameter(maxNorthing.getName());will(returnValue(maxNorthing));
-            allowing(mockJob).getJobParameter(minNorthing.getName());will(returnValue(minNorthing));
             allowing(mockJob).getDescription();will(returnValue("description"));
             allowing(mockJob).getSubmitDate();will(returnValue(new Date()));
             allowing(mockJob).getName();will(returnValue("name"));
@@ -220,21 +216,17 @@ public class TestGeonetworkController {
                 new CloudFileInformation("my/key2", 200L, "http://public.url2"),
                 new CloudFileInformation("my/key3", 300L, "http://public.url3")
         };
-        final VglParameter minEasting = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MIN_EASTING, "2.0", "number", new VEGLJob(jobId));
-        final VglParameter maxEasting = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MAX_EASTING, "1.0", "number", new VEGLJob(jobId));
-        final VglParameter maxNorthing = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MAX_NORTHING, "3.0", "number", new VEGLJob(jobId));
-        final VglParameter minNorthing = new VglParameter(1, ERRDAPController.SESSION_SELECTION_MIN_NORTHING, "4.0", "number", new VEGLJob(jobId));
         final VglDownload download = new VglDownload(5341);
+        download.setNorthBoundLatitude(4.0);
+        download.setSouthBoundLatitude(3.0);
+        download.setEastBoundLongitude(2.0);
+        download.setWestBoundLongitude(1.0);
 
         download.setDescription("desc");
         download.setName("name");
         download.setUrl("http://example.org/5432");
         context.checking(new Expectations() {{
             //Our mock job configuration
-            allowing(mockJob).getJobParameter(minEasting.getName());will(returnValue(minEasting));
-            allowing(mockJob).getJobParameter(maxEasting.getName());will(returnValue(maxEasting));
-            allowing(mockJob).getJobParameter(maxNorthing.getName());will(returnValue(maxNorthing));
-            allowing(mockJob).getJobParameter(minNorthing.getName());will(returnValue(minNorthing));
             allowing(mockJob).getDescription();will(returnValue("description"));
             allowing(mockJob).getSubmitDate();will(returnValue("20110713_105730"));
             allowing(mockJob).getName();will(returnValue("name"));

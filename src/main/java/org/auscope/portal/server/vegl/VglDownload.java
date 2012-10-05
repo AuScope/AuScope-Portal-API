@@ -21,6 +21,14 @@ public class VglDownload implements Serializable, Cloneable {
     private String url;
     /** Where the downloaded data (on the job VM) will be downloaded to*/
     private String localPath;
+    /** If this download is for a spatial region this will represent the most northern bounds of the region in WGS:84*/
+    private Double northBoundLatitude;
+    /** If this download is for a spatial region this will represent the most southern bounds of the region in WGS:84*/
+    private Double southBoundLatitude;
+    /** If this download is for a spatial region this will represent the most eastern bounds of the region in WGS:84*/
+    private Double eastBoundLongitude;
+    /** If this download is for a spatial region this will represent the most western bounds of the region in WGS:84*/
+    private Double westBoundLongitude;
     /** The job that owns this download*/
     private VEGLJob parent;
 
@@ -121,6 +129,69 @@ public class VglDownload implements Serializable, Cloneable {
         this.localPath = localPath;
     }
 
+    /**
+     * If this download is for a spatial region this will represent the most northern bounds of the region in WGS:84
+     * @return
+     */
+    public Double getNorthBoundLatitude() {
+        return northBoundLatitude;
+    }
+
+    /**
+     * If this download is for a spatial region this will represent the most northern bounds of the region in WGS:84
+     * @param northBoundLatitude
+     */
+    public void setNorthBoundLatitude(Double northBoundLatitude) {
+        this.northBoundLatitude = northBoundLatitude;
+    }
+
+    /**
+     * If this download is for a spatial region this will represent the most southern bounds of the region in WGS:84
+     * @return
+     */
+    public Double getSouthBoundLatitude() {
+        return southBoundLatitude;
+    }
+
+    /**
+     * If this download is for a spatial region this will represent the most southern bounds of the region in WGS:84
+     * @param southBoundLatitude
+     */
+    public void setSouthBoundLatitude(Double southBoundLatitude) {
+        this.southBoundLatitude = southBoundLatitude;
+    }
+
+    /**
+     * If this download is for a spatial region this will represent the most eastern bounds of the region in WGS:84
+     * @return
+     */
+    public Double getEastBoundLongitude() {
+        return eastBoundLongitude;
+    }
+
+    /**
+     * If this download is for a spatial region this will represent the most eastern bounds of the region in WGS:84
+     * @param eastBoundLongitude
+     */
+    public void setEastBoundLongitude(Double eastBoundLongitude) {
+        this.eastBoundLongitude = eastBoundLongitude;
+    }
+
+    /**
+     * If this download is for a spatial region this will represent the most western bounds of the region in WGS:84
+     * @return
+     */
+    public Double getWestBoundLongitude() {
+        return westBoundLongitude;
+    }
+
+    /**
+     * If this download is for a spatial region this will represent the most western bounds of the region in WGS:84
+     * @param westBoundLongitude
+     */
+    public void setWestBoundLongitude(Double westBoundLongitude) {
+        this.westBoundLongitude = westBoundLongitude;
+    }
 
     /**
      * The job that owns this download

@@ -11,6 +11,10 @@
         <property name="description"/>
         <property name="url"/>
         <property name="localPath"/>
+        <property name="northBoundLatitude"/>
+        <property name="southBoundLatitude"/>
+        <property name="eastBoundLongitude"/>
+        <property name="westBoundLongitude"/>
 
         <many-to-one name="parent" column="jobId" not-null="true"></many-to-one>
     </class>

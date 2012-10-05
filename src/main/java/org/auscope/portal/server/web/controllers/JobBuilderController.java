@@ -1,12 +1,10 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -171,11 +169,11 @@ public class JobBuilderController extends BasePortalController {
      * @return
      */
     private FileInformation stagedFileToFileInformation(StagedFile file) {
-    	File internalFile = file.getFile();
-    	long length = internalFile == null ? 0 : internalFile.length();
+        File internalFile = file.getFile();
+        long length = internalFile == null ? 0 : internalFile.length();
         return new FileInformation(file.getName(), length, false, "");
     }
-    
+
     /**
      * Returns a JSON object containing an array of filenames and sizes which
      * are currently in the job's stage in directory.
@@ -635,11 +633,11 @@ public class JobBuilderController extends BasePortalController {
                 return generateJSONResponseMAV(false, null, "There was a problem submitting your job for processing.",
                         "Please upload your input files and try again.");
             }
-            
+
             //Upload them to storage
             File[] files = new File[stagedFiles.length];
             for (int i = 0; i < stagedFiles.length; i++) {
-            	files[i] = stagedFiles[i].getFile();
+                files[i] = stagedFiles[i].getFile();
             }
             cloudStorageService.uploadJobFiles(job, files);
         } catch (PortalServiceException e) {
@@ -766,12 +764,13 @@ public class JobBuilderController extends BasePortalController {
      * @return
      */
     private boolean createDownloadScriptFile(VEGLJob job, String fileName) {
-        
 
-    	OutputStream os = null;
+
+        OutputStream os = null;
+        OutputStreamWriter out = null;
         try {
-        	os = fileStagingService.writeFile(job,  fileName);
-        	OutputStreamWriter out = new OutputStreamWriter(os);
+            os = fileStagingService.writeFile(job,  fileName);
+            out = new OutputStreamWriter(os);
 
             for (VglDownload dl : job.getJobDownloads()) {
                 out.write(String.format("#Downloading %1$s\n", dl.getName()));
@@ -785,6 +784,7 @@ public class JobBuilderController extends BasePortalController {
             logger.debug("Error:", e);
             return false;
         } finally {
+            FileIOUtil.closeQuietly(out);
             FileIOUtil.closeQuietly(os);
         }
     }

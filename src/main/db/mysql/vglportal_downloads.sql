@@ -31,6 +31,10 @@ CREATE TABLE `downloads` (
   `localPath` varchar(1024) NOT NULL,
   `name` varchar(128) DEFAULT NULL,
   `description` varchar(1024) DEFAULT NULL,
+  `northBoundLatitude` double DEFAULT NULL,
+  `southBoundLatitude` double DEFAULT NULL,
+  `eastBoundLongitude` double DEFAULT NULL,
+  `westBoundLongitude` double DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `jobId` (`jobId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
