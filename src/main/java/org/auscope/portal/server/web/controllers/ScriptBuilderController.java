@@ -28,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
  *
  * @author Cihan Altinay
  * @author Josh Vote - modified for usage with VEGL
+ * @author Richard Goh
  */
 @Controller
 public class ScriptBuilderController extends BasePortalController {
@@ -39,6 +40,7 @@ public class ScriptBuilderController extends BasePortalController {
 
     /**
      * Creates a new instance
+     *
      * @param jobFileService
      * @param jobManager
      */
@@ -70,6 +72,26 @@ public class ScriptBuilderController extends BasePortalController {
         }
 
         return generateJSONResponseMAV(true, null, "");
+    }
+
+    /**
+     * Gets the contents of a saved job's script file.
+     * @param jobId
+     * @return A JSON encoded response which contains the contents of a saved job's script file
+     */
+    @RequestMapping("/getSavedScript.do")
+    public ModelAndView getSavedScript(@RequestParam("jobId") String jobId) {
+        logger.debug("getSavedScript with jobId: " + jobId);
+        String script = null;
+
+        try {
+            script = sbService.loadScript(jobId);
+        } catch (PortalServiceException ex) {
+            logger.error("Unable to load saved script for job with id " + jobId, ex);
+            return generateJSONResponseMAV(false, null, ex.getMessage(), ex.getErrorCorrection());
+        }
+
+        return generateJSONResponseMAV(true, script, "");
     }
 
     /**
@@ -120,4 +142,3 @@ public class ScriptBuilderController extends BasePortalController {
         }
     }
 }
-

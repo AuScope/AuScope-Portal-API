@@ -15,7 +15,7 @@ Ext.define('ScriptBuilder.ComponentTreePanel', {
     constructor : function(config) {
         Ext.apply(config, {
             rootVisible : false,
-            root : ScriptBuilder.Components
+            root : ScriptBuilder.Components.getComponents()
         });
 
         this.callParent(arguments);

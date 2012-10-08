@@ -15,6 +15,7 @@ Ext.define('vegl.widgets.JobsPanel', {
     cancelJobAction : null,
     deleteJobAction : null,
     duplicateJobAction : null,
+    editJobAction : null,
 
     /**
      * Accepts the config for a Ext.grid.Panel along with the following additions:
@@ -49,7 +50,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         });
 
         this.duplicateJobAction = new Ext.Action({
-            text: 'Repeat job',
+            text: 'Duplicate job',
             iconCls: 'refresh-icon',
             scope : this,
             disabled : true,
@@ -57,6 +58,19 @@ Ext.define('vegl.widgets.JobsPanel', {
                 var selection = this.getSelectionModel().getSelection();
                 if (selection.length > 0) {
                     this.repeatJob(selection[0]);
+                }
+            }
+        });
+
+        this.editJobAction = new Ext.Action({
+            text: 'Edit job',
+            iconCls: 'edit-icon',
+            scope : this,
+            disabled : true,
+            handler: function() {
+                var selection = this.getSelectionModel().getSelection();
+                if (selection.length > 0) {
+                    this.editJob(selection[0]);
                 }
             }
         });
@@ -78,7 +92,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             plugins : [{
                 ptype : 'rowcontextmenu',
                 contextMenu : Ext.create('Ext.menu.Menu', {
-                    items: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.submitJobAction]
+                    items: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.editJobAction, this.submitJobAction]
                 })
             }],
             store : Ext.create('Ext.data.Store', {
@@ -113,7 +127,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             tbar: [{
                 text: 'Actions',
                 iconCls: 'folder-icon',
-                menu: [ this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.submitJobAction]
+                menu: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.editJobAction, this.submitJobAction]
             }]
         });
 
@@ -136,23 +150,39 @@ Ext.define('vegl.widgets.JobsPanel', {
             this.deleteJobAction.setDisabled(true);
             this.duplicateJobAction.setDisabled(true);
             this.submitJobAction.setDisabled(true);
+            this.editJobAction.setDisabled(true);
         } else {
-            this.cancelJobAction.setDisabled(false);
-            this.deleteJobAction.setDisabled(false);
-            this.duplicateJobAction.setDisabled(false);
-            this.submitJobAction.setDisabled(true);
-
+            // Change the job available options based on its actual status
             switch(selections[0].get('status')) {
-            case vegl.models.Job.STATUS_ACTIVE:
-                this.deleteJobAction.setDisabled(true);
-                break;
-            case vegl.models.Job.STATUS_UNSUBMITTED:
-                this.duplicateJobAction.setDisabled(true);
-                this.submitJobAction.setDisabled(false);
-                break;
-            default:
-                this.cancelJobAction.setDisabled(true);
-                break;
+                case vegl.models.Job.STATUS_ACTIVE:
+                    this.cancelJobAction.setDisabled(false);
+                    this.deleteJobAction.setDisabled(true);
+                    this.duplicateJobAction.setDisabled(false);
+                    this.submitJobAction.setDisabled(true);
+                    this.editJobAction.setDisabled(true);
+                    break;
+                case vegl.models.Job.STATUS_UNSUBMITTED:
+                    this.cancelJobAction.setDisabled(true);
+                    this.deleteJobAction.setDisabled(false);
+                    this.duplicateJobAction.setDisabled(true);
+                    this.submitJobAction.setDisabled(false);
+                    this.editJobAction.setDisabled(false);
+                    break;
+                case vegl.models.Job.STATUS_DONE:
+                    this.cancelJobAction.setDisabled(true);
+                    this.deleteJobAction.setDisabled(false);
+                    this.duplicateJobAction.setDisabled(false);
+                    this.submitJobAction.setDisabled(true);
+                    this.editJobAction.setDisabled(true);
+                    break;
+                default:
+                    // Job status is STATUS_PENDING
+                    this.cancelJobAction.setDisabled(false);
+                    this.deleteJobAction.setDisabled(true);
+                    this.duplicateJobAction.setDisabled(false);
+                    this.submitJobAction.setDisabled(true);
+                    this.editJobAction.setDisabled(true);
+                    break;
             }
         }
     },
@@ -296,7 +326,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             height : 600,
             modal : true,
             layout : 'fit',
-            title : 'Repeat Job Wizard',
+            title : 'Duplicate Job Wizard',
             items :[{
                 xtype : 'jobwizard',
                 border : false,
@@ -305,6 +335,30 @@ Ext.define('vegl.widgets.JobsPanel', {
                 },
                 forms : ['vegl.jobwizard.forms.DuplicateJobForm',
                          'vegl.jobwizard.forms.JobObjectForm',
+                         'vegl.jobwizard.forms.JobSubmitForm']
+            }]
+        });
+        popup.show();
+    },
+
+    editJob : function(job) {
+        var popup = Ext.create('Ext.window.Window', {
+            width : 800,
+            height : 600,
+            modal : true,
+            layout : 'fit',
+            title : 'Edit Job Wizard',
+            items : [{
+                xtype : 'jobwizard',
+                border : false,
+                wizardState : {
+                    jobId : job.get('id'),
+                    seriesId : job.get('seriesId'),
+                    userAction : 'edit'
+                },
+                forms : ['vegl.jobwizard.forms.JobObjectForm',
+                         'vegl.jobwizard.forms.JobUploadForm',
+                         'vegl.jobwizard.forms.ScriptBuilderForm',
                          'vegl.jobwizard.forms.JobSubmitForm']
             }]
         });
@@ -342,7 +396,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                 }
 
                 this.listJobsForSeries(this.currentSeries);
-                
+
                 if (error) {
                     //Create an error object and pass it to custom error window
                     var errorObj = {

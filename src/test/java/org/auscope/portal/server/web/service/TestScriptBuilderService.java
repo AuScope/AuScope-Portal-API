@@ -1,8 +1,10 @@
 package org.auscope.portal.server.web.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,7 +27,7 @@ import org.junit.Test;
 /**
  * Unit tests for ScriptBuilderService
  * @author Josh Vote
- *
+ * @author Richard Goh
  */
 public class TestScriptBuilderService extends PortalTestClass {
     private ScriptBuilderService service;
@@ -46,7 +48,7 @@ public class TestScriptBuilderService extends PortalTestClass {
     public void testSaveScript() throws Exception {
         final String script = "#a pretend script\n";
         final Integer jobId = 123;
-        
+
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
 
         context.checking(new Expectations() {{
@@ -76,7 +78,64 @@ public class TestScriptBuilderService extends PortalTestClass {
             will(throwException(new ConnectException()));
         }});
 
-        service.saveScript(jobId.toString(), script);
+        service.loadScript(jobId.toString());
+    }
+
+    /**
+     * Tests script loading success scenario
+     */
+    @Test
+    public void testLoadScript() throws Exception {
+        final String script = "#a pretend script\n";
+        final Integer jobId = 123;
+
+        context.checking(new Expectations() {{
+            oneOf(mockJobManager).getJobById(jobId);
+            will(returnValue(mockJob));
+
+            oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
+            will(returnValue(new ByteArrayInputStream(script.getBytes())));
+        }});
+
+        String actualScript = service.loadScript(jobId.toString());
+        Assert.assertEquals(script, actualScript);
+    }
+
+    /**
+     * Tests to ensure empty string is return when the script file doesn't exist
+     */
+    @Test
+    public void testLoadEmptyScript() throws Exception {
+        final Integer jobId = 123;
+
+        context.checking(new Expectations() {{
+            oneOf(mockJobManager).getJobById(jobId);
+            will(returnValue(mockJob));
+
+            oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
+            will(returnValue(null));
+        }});
+
+        String actualScript = service.loadScript(jobId.toString());
+        Assert.assertEquals("", actualScript);
+    }
+
+    /**
+     * Tests to ensure exception is handled properly
+     */
+    @Test(expected=PortalServiceException.class)
+    public void testLoadScriptError() throws Exception {
+        final Integer jobId = 123;
+
+        context.checking(new Expectations() {{
+            oneOf(mockJobManager).getJobById(jobId);
+            will(returnValue(mockJob));
+
+            oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
+            will(throwException(new PortalServiceException("Test load script exception")));
+        }});
+
+        String actualScript = service.loadScript(jobId.toString());
     }
 
     /**

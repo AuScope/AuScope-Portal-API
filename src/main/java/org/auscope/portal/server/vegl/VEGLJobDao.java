@@ -15,13 +15,14 @@ public class VEGLJobDao extends HibernateDaoSupport {
     protected final Log logger = LogFactory.getLog(getClass());
 
     /**
-     * Retrieves jobs that are grouped under given series
+     * Retrieves jobs that are grouped under given series.
+     * It excludes jobs that are deleted.
      *
      * @param seriesID the ID of the series
      */
     public List<VEGLJob> getJobsOfSeries(final int seriesID) {
         return (List<VEGLJob>) getHibernateTemplate()
-            .findByNamedParam("from VEGLJob j where j.seriesId=:searchID",
+            .findByNamedParam("from VEGLJob j where j.seriesId=:searchID and lower(j.status)!='deleted'",
                     "searchID", seriesID);
     }
 
@@ -43,7 +44,6 @@ public class VEGLJobDao extends HibernateDaoSupport {
     public VEGLJob get(final int id) {
         return (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
     }
-
 
     /**
      * Deletes the job with given ID.

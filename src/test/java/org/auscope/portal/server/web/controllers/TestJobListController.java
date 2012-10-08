@@ -35,13 +35,13 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * Unit tests for JobListController
  * @author Josh Vote
- *
+ * @author Richard Goh
  */
 public class TestJobListController {
     private Mockery context = new Mockery() {{
         setImposteriser(ClassImposteriser.INSTANCE);
     }};
-    
+
     private VEGLJobManager mockJobManager;
     private CloudStorageService mockCloudStorageService;
     private FileStagingService mockFileStagingService;
@@ -111,7 +111,7 @@ public class TestJobListController {
     }
 
     /**
-     * Tests deleting a job succesfully
+     * Tests deleting a job successfully
      */
     @Test
     public void testDeleteJob() {
@@ -123,13 +123,16 @@ public class TestJobListController {
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
 
-
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
 
-            //Make sure deletion occurs
+            //Make sure the job marked as deleted and its transition audit trial record is created
+            oneOf(mockJob).getStatus();will(returnValue("old mock job status"));
+            oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
+            oneOf(mockJobManager).saveJob(mockJob);
+            oneOf(mockJobManager).createJobAuditTrail("old mock job status", mockJob, "Job deleted.");
+
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
-            oneOf(mockJobManager).deleteJob(mockJob);
         }});
 
         ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId);
@@ -179,7 +182,7 @@ public class TestJobListController {
     }
 
     /**
-     * Tests deleting a series succesfully
+     * Tests deleting a series successfully
      */
     @Test
     public void testDeleteSeries() {
@@ -198,11 +201,19 @@ public class TestJobListController {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
 
-            //Make sure job deletion occurs
+            //Make sure each job marked as deleted, its transition audit trial record
+            //is created and all its files in staging directory are deleted.
+            oneOf(mockJobs.get(0)).getStatus();will(returnValue(JobBuilderController.STATUS_PENDING));
+            oneOf(mockJobs.get(0)).setStatus(JobBuilderController.STATUS_DELETED);
+            oneOf(mockJobManager).saveJob(mockJobs.get(0));
+            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PENDING, mockJobs.get(0), "Job deleted.");
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJobs.get(0));
-            oneOf(mockJobManager).deleteJob(mockJobs.get(0));
+
+            oneOf(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
+            oneOf(mockJobs.get(1)).setStatus(JobBuilderController.STATUS_DELETED);
+            oneOf(mockJobManager).saveJob(mockJobs.get(1));
+            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_DONE, mockJobs.get(1), "Job deleted.");
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJobs.get(1));
-            oneOf(mockJobManager).deleteJob(mockJobs.get(1));
 
             oneOf(mockJobManager).deleteSeries(mockSeries);
         }});
@@ -212,7 +223,7 @@ public class TestJobListController {
     }
 
     /**
-     * Tests deleting a series fails when the user doesnt have permission
+     * Tests deleting a series fails when the user doesn't have permission
      */
     @Test
     public void testDeleteSeriesNoPermission() {
@@ -257,26 +268,31 @@ public class TestJobListController {
     }
 
     /**
-     * Tests that killing a job succeeds
+     * Tests that killing or cancelling a job succeeds
      */
     @Test
-    public void testKillJob() {
+    public void testKillJob() throws Exception {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
-
+        final CloudFileInformation[] jobPendingFiles = new CloudFileInformation[] {
+                new CloudFileInformation("key3/filename", 100L, "http://public.url3/filename"),
+                new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
+        };
 
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
-
             allowing(mockJob).getUser();will(returnValue(userEmail));
-
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
 
+            allowing(mockJob).getStatus();will(returnValue(JobBuilderController.STATUS_PENDING));
+            oneOf(mockCloudStorageService).listJobFiles(with(mockJob));will(returnValue(jobPendingFiles));
+
             oneOf(mockCloudComputeService).terminateJob(mockJob);
-            oneOf(mockJob).setStatus(JobBuilderController.STATUS_CANCELLED);
+            oneOf(mockJob).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
             oneOf(mockJobManager).saveJob(mockJob);
+            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PENDING, mockJob, "Job cancelled by user.");
         }});
 
         ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId);
@@ -292,7 +308,6 @@ public class TestJobListController {
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
-
 
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
@@ -327,26 +342,31 @@ public class TestJobListController {
     }
 
     /**
-     * Tests that killing all jobs of a series succeeds
+     * Tests that killing or cancelling all jobs of a series succeeds
      */
     @Test
-    public void testKillSeriesJobs() {
+    public void testKillSeriesJobs() throws Exception {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
         final List<VEGLJob> mockJobs = Arrays.asList(
                 context.mock(VEGLJob.class, "mockJobDone"),
-                context.mock(VEGLJob.class, "mockJobFailed"),
-                context.mock(VEGLJob.class, "mockJobCancelled"),
                 context.mock(VEGLJob.class, "mockJobActive"),
-                context.mock(VEGLJob.class, "mockJobUnsubmitted"));
-
+                context.mock(VEGLJob.class, "mockJobUnsubmitted"),
+                context.mock(VEGLJob.class, "mockJobPending"));
+        final CloudFileInformation[] jobPendingFiles = new CloudFileInformation[] {
+                new CloudFileInformation("key3/filename", 100L, "http://public.url3/filename"),
+                new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
+        };
+        final CloudFileInformation[] jobActiveFiles = new CloudFileInformation[] {
+                new CloudFileInformation("key2/filename", 100L, "http://public.url2/filename"),
+                new CloudFileInformation("key2/filename3", 102L, "http://public.url2/filename3"),
+                new CloudFileInformation("key2/workflow-version.txt", 102L, "http://public.url2/filename3"),
+        };
 
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
-
-
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
@@ -354,20 +374,25 @@ public class TestJobListController {
 
             //Each of our jobs is in a different status
             allowing(mockJobs.get(0)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
-            allowing(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_FAILED));
-            allowing(mockJobs.get(2)).getStatus();will(returnValue(JobBuilderController.STATUS_CANCELLED));
-            allowing(mockJobs.get(3)).getStatus();will(returnValue(JobBuilderController.STATUS_ACTIVE));
-            allowing(mockJobs.get(4)).getStatus();will(returnValue(JobBuilderController.STATUS_UNSUBMITTED));
+            allowing(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_ACTIVE));
+            allowing(mockJobs.get(2)).getStatus();will(returnValue(JobBuilderController.STATUS_UNSUBMITTED));
+            allowing(mockJobs.get(3)).getStatus();will(returnValue(JobBuilderController.STATUS_PENDING));
             allowing(mockJobs.get(0)).getId();will(returnValue(new Integer(0)));
             allowing(mockJobs.get(1)).getId();will(returnValue(new Integer(1)));
             allowing(mockJobs.get(2)).getId();will(returnValue(new Integer(2)));
             allowing(mockJobs.get(3)).getId();will(returnValue(new Integer(3)));
-            allowing(mockJobs.get(4)).getId();will(returnValue(new Integer(4)));
 
-            //Only the active job will be cancelled
+            //Only the pending and active job can be cancelled
+            oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(1)));will(returnValue(jobActiveFiles));
+            oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(3)));will(returnValue(jobPendingFiles));
+            oneOf(mockCloudComputeService).terminateJob(mockJobs.get(1));
             oneOf(mockCloudComputeService).terminateJob(mockJobs.get(3));
-            oneOf(mockJobs.get(3)).setStatus(JobBuilderController.STATUS_CANCELLED);
+            oneOf(mockJobs.get(1)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+            oneOf(mockJobs.get(3)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+            oneOf(mockJobManager).saveJob(mockJobs.get(1));
             oneOf(mockJobManager).saveJob(mockJobs.get(3));
+            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_ACTIVE, mockJobs.get(1), "Job cancelled by user.");
+            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PENDING, mockJobs.get(3), "Job cancelled by user.");
         }});
 
         ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId);
@@ -383,8 +408,6 @@ public class TestJobListController {
         final String seriesEmail = "anotheruser@email.com";
         final int seriesId = 1234;
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
-
-
 
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
@@ -847,8 +870,7 @@ public class TestJobListController {
                 context.mock(VEGLJob.class, "mockJobActive"),
                 context.mock(VEGLJob.class, "mockJobUnsubmitted"),
                 context.mock(VEGLJob.class, "mockJobDone"),
-                context.mock(VEGLJob.class, "mockJobPending"),
-                context.mock(VEGLJob.class, "mockJobFailed")
+                context.mock(VEGLJob.class, "mockJobPending")
         );
         final CloudFileInformation[] jobActiveFiles = new CloudFileInformation[] {
                 new CloudFileInformation("key2/filename", 100L, "http://public.url2/filename"),
@@ -879,7 +901,6 @@ public class TestJobListController {
             allowing(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_UNSUBMITTED));
             allowing(mockJobs.get(2)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
             allowing(mockJobs.get(3)).getStatus();will(returnValue(JobBuilderController.STATUS_PENDING));
-            allowing(mockJobs.get(4)).getStatus();will(returnValue(JobBuilderController.STATUS_FAILED));
 
             //Output files for each job
             oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(0)));will(returnValue(jobActiveFiles));
@@ -958,10 +979,10 @@ public class TestJobListController {
         final String baseKey = "base-key";
         final VEGLJob existingJob = new VEGLJob(jobId);
         existingJob.setUser(userEmail);
-        
+
         final ByteArrayOutputStream bos1 = new ByteArrayOutputStream();
         final ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
-        
+
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));

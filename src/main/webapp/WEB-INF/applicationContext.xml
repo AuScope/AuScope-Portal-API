@@ -115,6 +115,7 @@
     <bean id="veglJobManager" class="org.auscope.portal.server.vegl.VEGLJobManager">
         <property name="veglJobDao" ref="veglJobDao"/>
         <property name="veglSeriesDao" ref="veglSeriesDao"/>
+        <property name="vglJobAuditLogDao" ref="vglJobAuditLogDao"/>
     </bean>
 
     <bean id="veglJobDao" class="org.auscope.portal.server.vegl.VEGLJobDao">
@@ -125,6 +126,10 @@
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
 
+    <bean id="vglJobAuditLogDao" class="org.auscope.portal.server.vegl.VGLJobAuditLogDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
+    </bean>
+
     <bean id="veglSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingResources">
@@ -132,6 +137,7 @@
                 <value>vegljob.hbm.xml</value>
                 <value>veglseries.hbm.xml</value>
                 <value>vglparameter.hbm.xml</value>
+                <value>vgljobsauditlog.hbm.xml</value>
                 <value>vgldownload.hbm.xml</value>
             </list>
         </property>

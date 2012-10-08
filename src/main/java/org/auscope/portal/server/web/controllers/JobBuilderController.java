@@ -41,6 +41,7 @@ import org.auscope.portal.server.web.service.VglMachineImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,13 +71,11 @@ public class JobBuilderController extends BasePortalController {
     private CloudComputeService cloudComputeService;
     private VglMachineImageService vglImageService;
 
-
-    public static final String STATUS_FAILED = "Failed";
     public static final String STATUS_PENDING = "Pending";
     public static final String STATUS_ACTIVE = "Active";
     public static final String STATUS_DONE = "Done";
-    public static final String STATUS_CANCELLED = "Cancelled";
-    public static final String STATUS_UNSUBMITTED = "Unsubmitted";
+    public static final String STATUS_DELETED = "Deleted";
+    public static final String STATUS_UNSUBMITTED = "Saved";
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
@@ -603,101 +602,79 @@ public class JobBuilderController extends BasePortalController {
     public ModelAndView submitJob(HttpServletRequest request,
                                   HttpServletResponse response,
                                   @RequestParam("jobId") String jobId) {
-        // Get our job
-        VEGLJob job = null;
+        boolean succeeded = false;
+        String instanceId = null, oldJobStatus = null, errorDescription = null, errorCorrection = null;
+        VEGLJob curJob = null;
+
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId));
-            if (job == null) {
-                throw new Exception("Job not found.");
-            }
-        } catch (Exception ex) {
-            logger.error("Error fetching job with id " + jobId, ex);
-            return generateJSONResponseMAV(false, null, "There was a problem retrieving your job from the database.",
-                    "Please try again in a few minutes or report it to cg-admin@csiro.au.");
-        }
+            // Get our job
+            curJob = jobManager.getJobById(Integer.parseInt(jobId));
+            if (curJob == null) {
+                logger.error("Error fetching job with id " + jobId);
+                errorDescription = "There was a problem retrieving your job from the database.";
+                errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
+            } else {
+                // we need to keep track of old job for audit trail purposes
+                oldJobStatus = curJob.getStatus();
+                // Right before we submit - pump out a script file for downloading every VglDownload object when the VM starts
+                if (!createDownloadScriptFile(curJob, DOWNLOAD_SCRIPT)) {
+                    logger.error(String.format("Error creating download script '%1$s' for job with id %2$s", DOWNLOAD_SCRIPT, jobId));
+                    errorDescription = "There was a problem configuring the data download script.";
+                    errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
+                } else {
+                    // copy files to S3 storage for processing
+                    // get job files from local directory
+                    StagedFile[] stagedFiles = fileStagingService.listStageInDirectoryFiles(curJob);
+                    if (stagedFiles.length == 0) {
+                        errorDescription = "There wasn't any input files found for submitting your job for processing.";
+                        errorCorrection = "Please upload your input files and try again.";
+                    } else {
+                        // Upload them to storage
+                        File[] files = new File[stagedFiles.length];
+                        for (int i = 0; i < stagedFiles.length; i++) {
+                            files[i] = stagedFiles[i].getFile();
+                        }
+                        cloudStorageService.uploadJobFiles(curJob, files);
 
-        //Right before we submit - pump out a script file for downloading every VglDownload object when the VM starts
-        if (!createDownloadScriptFile(job, DOWNLOAD_SCRIPT)) {
-            logger.error(String.format("Error creating download script '%1$s' for job with id %2$s", DOWNLOAD_SCRIPT, jobId));
-            return generateJSONResponseMAV(false, null, "There was a problem configuring the data download script.",
-                    "Please try again in a few minutes or report it to cg-admin@csiro.au.");
-        }
+                        // create our input user data string
+                        String userDataString = null;
+                        userDataString = createBootstrapForJob(curJob);
 
-        // copy files to S3 storage for processing
-        try {
-            // get job files from local directory
-            StagedFile[] stagedFiles = fileStagingService.listStageInDirectoryFiles(job);
-            if (stagedFiles.length == 0) {
-                job.setStatus(STATUS_FAILED);
-                jobManager.saveJob(job);
-                return generateJSONResponseMAV(false, null, "There was a problem submitting your job for processing.",
-                        "Please upload your input files and try again.");
-            }
+                        // TODO: final check to ensure user has permission to run the job
+                        
+                        // launch the ec2 instance
+                        instanceId = cloudComputeService.executeJob(curJob, userDataString);
+                        logger.info("Launched instance: " + instanceId);
 
-            //Upload them to storage
-            File[] files = new File[stagedFiles.length];
-            for (int i = 0; i < stagedFiles.length; i++) {
-                files[i] = stagedFiles[i].getFile();
+                        // set reference as instanceId for use when killing a job
+                        curJob.setComputeInstanceId(instanceId);
+                        curJob.setStatus(STATUS_PENDING);
+                        curJob.setSubmitDate(new Date());
+                        jobManager.saveJob(curJob);
+                        succeeded = true;
+                    }
+                }
             }
-            cloudStorageService.uploadJobFiles(job, files);
         } catch (PortalServiceException e) {
-            logger.error("Files upload failed.", e);
-            job.setStatus(STATUS_FAILED);
-            jobManager.saveJob(job);
-            return generateJSONResponseMAV(false, null, "There was a problem uploading files to S3 cloud storage.",
-                    e.getMessage());
-        } catch (Exception e) {
-            logger.error("Files upload failed.", e);
-            job.setStatus(STATUS_FAILED);
-            jobManager.saveJob(job);
-            return generateJSONResponseMAV(false, null, "There was a problem uploading files to S3 cloud storage.",
-                    "Please report this error to cg_admin@csiro.au");
-        }
-
-        //create our input user data string
-        String userDataString = null;
-        try {
-            userDataString = createBootstrapForJob(job);
+            errorDescription = e.getMessage();
+            errorCorrection = e.getErrorCorrection();
         } catch (IOException e) {
-            logger.error("Job bootstrap creation failed." + e.getMessage(), e);
-            job.setStatus(STATUS_FAILED);
-            jobManager.saveJob(job);
-            return generateJSONResponseMAV(false, null, "There was a problem creating startup script.",
-                    "Please report this error to cg_admin@csiro.au");
+            logger.error("Job bootstrap creation failed.", e);
+            errorDescription = "There was a problem creating startup script.";
+            errorCorrection = "Please report this error to cg_admin@csiro.au";
+        } catch (Exception e) {
+            logger.error("Job submission failed.", e);
+            errorDescription = "An unexpected error has occurred while submitting your job for processing.";
+            errorCorrection = "Please report this error to cg_admin@csiro.au";
         }
 
-        // launch the ec2 instance
-        String instanceId = null;
-        try {
-            instanceId = cloudComputeService.executeJob(job, userDataString);
-        } catch (PortalServiceException ex) {
-            logger.error("Failed to launch instance to run job " + job.getId(), ex);
-            job.setStatus(STATUS_FAILED);
-            jobManager.saveJob(job);
-            return generateJSONResponseMAV(false, null, "There was a problem submitting your job for processing.",
-                    ex.getMessage());
-        }
-
-        logger.info("Launched instance: " + instanceId);
-
-        // set reference as instanceId for use when killing a job
-        job.setComputeInstanceId(instanceId);
-        job.setStatus(STATUS_PENDING);
-        job.setSubmitDate(new Date());
-        jobManager.saveJob(job);
-
-        //Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
-        //Failure here is NOT fatal - it will just result in some residual files
-        try {
-            if (!fileStagingService.deleteStageInDirectory(job)) {
-                logger.error(String.format("There was a problem wiping the stage in directory for job:  %1$s", job));
-            }
-        } catch (Exception ex) {
-            logger.error(String.format("There was a problem wiping the stage in directory for job:  %1$s", job), ex);
-        }
-
-        // Save in session for status update request for this job.
-        return generateJSONResponseMAV(true, null, "");
+        if (succeeded) {
+            jobManager.createJobAuditTrail(oldJobStatus, curJob, "");
+            return generateJSONResponseMAV(true, null, "");
+        } else {
+            jobManager.createJobAuditTrail(oldJobStatus, curJob, errorDescription);
+            return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
+        }       
     }
 
     /**
@@ -764,8 +741,6 @@ public class JobBuilderController extends BasePortalController {
      * @return
      */
     private boolean createDownloadScriptFile(VEGLJob job, String fileName) {
-
-
         OutputStream os = null;
         OutputStreamWriter out = null;
         try {

@@ -11,7 +11,7 @@ Ext.define('vegl.models.Job', {
         STATUS_PENDING : "Pending",
         STATUS_DONE : "Done",
         STATUS_CANCELLED : "Cancelled",
-        STATUS_UNSUBMITTED : "Unsubmitted"
+        STATUS_UNSUBMITTED : "Saved"
     },
 
     fields: [

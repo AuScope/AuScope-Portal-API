@@ -35,8 +35,9 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
             },
             timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
             callback : function(options, success, response) {
-                var msg;
                 loadMask.hide();
+                var errorMsg, errorInfo;
+
                 if (success) {
                     var responseObj = Ext.JSON.decode(response.responseText);
                     msg = responseObj.msg;
@@ -45,14 +46,20 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
                         callback(true);
                         window.location = 'joblist.html';
                         return;
+                    } else {
+                        errorMsg = responseObj.msg;
+                        errorInfo = responseObj.debugInfo;
                     }
+                } else {
+                    errorMsg = "There was an error submitting your script for processing.";
+                    errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
                 }
 
                 //Create an error object and pass it to custom error window
                 var errorObj = {
                     title : 'Failure',
-                    message : responseObj.msg,
-                    info : responseObj.debugInfo
+                    message : errorMsg,
+                    info : errorInfo
                 };
 
                 var errorWin = Ext.create('portal.widgets.window.ErrorWindow', {

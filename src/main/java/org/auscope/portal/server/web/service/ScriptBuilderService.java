@@ -1,15 +1,10 @@
 package org.auscope.portal.server.web.service;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.IllegalFormatConversionException;
-import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,10 +74,38 @@ public class ScriptBuilderService {
         } catch (Exception e) {
             logger.error("Couldn't write script file: " + e.getMessage());
             logger.debug("error: ", e);
-
             throw new PortalServiceException(null, "Couldn't write script file for job with id " + jobId, e);
         } finally {
-        	FileIOUtil.closeQuietly(scriptFile);
+            FileIOUtil.closeQuietly(scriptFile);
+        }
+    }
+
+    /**
+     * Loads the saved VGL script source with a specified job ID
+     * @param jobId
+     * @return the file contents if the script file exists otherwise an empty string if the script file doesn't exist or is empty.
+     * @throws PortalServiceException
+     */
+    public String loadScript(String jobId) throws PortalServiceException {
+        InputStream is = null;
+        try {
+            //Lookup our job
+            VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
+            //Load script from VGL server's filesystem
+            is = jobFileService.readFile(job, SCRIPT_FILE_NAME);
+            String script = null;
+            if (is == null) {
+                logger.warn("User script file does not exist.");
+                script = "";
+            } else {
+                script = FileIOUtil.convertStreamtoString(is);
+            }
+            return script;
+        } catch (Exception ex) {
+            logger.error("Error loading script.", ex);
+            throw new PortalServiceException("There was a problem loading your script.", "Please report this error to cg_admin@csiro.au");
+        } finally {
+            FileIOUtil.closeQuietly(is);
         }
     }
 

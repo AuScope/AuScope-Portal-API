@@ -46,7 +46,6 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
 
         Ext.apply(config, {
             layout : 'border',
-            id : 'scriptbuilder-form',
             border : false,
             items: [{
                 xtype : 'panel',

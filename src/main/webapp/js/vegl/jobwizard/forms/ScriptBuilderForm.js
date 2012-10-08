@@ -7,6 +7,7 @@
  *
  * Original Author - Cihan Altinay
  * Author - Josh Vote
+ * Author - Richard Goh
  *
  */
 Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
@@ -26,8 +27,61 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         this.callParent([{
             wizardState : wizardState,
             layout : 'fit',
+            listeners : {
+                jobWizardActive : function() {
+                    if (this.wizardState.userAction == 'edit') {
+                        this.loadSavedScript(this.wizardState.jobId);
+                    }
+                }
+            },
             items: [this.scriptBuilderFrm]
         }]);
+    },
+
+    // load script source from VGL server filesystem
+    loadSavedScript : function(jobId) {
+        var loadMask = new Ext.LoadMask(Ext.getBody(), {
+            msg : 'Loading saved script...',
+            removeMask : true
+        });
+        loadMask.show();
+        Ext.Ajax.request({
+            url : 'getSavedScript.do',
+            params : {
+                'jobId' : jobId
+            },
+            scope : this,
+            callback : function(options, success, response) {
+                loadMask.hide();
+                var errorMsg, errorInfo;
+
+                if (success) {
+                    var responseObj = Ext.JSON.decode(response.responseText);
+                    if (responseObj.success) {
+                        this.scriptBuilderFrm.replaceScript(responseObj.data);
+                        return;
+                    } else {
+                        errorMsg = responseObj.msg;
+                        errorInfo = responseObj.debugInfo;
+                    }
+                } else {
+                    errorMsg = "There was an error loading your script.";
+                    errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
+                }
+
+                //Create an error object and pass it to custom error window
+                var errorObj = {
+                    title : 'Script Loading Error',
+                    message : errorMsg,
+                    info : errorInfo
+                };
+
+                var errorWin = Ext.create('portal.widgets.window.ErrorWindow', {
+                    errorObj : errorObj
+                });
+                errorWin.show();
+            }
+        });
     },
 
     // submit script source for storage at the server

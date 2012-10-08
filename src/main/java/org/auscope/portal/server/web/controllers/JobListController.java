@@ -42,6 +42,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Cihan Altinay
  * @author Abdi Jama
  * @author Josh Vote
+ * @author Richard Goh
  */
 @Controller
 public class JobListController extends BasePortalController  {
@@ -72,6 +73,8 @@ public class JobListController extends BasePortalController  {
      * @return The VEGLJob object on success or null otherwise.
      */
     private VEGLJob attemptGetJob(Integer jobId, HttpServletRequest request) {
+        logger.info("Getting job with ID " + jobId);
+
         VEGLJob job = null;
         String user = (String)request.getSession().getAttribute("openID-Email");
 
@@ -184,18 +187,24 @@ public class JobListController extends BasePortalController  {
     public ModelAndView deleteJob(HttpServletRequest request,
                                 HttpServletResponse response,
                                 @RequestParam("jobId") Integer jobId) {
+        logger.info("Deleting job with ID " + jobId);
 
         VEGLJob job = attemptGetJob(jobId, request);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The requested job was not found.");
         }
 
-        logger.info("Deleting job with ID " + jobId);
+        String oldJobStatus = job.getStatus();
+        job.setStatus(JobBuilderController.STATUS_DELETED);
+        jobManager.saveJob(job);
+        jobManager.createJobAuditTrail(oldJobStatus, job, "Job deleted.");
+        // Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
+        // Failure here is NOT fatal - it will just result in some residual files
         fileStagingService.deleteStageInDirectory(job);
-        jobManager.deleteJob(job);
 
         return generateJSONResponseMAV (true, null, "");
     }
+
     /**
      * delete all jobs of given series (and the series itself)
      *
@@ -224,9 +233,14 @@ public class JobListController extends BasePortalController  {
         logger.info("Deleting jobs of series " + seriesId);
         for (VEGLJob job : jobs) {
             logger.debug(String.format("Deleting job %1$s",job));
+            String oldJobStatus = job.getStatus();
+            job.setStatus(JobBuilderController.STATUS_DELETED);
+            jobManager.saveJob(job);
+            jobManager.createJobAuditTrail(oldJobStatus, job, "Job deleted.");
 
+            // Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
+            // Failure here is NOT fatal - it will just result in some residual files
             fileStagingService.deleteStageInDirectory(job);
-            jobManager.deleteJob(job);
         }
 
         logger.info("Deleting series "+seriesId);
@@ -236,7 +250,7 @@ public class JobListController extends BasePortalController  {
     }
 
     /**
-     * Kills the job given by its reference.
+     * Kills or cancels the job given by its reference.
      *
      * @param request The servlet request including a jobId parameter
      * @param response The servlet response
@@ -248,25 +262,28 @@ public class JobListController extends BasePortalController  {
     public ModelAndView killJob(HttpServletRequest request,
                                 HttpServletResponse response,
                                 @RequestParam("jobId") Integer jobId) {
+        logger.info("Cancelling job with ID "+jobId);
 
         VEGLJob job = attemptGetJob(jobId, request);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job to kill.");
         }
 
-        // terminate the EMI instance
         try {
-            logger.info("Cancelling job with ID "+jobId);
+            // we need to update the job status because we don't know
+            // whether or not the job has already been run
+            updateJobStatus(job);
+
+            // terminate the EMI instance
             terminateInstance(job);
         } catch (Exception e) {
-            logger.error("Failed to terminate instance with id: " + job.getComputeInstanceId(), e);
-            return generateJSONResponseMAV(false, null, "Error killing running instance");
+            logger.error("Failed to cancel the job.", e);
+            return generateJSONResponseMAV(false, null, "There was a problem cancelling your job.",
+                    "Please try again in a few minutes or report it to cg-admin@csiro.au.");
         }
 
         return generateJSONResponseMAV(true, null, "");
     }
-
-
 
     /**
      * Terminates the instance of an EMI that was launched by a job.
@@ -275,9 +292,22 @@ public class JobListController extends BasePortalController  {
      * @param job The job linked the to instance that is to be terminated
      */
     private void terminateInstance(VEGLJob job) {
-        cloudComputeService.terminateJob(job);
-        job.setStatus(JobBuilderController.STATUS_CANCELLED);
-        jobManager.saveJob(job);
+        String oldJobStatus = job.getStatus();
+        if (oldJobStatus.equals(JobBuilderController.STATUS_DONE) ||
+                oldJobStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
+            logger.debug("Skipping finished or unsubmitted job "+job.getId());
+        } else {
+            // We allow the job to be cancelled and re-submitted regardless
+            // of its termination status.
+            job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+            jobManager.saveJob(job);
+            jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+            try {
+                cloudComputeService.terminateJob(job);
+            } catch (Exception e) {
+                logger.warn("Failed to terminate instance with id: " + job.getComputeInstanceId(), e);
+            }
+        }
     }
 
     /**
@@ -307,20 +337,18 @@ public class JobListController extends BasePortalController  {
 
         //Iterate our jobs, terminating as we go (abort iteration on failure)
         for (VEGLJob job : jobs) {
-            String oldStatus = job.getStatus();
-            if (!oldStatus.equals(JobBuilderController.STATUS_ACTIVE)) {
-                logger.debug("Skipping finished job "+job.getId());
-                continue;
-            }
-            logger.info("Cancelling job with ID "+job.getId());
-
             //terminate the EMI instance
             try {
                 logger.info("Cancelling job with ID "+ job.getId());
+                // we need to update the job status because we don't know
+                // whether or not the job has already been run
+                updateJobStatus(job);
+                // terminate the EMI instance
                 terminateInstance(job);
             } catch (Exception e) {
-                logger.error("Failed to terminate instance with id: " + job.getComputeInstanceId(), e);
-                return generateJSONResponseMAV(false, null, "Error killing running instance");
+                logger.error("Failed to cancel one of the jobs in a given series.", e);
+                return generateJSONResponseMAV(false, null, "There was a problem cancelling one of your jobs in selected series.",
+                        "Please try again in a few minutes or report it to cg-admin@csiro.au.");
             }
         }
 
@@ -343,6 +371,7 @@ public class JobListController extends BasePortalController  {
     public ModelAndView jobFiles(HttpServletRequest request,
                                  HttpServletResponse response,
                                  @RequestParam("jobId") Integer jobId) {
+        logger.info("Getting job files for job ID " + jobId);
 
         VEGLJob job = attemptGetJob(jobId, request);
         if (job == null) {
@@ -378,7 +407,6 @@ public class JobListController extends BasePortalController  {
                                      @RequestParam("jobId") Integer jobId,
                                      @RequestParam("filename") String fileName,
                                      @RequestParam("key") String key) {
-
 
         VEGLJob job = attemptGetJob(jobId, request);
         if (job == null) {
@@ -580,13 +608,14 @@ public class JobListController extends BasePortalController  {
      * @param job
      */
     private void updateJobStatus(VEGLJob job) {
-        String status = job.getStatus();
-        if (status == null) {
-            status = "";
+        String oldStatus = job.getStatus();
+        if (oldStatus == null) {
+            oldStatus = "";
         }
 
-        //Don't lookup files for jobs that haven't been submitted or failed
-        if (status.equals(JobBuilderController.STATUS_UNSUBMITTED) || status.equals(JobBuilderController.STATUS_FAILED)) {
+        //Don't lookup files for jobs that haven't been submitted or cancelled
+        if (oldStatus.equals(JobBuilderController.STATUS_UNSUBMITTED) ||
+                oldStatus.equals(JobBuilderController.STATUS_DONE)) {
             return;
         }
 
@@ -595,22 +624,26 @@ public class JobListController extends BasePortalController  {
         try {
             results = cloudStorageService.listJobFiles(job);
         } catch (Exception e) {
-            logger.error("Unable to list output job files", e);
+            logger.warn("Unable to list output job files", e);
         }
 
         boolean jobStarted = containsFile(results, "workflow-version.txt");
         boolean jobFinished = containsFile(results, "vegl.sh.log");
 
-        String newStatus = status;
+        String newStatus = oldStatus;
         if (jobFinished) {
             newStatus = JobBuilderController.STATUS_DONE;
+            // Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
+            // Failure here is NOT fatal - it will just result in some residual files
+            fileStagingService.deleteStageInDirectory(job);
         } else if (jobStarted) {
             newStatus = JobBuilderController.STATUS_ACTIVE;
         }
 
-        if (!newStatus.equals(status)) {
+        if (!newStatus.equals(oldStatus)) {
             job.setStatus(newStatus);
             jobManager.saveJob(job);
+            jobManager.createJobAuditTrail(oldStatus, job, "Job status updated.");
         }
     }
 
@@ -676,6 +709,7 @@ public class JobListController extends BasePortalController  {
                                 HttpServletResponse response,
                                 @RequestParam("jobId") Integer jobId,
                                 @RequestParam(required=false, value="file") String[] files) {
+        logger.info("Duplicate a new job from job ID "+ jobId);
 
         //Lookup the job we are cloning
         VEGLJob oldJob = attemptGetJob(jobId, request);
@@ -725,17 +759,14 @@ public class JobListController extends BasePortalController  {
         } catch (Exception ex) {
             log.error("Unable to duplicate input files: " + ex.getMessage());
             log.debug("Exception:", ex);
-
             //Tidy up after ourselves
-            fileStagingService.deleteStageInDirectory(newJob);
             jobManager.deleteJob(newJob);
-
+            // Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
+            // Failure here is NOT fatal - it will just result in some residual files
+            fileStagingService.deleteStageInDirectory(newJob);
             return generateJSONResponseMAV(false, null, "Unable to save new job.");
         }
 
         return generateJSONResponseMAV(true, Arrays.asList(newJob), "");
     }
-
-
 }
-

@@ -54,7 +54,12 @@
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobObjectForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobUploadForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobSubmitForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/forms/ScriptBuilderForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/JobWizard.js"></script>
+
+    <script type="text/javascript" src="js/ScriptBuilder/ScriptBuilder.js"></script>
+    <script type="text/javascript" src="js/ScriptBuilder/Components.js" ></script>
+    <script type="text/javascript" src="js/ScriptBuilder/ComponentTreePanel.js" ></script>
 
     <script type="text/javascript" src="js/vegl/JobList.js"></script>
 </head>
@@ -66,4 +71,3 @@
 </body>
 
 </html>
-
