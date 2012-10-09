@@ -88,7 +88,7 @@ public class TestJobBuilderController {
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
         final String instanceId = "new-instance-id";
         final Sequence jobFileSequence = context.sequence("jobFileSequence"); //this makes sure we aren't deleting directories before uploading (and other nonsense)
-        
+
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
 
         jobObj.setStorageBaseKey("base/key");
@@ -123,11 +123,11 @@ public class TestJobBuilderController {
             //This MUST occur - it cleans up after upload
             oneOf(mockFileStagingService).deleteStageInDirectory(jobObj);will(returnValue(true));
             inSequence(jobFileSequence);
-            
-            oneOf(mockOutputStream).close();
+
+            atLeast(1).of(mockOutputStream).close();
         }});
 
-        
+
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(instanceId, jobObj.getComputeInstanceId());
@@ -179,11 +179,11 @@ public class TestJobBuilderController {
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));will(throwException(new PortalServiceException("")));
         }});
 
-        
+
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
-        Assert.assertEquals(JobBuilderController.STATUS_FAILED, jobObj.getStatus());
+        Assert.assertEquals(JobBuilderController.STATUS_DONE, jobObj.getStatus());
     }
 
     /**
@@ -222,15 +222,15 @@ public class TestJobBuilderController {
 
             //And finally 1 call to execute the job (which will throw PortalServiceException indicating failure)
             oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(new PortalServiceException("")));
-            
-            oneOf(mockOutputStream).close();
+
+            atLeast(1).of(mockOutputStream).close();
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
-        Assert.assertEquals(JobBuilderController.STATUS_FAILED, jobObj.getStatus());
-        
+        Assert.assertEquals(JobBuilderController.STATUS_DONE, jobObj.getStatus());
+
     }
 
     /**
