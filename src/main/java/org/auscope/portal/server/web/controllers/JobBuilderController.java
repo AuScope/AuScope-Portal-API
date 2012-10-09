@@ -613,6 +613,7 @@ public class JobBuilderController extends BasePortalController {
                 logger.error("Error fetching job with id " + jobId);
                 errorDescription = "There was a problem retrieving your job from the database.";
                 errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
+                return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
             } else {
                 // we need to keep track of old job for audit trail purposes
                 oldJobStatus = curJob.getStatus();

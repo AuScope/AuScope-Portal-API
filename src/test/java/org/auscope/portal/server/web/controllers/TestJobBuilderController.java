@@ -88,9 +88,10 @@ public class TestJobBuilderController {
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
         final String instanceId = "new-instance-id";
         final Sequence jobFileSequence = context.sequence("jobFileSequence"); //this makes sure we aren't deleting directories before uploading (and other nonsense)
-
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
+        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
 
+        jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
         jobObj.setStorageBaseKey("base/key");
         jobObj.setStorageAccessKey("accessKey");
         jobObj.setStorageBucket("bucket");
@@ -105,6 +106,7 @@ public class TestJobBuilderController {
 
             oneOf(mockFileStagingService).writeFile(jobObj, JobBuilderController.DOWNLOAD_SCRIPT);
             will(returnValue(mockOutputStream));
+            allowing(mockOutputStream).close();
 
             //We should have 1 call to get our stage in files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
@@ -120,18 +122,17 @@ public class TestJobBuilderController {
             //And finally 1 call to execute the job
             oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(instanceId));
 
-            //This MUST occur - it cleans up after upload
-            oneOf(mockFileStagingService).deleteStageInDirectory(jobObj);will(returnValue(true));
-            inSequence(jobFileSequence);
-
-            atLeast(1).of(mockOutputStream).close();
+            //We should have 1 call to our job manager to create a job audit trail record
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "");
         }});
 
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(instanceId, jobObj.getComputeInstanceId());
-
+        Assert.assertEquals(JobBuilderController.STATUS_PENDING, jobObj.getStatus());
+        Assert.assertNotNull(jobObj.getSubmitDate());
     }
 
     /**
@@ -161,13 +162,14 @@ public class TestJobBuilderController {
         final File mockFile1 = context.mock(File.class, "MockFile1");
         final File mockFile2 = context.mock(File.class, "MockFile2");
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
-
+        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
 
+        jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
+
         context.checking(new Expectations() {{
-            //We should have 1 call to our job manager to get our job object and 1 call to save it
+            //We should have 1 call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId());will(returnValue(jobObj));
-            oneOf(mockJobManager).saveJob(jobObj);
 
             oneOf(mockFileStagingService).writeFile(jobObj, JobBuilderController.DOWNLOAD_SCRIPT);
             will(returnValue(bos));
@@ -177,13 +179,15 @@ public class TestJobBuilderController {
 
             //And one call to upload them (which we will mock as failing)
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));will(throwException(new PortalServiceException("")));
-        }});
 
+            //We should have 1 call to our job manager to create a job audit trail record
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "");
+        }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
-        Assert.assertEquals(JobBuilderController.STATUS_DONE, jobObj.getStatus());
+        Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
     }
 
     /**
@@ -194,9 +198,12 @@ public class TestJobBuilderController {
     public void testJobSubmission_ExecuteFailure() throws Exception {
         //Instantiate our job object
         final VEGLJob jobObj = new VEGLJob(13);
+        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
         //As submitJob method no longer explicitly checks for empty storage credentials,
         //we need to manually set the storageBaseKey property to avoid NullPointerException
         jobObj.setStorageBaseKey("storageBaseKey");
+        //By default, a job is in SAVED state
+        jobObj.setStatus(jobInSavedState);
         final File mockFile1 = context.mock(File.class, "MockFile1");
         final File mockFile2 = context.mock(File.class, "MockFile2");
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
@@ -206,10 +213,10 @@ public class TestJobBuilderController {
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
             oneOf(mockJobManager).getJobById(jobObj.getId());will(returnValue(jobObj));
-            oneOf(mockJobManager).saveJob(jobObj);
 
             oneOf(mockFileStagingService).writeFile(jobObj, JobBuilderController.DOWNLOAD_SCRIPT);
             will(returnValue(mockOutputStream));
+            allowing(mockOutputStream).close();
 
             //We should have 1 call to get our stage in files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
@@ -217,20 +224,20 @@ public class TestJobBuilderController {
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
-            //And one call to upload them
+            //We should have 1 call to upload them
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
 
             //And finally 1 call to execute the job (which will throw PortalServiceException indicating failure)
             oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(new PortalServiceException("")));
 
-            atLeast(1).of(mockOutputStream).close();
+            //We should have 1 call to our job manager to create a job audit trail record
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "");
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
-        Assert.assertEquals(JobBuilderController.STATUS_DONE, jobObj.getStatus());
-
+        Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
     }
 
     /**
@@ -305,10 +312,17 @@ public class TestJobBuilderController {
     @SuppressWarnings("rawtypes")
     @Test
     public void testListImages() throws Exception {
+        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+
+        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
+
         context.checking(new Expectations() {{
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+
             //We allow calls to the Configurer which simply extract values from our property file
-            oneOf(mockImageService).getAllImages();will(returnValue(images));
+            oneOf(mockImageService).getImagesByRoles((String[])sessionVariables.get("user-roles"));will(returnValue(images));
         }});
 
         ModelAndView mav = controller.getImagesForUser(mockRequest);
@@ -324,9 +338,17 @@ public class TestJobBuilderController {
      */
     @Test
     public void testListImagesError() throws Exception {
+        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
+        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
+
         context.checking(new Expectations() {{
+            //We should have a call to servlet request object to get user session
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            //We should have a call to get user roles from user session object
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+
             //We allow calls to the Configurer which simply extract values from our property file
-            oneOf(mockImageService).getAllImages();will(throwException(new PortalServiceException("error")));
+            oneOf(mockImageService).getImagesByRoles((String[])sessionVariables.get("user-roles"));will(throwException(new PortalServiceException("error")));
         }});
 
         ModelAndView mav = controller.getImagesForUser(mockRequest);
@@ -346,7 +368,6 @@ public class TestJobBuilderController {
         final String storageEndpoint = "http://example.org/storage";
         final String baseKey = "base/key";
 
-
         sessionVariables.put("doubleValue", 123.45);
         sessionVariables.put("intValue", 123);
         sessionVariables.put("openID-Email", "email@example.org");
@@ -362,6 +383,7 @@ public class TestJobBuilderController {
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(sessionVariables.get("openID-Email")));
             allowing(mockSession).getAttribute("notExtracted");will(returnValue(sessionVariables.get("notExtracted")));
             allowing(mockSession).getAttribute(ERRDAPController.SESSION_ERRDAP_DOWNLOAD_LIST);will(returnValue(null));
+            allowing(mockSession).setAttribute(ERRDAPController.SESSION_ERRDAP_DOWNLOAD_LIST, null);
 
             oneOf(mockCloudStorageService).generateBaseKey(with(any(VEGLJob.class)));will(returnValue(baseKey));
 
@@ -392,7 +414,6 @@ public class TestJobBuilderController {
         Map<String, VglParameter> params = newJob.getJobParameters();
         Assert.assertNotNull(params);
         Assert.assertEquals(3, params.size());
-
 
         String paramToTest = "doubleValue";
         VglParameter param = params.get(paramToTest);

@@ -52,14 +52,15 @@ public class VEGLJobManager {
      * @param message
      */
     public void createJobAuditTrail(String oldJobStatus, VEGLJob curJob, String message) {
-        VGLJobAuditLog vglJobAuditLog = new VGLJobAuditLog();
-        vglJobAuditLog.setJobId(curJob.getId());
-        vglJobAuditLog.setFromStatus(oldJobStatus);
-        vglJobAuditLog.setToStatus(curJob.getStatus());
-        vglJobAuditLog.setTransitionDate(new Date());
-        vglJobAuditLog.setMessage(message);
-
+        VGLJobAuditLog vglJobAuditLog = null;
         try {
+            vglJobAuditLog = new VGLJobAuditLog();
+            vglJobAuditLog.setJobId(curJob.getId());
+            vglJobAuditLog.setFromStatus(oldJobStatus);
+            vglJobAuditLog.setToStatus(curJob.getStatus());
+            vglJobAuditLog.setTransitionDate(new Date());
+            vglJobAuditLog.setMessage(message);
+
             // Failure in the creation of the job life cycle audit trail is
             // not critical hence we allow it to fail silently and log it.
             vglJobAuditLogDao.save(vglJobAuditLog);
