@@ -42,6 +42,22 @@
                         </array>
                     </property>
                 </bean>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ami-00000023"/>
+                    <property name="name" value="Underworld"/>
+                    <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>Underworld</value>
+                            <value>centos6</value>
+                        </array>
+                    </property>
+                    <property name="permissions">
+                        <array>
+                            <value>ROLE_USER</value>
+                        </array>
+                    </property>
+                </bean>
             </list>
         </constructor-arg>
     </bean>

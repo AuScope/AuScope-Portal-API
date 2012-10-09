@@ -22,6 +22,12 @@ Ext.define('vegl.layer.VeglQuerierFactory', {
             });
         }
 
+        if (knownLayer) {
+            if (knownLayer.get('id') === 'gocad-models') {
+                return Ext.create('vegl.layer.querier.csw.SelectableCSWQuerier', cfg);
+            }
+        }
+
         if (wfsResources.length > 0) {
             cfg.parser = Ext.create('vegl.layer.querier.wfs.VeglParser', {});
             cfg.knownLayerParser = Ext.create('vegl.layer.querier.wfs.VeglKnownLayerParser', {});

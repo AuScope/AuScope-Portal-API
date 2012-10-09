@@ -15,6 +15,7 @@
                 <ref bean="knownTypeGravAnomalyGeodetic" />
                 <ref bean="knownTypeRadMapTotaldose" />
                 <ref bean="knownTypeMagMap" />
+                <ref bean="knownTypeGocadModels" />
             </list>
         </constructor-arg>
     </bean>
@@ -23,6 +24,7 @@
         <constructor-arg>
             <list>
                 <ref bean="cswVeglProduction" />
+                <ref bean="cswModelLibTest" />
             </list>
         </constructor-arg>
     </bean>

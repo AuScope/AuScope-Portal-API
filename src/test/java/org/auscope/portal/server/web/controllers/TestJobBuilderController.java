@@ -382,8 +382,8 @@ public class TestJobBuilderController {
             allowing(mockSession).getAttribute("intValue");will(returnValue(sessionVariables.get("intValue")));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(sessionVariables.get("openID-Email")));
             allowing(mockSession).getAttribute("notExtracted");will(returnValue(sessionVariables.get("notExtracted")));
-            allowing(mockSession).getAttribute(ERRDAPController.SESSION_ERRDAP_DOWNLOAD_LIST);will(returnValue(null));
-            allowing(mockSession).setAttribute(ERRDAPController.SESSION_ERRDAP_DOWNLOAD_LIST, null);
+            allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(null));
+            allowing(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, null);
 
             oneOf(mockCloudStorageService).generateBaseKey(with(any(VEGLJob.class)));will(returnValue(baseKey));
 

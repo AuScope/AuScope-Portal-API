@@ -142,8 +142,8 @@ public class JobBuilderController extends BasePortalController {
 
         //Create the subset file and dump it in our stage in directory
         @SuppressWarnings("unchecked")
-        List<VglDownload> erddapDownloads = (List<VglDownload>) session.getAttribute(ERRDAPController.SESSION_ERRDAP_DOWNLOAD_LIST);
-        session.setAttribute(ERRDAPController.SESSION_ERRDAP_DOWNLOAD_LIST, null); //ensure we clear the list out in case the user makes more jobs
+        List<VglDownload> erddapDownloads = (List<VglDownload>) session.getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);
+        session.setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, null); //ensure we clear the list out in case the user makes more jobs
         if (erddapDownloads != null) {
             newJob.setJobDownloads(new ArrayList<VglDownload>(erddapDownloads));
         } else {

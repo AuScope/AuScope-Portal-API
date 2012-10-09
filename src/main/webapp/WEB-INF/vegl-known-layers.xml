@@ -53,4 +53,29 @@
         <property name="description" value=""/>
         <property name="group" value="Geoscience Australia Coverages"/>
     </bean>
+
+    <bean id="knownTypeGocadModels" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gocad-models"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.CSWRecordSelector">
+                <property name="descriptiveKeyword" value="http://vgl.auscope.org/model/gocad"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="GOCAD Models"/>
+        <property name="description" value="A collection of spatially located 3D models that have been generated using GOCAD"/>
+        <property name="iconUrl" value="http://maps.google.com/mapfiles/kml/paddle/blu-square.png"/>
+        <property name="iconAnchor">
+            <bean class="java.awt.Point">
+                <constructor-arg index="0" value="16"/>
+                <constructor-arg index="1" value="32"/>
+            </bean>
+        </property>
+        <property name="iconSize">
+            <bean class="java.awt.Dimension">
+                <constructor-arg index="0" value="32"/>
+                <constructor-arg index="1" value="32"/>
+            </bean>
+        </property>
+    </bean>
+
 </beans>
