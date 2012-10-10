@@ -7,7 +7,15 @@
 #wrapper for swift upload. Swift tool uses the file name as key
 if [ "$STORAGE_TYPE" == "swift" ] && [ "$1" == "upload" ]
 then
-        swift upload "$2/$3" "$5"
+        #To overcome swift tool using directory structure as part of key
+        #Change to directory before running this command (then change back)
+        originalDir=`pwd`
+        fileDir=`dirname "$5"`
+        fileName=`basename "$5"`
+
+        cd "$fileDir"
+        swift upload "$2/$3" "$fileName"
+        cd "$originalDir"
 fi
 
 #wrapper for aws upload
