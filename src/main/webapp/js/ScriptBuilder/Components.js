@@ -4,7 +4,7 @@ Ext.ns('ScriptBuilder.Components');
  * The raw configuration for building the scriptbuilder tree
  */
 ScriptBuilder.Components.getComponents = function() {
-    return {   
+    return {
         text : "Script Builder Components",
         expanded : true,
         children : [{
@@ -32,6 +32,16 @@ ScriptBuilder.Components.getComponents = function() {
                 type : "s",
                 text : "Gravity Inversion",
                 qtip : "Perform a gravity inversion using eScript. Expects data in the form of a NetCDF file.",
+                leaf : true
+            }]
+        },{
+            text : "Underworld Examples",
+            type : "category",
+            children : [{
+                id   : "ScriptBuilder.templates.UnderworldGocadTemplate",
+                type : "s",
+                text : "Gocad Simulation",
+                qtip : "Perform an Underworld simulation using a Gocad Voxelset. Expects data in the form of a Gocad voxel set.",
                 leaf : true
             }]
         }]
