@@ -293,7 +293,13 @@ public class JobListController extends BasePortalController  {
             // we need to update the job status because we don't know
             // whether or not the job has already been run
             updateJobStatus(job);
-
+            
+            // we need to inform the user that the job cancelling is aborted
+            // because the job has already been processed.
+            if (job.getStatus().equals(JobBuilderController.STATUS_DONE)) {
+                return generateJSONResponseMAV(false, null, "Cancelling of job aborted as it has already been processed.");
+            }
+            
             // terminate the EMI instance
             terminateInstance(job);
         } catch (Exception e) {
@@ -363,6 +369,14 @@ public class JobListController extends BasePortalController  {
                 // we need to update the job status because we don't know
                 // whether or not the job has already been run
                 updateJobStatus(job);
+
+                // we need to inform the user that the job cancelling is aborted
+                // because the job has already been processed.
+                if (job.getStatus().equals(JobBuilderController.STATUS_DONE)) {
+                    logger.info("Cancelling of job aborted as it has already been processed.");
+                    continue;
+                }
+
                 // terminate the EMI instance
                 terminateInstance(job);
             } catch (Exception e) {
