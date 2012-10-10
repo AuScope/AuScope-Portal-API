@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
@@ -198,9 +199,9 @@ public class JobListController extends BasePortalController  {
         job.setStatus(JobBuilderController.STATUS_DELETED);
         jobManager.saveJob(job);
         jobManager.createJobAuditTrail(oldJobStatus, job, "Job deleted.");
-        // Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
-        // Failure here is NOT fatal - it will just result in some residual files
-        fileStagingService.deleteStageInDirectory(job);
+        // Failure here is NOT fatal - it will just result in some
+        // residual files in staging directory and S3 cloud storage.
+        cleanupDeletedJob(job);
 
         return generateJSONResponseMAV (true, null, "");
     }
@@ -237,16 +238,35 @@ public class JobListController extends BasePortalController  {
             job.setStatus(JobBuilderController.STATUS_DELETED);
             jobManager.saveJob(job);
             jobManager.createJobAuditTrail(oldJobStatus, job, "Job deleted.");
-
-            // Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
-            // Failure here is NOT fatal - it will just result in some residual files
-            fileStagingService.deleteStageInDirectory(job);
+            // Failure here is NOT fatal - it will just result in some
+            // residual files in staging directory and S3 cloud storage.
+            cleanupDeletedJob(job);
         }
 
         logger.info("Deleting series "+seriesId);
         jobManager.deleteSeries(series);
 
         return generateJSONResponseMAV(true, null, "");
+    }
+
+    /**
+     * Cleans up all the files for a deleted job from staging directory
+     * and S3 cloud storage. Failure in cleaning up will not be propagated
+     * back to the calling method.
+     * @param job the job to be deleted.
+     */
+    private void cleanupDeletedJob(VEGLJob job) {
+        try {
+            // Remove files from staging directory
+            fileStagingService.deleteStageInDirectory(job);
+            // Remove files from S3 cloud storage if the job
+            // hasn't been registered in GeoNetwork
+            if (StringUtils.isEmpty(job.getRegisteredUrl())) {
+                cloudStorageService.deleteJobFiles(job);
+            }
+        } catch (Exception ex) {
+            logger.warn("Error cleaning up deleted job.", ex);
+        }
     }
 
     /**

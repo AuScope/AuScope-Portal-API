@@ -114,7 +114,7 @@ public class TestJobListController {
      * Tests deleting a job successfully
      */
     @Test
-    public void testDeleteJob() {
+    public void testDeleteJob() throws Exception {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
@@ -133,6 +133,8 @@ public class TestJobListController {
             oneOf(mockJobManager).createJobAuditTrail("old mock job status", mockJob, "Job deleted.");
 
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
+            oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
+            oneOf(mockCloudStorageService).deleteJobFiles(mockJob);
         }});
 
         ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId);
@@ -185,7 +187,7 @@ public class TestJobListController {
      * Tests deleting a series successfully
      */
     @Test
-    public void testDeleteSeries() {
+    public void testDeleteSeries() throws Exception {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final List<VEGLJob> mockJobs = Arrays.asList(
@@ -208,12 +210,16 @@ public class TestJobListController {
             oneOf(mockJobManager).saveJob(mockJobs.get(0));
             oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PENDING, mockJobs.get(0), "Job deleted.");
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJobs.get(0));
+            oneOf(mockJobs.get(0)).getRegisteredUrl();will(returnValue("geonetwork url"));
+            oneOf(mockCloudStorageService).deleteJobFiles(mockJobs.get(0));
 
             oneOf(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
             oneOf(mockJobs.get(1)).setStatus(JobBuilderController.STATUS_DELETED);
             oneOf(mockJobManager).saveJob(mockJobs.get(1));
             oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_DONE, mockJobs.get(1), "Job deleted.");
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJobs.get(1));
+            oneOf(mockJobs.get(1)).getRegisteredUrl();will(returnValue("geonetwork url"));
+            oneOf(mockCloudStorageService).deleteJobFiles(mockJobs.get(1));
 
             oneOf(mockJobManager).deleteSeries(mockSeries);
         }});
