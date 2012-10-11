@@ -31,6 +31,10 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
                 jobWizardActive : function() {
                     if (this.wizardState.userAction == 'edit') {
                         this.loadSavedScript(this.wizardState.jobId);
+                        // Once the script is loaded into the memory,
+                        // we don't want it to be loaded again to prevent
+                        // unsaved changes.
+                        this.wizardState.userAction = null;
                     }
                 }
             },
