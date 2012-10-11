@@ -641,18 +641,34 @@ public class JobBuilderController extends BasePortalController {
                         String userDataString = null;
                         userDataString = createBootstrapForJob(curJob);
 
-                        // TODO: final check to ensure user has permission to run the job
+                        // final check to ensure user has permission to run the job
+                        boolean permissionGranted = false;
 
-                        // launch the ec2 instance
-                        instanceId = cloudComputeService.executeJob(curJob, userDataString);
-                        logger.info("Launched instance: " + instanceId);
+                        String jobImageId = curJob.getComputeVmId();
+                        String[] userRoles = (String[])request.getSession().getAttribute("user-roles");
+                        VglMachineImage[] images = vglImageService.getImagesByRoles(userRoles);
 
-                        // set reference as instanceId for use when killing a job
-                        curJob.setComputeInstanceId(instanceId);
-                        curJob.setStatus(STATUS_PENDING);
-                        curJob.setSubmitDate(new Date());
-                        jobManager.saveJob(curJob);
-                        succeeded = true;
+                        for (VglMachineImage vglMachineImage : images) {
+                            if (vglMachineImage.getImageId().equals(jobImageId)) {
+                                permissionGranted = true;
+                                break;
+                            }
+                        }
+
+                        if (permissionGranted) {
+                            // launch the ec2 instance
+                            instanceId = cloudComputeService.executeJob(curJob, userDataString);
+                            logger.info("Launched instance: " + instanceId);
+                            // set reference as instanceId for use when killing a job
+                            curJob.setComputeInstanceId(instanceId);
+                            curJob.setStatus(STATUS_PENDING);
+                            curJob.setSubmitDate(new Date());
+                            jobManager.saveJob(curJob);
+                            succeeded = true;
+                        } else {
+                            errorDescription = "You do not have the permission to submit this job for processing.";
+                            errorCorrection = "If you think this is wrong, please report it to cg-admin@csiro.au.";
+                        }
                     }
                 }
             }

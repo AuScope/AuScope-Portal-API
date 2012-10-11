@@ -87,11 +87,17 @@ public class TestJobBuilderController {
         final File mockFile1 = context.mock(File.class, "MockFile1");
         final File mockFile2 = context.mock(File.class, "MockFile2");
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
+        final String computeVmId = "compute-vmi-id";
         final String instanceId = "new-instance-id";
         final Sequence jobFileSequence = context.sequence("jobFileSequence"); //this makes sure we aren't deleting directories before uploading (and other nonsense)
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
+        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
 
+        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
+
+        jobObj.setComputeVmId(computeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
         jobObj.setStorageBaseKey("base/key");
         jobObj.setStorageAccessKey("accessKey");
@@ -116,9 +122,15 @@ public class TestJobBuilderController {
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
-            //And one call to upload them
+            //We should have 1 call to upload them
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(equal(new File[] {mockFile1, mockFile2})));
             inSequence(jobFileSequence);
+
+            //We should have access control check to ensure user has permission to run the job
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+            oneOf(mockImageService).getImagesByRoles((String[])sessionVariables.get("user-roles"));will(returnValue(mockImages));
+            oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
 
             //And finally 1 call to execute the job
             oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(instanceId));
@@ -205,11 +217,15 @@ public class TestJobBuilderController {
         jobObj.setStorageBaseKey("storageBaseKey");
         //By default, a job is in SAVED state
         jobObj.setStatus(jobInSavedState);
+        final String computeVmId = "compute-vmi-id";
+        jobObj.setComputeVmId(computeVmId);
         final File mockFile1 = context.mock(File.class, "MockFile1");
         final File mockFile2 = context.mock(File.class, "MockFile2");
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
-
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
+        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
+        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -227,6 +243,12 @@ public class TestJobBuilderController {
 
             //We should have 1 call to upload them
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
+
+            //We should have access control check to ensure user has permission to run the job
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+            oneOf(mockImageService).getImagesByRoles((String[])sessionVariables.get("user-roles"));will(returnValue(mockImages));
+            oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
 
             //And finally 1 call to execute the job (which will throw PortalServiceException indicating failure)
             oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(new PortalServiceException("")));
