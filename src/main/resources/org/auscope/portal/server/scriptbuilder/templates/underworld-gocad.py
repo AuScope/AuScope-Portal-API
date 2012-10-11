@@ -9,7 +9,7 @@ def cloudUpload(inFilePath, cloudKey):
     print "cloudUpload: " + inFilePath + " to " + queryPath + " returned " + str(retcode)
 
 print "starting"
-retcode = subprocess.call(["uwGocadModelGenerator.sh", "--voxetFilename=Cooper_Basin_3D_Map_geology.vo", "--conductivityPropName=Geology", "--run"])
+retcode = subprocess.call(["uwGocadModelGenerator.sh", "--voxetFilename=${voxet-filename}", "--conductivityPropName=${conductivity-property}", "--run"])
 print "result: " + str(retcode)
 
 

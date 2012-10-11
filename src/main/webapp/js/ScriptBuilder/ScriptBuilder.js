@@ -63,23 +63,17 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
 
     onAddComponent : function(panel, templateClass, name, description) {
         var me = this;
-        var loadMask = new Ext.LoadMask(me.getEl(), {
-            msg : 'Loading script...',
-            removeMask : true
-        });
-        loadMask.show();
 
         //Create the template which will load our script
         var template = Ext.create(templateClass, {
             name : name,
             description : description,
+            wizardState : me.wizardState,
             parameters : Ext.apply({}, me.templateVariables)
         });
-        template.requestScript(function(success, script) {
-            loadMask.hide();
-
+        template.requestScript(function(status, script) {
             //Once we have the script text - ask the user what they want to do with it
-            if (success) {
+            if (status === ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_SUCCESS) {
                 //If there's nothing in the window - just put text in there
                 if (me.getScript().length === 0) {
                     me.replaceScript(script);
@@ -100,7 +94,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
                         }
                     }).show();
                 }
-            } else {
+            } else if (status === ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_ERROR) {
                 Ext.Msg.alert('Internal Error', 'An error has occured while loading the template from the server. Please try again in a few minutes or consider refreshing this page.');
             }
         });

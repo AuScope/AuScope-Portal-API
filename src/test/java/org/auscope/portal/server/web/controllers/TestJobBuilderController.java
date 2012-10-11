@@ -23,6 +23,7 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.ResourceUtil;
+import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VglDownload;
@@ -515,5 +516,48 @@ public class TestJobBuilderController {
             Assert.assertEquals(urls[i], dlToTest.getUrl());
             Assert.assertEquals(localPaths[i], dlToTest.getLocalPath());
         }
+    }
+
+    /**
+     * Unit test for succesfull object conversion in getAllJobInputs
+     * @throws Exception
+     */
+    @Test
+    public void testGetAllJobInputs() throws Exception {
+        final Integer jobId = 543231;
+        final VEGLJob job = new VEGLJob(jobId);
+        final VglDownload dl = new VglDownload(413);
+        final File mockFile = context.mock(File.class);
+        final long mockFileLength = 21314L;
+        final StagedFile[] stagedFiles = new StagedFile[]{new StagedFile(job, "another/file.ext", mockFile)};
+
+        dl.setDescription("desc");
+        dl.setEastBoundLongitude(1.0);
+        dl.setWestBoundLongitude(2.0);
+        dl.setLocalPath("local/path/file.ext");
+        dl.setName("myFile");
+        dl.setNorthBoundLatitude(3.0);
+        dl.setSouthBoundLatitude(4.0);
+        dl.setParent(job);
+
+        job.setJobDownloads(Arrays.asList(dl));
+
+        context.checking(new Expectations() {{
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(job));
+            oneOf(mockFile).length();will(returnValue(mockFileLength));
+            oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stagedFiles));
+        }});
+
+        ModelAndView mav = controller.getAllJobInputs(jobId);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+
+        Assert.assertNotNull(mav.getModel().get("data"));
+        List<FileInformation> fileInfo = (List<FileInformation>) mav.getModel().get("data");
+
+        Assert.assertEquals(2, fileInfo.size());
+
+        Assert.assertEquals(stagedFiles[0].getName(), fileInfo.get(0).getName());
+        Assert.assertEquals(dl.getLocalPath(), fileInfo.get(1).getName());
     }
 }

@@ -15,7 +15,48 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
      * See parent description
      */
     requestScript : function(callback) {
-        this._getTemplatedScript(callback, 'underworld-gocad.py');
+        var jobId = this.wizardState.jobId;
+
+        this._getTemplatedScriptGui(callback, 'underworld-gocad.py', {
+            xtype : 'form',
+            width : 400,
+            height : 200,
+            items : [{
+                xtype : 'combo',
+                fieldLabel : 'Voxel Set',
+                name : 'voxet-filename',
+                allowBlank : false,
+                valueField : 'name',
+                displayField : 'name',
+                anchor : '-20',
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'The file path to the voxel set input.'
+                }],
+                store : Ext.create('Ext.data.Store', {
+                    model : 'vegl.models.FileRecord',
+                    proxy : {
+                        type : 'ajax',
+                        url : 'getAllJobInputs.do',
+                        extraParams : {
+                            jobId : jobId
+                        },
+                        reader : {
+                            type : 'json',
+                            root : 'data'
+                        }
+                    },
+                    autoLoad : true
+                })
+            },{
+                xtype : 'textfield',
+                fieldLabel : 'Conductivity Property',
+                anchor : '100%',
+                name : 'conductivity-property',
+                value : 'Geology',
+                allowBlank : false
+            }]
+        });
     }
 
 });

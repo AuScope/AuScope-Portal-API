@@ -642,7 +642,7 @@ public class JobBuilderController extends BasePortalController {
                         userDataString = createBootstrapForJob(curJob);
 
                         // TODO: final check to ensure user has permission to run the job
-                        
+
                         // launch the ec2 instance
                         instanceId = cloudComputeService.executeJob(curJob, userDataString);
                         logger.info("Launched instance: " + instanceId);
@@ -675,7 +675,7 @@ public class JobBuilderController extends BasePortalController {
         } else {
             jobManager.createJobAuditTrail(oldJobStatus, curJob, errorDescription);
             return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
-        }       
+        }
     }
 
     /**
@@ -781,5 +781,45 @@ public class JobBuilderController extends BasePortalController {
             log.error("Unable to access image list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
         }
+    }
+
+    /**
+     * A combination of getJobInputFiles and getJobDownloads. This function amalgamates the list
+     * of remote service downloads and local file uploads into a single list of input files that
+     * are available to a job at startup.
+     *
+     * The results will be presented in an array of FileInformation objects
+     * @param jobId
+     * @return
+     */
+    @RequestMapping("/getAllJobInputs.do")
+    public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId) {
+        VEGLJob job = null;
+        try {
+            job = jobManager.getJobById(jobId);
+        } catch (Exception ex) {
+            logger.error("Error fetching job with id " + jobId, ex);
+            return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        }
+
+        //Get our files
+        StagedFile[] files = null;
+        try {
+            files = fileStagingService.listStageInDirectoryFiles(job);
+        } catch (Exception ex) {
+            logger.error("Error listing job stage in directory", ex);
+            return generateJSONResponseMAV(false, null, "Error reading job stage in directory");
+        }
+        List<FileInformation> fileInfos = new ArrayList<FileInformation>();
+        for (StagedFile file : files) {
+            fileInfos.add(stagedFileToFileInformation(file));
+        }
+
+        //Get our downloads and convert them to FileInformation objects
+        for (VglDownload dl : job.getJobDownloads()) {
+            fileInfos.add(new FileInformation(dl.getLocalPath(), -1, false, ""));
+        }
+
+        return generateJSONResponseMAV(true, fileInfos, "");
     }
 }
