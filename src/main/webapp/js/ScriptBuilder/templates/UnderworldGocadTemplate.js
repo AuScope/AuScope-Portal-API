@@ -26,15 +26,15 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
                 fieldLabel : 'Voxel Set',
                 name : 'voxet-filename',
                 allowBlank : false,
-                valueField : 'name',
-                displayField : 'name',
+                valueField : 'localPath',
+                displayField : 'localPath',
                 anchor : '-20',
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'The file path to the voxel set input.'
                 }],
                 store : Ext.create('Ext.data.Store', {
-                    model : 'vegl.models.FileRecord',
+                    model : 'vegl.models.Download',
                     proxy : {
                         type : 'ajax',
                         url : 'getAllJobInputs.do',

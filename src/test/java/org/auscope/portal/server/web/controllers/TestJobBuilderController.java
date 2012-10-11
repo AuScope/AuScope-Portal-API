@@ -575,11 +575,12 @@ public class TestJobBuilderController {
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
         Assert.assertNotNull(mav.getModel().get("data"));
-        List<FileInformation> fileInfo = (List<FileInformation>) mav.getModel().get("data");
+        @SuppressWarnings("unchecked")
+        List<VglDownload> fileInfo = (List<VglDownload>) mav.getModel().get("data");
 
         Assert.assertEquals(2, fileInfo.size());
 
-        Assert.assertEquals(stagedFiles[0].getName(), fileInfo.get(0).getName());
-        Assert.assertEquals(dl.getLocalPath(), fileInfo.get(1).getName());
+        Assert.assertEquals(stagedFiles[0].getName(), fileInfo.get(0).getLocalPath());
+        Assert.assertEquals(dl.getLocalPath(), fileInfo.get(1).getLocalPath());
     }
 }

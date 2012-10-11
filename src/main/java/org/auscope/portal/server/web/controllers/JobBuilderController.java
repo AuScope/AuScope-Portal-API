@@ -804,7 +804,7 @@ public class JobBuilderController extends BasePortalController {
      * of remote service downloads and local file uploads into a single list of input files that
      * are available to a job at startup.
      *
-     * The results will be presented in an array of FileInformation objects
+     * The results will be presented in an array of VglDownload objects
      * @param jobId
      * @return
      */
@@ -826,16 +826,23 @@ public class JobBuilderController extends BasePortalController {
             logger.error("Error listing job stage in directory", ex);
             return generateJSONResponseMAV(false, null, "Error reading job stage in directory");
         }
-        List<FileInformation> fileInfos = new ArrayList<FileInformation>();
+
+        //Load the staged files
+        List<VglDownload> allInputs = new ArrayList<VglDownload>();
+        int idCounter = Integer.MIN_VALUE;
         for (StagedFile file : files) {
-            fileInfos.add(stagedFileToFileInformation(file));
+            //we need unique ids - this is our simple way of generating them (low likelyhood of collision)
+            //if we have a collision the GUI might not show one entry - it's not the end of the world
+            VglDownload dl = new VglDownload(idCounter++);
+            dl.setName(file.getName());
+            dl.setLocalPath(file.getName());
+
+            allInputs.add(dl);
         }
 
-        //Get our downloads and convert them to FileInformation objects
-        for (VglDownload dl : job.getJobDownloads()) {
-            fileInfos.add(new FileInformation(dl.getLocalPath(), -1, false, ""));
-        }
+        //Load the job downloads
+        allInputs.addAll(job.getJobDownloads());
 
-        return generateJSONResponseMAV(true, fileInfos, "");
+        return generateJSONResponseMAV(true, allInputs, "");
     }
 }

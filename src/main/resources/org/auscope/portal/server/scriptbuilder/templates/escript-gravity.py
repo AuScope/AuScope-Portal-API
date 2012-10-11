@@ -58,7 +58,7 @@ handler.setFormatter(formatter)
 handler.setLevel(loglevel)
 logger.addHandler(handler)
 
-source=NetCDFDataSource(domainclass=Brick, gravfile='/tmp/vegl-subset.csv')
+source=NetCDFDataSource(domainclass=Brick, gravfile='${inversion-file}')
 #source.setPadding(5, 0.1)
 inv=GravityInversion()
 inv.setDataSource(source)
