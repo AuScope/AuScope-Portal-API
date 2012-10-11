@@ -306,6 +306,27 @@ public class TestJobListController {
     }
 
     /**
+     * Tests that killing or cancelling job get aborted when the job is processed
+     */
+    @Test
+    public void testKillJobAborted() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            allowing(mockJob).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
+        }});
+
+        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
      * Tests that killing a job fails when its not the user's job
      */
     @Test
