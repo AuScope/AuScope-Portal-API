@@ -17,6 +17,23 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
     requestScript : function(callback) {
         var jobId = this.wizardState.jobId;
 
+        var jobInputsStore = Ext.create('Ext.data.Store', {
+            model : 'vegl.models.Download',
+            proxy : {
+                type : 'ajax',
+                url : 'getAllJobInputs.do',
+                extraParams : {
+                    jobId : jobId
+                },
+                reader : {
+                    type : 'json',
+                    root : 'data'
+                }
+            },
+            autoLoad : true
+        });
+
+        //
         this._getTemplatedScriptGui(callback, 'underworld-gocad.py', {
             xtype : 'form',
             width : 400,
@@ -33,26 +50,25 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
                     ptype: 'fieldhelptext',
                     text: 'The file path to the voxel set input.'
                 }],
-                store : Ext.create('Ext.data.Store', {
-                    model : 'vegl.models.Download',
-                    proxy : {
-                        type : 'ajax',
-                        url : 'getAllJobInputs.do',
-                        extraParams : {
-                            jobId : jobId
-                        },
-                        reader : {
-                            type : 'json',
-                            root : 'data'
-                        }
-                    },
-                    autoLoad : true
-                })
+                store : jobInputsStore
+            },{
+                xtype : 'combo',
+                fieldLabel : 'Voxel Key',
+                name : 'voxet-key',
+                allowBlank : false,
+                valueField : 'localPath',
+                displayField : 'localPath',
+                anchor : '-20',
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'The file path to the CSV key describing the above voxel set.'
+                }],
+                store : jobInputsStore
             },{
                 xtype : 'textfield',
-                fieldLabel : 'Conductivity Property',
+                fieldLabel : 'Materials Property',
                 anchor : '100%',
-                name : 'conductivity-property',
+                name : 'materials-property',
                 value : 'Geology',
                 allowBlank : false
             }]
