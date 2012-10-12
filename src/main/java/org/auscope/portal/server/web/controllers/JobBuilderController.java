@@ -152,6 +152,7 @@ public class JobBuilderController extends BasePortalController {
         //Save our job to the database before setting up staging directories (we need an ID!!)
         try {
             jobManager.saveJob(newJob);
+            jobManager.createJobAuditTrail(null, newJob, "Job created.");
             return generateJSONResponseMAV(true, Arrays.asList(newJob), "");
         } catch (Exception ex) {
             //On failure make sure we delete the new directory
@@ -678,7 +679,7 @@ public class JobBuilderController extends BasePortalController {
         }
 
         if (succeeded) {
-            jobManager.createJobAuditTrail(oldJobStatus, curJob, "");
+            jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job submitted.");
             return generateJSONResponseMAV(true, null, "");
         } else {
             jobManager.createJobAuditTrail(oldJobStatus, curJob, errorDescription);

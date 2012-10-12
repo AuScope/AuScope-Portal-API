@@ -139,7 +139,7 @@ public class TestJobBuilderController {
             oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(instanceId));
 
             //We should have 1 call to our job manager to create a job audit trail record
-            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "");
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Job submitted.");
         }});
 
 
@@ -490,7 +490,10 @@ public class TestJobBuilderController {
 
             oneOf(mockFileStagingService).generateStageInDirectory(with(any(VEGLJob.class)));inSequence(sequence);
 
-            oneOf(mockJobManager).saveJob(with(any(VEGLJob.class)));inSequence(sequence); //another to finish off
+            oneOf(mockJobManager).saveJob(with(any(VEGLJob.class)));inSequence(sequence);
+
+            //We should have 1 call to our job manager to create a job audit trail record
+            oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)), with(any(String.class)));
         }});
 
         ModelAndView mav = controller.createJobObject(mockRequest);

@@ -1025,6 +1025,9 @@ public class TestJobListController {
             oneOf(mockCloudStorageService).listJobFiles(with(aVeglJob(jobId)));will(returnValue(cloudFiles));
             oneOf(mockCloudStorageService).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[0].getName()));will(returnValue(is1));
             oneOf(mockCloudStorageService).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[1].getName()));will(returnValue(is2));
+
+            //We should have 1 call to our job manager to create a job audit trail record
+            oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)), with(any(String.class)));
         }});
 
         ModelAndView mav = controller.duplicateJob(mockRequest, mockResponse, jobId, files);

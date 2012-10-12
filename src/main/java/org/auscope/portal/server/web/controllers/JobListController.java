@@ -293,13 +293,13 @@ public class JobListController extends BasePortalController  {
             // we need to update the job status because we don't know
             // whether or not the job has already been run
             updateJobStatus(job);
-            
+
             // we need to inform the user that the job cancelling is aborted
             // because the job has already been processed.
             if (job.getStatus().equals(JobBuilderController.STATUS_DONE)) {
                 return generateJSONResponseMAV(false, null, "Cancelling of job aborted as it has already been processed.");
             }
-            
+
             // terminate the EMI instance
             terminateInstance(job);
         } catch (Exception e) {
@@ -760,20 +760,17 @@ public class JobListController extends BasePortalController  {
         //Attempt to save the new job to the DB
         try {
             jobManager.saveJob(newJob);
-
             //This needs to be set AFTER we first save the job (the ID will form part of the key)
             newJob.setStorageBaseKey(cloudStorageService.generateBaseKey(newJob));
             jobManager.saveJob(newJob);
         } catch (Exception ex) {
-            log.error("Unable to save job to database: " + ex.getMessage());
-            log.debug("Exception:", ex);
+            log.error("Unable to save job to database: " + ex.getMessage(), ex);
             return generateJSONResponseMAV(false, null, "Unable to save new job.");
         }
 
         try {
             //Lets setup a staging area for the input files
             fileStagingService.generateStageInDirectory(newJob);
-
             //Write every file to the local staging area
             CloudFileInformation[] cloudFiles = cloudStorageService.listJobFiles(oldJob);
             for (CloudFileInformation cloudFile : cloudFiles) {
@@ -791,8 +788,7 @@ public class JobListController extends BasePortalController  {
                 }
             }
         } catch (Exception ex) {
-            log.error("Unable to duplicate input files: " + ex.getMessage());
-            log.debug("Exception:", ex);
+            log.error("Unable to duplicate input files: " + ex.getMessage(), ex);
             //Tidy up after ourselves
             jobManager.deleteJob(newJob);
             // Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
@@ -801,6 +797,7 @@ public class JobListController extends BasePortalController  {
             return generateJSONResponseMAV(false, null, "Unable to save new job.");
         }
 
+        jobManager.createJobAuditTrail(null, newJob, "Job duplicated.");
         return generateJSONResponseMAV(true, Arrays.asList(newJob), "");
     }
 }
