@@ -41,7 +41,6 @@ import org.auscope.portal.server.web.service.VglMachineImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -617,45 +616,46 @@ public class JobBuilderController extends BasePortalController {
             } else {
                 // we need to keep track of old job for audit trail purposes
                 oldJobStatus = curJob.getStatus();
-                // Right before we submit - pump out a script file for downloading every VglDownload object when the VM starts
-                if (!createDownloadScriptFile(curJob, DOWNLOAD_SCRIPT)) {
-                    logger.error(String.format("Error creating download script '%1$s' for job with id %2$s", DOWNLOAD_SCRIPT, jobId));
-                    errorDescription = "There was a problem configuring the data download script.";
-                    errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
-                } else {
-                    // copy files to S3 storage for processing
-                    // get job files from local directory
-                    StagedFile[] stagedFiles = fileStagingService.listStageInDirectoryFiles(curJob);
-                    if (stagedFiles.length == 0) {
-                        errorDescription = "There wasn't any input files found for submitting your job for processing.";
-                        errorCorrection = "Please upload your input files and try again.";
+
+                // final check to ensure user has permission to run the job
+                boolean permissionGranted = false;
+
+                String jobImageId = curJob.getComputeVmId();
+                String[] userRoles = (String[])request.getSession().getAttribute("user-roles");
+                VglMachineImage[] images = vglImageService.getImagesByRoles(userRoles);
+
+                for (VglMachineImage vglMachineImage : images) {
+                    if (vglMachineImage.getImageId().equals(jobImageId)) {
+                        permissionGranted = true;
+                        break;
+                    }
+                }
+
+                if (permissionGranted) {
+                    // Right before we submit - pump out a script file for downloading every VglDownload object when the VM starts
+                    if (!createDownloadScriptFile(curJob, DOWNLOAD_SCRIPT)) {
+                        logger.error(String.format("Error creating download script '%1$s' for job with id %2$s", DOWNLOAD_SCRIPT, jobId));
+                        errorDescription = "There was a problem configuring the data download script.";
+                        errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
                     } else {
-                        // Upload them to storage
-                        File[] files = new File[stagedFiles.length];
-                        for (int i = 0; i < stagedFiles.length; i++) {
-                            files[i] = stagedFiles[i].getFile();
-                        }
-                        cloudStorageService.uploadJobFiles(curJob, files);
-
-                        // create our input user data string
-                        String userDataString = null;
-                        userDataString = createBootstrapForJob(curJob);
-
-                        // final check to ensure user has permission to run the job
-                        boolean permissionGranted = false;
-
-                        String jobImageId = curJob.getComputeVmId();
-                        String[] userRoles = (String[])request.getSession().getAttribute("user-roles");
-                        VglMachineImage[] images = vglImageService.getImagesByRoles(userRoles);
-
-                        for (VglMachineImage vglMachineImage : images) {
-                            if (vglMachineImage.getImageId().equals(jobImageId)) {
-                                permissionGranted = true;
-                                break;
+                        // copy files to S3 storage for processing
+                        // get job files from local directory
+                        StagedFile[] stagedFiles = fileStagingService.listStageInDirectoryFiles(curJob);
+                        if (stagedFiles.length == 0) {
+                            errorDescription = "There wasn't any input files found for submitting your job for processing.";
+                            errorCorrection = "Please upload your input files and try again.";
+                        } else {
+                            // Upload them to storage
+                            File[] files = new File[stagedFiles.length];
+                            for (int i = 0; i < stagedFiles.length; i++) {
+                                files[i] = stagedFiles[i].getFile();
                             }
-                        }
+                            cloudStorageService.uploadJobFiles(curJob, files);
 
-                        if (permissionGranted) {
+                            // create our input user data string
+                            String userDataString = null;
+                            userDataString = createBootstrapForJob(curJob);
+
                             // launch the ec2 instance
                             instanceId = cloudComputeService.executeJob(curJob, userDataString);
                             logger.info("Launched instance: " + instanceId);
@@ -665,11 +665,11 @@ public class JobBuilderController extends BasePortalController {
                             curJob.setSubmitDate(new Date());
                             jobManager.saveJob(curJob);
                             succeeded = true;
-                        } else {
-                            errorDescription = "You do not have the permission to submit this job for processing.";
-                            errorCorrection = "If you think this is wrong, please report it to cg-admin@csiro.au.";
                         }
                     }
+                } else {
+                    errorDescription = "You do not have the permission to submit this job for processing.";
+                    errorCorrection = "If you think this is wrong, please report it to cg-admin@csiro.au.";
                 }
             }
         } catch (PortalServiceException e) {

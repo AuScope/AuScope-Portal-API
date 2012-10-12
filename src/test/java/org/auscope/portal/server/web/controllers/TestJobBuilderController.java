@@ -107,6 +107,12 @@ public class TestJobBuilderController {
         jobObj.setStorageSecretKey("secretKey");
 
         context.checking(new Expectations() {{
+            //We should have access control check to ensure user has permission to run the job
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+            oneOf(mockImageService).getImagesByRoles((String[])sessionVariables.get("user-roles"));will(returnValue(mockImages));
+            oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
+
             //We should have 1 call to our job manager to get our job object and 1 call to save it
             oneOf(mockJobManager).getJobById(jobObj.getId());will(returnValue(jobObj));
             oneOf(mockJobManager).saveJob(jobObj);
@@ -126,12 +132,6 @@ public class TestJobBuilderController {
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(equal(new File[] {mockFile1, mockFile2})));
             inSequence(jobFileSequence);
 
-            //We should have access control check to ensure user has permission to run the job
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
-            oneOf(mockImageService).getImagesByRoles((String[])sessionVariables.get("user-roles"));will(returnValue(mockImages));
-            oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
-
             //And finally 1 call to execute the job
             oneOf(mockCloudComputeService).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(instanceId));
 
@@ -149,7 +149,46 @@ public class TestJobBuilderController {
     }
 
     /**
-     * Tests that job submission correctly interacts with all dependencies
+     * Tests that job submission fails correctly when user doesn't have permission to use
+     * the VMI.
+     */
+    @Test
+    public void testJobSubmission_PermissionDenied() throws Exception {
+        //Instantiate our job object
+        final VEGLJob jobObj = new VEGLJob(new Integer(13));
+        final String injectedComputeVmId = "injected-compute-vmi-id";
+        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
+        final String errorDescription = "You do not have the permission to submit this job for processing.";
+
+        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
+        jobObj.setComputeVmId(injectedComputeVmId);
+        jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
+
+        context.checking(new Expectations() {{
+            //We should have 1 call to our job manager to get our job object and 1 call to save it
+            oneOf(mockJobManager).getJobById(jobObj.getId());will(returnValue(jobObj));
+            oneOf(mockJobManager).saveJob(jobObj);
+
+            //We should have access control check to ensure user has permission to run the job
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+            oneOf(mockImageService).getImagesByRoles((String[])sessionVariables.get("user-roles"));will(returnValue(mockImages));
+            oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
+
+            //We should have 1 call to our job manager to create a job audit trail record
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, errorDescription);
+        }});
+
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
+    }
+
+    /**
+     * Tests that job submission fails correctly when the job doesn't exist
      * @throws Exception
      */
     @Test
@@ -161,6 +200,7 @@ public class TestJobBuilderController {
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobId);
+
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -172,17 +212,27 @@ public class TestJobBuilderController {
     public void testJobSubmission_S3Failure() throws Exception {
         //Instantiate our job object
         final VEGLJob jobObj = new VEGLJob(13);
+        final String computeVmId = "compute-vmi-id";
         final File mockFile1 = context.mock(File.class, "MockFile1");
         final File mockFile2 = context.mock(File.class, "MockFile2");
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
+        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
 
+        jobObj.setComputeVmId(computeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId());will(returnValue(jobObj));
+
+            //We should have access control check to ensure user has permission to run the job
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+            oneOf(mockImageService).getImagesByRoles((String[])sessionVariables.get("user-roles"));will(returnValue(mockImages));
+            oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
 
             oneOf(mockFileStagingService).writeFile(jobObj, JobBuilderController.DOWNLOAD_SCRIPT);
             will(returnValue(bos));
