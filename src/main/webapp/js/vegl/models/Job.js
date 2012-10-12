@@ -33,13 +33,10 @@ Ext.define('vegl.models.Job', {
         { name: 'computeInstanceId', type: 'string'}, //the ID of the VM instance that is running this job (will be null if no job is currently running)
         { name: 'computeInstanceType', type: 'string'}, //The type of the compute instance to start (size of memory, number of CPUs etc) - eg m1.large. Can be null
         { name: 'computeInstanceKey', type: 'string'}, //The name of the key to inject into the instance at startup for root access. Can be null
+        { name: 'computeServiceId', type: 'string'}, //The ID of the compute service used to execute this job
 
-        { name: 'storageProvider', type: 'string'}, //A unique identifier identifying the type of storage API used to store this job's files
-        { name: 'storageEndpoint', type: 'string'}, //The endpoint for the cloud storage service
-        { name: 'storageBucket', type: 'string'}, //The 'bucket' name where input/output files will be staged for this job
+        { name: 'storageServiceId', type: 'string'}, //The ID of the storage service used to store this job's input/outputs
         { name: 'storageBaseKey', type: 'string'}, //The key prefix for all files associated with this job in the specified storage bucket
-        { name: 'storageAccessKey', type: 'string'}, //The access key (user name) for writing to storage
-        { name: 'storageSecretKey', type: 'string'}, //the secret key (password) for writing to storage
 
         { name: 'registeredUrl', type: 'string'},
         { name: 'seriesId', type: 'int'},

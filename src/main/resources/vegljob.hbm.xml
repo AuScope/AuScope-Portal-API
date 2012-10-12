@@ -12,18 +12,15 @@
         <property name="user"/>
         <property name="submitDate"/>
         <property name="status"/>
+        <property name="computeServiceId"/>
         <property name="computeVmId"/>
         <property name="computeInstanceId"/>
         <property name="computeInstanceType"/>
         <property name="computeInstanceKey"/>
-        <property name="storageEndpoint"/>
-        <property name="storageBucket"/>
-        <property name="storageAccessKey"/>
-        <property name="storageSecretKey"/>
+        <property name="storageServiceId"/>
         <property name="registeredUrl"/>
         <property name="seriesId"/>
         <property name="storageBaseKey"/>
-        <property name="storageProvider"/>
 
         <map name="jobParameters" lazy="false" cascade="all" inverse="true">
             <key column="jobId"/>

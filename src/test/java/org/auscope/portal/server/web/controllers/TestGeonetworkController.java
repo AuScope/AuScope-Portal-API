@@ -91,7 +91,6 @@ public class TestGeonetworkController {
             allowing(mockJob).getName();will(returnValue("name"));
             allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
-            allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
 
@@ -105,6 +104,7 @@ public class TestGeonetworkController {
 
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageService).listJobFiles(mockJob);will(returnValue(outputFileInfo));
+            allowing(cloudStorageService).getBucket();will(returnValue("s3-output-bucket"));
 
             //Only 1 call to save our newly created record
             oneOf(mockGNService).makeCSWRecordInsertion(with(any(CSWRecord.class)));will(returnValue(registeredUrl));
@@ -232,7 +232,6 @@ public class TestGeonetworkController {
             allowing(mockJob).getName();will(returnValue("name"));
             allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
-            allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
 
@@ -246,6 +245,7 @@ public class TestGeonetworkController {
 
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageService).listJobFiles(mockJob);will(returnValue(outputFileInfo));
+            allowing(cloudStorageService).getBucket();will(returnValue("s3-output-bucket"));
 
             //Only 1 call to save our newly created record
             oneOf(mockGNService).makeCSWRecordInsertion(with(any(CSWRecord.class)));will(throwException(new Exception()));

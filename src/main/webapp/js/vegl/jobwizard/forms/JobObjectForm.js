@@ -58,19 +58,24 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 xtype: 'textfield',
                 name: 'name',
                 fieldLabel: 'Job Name',
-                emptyText : 'Enter an optional descriptive name for your job here.',
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Enter an optional descriptive name for your job here.'
+                }],
                 allowBlank: true
             },{
                 xtype: 'textfield',
                 name: 'description',
                 fieldLabel: 'Job Description',
-                emptyText : 'Enter an optional description for your job here.',
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Enter an optional description for your job here.'
+                }],
                 allowBlank: true
             },{
                 xtype : 'machineimagecombo',
                 fieldLabel : 'Toolbox',
                 name: 'computeVmId',
-                emptyText : 'Select a set of tools to help run your job.',
                 allowBlank: false,
                 queryMode: 'local',
                 triggerAction: 'all',
@@ -79,26 +84,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 listConfig : {
                     loadingText: 'Getting tools...',
                     emptyText: 'No matching toolboxes found.'
-                }
-            },{
-                xtype: 'textfield',
-                name: 'storageBucket',
-                emptyText: 'Enter a cloud storage container where your job results will be stored',
-                fieldLabel: 'Storage Container',
-                value : 'vegl-portal',
-                allowBlank: false
-            },{
-                xtype: 'textfield',
-                name: 'storageAccessKey',
-                emptyText: 'Enter a cloud storage access key that will be used to store your job outputs',
-                fieldLabel: 'Storage Access Key',
-                allowBlank: false
-            }, {
-                xtype: 'textfield',
-                name: 'storageSecretKey',
-                inputType: 'password',
-                fieldLabel: 'Storage Secret Key',
-                allowBlank: false
+                },
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select a toolbox that contains software that you would like to use to process your data.'
+                }]
             },
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'emailAddress' },

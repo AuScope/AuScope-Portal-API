@@ -429,16 +429,12 @@ public class JobBuilderController extends BasePortalController {
             @RequestParam(value="computeInstanceKey", required=false) String computeInstanceKey,
             @RequestParam(value="computeInstanceType", required=false) String computeInstanceType,
             @RequestParam(value="computeVmId", required=false) String computeVmId,
-            @RequestParam(value="storageAccessKey", required=false) String storageAccessKey,
             @RequestParam(value="storageBaseKey", required=false) String storageBaseKey,
-            @RequestParam(value="storageBucket", required=false) String storageBucket,
-            @RequestParam(value="storageEndpoint", required=false) String storageEndpoint,
-            @RequestParam(value="storageProvider", required=false) String storageProvider,
-            @RequestParam(value="storageSecretKey", required=false) String storageSecretKey,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl) throws ParseException {
 
         //Build our VEGLJob from all of the specified parameters
         VEGLJob job = new VEGLJob(id);
+        job.setComputeServiceId(cloudComputeService.getId());
         job.setComputeInstanceId(computeInstanceId);
         job.setComputeInstanceKey(computeInstanceKey);
         job.setComputeInstanceType(computeInstanceType);
@@ -449,12 +445,8 @@ public class JobBuilderController extends BasePortalController {
         job.setRegisteredUrl(registeredUrl);
         job.setSeriesId(seriesId);
         job.setStatus(status);
-        job.setStorageAccessKey(storageAccessKey);
+        job.setStorageServiceId(cloudStorageService.getId());
         job.setStorageBaseKey(storageBaseKey);
-        job.setStorageBucket(storageBucket);
-        job.setStorageEndpoint(storageEndpoint);
-        job.setStorageProvider(storageProvider);
-        job.setStorageSecretKey(storageSecretKey);
         job.setSubmitDate(submitDate);
         job.setUser(user);
 
@@ -575,13 +567,13 @@ public class JobBuilderController extends BasePortalController {
         String bootstrapTemplate = getBootstrapTemplate();
 
         Object[] arguments = new Object[] {
-            job.getStorageBucket(), //STORAGE_BUCKET
+            cloudStorageService.getBucket(), //STORAGE_BUCKET
             job.getStorageBaseKey().replace("//", "/"), //STORAGE_BASE_KEY_PATH
-            job.getStorageAccessKey(), //STORAGE_ACCESS_KEY
-            job.getStorageSecretKey(), //STORAGE_SECRET_KEY
+            cloudStorageService.getAccessKey(), //STORAGE_ACCESS_KEY
+            cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
             hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
             hostConfigurer.resolvePlaceholder("storage.endpoint"), //STORAGE_ENDPOINT
-            "swift" //STORAGE_TYPE
+            cloudStorageService.getProvider() //STORAGE_TYPE
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);
@@ -732,15 +724,13 @@ public class JobBuilderController extends BasePortalController {
         //Load details from
         job.setUser((String) session.getAttribute("openID-Email"));
         job.setEmailAddress((String) session.getAttribute("openID-Email"));
-
+        job.setComputeServiceId(cloudComputeService.getId());
         job.setComputeInstanceType("m1.large");
         job.setComputeInstanceKey("vgl-developers");
-        job.setStorageProvider(hostConfigurer.resolvePlaceholder("storage.provider"));
-        job.setStorageEndpoint(hostConfigurer.resolvePlaceholder("storage.endpoint"));
-        job.setStorageBucket("vegl-portal");
-        job.setName("VEGL-Job");
+        job.setName("VGL-Job " + new Date().toString());
         job.setDescription("");
         job.setStatus(STATUS_UNSUBMITTED);
+        job.setStorageServiceId(cloudStorageService.getId());
 
         //We need an ID for storing our job file that won't collide with other storage ID's
         job.setStorageBaseKey(cloudStorageService.generateBaseKey(job));

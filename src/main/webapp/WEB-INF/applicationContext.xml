@@ -87,7 +87,13 @@
     </bean>
 
     <bean id="cloudStorageService" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+        <constructor-arg name="endpoint" value="${storage.endpoint}"/>
+        <constructor-arg name="provider" value="${storage.provider}"/>
+        <constructor-arg name="accessKey" value="${env.storage.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.storage.secretkey}"/>
         <property name="relaxHostName" value="true"/>
+        <property name="id" value="nci-openstack-storage"/>
+        <property name="bucket" value="vegl-portal"/>
     </bean>
 
     <bean id="cloudComputeService" class="org.auscope.portal.core.services.cloud.CloudComputeService">
@@ -98,6 +104,7 @@
                 <constructor-arg name="secretKey" value="${env.ec2.secretkey}"/>
             </bean>
         </constructor-arg>
+        <property name="id" value="nci-openstack-compute"/>
     </bean>
 
     <bean id="fileStagingService" class="org.auscope.portal.core.services.cloud.FileStagingService">

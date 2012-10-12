@@ -23,7 +23,6 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.ResourceUtil;
-import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VglDownload;
@@ -94,17 +93,16 @@ public class TestJobBuilderController {
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
         final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final String storageBucket = "storage-bucket";
+        final String storageAccess = "213-asd-54";
+        final String storageSecret = "tops3cret";
+        final String storageProvider = "provider";
 
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
         jobObj.setComputeVmId(computeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
         jobObj.setStorageBaseKey("base/key");
-        jobObj.setStorageAccessKey("accessKey");
-        jobObj.setStorageBucket("bucket");
-        jobObj.setStorageEndpoint("http://example.com/storage");
-        jobObj.setStorageProvider("example-storage-provider");
-        jobObj.setStorageSecretKey("secretKey");
 
         context.checking(new Expectations() {{
             //We should have access control check to ensure user has permission to run the job
@@ -127,6 +125,11 @@ public class TestJobBuilderController {
 
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
+
+            allowing(mockCloudStorageService).getBucket();will(returnValue(storageBucket));
+            allowing(mockCloudStorageService).getAccessKey();will(returnValue(storageAccess));
+            allowing(mockCloudStorageService).getSecretKey();will(returnValue(storageSecret));
+            allowing(mockCloudStorageService).getProvider();will(returnValue(storageProvider));
 
             //We should have 1 call to upload them
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(equal(new File[] {mockFile1, mockFile2})));
@@ -275,6 +278,10 @@ public class TestJobBuilderController {
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
         final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final String storageBucket = "storage-bucket";
+        final String storageAccess = "213-asd-54";
+        final String storageSecret = "tops3cret";
+        final String storageProvider = "provider";
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
         context.checking(new Expectations() {{
@@ -290,6 +297,11 @@ public class TestJobBuilderController {
 
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
+
+            allowing(mockCloudStorageService).getBucket();will(returnValue(storageBucket));
+            allowing(mockCloudStorageService).getAccessKey();will(returnValue(storageAccess));
+            allowing(mockCloudStorageService).getSecretKey();will(returnValue(storageSecret));
+            allowing(mockCloudStorageService).getProvider();will(returnValue(storageProvider));
 
             //We should have 1 call to upload them
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
@@ -357,25 +369,31 @@ public class TestJobBuilderController {
     @Test
     public void testCreateBootstrapForJob() throws Exception {
         final VEGLJob job = new VEGLJob(1234);
+        final String bucket = "stora124e-Bucket";
+        final String access = "213-asd-54";
+        final String secret = "tops3cret";
+        final String provider = "provider";
 
         context.checking(new Expectations() {{
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
+            allowing(mockCloudStorageService).getBucket();will(returnValue(bucket));
+            allowing(mockCloudStorageService).getAccessKey();will(returnValue(access));
+            allowing(mockCloudStorageService).getSecretKey();will(returnValue(secret));
+            allowing(mockCloudStorageService).getProvider();will(returnValue(provider));
         }});
 
-        job.setStorageBucket("stora124e-Bucket");
-        job.setStorageAccessKey("213-asd-54");
         job.setStorageBaseKey("test/key");
-        job.setStorageSecretKey("tops3cret");
 
         String contents = controller.createBootstrapForJob(job);
         Assert.assertNotNull(contents);
         Assert.assertTrue("Bootstrap is empty!", contents.length() > 0);
         Assert.assertFalse("Boostrap needs Unix style line endings!", contents.contains("\r"));
-        Assert.assertTrue(contents.contains(job.getStorageBucket()));
-        Assert.assertTrue(contents.contains(job.getStorageAccessKey()));
+        Assert.assertTrue(contents.contains(bucket));
+        Assert.assertTrue(contents.contains(access));
         Assert.assertTrue(contents.contains(job.getStorageBaseKey()));
-        Assert.assertTrue(contents.contains(job.getStorageSecretKey()));
+        Assert.assertTrue(contents.contains(secret));
+        Assert.assertTrue(contents.contains(provider));
     }
 
     /**
@@ -440,6 +458,8 @@ public class TestJobBuilderController {
         final String storageProvider = "swift";
         final String storageEndpoint = "http://example.org/storage";
         final String baseKey = "base/key";
+        final String storageServiceId = "storage-service";
+        final String computeServiceId = "compute-service";
 
         sessionVariables.put("doubleValue", 123.45);
         sessionVariables.put("intValue", 123);
@@ -458,7 +478,10 @@ public class TestJobBuilderController {
             allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(null));
             allowing(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, null);
 
+            allowing(mockCloudComputeService).getId();will(returnValue(computeServiceId));
+
             oneOf(mockCloudStorageService).generateBaseKey(with(any(VEGLJob.class)));will(returnValue(baseKey));
+            allowing(mockCloudStorageService).getId();will(returnValue(storageServiceId));
 
             oneOf(mockHostConfigurer).resolvePlaceholder("storage.provider");will(returnValue(storageProvider));
             oneOf(mockHostConfigurer).resolvePlaceholder("storage.endpoint");will(returnValue(storageEndpoint));
@@ -480,8 +503,8 @@ public class TestJobBuilderController {
 
         VEGLJob newJob = data.get(0);
         Assert.assertNotNull(newJob);
-        Assert.assertEquals(storageEndpoint, newJob.getStorageEndpoint());
-        Assert.assertEquals(storageProvider, newJob.getStorageProvider());
+        Assert.assertEquals(storageServiceId, newJob.getStorageServiceId());
+        Assert.assertEquals(computeServiceId, newJob.getComputeServiceId());
         Assert.assertEquals(baseKey, newJob.getStorageBaseKey());
 
         Map<String, VglParameter> params = newJob.getJobParameters();
