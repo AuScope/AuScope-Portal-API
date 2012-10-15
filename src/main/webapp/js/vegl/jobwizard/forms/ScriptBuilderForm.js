@@ -29,7 +29,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
             layout : 'fit',
             listeners : {
                 jobWizardActive : function() {
-                    if (this.wizardState.userAction == 'edit') {
+                    if (this.wizardState.userAction == 'edit' || this.wizardState.userAction == 'duplicate') {
                         this.loadSavedScript(this.wizardState.jobId);
                         // Once the script is loaded into the memory,
                         // we don't want it to be loaded again to prevent

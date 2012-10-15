@@ -250,6 +250,10 @@ Ext.define('vegl.widgets.JobsPanel', {
         store.load();
     },
 
+    refreshJobsForSeries : function() {
+        this.getStore().load();
+    },
+
     cancelJob : function(job) {
         Ext.Msg.show({
             title: 'Cancel Job',
@@ -277,7 +281,8 @@ Ext.define('vegl.widgets.JobsPanel', {
                                 return;
                             }
 
-                            this.getStore().load();//refresh our store
+                            //refresh our store
+                            this.refreshJobsForSeries();
                         }
                     });
                 }
@@ -312,7 +317,8 @@ Ext.define('vegl.widgets.JobsPanel', {
                                 return;
                             }
 
-                            this.getStore().load();//refresh our store
+                            //refresh our store
+                            this.refreshJobsForSeries();
                         }
                     });
                 }
@@ -331,13 +337,20 @@ Ext.define('vegl.widgets.JobsPanel', {
                 xtype : 'jobwizard',
                 border : false,
                 wizardState : {
-                    duplicateJobId : job.get('id')
+                    duplicateJobId : job.get('id'),
+                    userAction : 'duplicate'
                 },
                 forms : ['vegl.jobwizard.forms.DuplicateJobForm',
                          'vegl.jobwizard.forms.JobObjectForm',
+                         'vegl.jobwizard.forms.ScriptBuilderForm',
                          'vegl.jobwizard.forms.JobSubmitForm']
             }]
         });
+
+        //on close event, refresh our store so that the cloned job
+        //will be displayed on the job list panel
+        popup.on('close', this.refreshJobsForSeries, this);
+
         popup.show();
     },
 
