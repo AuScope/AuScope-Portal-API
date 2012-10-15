@@ -120,7 +120,7 @@
                 <configuration>
                     <!--
                     <excludes>
-                        Exclude Ext JS 
+                        Exclude Ext JS
                         <exclude>portal-core/**</exclude>
                         <exclude>external/**</exclude>
                     </excludes>
@@ -141,7 +141,7 @@
         <spring.version>3.0.5.RELEASE</spring.version>
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>1.6</targetJdk>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>            
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <repositories>
@@ -280,6 +280,12 @@
             <artifactId>netcdf</artifactId>
             <version>4.1</version>
             <optional>false</optional>
+        </dependency>
+        <!-- Added for Amazon cloud -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.2.2</version>
         </dependency>
     </dependencies>
 </project>
