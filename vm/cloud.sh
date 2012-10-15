@@ -10,8 +10,8 @@ then
         #To overcome swift tool using directory structure as part of key
         #Change to directory before running this command (then change back)
         originalDir=`pwd`
-        fileDir=`dirname "$5"`
-        fileName=`basename "$5"`
+        fileDir=`dirname "$3"`
+        fileName=`basename "$3"`
 
         cd "$fileDir"
         swift upload "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH" "$fileName"
