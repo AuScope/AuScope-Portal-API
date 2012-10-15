@@ -128,7 +128,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             },
             waitMsg : 'Saving Job state...',
             failure : function() {
-                Ext.Msg.alert('Input Error', 'Storage container, storage access key and storage secret key must not be blank.');
+                Ext.Msg.alert('Input Error', 'You must select a toolbox before proceeding!');
                 callback(false);
             },
             success : function() {
