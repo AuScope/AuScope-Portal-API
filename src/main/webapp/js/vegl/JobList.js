@@ -43,6 +43,10 @@ Ext.application({
                     jobDetailsPanel.showDetailsForJob(job);
                     jobFilesPanel.listFilesForJob(job);
                 },
+                refreshDetailsPanel : function(panel, series) {
+                    jobDetailsPanel.showDetailsForSeries(series);
+                    jobFilesPanel.cleanupDataStore();
+                },
                 error : onError
             },
             viewConfig : {
@@ -70,6 +74,12 @@ Ext.application({
                 selectseries : function(panel, series) {
                     jobsPanel.listJobsForSeries(series);
                     jobDetailsPanel.showDetailsForSeries(series);
+                    jobFilesPanel.cleanupDataStore();
+                },
+                refreshDetailsPanel : function() {
+                    jobsPanel.cleanupDataStore();
+                    jobDetailsPanel.cleanupDetails();
+                    jobFilesPanel.cleanupDataStore();
                 },
                 error : onError
             }

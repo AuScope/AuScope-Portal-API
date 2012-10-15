@@ -10,7 +10,6 @@ Ext.define('vegl.widgets.DetailsPanel', {
     seriesTemplate : null,
 
     constructor : function(config) {
-
         this.seriesTemplate = new Ext.Template(
             '<p class="jobdesc-title">{name}</p><br/>',
             '<p class="jobdesc-key">Description:</p><br/><p>{description}</p>');
@@ -42,5 +41,12 @@ Ext.define('vegl.widgets.DetailsPanel', {
      */
     showDetailsForSeries : function(series) {
         this.seriesTemplate.overwrite(this.getEl(), series.data);
+    },
+
+    /**
+     * Updates the body of this panel with an empty string
+     */
+    cleanupDetails : function() {
+        this.getEl().setHTML("");
     }
 });

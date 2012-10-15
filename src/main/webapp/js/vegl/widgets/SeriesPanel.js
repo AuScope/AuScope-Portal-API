@@ -4,6 +4,8 @@
  *
  * Adds the following events
  * selectseries : function(vegl.widgets.SeriesPanel panel, vegl.models.Series selection) - fires whenever a new Series is selected
+ * refreshDetailsPanel : function(vegl.widgets.SeriesPanel panel, vegl.models.Series series) - fires whenever a Series is successfully deleted
+ * error : function(vegl.widgets.SereisPanel panel, String message) - fires whenever a comms error occurs
  */
 Ext.define('vegl.widgets.SeriesPanel', {
     extend : 'Ext.grid.Panel',
@@ -78,6 +80,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
 
         this.addEvents({
             'selectseries' : true,
+            'refreshDetailsPanel' : true,
             'error' : true
         });
 
@@ -246,6 +249,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
                             }
 
                             this.getStore().load();//refresh our store
+                            this.fireEvent('refreshDetailsPanel'); //refresh Details panel
                         }
                     });
                 }

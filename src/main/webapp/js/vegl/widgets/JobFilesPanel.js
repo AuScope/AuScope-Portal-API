@@ -121,5 +121,13 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         this.currentJob = job;
         store.removeAll(false);
         store.load();
+    },
+
+    /**
+     * Removes all files from the store and refresh the job files panel
+     */
+    cleanupDataStore : function() {
+        var store = this.getStore();
+        store.removeAll(false);
     }
 });

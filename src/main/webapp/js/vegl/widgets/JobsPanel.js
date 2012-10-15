@@ -4,6 +4,7 @@
  *
  * Adds the following events
  * selectjob : function(vegl.widgets.SeriesPanel panel, vegl.models.Job selection) - fires whenever a new Job is selected
+ * refreshDetailsPanel : function(vegl.widgets.SeriesPanel panel, vegl.models.Series series) - fires whenever a job successfully deleted
  * jobregistered : function(vegl.widgets.SeriesPanel panel, vegl.models.Job jobRegistered) - fires whenever a new Job is registered in a remote registry
  * error : function(vegl.widgets.SereisPanel panel, String message) - fires whenever a comms error occurs
  */
@@ -133,6 +134,7 @@ Ext.define('vegl.widgets.JobsPanel', {
 
         this.addEvents({
             'selectjob' : true,
+            'refreshDetailsPanel' : true,
             'jobregistered' : true,
             'error' : true
         });
@@ -205,7 +207,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                     return;
                 }
 
-                this.getStore().load();//refresh our store
+                this.refreshJobsForSeries(); //refresh our store
                 this.fireEvent('jobregistered', this, selectedJob);
             }
         });
@@ -250,8 +252,19 @@ Ext.define('vegl.widgets.JobsPanel', {
         store.load();
     },
 
+    /**
+     * Reloads the store with all the jobs of currently loaded series
+     */
     refreshJobsForSeries : function() {
         this.getStore().load();
+    },
+
+    /**
+     * Removes all jobs from the store and refresh the jobs panel
+     */
+    cleanupDataStore : function() {
+        var store = this.getStore();
+        store.removeAll(false);
     },
 
     cancelJob : function(job) {
@@ -319,6 +332,8 @@ Ext.define('vegl.widgets.JobsPanel', {
 
                             //refresh our store
                             this.refreshJobsForSeries();
+                            //refresh Details panel
+                            this.fireEvent('refreshDetailsPanel', this, this.currentSeries);
                         }
                     });
                 }
