@@ -70,7 +70,7 @@ def cloudUpload(inFilePath, cloudKey):
     cloudBucket = os.environ["STORAGE_BUCKET"]
     cloudDir = os.environ["STORAGE_BASE_KEY_PATH"]
     queryPath = (cloudBucket + "/" + cloudDir + "/" + cloudKey).replace("//", "/")
-    retcode = subprocess.call(["cloud", "upload", cloudBucket,cloudDir,cloudKey, inFilePath, "--set-acl=public-read"])
+    retcode = subprocess.call(["cloud", "upload", cloudKey, inFilePath, "--set-acl=public-read"])
     logger.debug("cloudUpload: " + inFilePath + " to " + queryPath + " returned " + str(retcode))
 
 def solverCallback(k, x, fx, gfx):

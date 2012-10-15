@@ -81,16 +81,16 @@ echo "--------------------------------------"
 #Upload a file indicating that work has started
 echo "Uploading script version file..."
 echo "${VEGL_WORKFLOW_VERSION}" > workflow-version.txt
-echo "cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH workflow-version.txt workflow-version.txt"
-cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH workflow-version.txt workflow-version.txt
+echo "cloud upload workflow-version.txt workflow-version.txt"
+cloud upload workflow-version.txt workflow-version.txt
 
 #Download our input files from swift storage and load them into files in the current working directory
 echo "Downloading inputfiles from S3..."
-echo "cloud list ${STORAGE_BUCKET} ${STORAGE_BASE_KEY_PATH}"
-for line in `cloud list ${STORAGE_BUCKET} ${STORAGE_BASE_KEY_PATH}`;do
+echo "cloud list"
+for line in `cloud list`;do
        downloadOutputFile=`basename "${line}"`
-       echo "cloud download -o ${STORAGE_BUCKET} ${STORAGE_BASE_KEY_PATH} ${downloadOutputFile} ${downloadOutputFile} ${downloadOutputFile}"
-       cloud download ${STORAGE_BUCKET} ${STORAGE_BASE_KEY_PATH} ${downloadOutputFile} ${downloadOutputFile} ${downloadOutputFile}
+       echo "cloud download ${downloadOutputFile} ${downloadOutputFile} ${downloadOutputFile}"
+       cloud download ${downloadOutputFile} ${downloadOutputFile} ${downloadOutputFile}
 done
 echo "... finished downloading input files"
 
@@ -108,8 +108,8 @@ cd $WORKING_DIR
 
 #Finally upload our logs for debug purposes
 echo "About to upload output log..."
-echo "cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH $VEGL_LOG_FILE_NAME $VEGL_LOG_FILE"
-cloud upload $STORAGE_BUCKET $STORAGE_BASE_KEY_PATH $VEGL_LOG_FILE_NAME $VEGL_LOG_FILE_NAME
+echo "cloud upload $VEGL_LOG_FILE_NAME $VEGL_LOG_FILE"
+cloud upload $VEGL_LOG_FILE_NAME $VEGL_LOG_FILE_NAME
 
 #At this point we can give developers a grace period in which they can login to the VM for debugging
 echo "Sleeping for ${FINAL_SLEEP_LENGTH} before shutting down"

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# description: cloud - Wrapper class for swift tools and aws tool
-# cloud upload [bucket] [baseKey] [uploadedFileName] [file]
-# cloud download [bucket] [baseKey] [cloudFileName] [outputFile]
-# cloud list [bucket] [baseKey]
+# description: cloud - Wrapper class for swift tools and aws tool. Requires STORAGE_TYPE, STORAGE_BUCKET and STORAGE_BASE_KEY_PATH to be set.
+# cloud upload [uploadedFileName] [file]
+# cloud download [cloudFileName] [outputFile]
+# cloud list
 
 #wrapper for swift upload. Swift tool uses the file name as key
 if [ "$STORAGE_TYPE" == "swift" ] && [ "$1" == "upload" ]
@@ -14,32 +14,32 @@ then
         fileName=`basename "$5"`
 
         cd "$fileDir"
-        swift upload "$2/$3" "$fileName"
+        swift upload "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH" "$fileName"
         cd "$originalDir"
 fi
 
 #wrapper for aws upload
 if [ "$STORAGE_TYPE" == "aws" ] && [ "$1" == "upload" ]
 then
-        aws put "$2/$3/$4" "$5"
+        aws put "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/$2" "$3"
 fi
 
 #wrapper for swift download
 if [ "$STORAGE_TYPE" == "swift" ] && [ "$1" == "download" ]
 then
-        swift download -o "$5" "$2" "$3/$4"
+        swift download -o "$3" "$STORAGE_BUCKET" "$STORAGE_BASE_KEY_PATH/$2"
 fi
 
 
 #wrapper for aws download
 if [ "$STORAGE_TYPE" == "aws" ] && [ "$1" == "download" ]
 then
-        aws get "$2/$3/$4" "$5"
+        aws get "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/$2" "$3"
 fi
 
 
 #wrapper for swift download
 if [ "$STORAGE_TYPE" == "swift" ] && [ "$1" == "list" ]
 then
-        swift list "$2" -p "$3"
+        swift list "$STORAGE_BUCKET" -p "$STORAGE_BASE_KEY_PATH"
 fi
