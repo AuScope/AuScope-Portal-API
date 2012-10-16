@@ -50,7 +50,7 @@ public class PreAuthenticatedProcessingFilter extends
                     List<String> values = attrib.getValues();
                     userEmail = values.get(0);
                     request.getSession().setAttribute("openID-Email", userEmail);
-                    logger.info("openID email: " + userEmail);
+                    logger.debug("openID email: " + userEmail);
                 }
             }
 
