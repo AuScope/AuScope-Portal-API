@@ -534,6 +534,68 @@ public class TestJobBuilderController {
     }
 
     /**
+     * Tests that the updateJob works as expected
+     * @throws Exception
+     */
+    @Test
+    public void testUpdateJob() throws Exception {
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final int seriesId = 12;
+        final int jobId = 1234;
+
+        context.checking(new Expectations() {{
+            //We should have 1 call to our job manager to get our job object and 1 call to save it
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+
+            //We should have 3 fields updated
+            oneOf(mockJob).setSeriesId(seriesId);
+            oneOf(mockJob).setName("name");
+            oneOf(mockJob).setDescription("description");
+            oneOf(mockJob).setComputeVmId("computeVmId");
+
+            //We should have 1 call to save our job
+            oneOf(mockJobManager).saveJob(mockJob);
+        }});
+
+        ModelAndView mav = controller.updateJob(jobId, "name", "description",
+                "emailAddress", seriesId, "status", "user",
+                "computeInstanceId", "computeInstanceKey",
+                "computeInstanceType", "computeVmId", "storageBaseKey",
+                "registeredUrl");
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+    }
+
+    @Test
+    public void testUpdatedJob_SaveFailure() throws Exception {
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final int seriesId = 12;
+        final int jobId = 1234;
+
+        context.checking(new Expectations() {{
+            //We should have 1 call to our job manager to get our job object and 1 call to save it
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+
+            //We should have 3 fields updated
+            oneOf(mockJob).setSeriesId(seriesId);
+            oneOf(mockJob).setName("name");
+            oneOf(mockJob).setDescription("description");
+            oneOf(mockJob).setComputeVmId("computeVmId");
+
+            //We should have 1 call to save our job but will throw Exception
+            oneOf(mockJobManager).saveJob(mockJob);will(throwException(new Exception("")));            
+        }});
+
+        ModelAndView mav = controller.updateJob(jobId, "name", "description",
+                "emailAddress", seriesId, "status", "user",
+                "computeInstanceId", "computeInstanceKey",
+                "computeInstanceType", "computeVmId", "storageBaseKey",
+                "registeredUrl");
+        Assert.assertNotNull(mav);
+        Assert.assertFalse((Boolean) mav.getModel().get("success"));
+    }
+
+    /**
      * Tests that the updateJobDownloads works as expected when appending
      * @throws Exception
      */

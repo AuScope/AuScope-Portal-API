@@ -424,7 +424,6 @@ public class JobBuilderController extends BasePortalController {
             @RequestParam(value="emailAddress", required=false) String emailAddress,
             @RequestParam(value="seriesId", required=false) Integer seriesId,
             @RequestParam(value="status", required=false) String status,
-            @RequestParam(value="submitDate", required=false) Date submitDate,
             @RequestParam(value="user", required=false) String user,
             @RequestParam(value="computeInstanceId", required=false) String computeInstanceId,
             @RequestParam(value="computeInstanceKey", required=false) String computeInstanceKey,
@@ -433,23 +432,20 @@ public class JobBuilderController extends BasePortalController {
             @RequestParam(value="storageBaseKey", required=false) String storageBaseKey,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl) throws ParseException {
 
-        //Build our VEGLJob from all of the specified parameters
-        VEGLJob job = new VEGLJob(id);
-        job.setComputeServiceId(cloudComputeService.getId());
-        job.setComputeInstanceId(computeInstanceId);
-        job.setComputeInstanceKey(computeInstanceKey);
-        job.setComputeInstanceType(computeInstanceType);
-        job.setComputeVmId(computeVmId);
-        job.setDescription(description);
-        job.setEmailAddress(emailAddress);
-        job.setName(name);
-        job.setRegisteredUrl(registeredUrl);
+        //Get our job
+        VEGLJob job = null;
+        try {
+            job = jobManager.getJobById(id);
+        } catch (Exception ex) {
+            logger.error("Error fetching job with id " + id, ex);
+            return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
+        }
+
+        //Update our job from the request parameters
         job.setSeriesId(seriesId);
-        job.setStatus(status);
-        job.setStorageServiceId(cloudStorageService.getId());
-        job.setStorageBaseKey(storageBaseKey);
-        job.setSubmitDate(submitDate);
-        job.setUser(user);
+        job.setName(name);
+        job.setDescription(description);
+        job.setComputeVmId(computeVmId);
 
         //Save the VEGL job
         try {

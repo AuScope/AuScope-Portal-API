@@ -93,7 +93,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'emailAddress' },
             { xtype: 'hidden', name: 'user' },
-            { xtype: 'hidden', name: 'submitDate' },
             { xtype: 'hidden', name: 'status' },
             { xtype: 'hidden', name: 'computeInstanceId' },
             { xtype: 'hidden', name: 'computeInstanceType' },
