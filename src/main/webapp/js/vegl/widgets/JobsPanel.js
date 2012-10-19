@@ -278,11 +278,18 @@ Ext.define('vegl.widgets.JobsPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {
+                    loadMask = new Ext.LoadMask(Ext.getBody(), {
+                        msg : 'Cancelling Job...',
+                        removeMask : true
+                    });
+                    loadMask.show();
                     Ext.Ajax.request({
                         url: 'killJob.do',
                         params: { 'jobId': job.get('id')},
                         scope : this,
                         callback : function(options, success, response) {
+                            loadMask.hide();
+
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VEGL server. Please try again later.');
                                 return;
@@ -314,11 +321,19 @@ Ext.define('vegl.widgets.JobsPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {
+                    loadMask = new Ext.LoadMask(Ext.getBody(), {
+                        msg : 'Deleting Job...',
+                        removeMask : true
+                    });
+                    loadMask.show();
                     Ext.Ajax.request({
                         url: 'deleteJob.do',
                         params: { 'jobId': job.get('id')},
+                        timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
                         scope : this,
                         callback : function(options, success, response) {
+                            loadMask.hide();
+
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VEGL server. Please try again later.');
                                 return;
