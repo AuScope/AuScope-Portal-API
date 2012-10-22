@@ -87,14 +87,27 @@
     </bean>
 
     <bean id="cloudStorageService" class="org.auscope.portal.core.services.cloud.CloudStorageService">
-        <constructor-arg name="endpoint" value="${storage.endpoint}"/>
-        <constructor-arg name="provider" value="${storage.provider}"/>
+        <constructor-arg name="endpoint" value="https://s3.nci.org.au:8080/auth/v1.0"/>
+        <constructor-arg name="provider" value="swift"/>
         <constructor-arg name="accessKey" value="${env.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.storage.secretkey}"/>
         <property name="relaxHostName" value="true"/>
         <property name="id" value="nci-openstack-storage"/>
         <property name="bucket" value="vegl-portal"/>
+        <property name="authVersion" value="1.0"/>
     </bean>
+
+    <!--
+    <bean id="cloudStorageService" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+        <constructor-arg name="provider" value="swift-keystone"/>
+        <constructor-arg name="accessKey" value="${env.storage.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.storage.secretkey}"/>
+        <property name="id" value="nectar-openstack-storage"/>
+        <property name="bucket" value="vgl-portal"/>
+        <property name="authVersion" value="2.0"/>
+    </bean>
+     -->
 
     <bean id="cloudComputeService" class="org.auscope.portal.core.services.cloud.CloudComputeService">
         <constructor-arg name="endpoint" value="${ec2.endpoint}"/>

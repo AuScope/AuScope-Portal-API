@@ -570,7 +570,8 @@ public class JobBuilderController extends BasePortalController {
             cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
             hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
             hostConfigurer.resolvePlaceholder("storage.endpoint"), //STORAGE_ENDPOINT
-            cloudStorageService.getProvider() //STORAGE_TYPE
+            cloudStorageService.getProvider(), //STORAGE_TYPE
+            cloudStorageService.getAuthVersion() == null ? "1.0" : cloudStorageService.getAuthVersion() //STORAGE_AUTH_VERSION
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);

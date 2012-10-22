@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# description: cloud - Wrapper class for swift tools and aws tool. Requires STORAGE_TYPE, STORAGE_BUCKET and STORAGE_BASE_KEY_PATH to be set.
+# description: cloud - Wrapper class for swift tools and aws tool. Requires STORAGE_TYPE, STORAGE_BUCKET, STORAGE_BASE_KEY_PATH and STORAGE_AUTH_VERSION to be set.
 # cloud upload [uploadedFileName] [file]
 # cloud download [cloudFileName] [outputFile]
 # cloud list
 
 #wrapper for swift upload. Swift tool uses the file name as key
-if [ "$STORAGE_TYPE" == "swift" ] && [ "$1" == "upload" ]
+if [[ $STORAGE_TYPE == swift* ]] && [ "$1" == "upload" ]
 then
         #To overcome swift tool using directory structure as part of key
         #Change to directory before running this command (then change back)
@@ -14,7 +14,7 @@ then
         fileName=`basename "$3"`
 
         cd "$fileDir"
-        swift upload "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH" "$fileName"
+        swift upload "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH" "$fileName" -V "$STORAGE_AUTH_VERSION"
         cd "$originalDir"
 fi
 
@@ -25,9 +25,9 @@ then
 fi
 
 #wrapper for swift download
-if [ "$STORAGE_TYPE" == "swift" ] && [ "$1" == "download" ]
+if [[ $STORAGE_TYPE == swift* ]] && [ "$1" == "download" ]
 then
-        swift download -o "$3" "$STORAGE_BUCKET" "$STORAGE_BASE_KEY_PATH/$2"
+        swift download -o "$3" "$STORAGE_BUCKET" "$STORAGE_BASE_KEY_PATH/$2" -V "$STORAGE_AUTH_VERSION"
 fi
 
 
@@ -39,7 +39,7 @@ fi
 
 
 #wrapper for swift download
-if [ "$STORAGE_TYPE" == "swift" ] && [ "$1" == "list" ]
+if [[ $STORAGE_TYPE == swift* ]] && [ "$1" == "list" ]
 then
-        swift list "$STORAGE_BUCKET" -p "$STORAGE_BASE_KEY_PATH"
+        swift list "$STORAGE_BUCKET" -p "$STORAGE_BASE_KEY_PATH" -V "$STORAGE_AUTH_VERSION"
 fi
