@@ -12,6 +12,8 @@ Ext.define('vegl.widgets.JobsPanel', {
     extend : 'Ext.grid.Panel',
     alias : 'widget.jobspanel',
 
+    jobSeriesFrm : null,
+
     currentSeries : null,
     cancelJobAction : null,
     deleteJobAction : null,
@@ -24,6 +26,8 @@ Ext.define('vegl.widgets.JobsPanel', {
      * hideRegisterButton : Boolean - if true the 'register to geonetwork' button will be hidden
      */
     constructor : function(config) {
+        this.jobSeriesFrm = config.jobSeriesFrm;
+
         this.cancelJobAction = new Ext.Action({
             text: 'Cancel job',
             iconCls: 'cross-icon',
@@ -58,6 +62,11 @@ Ext.define('vegl.widgets.JobsPanel', {
             handler: function() {
                 var selection = this.getSelectionModel().getSelection();
                 if (selection.length > 0) {
+                    //This is needed to ensure job submission from edit or duplicate
+                    //job action via Submit Jobs tab won't show up the warning
+                    if (this.jobSeriesFrm != null) {
+                        this.jobSeriesFrm.noWindowUnloadWarning = true;
+                    }
                     this.repeatJob(selection[0]);
                 }
             }
@@ -71,6 +80,11 @@ Ext.define('vegl.widgets.JobsPanel', {
             handler: function() {
                 var selection = this.getSelectionModel().getSelection();
                 if (selection.length > 0) {
+                    //This is needed to ensure job submission from edit or duplicate
+                    //job action via Submit Jobs tab won't show up the warning
+                    if (this.jobSeriesFrm != null) {
+                        this.jobSeriesFrm.noWindowUnloadWarning = true;
+                    }
                     this.editJob(selection[0]);
                 }
             }
@@ -267,6 +281,17 @@ Ext.define('vegl.widgets.JobsPanel', {
         store.removeAll(false);
     },
 
+    /**
+     * Cleans up the job wizard internal states including deactivating
+     * any event handler(s) associated with the forms in the job wizard.
+     */
+    cleanupJobWizard : function(jobWizPanelId) {
+        jobWizPanel = Ext.getCmp(jobWizPanelId);
+        layout = jobWizPanel.getLayout();
+        //Deactivate our current form
+        layout.activeItem.items.get(0).fireEvent('jobWizardDeactive');
+    },
+
     cancelJob : function(job) {
         Ext.Msg.show({
             title: 'Cancel Job',
@@ -365,6 +390,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             title : 'Duplicate Job Wizard',
             items :[{
                 xtype : 'jobwizard',
+                id : 'repeatJobPanel',
                 border : false,
                 wizardState : {
                     duplicateJobId : job.get('id'),
@@ -377,9 +403,18 @@ Ext.define('vegl.widgets.JobsPanel', {
             }]
         });
 
-        //on close event, refresh our store so that the cloned job
-        //will be displayed on the job list panel
-        popup.on('close', this.refreshJobsForSeries, this);
+        //On close event, (a) refreshes our store so that the cloned job
+        //will be displayed on the job list panel, (b) cleans up the job
+        //wizard internal states and (c) resets the noWindowUnloadWarning
+        //attribute back to its default value if the repeat job action
+        //is performed via Submit Jobs tab
+        popup.on('close', function() {
+                    this.refreshJobsForSeries;
+                    this.cleanupJobWizard("repeatJobPanel");
+                    if (this.jobSeriesFrm != null) {
+                        this.jobSeriesFrm.noWindowUnloadWarning = false;
+                    }
+                }, this);
 
         popup.show();
     },
@@ -393,6 +428,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             title : 'Edit Job Wizard',
             items : [{
                 xtype : 'jobwizard',
+                id : 'editJobPanel',
                 border : false,
                 wizardState : {
                     jobId : job.get('id'),
@@ -405,6 +441,17 @@ Ext.define('vegl.widgets.JobsPanel', {
                          'vegl.jobwizard.forms.JobSubmitForm']
             }]
         });
+
+        //on close event, (a) cleans up the job wizard internal states and
+        //(b) resets the noWindowUnloadWarning attribute back to its default
+        //value if the edit job action is performed via Submit Jobs tab
+        popup.on('close', function() {
+                    this.cleanupJobWizard("editJobPanel");
+                    if (this.jobSeriesFrm != null) {
+                        this.jobSeriesFrm.noWindowUnloadWarning = false;
+                    }
+                }, this);
+
         popup.show();
     },
 

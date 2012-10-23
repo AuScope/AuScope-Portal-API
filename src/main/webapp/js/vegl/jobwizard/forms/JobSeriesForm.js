@@ -105,6 +105,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                 title : 'Other Jobs in selected series',
                 hideRegisterButton : true,
                 flex : 1,
+                jobSeriesFrm : jobSeriesObj,
                 viewConfig : {
                     deferEmptyText : false,
                     emptyText : '<p class="centeredlabel">The selected series doesn\'t have any jobs.</p>'
