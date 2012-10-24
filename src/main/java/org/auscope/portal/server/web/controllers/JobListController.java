@@ -570,13 +570,13 @@ public class JobListController extends BasePortalController  {
     @RequestMapping("/querySeries.do")
     public ModelAndView querySeries(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    @RequestParam(required=false, value="qUser") String qUser,
                                     @RequestParam(required=false, value="qSeriesName") String qName,
                                     @RequestParam(required=false, value="qSeriesDesc") String qDesc) {
 
+        //User can only query his/her own job series
+        String qUser = (String)request.getSession().getAttribute("openID-Email");
 
-        if (qUser == null && qName == null && qDesc == null) {
-            qUser = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
+        if (StringUtils.isEmpty(qName) && StringUtils.isEmpty(qDesc)) {
             logger.debug("No query parameters provided. Will return "+qUser+"'s series.");
         }
 

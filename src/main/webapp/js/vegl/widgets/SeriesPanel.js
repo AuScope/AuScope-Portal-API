@@ -66,7 +66,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
                       { header: 'Series Name', flex : 1, sortable: true, dataIndex: 'name'}],
             buttons: [{
                 text: 'Query...',
-                tooltip: 'Displays the query dialog to search for jobs',
+                tooltip: 'Displays the query dialog to search for job series',
                 handler: Ext.bind(this.onQuerySeries, this),
                 cls: 'x-btn-text-icon',
                 iconCls: 'find-icon'
@@ -123,10 +123,6 @@ Ext.define('vegl.widgets.SeriesPanel', {
                 defaults: { anchor: "100%" },
                 items: [{
                     xtype: 'textfield',
-                    itemId: 'qUser',
-                    fieldLabel: 'User Name'
-                }, {
-                    xtype: 'textfield',
                     itemId: 'qSeriesName',
                     fieldLabel: 'Series Name'
                 }, {
@@ -141,12 +137,9 @@ Ext.define('vegl.widgets.SeriesPanel', {
                 handler: function(btn) {
                     var qWindow = btn.ownerCt.ownerCt;
                     var qForm = qWindow.getComponent('qForm');
-
-
-                    var qUser = qForm.getComponent('qUser').getValue();
                     var qName = qForm.getComponent('qSeriesName').getValue();
                     var qDesc = qForm.getComponent('qSeriesDesc').getValue();
-                    me.querySeries(qUser, qName, qDesc);
+                    me.querySeries(qName, qDesc);
                     qWindow.close();
                 }
             }, {
@@ -164,15 +157,10 @@ Ext.define('vegl.widgets.SeriesPanel', {
     /**
      * Update the contents of this panel with the specified query parameters
      */
-    querySeries : function(user, name, desc) {
+    querySeries : function(name, desc) {
         var store = this.getStore();
         var ajaxProxy = store.getProxy();
 
-        if (Ext.isEmpty(user)) {
-            ajaxProxy.extraParams.qUser = null;
-        } else {
-            ajaxProxy.extraParams.qUser = user;
-        }
         if (Ext.isEmpty(name)) {
             ajaxProxy.extraParams.qSeriesName = null;
         } else {

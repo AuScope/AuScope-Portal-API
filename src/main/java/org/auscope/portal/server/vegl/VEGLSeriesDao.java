@@ -2,6 +2,7 @@ package org.auscope.portal.server.vegl;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -13,7 +14,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author Josh Vote  -- Modified for VEGL
  */
 public class VEGLSeriesDao extends HibernateDaoSupport {
-	protected final Log logger = LogFactory.getLog(getClass());
+    protected final Log logger = LogFactory.getLog(getClass());
 
     /**
      * Queries for series matching the given criteria. Some but not all of
@@ -23,12 +24,13 @@ public class VEGLSeriesDao extends HibernateDaoSupport {
                                  final String desc) {
         String queryString = new String("from VEGLSeries s where");
         boolean first = true;
-        if (user != null) {
-            queryString += " s.user like '%"+user+"%'";
+
+        if (StringUtils.isNotEmpty(user)) {
+            queryString += " s.user = '" + user + "'";
             first = false;
         }
 
-        if (name != null) {
+        if (StringUtils.isNotEmpty(name)) {
             if (!first) {
                 queryString += " and";
             }
@@ -37,7 +39,7 @@ public class VEGLSeriesDao extends HibernateDaoSupport {
             first = false;
         }
 
-        if (desc != null) {
+        if (StringUtils.isNotEmpty(desc)) {
             if (!first) {
                 queryString += " and";
             }
@@ -50,7 +52,7 @@ public class VEGLSeriesDao extends HibernateDaoSupport {
             logger.warn("All parameters were null!");
             return null;
         }
-        
+
         return (List<VEGLSeries>) getHibernateTemplate().find(queryString);
     }
 
@@ -67,7 +69,7 @@ public class VEGLSeriesDao extends HibernateDaoSupport {
     public void save(final VEGLSeries series) {
         getHibernateTemplate().saveOrUpdate(series);
     }
-    
+
     /**
      * Delete the given series.
      */

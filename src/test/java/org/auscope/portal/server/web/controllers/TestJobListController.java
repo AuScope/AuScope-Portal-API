@@ -774,7 +774,7 @@ public class TestJobListController {
     @Test
     public void testQuerySeries() throws Exception {
         final String userEmail = "exampleuser@email.com";
-        final String qUser = "user";
+        final String qUser = "exampleuser@email.com";
         final String qName = "name";
         final String qDescription = "description";
         final List<VEGLSeries> series = Arrays.asList(
@@ -789,7 +789,7 @@ public class TestJobListController {
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.querySeries(mockRequest, mockResponse, qUser, qName, qDescription);
+        ModelAndView mav = controller.querySeries(mockRequest, mockResponse, qName, qDescription);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertSame(series, mav.getModel().get("data"));
     }
@@ -815,7 +815,7 @@ public class TestJobListController {
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.querySeries(mockRequest, mockResponse, qUser, qName, qDescription);
+        ModelAndView mav = controller.querySeries(mockRequest, mockResponse, qName, qDescription);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertSame(series, mav.getModel().get("data"));
     }
