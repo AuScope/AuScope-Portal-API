@@ -17,6 +17,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.jmock.ReadableServletOutputStream;
 import org.auscope.portal.jmock.VEGLJobMatcher;
 import org.auscope.portal.jmock.VEGLSeriesMatcher;
@@ -37,11 +38,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Josh Vote
  * @author Richard Goh
  */
-public class TestJobListController {
-    private Mockery context = new Mockery() {{
-        setImposteriser(ClassImposteriser.INSTANCE);
-    }};
-
+public class TestJobListController extends PortalTestClass {
     private VEGLJobManager mockJobManager;
     private CloudStorageService mockCloudStorageService;
     private FileStagingService mockFileStagingService;
@@ -134,7 +131,37 @@ public class TestJobListController {
 
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
             oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
-            oneOf(mockCloudStorageService).deleteJobFiles(mockJob);
+        }});
+
+        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests deleting a job successfully
+     */
+    @Test
+    public void testDeleteJob_NotRegistered() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+
+            //Make sure the job marked as deleted and its transition audit trial record is created
+            oneOf(mockJob).getStatus();will(returnValue("old mock job status"));
+            oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
+            oneOf(mockJobManager).saveJob(mockJob);
+            oneOf(mockJobManager).createJobAuditTrail("old mock job status", mockJob, "Job deleted.");
+
+            oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
+            oneOf(mockJob).getRegisteredUrl();will(returnValue(null)); //the job isn't registered
+            oneOf(mockCloudStorageService).deleteJobFiles(mockJob); //this must occur if the job isnt registered
         }});
 
         ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId);
@@ -211,7 +238,6 @@ public class TestJobListController {
             oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PENDING, mockJobs.get(0), "Job deleted.");
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJobs.get(0));
             oneOf(mockJobs.get(0)).getRegisteredUrl();will(returnValue("geonetwork url"));
-            oneOf(mockCloudStorageService).deleteJobFiles(mockJobs.get(0));
 
             oneOf(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
             oneOf(mockJobs.get(1)).setStatus(JobBuilderController.STATUS_DELETED);
@@ -219,7 +245,6 @@ public class TestJobListController {
             oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_DONE, mockJobs.get(1), "Job deleted.");
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJobs.get(1));
             oneOf(mockJobs.get(1)).getRegisteredUrl();will(returnValue("geonetwork url"));
-            oneOf(mockCloudStorageService).deleteJobFiles(mockJobs.get(1));
 
             oneOf(mockJobManager).deleteSeries(mockSeries);
         }});
@@ -247,7 +272,6 @@ public class TestJobListController {
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
-            oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
         }});
 
         ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId);
@@ -931,13 +955,7 @@ public class TestJobListController {
 
             //Output files for each job
             oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(0)));will(returnValue(jobActiveFiles));
-            oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(2)));will(returnValue(jobDoneFiles));
             oneOf(mockCloudStorageService).listJobFiles(with(mockJobs.get(3)));will(returnValue(jobPendingFiles));
-
-            //Update our running job to done (due to presence of vegl.sh.log)
-            oneOf(mockJobs.get(0)).setStatus(JobBuilderController.STATUS_DONE);
-            oneOf(mockJobs.get(3)).setStatus(JobBuilderController.STATUS_PENDING);
-            oneOf(mockJobManager).saveJob(mockJobs.get(0));
         }});
 
         ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId);
