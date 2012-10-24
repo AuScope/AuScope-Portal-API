@@ -23,7 +23,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
@@ -46,23 +45,20 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Richard Goh
  */
 @Controller
-public class JobListController extends BasePortalController  {
+public class JobListController extends BaseCloudController  {
 
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
 
     private VEGLJobManager jobManager;
-    private CloudStorageService cloudStorageService;
     private FileStagingService fileStagingService;
-    private CloudComputeService cloudComputeService;
 
     @Autowired
-    public JobListController(VEGLJobManager jobManager, CloudStorageService cloudStorageService,
-            FileStagingService fileStagingService, CloudComputeService cloudComputeService) {
+    public JobListController(VEGLJobManager jobManager, CloudStorageService[] cloudStorageServices,
+            FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices) {
+        super(cloudStorageServices, cloudComputeServices);
         this.jobManager = jobManager;
-        this.cloudStorageService = cloudStorageService;
         this.fileStagingService = fileStagingService;
-        this.cloudComputeService = cloudComputeService;
     }
 
     /**
@@ -262,7 +258,12 @@ public class JobListController extends BasePortalController  {
             // Remove files from S3 cloud storage if the job
             // hasn't been registered in GeoNetwork
             if (StringUtils.isEmpty(job.getRegisteredUrl())) {
-                cloudStorageService.deleteJobFiles(job);
+                CloudStorageService cloudStorageService = getStorageService(job);
+                if (cloudStorageService == null) {
+                    logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud files (if any) will not be removed", job.getStorageServiceId(), job.getId()));
+                } else {
+                    cloudStorageService.deleteJobFiles(job);
+                }
             }
         } catch (Exception ex) {
             logger.warn("Error cleaning up deleted job.", ex);
@@ -329,7 +330,12 @@ public class JobListController extends BasePortalController  {
             jobManager.saveJob(job);
             jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
             try {
-                cloudComputeService.terminateJob(job);
+                CloudComputeService cloudComputeService = getComputeService(job);
+                if (cloudComputeService == null) {
+                    logger.error(String.format("No cloud compute service with id '%1$s' for job '%2$s'. Cloud VM cannot be terminated", job.getComputeServiceId(), job.getId()));
+                } else {
+                    cloudComputeService.terminateJob(job);
+                }
             } catch (Exception e) {
                 logger.warn("Failed to terminate instance with id: " + job.getComputeInstanceId(), e);
             }
@@ -414,8 +420,14 @@ public class JobListController extends BasePortalController  {
 
         CloudFileInformation[] fileDetails = null;
         try {
-            fileDetails = cloudStorageService.listJobFiles(job);
-            logger.info(fileDetails.length + " job files located");
+            CloudStorageService cloudStorageService = getStorageService(job);
+            if (cloudStorageService == null) {
+                logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud files cannot be listed", job.getStorageServiceId(), job.getId()));
+                return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+            } else {
+                fileDetails = cloudStorageService.listJobFiles(job);
+                logger.info(fileDetails.length + " job files located");
+            }
         } catch (Exception e) {
             logger.warn("Error fetching output directory information.", e);
             return generateJSONResponseMAV(false, null, "Error fetching output directory information");
@@ -452,6 +464,11 @@ public class JobListController extends BasePortalController  {
         //Get our Input Stream
         InputStream is = null;
         try {
+            CloudStorageService cloudStorageService = getStorageService(job);
+            if (cloudStorageService == null) {
+                logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
+                return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+            }
             is = cloudStorageService.getJobFile(job, key);
         } catch (Exception ex) {
             logger.warn(String.format("Unable to access '%1$s' from the cloud", key), ex);
@@ -508,6 +525,12 @@ public class JobListController extends BasePortalController  {
         VEGLJob job = attemptGetJob(jobId, request);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job object.");
+        }
+
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded as zip", job.getStorageServiceId(), job.getId()));
+            return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
         }
 
         logger.debug("filesParam: " + filesParam);
@@ -653,6 +676,12 @@ public class JobListController extends BasePortalController  {
             return;
         }
 
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. cannot update job status", job.getStorageServiceId(), job.getId()));
+            return;
+        }
+
         //Get the output files for this job
         CloudFileInformation[] results = null;
         try {
@@ -749,6 +778,12 @@ public class JobListController extends BasePortalController  {
         VEGLJob oldJob = attemptGetJob(jobId, request);
         if (oldJob == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job to duplicate.");
+        }
+
+        CloudStorageService cloudStorageService = getStorageService(oldJob);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cannot duplicate", oldJob.getStorageServiceId(), oldJob.getId()));
+            return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
         }
 
         //Create a cloned job but make it 'unsubmitted'

@@ -97,6 +97,7 @@ public class TestJobBuilderController {
         final String storageAccess = "213-asd-54";
         final String storageSecret = "tops3cret";
         final String storageProvider = "provider";
+        final String storageAuthVersion = "1.2.3";
 
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
@@ -130,6 +131,8 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageService).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageService).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageService).getProvider();will(returnValue(storageProvider));
+            allowing(mockCloudStorageService).getProvider();will(returnValue(storageProvider));
+            allowing(mockCloudStorageService).getAuthVersion();will(returnValue(storageAuthVersion));
 
             //We should have 1 call to upload them
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(equal(new File[] {mockFile1, mockFile2})));
@@ -282,6 +285,7 @@ public class TestJobBuilderController {
         final String storageAccess = "213-asd-54";
         final String storageSecret = "tops3cret";
         final String storageProvider = "provider";
+        final String storageAuthVersion = "1.2.3";
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
         context.checking(new Expectations() {{
@@ -302,6 +306,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageService).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageService).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageService).getProvider();will(returnValue(storageProvider));
+            allowing(mockCloudStorageService).getAuthVersion();will(returnValue(storageAuthVersion));
 
             //We should have 1 call to upload them
             oneOf(mockCloudStorageService).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
@@ -373,6 +378,7 @@ public class TestJobBuilderController {
         final String access = "213-asd-54";
         final String secret = "tops3cret";
         final String provider = "provider";
+        final String storageAuthVersion = "1.2.3";
 
         context.checking(new Expectations() {{
             //We allow calls to the Configurer which simply extract values from our property file
@@ -381,6 +387,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageService).getAccessKey();will(returnValue(access));
             allowing(mockCloudStorageService).getSecretKey();will(returnValue(secret));
             allowing(mockCloudStorageService).getProvider();will(returnValue(provider));
+            allowing(mockCloudStorageService).getAuthVersion();will(returnValue(storageAuthVersion));
         }});
 
         job.setStorageBaseKey("test/key");
@@ -394,6 +401,7 @@ public class TestJobBuilderController {
         Assert.assertTrue(contents.contains(job.getStorageBaseKey()));
         Assert.assertTrue(contents.contains(secret));
         Assert.assertTrue(contents.contains(provider));
+        Assert.assertTrue(contents.contains(storageAuthVersion));
     }
 
     /**
@@ -583,7 +591,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setComputeVmId("computeVmId");
 
             //We should have 1 call to save our job but will throw Exception
-            oneOf(mockJobManager).saveJob(mockJob);will(throwException(new Exception("")));            
+            oneOf(mockJobManager).saveJob(mockJob);will(throwException(new Exception("")));
         }});
 
         ModelAndView mav = controller.updateJob(jobId, "name", "description",

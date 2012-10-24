@@ -25,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
-import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -57,7 +56,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Josh Vote
  */
 @Controller
-public class JobBuilderController extends BasePortalController {
+public class JobBuilderController extends BaseCloudController {
 
 
     /** Logger for this class */
@@ -66,8 +65,6 @@ public class JobBuilderController extends BasePortalController {
     private VEGLJobManager jobManager;
     private FileStagingService fileStagingService;
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
-    private CloudStorageService cloudStorageService;
-    private CloudComputeService cloudComputeService;
     private VglMachineImageService vglImageService;
 
     public static final String STATUS_PENDING = "Pending";
@@ -82,13 +79,14 @@ public class JobBuilderController extends BasePortalController {
 
     @Autowired
     public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
-            PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService cloudStorageService,
-            CloudComputeService cloudComputeService, VglMachineImageService imageService) {
+            PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService[] cloudStorageServices,
+            CloudComputeService[] cloudComputeServices, VglMachineImageService imageService) {
+        super(cloudStorageServices, cloudComputeServices);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.hostConfigurer = hostConfigurer;
-        this.cloudStorageService = cloudStorageService;
-        this.cloudComputeService = cloudComputeService;
+        this.cloudStorageServices = cloudStorageServices;
+        this.cloudComputeServices = cloudComputeServices;
         this.vglImageService = imageService;
     }
 
@@ -119,13 +117,26 @@ public class JobBuilderController extends BasePortalController {
      * @return
      */
     @RequestMapping("/createJobObject.do")
-    public ModelAndView createJobObject(HttpServletRequest request) {
+    public ModelAndView createJobObject(HttpServletRequest request,
+            @RequestParam("cloudComputeServiceId") String cloudComputeServiceId,
+            @RequestParam("cloudStorageServiceId") String cloudStorageServiceId) {
+
+        CloudStorageService cloudStorageService = getStorageService(cloudStorageServiceId);
+        CloudComputeService cloudComputeService = getComputeService(cloudComputeServiceId);
+
+        if (cloudStorageService == null) {
+            return generateJSONResponseMAV(false, null, "No cloud storage service with that ID");
+        }
+
+        if (cloudComputeService == null) {
+            return generateJSONResponseMAV(false, null, "No cloud compute service with that ID");
+        }
 
         //Create our initial job object
         VEGLJob newJob = null;
         HttpSession session = request.getSession();
         try {
-             newJob = createDefaultVEGLJob(session);
+             newJob = createDefaultVEGLJob(session, cloudStorageService, cloudComputeService);
         } catch (Exception ex) {
             logger.error("Error saving newly created job", ex);
             return generateJSONResponseMAV(false, null, "Error saving newly created job");
@@ -562,6 +573,7 @@ public class JobBuilderController extends BasePortalController {
      */
     public String createBootstrapForJob(VEGLJob job) throws IOException {
         String bootstrapTemplate = getBootstrapTemplate();
+        CloudStorageService cloudStorageService = getStorageService(job);
 
         Object[] arguments = new Object[] {
             cloudStorageService.getBucket(), //STORAGE_BUCKET
@@ -570,7 +582,8 @@ public class JobBuilderController extends BasePortalController {
             cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
             hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
             hostConfigurer.resolvePlaceholder("storage.endpoint"), //STORAGE_ENDPOINT
-            cloudStorageService.getProvider() //STORAGE_TYPE
+            cloudStorageService.getProvider(), //STORAGE_TYPE
+            cloudStorageService.getAuthVersion() == null ? "1.0" : cloudStorageService.getAuthVersion() //STORAGE_AUTH_VERSION
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);
@@ -603,6 +616,15 @@ public class JobBuilderController extends BasePortalController {
                 errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
                 return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
             } else {
+
+                CloudStorageService cloudStorageService = getStorageService(curJob);
+                CloudComputeService cloudComputeService = getComputeService(curJob);
+                if (cloudStorageService == null || cloudComputeService == null) {
+                    errorDescription = "One of the specified storage/compute services cannot be found.";
+                    errorCorrection = "Consider changing the selected compute or storage service.";
+                    return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
+                }
+
                 // we need to keep track of old job for audit trail purposes
                 oldJobStatus = curJob.getStatus();
 
@@ -639,6 +661,7 @@ public class JobBuilderController extends BasePortalController {
                             for (int i = 0; i < stagedFiles.length; i++) {
                                 files[i] = stagedFiles[i].getFile();
                             }
+
                             cloudStorageService.uploadJobFiles(curJob, files);
 
                             // create our input user data string
@@ -685,10 +708,13 @@ public class JobBuilderController extends BasePortalController {
 
     /**
      * Creates a new VEGL job initialised with the default configuration values
+     *
+     * The Job MUST be associated with a specific compute and storage service
+     *
      * @param email
      * @return
      */
-    private VEGLJob createDefaultVEGLJob(HttpSession session) {
+    private VEGLJob createDefaultVEGLJob(HttpSession session, CloudStorageService cloudStorageService, CloudComputeService cloudComputeService) {
         VEGLJob job = new VEGLJob();
 
         //Start by saving our job to set its ID

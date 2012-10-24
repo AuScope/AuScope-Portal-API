@@ -43,6 +43,7 @@ echo "STORAGE_ENDPOINT = ${STORAGE_ENDPOINT}"
 echo "STORAGE_BASE_KEY_PATH = ${STORAGE_BASE_KEY_PATH}"
 echo "WORKFLOW_URL = ${WORKFLOW_URL}"
 echo "STORAGE_ENDPOINT = ${STORAGE_ENDPOINT}"
+echo "STORAGE_AUTH_VERSION = ${STORAGE_AUTH_VERSION}"
 echo "--------------------------------------"
 
 #Lets get started by moving to our working directory
