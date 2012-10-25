@@ -91,6 +91,8 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
     // submit script source for storage at the server
     beginValidation : function(callback) {
         sourceText = this.scriptBuilderFrm.getScript();
+        // replace tab with 4 spaces whenever it occurs in the sourceText
+        sourceText = sourceText.replace(/\t/g,"\u0020\u0020\u0020\u0020");
 
         Ext.Ajax.request({
             url: 'saveScript.do',
