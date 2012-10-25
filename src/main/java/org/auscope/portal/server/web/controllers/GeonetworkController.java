@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.GeonetworkService;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.responses.csw.CSWContact;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
@@ -40,19 +40,19 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 @Controller
-public class GeonetworkController extends BasePortalController {
+public class GeonetworkController extends BaseCloudController {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
     private VEGLJobManager jobManager;
     private GeonetworkService gnService;
-    private CloudStorageService cloudStorageService;
 
     @Autowired
-    public GeonetworkController(VEGLJobManager jobManager, GeonetworkService gnService, CloudStorageService cloudStorageService) {
+    public GeonetworkController(VEGLJobManager jobManager, GeonetworkService gnService, CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices) {
+        super(cloudStorageServices, cloudComputeServices);
         this.jobManager = jobManager;
         this.gnService = gnService;
-        this.cloudStorageService = cloudStorageService;
+        this.cloudStorageServices = cloudStorageServices;
     }
 
 
@@ -67,7 +67,12 @@ public class GeonetworkController extends BasePortalController {
      * @throws CloudStorageException
      */
     private CSWRecord jobToCSWRecord(HttpServletRequest request, VEGLJob job, VEGLSeries series) throws Exception {
-        CloudFileInformation[] outputFiles = cloudStorageService.listJobFiles(job);
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            throw new Exception(String.format("storage service with ID %1$s DNE", job.getStorageServiceId()));
+        }
+
+        CloudFileInformation[] outputFiles =  cloudStorageService.listJobFiles(job);
         List<CSWOnlineResourceImpl> onlineResources = new ArrayList<CSWOnlineResourceImpl>();
 
         //Add any output files to our online resources tab
