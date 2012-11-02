@@ -65,6 +65,7 @@
         <beans:constructor-arg index="0" value="ROLE_USER" />
         <beans:constructor-arg index="1">
             <beans:list>
+                <!-- Administrators -->
                 <!-- Josh.Vote@csiro.au -->
                 <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
                     <beans:constructor-arg name="name" value="http://joshvote.myopenid.com/" />
@@ -73,12 +74,27 @@
                         <beans:list>
                             <beans:value>ROLE_USER</beans:value>
                             <beans:value>ROLE_ADMINISTRATOR</beans:value>
+                            <beans:value>ROLE_UBC</beans:value>
                         </beans:list>
                     </beans:constructor-arg>
                 </beans:bean>
                 <!-- Richard.Goh@csiro.au -->
                 <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
                     <beans:constructor-arg name="name" value="http://rgoh.myopenid.com/" />
+                    <beans:constructor-arg name="credentials" value="" />
+                    <beans:constructor-arg name="grantedAuthorities">
+                        <beans:list>
+                            <beans:value>ROLE_USER</beans:value>
+                            <beans:value>ROLE_ADMINISTRATOR</beans:value>
+                            <beans:value>ROLE_UBC</beans:value>
+                        </beans:list>
+                    </beans:constructor-arg>
+                </beans:bean>
+                
+                <!-- Privileged Users -->
+                <!-- Peter.Millgan@ga.gov.au -->
+                <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
+                    <beans:constructor-arg name="name" value="http://prm.myopenid.com/ />
                     <beans:constructor-arg name="credentials" value="" />
                     <beans:constructor-arg name="grantedAuthorities">
                         <beans:list>
