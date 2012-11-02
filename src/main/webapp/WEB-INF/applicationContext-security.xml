@@ -94,7 +94,7 @@
                 <!-- Privileged Users -->
                 <!-- Peter.Millgan@ga.gov.au -->
                 <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                    <beans:constructor-arg name="name" value="http://prm.myopenid.com/ />
+                    <beans:constructor-arg name="name" value="http://prm.myopenid.com/" />
                     <beans:constructor-arg name="credentials" value="" />
                     <beans:constructor-arg name="grantedAuthorities">
                         <beans:list>
