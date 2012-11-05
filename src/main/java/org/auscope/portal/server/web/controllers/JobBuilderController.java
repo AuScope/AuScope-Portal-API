@@ -584,10 +584,17 @@ public class JobBuilderController extends BaseCloudController {
 
         for (MachineImage img : ccs.getAvailableImages()) {
             if (img instanceof VglMachineImage) {
-                for (String validRole : ((VglMachineImage) img).getPermissions()) {
-                    if (userRoles.contains(validRole)) {
-                        authorisedImages.add(img);
-                        break;
+                //If the image has no permission restrictions, add it. Otherwise
+                //ensure that the user has a role matching something in the image permission list
+                String[] permissions = ((VglMachineImage) img).getPermissions();
+                if (permissions == null) {
+                    authorisedImages.add(img);
+                } else {
+                    for (String validRole : permissions) {
+                        if (userRoles.contains(validRole)) {
+                            authorisedImages.add(img);
+                            break;
+                        }
                     }
                 }
             } else {

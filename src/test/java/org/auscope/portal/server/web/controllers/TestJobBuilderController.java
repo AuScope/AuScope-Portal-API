@@ -563,6 +563,36 @@ public class TestJobBuilderController {
     }
 
     /**
+     * Tests that listing job images for a user works as expected when there is an image with no restrictions
+     * @throws Exception
+     */
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void testListImages_NoRestrictions() throws Exception {
+        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
+        final String computeServiceId = "compute-service-id";
+        final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+
+        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
+
+        context.checking(new Expectations() {{
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+
+            allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
+            oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(images));
+
+            oneOf(images[0]).getPermissions();will(returnValue(null));
+        }});
+
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Assert.assertNotNull(mav.getModel().get("data"));
+        Assert.assertEquals(images.length, ((List) mav.getModel().get("data")).size());
+    }
+
+    /**
      * Tests the creation of a new job object.
      * @throws Exception
      */
