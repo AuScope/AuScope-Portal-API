@@ -110,7 +110,7 @@
     </bean>
 
     <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeService">
-        <constructor-arg name="endpoint" value="${ec2.endpoint}"/>
+        <constructor-arg name="endpoint" value="http://openstack.nci.org.au:8773/services/Cloud"/>
         <constructor-arg name="credentials">
             <bean class="com.amazonaws.auth.BasicAWSCredentials">
                 <constructor-arg name="accessKey" value="${env.nci.ec2.accesskey}"/>
@@ -167,6 +167,33 @@
                     <property name="permissions">
                         <array>
                             <value>ROLE_USER</value>
+                        </array>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeService">
+        <constructor-arg name="endpoint" value="https://nova.rc.nectar.org.au:8773/services/Cloud"/>
+        <constructor-arg name="credentials">
+            <bean class="com.amazonaws.auth.BasicAWSCredentials">
+                <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
+                <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
+            </bean>
+        </constructor-arg>
+        <property name="id" value="nectar-openstack-compute"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
+        <property name="availableImages">
+            <list>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ami-000001c6"/>
+                    <property name="name" value="escript"/>
+                    <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>escript</value>
+                            <value>centos6</value>
                         </array>
                     </property>
                 </bean>

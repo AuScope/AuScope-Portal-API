@@ -19,14 +19,14 @@ import org.springframework.stereotype.Service;
 public class VglAdminService extends AdminService {
 
     /** The compute service for running images*/
-    private CloudComputeService cloudComputeService;
+    private CloudComputeService[] cloudComputeServices;
     /** Used for looking up some config (this service is dependent on some configuration options */
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
 
     @Autowired
-    public VglAdminService(HttpServiceCaller serviceCaller, CloudComputeService cloudComputeService, PortalPropertyPlaceholderConfigurer hostConfigurer) {
+    public VglAdminService(HttpServiceCaller serviceCaller, CloudComputeService[] cloudComputeServices, PortalPropertyPlaceholderConfigurer hostConfigurer) {
         super(serviceCaller);
-        this.cloudComputeService = cloudComputeService;
+        this.cloudComputeServices = cloudComputeServices;
         this.hostConfigurer = hostConfigurer;
     }
 
