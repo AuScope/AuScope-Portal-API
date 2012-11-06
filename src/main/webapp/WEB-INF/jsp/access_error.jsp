@@ -17,7 +17,7 @@
     </style>
 
     <!-- Portal Core Includes -->
-    <link rel="stylesheet" type="text/css" href="portal-core/js/extjs-4.1.0-rc1/resources/css/ext-all.css">
+    <link rel="stylesheet" type="text/css" href="portal-core/js/ext-4.1.1a/resources/css/ext-all.css">
 
 </head>
 <body>

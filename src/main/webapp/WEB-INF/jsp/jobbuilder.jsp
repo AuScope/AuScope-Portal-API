@@ -24,10 +24,10 @@
     <script type="text/javascript" src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
 
     <!-- Portal Core Includes -->
-    <link rel="stylesheet" type="text/css" href="portal-core/js/extjs-4.1.0-rc1/resources/css/ext-all.css">
-    <link rel="stylesheet" type="text/css" href="portal-core/js/extjs-4.1.0-rc1/examples/ux/css/CheckHeader.css">
-    <script type="text/javascript" src="portal-core/js/extjs-4.1.0-rc1/ext-all-debug.js"></script>
-    <script type="text/javascript" src="portal-core/js/extjs-4.1.0-rc1/examples/ux/RowExpander.js"></script>
+    <link rel="stylesheet" type="text/css" href="portal-core/js/ext-4.1.1a/resources/css/ext-all.css">
+    <link rel="stylesheet" type="text/css" href="portal-core/js/ext-4.1.1a/examples/ux/css/CheckHeader.css">
+    <script type="text/javascript" src="portal-core/js/ext-4.1.1a/ext-all-debug.js"></script>
+    <script type="text/javascript" src="portal-core/js/ext-4.1.1a/examples/ux/RowExpander.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/util/ObservableMap.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/widgets/window/ErrorWindow.js"></script>
