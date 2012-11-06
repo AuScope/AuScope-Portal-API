@@ -25,6 +25,7 @@
     <link rel="stylesheet" type="text/css" href="portal-core/js/ext-4.1.1a/resources/css/ext-all.css">
     <link rel="stylesheet" type="text/css" href="portal-core/js/ext-4.1.1a/examples/ux/css/CheckHeader.css">
     <script type="text/javascript" src="portal-core/js/ext-4.1.1a/ext-all-debug.js"></script>
+    <script type="text/javascript" src="portal-core/js/extjs-patches/ext-4.1.1a/EXTJSIV-6745.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/widgets/grid/plugin/RowContextMenu.js"></script>
     <script type="text/javascript" src="portal-core/js/ext-4.1.1a/examples/ux/RowExpander.js"></script>
