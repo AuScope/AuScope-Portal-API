@@ -25,7 +25,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
             handler: function() {
                 var selection = this.getSelectionModel().getSelection();
                 if (selection.length > 0) {
-                    this.cancelSeries(selection[0])
+                    this.cancelSeries(selection[0]);
                 }
             }
         });
@@ -38,7 +38,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
             handler: function() {
                 var selection = this.getSelectionModel().getSelection();
                 if (selection.length > 0) {
-                    this.deleteSeries(selection[0])
+                    this.deleteSeries(selection[0]);
                 }
             }
         });
@@ -92,7 +92,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
 
     _onSelectionChange : function(sm) {
         var selections = this.getSelectionModel().getSelection();
-        if (selections.length == 0) {
+        if (selections.length === 0) {
             this.cancelSeriesAction.setDisabled(true);
             this.deleteSeriesAction.setDisabled(true);
         } else {
@@ -243,5 +243,5 @@ Ext.define('vegl.widgets.SeriesPanel', {
                 }
             }
         });
-    },
+    }
 });

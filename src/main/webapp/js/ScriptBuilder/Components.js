@@ -45,5 +45,5 @@ ScriptBuilder.Components.getComponents = function() {
                 leaf : true
             }]
         }]
-    }
+    };
 };

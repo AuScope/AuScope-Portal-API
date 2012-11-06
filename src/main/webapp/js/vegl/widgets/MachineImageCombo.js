@@ -38,7 +38,7 @@ Ext.define('vegl.widgets.MachineImageCombo', {
             store: ds,
             displayField: 'name',
             valueField : 'imageId',
-            listConfig: listCfg,
+            listConfig: listCfg
         });
 
         this.callParent(arguments);

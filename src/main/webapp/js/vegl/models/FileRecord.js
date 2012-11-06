@@ -7,6 +7,6 @@ Ext.define('vegl.models.FileRecord', {
     fields: [
         { name: 'name', type: 'string' }, //name of the input file
         { name: 'size', type: 'int' }, //Size of the input file in bytes
-        { name: 'parentPath', type: 'string' }, //Parent path for where the input file is located
+        { name: 'parentPath', type: 'string' } //Parent path for where the input file is located
     ]
 });

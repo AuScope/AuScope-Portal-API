@@ -5,6 +5,12 @@
 Ext.define('vegl.layer.filterer.forms.VeglCoverageFilterForm', {
     extend: 'portal.layer.filterer.BaseFilterForm',
 
+    xCellDim : 0,
+    yCellDim : 0,
+    zCellDim : 0,
+    maxDepth : 0,
+    mgaZone : 0,
+
     /**
      * Accepts a config for portal.layer.filterer.BaseFilterForm
      */
@@ -25,11 +31,7 @@ Ext.define('vegl.layer.filterer.forms.VeglCoverageFilterForm', {
         var gMap2 = map.map;
         var pos = new GControlPosition(G_ANCHOR_BOTTOM_LEFT, new GSize(0, -85));
         gMap2.addControl(new MStatusControl({position:pos}));
-        this.xCellDim;
-        this.yCellDim;
-        this.zCellDim;
-        this.maxDepth;
-        this.mgaZone;
+
 
         // create a drag control for each bounding box
         this.dataBbox = new MPolyDragControl({
@@ -71,7 +73,7 @@ Ext.define('vegl.layer.filterer.forms.VeglCoverageFilterForm', {
                 var bbox = null;
 
                 //Our bbox is either the visible bounds or the drawn subset box
-                if (this.dataBbox.getParams() == null) {
+                if (this.dataBbox.getParams() === null) {
                     bbox = map.getVisibleMapBounds();
                 } else {
                     bbox = Ext.create('portal.util.BBox', {
@@ -84,7 +86,7 @@ Ext.define('vegl.layer.filterer.forms.VeglCoverageFilterForm', {
 
                 // check if selected region is within the bounds of the coverage layer
                 var cswRecords = layer.get('cswRecords');
-                if (cswRecords.length != 0) {
+                if (cswRecords.length !== 0) {
                     //Assumption - we only expect 1 WCS
                     var cswRecord = cswRecords[0];
                     var bboxes = cswRecord.get('geographicElements');

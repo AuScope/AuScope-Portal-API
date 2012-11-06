@@ -98,7 +98,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
 
     _onSelectionChange : function(sm) {
         var totalSelections = this.getSelectionModel().getSelection().length;
-        if (totalSelections == 0) {
+        if (totalSelections === 0) {
             this.downloadAction.setDisabled(true);
             this.downloadZipAction.setDisabled(true);
         } else {

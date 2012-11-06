@@ -71,7 +71,7 @@ Ext.define('vegl.jobwizard.JobWizard', {
 
             buttons = [];
 
-            if (i != 0) {
+            if (i !== 0) {
                 buttons.push({
                     text: frm.getPreviousText(),
                     iconCls : frm.getPreviousIconClass(),

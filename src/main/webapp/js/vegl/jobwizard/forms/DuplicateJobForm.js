@@ -96,7 +96,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
         Ext.Ajax.request({
             url : 'deleteJob.do',
             params : {
-                jobId : id,
+                jobId : id
             },
             scope : this,
             callback : function(options, success, response) {

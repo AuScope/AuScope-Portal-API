@@ -147,7 +147,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
     beginValidation : function(callback) {
         var radioGroup = this.getComponent('seriesRadioGroup');
         var wizardState = this.wizardState;
-        if (radioGroup.getValue().sCreateSelect == 0) {
+        if (radioGroup.getValue().sCreateSelect === 0) {
             if (Ext.isEmpty(wizardState.seriesId)) {
                 Ext.Msg.alert('No series selected', 'Please select a series to add the new job to.');
                 callback(false);
