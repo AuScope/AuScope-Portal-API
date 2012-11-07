@@ -46,6 +46,7 @@
 
     <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobLogsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFilesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>

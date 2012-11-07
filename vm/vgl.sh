@@ -23,6 +23,7 @@ echo "Loading system wide profile:"
 source /etc/profile
 
 # Print environment variables (don't print any credentials here)
+echo "#### Environment start ####"
 echo "------ VEGL Workflow Script ----------"
 echo "                                      "
 echo "------ Printing Environment ----------"
@@ -45,6 +46,7 @@ echo "WORKFLOW_URL = ${WORKFLOW_URL}"
 echo "STORAGE_ENDPOINT = ${STORAGE_ENDPOINT}"
 echo "STORAGE_AUTH_VERSION = ${STORAGE_AUTH_VERSION}"
 echo "--------------------------------------"
+echo "#### Environment end ####"
 
 #Lets get started by moving to our working directory
 cd $WORKING_DIR
@@ -101,10 +103,12 @@ echo "About to execute ${SUBSET_REQUEST_PATH} as a shell script"
 sh $SUBSET_REQUEST_PATH
 cd $WORKING_DIR
 
-#Next we can perform our actual work
+#Next we can perform our actual work (make sure we indicate where the python logs start/finish)
 chmod +x "$VEGL_SCRIPT_PATH"
 echo "About to execute ${VEGL_SCRIPT_PATH} as a python script"
+echo "#### Python start ####"
 python $VEGL_SCRIPT_PATH
+echo "#### Python end ####"
 cd $WORKING_DIR
 
 #Finally upload our logs for debug purposes

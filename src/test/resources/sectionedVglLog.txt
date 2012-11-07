@@ -1,0 +1,19 @@
+#### environment start ####
+contents of env
+#### environment end ####
+Other text
+
+that will
+
+not be
+
+# This is a comment
+#### spaced header start ####
+text
+#### spaced header end ####
+
+sectioned
+#### test start ####
+multiple
+lines
+#### test end ####

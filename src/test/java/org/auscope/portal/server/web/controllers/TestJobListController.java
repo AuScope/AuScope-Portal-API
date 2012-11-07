@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.services.PortalServiceException;
@@ -18,6 +19,7 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.PortalTestClass;
+import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.core.test.jmock.ReadableServletOutputStream;
 import org.auscope.portal.jmock.VEGLJobMatcher;
 import org.auscope.portal.jmock.VEGLSeriesMatcher;
@@ -31,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.dao.DataAccessException;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -1056,5 +1059,94 @@ public class TestJobListController extends PortalTestClass {
 
         Assert.assertArrayEquals(data1, fis1Data);
         Assert.assertArrayEquals(data2, fis2Data);
+    }
+
+    private String stripCarriageReturns(String s) {
+        return s.replaceAll("\r", "");
+    }
+
+    /**
+     * Tests that log sectioning works as expected
+     * @throws Exception
+     */
+    @Test
+    public void testGetSectionedLogs() throws Exception {
+        final InputStream logContents = ResourceUtil.loadResourceAsStream("sectionedVglLog.txt");
+        final String logContentString = IOUtils.toString(ResourceUtil.loadResourceAsStream("sectionedVglLog.txt"));
+        final String userEmail = "user@example.org";
+        final Integer jobId = 54321;
+
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+
+            oneOf(mockCloudStorageService).getJobFile(mockJob, JobListController.VGL_LOG_FILE);will(returnValue(logContents));
+        }});
+
+        ModelAndView mav = controller.getSectionedLogs(mockRequest, jobId);
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+
+        ModelMap map = ((List<ModelMap>) mav.getModel().get("data")).get(0);
+
+        //There should be 3 sections (we don't care about line ending formats - normalise it to unix style \n)
+        Assert.assertEquals(4, map.keySet().size());
+        Assert.assertEquals("contents of env\n", stripCarriageReturns(map.get("environment").toString()));
+        Assert.assertEquals("multiple\nlines\n", stripCarriageReturns(map.get("test").toString()));
+        Assert.assertEquals("text\n", stripCarriageReturns(map.get("spaced header").toString()));
+        Assert.assertEquals(stripCarriageReturns(logContentString), stripCarriageReturns(map.get("Full").toString()));
+    }
+
+    /**
+     * Tests that log sectioning fails when job ID DNE
+     * @throws Exception
+     */
+    @Test
+    public void testGetSectionedLogs_JobDne() throws Exception {
+        final InputStream logContents = ResourceUtil.loadResourceAsStream("sectionedVglLog.txt");
+        final String userEmail = "user@example.org";
+        final Integer jobId = 54321;
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
+        }});
+
+        ModelAndView mav = controller.getSectionedLogs(mockRequest, jobId);
+        Assert.assertFalse((Boolean) mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests that log sectioning fails as expected when log lookup fails
+     * @throws Exception
+     */
+    @Test
+    public void testGetSectionedLogs_LogAccessError() throws Exception {
+        final InputStream logContents = ResourceUtil.loadResourceAsStream("sectionedVglLog.txt");
+        final String userEmail = "user@example.org";
+        final Integer jobId = 54321;
+
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+
+            oneOf(mockCloudStorageService).getJobFile(mockJob, JobListController.VGL_LOG_FILE);will(throwException(new PortalServiceException("error")));
+        }});
+
+        ModelAndView mav = controller.getSectionedLogs(mockRequest, jobId);
+        Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 }

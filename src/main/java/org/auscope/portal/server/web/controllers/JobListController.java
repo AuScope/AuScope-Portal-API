@@ -12,6 +12,8 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -33,6 +35,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -47,6 +50,9 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class JobListController extends BasePortalController  {
+
+    /** The name of the log file that the job will use*/
+    public static final String VGL_LOG_FILE = "vegl.sh.log";
 
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
@@ -662,7 +668,7 @@ public class JobListController extends BasePortalController  {
         }
 
         boolean jobStarted = containsFile(results, "workflow-version.txt");
-        boolean jobFinished = containsFile(results, "vegl.sh.log");
+        boolean jobFinished = containsFile(results, VGL_LOG_FILE);
 
         String newStatus = oldStatus;
         if (jobFinished) {
@@ -799,5 +805,68 @@ public class JobListController extends BasePortalController  {
 
         jobManager.createJobAuditTrail(null, newJob, "Job duplicated.");
         return generateJSONResponseMAV(true, Arrays.asList(newJob), "");
+    }
+
+    /**
+     * Gets a pre parsed version of the internal logs. The resulting object will
+     * contain the logs sectioned into 'named sections' eg: Section for python code, section for environment etc
+     *
+     * Will always contain a single section called "Full" containing the unsectioned original log
+     *
+     * @param jobId
+     * @return
+     */
+    @RequestMapping("/getSectionedLogs.do")
+    public ModelAndView getSectionedLogs(HttpServletRequest request, @RequestParam("jobId") Integer jobId) {
+        //Lookup the job whose logs we are accessing
+        VEGLJob job = attemptGetJob(jobId, request);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The specified job does not exist.");
+        }
+
+        //Download the logs from cloud storage
+        String logContents = null;
+        InputStream is = null;
+        try {
+            is = cloudStorageService.getJobFile(job, VGL_LOG_FILE);
+            logContents = IOUtils.toString(is);
+        } catch (Exception ex) {
+            log.info("Unable to lookup job logs (accessing file): " + ex.getMessage());
+            log.debug("Exception:", ex);
+            return generateJSONResponseMAV(false, null, "The specified job hasn't uploaded any logs yet.");
+        } finally {
+            FileIOUtil.closeQuietly(is);
+        }
+
+        ModelMap namedSections = new ModelMap();
+        namedSections.put("Full", logContents); //always include the full log
+
+        //Iterate through looking for start/end matches. All text between a start/end
+        //tag will be snipped out and used in their own region/section
+        Pattern p = Pattern.compile("^#### (.*) (.+) ####$[\\n\\r]*", Pattern.MULTILINE);
+        Matcher m = p.matcher(logContents);
+        int start = 0;
+        String currentSectionName = null;
+        while (m.find()) {
+            String sectionName = m.group(1);
+            String delimiter = m.group(2);
+
+            //On a new match - record the location and name
+            if (delimiter.equals("start")) {
+                start = m.end();
+                currentSectionName = sectionName;
+            } else if (delimiter.equals("end")) {
+                //On a closing pattern - ensure we are closing the current region (we don't support nesting)
+                //Take the snippet of text and store it in our result map
+                if (sectionName.equals(currentSectionName)) {
+                    String regionText = logContents.substring(start, m.start());
+                    namedSections.put(sectionName, regionText);
+                    currentSectionName = null;
+                    start = 0;
+                }
+            }
+        }
+
+        return generateJSONResponseMAV(true, Arrays.asList(namedSections), "");
     }
 }
