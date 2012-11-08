@@ -548,7 +548,7 @@ public class JobBuilderController extends BaseCloudController {
             cloudStorageService.getAccessKey(), //STORAGE_ACCESS_KEY
             cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
             hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
-            hostConfigurer.resolvePlaceholder("storage.endpoint"), //STORAGE_ENDPOINT
+            cloudStorageService.getEndpoint(), //STORAGE_ENDPOINT
             cloudStorageService.getProvider(), //STORAGE_TYPE
             cloudStorageService.getAuthVersion() == null ? "1.0" : cloudStorageService.getAuthVersion() //STORAGE_AUTH_VERSION
         };

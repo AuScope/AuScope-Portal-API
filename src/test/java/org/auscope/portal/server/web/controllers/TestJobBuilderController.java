@@ -97,6 +97,7 @@ public class TestJobBuilderController {
         final String storageAccess = "213-asd-54";
         final String storageSecret = "tops3cret";
         final String storageServiceId = "storageid";
+        final String storageEndpoint = "http://example.org";
         final String storageProvider = "provider";
         final String storageAuthVersion = "1.2.3";
 
@@ -138,6 +139,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
@@ -309,6 +311,7 @@ public class TestJobBuilderController {
         final String storageSecret = "tops3cret";
         final String storageProvider = "provider";
         final String storageAuthVersion = "1.2.3";
+        final String storageEndpoint = "http://example.org";
         final String storageServiceId = "storage-service-id";
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
@@ -341,6 +344,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
 
             //We should have 1 call to upload them
             oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
@@ -502,20 +506,22 @@ public class TestJobBuilderController {
         final String storageAuthVersion = "1.2.3";
         final String computeServiceId = "ccs";
         final String storageServiceId = "css";
+        final String endpoint = "http://example.org";
+        final String vmSh = "http://example2.org";
 
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);
 
         context.checking(new Expectations() {{
             //We allow calls to the Configurer which simply extract values from our property file
-            allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue(bucket));
-            allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
-            allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
-            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(provider));
-            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
-
+            allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
+            atLeast(1).of(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
+            atLeast(1).of(mockCloudStorageServices[0]).getBucket();will(returnValue(bucket));
+            atLeast(1).of(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
+            atLeast(1).of(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
+            atLeast(1).of(mockCloudStorageServices[0]).getProvider();will(returnValue(provider));
+            atLeast(1).of(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            atLeast(1).of(mockCloudStorageServices[0]).getEndpoint();will(returnValue(endpoint));
         }});
 
         job.setStorageBaseKey("test/key");
@@ -529,7 +535,10 @@ public class TestJobBuilderController {
         Assert.assertTrue(contents.contains(job.getStorageBaseKey()));
         Assert.assertTrue(contents.contains(secret));
         Assert.assertTrue(contents.contains(provider));
+        Assert.assertTrue(contents.contains(endpoint));
         Assert.assertTrue(contents.contains(storageAuthVersion));
+        Assert.assertTrue(contents.contains(vmSh));
+        Assert.assertTrue(contents.contains(endpoint));
     }
 
     /**
