@@ -2,8 +2,6 @@ package org.auscope.portal.server.web.controllers;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -16,8 +14,8 @@ import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.vegl.VGLSignature;
 import org.auscope.portal.server.vegl.VglDownload;
-import org.auscope.portal.server.vegl.VglParameter;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
@@ -30,7 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * Units tests for GeonetworkController
  * @author Josh Vote
- *
+ * @author Richard Goh
  */
 public class TestGeonetworkController {
     private Mockery context = new Mockery() {{
@@ -53,6 +51,72 @@ public class TestGeonetworkController {
     }
 
     /**
+     * Tests that the getUserSignature correctly interact with all dependencies.
+     */
+    @Test
+    public void testGetUserSignature() {
+        final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
+        final HttpSession mockSession = context.mock(HttpSession.class);
+        final String userEmail = "user@test.au";
+        final VGLSignature userSignature = new VGLSignature(1, userEmail);
+
+        context.checking(new Expectations() {{
+            //We should make a single call to the database for job objects
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            //We should have a single call to the database for user signature object
+            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
+        }});
+
+        ModelAndView mav = controller.getUserSignature(mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests that the getUserSignature
+     */
+    @Test
+    public void testGetUserSignatureDNE() {
+        final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
+        final HttpSession mockSession = context.mock(HttpSession.class);
+        final String userEmail = "user@test.org";
+
+        context.checking(new Expectations() {{
+            //We should have a call to http request session to get user's email
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            //We should have a single call to the database for user signature object
+            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(null));
+        }});
+
+        ModelAndView mav = controller.getUserSignature(mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests that the getUserSignature correctly fails when user session has expired.
+     */
+    @Test
+    public void testGetUserSignatureSessionExpired() {
+        final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
+        final HttpSession mockSession = context.mock(HttpSession.class);
+
+        context.checking(new Expectations() {{
+            //We should have a call to http request session to get user's email
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(null));
+        }});
+
+        ModelAndView mav = controller.getUserSignature(mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertFalse((Boolean) mav.getModel().get("success"));
+    }
+
+    /**
      * Tests that the insertRecord function correctly uses all dependencies on success.
      * @throws Exception
      */
@@ -66,6 +130,8 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
         final HttpSession mockSession = context.mock(HttpSession.class);
         final ServletContext mockContext = context.mock(ServletContext.class);
+        final String userEmail = "user@test.au";
+        final VGLSignature userSignature = new VGLSignature(1, userEmail);
         final CloudFileInformation[] outputFileInfo = new CloudFileInformation[] {
                 new CloudFileInformation("my/key1", 100L, "http://public.url1"),
                 new CloudFileInformation("my/key2", 200L, "http://public.url2"),
@@ -102,9 +168,37 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
+            //We should have a call to http request session to get user's email
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            //We should have a single call to the database for user signature object
+            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
+
+            //We should have a call to the job manager to store user signature object
+            oneOf(mockJobManager).saveSignature(userSignature);
+
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageService).listJobFiles(mockJob);will(returnValue(outputFileInfo));
             allowing(cloudStorageService).getBucket();will(returnValue("s3-output-bucket"));
+
+            //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
+            allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
+            allowing(mockRequest).getParameter("administrativeArea");will(returnValue("administrativeArea"));
+            allowing(mockRequest).getParameter("city");will(returnValue("city"));
+            allowing(mockRequest).getParameter("deliveryPoint");will(returnValue("deliveryPoint"));
+            allowing(mockRequest).getParameter("postalCode");will(returnValue("postalCode"));
+            allowing(mockRequest).getParameter("country");will(returnValue("country"));
+            allowing(mockRequest).getParameter("telephone");will(returnValue("telephone"));
+            allowing(mockRequest).getParameter("facsimile");will(returnValue("facsimile"));
+            allowing(mockRequest).getParameter("onlineContactURL");will(returnValue("http://localhost"));
+            allowing(mockRequest).getParameter("onlineContactName");will(returnValue("onlineContactName"));
+            allowing(mockRequest).getParameter("onlineContactDescription");will(returnValue("onlineContactDescription"));
+            allowing(mockRequest).getParameter("individualName");will(returnValue("individualName"));
+            allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
+            allowing(mockRequest).getParameter("positionName");will(returnValue("positionName"));
+            allowing(mockRequest).getParameter("constraints");will(returnValue("constraints"));
+            allowing(mockRequest).getParameter("keywords");will(returnValue("keyword1, keyword2"));
 
             //Only 1 call to save our newly created record
             oneOf(mockGNService).makeCSWRecordInsertion(with(any(CSWRecord.class)));will(returnValue(registeredUrl));
@@ -134,7 +228,6 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 
         context.checking(new Expectations() {{
-
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
         }});
@@ -180,14 +273,45 @@ public class TestGeonetworkController {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
+        final HttpSession mockSession = context.mock(HttpSession.class);
+        final String userEmail = "user@test.au";
+        final VGLSignature userSignature = new VGLSignature(1, userEmail);
 
         context.checking(new Expectations() {{
             //Our mock job configuration
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
 
+            //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
+            allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
+            allowing(mockRequest).getParameter("administrativeArea");will(returnValue("administrativeArea"));
+            allowing(mockRequest).getParameter("city");will(returnValue("city"));
+            allowing(mockRequest).getParameter("deliveryPoint");will(returnValue("deliveryPoint"));
+            allowing(mockRequest).getParameter("postalCode");will(returnValue("postalCode"));
+            allowing(mockRequest).getParameter("country");will(returnValue("country"));
+            allowing(mockRequest).getParameter("telephone");will(returnValue("telephone"));
+            allowing(mockRequest).getParameter("facsimile");will(returnValue("facsimile"));
+            allowing(mockRequest).getParameter("onlineContactURL");will(returnValue("http://localhost"));
+            allowing(mockRequest).getParameter("onlineContactName");will(returnValue("onlineContactName"));
+            allowing(mockRequest).getParameter("onlineContactDescription");will(returnValue("onlineContactDescription"));
+            allowing(mockRequest).getParameter("individualName");will(returnValue("individualName"));
+            allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
+            allowing(mockRequest).getParameter("positionName");will(returnValue("positionName"));
+            allowing(mockRequest).getParameter("constraints");will(returnValue("constraints"));
+            allowing(mockRequest).getParameter("keywords");will(returnValue("keyword1, keyword2"));
+
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+
+            //We should have a call to http request session to get user's email
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            //We should have a single call to the database for user signature object
+            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
+
+            //We should have a call to the job manager to store user signature object
+            oneOf(mockJobManager).saveSignature(userSignature);
 
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageService).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
@@ -211,6 +335,8 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
         final HttpSession mockSession = context.mock(HttpSession.class);
         final ServletContext mockContext = context.mock(ServletContext.class);
+        final String userEmail = "user@test.au";
+        final VGLSignature userSignature = new VGLSignature(1, userEmail);
         final CloudFileInformation[] outputFileInfo = new CloudFileInformation[] {
                 new CloudFileInformation("my/key1", 100L, "http://public.url1"),
                 new CloudFileInformation("my/key2", 200L, "http://public.url2"),
@@ -243,9 +369,37 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
+            //We should have a call to http request session to get user's email
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            //We should have a single call to the database for user signature object
+            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
+
+            //We should have a call to the job manager to store user signature object
+            oneOf(mockJobManager).saveSignature(userSignature);
+
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageService).listJobFiles(mockJob);will(returnValue(outputFileInfo));
             allowing(cloudStorageService).getBucket();will(returnValue("s3-output-bucket"));
+
+            //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
+            allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
+            allowing(mockRequest).getParameter("administrativeArea");will(returnValue("administrativeArea"));
+            allowing(mockRequest).getParameter("city");will(returnValue("city"));
+            allowing(mockRequest).getParameter("deliveryPoint");will(returnValue("deliveryPoint"));
+            allowing(mockRequest).getParameter("postalCode");will(returnValue("postalCode"));
+            allowing(mockRequest).getParameter("country");will(returnValue("country"));
+            allowing(mockRequest).getParameter("telephone");will(returnValue("telephone"));
+            allowing(mockRequest).getParameter("facsimile");will(returnValue("facsimile"));
+            allowing(mockRequest).getParameter("onlineContactURL");will(returnValue("http://localhost"));
+            allowing(mockRequest).getParameter("onlineContactName");will(returnValue("onlineContactName"));
+            allowing(mockRequest).getParameter("onlineContactDescription");will(returnValue("onlineContactDescription"));
+            allowing(mockRequest).getParameter("individualName");will(returnValue("individualName"));
+            allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
+            allowing(mockRequest).getParameter("positionName");will(returnValue("positionName"));
+            allowing(mockRequest).getParameter("constraints");will(returnValue("constraints"));
+            allowing(mockRequest).getParameter("keywords");will(returnValue("keyword1, keyword2"));
 
             //Only 1 call to save our newly created record
             oneOf(mockGNService).makeCSWRecordInsertion(with(any(CSWRecord.class)));will(throwException(new Exception()));

@@ -205,26 +205,33 @@ Ext.define('vegl.widgets.JobsPanel', {
 
     _onRegisterToGeonetwork : function(btn) {
         var selectedJob = this.getSelectionModel().getSelection()[0];
-        Ext.Ajax.request({
-            url: 'insertRecord.do',
-            params: {jobId: selectedJob.get('id') },
-            scope : this,
-            callback : function(options, success, response) {
-                if (!success) {
-                    this.fireEvent('error', this, 'There was an error communicating with the VEGL server. Please try again later.');
-                    return;
-                }
 
-                var responseObj = Ext.JSON.decode(response.responseText);
-                if (!responseObj.success) {
-                    this.fireEvent('error', this, Ext.util.Format.format('There was an error registering this job with Geonetwork. {0}', responseObj.msg));
-                    return;
-                }
-
-                this.refreshJobsForSeries(); //refresh our store
-                this.fireEvent('jobregistered', this, selectedJob);
-            }
+        var popup = Ext.create('Ext.window.Window', {
+            id : 'jobRegisterWin',
+            width : 800,
+            modal : true,
+            layout : 'anchor',
+            title : 'Register to GeoNetwork',
+            items :[{
+                xtype : 'jobregister',
+                id : 'jobRegisterPanel',
+                jobId : selectedJob.get('id')
+            }]
         });
+
+        popup.on('beforerender', function() {
+            //loads user contact/signature data into the form
+            popup.items.getAt(0).loadFormData();
+        }, this);
+
+        popup.on('close', function() {
+            //refreshes jobs store of selected series
+            this.refreshJobsForSeries();
+            //refreshes Details panel
+            this.fireEvent('refreshDetailsPanel', this, this.currentSeries);
+        }, this);
+
+        popup.show();
     },
 
     _onRefresh : function(btn) {
@@ -409,12 +416,12 @@ Ext.define('vegl.widgets.JobsPanel', {
         //attribute back to its default value if the repeat job action
         //is performed via Submit Jobs tab
         popup.on('close', function() {
-            this.refreshJobsForSeries();
-            this.cleanupJobWizard("repeatJobPanel");
-            if (this.jobSeriesFrm !== null) {
-                this.jobSeriesFrm.noWindowUnloadWarning = false;
-            }
-        }, this);
+                    this.refreshJobsForSeries();
+                    this.cleanupJobWizard("repeatJobPanel");
+                    if (this.jobSeriesFrm !== null) {
+                        this.jobSeriesFrm.noWindowUnloadWarning = false;
+                    }
+                }, this);
 
         popup.show();
     },

@@ -52,6 +52,7 @@
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/SeriesPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobRegisterPanel.js"></script>
 
     <script type="text/javascript" src="js/vegl/jobwizard/forms/BaseJobWizardForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/DuplicateJobForm.js"></script>
