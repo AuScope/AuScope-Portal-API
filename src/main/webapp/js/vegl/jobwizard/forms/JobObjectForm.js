@@ -206,7 +206,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     beginValidation : function(callback) {
         var jobObjectFrm = this;
         var wizardState = this.wizardState;
-        
+
         //Ensure we have entered all appropriate fields
         if (!jobObjectFrm.getForm().isValid()) {
             callback(false);
@@ -234,9 +234,9 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
 
                 jobObjectFrm.wizardState.jobId = responseObj.data[0].id;
-                // Store user selected compute vm id into wizard state. That vm id
+                // Store user selected toolbox into wizard state. That toolbox
                 // will be used to select relevant script templates or examples.
-                wizardState.computeVmId = jobObjectFrm.getForm().findField("computeVmId").getValue();
+                wizardState.toolbox = jobObjectFrm.getForm().findField("computeVmId").getRawValue();
                 callback(true);
             }
         });

@@ -100,10 +100,10 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
     },
 
     /**
-     * Builds components panel with selected compute vm id
+     * Builds components panel with selected toolbox
      */
-    buildComponentsPanel : function(selectedComputeVmId) {
-        var comps = ScriptBuilder.Components.getComponents(selectedComputeVmId);
+    buildComponentsPanel : function(selectedToolbox) {
+        var comps = ScriptBuilder.Components.getComponents(selectedToolbox);
         this.componentsPanel.setRootNode(comps);
     },
     

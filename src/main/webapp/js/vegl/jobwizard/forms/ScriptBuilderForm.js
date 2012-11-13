@@ -28,8 +28,8 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
             layout : 'fit',
             listeners : {
                 jobWizardActive : function() {
-                    // Builds scriptbuilder component tree with user selected compute vm id
-                    this.scriptBuilderFrm.buildComponentsPanel(wizardState.computeVmId);
+                    // Builds scriptbuilder component tree with user selected toolbox
+                    this.scriptBuilderFrm.buildComponentsPanel(wizardState.toolbox);
                     
                     if (this.wizardState.userAction == 'edit' || this.wizardState.userAction == 'duplicate') {
                         this.loadSavedScript(this.wizardState.jobId);

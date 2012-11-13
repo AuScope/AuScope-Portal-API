@@ -139,11 +139,11 @@
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
                     <constructor-arg name="imageId" value="ami-00000022"/>
-                    <property name="name" value="eScript"/>
-                    <property name="description"><value>A Centos 6 machine with eScript already installed.</value></property>
+                    <property name="name" value="escript"/>
+                    <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
                     <property name="keywords">
                         <array>
-                            <value>eScript</value>
+                            <value>escript</value>
                             <value>centos6</value>
                         </array>
                     </property>

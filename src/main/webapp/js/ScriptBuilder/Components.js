@@ -3,21 +3,21 @@ Ext.ns('ScriptBuilder.Components');
 /**
  * The raw configuration for building the scriptbuilder tree
  */
-ScriptBuilder.Components.getComponents = function(selectedComputeVmId) {
+ScriptBuilder.Components.getComponents = function(selectedToolbox) {
     var comps = {
         text : "Script Builder Components",
         expanded : true,
         children : []
     };
 
-    switch (selectedComputeVmId) {
-        case "ami-0000000b": // UBC
+    switch (selectedToolbox.toLowerCase()) {
+        case "ubc-gif":
             comps.children.push(ScriptBuilder.Components.getUBCExamples());
             break;
-        case "ami-00000022": // escript
+        case "escript":
             comps.children.push(ScriptBuilder.Components.getEscriptExamples());
             break;
-        case "ami-00000025": // Underworld
+        case "underworld":
             comps.children.push(ScriptBuilder.Components.getUnderworldExamples());
             break;
         default:
@@ -38,13 +38,13 @@ ScriptBuilder.Components.getUBCExamples = function() {
             id   : "ScriptBuilder.templates.UbcGravityTemplate",
             type : "s",
             text : "Gravity Inversion",
-            qtip : "Perform a gravity inversion using UBC GIF. Expects data in the form of a CSV file.",
+            qtip : "Perform a gravity inversion using UBC GIF. Expects data in the form of a CSV file. Double click to use this example.",
             leaf : true
         },{
             id   : "ScriptBuilder.templates.UbcMagneticTemplate",
             type : "s",
             text : "Magnetic Inversion",
-            qtip : "Perform a magnetic inversion using UBC GIF. Expects data in the form of a CSV file.",
+            qtip : "Perform a magnetic inversion using UBC GIF. Expects data in the form of a CSV file. Double click to use this example.",
             leaf : true
         }]
     };
@@ -52,14 +52,14 @@ ScriptBuilder.Components.getUBCExamples = function() {
 
 ScriptBuilder.Components.getEscriptExamples = function() {
     return {
-        text : "eScript Examples",
+        text : "escript Examples",
         type : "category",
         expanded : true,
         children : [{
             id   : "ScriptBuilder.templates.EScriptGravityTemplate",
             type : "s",
             text : "Gravity Inversion",
-            qtip : "Perform a gravity inversion using eScript. Expects data in the form of a NetCDF file.",
+            qtip : "Perform a gravity inversion using escript. Expects data in the form of a NetCDF file. Double click to use this example.",
             leaf : true
         }]
     };
@@ -74,7 +74,7 @@ ScriptBuilder.Components.getUnderworldExamples = function() {
             id   : "ScriptBuilder.templates.UnderworldGocadTemplate",
             type : "s",
             text : "Gocad Simulation",
-            qtip : "Perform an Underworld simulation using a Gocad Voxelset. Expects data in the form of a Gocad voxel set.",
+            qtip : "Perform an Underworld simulation using a Gocad Voxelset. Expects data in the form of a Gocad voxel set. Double click to use this example.",
             leaf : true
         }]
     };
