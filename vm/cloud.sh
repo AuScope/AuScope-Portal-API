@@ -5,41 +5,54 @@
 # cloud list
 
 #wrapper for swift upload. Swift tool uses the file name as key
-if [[ $STORAGE_TYPE == swift* ]] && [ "$1" == "upload" ]
+if [[ $STORAGE_TYPE == swift* ]]
 then
-        #To overcome swift tool using directory structure as part of key
-        #Change to directory before running this command (then change back)
-        originalDir=`pwd`
-        fileDir=`dirname "$3"`
-        fileName=`basename "$3"`
+        #There may be some flags that get set depending on env
+        additionalFlags=""
+        if [[ -n $STORAGE_AUTH_VERSION ]]
+        then
+                additionalFlags="-V $STORAGE_AUTH_VERSION"
+        fi
+        
+        if [[ "$1" == "list" ]]
+        then
+                swift list "$STORAGE_BUCKET" -p "$STORAGE_BASE_KEY_PATH" $additionalFlags
+        fi
 
-        cd "$fileDir"
-        swift upload "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH" "$fileName" -V "$STORAGE_AUTH_VERSION"
-        cd "$originalDir"
+        if [[ "$1" == "download" ]]
+        then
+                swift download -o "$3" "$STORAGE_BUCKET" "$STORAGE_BASE_KEY_PATH/$2" $additionalFlags
+        fi
+
+        if [[ "$1" == "upload" ]]
+        then
+                #To overcome swift tool using directory structure as part of key
+                #Change to directory before running this command (then change back)
+                originalDir=`pwd`
+                fileDir=`dirname "$3"`
+                fileName=`basename "$3"`
+
+                cd "$fileDir"
+                swift upload "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH" "$fileName" $additionalFlags
+                cd "$originalDir"
+        fi
 fi
 
 #wrapper for aws upload
-if [ "$STORAGE_TYPE" == "aws" ] && [ "$1" == "upload" ]
+if [[ "$STORAGE_TYPE" == "aws" ]]
 then
-        aws put "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/$2" "$3"
-fi
+        if [[ "$1" == "list" ]]
+        then
+                aws list "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH"
+        fi
 
-#wrapper for swift download
-if [[ $STORAGE_TYPE == swift* ]] && [ "$1" == "download" ]
-then
-        swift download -o "$3" "$STORAGE_BUCKET" "$STORAGE_BASE_KEY_PATH/$2" -V "$STORAGE_AUTH_VERSION"
-fi
+        if [[ "$1" == "download" ]]
+        then
+                aws get "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/$2" "$3"
+        fi
 
-
-#wrapper for aws download
-if [ "$STORAGE_TYPE" == "aws" ] && [ "$1" == "download" ]
-then
-        aws get "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/$2" "$3"
-fi
-
-
-#wrapper for swift download
-if [[ $STORAGE_TYPE == swift* ]] && [ "$1" == "list" ]
-then
-        swift list "$STORAGE_BUCKET" -p "$STORAGE_BASE_KEY_PATH" -V "$STORAGE_AUTH_VERSION"
+        if [[ "$1" == "upload" ]]
+        then
+                aws put "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/$2" "$3"
+        fi      
 fi

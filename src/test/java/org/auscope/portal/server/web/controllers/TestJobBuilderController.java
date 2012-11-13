@@ -546,6 +546,47 @@ public class TestJobBuilderController {
     }
 
     /**
+     * Tests that Grid Submit Controller's usage of the bootstrap template correctly encodes an empty
+     * auth version (when required)
+     * @throws Exception
+     */
+    @Test
+    public void testCreateBootstrapForJob_NoAuthVersion() throws Exception {
+        final VEGLJob job = new VEGLJob(1234);
+        final String bucket = "stora124e-Bucket";
+        final String access = "213-asd-54";
+        final String secret = "tops3cret";
+        final String provider = "provider";
+        final String storageAuthVersion = null;
+        final String computeServiceId = "ccs";
+        final String storageServiceId = "css";
+        final String endpoint = "http://example.org";
+        final String vmSh = "http://example2.org";
+
+        job.setComputeServiceId(computeServiceId);
+        job.setStorageServiceId(storageServiceId);
+
+        context.checking(new Expectations() {{
+            //We allow calls to the Configurer which simply extract values from our property file
+            allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
+            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
+            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue(bucket));
+            allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
+            allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
+            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(provider));
+            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(endpoint));
+            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+        }});
+
+        job.setStorageBaseKey("test/key");
+
+        String contents = controller.createBootstrapForJob(job);
+        Assert.assertNotNull(contents);
+        Assert.assertTrue(contents.contains("STORAGE_AUTH_VERSION=\"\""));
+    }
+
+    /**
      * Tests that listing job images for a user works as expected
      * @throws Exception
      */

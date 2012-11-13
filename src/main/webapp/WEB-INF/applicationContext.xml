@@ -95,7 +95,6 @@
         <property name="id" value="nci-openstack-storage"/>
         <property name="name" value="National Computing Infrastructure (Canberra)"/>
         <property name="bucket" value="vegl-portal"/>
-        <property name="authVersion" value="1.0"/>
     </bean>
 
     <bean id="cloudStorageService-nectar" class="org.auscope.portal.core.services.cloud.CloudStorageService">
