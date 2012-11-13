@@ -64,7 +64,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                 if (selection.length > 0) {
                     //This is needed to ensure job submission from edit or duplicate
                     //job action via Submit Jobs tab won't show up the warning
-                    if (this.jobSeriesFrm !== null) {
+                    if (this.jobSeriesFrm != null) {
                         this.jobSeriesFrm.noWindowUnloadWarning = true;
                     }
                     this.repeatJob(selection[0]);
@@ -82,7 +82,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                 if (selection.length > 0) {
                     //This is needed to ensure job submission from edit or duplicate
                     //job action via Submit Jobs tab won't show up the warning
-                    if (this.jobSeriesFrm !== null) {
+                    if (this.jobSeriesFrm != null) {
                         this.jobSeriesFrm.noWindowUnloadWarning = true;
                     }
                     this.editJob(selection[0]);
@@ -418,7 +418,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         popup.on('close', function() {
                     this.refreshJobsForSeries();
                     this.cleanupJobWizard("repeatJobPanel");
-                    if (this.jobSeriesFrm !== null) {
+                    if (this.jobSeriesFrm != null) {
                         this.jobSeriesFrm.noWindowUnloadWarning = false;
                     }
                 }, this);
@@ -454,7 +454,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         //value if the edit job action is performed via Submit Jobs tab
         popup.on('close', function() {
                     this.cleanupJobWizard("editJobPanel");
-                    if (this.jobSeriesFrm !== null) {
+                    if (this.jobSeriesFrm != null) {
                         this.jobSeriesFrm.noWindowUnloadWarning = false;
                     }
                 }, this);
