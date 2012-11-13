@@ -23,9 +23,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
+import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
-import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -37,10 +37,10 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
-import org.auscope.portal.server.web.service.VglMachineImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +57,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Josh Vote
  */
 @Controller
-public class JobBuilderController extends BasePortalController {
+public class JobBuilderController extends BaseCloudController {
 
 
     /** Logger for this class */
@@ -66,9 +66,6 @@ public class JobBuilderController extends BasePortalController {
     private VEGLJobManager jobManager;
     private FileStagingService fileStagingService;
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
-    private CloudStorageService cloudStorageService;
-    private CloudComputeService cloudComputeService;
-    private VglMachineImageService vglImageService;
 
     public static final String STATUS_PENDING = "Pending";
     public static final String STATUS_ACTIVE = "Active";
@@ -82,14 +79,14 @@ public class JobBuilderController extends BasePortalController {
 
     @Autowired
     public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
-            PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService cloudStorageService,
-            CloudComputeService cloudComputeService, VglMachineImageService imageService) {
+            PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService[] cloudStorageServices,
+            CloudComputeService[] cloudComputeServices) {
+        super(cloudStorageServices, cloudComputeServices);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.hostConfigurer = hostConfigurer;
-        this.cloudStorageService = cloudStorageService;
-        this.cloudComputeService = cloudComputeService;
-        this.vglImageService = imageService;
+        this.cloudStorageServices = cloudStorageServices;
+        this.cloudComputeServices = cloudComputeServices;
     }
 
     /**
@@ -110,55 +107,6 @@ public class JobBuilderController extends BasePortalController {
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
-        }
-    }
-
-    /**
-     * Returns a JSON object containing a newly created VEGLJob object.
-     * @param request
-     * @return
-     */
-    @RequestMapping("/createJobObject.do")
-    public ModelAndView createJobObject(HttpServletRequest request) {
-
-        //Create our initial job object
-        VEGLJob newJob = null;
-        HttpSession session = request.getSession();
-        try {
-             newJob = createDefaultVEGLJob(session);
-        } catch (Exception ex) {
-            logger.error("Error saving newly created job", ex);
-            return generateJSONResponseMAV(false, null, "Error saving newly created job");
-        }
-
-        //Generate our stage in directory
-        try {
-            fileStagingService.generateStageInDirectory(newJob);
-        } catch (Exception ex) {
-            logger.error("Error creating input dir", ex);
-            return generateJSONResponseMAV(false, null, "Error creating input directory");
-        }
-
-        //Create the subset file and dump it in our stage in directory
-        @SuppressWarnings("unchecked")
-        List<VglDownload> erddapDownloads = (List<VglDownload>) session.getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);
-        session.setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, null); //ensure we clear the list out in case the user makes more jobs
-        if (erddapDownloads != null) {
-            newJob.setJobDownloads(new ArrayList<VglDownload>(erddapDownloads));
-        } else {
-            logger.warn("No downloads configured for user session!");
-        }
-
-        //Save our job to the database before setting up staging directories (we need an ID!!)
-        try {
-            jobManager.saveJob(newJob);
-            jobManager.createJobAuditTrail(null, newJob, "Job created.");
-            return generateJSONResponseMAV(true, Arrays.asList(newJob), "");
-        } catch (Exception ex) {
-            //On failure make sure we delete the new directory
-            fileStagingService.deleteStageInDirectory(newJob);
-            logger.error("Error saving edited job", ex);
-            return generateJSONResponseMAV(false, null, "Error saving edited job");
         }
     }
 
@@ -409,35 +357,37 @@ public class JobBuilderController extends BasePortalController {
 
     /**
      * Given an entire job object this function attempts to save the specified job with ID
-     * to the internal database.
+     * to the internal database. If the Job DNE (or id is null), the job will be created and
+     * have it's staging area initialised and other creation specific tasks performed.
      *
      * @return A JSON object with a success attribute that indicates whether
-     *         the job was successfully updated.
-     * @param job
+     *         the job was successfully updated. The data object will contain the updated job
      * @return
      * @throws ParseException
      */
-    @RequestMapping("/updateJob.do")
-    public ModelAndView updateJob(@RequestParam(value="id", required=true) Integer id,  //The integer ID is the only required value
+    @RequestMapping("/updateOrCreateJob.do")
+    public ModelAndView updateOrCreateJob(@RequestParam(value="id", required=false) Integer id,  //The integer ID if not specified will trigger job creation
             @RequestParam(value="name", required=false) String name,
             @RequestParam(value="description", required=false) String description,
-            @RequestParam(value="emailAddress", required=false) String emailAddress,
             @RequestParam(value="seriesId", required=false) Integer seriesId,
-            @RequestParam(value="status", required=false) String status,
-            @RequestParam(value="user", required=false) String user,
-            @RequestParam(value="computeInstanceId", required=false) String computeInstanceId,
-            @RequestParam(value="computeInstanceKey", required=false) String computeInstanceKey,
-            @RequestParam(value="computeInstanceType", required=false) String computeInstanceType,
+            @RequestParam(value="computeServiceId", required=false) String computeServiceId,
             @RequestParam(value="computeVmId", required=false) String computeVmId,
-            @RequestParam(value="storageBaseKey", required=false) String storageBaseKey,
-            @RequestParam(value="registeredUrl", required=false) String registeredUrl) throws ParseException {
+            @RequestParam(value="storageServiceId", required=false) String storageServiceId,
+            @RequestParam(value="registeredUrl", required=false) String registeredUrl,
+            HttpServletRequest request) throws ParseException {
 
         //Get our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(id);
+            //If we have an ID - look up the job, otherwise create a job
+            if (id == null) {
+                //Job creation involves a fair bit of initialisation on the server
+                job = initialiseVEGLJob(request.getSession());
+            } else {
+                job = jobManager.getJobById(id);
+            }
         } catch (Exception ex) {
-            logger.error("Error fetching job with id " + id, ex);
+            logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
         }
 
@@ -447,6 +397,34 @@ public class JobBuilderController extends BasePortalController {
         job.setDescription(description);
         job.setComputeVmId(computeVmId);
 
+        //Updating the storage service means changing the base key
+        if (storageServiceId != null) {
+            CloudStorageService css = getStorageService(storageServiceId);
+            if (css == null) {
+                logger.error(String.format("Error fetching storage service with id %1$s", storageServiceId));
+                return generateJSONResponseMAV(false, null, "Storage service does not exist");
+            }
+
+            job.setStorageServiceId(storageServiceId);
+            job.setStorageBaseKey(css.generateBaseKey(job));
+        } else {
+            job.setStorageServiceId(null);
+            job.setStorageBaseKey(null);
+        }
+
+        //Dont allow the user to specify a cloud compute service that DNE
+        if (computeServiceId != null) {
+            CloudComputeService ccs = getComputeService(computeServiceId);
+            if (ccs == null) {
+                logger.error(String.format("Error fetching compute service with id %1$s", computeServiceId));
+                return generateJSONResponseMAV(false, null, "No compute/storage service with those ID's");
+            }
+
+            job.setComputeServiceId(computeServiceId);
+        } else {
+            job.setComputeServiceId(null);
+        }
+
         //Save the VEGL job
         try {
             jobManager.saveJob(job);
@@ -455,7 +433,7 @@ public class JobBuilderController extends BasePortalController {
             return generateJSONResponseMAV(false, null, "Error saving job");
         }
 
-        return generateJSONResponseMAV(true, null, "");
+        return generateJSONResponseMAV(true, Arrays.asList(job), "");
     }
 
     /**
@@ -562,6 +540,7 @@ public class JobBuilderController extends BasePortalController {
      */
     public String createBootstrapForJob(VEGLJob job) throws IOException {
         String bootstrapTemplate = getBootstrapTemplate();
+        CloudStorageService cloudStorageService = getStorageService(job);
 
         Object[] arguments = new Object[] {
             cloudStorageService.getBucket(), //STORAGE_BUCKET
@@ -569,13 +548,61 @@ public class JobBuilderController extends BasePortalController {
             cloudStorageService.getAccessKey(), //STORAGE_ACCESS_KEY
             cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
             hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
-            hostConfigurer.resolvePlaceholder("storage.endpoint"), //STORAGE_ENDPOINT
+            cloudStorageService.getEndpoint(), //STORAGE_ENDPOINT
             cloudStorageService.getProvider(), //STORAGE_TYPE
             cloudStorageService.getAuthVersion() == null ? "1.0" : cloudStorageService.getAuthVersion() //STORAGE_AUTH_VERSION
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);
         return result;
+    }
+
+    /**
+     * Gets the list of authorised images for the specified job owned by user
+     * @param request The request (from a user) making the query
+     * @param job The job for which the images will be tested
+     * @return
+     */
+    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, VEGLJob job) {
+        return getImagesForJobAndUser(request, job.getComputeServiceId());
+    }
+
+    /**
+     * Gets the list of authorised images for the specified job owned by user
+     * @param request The request (from a user) making the query
+     * @param computeServiceId The compute service ID to search for images
+     * @return
+     */
+    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, String computeServiceId) {
+        CloudComputeService ccs = getComputeService(computeServiceId);
+        if (ccs == null) {
+            return new ArrayList<MachineImage>();
+        }
+
+        List<String> userRoles = Arrays.asList((String[])request.getSession().getAttribute("user-roles"));
+        List<MachineImage> authorisedImages = new ArrayList<MachineImage>();
+
+        for (MachineImage img : ccs.getAvailableImages()) {
+            if (img instanceof VglMachineImage) {
+                //If the image has no permission restrictions, add it. Otherwise
+                //ensure that the user has a role matching something in the image permission list
+                String[] permissions = ((VglMachineImage) img).getPermissions();
+                if (permissions == null) {
+                    authorisedImages.add(img);
+                } else {
+                    for (String validRole : permissions) {
+                        if (userRoles.contains(validRole)) {
+                            authorisedImages.add(img);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                authorisedImages.add(img);
+            }
+        }
+
+        return authorisedImages;
     }
 
     /**
@@ -604,6 +631,15 @@ public class JobBuilderController extends BasePortalController {
                 errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
                 return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
             } else {
+
+                CloudStorageService cloudStorageService = getStorageService(curJob);
+                CloudComputeService cloudComputeService = getComputeService(curJob);
+                if (cloudStorageService == null || cloudComputeService == null) {
+                    errorDescription = "One of the specified storage/compute services cannot be found.";
+                    errorCorrection = "Consider changing the selected compute or storage service.";
+                    return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
+                }
+
                 // we need to keep track of old job for audit trail purposes
                 oldJobStatus = curJob.getStatus();
 
@@ -611,10 +647,8 @@ public class JobBuilderController extends BasePortalController {
                 boolean permissionGranted = false;
 
                 String jobImageId = curJob.getComputeVmId();
-                String[] userRoles = (String[])request.getSession().getAttribute("user-roles");
-                VglMachineImage[] images = vglImageService.getImagesByRoles(userRoles);
-
-                for (VglMachineImage vglMachineImage : images) {
+                List<MachineImage> images = getImagesForJobAndUser(request, curJob);
+                for (MachineImage vglMachineImage : images) {
                     if (vglMachineImage.getImageId().equals(jobImageId)) {
                         permissionGranted = true;
                         break;
@@ -640,6 +674,7 @@ public class JobBuilderController extends BasePortalController {
                             for (int i = 0; i < stagedFiles.length; i++) {
                                 files[i] = stagedFiles[i].getFile();
                             }
+
                             cloudStorageService.uploadJobFiles(curJob, files);
 
                             // create our input user data string
@@ -685,11 +720,14 @@ public class JobBuilderController extends BasePortalController {
     }
 
     /**
-     * Creates a new VEGL job initialised with the default configuration values
+     * Creates a new VEGL job initialised with the default configuration values. The job will be persisted into the database.
+     *
+     * The Job MUST be associated with a specific compute and storage service. Staging areas and other bits and pieces relating to the job will also be initialised.
+     *
      * @param email
      * @return
      */
-    private VEGLJob createDefaultVEGLJob(HttpSession session) {
+    private VEGLJob initialiseVEGLJob(HttpSession session) throws PortalServiceException {
         VEGLJob job = new VEGLJob();
 
         //Start by saving our job to set its ID
@@ -722,16 +760,28 @@ public class JobBuilderController extends BasePortalController {
         //Load details from
         job.setUser((String) session.getAttribute("openID-Email"));
         job.setEmailAddress((String) session.getAttribute("openID-Email"));
-        job.setComputeServiceId(cloudComputeService.getId());
         job.setComputeInstanceType("m1.large");
         job.setComputeInstanceKey("vgl-developers");
         job.setName("VGL-Job " + new Date().toString());
         job.setDescription("");
         job.setStatus(STATUS_UNSUBMITTED);
-        job.setStorageServiceId(cloudStorageService.getId());
 
-        //We need an ID for storing our job file that won't collide with other storage ID's
-        job.setStorageBaseKey(cloudStorageService.generateBaseKey(job));
+        //Transfer the 'session downloads' into actual download objects associated with a job
+        @SuppressWarnings("unchecked")
+        List<VglDownload> erddapDownloads = (List<VglDownload>) session.getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);
+        session.setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, null); //ensure we clear the list out in case the user makes more jobs
+        if (erddapDownloads != null) {
+            job.setJobDownloads(new ArrayList<VglDownload>(erddapDownloads));
+        } else {
+            logger.warn("No downloads configured for user session!");
+        }
+
+        //Save our job to the database before setting up staging directories (we need an ID!!)
+        jobManager.saveJob(job);
+        jobManager.createJobAuditTrail(null, job, "Job created.");
+
+        //Finally generate our stage in directory for persisting inputs
+        fileStagingService.generateStageInDirectory(job);
 
         return job;
     }
@@ -774,17 +824,52 @@ public class JobBuilderController extends BasePortalController {
      * @param request
      * @return
      */
-    @RequestMapping("/getVmImages.do")
-    public ModelAndView getImagesForUser(HttpServletRequest request) {
+    @RequestMapping("/getVmImagesForComputeService.do")
+    public ModelAndView getImagesForComputeService(HttpServletRequest request,
+                                        @RequestParam("computeServiceId") String computeServiceId) {
         try {
-            String[] userRoles = (String[])request.getSession().getAttribute("user-roles");
-            VglMachineImage[] images = vglImageService.getImagesByRoles(userRoles);
-
-            return generateJSONResponseMAV(true, Arrays.asList(images), "");
+            List<MachineImage> images = getImagesForJobAndUser(request, computeServiceId);
+            return generateJSONResponseMAV(true, images, "");
         } catch (Exception ex) {
             log.error("Unable to access image list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
         }
+    }
+
+    /**
+     * Gets a JSON list of id/name pairs for every available compute service
+     * @return
+     */
+    @RequestMapping("/getComputeServices.do")
+    public ModelAndView getComputeServices() {
+        List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();
+
+        for (CloudComputeService ccs : cloudComputeServices) {
+            ModelMap map = new ModelMap();
+            map.put("id", ccs.getId());
+            map.put("name", ccs.getName());
+            simpleComputeServices.add(map);
+        }
+
+        return generateJSONResponseMAV(true, simpleComputeServices, "");
+    }
+
+    /**
+     * Gets a JSON list of id/name pairs for every available storage service
+     * @return
+     */
+    @RequestMapping("/getStorageServices.do")
+    public ModelAndView getStorageServices() {
+        List<ModelMap> simpleStorageServices = new ArrayList<ModelMap>();
+
+        for (CloudStorageService ccs : cloudStorageServices) {
+            ModelMap map = new ModelMap();
+            map.put("id", ccs.getId());
+            map.put("name", ccs.getName());
+            simpleStorageServices.add(map);
+        }
+
+        return generateJSONResponseMAV(true, simpleStorageServices, "");
     }
 
     /**

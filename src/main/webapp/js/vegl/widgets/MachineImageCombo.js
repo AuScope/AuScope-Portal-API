@@ -6,24 +6,10 @@ Ext.define('vegl.widgets.MachineImageCombo', {
     alias : 'widget.machineimagecombo',
 
     /**
-     * Accepts the config for a Ext.grid.Panel along with the following additions:
-     *
-     * hideRegisterButton : Boolean - if true the 'register to geonetwork' button will be hidden
+     * Accepts an Ext.field.Combo. It is expected that the internal store will be populated
+     * using vegl.models.MachineImage objects.
      */
     constructor : function(config) {
-        var ds = Ext.create('Ext.data.Store', {
-            model: 'vegl.models.MachineImage',
-            proxy: {
-                type: 'ajax',
-                url: 'getVmImages.do',
-                reader: {
-                   type: 'json',
-                   root : 'data'
-                }
-            },
-            autoLoad : true
-        });
-
         var listCfg = config.listConfig ? config.listConfig : {};
         listCfg.getInnerTpl = function() {
             // Custom rendering template for each item
@@ -35,7 +21,6 @@ Ext.define('vegl.widgets.MachineImageCombo', {
         };
 
         Ext.apply(config, {
-            store: ds,
             displayField: 'name',
             valueField : 'imageId',
             listConfig: listCfg

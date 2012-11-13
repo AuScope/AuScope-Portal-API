@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.services.GeonetworkService;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -37,17 +38,27 @@ public class TestGeonetworkController {
 
     private VEGLJobManager mockJobManager;
     private GeonetworkService mockGNService;
-    private CloudStorageService cloudStorageService;
+    private CloudStorageService[] cloudStorageServices;
+    private CloudComputeService[] cloudComputeServices;
 
     private GeonetworkController controller;
+
+    private final String storageServiceId = "storage-service-id";
+    private final String computeServiceId = "compute-service-id";
 
     @Before
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockGNService = context.mock(GeonetworkService.class);
-        cloudStorageService = context.mock(CloudStorageService.class);
+        cloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
+        cloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
 
-        controller = new GeonetworkController(mockJobManager, mockGNService, cloudStorageService);
+        context.checking(new Expectations() {{
+            allowing(cloudStorageServices[0]).getId();will(returnValue(storageServiceId));
+            allowing(cloudComputeServices[0]).getId();will(returnValue(computeServiceId));
+        }});
+
+        controller = new GeonetworkController(mockJobManager, mockGNService, cloudStorageServices, cloudComputeServices);
     }
 
     /**
@@ -159,6 +170,8 @@ public class TestGeonetworkController {
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
 
             //Our series configuration
             allowing(mockSeries).getName();will(returnValue("seriesName"));
@@ -179,8 +192,8 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).saveSignature(userSignature);
 
             //Only 1 call to the job storage service for files
-            oneOf(cloudStorageService).listJobFiles(mockJob);will(returnValue(outputFileInfo));
-            allowing(cloudStorageService).getBucket();will(returnValue("s3-output-bucket"));
+            oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(outputFileInfo));
+            allowing(cloudStorageServices[0]).getBucket();will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
@@ -280,6 +293,8 @@ public class TestGeonetworkController {
         context.checking(new Expectations() {{
             //Our mock job configuration
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
@@ -314,7 +329,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).saveSignature(userSignature);
 
             //Only 1 call to the job storage service for files
-            oneOf(cloudStorageService).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
+            oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
         }});
 
         ModelAndView mav = controller.insertRecord(jobId, mockRequest);
@@ -360,6 +375,8 @@ public class TestGeonetworkController {
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
 
             //Our series configuration
             allowing(mockSeries).getName();will(returnValue("seriesName"));
@@ -380,8 +397,8 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).saveSignature(userSignature);
 
             //Only 1 call to the job storage service for files
-            oneOf(cloudStorageService).listJobFiles(mockJob);will(returnValue(outputFileInfo));
-            allowing(cloudStorageService).getBucket();will(returnValue("s3-output-bucket"));
+            oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(outputFileInfo));
+            allowing(cloudStorageServices[0]).getBucket();will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));

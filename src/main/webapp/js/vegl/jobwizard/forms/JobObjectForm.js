@@ -7,11 +7,57 @@
 Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
+    imageStore : null,
+    storageServicesStore : null,
+    computeServicesStore : null,
+
     /**
      * Creates a new JobObjectForm form configured to write/read to the specified global state
      */
     constructor: function(wizardState) {
         var jobObjectFrm = this;
+
+        this.imageStore = Ext.create('Ext.data.Store', {
+            model: 'vegl.models.MachineImage',
+            proxy: {
+                type: 'ajax',
+                url: 'getVmImagesForComputeService.do',
+                reader: {
+                   type: 'json',
+                   root : 'data'
+                }
+            }
+        });
+
+        this.storageServicesStore = Ext.create('Ext.data.Store', {
+            fields : [{name: 'id', type: 'string'},
+                      {name: 'name', type: 'string'}],
+            proxy: {
+                type: 'ajax',
+                url: 'getStorageServices.do',
+                reader: {
+                   type: 'json',
+                   root : 'data'
+                }
+            },
+            autoLoad : true
+        });
+        this.storageServicesStore.load();
+
+        this.computeServicesStore = Ext.create('Ext.data.Store', {
+            fields : [{name: 'id', type: 'string'},
+                      {name: 'name', type: 'string'}],
+            proxy: {
+                type: 'ajax',
+                url: 'getComputeServices.do',
+                reader: {
+                   type: 'json',
+                   root : 'data'
+                }
+            },
+            autoLoad : true
+        });
+        this.storageServicesStore.load();
 
         this.callParent([{
             wizardState : wizardState,
@@ -23,41 +69,35 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             listeners : {
                 //The first time this form is active create a new job object
                 jobWizardActive : function() {
-                    var params = {};
-                    var url = '';
-                    var msg = '';
-
-                    //If we have a jobId, load that, OTHERWISE create a job object
+                    //If we have a jobId, load that, OTHERWISE the job will be created later
                     if (jobObjectFrm.wizardState.jobId) {
-                        url = 'getJobObject.do';
-                        msg = 'Loading Job Object...';
-                        params.jobId = jobObjectFrm.wizardState.jobId;
-                    } else {
-                        url = 'createJobObject.do';
-                        msg = 'Creating Job Object...';
-                    }
+                        jobObjectFrm.getForm().load({
+                            url : 'getJobObject.do',
+                            waitMsg : 'Loading Job Object...',
+                            params : {
+                                jobId : jobObjectFrm.wizardState.jobId
+                            },
+                            failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
+                            success : function(frm, action) {
+                                var responseObj = Ext.JSON.decode(action.response.responseText);
 
-                    //Load the job object into the form
-                    jobObjectFrm.getForm().load({
-                        url : url,
-                        waitMsg : msg,
-                        params : params,
-                        failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
-                        success : function(frm, action) {
-                            var responseObj = Ext.JSON.decode(action.response.responseText);
-
-                            if (responseObj.success) {
-                                frm.setValues(responseObj.data[0]);
-                                jobObjectFrm.wizardState.jobId = frm.getValues().id;
+                                if (responseObj.success) {
+                                    frm.setValues(responseObj.data[0]);
+                                    jobObjectFrm.wizardState.jobId = frm.getValues().id;
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
+            },
+            fieldDefaults: {
+                labelWidth: 120
             },
             items: [{
                 xtype: 'textfield',
                 name: 'name',
                 fieldLabel: 'Job Name',
+                value : Ext.util.Format.format('VGL Job {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'Enter an optional descriptive name for your job here.'
@@ -73,17 +113,62 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }],
                 allowBlank: true
             },{
+                xtype : 'combo',
+                fieldLabel : 'Compute Provider',
+                name: 'computeServiceId',
+                allowBlank: false,
+                queryMode: 'local',
+                triggerAction: 'all',
+                displayField: 'name',
+                valueField : 'id',
+                typeAhead: true,
+                forceSelection: true,
+                store : this.computeServicesStore,
+                listConfig : {
+                    loadingText: 'Getting Compute Services...',
+                    emptyText: 'No compute services found.'
+                },
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select a location where your data will be processed. Different locations will have different toolboxes.'
+                }],
+                listeners : {
+                    select : Ext.bind(this.onComputeSelect, this)
+                }
+            },{
+                xtype : 'combo',
+                fieldLabel : 'Storage Provider',
+                name: 'storageServiceId',
+                allowBlank: false,
+                queryMode: 'local',
+                triggerAction: 'all',
+                displayField: 'name',
+                valueField : 'id',
+                typeAhead: true,
+                forceSelection: true,
+                store : this.storageServicesStore,
+                listConfig : {
+                    loadingText: 'Getting Storage Services...',
+                    emptyText: 'No storage services found.'
+                },
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select a location where your data will be stored.'
+                }]
+            },{
                 xtype : 'machineimagecombo',
                 fieldLabel : 'Toolbox',
                 name: 'computeVmId',
+                itemId : 'image-combo',
                 allowBlank: false,
                 queryMode: 'local',
                 triggerAction: 'all',
                 typeAhead: true,
                 forceSelection: true,
+                store : this.imageStore,
                 listConfig : {
                     loadingText: 'Getting tools...',
-                    emptyText: 'No matching toolboxes found.'
+                    emptyText: 'No matching toolboxes found. Select a different compute location.'
                 },
                 plugins: [{
                     ptype: 'fieldhelptext',
@@ -91,20 +176,27 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }]
             },
             { xtype: 'hidden', name: 'id' },
-            { xtype: 'hidden', name: 'emailAddress' },
-            { xtype: 'hidden', name: 'user' },
-            { xtype: 'hidden', name: 'status' },
-            { xtype: 'hidden', name: 'computeInstanceId' },
-            { xtype: 'hidden', name: 'computeInstanceType' },
-            { xtype: 'hidden', name: 'computeInstanceKey' },
             { xtype: 'hidden', name: 'storageProvider' },
             { xtype: 'hidden', name: 'storageEndpoint' },
-            { xtype: 'hidden', name: 'storageBaseKey' },
             { xtype: 'hidden', name: 'registeredUrl' },
             { xtype: 'hidden', name: 'vmSubsetFilePath' },
             { xtype: 'hidden', name: 'vmSubsetUrl' }
             ]
         }]);
+    },
+
+    onComputeSelect : function(combo, records) {
+        if (!records.length) {
+            this.imageStore.removeAll();
+            return;
+        }
+
+        this.getComponent('image-combo').clearValue();
+        this.imageStore.load({
+            params : {
+                computeServiceId : records[0].get('id')
+            }
+        });
     },
 
     getTitle : function() {
@@ -118,20 +210,30 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         //Ensure we have entered all appropriate fields
         if (!jobObjectFrm.getForm().isValid()) {
             callback(false);
+            return;
         }
 
         //Then save the job to the database before proceeding
-        jobObjectFrm.getForm().submit({
-            url : 'updateJob.do',
-            params : {
-                seriesId : jobObjectFrm.wizardState.seriesId
-            },
-            waitMsg : 'Saving Job state...',
-            failure : function() {
-                Ext.Msg.alert('Input Error', 'You must select a toolbox before proceeding!');
-                callback(false);
-            },
-            success : function() {
+        var values = jobObjectFrm.getForm().getValues();
+        values.seriesId = jobObjectFrm.wizardState.seriesId;
+        Ext.Ajax.request({
+            url : 'updateOrCreateJob.do',
+            params : values,
+            callback : function(options, success, response) {
+                if (!success) {
+                    portal.widgets.window.ErrorWindow.showText('Error saving details', 'There was an unexpected error when attempting to save the details on this form. Please try again in a few minutes.');
+                    callback(false);
+                    return;
+                }
+
+                var responseObj = Ext.JSON.decode(response.responseText);
+                if (!responseObj.success) {
+                    portal.widgets.window.ErrorWindow.showText('Error saving details', 'There was an unexpected error when attempting to save the details on this form.', responseObj.msg);
+                    callback(false);
+                    return;
+                }
+
+                jobObjectFrm.wizardState.jobId = responseObj.data[0].id;
                 // Store user selected compute vm id into wizard state. That vm id
                 // will be used to select relevant script templates or examples.
                 wizardState.computeVmId = jobObjectFrm.getForm().findField("computeVmId").getValue();

@@ -86,38 +86,130 @@
         </constructor-arg>
     </bean>
 
-    <bean id="cloudStorageService" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+    <bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageService">
         <constructor-arg name="endpoint" value="https://s3.nci.org.au:8080/auth/v1.0"/>
         <constructor-arg name="provider" value="swift"/>
-        <constructor-arg name="accessKey" value="${env.storage.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.storage.secretkey}"/>
+        <constructor-arg name="accessKey" value="${env.nci.storage.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nci.storage.secretkey}"/>
         <property name="relaxHostName" value="true"/>
         <property name="id" value="nci-openstack-storage"/>
+        <property name="name" value="National Computing Infrastructure (Canberra)"/>
         <property name="bucket" value="vegl-portal"/>
         <property name="authVersion" value="1.0"/>
     </bean>
 
-    <!--
-    <bean id="cloudStorageService" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+    <bean id="cloudStorageService-nectar" class="org.auscope.portal.core.services.cloud.CloudStorageService">
         <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
         <constructor-arg name="provider" value="swift-keystone"/>
-        <constructor-arg name="accessKey" value="${env.storage.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.storage.secretkey}"/>
+        <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
+        <property name="name" value="NeCTAR (Melbourne)"/>
         <property name="id" value="nectar-openstack-storage"/>
         <property name="bucket" value="vgl-portal"/>
         <property name="authVersion" value="2.0"/>
     </bean>
-     -->
 
-    <bean id="cloudComputeService" class="org.auscope.portal.core.services.cloud.CloudComputeService">
-        <constructor-arg name="endpoint" value="${ec2.endpoint}"/>
+    <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeService">
+        <constructor-arg name="endpoint" value="http://openstack.nci.org.au:8773/services/Cloud"/>
         <constructor-arg name="credentials">
             <bean class="com.amazonaws.auth.BasicAWSCredentials">
-                <constructor-arg name="accessKey" value="${env.ec2.accesskey}"/>
-                <constructor-arg name="secretKey" value="${env.ec2.secretkey}"/>
+                <constructor-arg name="accessKey" value="${env.nci.ec2.accesskey}"/>
+                <constructor-arg name="secretKey" value="${env.nci.ec2.secretkey}"/>
             </bean>
         </constructor-arg>
         <property name="id" value="nci-openstack-compute"/>
+        <property name="name" value="National Computing Infrastructure (Canberra)"/>
+        <property name="availableImages">
+            <list>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ami-0000000b"/>
+                    <property name="name" value="UBC-GIF"/>
+                    <property name="description"><value>A Centos 6 machine with the University of British Columbia's Geophysical inversion facility already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>ubc-gif</value>
+                            <value>centos6</value>
+                        </array>
+                    </property>
+                    <property name="permissions">
+                        <array>
+                            <value>ROLE_UBC</value>
+                            <value>ROLE_ADMINISTRATOR</value>
+                        </array>
+                    </property>
+                </bean>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ami-00000022"/>
+                    <property name="name" value="eScript"/>
+                    <property name="description"><value>A Centos 6 machine with eScript already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>eScript</value>
+                            <value>centos6</value>
+                        </array>
+                    </property>
+                    <property name="permissions">
+                        <array>
+                            <value>ROLE_USER</value>
+                        </array>
+                    </property>
+                </bean>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ami-00000025"/>
+                    <property name="name" value="Underworld"/>
+                    <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>Underworld</value>
+                            <value>centos6</value>
+                        </array>
+                    </property>
+                    <property name="permissions">
+                        <array>
+                            <value>ROLE_USER</value>
+                        </array>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeService">
+        <constructor-arg name="endpoint" value="https://nova.rc.nectar.org.au:8773/services/Cloud"/>
+        <constructor-arg name="credentials">
+            <bean class="com.amazonaws.auth.BasicAWSCredentials">
+                <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
+                <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
+            </bean>
+        </constructor-arg>
+        <property name="id" value="nectar-openstack-compute"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
+        <property name="availableImages">
+            <list>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ami-000001ec"/>
+                    <property name="name" value="escript"/>
+                    <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>escript</value>
+                            <value>centos6</value>
+                        </array>
+                    </property>
+                </bean>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ami-000001ee"/>
+                    <property name="name" value="Underworld"/>
+                    <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>Underworld</value>
+                            <value>centos6</value>
+                        </array>
+                    </property>
+                </bean>
+            </list>
+        </property>
     </bean>
 
     <bean id="fileStagingService" class="org.auscope.portal.core.services.cloud.FileStagingService">
