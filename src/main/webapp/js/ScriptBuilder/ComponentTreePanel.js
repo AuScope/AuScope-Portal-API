@@ -9,13 +9,11 @@
  */
 Ext.define('ScriptBuilder.ComponentTreePanel', {
     extend : 'Ext.tree.Panel',
-
     alias : 'widget.sbcomponenttreepanel',
 
     constructor : function(config) {
         Ext.apply(config, {
-            rootVisible : false,
-            root : ScriptBuilder.Components.getComponents()
+            rootVisible : false
         });
 
         this.callParent(arguments);

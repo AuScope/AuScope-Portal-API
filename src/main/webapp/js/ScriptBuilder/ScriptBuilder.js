@@ -13,7 +13,6 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
     componentsPanel : null,
 
     constructor: function(config) {
-        var scriptBuilderFrm = this;
         this.wizardState = config.wizardState;
         this.templateVariables = config.templateVariables;
 
@@ -78,7 +77,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
                 if (me.getScript().length === 0) {
                     me.replaceScript(script);
                 } else {
-                    var popup = Ext.create('ScriptBuilder.InsertionPromptWindow', {
+                    Ext.create('ScriptBuilder.InsertionPromptWindow', {
                         script : script,
                         listeners : {
                             select : function(popup, selection) {
@@ -100,6 +99,14 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         });
     },
 
+    /**
+     * Builds components panel with selected compute vm id
+     */
+    buildComponentsPanel : function(selectedComputeVmId) {
+        var comps = ScriptBuilder.Components.getComponents(selectedComputeVmId);
+        this.componentsPanel.setRootNode(comps);
+    },
+    
     /**
      * Inserts the specified script at the current caret location
      */

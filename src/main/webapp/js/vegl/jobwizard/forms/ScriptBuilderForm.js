@@ -8,11 +8,10 @@
  * Original Author - Cihan Altinay
  * Author - Josh Vote
  * Author - Richard Goh
- *
  */
 Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
-
+    
     scriptBuilderFrm : null,
 
     /**
@@ -29,6 +28,9 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
             layout : 'fit',
             listeners : {
                 jobWizardActive : function() {
+                    // Builds scriptbuilder component tree with user selected compute vm id
+                    this.scriptBuilderFrm.buildComponentsPanel(wizardState.computeVmId);
+                    
                     if (this.wizardState.userAction == 'edit' || this.wizardState.userAction == 'duplicate') {
                         this.loadSavedScript(this.wizardState.jobId);
                         // Once the script is loaded into the memory,
