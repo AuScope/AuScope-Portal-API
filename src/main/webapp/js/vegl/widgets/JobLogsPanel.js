@@ -4,7 +4,7 @@
  *
  */
 Ext.define('vegl.widgets.JobLogsPanel', {
-    extend : 'Ext.tab.Panel',
+    extend : 'portal.widgets.tab.ActivePreRenderTabPanel',
     alias : 'widget.joblogspanel',
 
     currentJob : null,
@@ -12,14 +12,13 @@ Ext.define('vegl.widgets.JobLogsPanel', {
     constructor : function(config) {
 
         Ext.apply(config, {
+            autoScroll : true,
             items : []
         });
 
         this.callParent(arguments);
 
-        this.on('render', function(cmp) {
-            this.clearLogs(true);
-        });
+        this.clearLogs(true);
     },
 
     /**
@@ -101,10 +100,11 @@ Ext.define('vegl.widgets.JobLogsPanel', {
      */
     clearLogs : function(addEmptyTab) {
         this.currentJob = null;
-        this.removeAll();
+        this.removeAll(true);
         if (addEmptyTab) {
             this.addEmptyTab('No job selected.');
         }
+        this.doLayout();
     },
 
     /**
