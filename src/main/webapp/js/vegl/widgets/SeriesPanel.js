@@ -185,11 +185,17 @@ Ext.define('vegl.widgets.SeriesPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {
+                    loadMask = new Ext.LoadMask(Ext.getBody(), {
+                        msg : 'Cancelling Series Jobs...',
+                        removeMask : true
+                    });
+                    loadMask.show();
                     Ext.Ajax.request({
                         url: 'killSeriesJobs.do',
                         params: { 'seriesId': series.get('id')},
                         scope : this,
                         callback : function(options, success, response) {
+                            loadMask.hide();
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VEGL server. Please try again later.');
                                 return;
@@ -220,13 +226,20 @@ Ext.define('vegl.widgets.SeriesPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {
+                    loadMask = new Ext.LoadMask(Ext.getBody(), {
+                        msg : 'Deleting Series...',
+                        removeMask : true
+                    });
+                    loadMask.show();
                     Ext.Ajax.request({
                         url: 'deleteSeriesJobs.do',
                         params: { 'seriesId': series.get('id')},
                         scope : this,
                         callback : function(options, success, response) {
+                            loadMask.hide();
+                            
                             if (!success) {
-                                this.fireEvent('error', this, 'There was an error communicating with the VEGL server. Please try again later.');
+                                this.fireEvent('error', this, 'There was an error communicating with the VGL server. Please try again later.');
                                 return;
                             }
 
