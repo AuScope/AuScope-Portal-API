@@ -19,8 +19,8 @@ Ext.define('ScriptBuilder.templates.EScriptGravityTemplate', {
 
         this._getTemplatedScriptGui(callback, 'escript-gravity.py', {
             xtype : 'form',
-            width : 400,
-            height : 200,
+            width : 450,
+            height : 370,
             items : [{
                 xtype : 'combo',
                 fieldLabel : 'Dataset',
@@ -48,6 +48,68 @@ Ext.define('ScriptBuilder.templates.EScriptGravityTemplate', {
                     },
                     autoLoad : true
                 })
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'Max Depth',
+                anchor : '-20',
+                name : 'max-depth',
+                value : 4000,
+                allowBlank : false,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'The maximum depth of the inversion (in meters).'
+                }]
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'Air Buffer',
+                anchor : '-20',
+                name : 'air-buffer',
+                value : 6000,
+                allowBlank : false,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'buffer zone above data (in meters; 6-10km recommended)'
+                }]
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'Z Mesh Elements',
+                anchor : '-20',
+                name : 'vertical-mesh-elements',
+                value : 25,
+                allowDecimals : false,
+                allowBlank : false,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Number of mesh elements in vertical direction (approx 1 element per 2km recommended)'
+                }]
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'X Padding',
+                anchor : '-20',
+                name : 'x-padding',
+                value : 0.2,
+                minValue : 0,
+                maxValue : 1,
+                step : 0.1,
+                allowBlank : false,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'The amount of horizontal padding in the X direction. This affects end result, about 20% recommended'
+                }]
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'Y Padding',
+                anchor : '-20',
+                name : 'y-padding',
+                value : 0.2,
+                allowBlank : false,
+                minValue : 0,
+                maxValue : 1,
+                step : 0.1,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'The amount of horizontal padding in the Y direction. This affects end result, about 20% recommended'
+                }]
             }]
         });
     }
