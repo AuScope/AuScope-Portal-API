@@ -18,7 +18,7 @@ USE `veglportaltest`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `parameters`
+-- Table structure for table `jobs_audit_log`
 --
 
 DROP TABLE IF EXISTS `jobs_audit_log`;
