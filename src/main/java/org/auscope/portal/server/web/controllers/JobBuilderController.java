@@ -809,7 +809,6 @@ public class JobBuilderController extends BaseCloudController {
 
             return true;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             logger.error("Error creating download script" +  e.getMessage());
             logger.debug("Error:", e);
             return false;

@@ -3,12 +3,9 @@ package org.auscope.portal.server.web.security;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.junit.Test;
-import org.junit.Before;
 import org.junit.Assert;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.User;

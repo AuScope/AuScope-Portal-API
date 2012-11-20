@@ -2,11 +2,8 @@ package org.auscope.portal.server.web.service;
 
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
-import org.auscope.portal.core.services.admin.AdminDiagnosticResponse;
 import org.auscope.portal.core.services.admin.AdminService;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
-import org.auscope.portal.core.services.cloud.FileStagingService;
-import org.auscope.portal.server.vegl.VEGLJob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

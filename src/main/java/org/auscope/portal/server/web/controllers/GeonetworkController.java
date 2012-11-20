@@ -89,7 +89,7 @@ public class GeonetworkController extends BaseCloudController {
             try {
                 url = new URL(dl.getUrl());
             } catch (Exception ex) {
-                log.warn(String.format("Unable to parse URL '%1$s' for job '%2$s'. It will be skipped", dl.getUrl(), job.getId()));
+                log.warn(String.format("Unable to parse URL '%1$s' for job '%2$s'. It will be skipped", dl.getUrl(), job.getId()), ex);
                 continue;
             }
 
@@ -121,7 +121,7 @@ public class GeonetworkController extends BaseCloudController {
         rp.setPositionName(request.getParameter("positionName"));
 
         //Build our bounding boxes
-        List<CSWGeographicElement> geoEls = new ArrayList<CSWGeographicElement>();;
+        List<CSWGeographicElement> geoEls = new ArrayList<CSWGeographicElement>();
         for (VglDownload dl : jobDownloads) {
             if ( dl.getEastBoundLongitude()!= null &&
                     dl.getWestBoundLongitude() != null &&

@@ -15,14 +15,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.PropertiesCredentials;
 
 /**
  * Controller that handles all {@link Menu}-related requests,
@@ -52,7 +47,7 @@ public class MenuController {
 
        mav.addObject("googleKey", googleKey);
        if (analyticKey != null && !analyticKey.isEmpty()) {
-           mav.addObject("analyticKey", analyticKey);;
+           mav.addObject("analyticKey", analyticKey);
        }
    }
 

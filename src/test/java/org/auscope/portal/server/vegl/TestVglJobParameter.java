@@ -15,8 +15,8 @@ public class TestVglJobParameter extends PortalTestClass {
         VglParameter p1 = new VglParameter(1, "name1", "v1", "number", new VEGLJob(1));
         VglParameter p2 = new VglParameter(2, "name1", "v2", "string", new VEGLJob(1));
         VglParameter p3 = new VglParameter(3, "name1", "v3", "number", new VEGLJob(2));
-        VglParameter p4 = new VglParameter(4, "name2", "v4", "string", new VEGLJob(1));;
-        VglParameter p5 = new VglParameter(5, "name3", "v5", "number", new VEGLJob(3));;
+        VglParameter p4 = new VglParameter(4, "name2", "v4", "string", new VEGLJob(1));
+        VglParameter p5 = new VglParameter(5, "name3", "v5", "number", new VEGLJob(3));
 
         //Test general equality
         Assert.assertTrue(equalsWithHashcode(p1, p1));
