@@ -209,8 +209,6 @@ public class GeonetworkController extends BaseCloudController {
      */
     @RequestMapping("/insertRecord.do")
     public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request) throws Exception {
-        logger.debug("in insertRecord...");
-
         //Lookup our appropriate job
         VEGLJob job = jobManager.getJobById(jobId);
         if (job == null) {

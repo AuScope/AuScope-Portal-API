@@ -271,13 +271,43 @@ public class VGLSignature implements Serializable {
 
     /**
      * Tests two VglSignature objects for equality based on signature id and name
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof VGLSignature) {
-            return this.getId().equals(((VGLSignature) o).getId()) && this.user.equals(((VGLSignature) o).user);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
-
-        return false;
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof VGLSignature)) {
+            return false;
+        }
+        VGLSignature other = (VGLSignature) obj;
+        if (id == null) {
+            if (other.id != null) {
+                return false;
+            }
+        } else if (!id.equals(other.id)) {
+            return false;
+        }
+        if (user == null) {
+            if (other.user != null) {
+                return false;
+            }
+        } else if (!user.equals(other.user)) {
+            return false;
+        }
+        return true;
     }
+    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((user == null) ? 0 : user.hashCode());
+        return result;
+    }    
 }
