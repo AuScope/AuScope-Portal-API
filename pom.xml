@@ -293,13 +293,11 @@
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-support</artifactId>
             <version>${powermock.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
             <version>${powermock.version}</version>
-            <scope>test</scope>
         </dependency>
         <!--
             We depend on the EasyMock API but exclude the EasyMock dependency. The reason
@@ -315,7 +313,6 @@
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-easymock</artifactId>
             <version>${powermock.version}</version>
-            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.easymock</groupId>
