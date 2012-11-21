@@ -142,6 +142,7 @@
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>1.6</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <powermock.version>1.4.12</powermock.version>
     </properties>
 
     <repositories>
@@ -286,6 +287,41 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
             <version>1.2.2</version>
+        </dependency>
+        <!-- Added for using PowerMock with JMock -->
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-support</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--
+            We depend on the EasyMock API but exclude the EasyMock dependency. The reason
+            is that PowerMock Whitebox needs a "org.powermock.reflect.spi.ProxyFramework"
+            implementation in order to work correctly. This implementation is provided by
+            the extension API:s. Since JMock uses CGLib it can reuse the
+            "org.powermock.api.extension.proxyframework.ProxyFrameworkImpl" in the
+            PowerMock EasyMock API. An alternative to depend on this class would be to simply copy
+            the class it into your code (remember that the class must be named
+            org.powermock.api.extension.proxyframework.ProxyFrameworkImpl).
+        -->
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-easymock</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.easymock</groupId>
+                    <artifactId>easymock</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
