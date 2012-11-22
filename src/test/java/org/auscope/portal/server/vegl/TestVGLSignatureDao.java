@@ -4,17 +4,13 @@ import static org.powermock.api.support.membermodification.MemberMatcher.method;
 import static org.powermock.api.support.membermodification.MemberModifier.stub;
 import junit.framework.Assert;
 
+import org.auscope.portal.server.test.VGLPortalTestClass;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -22,13 +18,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * Unit tests for VGLSignatureDao
  * @author Richard Goh
  */
-@RunWith(PowerMockRunner.class)
 @PrepareForTest({HibernateDaoSupport.class})
-public class TestVGLSignatureDao {
-    private Mockery context = new JUnit4Mockery(){{
-        setImposteriser(ClassImposteriser.INSTANCE);
-    }};
-    
+public class TestVGLSignatureDao extends VGLPortalTestClass {    
     private String query = "from VGLSignature s where s.user=:user";
     private Session mockSession;
     private HibernateTemplate mockTemplate;
@@ -37,12 +28,12 @@ public class TestVGLSignatureDao {
     private VGLSignatureDao testDao;
     
     @Before
-    public void setup() throws Exception {        
+    public void setup() throws Exception {       
+        // Setting up mock objects needed for Object Under Test (OUT)
         mockSession = context.mock(Session.class);
         mockTemplate = context.mock(HibernateTemplate.class);
         mockQuery = context.mock(Query.class);
         mockVGLSignature = context.mock(VGLSignature.class);
-        
         // DAO under test
         testDao = new VGLSignatureDao();
     }

@@ -19,7 +19,8 @@ public class VGLJobAuditLogDao extends HibernateDaoSupport {
      *
      * @param jobId the id of a job
      */
-    public List<VGLJobAuditLog> getJobsOfSeries(final int jobId) {
+    @SuppressWarnings("unchecked")
+    public List<VGLJobAuditLog> getAuditLogsOfJob(final int jobId) {
         return (List<VGLJobAuditLog>) getHibernateTemplate().findByNamedParam(
                 "from VGLJobAuditLog j where j.jobId=:jobId", "jobId", jobId);
     }
