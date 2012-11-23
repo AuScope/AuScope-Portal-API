@@ -62,16 +62,35 @@ public class TestScriptBuilderService extends PortalTestClass {
      * @throws Exception
      */
     @Test(expected=PortalServiceException.class)
-    public void testSaveScriptError() throws Exception {
-        final String script = "#a pretend script\n";
+    public void testSaveScript_JobNotFoundException() throws Exception {
         final Integer jobId = 123;
+        final String script = "#a pretend script\n";
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId);
             will(throwException(new ConnectException()));
         }});
 
-        service.loadScript(jobId.toString());
+        service.saveScript(jobId.toString(), script);
+    }
+    
+    @Test(expected=PortalServiceException.class)
+    public void testSaveScript_Exception() throws Exception {
+        final String script = "#a pretend script\n";
+        final Integer jobId = 123;
+
+        context.checking(new Expectations() {
+            {
+                oneOf(mockJobManager).getJobById(jobId);
+                will(returnValue(mockJob));
+
+                oneOf(mockFileStagingService).writeFile(mockJob,
+                        ScriptBuilderService.SCRIPT_FILE_NAME);
+                will(throwException(new Exception()));
+            }
+        });
+
+        service.saveScript(jobId.toString(), script);
     }
 
     /**
@@ -128,7 +147,7 @@ public class TestScriptBuilderService extends PortalTestClass {
             will(throwException(new PortalServiceException("Test load script exception")));
         }});
 
-        String actualScript = service.loadScript(jobId.toString());
+        service.loadScript(jobId.toString());
     }
 
     /**

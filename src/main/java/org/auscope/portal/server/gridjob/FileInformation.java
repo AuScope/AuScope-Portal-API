@@ -15,6 +15,8 @@ import java.io.Serializable;
  * @author Cihan Altinay
  */
 public class FileInformation implements Serializable {
+    private static final long serialVersionUID = -7357222903106188095L;
+    
     /** The filename */
     private String name;
     /** The file size in bytes */
@@ -95,4 +97,3 @@ public class FileInformation implements Serializable {
 		this.parentPath = parentPath;
 	}
 }
-

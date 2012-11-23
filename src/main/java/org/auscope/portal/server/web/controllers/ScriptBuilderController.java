@@ -132,13 +132,8 @@ public class ScriptBuilderController extends BasePortalController {
             FileIOUtil.closeQuietly(is);
         }
 
-        try {
-            String finalTemplate = sbService.populateTemplate(templateString, kvpMapping);
-            return generateJSONResponseMAV(true, finalTemplate, "");
-        } catch (PortalServiceException e) {
-            logger.error("Unable to populate template - " + templateResource + ":" + e.getMessage());
-            logger.debug("Exception:", e);
-            return generateJSONResponseMAV(false, null, "Internal server error when populating template.");
-        }
+        String finalTemplate = sbService.populateTemplate(templateString,
+                kvpMapping);
+        return generateJSONResponseMAV(true, finalTemplate, "");
     }
 }

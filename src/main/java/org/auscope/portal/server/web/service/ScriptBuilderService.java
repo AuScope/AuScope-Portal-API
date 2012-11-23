@@ -116,13 +116,7 @@ public class ScriptBuilderService {
      * @param values The key/value pairs to be used in replacing placeholders in templateText
      * @return
      */
-    public String populateTemplate(String templateText, Map<String, Object> values) throws PortalServiceException {
-        try {
-            return StrSubstitutor.replace(templateText, values);
-        } catch (IllegalArgumentException ex) {
-            logger.warn("Unable to populate template: " + ex.getMessage());
-            logger.debug("Exception:", ex);
-            throw new PortalServiceException(null, "Unable to populate template", ex);
-        }
+    public String populateTemplate(String templateText, Map<String, Object> values) {
+        return StrSubstitutor.replace(templateText, values);
     }
 }
