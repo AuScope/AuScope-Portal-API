@@ -37,6 +37,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -81,12 +82,12 @@ public class TestJobBuilderController {
     @Test
     public void testGetJobObject() {
         final String jobId = "1";
-        final VEGLJob mockJob = new VEGLJob(new Integer(jobId));
+        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
         
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId));
-            will(returnValue(mockJob));
+            will(returnValue(jobObj));
         }});
         
         ModelAndView mav = controller.getJobObject(jobId);
@@ -186,6 +187,276 @@ public class TestJobBuilderController {
         ModelAndView mav = controller.listJobFiles(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
+    }
+    
+    /**
+     * Tests that the downloading of job file fails when
+     * the underlying file staging service's file download handler fails.
+     * @throws Exception
+     */
+    @Test
+    public void testDownloadFile() throws Exception {
+        final String jobId = "1";
+        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
+        final String filename = "test.py";
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(jobObj.getId());
+            will(returnValue(jobObj));
+            //We should have a call to file staging service to download a file
+            oneOf(mockFileStagingService).handleFileDownload(jobObj, filename, mockResponse);
+        }});
+        
+        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, filename);
+        Assert.assertNull(mav);
+    }
+    
+    /**
+     * Tests that the deleting of given job files succeeds.
+     */
+    @Test
+    public void testDeleteFiles() {
+        final String jobId = "1";
+        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
+        final String file1 = "file1.txt";
+        final String file2 = "file2.txt";
+        final String[] filenames = new String[] { file1, file2 };
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(jobObj.getId());
+            will(returnValue(jobObj));
+            //We should have calls to file staging service to delete files in staging dir
+            oneOf(mockFileStagingService).deleteStageInFile(jobObj, file1);
+            will(returnValue(true));
+            oneOf(mockFileStagingService).deleteStageInFile(jobObj, file2);
+            will(returnValue(true));
+        }});
+        
+        ModelAndView mav = controller.deleteFiles(jobId, filenames);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Assert.assertNull(mav.getModel().get("data"));
+    }
+    
+    /**
+     * Tests that the deleting of given job files fails
+     * when the job cannot be found.
+     */
+    @Test
+    public void testDeleteFiles_JobNotFoundException() {
+        final String jobId = "1";
+        final String file1 = "file1.txt";
+        final String file2 = "file2.txt";
+        final String[] filenames = new String[] { file1, file2 };        
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId));
+            will(throwException(new Exception()));
+        }});
+        
+        ModelAndView mav = controller.deleteFiles(jobId, filenames);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        Assert.assertNull(mav.getModel().get("data"));
+    }
+    
+    /**
+     * Tests that the deleting of a given job's download objects succeeds.
+     */
+    @Test
+    public void testDeleteDownloads() {
+        final String jobId = "1";
+        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
+        int downloadId1 = 13579;
+        int downloadId2 = 23480;
+        final Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
+        VglDownload vglDownload1 = new VglDownload(downloadId1);
+        VglDownload vglDownload2 = new VglDownload(downloadId2);
+        VglDownload[] vglDownloads = new VglDownload[] { vglDownload1, vglDownload2 };
+        final List<VglDownload> downloadList = new ArrayList<VglDownload>(Arrays.asList(vglDownloads));
+        jobObj.setJobDownloads(downloadList);
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(jobObj.getId());
+            will(returnValue(jobObj));
+            //We should have a call to our job manager to save our job object
+            oneOf(mockJobManager).saveJob(jobObj);
+        }});
+        
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Assert.assertNull(mav.getModel().get("data"));
+    }
+    
+    /**
+     * Tests that the deleting of a given job's download objects fails
+     * when job saving fails.
+     */
+    @Test
+    public void testDeleteDownloads_SaveJobException() {
+        final String jobId = "1";
+        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
+        int downloadId1 = 13579;
+        int downloadId2 = 23480;
+        final Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
+        VglDownload vglDownload1 = new VglDownload(downloadId1);
+        VglDownload vglDownload2 = new VglDownload(downloadId2);
+        VglDownload[] vglDownloads = new VglDownload[] { vglDownload1, vglDownload2 };
+        final List<VglDownload> downloadList = new ArrayList<VglDownload>(Arrays.asList(vglDownloads));
+        jobObj.setJobDownloads(downloadList);
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(jobObj.getId());
+            will(returnValue(jobObj));
+            //We should have a call to our job manager to save our job object
+            oneOf(mockJobManager).saveJob(jobObj);
+            will(throwException(new Exception()));
+        }});
+        
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        Assert.assertNull(mav.getModel().get("data"));
+    }
+    
+    /**
+     * Tests that the deleting of a given job's download objects fails
+     * when the job cannot be found.
+     */
+    @Test
+    public void testDeleteDownloads_JobNotFoundException() {
+        final String jobId = "1";
+        int downloadId1 = 13579;
+        int downloadId2 = 23480;
+        final Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId));
+            will(throwException(new Exception()));
+        }});
+        
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        Assert.assertNull(mav.getModel().get("data"));
+    }
+    
+    /**
+     * Tests that file uploading for a given job succeeds.
+     * @throws Exception
+     */
+    @Test
+    public void testUploadFile() throws Exception {
+        final VEGLJob jobObj = new VEGLJob(new Integer(13));
+        final MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
+        final File mockFile = context.mock(File.class);
+        final StagedFile mockStagedFile = new StagedFile(jobObj, "mockFile", mockFile);
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(jobObj.getId());
+            will(returnValue(jobObj));
+            
+            //We should have a call to file staging service to update a file
+            oneOf(mockFileStagingService).handleFileUpload(jobObj, mockMultipartRequest);
+            will(returnValue(mockStagedFile));
+            
+            oneOf(mockFile).length();
+            will(returnValue(1024L));
+        }});
+        
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString());
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+    }
+    
+    /**
+     * Tests that file uploading for a given job fails
+     * when the underlying file staging file upload handler fails.
+     * @throws Exception
+     */
+    @Test
+    public void testUploadFile_FileUploadException() throws Exception {
+        final VEGLJob jobObj = new VEGLJob(new Integer(13));
+        final MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(jobObj.getId());
+            will(returnValue(jobObj));
+            
+            //We should have a call to file staging service to update a file
+            oneOf(mockFileStagingService).handleFileUpload(jobObj, mockMultipartRequest);
+            will(throwException(new Exception()));
+        }});
+        
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString());
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));        
+    }
+    
+    /**
+     * Tests that file uploading for a given job fails
+     * when the given job cannot be found.
+     * @throws Exception
+     */
+    @Test
+    public void testUploadFile_JobNotFoundException() throws Exception {
+        final VEGLJob jobObj = new VEGLJob(new Integer(13));
+        final MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(jobObj.getId());
+            will(throwException(new Exception()));
+        }});
+        
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString());
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        Assert.assertNull(mav.getModel().get("data"));
+    }
+    
+    /**
+     * Tests that retrieving of a given job's download objects succeeds.
+     */
+    @Test
+    public void testGetJobDownloads() {
+        final int jobId = 1;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final VglDownload[] existingDownloads = new VglDownload[] { new VglDownload(12356) };
+        final List<VglDownload> downloadList = new ArrayList<VglDownload>(Arrays.asList(existingDownloads));
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(jobId);
+            will(returnValue(mockJob));
+            //We should have a call to job object to get a list of download objects
+            oneOf(mockJob).getJobDownloads();
+            will(returnValue(downloadList));
+        }});
+        
+        ModelAndView mav = controller.getJobDownloads(jobId);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Assert.assertNotNull(mav.getModel().get("data"));
+    }
+    
+    /**
+     * Tests that retrieving of a given job's download objects fails
+     * when the given job cannot be found.
+     */
+    @Test
+    public void testGetJobDownloads_Exception() {
+        final int jobId = 1;
+        
+        context.checking(new Expectations() {{
+            //We should have a call to our job manager to get our job object
+            oneOf(mockJobManager).getJobById(jobId);
+            will(throwException(new Exception()));
+        }});
+        
+        ModelAndView mav = controller.getJobDownloads(jobId);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        Assert.assertNull(mav.getModel().get("data"));        
     }
     
     /**
@@ -850,6 +1121,7 @@ public class TestJobBuilderController {
      * Tests the creation of a new job object.
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testUpdateOrCreateJob_CreateJobObject() throws Exception {
         final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
@@ -1242,6 +1514,7 @@ public class TestJobBuilderController {
      * Simple test to test formatting of cloud service into ModelMap objects
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetComputeServices() throws Exception {
         final String name = "name";
@@ -1267,6 +1540,7 @@ public class TestJobBuilderController {
      * Simple test to test formatting of cloud service into ModelMap objects
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetStorageServices() throws Exception {
         final String name = "name";

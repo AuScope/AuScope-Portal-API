@@ -20,6 +20,7 @@ public class VEGLJobDao extends HibernateDaoSupport {
      *
      * @param seriesID the ID of the series
      */
+    @SuppressWarnings("unchecked")
     public List<VEGLJob> getJobsOfSeries(final int seriesID) {
         return (List<VEGLJob>) getHibernateTemplate()
             .findByNamedParam("from VEGLJob j where j.seriesId=:searchID and lower(j.status)!='deleted'",
@@ -32,6 +33,7 @@ public class VEGLJobDao extends HibernateDaoSupport {
      * @param emailAddress the email whose jobs are to be retrieved
 
      */
+    @SuppressWarnings("unchecked")
     public List<VEGLJob> getJobsByEmail(final String emailAddress) {
         return (List<VEGLJob>) getHibernateTemplate()
             .findByNamedParam("from VEGLJob j where j.emailAddress=:email",

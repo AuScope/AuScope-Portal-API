@@ -274,9 +274,6 @@ public class TestJobListController extends PortalTestClass {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
         final int seriesId = 1234;
-        final List<VEGLJob> mockJobs = Arrays.asList(
-                context.mock(VEGLJob.class, "mockJob1"),
-                context.mock(VEGLJob.class, "mockJob2"));
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
@@ -308,6 +305,30 @@ public class TestJobListController extends PortalTestClass {
 
         ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
+    
+    /**
+     * Tests that deleting a series fails when job 
+     * list is null.
+     */
+    @Test
+    public void testDeleteSeries_JobListIsNull() {
+        final String userEmail = "exampleuser@email.com";
+        final int seriesId = 1234;
+        final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockSeries).getUser();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(null));
+        }});
+
+        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        Assert.assertNull(mav.getModel().get("data"));
     }
 
     /**
@@ -855,7 +876,6 @@ public class TestJobListController extends PortalTestClass {
     @Test
     public void testQuerySeriesNoUser() throws Exception {
         final String userEmail = "exampleuser@email.com";
-        final String qUser = null;
         final String qName = null;
         final String qDescription = null;
         final List<VEGLSeries> series = Arrays.asList(
@@ -883,6 +903,7 @@ public class TestJobListController extends PortalTestClass {
      * Tests that creating a series succeeds
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testCreateSeries() throws Exception {
         final String userEmail = "exampleuser@email.com";
@@ -1107,6 +1128,7 @@ public class TestJobListController extends PortalTestClass {
      * Tests that log sectioning works as expected
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetSectionedLogs() throws Exception {
         final InputStream logContents = ResourceUtil.loadResourceAsStream("sectionedVglLog.txt");
