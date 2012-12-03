@@ -1,6 +1,7 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -19,11 +20,14 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.core.services.responses.wcs.DescribeCoverageRecord;
+import org.auscope.portal.core.services.responses.wcs.RectifiedGrid;
 import org.auscope.portal.core.services.responses.wcs.Resolution;
+import org.auscope.portal.core.services.responses.wcs.SpatialDomain;
 import org.auscope.portal.core.services.responses.wcs.TimeConstraint;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -267,5 +271,112 @@ public class WCSController extends BasePortalController {
         }
 
         return generateJSONResponseMAV(true, records, "");
+    }
+
+    /**
+     * Given a rectified grid, calculate the wgs:84 max/min by multiplying the
+     * grid envelope high values against the offset vectors
+     *
+     * Returns an array representing X/Y width/height
+     *
+     * @param arr
+     * @param scalar
+     * @return
+     */
+    public double[] calculate2dExtents(RectifiedGrid rg) {
+        double maxX = 0.0;
+        double maxY = 0.0;
+
+        //Assume at least 2 dimensions. The first being X, the second being Y
+        double[][] offsetVectors = rg.getOffsetVectors();
+        int[] highValues = rg.getEnvelopeHighValues();
+        int[] lowValues = rg.getEnvelopeLowValues();
+        for (int dimension = 0; dimension < 2; dimension++) {
+            maxX += offsetVectors[dimension][0] * (double) (highValues[0] - lowValues[0]);
+            maxY += offsetVectors[dimension][1] * (double) (highValues[1] - lowValues[1]);
+        }
+
+        return new double[] {maxX, maxY};
+    }
+
+    /**
+     * Given a RectifiedGrid, convert a WGS84 lat/long coordinate into a datapoint index
+     * within a rectified grid
+     * @param rg Must contain a WGS4 coordinate space. Assumed to contain at least two axes, X and Y
+     * @param latitude
+     * @param longitude
+     * @return
+     */
+    public Point estimageLatLngToGridSpace(RectifiedGrid rg, double latitude, double longitude) {
+        double originX = rg.getOrigin()[0];
+        double originY = rg.getOrigin()[1];
+        double[] widthHeight = calculate2dExtents(rg);
+        double[] maxValues = new double[] {widthHeight[0] + originX, widthHeight[1] + originY};
+
+        //Get lat/lng as a proportional offset between origin and maxValues
+        double proportionalX = 1 - ((maxValues[0] - longitude) / (maxValues[0] - originX));
+        double proportionalY = 1 - ((maxValues[1] - latitude) / (maxValues[1] - originY));
+
+        //Used the proportional offset as a multiplier against the data indexes
+        int[] highIndexes = rg.getEnvelopeHighValues();
+        int[] lowIndexes = rg.getEnvelopeLowValues();
+        int indexX = (int) Math.round((((double)(highIndexes[0] - lowIndexes[0])) * proportionalX));
+        int indexY = (int) Math.round((((double)(highIndexes[1] - lowIndexes[1])) * proportionalY));
+
+        return new Point(indexX, indexY);
+    }
+
+    /**
+     * Attempts to estimate the size of a subset of a given coverage in data units.
+     * @param northBoundLatitude
+     * @param southBoundLatitude
+     * @param eastBoundLongitude
+     * @param westBoundLongitude
+     * @param serviceUrl
+     * @param coverageName
+     * @return
+     */
+    @RequestMapping("/estimateCoverageSize.do")
+    public ModelAndView estimateCoverageSize(@RequestParam("northBoundLatitude") double northBoundLatitude,
+                                 @RequestParam("southBoundLatitude") double southBoundLatitude,
+                                 @RequestParam("eastBoundLongitude") double eastBoundLongitude,
+                                 @RequestParam("westBoundLongitude") double westBoundLongitude,
+                                 @RequestParam("serviceUrl") String serviceUrl,
+                                 @RequestParam("coverageName") String coverageName) {
+
+        //Perform our calculations based on coverage description
+        DescribeCoverageRecord[] records = null;
+        try {
+            records = wcsService.describeCoverage(serviceUrl, coverageName);
+        } catch (Exception ex) {
+            logger.error(String.format("Error describing coverage for coverage size: %1$s", ex));
+            logger.debug("Exception: ", ex);
+            return generateJSONResponseMAV(false, null, "Error occured whilst communicating to remote service: " + ex.getMessage());
+        }
+
+        if (records == null || records.length == 0) {
+            return generateJSONResponseMAV(false, null, "No coverage description available for coverage: " + coverageName);
+        }
+
+        //Check our response has a rectified grid with at least 2 dimensions
+        SpatialDomain sd = records[0].getSpatialDomain();
+        RectifiedGrid rg = null;
+        if (sd == null || (rg = sd.getRectifiedGrid()) == null) {
+            return generateJSONResponseMAV(false, null, "No spatial domain with rectified grid for described coverage: " + coverageName);
+        }
+        if (rg.getDimension() < 2) {
+            return generateJSONResponseMAV(false, null, "The rectified grid for coverage must have at least 2 dimensions: " + coverageName);
+        }
+
+        //ASSUMPTIONS - the rg is in a WGS:84 compatible srs
+        //            - The axes read X, Y and then possibly Z
+        Point ne = estimageLatLngToGridSpace(rg, northBoundLatitude, eastBoundLongitude);
+        Point sw = estimageLatLngToGridSpace(rg, southBoundLatitude, westBoundLongitude);
+
+        ModelMap model = new ModelMap();
+        model.put("width", ne.x - sw.x);
+        model.put("height", ne.y - sw.y);
+
+        return generateJSONResponseMAV(true, model, "");
     }
 }

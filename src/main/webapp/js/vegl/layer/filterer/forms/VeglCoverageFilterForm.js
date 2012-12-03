@@ -195,6 +195,8 @@ Ext.define('vegl.layer.filterer.forms.VeglCoverageFilterForm', {
                 xtype : 'erddapsubsetpanel',
                 itemId : 'subset-panel',
                 region : bbox,
+                coverageName : wcsResource.get('name'),
+                coverageUrl : wcsResource.get('url'),
                 name : 'Subset of ' + layer.get('name')
             }],
             buttons : [{

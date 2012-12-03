@@ -12,15 +12,19 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.core.services.responses.wcs.DescribeCoverageRecord;
+import org.auscope.portal.core.services.responses.wcs.RectifiedGrid;
 import org.auscope.portal.core.services.responses.wcs.Resolution;
+import org.auscope.portal.core.services.responses.wcs.SpatialDomain;
 import org.auscope.portal.core.services.responses.wcs.TimeConstraint;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 public class TestWCSController extends PortalTestClass {
@@ -219,5 +223,69 @@ public class TestWCSController extends PortalTestClass {
 
         Assert.assertEquals(true, model.get("success"));
         Assert.assertSame(records, model.get("data"));
+    }
+
+    /**
+     * Estimates the coverage size - tests that the math checks out
+     * @throws Exception
+     */
+    @Test
+    public void testEstimateCoverageSize() throws Exception {
+        final String serviceUrl = "http://example.com/test";
+        final String layerName = "layer_name";
+        final double north = 10;
+        final double south = -50;
+        final double east = 60;
+        final double west = 10;
+
+        //Create our dummy record
+        final double[][] offsetVectors = new double[][] {new double[] {2, 0 ,0},
+                new double[] {0, 1, 0},
+                new double[] {0, 0, 0.5}};
+
+        final RectifiedGrid rg = new RectifiedGrid("wgs:84", 2, new int[] {10, 10, 10}, new int[] {110, 110, 110}, new double[] {0, -80, 0},offsetVectors, new String[] {"x", "y", "z"});
+        final SpatialDomain sd = new SpatialDomain(null, rg);
+        final DescribeCoverageRecord record = new DescribeCoverageRecord("", layerName, "", null, null, null, null, null, sd, null, null);
+
+        final DescribeCoverageRecord[] records = new DescribeCoverageRecord[0];
+
+        context.checking(new Expectations() {{
+            oneOf(wcsService).describeCoverage(serviceUrl, layerName);
+            will(returnValue(new DescribeCoverageRecord[] {record}));
+         }});
+
+        WCSController controller = new WCSController(wcsService);
+        ModelAndView mav = controller.estimateCoverageSize(north, south, east, west, serviceUrl, layerName);
+        Assert.assertNotNull(mav);
+        Assert.assertEquals(true, mav.getModel().get("success"));
+
+        ModelMap data = (ModelMap) mav.getModel().get("data");
+        Assert.assertNotNull(data);
+        Assert.assertEquals(25, data.get("width"));
+        Assert.assertEquals(60, data.get("height"));
+    }
+
+    /**
+     * Estimates the coverage size - tests that comms errors are propogated upwards
+     * @throws Exception
+     */
+    @Test
+    public void testEstimateCoverageSizeError() throws Exception {
+        final String serviceUrl = "http://example.com/test";
+        final String layerName = "layer_name";
+        final double north = 10;
+        final double south = -50;
+        final double east = 60;
+        final double west = 10;
+
+        context.checking(new Expectations() {{
+            oneOf(wcsService).describeCoverage(serviceUrl, layerName);
+            will(throwException(new PortalServiceException("err")));
+         }});
+
+        WCSController controller = new WCSController(wcsService);
+        ModelAndView mav = controller.estimateCoverageSize(north, south, east, west, serviceUrl, layerName);
+        Assert.assertNotNull(mav);
+        Assert.assertEquals(false, mav.getModel().get("success"));
     }
 }
