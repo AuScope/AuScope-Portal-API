@@ -134,6 +134,18 @@ Ext.define('vegl.widgets.ErddapSubsetPanel', {
         this.on('render', this.updateSelectionSize, this);
     },
 
+    /**
+     * Given a number with N digits, disregard most of the least significant digits and round
+     * to a nice even number. This is to round off approximate values (eg 12456) to a more rounded
+     * value so it looks more 'approximate' to people (eg 12000).
+     */
+    roundToApproximation : function(number) {
+        var totalDigits = number.toString().length;
+        var digitsToKeep = Math.floor(totalDigits / 2);
+        var divisor = Math.pow(10, totalDigits - digitsToKeep);
+        return Math.round((number / divisor)) * divisor;
+    },
+
     updateSelectionSize : function() {
         var ssField = this.getComponent('selection-size');
         var values = this.getForm().getValues();
@@ -161,8 +173,10 @@ Ext.define('vegl.widgets.ErddapSubsetPanel', {
                 var width = responseObj.data.width;
                 var height = responseObj.data.height;
 
-                var roughSize = Ext.util.Format.fileSize(width * height * 4);
-                ssField.setValue(Ext.util.Format.format('Approximately <b>{0}</b> points wide and <b>{1}</b> points high. Uncompressed that\'s roughly {2}', width, height, roughSize));
+                var totalPoints = width * height;
+                var approxTotal = Ext.util.Format.number(this.roundToApproximation(totalPoints), '0,000');
+                var approxSize = Ext.util.Format.fileSize(this.roundToApproximation(totalPoints * 4));
+                ssField.setValue(Ext.util.Format.format('Approximately <b>{0}</b> data points in total. Uncompressed that\'s roughly {1}', approxTotal, approxSize));
             }
         });
     }
