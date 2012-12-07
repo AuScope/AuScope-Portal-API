@@ -197,7 +197,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-000001ee"/>
+                    <constructor-arg name="imageId" value="ami-0000024c"/>
                     <property name="name" value="Underworld"/>
                     <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
                     <property name="keywords">
