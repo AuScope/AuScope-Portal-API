@@ -89,6 +89,7 @@ Ext.define('vegl.widgets.JobLogsPanel', {
                         this.setActiveTab('Full');
                     }
                 } else {
+                    this.clearLogs();
                     this.addEmptyTab('The selected job hasn\'t recorded any logs yet.');
                 }
             }
