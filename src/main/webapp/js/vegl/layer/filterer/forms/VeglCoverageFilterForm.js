@@ -110,9 +110,12 @@ Ext.define('vegl.layer.filterer.forms.VeglCoverageFilterForm', {
             itemId : 'drawButton',
             scope : this,
             handler : function() {
+                //Check to see if the bbox has been drawn or is in 'drawing mode'
                 if (this.dataBbox.getParams() || this.dataBbox.transMarkerEnabled) {
+                    if (this.dataBbox.transMarkerEnabled) {
+                        this.dataBbox.disableTransMarker(); //if we are drawing - cancel it first
+                    }
                     this.dataBbox.reset();
-                    this.dataBbox.disableTransMarker();
 
                     this.drawButton.setText("Draw Subset");
                     this.captureButton.setText("Capture Viewport");
