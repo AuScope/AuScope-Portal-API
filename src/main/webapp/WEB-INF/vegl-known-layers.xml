@@ -78,4 +78,64 @@
         </property>
     </bean>
 
+    <bean id="knownTypeGswaMagMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-magmerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="WA_80m_Mag_Merge_landsea_v1_2012"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="80m Magnetic Merge (Land/Sea)"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geoscience Western Australia Coverages"/>
+    </bean>
+
+    <bean id="knownTypeGswaUMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-umerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="WA_100m_U_Merge_v1_2012"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="100m U Merge"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geoscience Western Australia Coverages"/>
+    </bean>
+
+    <bean id="knownTypeGswaThMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-thmerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="WA_100m_Th_Merge_v1_2012"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="100m Th Merge"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geoscience Western Australia Coverages"/>
+    </bean>
+
+    <bean id="knownTypeGswaTcMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-tcmerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="WA_100m_TC_Merge_v1_2012"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="100m Tc Merge"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geoscience Western Australia Coverages"/>
+    </bean>
+
+    <bean id="knownTypeGswaKMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-kmerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="WA_100m_K_Merge_v1_2012"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="100m K Merge"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geoscience Western Australia Coverages"/>
+    </bean>
+
 </beans>

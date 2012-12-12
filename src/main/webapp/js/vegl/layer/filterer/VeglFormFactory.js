@@ -36,6 +36,11 @@ Ext.define('vegl.layer.filterer.VeglFormFactory', {
             case 'ga-grav-anom-geo':
             case 'ga-magmap-v5-2010':
             case 'ga-radmap-totaldose':
+            case 'gswa-magmerge':
+            case 'gswa-umerge':
+            case 'gswa-thmerge':
+            case 'gswa-tcmerge':
+            case 'gswa-kmerge':
                 baseFilterForm = Ext.create('vegl.layer.filterer.forms.VeglCoverageFilterForm', baseFilterFormCfg);
                 return this._generateResult(baseFilterForm, true);
             }
