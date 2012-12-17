@@ -6,14 +6,11 @@ class python_pip {
     package { ["python", "python-devel"]: 
         ensure => installed,
     }
-
-    # Python pip comes from EPEL
-    import "epel"
-    class {"epel":}
     
     # Install Python-Pip
     package { ["python-pip"]: 
         ensure => installed,
+        require => Class["epel"],
     }
 
     # Centos packages call the 'pip' executable 'pip-python' which can cause problems.
