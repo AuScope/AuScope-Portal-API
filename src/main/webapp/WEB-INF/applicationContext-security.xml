@@ -90,9 +90,9 @@
                         </beans:list>
                     </beans:constructor-arg>
                 </beans:bean>
-                
+
                 <!-- Privileged Users -->
-                <!-- Peter.Millgan@ga.gov.au -->
+                <!-- Peter.Milligan@ga.gov.au -->
                 <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
                     <beans:constructor-arg name="name" value="http://prm.myopenid.com/" />
                     <beans:constructor-arg name="credentials" value="" />
@@ -103,6 +103,19 @@
                         </beans:list>
                     </beans:constructor-arg>
                 </beans:bean>
+
+                <!-- Carina.Kemp@ga.gov.au -->
+                <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
+                    <beans:constructor-arg name="name" value="http://carinakemp.myopenid.com/" />
+                    <beans:constructor-arg name="credentials" value="" />
+                    <beans:constructor-arg name="grantedAuthorities">
+                        <beans:list>
+                            <beans:value>ROLE_USER</beans:value>
+                            <beans:value>ROLE_UBC</beans:value>
+                        </beans:list>
+                    </beans:constructor-arg>
+                </beans:bean>
+
             </beans:list>
         </beans:constructor-arg>
     </beans:bean>
