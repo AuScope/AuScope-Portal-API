@@ -48,9 +48,11 @@ sudo chkconfig puppet on
 puppet module install stahnma/epel
 
 # VGL Portal Custom Modules - download from user specified SVN (or default)
+yum install -y wget 
 baseUrl="https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk/"
 pathSuffix="/vm/puppet/modules/"
 tmpModulesDir="/tmp/modules/"
+rm -rf "$tmpModulesDir"
 if [ "$1" !=  "" ]
 then
     baseUrl="$1"
@@ -77,5 +79,22 @@ fi
 baseUrlSlashes=`grep -o "/" <<<"$baseUrl" | wc -l`
 pathSuffixSlashes=`grep -o "/" <<<"$pathSuffix" | wc -l`
 cutDirs=`expr $baseUrlSlashes - 3 + $pathSuffixSlashes`
-wget -r "$baseUrl$pathSuffix" -P "$tmpModulesDir" -nH --cut-dirs $cutDirs
+wget -r "$baseUrl$pathSuffix" -P "$tmpModulesDir" -R htm,html -nH -np --cut-dirs $cutDirs
+if [ $? -ne 0 ]
+then
+    echo "Failed download - aborting"
+    exit 1
+fi
+
+#Now copy the modules to the puppet module install directory
+moduleDir="/etc/puppet/modules"
+find "$tmpModulesDir" -maxdepth 1 -mindepth 1 -type d -exec cp {} -r "$moduleDir" \;
+if [ $? -ne 0 ]
+then
+    echo "Failed copying to puppet module directory - aborting"
+    exit 2
+fi
+
+#Tidy up
 rm -rf "$tmpModulesDir"
+
