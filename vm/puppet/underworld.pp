@@ -7,8 +7,14 @@ import "vgl_common"
 import "epel"
 import "python_pip"
 import "puppi"
+import "autofsck"
 
 class {["epel", "python_pip", "vgl_common"]:}
+
+# Disable fsck on boot
+class { autofsck:
+  ensure => present, # default
+}
 
 # Setup some default exec environment variables (they will eventually point to directories)
 Exec {environment => ['PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib64/openmpi/bin:/usr/local/underworld/build/bin:', 'LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$PETSC_DIR/lib:$HDF5_DIR/lib', 'PETSC_DIR=/usr/local/petsc-3.1-p8-openmpi-1.6.1-opt', 'HDF5_DIR=/usr/local/hdf5-1.8.9']}

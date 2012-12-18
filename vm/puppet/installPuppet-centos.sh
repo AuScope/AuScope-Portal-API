@@ -47,6 +47,7 @@ sudo chkconfig puppet on
 # Puppet Forge Modules
 puppet module install stahnma/epel
 puppet module install example42/puppi
+puppet module install jhoblitt/autofsck 
 
 # VGL Portal Custom Modules - download from user specified SVN (or default)
 yum install -y wget 
