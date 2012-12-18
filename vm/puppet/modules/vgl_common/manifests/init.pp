@@ -1,6 +1,5 @@
 # Installs common VGL dependencies for Centos
 # Depends on the stahnma/epel module and python_pip module
-require 'puppet/provider/package'
 
 class vgl_common {
 
