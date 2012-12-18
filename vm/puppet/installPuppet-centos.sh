@@ -46,7 +46,9 @@ sudo chkconfig puppet on
 
 # Puppet Forge Modules
 puppet module install stahnma/epel
-puppet module install example42/puppi
+# Puppi from the forge is currently disabled - we are using a custom build checked into our SVN.
+# This should only be temporary - https://github.com/example42/puppi/pull/38
+#puppet module install example42/puppi
 puppet module install jhoblitt/autofsck 
 
 # VGL Portal Custom Modules - download from user specified SVN (or default)

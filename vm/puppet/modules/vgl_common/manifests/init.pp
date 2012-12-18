@@ -10,11 +10,18 @@ class vgl_common {
     }
     
     # Install default pip packages
-    package {  ["numpy", "scipy", "boto", "pyproj", "matplotlib"]:
+    package {  ["numpy", "boto", "pyproj"]:
         ensure => installed,
         provider => "pip",
         require => Class["python_pip"],
     }
+    package {["scipy", "matplotlib"]:
+        ensure => installed,
+        provider => "pip",
+        require => [Class["python_pip"], Package["numpy"]],
+    }
+    
+    
     
     # Install startup bootstrap
     $curl_cmd = "/usr/bin/curl"
