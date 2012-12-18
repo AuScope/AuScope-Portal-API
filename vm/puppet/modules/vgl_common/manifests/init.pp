@@ -1,5 +1,7 @@
 # Installs common VGL dependencies for Centos
 # Depends on the stahnma/epel module and python_pip module
+require 'puppet/provider/package'
+
 class vgl_common {
 
     # Install default packages
@@ -8,9 +10,22 @@ class vgl_common {
         require => Class["epel"],
     }
     
+    # Install default pip packages
     package {  ["numpy", "scipy", "boto", "pyproj", "matplotlib"]:
         ensure => installed,
         provider => "pip",
         require => Class["python_pip"],
+    }
+    
+    # Install startup bootstrap
+    $curl_cmd = "/usr/bin/curl"
+    $bootstrapLocation = "/etc/rc.d/rc.local"
+    exec { "get-bootstrap":
+        before => File[$bootstrapLocation],
+        command => "$curl_cmd -L https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk/vm/ec2-run-user-data.sh > $bootstrapLocation",
+    }
+    file { $bootstrapLocation: 
+        ensure => present,
+        mode => "a=rwx",
     }
 }
