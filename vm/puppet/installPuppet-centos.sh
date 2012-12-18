@@ -16,22 +16,26 @@ gpgcheck=1
 gpgkey=http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
 EOF'
 
-sudo sh -c \
-'sudo cat > /etc/yum.repos.d/ruby.repo << EOF
-[ruby]
-name=ruby
-baseurl=http://repo.premiumhelp.eu/ruby/
-gpgcheck=0
-enabled=0
-EOF'
-
 sudo yum install -y ruby
-sudo yum --enablerepo="ruby" update ruby
+if [ $? -ne 0 ]
+then
+    echo "Failed installing ruby"
+    exit 1
+fi
 
 sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-7.noarch.rpm
-#sudo yum update
+if [ $? -ne 0 ]
+then
+    echo "Failed to add epel repository using RPM"
+    exit 1
+fi
 
 sudo yum --enablerepo=epel install -y puppet
+if [ $? -ne 0 ]
+then
+    echo "Failed to install puppet"
+    exit 1
+fi
 
 #yum --enablerepo=epel,epel-puppet install -y puppet-server
 #sudo yum install -y puppet-server
@@ -46,10 +50,20 @@ sudo chkconfig puppet on
 
 # Puppet Forge Modules
 puppet module install stahnma/epel
+if [ $? -ne 0 ]
+then
+    echo "Failed to install puppet module stahnma/epel"
+    exit 1
+fi
 # Puppi from the forge is currently disabled - we are using a custom build checked into our SVN.
 # This should only be temporary - https://github.com/example42/puppi/pull/38
 #puppet module install example42/puppi
 puppet module install jhoblitt/autofsck 
+if [ $? -ne 0 ]
+then
+    echo "Failed to install puppet module jhoblitt/autofsck"
+    exit 1
+fi
 
 # VGL Portal Custom Modules - download from user specified SVN (or default)
 yum install -y wget 
@@ -83,10 +97,10 @@ fi
 baseUrlSlashes=`grep -o "/" <<<"$baseUrl" | wc -l`
 pathSuffixSlashes=`grep -o "/" <<<"$pathSuffix" | wc -l`
 cutDirs=`expr $baseUrlSlashes - 3 + $pathSuffixSlashes`
-wget -r "$baseUrl$pathSuffix" -P "$tmpModulesDir" -R htm,html -nH -np --cut-dirs $cutDirs
+wget -r "$baseUrl$pathSuffix" -P "$tmpModulesDir" -R htm,html -nH -np --cut-dirs $cutDirs -l 50
 if [ $? -ne 0 ]
 then
-    echo "Failed download - aborting"
+    echo "Failed download of VGL custom modules - aborting"
     exit 1
 fi
 
