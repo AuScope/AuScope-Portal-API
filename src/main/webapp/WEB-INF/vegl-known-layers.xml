@@ -87,7 +87,7 @@
         </constructor-arg>
         <property name="name" value="80m Magnetic Merge (Land/Sea)"/>
         <property name="description" value=""/>
-        <property name="group" value="Geoscience Western Australia Coverages"/>
+        <property name="group" value="Geological Survey of Western Australia"/>
     </bean>
 
     <bean id="knownTypeGswaUMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
@@ -99,7 +99,7 @@
         </constructor-arg>
         <property name="name" value="100m U Merge"/>
         <property name="description" value=""/>
-        <property name="group" value="Geoscience Western Australia Coverages"/>
+        <property name="group" value="Geological Survey of Western Australia"/>
     </bean>
 
     <bean id="knownTypeGswaThMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
@@ -111,7 +111,7 @@
         </constructor-arg>
         <property name="name" value="100m Th Merge"/>
         <property name="description" value=""/>
-        <property name="group" value="Geoscience Western Australia Coverages"/>
+        <property name="group" value="Geological Survey of Western Australia"/>
     </bean>
 
     <bean id="knownTypeGswaTcMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
@@ -123,7 +123,7 @@
         </constructor-arg>
         <property name="name" value="100m Tc Merge"/>
         <property name="description" value=""/>
-        <property name="group" value="Geoscience Western Australia Coverages"/>
+        <property name="group" value="Geological Survey of Western Australia"/>
     </bean>
 
     <bean id="knownTypeGswaKMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
@@ -135,7 +135,7 @@
         </constructor-arg>
         <property name="name" value="100m K Merge"/>
         <property name="description" value=""/>
-        <property name="group" value="Geoscience Western Australia Coverages"/>
+        <property name="group" value="Geological Survey of Western Australia"/>
     </bean>
 
 </beans>
