@@ -23,7 +23,7 @@ then
     exit 1
 fi
 
-sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-7.noarch.rpm
+sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 if [ $? -ne 0 ]
 then
     echo "Failed to add epel repository using RPM"
