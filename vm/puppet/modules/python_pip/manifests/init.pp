@@ -14,7 +14,9 @@ class python_pip {
     }
 
     # Centos packages call the 'pip' executable 'pip-python' which can cause problems.
-    # TODO: don't use hardcoded paths here
+    # This is only a workaround until the below issue is fixed
+    # Issue - http://projects.puppetlabs.com/issues/18236
+    # Patch - https://github.com/puppetlabs/puppet/pull/1345
     case $operatingsystem {
         centos, redhat: { 
             file { '/usr/bin/pip':
