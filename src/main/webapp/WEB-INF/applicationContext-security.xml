@@ -156,7 +156,7 @@
       <beans:property name="authenticationManager" ref="authenticationManager" />
    </beans:bean>
 
-   <http auto-config='true' >
+   <http auto-config='true' disable-url-rewriting="true">
         <intercept-url pattern="/gridsubmit.html" access="ROLE_USER"/>
         <intercept-url pattern="/jobbuilder.html" access="ROLE_USER"/>
         <intercept-url pattern="/joblist.html" access="ROLE_USER"/>
