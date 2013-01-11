@@ -2,9 +2,29 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+      http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**/createSeries.do" />
+            <mvc:mapping path="/**/mySeries.do" />
+            <mvc:mapping path="/**/querySeries.do" />
+            <mvc:mapping path="/**/deleteJob.do" />
+            <mvc:mapping path="/**/killJob.do" />
+            <mvc:mapping path="/**/jobFiles.do" />
+            <mvc:mapping path="/**/getSectionedLogs.do" />
+            <mvc:mapping path="/**/duplicateJob.do" />
+            <mvc:mapping path="/**/downloadFile.do" />
+            <mvc:mapping path="/**/downloadAsZip.do" />
+            <mvc:mapping path="/**/insertRecord.do" />
+            <mvc:mapping path="/**/getUserSignature.do" />
+            <bean class="org.auscope.portal.server.web.interceptors.UserSessionInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
 
    <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
    <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->

@@ -106,6 +106,16 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                 hideRegisterButton : true,
                 flex : 1,
                 jobSeriesFrm : jobSeriesObj,
+                listeners : {
+                    error : function(component, message) {
+                        Ext.Msg.show({
+                            title: 'Error',
+                            msg: message,
+                            buttons: Ext.Msg.OK,
+                            icon: Ext.Msg.ERROR
+                        });
+                    }
+                },
                 viewConfig : {
                     deferEmptyText : false,
                     emptyText : '<p class="centeredlabel">The selected series doesn\'t have any jobs.</p>'
@@ -182,10 +192,16 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                             wizardState.seriesId = responseObj.data[0].id;
                             callback(true);
                             return;
+                        } else {
+                            errorMsg = responseObj.msg;
+                            errorInfo = responseObj.debugInfo;                            
                         }
+                    } else {
+                        errorMsg = "There was an internal error saving your series.";
+                        errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";                        
                     }
-
-                    Ext.Msg.alert('Create new series','There was an internal error saving your series. Please try again in a few minutes.');
+                    
+                    portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
                     callback(false);
                     return;
                 }

@@ -482,12 +482,11 @@ Ext.define('vegl.widgets.JobsPanel', {
             scope : this,
             callback : function(options, success, response) {
                 loadMask.hide();
-                var msg = '';
+                var responseObj;
                 var error = true;
                 if (success) {
-                    var responseObj = Ext.JSON.decode(response.responseText);
+                    responseObj = Ext.JSON.decode(response.responseText);
                     if (responseObj.success) {
-                        msg = responseObj.msg;
                         error = false;
                     }
                 }
