@@ -82,7 +82,13 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                 var responseObj = Ext.JSON.decode(action.response.responseText);
 
                                 if (responseObj.success) {
-                                    frm.setValues(responseObj.data[0]);
+                                    //Loads the image store of user selected compute provider
+                                    jobObjectFrm.imageStore.load({
+                                        params : {
+                                            computeServiceId : responseObj.data[0].computeServiceId
+                                        }
+                                    });
+                                    frm.setValues(responseObj.data[0]);                                    
                                     jobObjectFrm.wizardState.jobId = frm.getValues().id;
                                 }
                             }
