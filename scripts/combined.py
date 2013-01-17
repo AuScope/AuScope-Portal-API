@@ -1,5 +1,4 @@
-﻿import subprocess, csv, os, sys, glob;
-
+import subprocess, csv, os, sys, glob, fnmatch
 
 '''hack std-out and std-err for a nicer log file...'''
 if sys.stdout.name == '<stdout>':
@@ -7,6 +6,9 @@ if sys.stdout.name == '<stdout>':
 
 if sys.stderr.name == '<stderr>':
     sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
+
+subprocess.call(['pip', 'install', 'h5py'])
+
 
 class unitProperty:
     '''This class describes the unitProperties required for a given geology'''
@@ -83,6 +85,54 @@ def generateCSV(inputdata=[], filename="inputfile.csv"):
       print "could not generate the file"
       print e.message
 
+def findFiles(starting_dir='.', pattern='Temp*h5'):
+    '''look for files to process'''
+    matches = []
+    for root, dirnames, filenames in os.walk(starting_dir):
+        for filename in fnmatch.filter(filenames, pattern):
+            matches.append(os.path.join(root, filename))
+    return matches
+
+
+import h5py, os
+import numpy as np
+
+def calcStats(filelist, outputfilename='results.h5'):
+    ''' open up the hdf5 files and grab the 'data' sets, 
+    in memory... 
+    and then try to run some calcs '''
+    try:
+        outputfile = h5py.File(outputfilename, 'w')
+
+        bigdata = None
+
+        i=0
+        for currFile in filelist:
+            f = h5py.File(currFile, 'r')
+            dataset = f['/data']
+            mydata = dataset[...]
+            
+            if bigdata is None:
+                bigdata = np.zeros([mydata.shape[0], len(filelist)])
+            bigdata[:,i]=np.squeeze(mydata)
+            i+=1
+
+        print np.std(bigdata, axis=1)
+        print np.average(bigdata, axis=1)
+        print np.min(bigdata, axis=1)
+        print np.max(bigdata, axis=1)
+
+        outputfile.create_dataset('std-dev', data=np.std(bigdata, axis=1))
+        outputfile.create_dataset('average', data=np.average(bigdata, axis=1))
+        outputfile.create_dataset('min', data=np.min(bigdata, axis=1))
+        outputfile.create_dataset('max', data=np.max(bigdata, axis=1))
+        outputfile.close()
+        print "outputfile created [ok]: %s" % outputfilename
+
+    except Exception, e:
+        print e.message
+
+
 def main():
   ''' Later on this may end up inside the loop to change things (like lower flux....)'''
   #Build the default list of arguments
@@ -133,9 +183,14 @@ def main():
           print "broken!"
           print e.message
           os.chdir(startdir)
-  	
-  #Zip up the outputs...
+
+  # create output dirs
   os.mkdir(dirName)
+
+  filelist = findFiles()
+  calcStats(filelist, dirName+'/stats.h5')
+
+  #Zip up the outputs...
   arglist = ['zip', '-9', '-r', dirName+'/outputs.zip'] + glob.glob('run*')
   retcode = subprocess.call(arglist)
   
