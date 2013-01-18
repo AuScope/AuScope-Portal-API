@@ -75,6 +75,52 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertTrue(download.getUrl().contains("." + format));
         Assert.assertTrue(download.getUrl().contains(layerName));
     }
+    
+    @Test
+    public void testAddSelectedResourcesToSession() {
+        final Double[] northBoundLatitude = { 2.0, 3.0 };
+        final Double[] eastBoundLongitude = { 4.0, 5.0 };
+        final Double[] southBoundLatitude = { 1.0, 2.0 };
+        final Double[] westBoundLongitude = { 3.0, 4.0 };
+        final String[] name = { "name1", "name2" };
+        final String[] description = { "desc1", "desc2" };
+        final String[] localPath = { "localPath1", "localPath2" };
+        final String[] serviceUrl = { "http://example.org/service1", "http://example.org/service2" };
+        
+        final List<VglDownload> downloads = new ArrayList<VglDownload>();
+        
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(downloads));
+            allowing(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
+        }});        
+        
+        ModelAndView mav = controller.addSelectedResourcesToSession(serviceUrl, name, description, localPath, northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue(((Boolean) mav.getModel().get("success")));        
+        
+        Assert.assertEquals(2, downloads.size());
+        
+        VglDownload download1 = downloads.get(0);
+        Assert.assertEquals(northBoundLatitude[0], download1.getNorthBoundLatitude());
+        Assert.assertEquals(eastBoundLongitude[0], download1.getEastBoundLongitude());
+        Assert.assertEquals(southBoundLatitude[0], download1.getSouthBoundLatitude());
+        Assert.assertEquals(westBoundLongitude[0], download1.getWestBoundLongitude());
+        Assert.assertEquals(name[0], download1.getName());
+        Assert.assertEquals(description[0], download1.getDescription());
+        Assert.assertEquals(localPath[0], download1.getLocalPath());
+        Assert.assertEquals(serviceUrl[0], download1.getUrl());
+        
+        VglDownload download2 = downloads.get(1);
+        Assert.assertEquals(northBoundLatitude[1], download2.getNorthBoundLatitude());
+        Assert.assertEquals(eastBoundLongitude[1], download2.getEastBoundLongitude());
+        Assert.assertEquals(southBoundLatitude[1], download2.getSouthBoundLatitude());
+        Assert.assertEquals(westBoundLongitude[1], download2.getWestBoundLongitude());
+        Assert.assertEquals(name[1], download2.getName());
+        Assert.assertEquals(description[1], download2.getDescription());
+        Assert.assertEquals(localPath[1], download2.getLocalPath());
+        Assert.assertEquals(serviceUrl[1], download2.getUrl());
+    }
 
     @Test
     public void testAddDownloadRequestToSession() throws Exception {

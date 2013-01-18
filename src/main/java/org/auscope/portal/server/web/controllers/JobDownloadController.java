@@ -57,6 +57,38 @@ public class JobDownloadController extends BasePortalController {
 
         request.getSession().setAttribute(SESSION_DOWNLOAD_LIST, erddapUrlList);
     }
+    
+    /**
+     * Adds user selected file(s) or download request(s) to the session wide SESSION_OWNLOAD_LIST list. 
+     * @return ModelAndView response object.
+     */
+    @RequestMapping("/addSelectedResourcesToSession.do")
+    public ModelAndView addSelectedResourcesToSession(@RequestParam("url") String[] url,
+            @RequestParam("name") String[] name,
+            @RequestParam("description") String[] description,
+            @RequestParam("localPath") String[] localPath,
+            @RequestParam("northBoundLatitude") final Double[] northBoundLatitude,
+            @RequestParam("eastBoundLongitude") final Double[] eastBoundLongitude,
+            @RequestParam("southBoundLatitude") final Double[] southBoundLatitude,
+            @RequestParam("westBoundLongitude") final Double[] westBoundLongitude,
+            HttpServletRequest request) {
+        
+        for (int i = 0; i < url.length; i++) {
+            VglDownload newDownload = new VglDownload();
+            newDownload.setName(name[i]);
+            newDownload.setDescription(description[i]);
+            newDownload.setLocalPath(localPath[i]);
+            newDownload.setUrl(url[i]);
+            newDownload.setNorthBoundLatitude(northBoundLatitude[i]);
+            newDownload.setEastBoundLongitude(eastBoundLongitude[i]);
+            newDownload.setSouthBoundLatitude(southBoundLatitude[i]);
+            newDownload.setWestBoundLongitude(westBoundLongitude[i]);
+			
+            addDownloadToSession(request, newDownload);
+        }
+        
+        return generateJSONResponseMAV(true, null, "");
+    }
 
     /**
      * Adds a new download request to the session wide SESSION_OWNLOAD_LIST list. This list

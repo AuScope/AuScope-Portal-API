@@ -15,7 +15,7 @@ Ext.define('vegl.layer.querier.csw.SelectableCSWQuerier', {
     /**
      * See parent class for definition
      */
-    query : function(queryTarget, callback) {
+    query : function(queryTarget, callback) {        
         var cswRecord = queryTarget.get('cswRecord');
         if (!cswRecord) {
             callback(this, [], queryTarget);
@@ -30,6 +30,8 @@ Ext.define('vegl.layer.querier.csw.SelectableCSWQuerier', {
                 keywordsString += ', ';
             }
         }
+        
+        var selModel = Ext.create('Ext.selection.CheckboxModel');
 
         var panel = Ext.create('portal.layer.querier.BaseComponent', {
             border : false,
@@ -67,21 +69,14 @@ Ext.define('vegl.layer.querier.csw.SelectableCSWQuerier', {
                         fieldLabel : 'Resources',
                         xtype : 'onlineresourcepanel',
                         cswRecords : cswRecord,
-                        columns : [{
-                            xtype : 'actioncolumn',
-                            width : 50,
-                            menuDisabled: true,
-                            sortable: false,
-                            items : [{
-                                icon : 'img/disk.png',
-                                tooltip : 'Make this resource available to the next job you create.',
-                                scope : this,
-                                handler : function(grid, rowIndex, colIndex) {
-                                    var orpRow = grid.getStore().getAt(rowIndex);
-                                    this.showSelectionWindow(orpRow.get('onlineResource'), orpRow.get('cswRecord'));
-                                }
-                            }]
-                        }]
+                        selModel : selModel,
+                        sortable : false,
+                        hideHeaders : false
+                    },{
+                        xtype : 'button',
+                        margin : '5 0 0 0',
+                        text : 'Capture selected',
+                        handler : Ext.bind(this.addSelectedResourcesToSession, this, selModel, true) 
                     }]
                 }]
             }]
@@ -89,8 +84,88 @@ Ext.define('vegl.layer.querier.csw.SelectableCSWQuerier', {
 
         callback(this, [panel], queryTarget);
     },
+    
+    addSelectedResourcesToSession : function(button, event, selModel) {        
+        // Check to ensure user has selected at least a file to capture
+        var selected = selModel.getSelection();
+        if (selected.length == 0) {
+            Ext.Msg.alert("Input error", "You haven't selected any file(s) to capture.");
+            return;
+        }
+        
+        // Array variables for holding user selected resources meta-data 
+        var urls = [];
+        var names = [];
+        var descriptions = [];
+        var localPaths = [];
+        var northBoundLatitudes = [];
+        var eastBoundLongitudes = [];
+        var southBoundLatitudes = [];
+        var westBoundLongitudes = [];
+        
+        // Populate the above variables by iterating thru user selected resources.
+        Ext.each(selected, function(orpRow) {
+            resource = orpRow.get('onlineResource');
+            cswRecord = orpRow.get('cswRecord');
+            
+            var bboxes = cswRecord.get('geographicElements');
+            var bbox = null;
+            if (bboxes.length > 0) {
+                bbox = bboxes[0];
+            }
+            
+            urls.push(resource.get('url') ? resource.get('url') : '');
+            names.push(resource.get('name') ? resource.get('name') : 'ERDDAP Subset Request');
+            descriptions.push(resource.get('description') ? resource.get('description') : '');
+            localPaths.push(resource.get('name') ? resource.get('name') : '/tmp/subset-request');
+            northBoundLatitudes.push(bbox.northBoundLatitude ? bbox.northBoundLatitude : 0);
+            eastBoundLongitudes.push(bbox.eastBoundLongitude ? bbox.eastBoundLongitude : 0);
+            southBoundLatitudes.push(bbox.southBoundLatitude ? bbox.southBoundLatitude : 0);
+            westBoundLongitudes.push(bbox.westBoundLongitude ? bbox.westBoundLongitude : 0);
+        });
+        
+        var loadMask = new Ext.LoadMask(Ext.getBody(), {
+            msg : 'Capturing input file(s)...',
+            removeMask : true
+        });
+        loadMask.show();
+        
+        Ext.Ajax.request({
+            url : 'addSelectedResourcesToSession.do',
+            params : {
+                url : urls, 
+                name : names,
+                description : descriptions,
+                localPath : localPaths,
+                northBoundLatitude : northBoundLatitudes,
+                eastBoundLongitude : eastBoundLongitudes,
+                southBoundLatitude : southBoundLatitudes,
+                westBoundLongitude : westBoundLongitudes
+            },
+            callback : function(options, success, response) {
+                loadMask.hide();
+                
+                if (!success) {
+                    Ext.Msg.alert('Communications Error', 'Failed to communicate with server. Please try again in a few minutes or report it to cg-admin@csiro.au.');
+                    return;
+                }
 
-    showSelectionWindow : function(resource, cswRecord) {
+                var responseObj = Ext.JSON.decode(response.responseText);
+                if (!responseObj.success) {
+                    Ext.Msg.alert('Application Error', 'An unexpected error has occurred. Please report it to cg-admin@csiro.au.');
+                    return;
+                }
+                
+                Ext.Msg.alert('Request Saved', 'Your download request has been saved. You can either continue selecting more data or <a href="jobbuilder.html">create a job</a> to process your existing selections.');
+            }
+        });
+    },
+
+	/**
+     * This function is now deprecated. It has been replaced by
+	 * addSelectedResourcesToSession function.
+     */
+    showSelectionWindow : function(resource, cswRecord) {        
         var bboxes = cswRecord.get('geographicElements');
         var bbox = null;
         if (bboxes.length > 0) {
