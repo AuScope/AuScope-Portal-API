@@ -7,15 +7,22 @@ if sys.stdout.name == '<stdout>':
 if sys.stderr.name == '<stderr>':
     sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
 
+    
+''' Begin pure evil cloud init - install software and run....'''
 try:
-    subprocess.call(['pip', 'install', 'h5py'])
-except Exception, e:
+    import h5py
+except Exception, e:    
     try:
-	    subprocess.call(['pip-python', 'install', 'h5py'])
-	except:
-	    print "unable to install pre-requisites"
-		sys.exit(1)
-	
+        subprocess.call(['pip', 'install', 'h5py'])
+    except Exception, e:
+        ''' are you on nectar? '''
+        try:
+            subprocess.call(['sudo', 'yum', '-y', 'install', 'h5py'])
+        except:
+            print "unable to install pre-requisites"
+            sys.exit(1)
+''' end pure evil cloud init '''
+
 
 
 class unitProperty:
