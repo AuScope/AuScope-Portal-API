@@ -7,7 +7,15 @@ if sys.stdout.name == '<stdout>':
 if sys.stderr.name == '<stderr>':
     sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
 
-subprocess.call(['pip', 'install', 'h5py'])
+try:
+    subprocess.call(['pip', 'install', 'h5py'])
+except Exception, e:
+    try:
+	    subprocess.call(['pip-python', 'install', 'h5py'])
+	except:
+	    print "unable to install pre-requisites"
+		sys.exit(1)
+	
 
 
 class unitProperty:
