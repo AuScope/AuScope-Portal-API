@@ -15,12 +15,9 @@ except Exception, e:
     try:
         subprocess.call(['pip', 'install', 'h5py'])
     except Exception, e:
-        ''' are you on nectar? '''
-        try:
-            subprocess.call(['sudo', 'yum', '-y', 'install', 'h5py'])
-        except:
-            print "unable to install pre-requisites"
-            sys.exit(1)
+        ''' are you on nectar?'''
+        print "unable to install pre-requisites"
+        sys.exit(1)
 ''' end pure evil cloud init '''
 
 
