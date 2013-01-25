@@ -29,7 +29,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
         });
         loadMask.show();
         Ext.Ajax.request({
-            url : 'submitJob.do',
+            url : 'secure/submitJob.do',
             params : {
                 jobId : jobSubmitFrm.wizardState.jobId
             },

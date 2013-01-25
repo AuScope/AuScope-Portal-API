@@ -614,7 +614,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a success attribute that indicates whether
      *         the job was successfully submitted.
      */
-    @RequestMapping("/submitJob.do")
+    @RequestMapping("/secure/submitJob.do")
     public ModelAndView submitJob(HttpServletRequest request,
                                   HttpServletResponse response,
                                   @RequestParam("jobId") String jobId) {

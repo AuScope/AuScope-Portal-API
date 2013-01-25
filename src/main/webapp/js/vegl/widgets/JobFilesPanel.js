@@ -30,7 +30,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                     key : fileRecord.get('name')
                 };
 
-                portal.util.FileDownloader.downloadFile("downloadFile.do", params);
+                portal.util.FileDownloader.downloadFile("secure/downloadFile.do", params);
             }
         });
 
@@ -47,7 +47,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                     fParam += ',' + files[i].get('name');
                 }
 
-                portal.util.FileDownloader.downloadFile("downloadAsZip.do", {
+                portal.util.FileDownloader.downloadFile("secure/downloadAsZip.do", {
                     jobId : jobFilesGrid.currentJob.get('id'),
                     files : fParam
                 });
@@ -66,10 +66,18 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                 model : 'vegl.models.FileRecord',
                 proxy : {
                     type : 'ajax',
-                    url : 'jobFiles.do',
+                    url : 'secure/jobFiles.do',
                     reader : {
                         type : 'json',
                         root : 'data'
+                    },
+                    listeners : {
+                        exception : function(proxy, response, operation) {
+                            responseObj = Ext.JSON.decode(response.responseText);
+                            errorMsg = responseObj.msg;
+                            errorInfo = responseObj.debugInfo;
+                            portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                        }
                     }
                 }
             }),

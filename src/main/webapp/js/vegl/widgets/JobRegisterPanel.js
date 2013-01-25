@@ -6,11 +6,13 @@ Ext.define('vegl.widgets.JobRegisterPanel', {
     extend : 'Ext.form.Panel',
     alias : 'widget.jobregister',
 
+    job : null,
     jobId : null,
 
     constructor : function(config) {
-        this.jobId = config.jobId;
-
+        this.job = config.job;
+        this.jobId = config.job.get('id');
+        
         Ext.apply(config, {
             id : 'jobRegisterFrm',
             frame : true,
@@ -129,7 +131,7 @@ Ext.define('vegl.widgets.JobRegisterPanel', {
                 }
             }]
         });
-
+        
         this.callParent(arguments);
     },
 
@@ -139,7 +141,7 @@ Ext.define('vegl.widgets.JobRegisterPanel', {
      */
     loadFormData : function() {
         this.getForm().load({
-            url : 'getUserSignature.do',
+            url : 'secure/getUserSignature.do',
             waitMsg : 'Loading contact details...',
             failure : function(frm, action) {
                 responseObj = Ext.JSON.decode(action.response.responseText);
@@ -167,6 +169,8 @@ Ext.define('vegl.widgets.JobRegisterPanel', {
         if (!form.isValid()) {
             return;
         }
+        
+        var selectedJob = this.job;
 
         var loadMask = new Ext.LoadMask(Ext.getBody(), {
             msg : 'Registering Job...',
@@ -175,7 +179,7 @@ Ext.define('vegl.widgets.JobRegisterPanel', {
         loadMask.show();
         
         form.submit({
-            url: 'insertRecord.do',
+            url: 'secure/insertRecord.do',
             params: {
                 jobId : this.jobId
             },
@@ -185,6 +189,10 @@ Ext.define('vegl.widgets.JobRegisterPanel', {
                     Ext.Msg.alert('Failure', 'Job registration failed. Please try again in a few minutes or report this error to cg_admin@csiro.au.');
                     return;
                 }
+                responseObj = Ext.JSON.decode(action.response.responseText);
+                //Set current selected job 'registeredUrl' attribute so that 
+                //the user can see the url upon successfully registration.
+                selectedJob.set('registeredUrl', responseObj.data);
                 popupWin = Ext.getCmp('jobRegisterWin');
                 popupWin.close();
             },

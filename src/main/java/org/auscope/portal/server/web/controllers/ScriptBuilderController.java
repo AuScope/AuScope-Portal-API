@@ -55,7 +55,7 @@ public class ScriptBuilderController extends BasePortalController {
      *
      * @return A JSON encoded response with a success flag
      */
-    @RequestMapping("/saveScript.do")
+    @RequestMapping("/secure/saveScript.do")
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
                                   @RequestParam("sourceText") String sourceText) {
 

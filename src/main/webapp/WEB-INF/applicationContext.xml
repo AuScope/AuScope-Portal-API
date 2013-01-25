@@ -10,18 +10,7 @@
 
     <mvc:interceptors>
         <mvc:interceptor>
-            <mvc:mapping path="/**/createSeries.do" />
-            <mvc:mapping path="/**/mySeries.do" />
-            <mvc:mapping path="/**/querySeries.do" />
-            <mvc:mapping path="/**/deleteJob.do" />
-            <mvc:mapping path="/**/killJob.do" />
-            <mvc:mapping path="/**/jobFiles.do" />
-            <mvc:mapping path="/**/getSectionedLogs.do" />
-            <mvc:mapping path="/**/duplicateJob.do" />
-            <mvc:mapping path="/**/downloadFile.do" />
-            <mvc:mapping path="/**/downloadAsZip.do" />
-            <mvc:mapping path="/**/insertRecord.do" />
-            <mvc:mapping path="/**/getUserSignature.do" />
+            <mvc:mapping path="/**/secure/*.do" />
             <bean class="org.auscope.portal.server.web.interceptors.UserSessionInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>

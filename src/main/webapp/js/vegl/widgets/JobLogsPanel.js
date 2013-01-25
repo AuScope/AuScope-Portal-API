@@ -36,7 +36,7 @@ Ext.define('vegl.widgets.JobLogsPanel', {
         this.currentJob = job;
 
         Ext.Ajax.request({
-            url : 'getSectionedLogs.do',
+            url : 'secure/getSectionedLogs.do',
             params : {
                 jobId : job.get('id')
             },

@@ -17,7 +17,6 @@ Ext.application({
             });
         };
 
-
         var jobDetailsPanel = Ext.create('vegl.widgets.DetailsPanel', {
             title: 'Description',
             bodyStyle: 'padding:10px',
@@ -56,6 +55,9 @@ Ext.application({
                     jobDetailsPanel.showDetailsForSeries(series);
                     jobFilesPanel.cleanupDataStore();
                     jobLogsPanel.clearLogs(true);
+                },
+                refreshJobDescription : function(job) {
+                    jobDetailsPanel.showDetailsForJob(job);
                 },
                 error : onError
             },

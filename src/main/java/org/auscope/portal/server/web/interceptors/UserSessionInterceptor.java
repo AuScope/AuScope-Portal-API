@@ -30,7 +30,7 @@ public class UserSessionInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request,
             HttpServletResponse response, Object handler) throws Exception {
-        String userEmail = (String)request.getSession().getAttribute("openID-Email");
+        String userEmail = (String)request.getSession(true).getAttribute("openID-Email");
         
         if (userEmail == null) {
             LOG.warn("Failed to retrieve user email from session.");

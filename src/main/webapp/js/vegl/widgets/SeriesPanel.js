@@ -54,10 +54,18 @@ Ext.define('vegl.widgets.SeriesPanel', {
                 model : 'vegl.models.Series',
                 proxy : {
                     type : 'ajax',
-                    url : 'querySeries.do',
+                    url : 'secure/querySeries.do',
                     reader : {
                         type : 'json',
                         root : 'data'
+                    },
+                    listeners : {
+                        exception : function(proxy, response, operation) {
+                            responseObj = Ext.JSON.decode(response.responseText);
+                            errorMsg = responseObj.msg;
+                            errorInfo = responseObj.debugInfo;
+                            portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                        }
                     }
                 },
                 autoLoad : true
@@ -191,7 +199,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
                     });
                     loadMask.show();
                     Ext.Ajax.request({
-                        url: 'killSeriesJobs.do',
+                        url: 'secure/killSeriesJobs.do',
                         params: { 'seriesId': series.get('id')},
                         scope : this,
                         callback : function(options, success, response) {
@@ -232,7 +240,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
                     });
                     loadMask.show();
                     Ext.Ajax.request({
-                        url: 'deleteSeriesJobs.do',
+                        url: 'secure/deleteSeriesJobs.do',
                         params: { 'seriesId': series.get('id')},
                         scope : this,
                         callback : function(options, success, response) {

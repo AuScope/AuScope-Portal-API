@@ -97,11 +97,19 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         sourceText = sourceText.replace(/\t/g,"\u0020\u0020\u0020\u0020");
 
         Ext.Ajax.request({
-            url: 'saveScript.do',
-            success: function() {
-                callback(true);
+            url: 'secure/saveScript.do',
+            success: function(response, opts) {
+                responseObj = Ext.JSON.decode(response.responseText);
+                if (responseObj.success) {
+                    callback(true);
+                } else {
+                    errorMsg = responseObj.msg;
+                    errorInfo = responseObj.debugInfo;
+                    portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                    callback(false);
+                }
             },
-            failure: function() {
+            failure: function(response, opts) {
                 Ext.Msg.alert('Error', 'Error storing script file! Please try again in a few minutes');
                 callback(false);
             },

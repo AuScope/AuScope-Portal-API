@@ -15,10 +15,18 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
             model : 'vegl.models.Series',
             proxy : {
                 type : 'ajax',
-                url : 'mySeries.do',
+                url : 'secure/mySeries.do',
                 reader : {
                     type : 'json',
                     root : 'data'
+                },
+				listeners : {
+                	exception : function(proxy, response, operation) {
+                		responseObj = Ext.JSON.decode(response.responseText);
+                		errorMsg = responseObj.msg;
+                    	errorInfo = responseObj.debugInfo;
+                		portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                	}
                 }
             },
             autoLoad : true,
@@ -180,7 +188,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
 
             //Request our new series is created
             Ext.Ajax.request({
-                url: 'createSeries.do',
+                url: 'secure/createSeries.do',
                 params: {
                     'seriesName': seriesName,
                     'seriesDescription': seriesDesc

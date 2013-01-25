@@ -172,7 +172,7 @@ public class GeonetworkController extends BaseCloudController {
         return rec;
     }
 
-    @RequestMapping("/getUserSignature.do")
+    @RequestMapping("/secure/getUserSignature.do")
     public ModelAndView getUserSignature(HttpServletRequest request) {
         //Get user email from session
         String user = (String) request.getSession().getAttribute("openID-Email");
@@ -207,7 +207,7 @@ public class GeonetworkController extends BaseCloudController {
      * @return A generic VEGL JSON response with the data element populated with the geonetwork URL string (on success)
      * @throws Exception
      */
-    @RequestMapping("/insertRecord.do")
+    @RequestMapping("/secure/insertRecord.do")
     public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request) throws Exception {
         //Lookup our appropriate job
         VEGLJob job = jobManager.getJobById(jobId);

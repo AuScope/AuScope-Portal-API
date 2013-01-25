@@ -114,11 +114,19 @@ Ext.define('vegl.widgets.JobsPanel', {
                 model : 'vegl.models.Job',
                 proxy : {
                     type : 'ajax',
-                    url : 'listJobs.do',
+                    url : 'secure/listJobs.do',
                     extraParams : {seriesId : null},
                     reader : {
                         type : 'json',
                         root : 'data'
+                    },
+					listeners : {
+                    	exception : function(proxy, response, operation) {
+                    		responseObj = Ext.JSON.decode(response.responseText);
+                    		errorMsg = responseObj.msg;
+                        	errorInfo = responseObj.debugInfo;
+                    		portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                    	}
                     }
                 }
             }),
@@ -215,6 +223,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             items :[{
                 xtype : 'jobregister',
                 id : 'jobRegisterPanel',
+                job : selectedJob,
                 jobId : selectedJob.get('id')
             }]
         });
@@ -225,10 +234,8 @@ Ext.define('vegl.widgets.JobsPanel', {
         }, this);
 
         popup.on('close', function() {
-            //refreshes jobs store of selected series
-            this.refreshJobsForSeries();
-            //refreshes Details panel
-            this.fireEvent('refreshDetailsPanel', this, this.currentSeries);
+        	//refresh selected job description
+        	this.fireEvent('refreshJobDescription', selectedJob);
         }, this);
 
         popup.show();
@@ -237,6 +244,7 @@ Ext.define('vegl.widgets.JobsPanel', {
     _onRefresh : function(btn) {
         if (this.currentSeries) {
             this.listJobsForSeries(this.currentSeries);
+            this.queryById('btnRegister').setDisabled(true);
         }
     },
 
@@ -278,6 +286,7 @@ Ext.define('vegl.widgets.JobsPanel', {
      */
     refreshJobsForSeries : function() {
         this.getStore().load();
+        this.queryById('btnRegister').setDisabled(true);
     },
 
     /**
@@ -316,7 +325,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                     });
                     loadMask.show();
                     Ext.Ajax.request({
-                        url: 'killJob.do',
+                        url: 'secure/killJob.do',
                         params: { 'jobId': job.get('id')},
                         scope : this,
                         callback : function(options, success, response) {
@@ -359,7 +368,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                     });
                     loadMask.show();
                     Ext.Ajax.request({
-                        url: 'deleteJob.do',
+                        url: 'secure/deleteJob.do',
                         params: { 'jobId': job.get('id')},
                         timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
                         scope : this,
@@ -474,7 +483,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         });
         loadMask.show();
         Ext.Ajax.request({
-            url : 'submitJob.do',
+            url : 'secure/submitJob.do',
             params : {
                 jobId : job.get('id')
             },

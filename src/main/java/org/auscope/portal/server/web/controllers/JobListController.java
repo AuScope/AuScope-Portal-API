@@ -162,11 +162,11 @@ public class JobListController extends BaseCloudController  {
      * @return A JSON object with a series attribute which is an array of
      *         VEGLSeries objects.
      */
-    @RequestMapping("/mySeries.do")
+    @RequestMapping("/secure/mySeries.do")
     public ModelAndView mySeries(HttpServletRequest request,
                                  HttpServletResponse response) {
 
-        String user = (String)request.getSession().getAttribute("openID-Email");//request.getRemoteUser();
+        String user = (String)request.getSession().getAttribute("openID-Email");
         if (user == null || user.isEmpty()) {
             logger.warn("No email attached to session");
             return generateJSONResponseMAV(false, null, "No email attached to session");
@@ -186,7 +186,7 @@ public class JobListController extends BaseCloudController  {
      * @return A JSON object with a success attribute and an error attribute
      *         in case the job was not found or can not be deleted.
      */
-    @RequestMapping("/deleteJob.do")
+    @RequestMapping("/secure/deleteJob.do")
     public ModelAndView deleteJob(HttpServletRequest request,
                                 HttpServletResponse response,
                                 @RequestParam("jobId") Integer jobId) {
@@ -217,7 +217,7 @@ public class JobListController extends BaseCloudController  {
      * @return A JSON object with a success attribute and an error attribute
      *         in case the series was not found in the job manager.
      */
-    @RequestMapping("/deleteSeriesJobs.do")
+    @RequestMapping("/secure/deleteSeriesJobs.do")
     public ModelAndView deleteSeriesJobs(HttpServletRequest request,
                                        HttpServletResponse response,
                                        @RequestParam("seriesId") Integer seriesId) {
@@ -285,7 +285,7 @@ public class JobListController extends BaseCloudController  {
      * @return A JSON object with a success attribute and an error attribute
      *         in case the job was not found in the job manager.
      */
-    @RequestMapping("/killJob.do")
+    @RequestMapping("/secure/killJob.do")
     public ModelAndView killJob(HttpServletRequest request,
                                 HttpServletResponse response,
                                 @RequestParam("jobId") Integer jobId) {
@@ -357,7 +357,7 @@ public class JobListController extends BaseCloudController  {
      * @return A JSON object with a success attribute and an error attribute
      *         in case the series was not found in the job manager.
      */
-    @RequestMapping("/killSeriesJobs.do")
+    @RequestMapping("/secure/killSeriesJobs.do")
     public ModelAndView killSeriesJobs(HttpServletRequest request,
                                        HttpServletResponse response,
                                        @RequestParam("seriesId") Integer seriesId) {
@@ -413,7 +413,7 @@ public class JobListController extends BaseCloudController  {
      *         manager the JSON object will contain an error attribute
      *         indicating the error.
      */
-    @RequestMapping("/jobFiles.do")
+    @RequestMapping("/secure/jobFiles.do")
     public ModelAndView jobFiles(HttpServletRequest request,
                                  HttpServletResponse response,
                                  @RequestParam("jobId") Integer jobId) {
@@ -453,7 +453,7 @@ public class JobListController extends BaseCloudController  {
      * @return null on success or the joblist view with an error parameter on
      *         failure.
      */
-    @RequestMapping("/downloadFile.do")
+    @RequestMapping("/secure/downloadFile.do")
     public ModelAndView downloadFile(HttpServletRequest request,
                                      HttpServletResponse response,
                                      @RequestParam("jobId") Integer jobId,
@@ -521,7 +521,7 @@ public class JobListController extends BaseCloudController  {
      * @return null on success or the joblist view with an error parameter on
      *         failure.
      */
-    @RequestMapping("/downloadAsZip.do")
+    @RequestMapping("/secure/downloadAsZip.do")
     public ModelAndView downloadAsZip(HttpServletRequest request,
                                       HttpServletResponse response,
                                       @RequestParam("jobId") Integer jobId,
@@ -596,7 +596,7 @@ public class JobListController extends BaseCloudController  {
      * @return A JSON object with a series attribute which is an array of
      *         VEGLSeries objects matching the criteria.
      */
-    @RequestMapping("/querySeries.do")
+    @RequestMapping("/secure/querySeries.do")
     public ModelAndView querySeries(HttpServletRequest request,
                                     HttpServletResponse response,
                                     @RequestParam(required=false, value="qSeriesName") String qName,
@@ -625,7 +625,7 @@ public class JobListController extends BaseCloudController  {
      * @param seriesDescription
      * @return
      */
-    @RequestMapping("/createSeries.do")
+    @RequestMapping("/secure/createSeries.do")
     public ModelAndView createSeries(HttpServletRequest request,
                                     @RequestParam("seriesName") String seriesName,
                                     @RequestParam("seriesDescription") String seriesDescription) {
@@ -644,7 +644,7 @@ public class JobListController extends BaseCloudController  {
 
         return generateJSONResponseMAV(true, Arrays.asList(series), "");
     }
-
+    
     /**
      * Tests whether the specified list of files contain a non empty file with the specified file name
      * @param files
@@ -725,7 +725,7 @@ public class JobListController extends BaseCloudController  {
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VEGLJob</code> objects.
      */
-    @RequestMapping("/listJobs.do")
+    @RequestMapping("/secure/listJobs.do")
     public ModelAndView listJobs(HttpServletRequest request,
                                  HttpServletResponse response,
                                  @RequestParam("seriesId") Integer seriesId) {
@@ -773,7 +773,7 @@ public class JobListController extends BaseCloudController  {
      * Job files will be duplicated in LOCAL staging only. The files duplicated can be
      * controlled by a list of file names
      */
-    @RequestMapping("/duplicateJob.do")
+    @RequestMapping("/secure/duplicateJob.do")
     public ModelAndView duplicateJob(HttpServletRequest request,
                                 HttpServletResponse response,
                                 @RequestParam("jobId") Integer jobId,
@@ -851,7 +851,7 @@ public class JobListController extends BaseCloudController  {
      * @param jobId
      * @return
      */
-    @RequestMapping("/getSectionedLogs.do")
+    @RequestMapping("/secure/getSectionedLogs.do")
     public ModelAndView getSectionedLogs(HttpServletRequest request, @RequestParam("jobId") Integer jobId) {
         //Lookup the job whose logs we are accessing
         VEGLJob job = attemptGetJob(jobId, request);

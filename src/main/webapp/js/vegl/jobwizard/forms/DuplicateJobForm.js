@@ -34,7 +34,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
             ],
             proxy : {
                 type : 'ajax',
-                url : 'jobFiles.do',
+                url : 'secure/jobFiles.do',
                 extraParams : {
                     jobId : wizardState.jobId
                 },
@@ -92,9 +92,9 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
         });
         loadMask.show();
 
-        //Tell the backend to duplicate
+        //Tell the backend to remove duplicate job
         Ext.Ajax.request({
-            url : 'deleteJob.do',
+            url : 'secure/deleteJob.do',
             params : {
                 jobId : id
             },
@@ -136,7 +136,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
 
         //Tell the backend to duplicate
         Ext.Ajax.request({
-            url : 'duplicateJob.do',
+            url : 'secure/duplicateJob.do',
             params : {
                 jobId : jobId,
                 file : filesToDuplicate
