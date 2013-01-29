@@ -59,7 +59,7 @@ public class ScriptBuilderController extends BasePortalController {
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
                                   @RequestParam("sourceText") String sourceText) {
 
-        if (sourceText == null || sourceText.isEmpty()) {
+        if (sourceText == null || sourceText.trim().isEmpty()) {
             return generateJSONResponseMAV(false, null, "No source text specified");
         }
 

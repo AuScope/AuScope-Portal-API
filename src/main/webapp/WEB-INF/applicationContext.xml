@@ -111,7 +111,7 @@
         <constructor-arg name="provider" value="swift-keystone"/>
         <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
-        <property name="name" value="NeCTAR (Melbourne)"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
         <property name="id" value="nectar-openstack-storage"/>
         <property name="bucket" value="vgl-portal"/>
         <property name="authVersion" value="2.0"/>

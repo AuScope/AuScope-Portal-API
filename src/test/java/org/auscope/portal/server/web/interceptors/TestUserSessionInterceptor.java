@@ -52,7 +52,7 @@ public class TestUserSessionInterceptor extends VGLPortalTestClass {
         final String userEmail = "test@email.com";
         
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockRequest).getSession(true);will(returnValue(mockSession));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
         }});        
         
@@ -67,7 +67,7 @@ public class TestUserSessionInterceptor extends VGLPortalTestClass {
     @Test
     public void testPreHandle_UserSessionExpired() throws Exception {
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockRequest).getSession(true);will(returnValue(mockSession));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(null));
         }});
         
