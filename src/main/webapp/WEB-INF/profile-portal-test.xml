@@ -16,6 +16,7 @@
                 <ref bean="knownTypeRadMapTotaldose" />
                 <ref bean="knownTypeMagMap" />
                 <ref bean="knownTypeGocadModels" />
+                <ref bean="KnownTypeGeophysicsDatasets" />
                 <ref bean="knownTypeGswaMagMerge" />
                 <ref bean="knownTypeGswaUMerge" />
                 <ref bean="knownTypeGswaThMerge" />

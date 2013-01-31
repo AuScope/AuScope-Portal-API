@@ -25,8 +25,8 @@
     <bean id="cswModelLibProduction" class="org.auscope.portal.core.services.csw.CSWServiceItem">
         <constructor-arg name="id" value="cswModelLibProduction"/>
         <constructor-arg name="title" value="NSP Model Library"/>
-        <constructor-arg name="serviceUrl" value="http://geophysics.nsp.melbourne.nectar.org.au/geonetwork/srv/en/csw"/>
-        <constructor-arg name="recordInformationUrl" value="http://geophysics.nsp.melbourne.nectar.org.au/geonetwork/srv/en/main.home?uuid=%1$s"/>
+        <constructor-arg name="serviceUrl" value="http://geophysics1.nsp.melbourne.nectar.org.au/geonetwork/srv/en/csw"/>
+        <constructor-arg name="recordInformationUrl" value="http://geophysics1.nsp.melbourne.nectar.org.au/geonetwork/srv/en/main.home?uuid=%1$s"/>
     </bean>
 
 </beans>

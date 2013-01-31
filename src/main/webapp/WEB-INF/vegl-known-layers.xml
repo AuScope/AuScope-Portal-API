@@ -77,7 +77,31 @@
             </bean>
         </property>
     </bean>
-
+    
+    <bean id="KnownTypeGeophysicsDatasets" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="geophysics-datasets"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.CSWRecordSelector">
+                <property name="descriptiveKeyword" value="GeophysicsDataset"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="GA Geophysics Projects"/>
+        <property name="description" value="A collection of spatially located geophysics datasets from GA"/>
+        <property name="iconUrl" value="http://maps.google.com/mapfiles/kml/paddle/blu-square.png"/>
+        <property name="iconAnchor">
+            <bean class="java.awt.Point">
+                <constructor-arg index="0" value="16"/>
+                <constructor-arg index="1" value="32"/>
+            </bean>
+        </property>
+        <property name="iconSize">
+            <bean class="java.awt.Dimension">
+                <constructor-arg index="0" value="32"/>
+                <constructor-arg index="1" value="32"/>
+            </bean>
+        </property>
+    </bean>
+       
     <bean id="knownTypeGswaMagMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
         <constructor-arg name="id" value="gswa-magmerge"/>
         <constructor-arg name="knownLayerSelector">
