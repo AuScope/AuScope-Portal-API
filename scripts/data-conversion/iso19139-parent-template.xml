@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:gts="http://www.isotc211.org/2005/gts"
+                 xmlns:gco="http://www.isotc211.org/2005/gco"
+                 xmlns:gml="http://www.opengis.net/gml"
+                 xmlns:srv="http://www.isotc211.org/2005/srv"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 xmlns:geonet="http://www.fao.org/geonetwork"
+                 xsi:schemaLocation=" http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd">
+  <gmd:fileIdentifier xmlns:gmx="http://www.isotc211.org/2005/gmx">
+      <gco:CharacterString>7f06335d-f373-473b-806a-8f53c2deec6b</gco:CharacterString>
+  </gmd:fileIdentifier>
+  <gmd:language>
+      <gco:CharacterString>eng</gco:CharacterString>
+  </gmd:language>
+  <gmd:characterSet>
+      <gmd:MD_CharacterSetCode codeListValue="utf8"
+                               codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CharacterSetCode"/>
+  </gmd:characterSet>
+  <gmd:hierarchyLevel>
+      <gmd:MD_ScopeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ScopeCode"
+                        codeListValue="dataset"/>
+  </gmd:hierarchyLevel>
+  <gmd:contact>
+      <gmd:CI_ResponsibleParty>
+         <gmd:organisationName>
+            <gco:CharacterString>Geoscience Australia</gco:CharacterString>
+         </gmd:organisationName>
+         <gmd:contactInfo>
+            <gmd:CI_Contact>
+               <gmd:phone>
+                  <gmd:CI_Telephone>
+                     <gmd:voice>
+                        <gco:CharacterString>+61 2 6249 9966</gco:CharacterString>
+                     </gmd:voice>
+                     <gmd:facsimile>
+                        <gco:CharacterString>+61 2 6249 9960</gco:CharacterString>
+                     </gmd:facsimile>
+                  </gmd:CI_Telephone>
+               </gmd:phone>
+               <gmd:address>
+                  <gmd:CI_Address>
+                     <gmd:deliveryPoint>
+                        <gco:CharacterString>GPO Box 378</gco:CharacterString>
+                     </gmd:deliveryPoint>
+                     <gmd:city>
+                        <gco:CharacterString>Canberra</gco:CharacterString>
+                     </gmd:city>
+                     <gmd:administrativeArea>
+                        <gco:CharacterString>ACT</gco:CharacterString>
+                     </gmd:administrativeArea>
+                     <gmd:postalCode>
+                        <gco:CharacterString>2601</gco:CharacterString>
+                     </gmd:postalCode>
+                     <gmd:country>
+                        <gco:CharacterString>Australia</gco:CharacterString>
+                     </gmd:country>
+                  </gmd:CI_Address>
+               </gmd:address>
+               <gmd:onlineResource>
+                  <gmd:CI_OnlineResource>
+                     <gmd:linkage>
+                        <gmd:URL>http://www.ga.gov.au/</gmd:URL>
+                     </gmd:linkage>
+                  </gmd:CI_OnlineResource>
+               </gmd:onlineResource>
+            </gmd:CI_Contact>
+         </gmd:contactInfo>
+         <gmd:role>
+            <gmd:CI_RoleCode codeListValue="pointOfContact"
+                             codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_RoleCode"/>
+         </gmd:role>
+      </gmd:CI_ResponsibleParty>
+  </gmd:contact>
+  <gmd:dateStamp>
+      <gco:DateTime xmlns:gmx="http://www.isotc211.org/2005/gmx">2013-01-30T12:28:23</gco:DateTime>
+  </gmd:dateStamp>
+  <gmd:metadataStandardName>
+      <gco:CharacterString>ISO 19115:2003/19139</gco:CharacterString>
+  </gmd:metadataStandardName>
+  <gmd:metadataStandardVersion>
+      <gco:CharacterString>1.0</gco:CharacterString>
+  </gmd:metadataStandardVersion>
+  <gmd:identificationInfo>
+      <srv:SV_ServiceIdentification>
+         <gmd:citation>
+            <gmd:CI_Citation>
+               <gmd:title>
+                  <gco:CharacterString>Sample Geophysics Project 01</gco:CharacterString>
+               </gmd:title>
+               <gmd:date>
+                  <gmd:CI_Date>
+                     <gmd:date>
+                        <gco:DateTime>2013-01-29T00:00:00</gco:DateTime>
+                     </gmd:date>
+                     <gmd:dateType>
+                        <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_DateTypeCode"
+                                             codeListValue="creation"/>
+                     </gmd:dateType>
+                  </gmd:CI_Date>
+               </gmd:date>
+            </gmd:CI_Citation>
+         </gmd:citation>
+         <gmd:abstract>
+            <gco:CharacterString>The ISO19139/119 metadata standard is the preferred metadata standard
+          to use for services (WMS, WFS, WCS).</gco:CharacterString>
+         </gmd:abstract>
+         <gmd:status>
+            <gmd:MD_ProgressCode codeListValue="underDevelopment"
+                                 codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ProgressCode"/>
+         </gmd:status>
+         <gmd:descriptiveKeywords>
+            <gmd:MD_Keywords>
+               <gmd:keyword>
+                  <gco:CharacterString>VGL</gco:CharacterString>
+               </gmd:keyword>
+               <gmd:keyword>
+                  <gco:CharacterString>GA</gco:CharacterString>
+               </gmd:keyword>
+               <gmd:keyword>
+                  <gco:CharacterString>Test data</gco:CharacterString>
+               </gmd:keyword>
+               <gmd:keyword>
+                  <gco:CharacterString>GeophysicsDataset</gco:CharacterString>
+               </gmd:keyword>
+               <gmd:type>
+                  <gmd:MD_KeywordTypeCode codeListValue="theme"
+                                          codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"/>
+               </gmd:type>
+            </gmd:MD_Keywords>
+         </gmd:descriptiveKeywords>
+         <srv:serviceType>
+            <gco:LocalName codeSpace="www.w3c.org">OGC:WMS</gco:LocalName>
+         </srv:serviceType>
+         <srv:serviceTypeVersion>
+            <gco:CharacterString>1.1.1</gco:CharacterString>
+         </srv:serviceTypeVersion>
+         <srv:accessProperties>
+            <gmd:MD_StandardOrderProcess>
+               <gmd:fees>
+                  <gco:CharacterString>NONE</gco:CharacterString>
+               </gmd:fees>
+            </gmd:MD_StandardOrderProcess>
+         </srv:accessProperties>
+         <srv:extent>
+            <gmd:EX_Extent>
+               <gmd:geographicElement>
+                  <gmd:EX_GeographicBoundingBox>
+                     <gmd:westBoundLongitude>
+                        <gco:Decimal>139.5</gco:Decimal>
+                     </gmd:westBoundLongitude>
+                     <gmd:eastBoundLongitude>
+                        <gco:Decimal>147</gco:Decimal>
+                     </gmd:eastBoundLongitude>
+                     <gmd:southBoundLatitude>
+                        <gco:Decimal>-22</gco:Decimal>
+                     </gmd:southBoundLatitude>
+                     <gmd:northBoundLatitude>
+                        <gco:Decimal>-17</gco:Decimal>
+                     </gmd:northBoundLatitude>
+                  </gmd:EX_GeographicBoundingBox>
+               </gmd:geographicElement>
+            </gmd:EX_Extent>
+         </srv:extent>
+         <srv:couplingType>
+            <srv:SV_CouplingType codeListValue="tight"
+                                 codeList="http://www.isotc211.org/2005/iso19119/resources/Codelist/gmxCodelists.xml#SV_CouplingType"/>
+         </srv:couplingType>
+         <srv:containsOperations/>
+      </srv:SV_ServiceIdentification>
+  </gmd:identificationInfo>
+</gmd:MD_Metadata>
