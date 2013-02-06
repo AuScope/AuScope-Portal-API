@@ -301,7 +301,7 @@ public class WCSController extends BasePortalController {
 
     /**
      * Given a RectifiedGrid, convert a WGS84 lat/long coordinate into a datapoint index
-     * within a rectified grid
+     * within a rectified grid. If lat/long lies outside the grid, it will be 'truncated' to the nearest point inside the grid
      * @param rg Must contain a WGS4 coordinate space. Assumed to contain at least two axes, X and Y
      * @param latitude
      * @param longitude
@@ -312,6 +312,18 @@ public class WCSController extends BasePortalController {
         double originY = rg.getOrigin()[1];
         double[] widthHeight = calculate2dExtents(rg);
         double[] maxValues = new double[] {widthHeight[0] + originX, widthHeight[1] + originY};
+
+        //truncate our lat/lng so that it lies within the bounds
+        if (latitude < originY) {
+            latitude = originY;
+        } else if (latitude > maxValues[1]) {
+            latitude = maxValues[1];
+        }
+        if (longitude < originX) {
+            longitude = originX;
+        } else if (longitude > maxValues[0]) {
+            longitude = maxValues[0];
+        }
 
         //Get lat/lng as a proportional offset between origin and maxValues
         double proportionalX = 1 - ((maxValues[0] - longitude) / (maxValues[0] - originX));

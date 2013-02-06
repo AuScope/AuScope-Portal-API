@@ -215,26 +215,41 @@ Ext.application({
           });
 
           //Iterate all active layers looking for data sources (csw records) that intersect the selection
-          var intersectedCswRecords = [];
+          var intersectedRecordsWithLayer = [];
           for (var layerIdx = 0; layerIdx < layerStore.getCount(); layerIdx++) {
-            var layer = layerStore.getAt(layerIdx);
-            var cswRecs = layer.get('cswRecords');
-            for (var recIdx = 0; recIdx < cswRecs.length; recIdx++) {
-              var cswRecord = cswRecs[recIdx];
-              var geoEls = cswRecord.get('geographicElements');
-              for (var geoIdx = 0; geoIdx < geoEls.length; geoIdx++) {
-                var bboxToCompare = geoEls[geoIdx];
-                if (bbox.intersects(bboxToCompare)) {
-                  intersectedCswRecords.push(cswRecord);
-                  break;
-                }
+              var layer = layerStore.getAt(layerIdx);
+              var cswRecs = layer.get('cswRecords');
+              for (var recIdx = 0; recIdx < cswRecs.length; recIdx++) {
+                  var cswRecord = cswRecs[recIdx];
+                  var geoEls = cswRecord.get('geographicElements');
+                  for (var geoIdx = 0; geoIdx < geoEls.length; geoIdx++) {
+                      var bboxToCompare = geoEls[geoIdx];
+                      if (bbox.intersects(bboxToCompare)) {
+                          intersectedRecordsWithLayer.push({
+                              layer : layer,
+                              cswRecord : cswRecord
+                          });
+                          break;
+                      }
+                  }
               }
-            }
           }
 
           //Show a dialog allow users to confirm the selected data sources
-          console.log('TODO: Selected the following: ', intersectedCswRecords);
-
+          if (intersectedRecordsWithLayer.length > 0) {
+              Ext.create('Ext.Window', {
+                  width : 700,
+                  height : 400,
+                  title : 'Confirm which datasets you wish to select',
+                  modal : true,
+                  autoScroll : true,
+                  items : [{
+                      xtype : 'dataselectionpanel',
+                      region : bbox,
+                      cswRecordAndLayers : intersectedRecordsWithLayer
+                  }]
+              }).show();
+          }
 
         }), new GControlPosition(G_ANCHOR_TOP_RIGHT, new GSize(405, 7)));
     }
