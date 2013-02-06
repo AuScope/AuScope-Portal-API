@@ -204,5 +204,38 @@ Ext.application({
         });
 
         map.renderToContainer(centerPanel);   //After our centerPanel is displayed, render our map into it
+
+        // The subset button needs a handler for when the user draws a subset bbox on the map:
+        map.map.addControl(new GmapSubsetControl(function(nw, ne, se, sw) {
+          var bbox = Ext.create('portal.util.BBox', {
+            northBoundLatitude : nw.lat(),
+                southBoundLatitude : sw.lat(),
+                eastBoundLongitude : ne.lng(),
+                westBoundLongitude : sw.lng()
+          });
+
+          //Iterate all active layers looking for data sources (csw records) that intersect the selection
+          var intersectedCswRecords = [];
+          for (var layerIdx = 0; layerIdx < layerStore.getCount(); layerIdx++) {
+            var layer = layerStore.getAt(layerIdx);
+            var cswRecs = layer.get('cswRecords');
+            for (var recIdx = 0; recIdx < cswRecs.length; recIdx++) {
+              var cswRecord = cswRecs[recIdx];
+              var geoEls = cswRecord.get('geographicElements');
+              for (var geoIdx = 0; geoIdx < geoEls.length; geoIdx++) {
+                var bboxToCompare = geoEls[geoIdx];
+                if (bbox.intersects(bboxToCompare)) {
+                  intersectedCswRecords.push(cswRecord);
+                  break;
+                }
+              }
+            }
+          }
+
+          //Show a dialog allow users to confirm the selected data sources
+          console.log('TODO: Selected the following: ', intersectedCswRecords);
+
+
+        }), new GControlPosition(G_ANCHOR_TOP_RIGHT, new GSize(405, 7)));
     }
 });
