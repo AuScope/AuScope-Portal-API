@@ -215,7 +215,7 @@ Ext.application({
           });
 
           //Iterate all active layers looking for data sources (csw records) that intersect the selection
-          var intersectedRecordsWithLayer = [];
+          var intersectedRecords = [];
           for (var layerIdx = 0; layerIdx < layerStore.getCount(); layerIdx++) {
               var layer = layerStore.getAt(layerIdx);
               var cswRecs = layer.get('cswRecords');
@@ -225,10 +225,7 @@ Ext.application({
                   for (var geoIdx = 0; geoIdx < geoEls.length; geoIdx++) {
                       var bboxToCompare = geoEls[geoIdx];
                       if (bbox.intersects(bboxToCompare)) {
-                          intersectedRecordsWithLayer.push({
-                              layer : layer,
-                              cswRecord : cswRecord
-                          });
+                          intersectedRecords.push(cswRecord);
                           break;
                       }
                   }
@@ -236,7 +233,7 @@ Ext.application({
           }
 
           //Show a dialog allow users to confirm the selected data sources
-          if (intersectedRecordsWithLayer.length > 0) {
+          if (intersectedRecords.length > 0) {
               Ext.create('Ext.Window', {
                   width : 700,
                   maxHeight : 400,
@@ -247,7 +244,7 @@ Ext.application({
                       xtype : 'dataselectionpanel',
                       region : bbox,
                       itemId : 'dataselection-panel',
-                      cswRecordAndLayers : intersectedRecordsWithLayer
+                      cswRecords : intersectedRecords
                   }],
                   buttons : [{
                       text : 'Capture Data',

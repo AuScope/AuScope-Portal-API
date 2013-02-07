@@ -10,9 +10,7 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
      * Accepts the following:
      * {
      *  region : portal.util.BBox - The selected area (defaults to 0,0,0,0)
-     *  cswRecordAndLayers : Object[] - The records to display info for. Passed in as an object with two fields.
-     *                        'layer' should reference the parent portal.layer.Layer and 'cswRecord' should reference
-     *                        the child portal.csw.CSWRecord
+     *  cswRecords : portal.csw.CSWRecord[] - The records to display info for.
      * }
      */
     constructor : function(config) {
@@ -21,11 +19,11 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
         }
         this.region = config.region;
 
-        if (!config.cswRecordAndLayers) {
-            config.cswRecordAndLayers = [];
+        if (!config.cswRecords) {
+            config.cswRecords = [];
         }
 
-        var dataItems = vegl.widgets.DataSelectionPanelRow.parseCswRecords(config.cswRecordAndLayers, this.region);
+        var dataItems = vegl.widgets.DataSelectionPanelRow.parseCswRecords(config.cswRecords, this.region);
 
         var groupingFeature = Ext.create('Ext.grid.feature.Grouping',{
             groupHeaderTpl: '{name} ({[values.rows.length]} {[values.rows.length > 1 ? "Items" : "Item"]})'
@@ -322,7 +320,7 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
         /**
          * Parses a single csw record and parent layer into an array of DataSelectionPanelRow items
          */
-        parseCswRecord : function(layer, cswRecord, defaultBbox) {
+        parseCswRecord : function(cswRecord, defaultBbox) {
             var dataItems = [];
             var resources = cswRecord.get('onlineResources');
             for (var i = 0; i < resources.length; i++) {
@@ -330,14 +328,12 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
 
                 //Set the defaults of our new item
                 newItem = {
-                    layerName : layer.get('name'),
                     resourceType : portal.csw.OnlineResource.typeToString(onlineResource.get('type')),
                     name : onlineResource.get('name'),
                     description : onlineResource.get('description'),
                     selected : true,
                     cswRecord : cswRecord,
                     onlineResource : onlineResource,
-                    layer : layer,
                     downloadOptions : {
                         name : 'Subset of ' + onlineResource.get('name'),
                         description : onlineResource.get('description'),
@@ -372,7 +368,7 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
             var childCswRecords = cswRecord.get('childRecords');
             if (childCswRecords) {
                 for (var i = 0; i < childCswRecords.length; i++) {
-                    dataItems = dataItems.concat(vegl.widgets.DataSelectionPanelRow.parseCswRecord(layer, childCswRecords[i]));
+                    dataItems = dataItems.concat(vegl.widgets.DataSelectionPanelRow.parseCswRecord(childCswRecords[i], defaultBbox));
                 }
             }
 
@@ -382,13 +378,12 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
         /**
          * Parses a CSWRecord array into an array of simple JS objects for usage with the internal data store for this panel
          */
-        parseCswRecords : function(cswRecordAndLayers, defaultBbox) {
+        parseCswRecords : function(cswRecords, defaultBbox) {
             var dataItems = [];
-            for (var i = 0; i < cswRecordAndLayers.length; i++) {
-                var cswRecord = cswRecordAndLayers[i].cswRecord;
-                var layer = cswRecordAndLayers[i].layer;
+            for (var i = 0; i < cswRecords.length; i++) {
+                var cswRecord = cswRecords[i];
 
-                dataItems = dataItems.concat(vegl.widgets.DataSelectionPanelRow.parseCswRecord(layer, cswRecord, defaultBbox));
+                dataItems = dataItems.concat(vegl.widgets.DataSelectionPanelRow.parseCswRecord(cswRecord, defaultBbox));
           }
 
           return dataItems;
@@ -401,7 +396,6 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
              {name : 'name', type: 'string'},
              {name : 'description', type: 'string'},
              {name : 'selected', type: 'boolean'},
-             {name : 'layer', type: 'auto'},
              {name : 'onlineResource', type: 'auto'},
              {name : 'cswRecord', type: 'auto'},
              {name : 'downloadOptions', type: 'auto'}
