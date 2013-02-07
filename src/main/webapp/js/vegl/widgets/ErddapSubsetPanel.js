@@ -16,10 +16,11 @@ Ext.define('vegl.widgets.ErddapSubsetPanel', {
      *  description : String - a longer description for this subset (defaults to ''),
      *  coverageName : String - The name of the coverage (WCS name) being subsetted
      *  coverageUrl : String - the URL of the WCS which can be queried for more specific info on the coverage
+     *  dataType : String - The default data type selection (defaults to 'nc' for NetCDF)
      * }
      */
     constructor : function(config) {
-        var dataType = 'nc';
+        var dataType = config.dataType ? config.dataType : 'nc';
         var region = config.region ? config.region : Ext.create('portal.util.BBox', {northBoundLatitude : 0,
             southBoundLatitude : 0,
             eastBoundLongitude : 0,
@@ -140,15 +141,15 @@ Ext.define('vegl.widgets.ErddapSubsetPanel', {
 
         ssField.setValue('Loading...');
 
-        vegl.util.WCSUtil.estimateCoverageSize(values, serviceUrl, coverageName, Ext.bind(function(success, msg, response) {
+        vegl.util.WCSUtil.estimateCoverageSize(values, this.coverageUrl, this.coverageName, ssField, function(success, msg, response, ssField) {
             if (!success) {
                 ssField.setValue(msg);
                 return;
             }
 
-            var approxTotal = Ext.util.Format.number(this.roundToApproximation(response.roundedTotal), '0,000');
-            var approxSize = Ext.util.Format.fileSize(this.roundToApproximation(totalPoints * 4));
+            var approxTotal = Ext.util.Format.number(vegl.util.WCSUtil.roundToApproximation(response.roundedTotal), '0,000');
+            var approxSize = Ext.util.Format.fileSize(vegl.util.WCSUtil.roundToApproximation(response.width * response.height * 4));
             ssField.setValue(Ext.util.Format.format('Approximately <b>{0}</b> data points in total. Uncompressed that\'s roughly {1}', approxTotal, approxSize));
-        }, this));
+        });
     }
 });

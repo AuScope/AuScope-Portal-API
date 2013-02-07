@@ -239,14 +239,37 @@ Ext.application({
           if (intersectedRecordsWithLayer.length > 0) {
               Ext.create('Ext.Window', {
                   width : 700,
-                  height : 400,
+                  maxHeight : 400,
                   title : 'Confirm which datasets you wish to select',
                   modal : true,
                   autoScroll : true,
                   items : [{
                       xtype : 'dataselectionpanel',
                       region : bbox,
+                      itemId : 'dataselection-panel',
                       cswRecordAndLayers : intersectedRecordsWithLayer
+                  }],
+                  buttons : [{
+                      text : 'Capture Data',
+                      iconCls : 'add',
+                      align : 'right',
+                      scope : this,
+                      handler : function(btn) {
+                          var parentWindow = btn.findParentByType('window');
+                          var panel = parentWindow.getComponent('dataselection-panel');
+
+                          panel.saveCurrentSelection(function(totalSelected, totalErrors) {
+                              if (totalSelected === 0) {
+                                  Ext.Msg.alert('No selection', 'You haven\'t selected any data to capture. Please select one or more rows by checking the box alongside each row.');
+                              } else if (totalErrors === 0) {
+                                  Ext.Msg.alert('Request Saved', 'Your ' + totalSelected + ' dataset(s) have been saved. You can either continue selecting more data or <a href="jobbuilder.html">create a job</a> to process your existing selections.');
+                                  parentWindow.close();
+                              } else {
+                                  Ext.Msg.alert('Error saving data', 'There were one or more errors when saving some of the datasets you selected');
+                                  parentWindow.close();
+                              }
+                          });
+                      }
                   }]
               }).show();
           }

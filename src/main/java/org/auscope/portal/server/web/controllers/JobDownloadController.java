@@ -53,13 +53,15 @@ public class JobDownloadController extends BasePortalController {
         }
 
         logger.trace("Adding download: " + download.getUrl());
-        erddapUrlList.add(download);
+        synchronized(erddapUrlList) {
+            erddapUrlList.add(download);
+        }
 
         request.getSession().setAttribute(SESSION_DOWNLOAD_LIST, erddapUrlList);
     }
-    
+
     /**
-     * Adds user selected file(s) or download request(s) to the session wide SESSION_OWNLOAD_LIST list. 
+     * Adds user selected file(s) or download request(s) to the session wide SESSION_OWNLOAD_LIST list.
      * @return ModelAndView response object.
      */
     @RequestMapping("/addSelectedResourcesToSession.do")
@@ -72,7 +74,7 @@ public class JobDownloadController extends BasePortalController {
             @RequestParam("southBoundLatitude") final Double[] southBoundLatitude,
             @RequestParam("westBoundLongitude") final Double[] westBoundLongitude,
             HttpServletRequest request) {
-        
+
         for (int i = 0; i < url.length; i++) {
             VglDownload newDownload = new VglDownload();
             newDownload.setName(name[i]);
@@ -83,10 +85,10 @@ public class JobDownloadController extends BasePortalController {
             newDownload.setEastBoundLongitude(eastBoundLongitude[i]);
             newDownload.setSouthBoundLatitude(southBoundLatitude[i]);
             newDownload.setWestBoundLongitude(westBoundLongitude[i]);
-			
+
             addDownloadToSession(request, newDownload);
         }
-        
+
         return generateJSONResponseMAV(true, null, "");
     }
 
