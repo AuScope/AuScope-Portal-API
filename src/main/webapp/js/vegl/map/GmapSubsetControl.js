@@ -14,7 +14,7 @@ function GmapSubsetControl(dragEndCallback) {
         fontFamily: 'Arial,sans-serif',
         fontSize: '12px',
         textAlign: 'center',
-        background: '#FFF'
+        background: '#A0D4FF'
       },
 
       buttonSubsetStyle : {
