@@ -216,7 +216,7 @@ public class WMSController extends BaseCSWController {
       double lat1 = Double.parseDouble(bboxParts[1]);
       double lat2 = Double.parseDouble(bboxParts[3]);
 
-      String responseString = wmsService.getFeatureInfo(wmsUrl, infoFormat, queryLayers, "EPSG:4326", Math.min(lng1, lng2), Math.min(lat1, lat2), Math.max(lng1, lng2), Math.max(lat1, lat2), Integer.parseInt(width), Integer.parseInt(height), Double.parseDouble(longitude), Double.parseDouble(latitude), Integer.parseInt(x), Integer.parseInt(y), "");
+      String responseString = wmsService.getFeatureInfo(wmsUrl, infoFormat, queryLayers, "EPSG:4326", Math.min(lng1, lng2), Math.min(lat1, lat2), Math.max(lng1, lng2), Math.max(lat1, lat2), Integer.parseInt(width), Integer.parseInt(height), Double.parseDouble(longitude), Double.parseDouble(latitude), Integer.parseInt(x), Integer.parseInt(y), "", null);
       InputStream responseStream = new ByteArrayInputStream(responseString.getBytes());
       this.writeInputToOutputStream(responseStream, response.getOutputStream(), 1024*1024, true);
    }
