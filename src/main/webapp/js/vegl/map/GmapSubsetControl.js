@@ -22,6 +22,7 @@ function GmapSubsetControl(dragEndCallback) {
       },
 
       buttonHtml : 'Select Data',
+      buttonId : 'gmap-subset-control',
       buttonSubsetHtml : 'Click and drag a region of interest',
 
       boxStyle : {
@@ -63,6 +64,7 @@ GmapSubsetControl.prototype.initButton_ = function(buttonContainerDiv) {
   var G = this.globals;
   var buttonDiv = document.createElement('div');
   buttonDiv.innerHTML = G.buttonHtml;
+  buttonDiv.id = G.buttonId;
   GmapSubsetUtil.style([buttonDiv], {cursor: 'pointer', zIndex:200});
   GmapSubsetUtil.style([buttonDiv], G.buttonStyle);
   buttonContainerDiv.appendChild(buttonDiv);

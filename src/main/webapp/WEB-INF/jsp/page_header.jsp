@@ -11,6 +11,7 @@
                 <li ><a href="admin.html">Administration<span></span></a></li>
             </security:authorize>
 
+            <%if (request.getRequestURL().toString().contains("/gmap.jsp")) {%><li><a id="help-button">Help<span></span></a></li><%} %>
             <li <%if (request.getRequestURL().toString().contains("/gmap.jsp")) {%>class="current" <%} %>><a href="gmap.html">VGL Portal<span></span></a></li>
             <li <%if (request.getRequestURL().toString().contains("/jobbuilder.jsp")) {%>class="current" <%} %>><a href="jobbuilder.html">Submit Jobs<span></span></a></li>
             <li <%if (request.getRequestURL().toString().contains("/joblist.jsp")) {%>class="current" <%} %>><a href="joblist.html">Monitor Jobs<span></span></a></li>
