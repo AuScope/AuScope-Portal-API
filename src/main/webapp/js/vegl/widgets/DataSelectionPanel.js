@@ -22,12 +22,17 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
         if (!config.cswRecords) {
             config.cswRecords = [];
         }
-
+        
         var dataItems = vegl.widgets.DataSelectionPanelRow.parseCswRecords(config.cswRecords, this.region);
 
         var groupingFeature = Ext.create('Ext.grid.feature.Grouping',{
             groupHeaderTpl: '{name} ({[values.rows.length]} {[values.rows.length > 1 ? "Items" : "Item"]})'
         });
+        
+        var hideHeaders = true;
+        if (typeof(config.hideHeaders) !== 'undefined' && config.hideHeaders != null) {
+            hideHeaders = config.hideHeaders;
+        }
 
         //Build our configuration object
         Ext.apply(config, {
@@ -38,7 +43,7 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                 model : 'vegl.widgets.DataSelectionPanelRow',
                 data : dataItems
             }),
-            hideHeaders : true,
+            hideHeaders : hideHeaders,
             plugins : [{
                 ptype : 'selectablegrid'
             }],

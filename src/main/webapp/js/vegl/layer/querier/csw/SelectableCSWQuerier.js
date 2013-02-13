@@ -30,8 +30,6 @@ Ext.define('vegl.layer.querier.csw.SelectableCSWQuerier', {
                 keywordsString += ', ';
             }
         }
-        
-        var selModel = Ext.create('Ext.selection.CheckboxModel');
 
         var panel = Ext.create('portal.layer.querier.BaseComponent', {
             border : false,
@@ -69,6 +67,7 @@ Ext.define('vegl.layer.querier.csw.SelectableCSWQuerier', {
                         xtype : 'dataselectionpanel',
                         itemId : 'dataselection-panel',
                         region : cswRecord.get('geographicElements'),
+                        hideHeaders : false,
                         cswRecords : [ cswRecord ]
                     },{
                         xtype : 'button',
@@ -84,7 +83,7 @@ Ext.define('vegl.layer.querier.csw.SelectableCSWQuerier', {
         callback(this, [panel], queryTarget);
     },
     
-    addSelectedResourcesToSession : function(button, event, selModel) {
+    addSelectedResourcesToSession : function(button) {
         var fieldSetContainer = button.findParentByType('fieldset');
         var dataSelPanel = fieldSetContainer.getComponent('dataselection-panel');
         
