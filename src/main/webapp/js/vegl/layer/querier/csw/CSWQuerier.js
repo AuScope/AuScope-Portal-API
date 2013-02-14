@@ -21,16 +21,7 @@ Ext.define('vegl.layer.querier.csw.CSWQuerier', {
             callback(this, [], queryTarget);
             return;
         }
-        
-        var cswRecords = [];
-        cswRecords.push(cswRecord);
-        var childRecords = cswRecord.get('childRecords');
-        if (childRecords) {
-            Ext.each(childRecords, function(record) {
-                cswRecords.push(record);
-            });
-        }
-        
+                
         var keywordsString = "";
         var keywords = cswRecord.get('descriptiveKeywords');
         for (var i = 0; i < keywords.length; i++) {
@@ -75,7 +66,7 @@ Ext.define('vegl.layer.querier.csw.CSWQuerier', {
                     },{
                         fieldLabel : 'Resources',
                         xtype : 'onlineresourcepanel',
-                        cswRecords : cswRecords
+                        cswRecords : cswRecord
                     }]
                 }]
             }]
