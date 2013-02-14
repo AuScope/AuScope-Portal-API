@@ -58,7 +58,7 @@ Ext.define('ScriptBuilder.InsertionPromptWindow', {
                 items : [{
                     //Our radiogroup can see its item list vary according to the presence of bounding boxes
                     xtype : 'radiogroup',
-                    columns : [1.0],
+                    columns : [0.999],
                     items : [{
                         boxLabel : 'Replace the entire script window with this snippet.',
                         name : 'insertion-radio',
