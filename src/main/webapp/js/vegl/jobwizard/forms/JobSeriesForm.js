@@ -171,10 +171,59 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                 callback(false);
                 return;
             }
-
-            //Goto next step as we have an already existing series
-            callback(true);
-            return;
+                        
+            if (!wizardState.skipDataValidation) {
+                //Request to check if user has captured any data set(s)
+                Ext.Ajax.request({
+                    url: 'secure/getSessionDownloadListSize.do',
+                    callback : function(options, success, response) {
+                        if (success) {
+                            var responseObj = Ext.JSON.decode(response.responseText);
+                            if (responseObj.success) {
+                                var size = responseObj.data;
+                                if (size > 0) {
+                                    //Go to next step as we have an already existing series 
+                                    //and user captured data set can be found in user session. 
+                                    wizardState.skipDataValidation = true;
+                                    callback(true);
+                                    return;
+                                } else {
+                                    Ext.Msg.confirm('Confirm', 
+                                        'No data set has been captured. Do you want to continue?', 
+                                        function(button) {
+                                            if (button === 'yes') {
+                                                //Go to next step as we have an already existing series
+                                                //and user has chosen to continue without any data set.
+                                                wizardState.skipDataValidation = true;
+                                                callback(true);
+                                                return;
+                                            } else {
+                                                callback(false);
+                                                return;
+                                            }
+                                    });
+                                }
+                            } else {
+                                errorMsg = responseObj.msg;
+                                errorInfo = responseObj.debugInfo;
+                                portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                            }
+                        } else {
+                            errorMsg = "There was an internal error communicating with the server.";
+                            errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
+                            portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                        }
+                        
+                        callback(false);
+                        return;
+                    }
+                });
+            } else {
+                //This branch will be executed when user has previously confirmed to continue 
+                //without data sets being captured or had the data sets already stored in the job. 
+                callback(true);
+                return;
+            }
         } else {
             var seriesName = this.getSeriesCombo().getRawValue();
             var seriesDesc = this.getSeriesDesc().getRawValue();
