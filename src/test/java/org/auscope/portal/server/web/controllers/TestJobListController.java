@@ -2,7 +2,6 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -27,7 +26,6 @@ import org.auscope.portal.jmock.VEGLSeriesMatcher;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
-import org.auscope.portal.server.vegl.VglDownload;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -1238,47 +1236,5 @@ public class TestJobListController extends PortalTestClass {
 
         ModelAndView mav = controller.getSectionedLogs(mockRequest, jobId);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
-    }
-    
-    /**
-     * Tests that get the number of download items stored 
-     * in user session works as expected
-     */
-    @Test
-    public void testGetSessionDownloadListSize() {
-        final List<VglDownload> vglDownloads = new ArrayList<VglDownload>();
-        final VglDownload d1 = new VglDownload(1);
-        final VglDownload d2 = new VglDownload(2);
-        vglDownloads.add(d1);
-        vglDownloads.add(d2);
-        
-        context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(vglDownloads));
-        }});
-
-        ModelAndView mav = controller.getSessionDownloadListSize(mockRequest);
-        Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        Integer numDownloads = (Integer) mav.getModel().get("data");
-        Assert.assertEquals(new Integer(2), numDownloads);
-    }
-    
-    /**
-     * Tests that get the number of download items stored 
-     * in user session works as expected when jobDownloadList 
-     * attribute can't be found in user session (meaning user
-     * has captured any data set).
-     */
-    @Test
-    public void testGetSessionDownloadListSize_NullJobDownloadList() {
-        context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(null));
-        }});
-        
-        ModelAndView mav = controller.getSessionDownloadListSize(mockRequest);
-        Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        Integer numDownloads = (Integer) mav.getModel().get("data");
-        Assert.assertEquals(new Integer(0), numDownloads);        
     }
 }

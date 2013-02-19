@@ -157,4 +157,46 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(localPath, download.getLocalPath());
         Assert.assertEquals(serviceUrl, download.getUrl());
     }
+    
+    /**
+     * Tests that get the number of download items stored 
+     * in user session works as expected
+     */
+    @Test
+    public void testGetNumDownloadRequests() {
+        final List<VglDownload> vglDownloads = new ArrayList<VglDownload>();
+        final VglDownload d1 = new VglDownload(1);
+        final VglDownload d2 = new VglDownload(2);
+        vglDownloads.add(d1);
+        vglDownloads.add(d2);
+        
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(vglDownloads));
+        }});
+
+        ModelAndView mav = controller.getNumDownloadRequests(mockRequest);
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+        Integer numDownloads = (Integer) mav.getModel().get("data");
+        Assert.assertEquals(new Integer(2), numDownloads);
+    }
+    
+    /**
+     * Tests that get the number of download items stored 
+     * in user session works as expected when jobDownloadList 
+     * attribute can't be found in user session (meaning user
+     * has captured any data set).
+     */
+    @Test
+    public void testGetNumDownloadRequests_NullJobDownloadList() {
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(null));
+        }});
+        
+        ModelAndView mav = controller.getNumDownloadRequests(mockRequest);
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+        Integer numDownloads = (Integer) mav.getModel().get("data");
+        Assert.assertEquals(new Integer(0), numDownloads);
+    }    
 }

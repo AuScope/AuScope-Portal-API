@@ -161,7 +161,25 @@ public class JobDownloadController extends BasePortalController {
 
         return generateJSONResponseMAV(true, null, "");
     }
-
+    
+    /**
+     * Get the number of download requests stored in user session. This method
+     * will be used by VGL frontend to check if any data set has been captured
+     * before creating a new job.
+     * 
+     * @param request The servlet request with query parameters
+     * @return number of download requests in user session.
+     */
+    @RequestMapping("/getNumDownloadRequests.do")
+    public ModelAndView getNumDownloadRequests(HttpServletRequest request) {
+        int size = 0;
+        List downloadList = (List)request.getSession().getAttribute(SESSION_DOWNLOAD_LIST);
+        if (downloadList != null && downloadList.size() > 0) {
+            size = downloadList.size();
+        }
+        return generateJSONResponseMAV(true, size, "");
+    }
+    
     /**
      * Takes the co-ordinates of a user drawn bounding box and constructs an ERDDAP
      * coverage subset request URL.

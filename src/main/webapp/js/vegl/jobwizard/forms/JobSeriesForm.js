@@ -165,77 +165,74 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
     beginValidation : function(callback) {
         var radioGroup = this.getComponent('seriesRadioGroup');
         var wizardState = this.wizardState;
+        var numDownloadReqs = this.getNumDownloadRequests();
+        
         if (radioGroup.getValue().sCreateSelect === 0) {
             if (Ext.isEmpty(wizardState.seriesId)) {
                 Ext.Msg.alert('No series selected', 'Please select a series to add the new job to.');
                 callback(false);
                 return;
             }
-                        
-            if (!wizardState.skipDataValidation) {
-                //Request to check if user has captured any data set(s)
-                Ext.Ajax.request({
-                    url: 'secure/getSessionDownloadListSize.do',
-                    callback : function(options, success, response) {
-                        if (success) {
-                            var responseObj = Ext.JSON.decode(response.responseText);
-                            if (responseObj.success) {
-                                var size = responseObj.data;
-                                if (size > 0) {
-                                    //Go to next step as we have an already existing series 
-                                    //and user captured data set can be found in user session. 
-                                    wizardState.skipDataValidation = true;
-                                    callback(true);
-                                    return;
-                                } else {
-                                    Ext.Msg.confirm('Confirm', 
-                                        'No data set has been captured. Do you want to continue?', 
-                                        function(button) {
-                                            if (button === 'yes') {
-                                                //Go to next step as we have an already existing series
-                                                //and user has chosen to continue without any data set.
-                                                wizardState.skipDataValidation = true;
-                                                callback(true);
-                                                return;
-                                            } else {
-                                                callback(false);
-                                                return;
-                                            }
-                                    });
-                                }
+            
+            if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
+                Ext.Msg.confirm('Confirm',
+                        'No data set has been captured. Do you want to continue?', 
+                        function(button) {
+                            if (button === 'yes') {
+                                wizardState.skipConfirmPopup = true;
+                                callback(true);
+                                return;
                             } else {
-                                errorMsg = responseObj.msg;
-                                errorInfo = responseObj.debugInfo;
-                                portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                                callback(false);
+                                return;
                             }
-                        } else {
-                            errorMsg = "There was an internal error communicating with the server.";
-                            errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
-                            portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
-                        }
-                        
-                        callback(false);
-                        return;
-                    }
-                });
+                    });
             } else {
-                //This branch will be executed when user has previously confirmed to continue 
-                //without data sets being captured or had the data sets already stored in the job. 
                 callback(true);
                 return;
             }
         } else {
             var seriesName = this.getSeriesCombo().getRawValue();
             var seriesDesc = this.getSeriesDesc().getRawValue();
-            if (Ext.isEmpty(seriesName) ||
-                    Ext.isEmpty(seriesDesc)) {
-                Ext.Msg.alert('Create new series',
-                    'Please specify a name and description for the new series.');
+            if (Ext.isEmpty(seriesName) || Ext.isEmpty(seriesDesc)) {
+                Ext.Msg.alert('Create new series', 'Please specify a name and description for the new series.');
                 callback(false);
                 return;
             }
-
-            //Request our new series is created
+            
+            var csFunc = this.createSeries(wizardState, seriesName, seriesDesc, callback);
+            
+            if (numDownloadReqs === 0) {
+                Ext.Msg.confirm('Confirm',
+                        'No data set has been captured. Do you want to continue?', 
+                        function(button) {
+                            if (button === 'yes') {
+                                //Request our new series is created
+                                csFunc();
+                            } else {
+                                callback(false);
+                                return;
+                            }
+                    });
+            } else {
+                //Request our new series is created
+                csFunc();
+            }
+        }
+    },
+    
+    getNumDownloadRequests : function() {
+        request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+        request.open("GET", "getNumDownloadRequests.do", false); //<-- false makes it a synchonous request!
+        request.send(null);
+        respObj = Ext.JSON.decode(request.responseText);
+        size = respObj.data;
+        return size;
+    },
+    
+    createSeries : function(wizardState, seriesName, seriesDesc, callback) {
+        return function() {
+            
             Ext.Ajax.request({
                 url: 'secure/createSeries.do',
                 params: {
@@ -251,7 +248,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                             return;
                         } else {
                             errorMsg = responseObj.msg;
-                            errorInfo = responseObj.debugInfo;                            
+                            errorInfo = responseObj.debugInfo;
                         }
                     } else {
                         errorMsg = "There was an internal error saving your series.";

@@ -910,22 +910,4 @@ public class JobListController extends BaseCloudController  {
 
         return generateJSONResponseMAV(true, Arrays.asList(namedSections), "");
     }
-    
-    /**
-     * Get the number of download items stored in user session. This method
-     * will be used by VGL frontend to check if any data set has been captured
-     * before creating a new job.
-     * 
-     * @param request The servlet request with query parameters
-     * @return number of download items in user session.
-     */
-    @RequestMapping("/secure/getSessionDownloadListSize.do")
-    public ModelAndView getSessionDownloadListSize(HttpServletRequest request) {
-        int listSize = 0;
-        List downloadList = (List)request.getSession().getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);
-        if (downloadList != null && downloadList.size() > 0) {
-            listSize = downloadList.size();
-        }
-        return generateJSONResponseMAV(true, listSize, "");
-    }
 }
