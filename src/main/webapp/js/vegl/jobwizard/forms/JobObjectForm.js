@@ -88,7 +88,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                             computeServiceId : responseObj.data[0].computeServiceId
                                         }
                                     });
-                                    frm.setValues(responseObj.data[0]);                                    
+                                    frm.setValues(responseObj.data[0]);
                                     jobObjectFrm.wizardState.jobId = frm.getValues().id;
                                 }
                             }
@@ -102,6 +102,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             items: [{
                 xtype: 'textfield',
                 name: 'name',
+                itemId : 'name',
                 fieldLabel: 'Job Name',
                 value : Ext.util.Format.format('VGL Job {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
                 plugins: [{
@@ -112,6 +113,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             },{
                 xtype: 'textfield',
                 name: 'description',
+                itemId : 'description',
                 fieldLabel: 'Job Description',
                 plugins: [{
                     ptype: 'fieldhelptext',
@@ -122,6 +124,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 xtype : 'combo',
                 fieldLabel : 'Compute Provider',
                 name: 'computeServiceId',
+                itemId : 'computeServiceId',
                 allowBlank: false,
                 queryMode: 'local',
                 triggerAction: 'all',
@@ -145,6 +148,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 xtype : 'combo',
                 fieldLabel : 'Storage Provider',
                 name: 'storageServiceId',
+                itemId : 'storageServiceId',
                 allowBlank: false,
                 queryMode: 'local',
                 triggerAction: 'all',
@@ -246,5 +250,40 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 callback(true);
             }
         });
+    },
+
+    getHelpInstructions : function() {
+        var name = this.getComponent('name');
+        var description = this.getComponent('description');
+        var compute = this.getComponent('computeServiceId');
+        var storage = this.getComponent('storageServiceId');
+        var toolbox = this.getComponent('image-combo');
+
+        return [Ext.create('portal.util.help.Instruction', {
+            highlightEl : name.getEl(),
+            title : 'Name your job',
+            anchor : 'bottom',
+            description : 'Every job requires a name. Names don\'t have to be unique but it\'s recommended you choose something meaningful as it will be the primary way to identify this job in the future.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : description.getEl(),
+            title : 'Describe your job',
+            anchor : 'bottom',
+            description : 'Enter an optional description for your job here.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : compute.getEl(),
+            title : 'Compute Location',
+            anchor : 'bottom',
+            description : 'It is here where you can select a physical location where your job will be processed. Different locations may have access to different toolboxes.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : storage.getEl(),
+            title : 'Storage Location',
+            anchor : 'bottom',
+            description : 'It is here where you can select a physical location where your job inputs and outputs will be stored. It doesn\'t have to be the same location as the compute provider, but keeping them the same will often make jobs complete faster.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : toolbox.getEl(),
+            title : 'Storage Toolbox',
+            anchor : 'bottom',
+            description : 'A toolbox is a collection of software packages that will be made available to your job when it starts processing. Some toolboxes are restricted to authorised users for licensing reasons. You will not be able to choose a toolbox until after you select a compute provider.'
+        })];
     }
 });

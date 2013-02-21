@@ -37,6 +37,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         this.componentsPanel = Ext.create('ScriptBuilder.ComponentTreePanel', {
             region : 'west',
             title : 'Available Templates',
+            itemId : 'sb-templates-panel',
             width : 250,
             listeners : {
                 addcomponent : Ext.bind(this.onAddComponent, this)
@@ -49,6 +50,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
             items: [{
                 xtype : 'panel',
                 border : false,
+                itemId : 'sb-script-panel',
                 layout : 'fit',
                 region : 'center',
                 title : 'Script Source',
@@ -106,7 +108,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         var comps = ScriptBuilder.Components.getComponents(selectedToolbox);
         this.componentsPanel.setRootNode(comps);
     },
-    
+
     /**
      * Inserts the specified script at the current caret location
      */

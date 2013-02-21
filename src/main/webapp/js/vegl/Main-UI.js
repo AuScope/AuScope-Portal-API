@@ -83,6 +83,7 @@ Ext.application({
         var map = Ext.create('portal.map.gmap.GoogleMap', mapCfg);
 
         var layersPanel = Ext.create('portal.widgets.panel.LayerPanel', {
+            id : 'vgl-layers-panel',
             title : 'Active Layers',
             region : 'center',
             store : layerStore,
@@ -103,6 +104,7 @@ Ext.application({
          * Used to show extra details for querying services
          */
         var filterPanel = Ext.create('portal.widgets.panel.FilterPanel', {
+            id : 'vgl-filter-panel',
             region: 'south',
             layerPanel : layersPanel,
             map : map,
@@ -163,6 +165,7 @@ Ext.application({
 
         // basic tabs 1, built from existing content
         var tabsPanel = Ext.create('Ext.TabPanel', {
+            id : 'vgl-tabs-panel',
             activeTab : 0,
             region : 'north',
             split : true,
@@ -272,39 +275,5 @@ Ext.application({
           }
 
         }), new GControlPosition(G_ANCHOR_TOP_RIGHT, new GSize(405, 7)));
-
-        //Create our help button content
-        var manager = Ext.create('portal.util.help.InstructionManager', {});
-        var helpButtonEl = Ext.get('help-button');
-        helpButtonEl.on('click', function() {
-            manager.showInstructions([Ext.create('portal.util.help.Instruction', {
-                highlightEl : tabsPanel.getEl(),
-                title : 'Find data/layers',
-                description : 'In this panel a list of all available datasets in the form of layers will be presented to you. To visualise a layer, select it and press the "Add Layer to Map" button.<br/><br/>Further information about the data behind each layer can be displayed by clicking the icons alongside the layer name.'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : layersPanel.getEl(),
-                title : 'Manage Layers',
-                description : 'Whenever you add a layer to the map, it will be listed in this window. Layers can be removed by selecting them and pressing "Remove Layer". Selecting a layer will also bring up any advanced filter options in the window below.'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : filterPanel.getEl(),
-                title : 'Apply filters',
-                description : 'Some layers allow you to filter what data will get visualised on the map. If the layer supports filtering, additional options will be displayed in this window. Select "Apply Filter" to update the visualised data on the map'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : centerPanel.getEl(),
-                anchor : 'right',
-                title : 'Visualise Data',
-                description : 'The map panel here is where all of the currently added layers will be visualised. You can pan and zoom the map to an area of interest if required.'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : 'gmap-subset-control',
-                anchor : 'right',
-                title : 'Select Data',
-                description : 'After reviewing one or more layers you can draw a region of interest using this button. All layers with data in the region you draw will be selected for use in a processing job. If the layer supports it, the data will be constrained to the region you select'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : 'help-button',
-                anchor : 'bottom',
-                title : 'More information',
-                description : 'For futher information, please consult the online <a target="_blank" href="https://www.seegrid.csiro.au/wiki/NeCTARProjects/VglUserGuide">VGL wiki</a>.'
-            })]);
-        });
     }
 });

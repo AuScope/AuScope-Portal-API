@@ -26,14 +26,18 @@
     <!-- Portal Core Includes -->
     <link rel="stylesheet" type="text/css" href="portal-core/js/ext-4.1.1a/resources/css/ext-all.css">
     <link rel="stylesheet" type="text/css" href="portal-core/js/ext-4.1.1a/examples/ux/css/CheckHeader.css">
+    <jsp:include page="../../portal-core/cssimports.htm"/>
     <script type="text/javascript" src="portal-core/js/ext-4.1.1a/ext-all-debug.js"></script>
+    <script type="text/javascript" src="portal-core/js/ext-4.1.1a/examples/ux/Spotlight.js"></script>
     <script type="text/javascript" src="portal-core/js/ext-4.1.1a/examples/ux/RowExpander.js"></script>
     <script type="text/javascript" src="portal-core/js/extjs-patches/ext-4.1.1a/EXTJSIV-6745.js"></script>
+    <script type="text/javascript" src="portal-core/js/portal/util/help/Instruction.js"></script>
+    <script type="text/javascript" src="portal-core/js/portal/util/help/InstructionManager.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/util/ObservableMap.js"></script>
     <script type="text/javascript" src="portal-core/js/portal/widgets/window/ErrorWindow.js"></script>
     <script type="text/javascript" src="portal-core/js/extjs-ux-externals/form/plugin/FieldHelpText.js"></script>
-<link rel="stylesheet" href="portal-core/js/extjs-ux-externals/form/plugin/FieldHelpText.css">
+    <link rel="stylesheet" href="portal-core/js/extjs-ux-externals/form/plugin/FieldHelpText.css">
 
 
     <!-- component includes -->
@@ -73,6 +77,7 @@
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileWindow.js"></script>
 
     <script type="text/javascript" src="js/vegl/JobBuilder.js"></script>
+    <script type="text/javascript" src="js/vegl/HelpHandler.js"></script>
 </head>
 
 <body>

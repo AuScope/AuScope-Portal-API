@@ -11,7 +11,7 @@
  */
 Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
-    
+
     scriptBuilderFrm : null,
 
     /**
@@ -19,7 +19,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
      */
     constructor: function(wizardState) {
         this.scriptBuilderFrm = Ext.create('ScriptBuilder.ScriptBuilder', {
-            wizardState : wizardState
+            wizardState : wizardState,
         });
 
         // Finally, build the main layout once all the pieces are ready.
@@ -30,7 +30,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
                 jobWizardActive : function() {
                     // Builds scriptbuilder component tree with user selected toolbox
                     this.scriptBuilderFrm.buildComponentsPanel(wizardState.toolbox);
-                    
+
                     if (this.wizardState.userAction == 'edit' || this.wizardState.userAction == 'duplicate') {
                         this.loadSavedScript(this.wizardState.jobId);
                         // Once the script is loaded into the memory,
@@ -125,5 +125,22 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
      */
     getTitle : function() {
         return "Define your job script.";
+    },
+
+    getHelpInstructions : function() {
+        var templates = this.scriptBuilderFrm.queryById('sb-templates-panel');
+        var script = this.scriptBuilderFrm.queryById('sb-script-panel')
+
+        return [Ext.create('portal.util.help.Instruction', {
+            highlightEl : script.getEl(),
+            title : 'Write Job Script',
+            anchor : 'left',
+            description : 'Everything you have configured so far has been around building an environment in which to run a job. This panel here is where you can enter Python script that will be executed as part of the job processing. The script will be executed in an environment with access to all the tools and input files you have configured.<br/><br/>Please be aware that after this script finishes execution, the entire environment will be erased. If you have any output files they must be uploaded manually using the \'cloud\' utility. You can find more information about this at the <a target="_blank" href="https://www.seegrid.csiro.au/wiki/NeCTARProjects/VglUserGuide">VGL wiki</a>.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : templates.getEl(),
+            title : 'Apply Templates',
+            anchor : 'right',
+            description : 'Depending on the toolbox you have selected, you will have access to number of template scripts that can be prefilled with references to your input files. To add a job script, simply double click it and fill in any required fields. The final template will be added to the \'Script Source\' automatically.'
+        })];
     }
 });

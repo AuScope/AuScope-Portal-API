@@ -98,5 +98,13 @@ Ext.define('vegl.jobwizard.forms.BaseJobWizardForm', {
      */
     getNextIconClass : function() {
         return undefined;
+    },
+
+    /**
+     * Gets an array of portal.util.help.Instruction objects for providing help with this form item. If there
+     * are no relevant instructions, return null or an empty array.
+     */
+    getHelpInstructions : function() {
+        return null;
     }
 });

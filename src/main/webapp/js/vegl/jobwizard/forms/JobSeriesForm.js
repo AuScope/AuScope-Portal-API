@@ -20,13 +20,13 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                     type : 'json',
                     root : 'data'
                 },
-				listeners : {
-                	exception : function(proxy, response, operation) {
-                		responseObj = Ext.JSON.decode(response.responseText);
-                		errorMsg = responseObj.msg;
-                    	errorInfo = responseObj.debugInfo;
-                		portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
-                	}
+                listeners : {
+                    exception : function(proxy, response, operation) {
+                        responseObj = Ext.JSON.decode(response.responseText);
+                        errorMsg = responseObj.msg;
+                        errorInfo = responseObj.debugInfo;
+                        portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                    }
                 }
             },
             autoLoad : true,
@@ -166,17 +166,17 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
         var radioGroup = this.getComponent('seriesRadioGroup');
         var wizardState = this.wizardState;
         var numDownloadReqs = this.getNumDownloadRequests();
-        
+
         if (radioGroup.getValue().sCreateSelect === 0) {
             if (Ext.isEmpty(wizardState.seriesId)) {
                 Ext.Msg.alert('No series selected', 'Please select a series to add the new job to.');
                 callback(false);
                 return;
             }
-            
+
             if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
                 Ext.Msg.confirm('Confirm',
-                        'No data set has been captured. Do you want to continue?', 
+                        'No data set has been captured. Do you want to continue?',
                         function(button) {
                             if (button === 'yes') {
                                 wizardState.skipConfirmPopup = true;
@@ -199,12 +199,12 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                 callback(false);
                 return;
             }
-            
+
             var csFunc = this.createSeries(wizardState, seriesName, seriesDesc, callback);
-            
+
             if (numDownloadReqs === 0) {
                 Ext.Msg.confirm('Confirm',
-                        'No data set has been captured. Do you want to continue?', 
+                        'No data set has been captured. Do you want to continue?',
                         function(button) {
                             if (button === 'yes') {
                                 //Request our new series is created
@@ -220,7 +220,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
             }
         }
     },
-    
+
     getNumDownloadRequests : function() {
         request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
         request.open("GET", "getNumDownloadRequests.do", false); //<-- false makes it a synchonous request!
@@ -229,10 +229,10 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
         size = respObj.data;
         return size;
     },
-    
+
     createSeries : function(wizardState, seriesName, seriesDesc, callback) {
         return function() {
-            
+
             Ext.Ajax.request({
                 url: 'secure/createSeries.do',
                 params: {
@@ -252,14 +252,31 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                         }
                     } else {
                         errorMsg = "There was an internal error saving your series.";
-                        errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";                        
+                        errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
                     }
-                    
+
                     portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
                     callback(false);
                     return;
                 }
             });
         }
+    },
+
+    getHelpInstructions : function() {
+        var seriesProperties = this.getComponent('seriesProperties');
+        var otherSeries = this.getComponent('jobspanel-seriesjobs');
+
+        return [Ext.create('portal.util.help.Instruction', {
+            highlightEl : seriesProperties.getEl(),
+            title : 'Select/Create Series',
+            anchor : 'bottom',
+            description : 'Every job that you create will be organised into a collection known as a series. A series is a simple way of keeping track of similar jobs.<br/>This panel allows you to either select an existing series or alternatively, create a new one.'
+        }),Ext.create('portal.util.help.Instruction', {
+            highlightEl : otherSeries.getEl(),
+            title : 'Browse other jobs',
+            anchor : 'top',
+            description : 'If you\'ve selected to add this new job to an existing series, all other jobs in that same series will be displayed in this panel. You can manage each of these other jobs by right clicking them or by selecting them and pressing \'Actions\'.'
+        })];
     }
 });
