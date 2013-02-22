@@ -45,6 +45,7 @@ Ext.application({
             title: 'Jobs of selected series',
             region: 'center',
             stripeRows: true,
+            itemId : 'vgl-jobs-panel',
             listeners : {
                 selectjob : function(panel, job) {
                     jobDetailsPanel.showDetailsForJob(job);
@@ -79,6 +80,7 @@ Ext.application({
         var seriesPanel = Ext.create('vegl.widgets.SeriesPanel', {
             title: 'Series List',
             region: 'north',
+            itemId : 'vgl-series-panel',
             height: 250,
             split: true,
             stripeRows: true,
@@ -101,6 +103,7 @@ Ext.application({
 
         Ext.create('Ext.container.Viewport', {
             layout: 'border',
+            id : 'vgl-joblist-viewport',
             items: [{
                 xtype: 'box',
                 region: 'north',
@@ -117,6 +120,7 @@ Ext.application({
             },{
                 xtype : 'tabpanel',
                 title: 'Details',
+                itemId : 'vgl-details-panel',
                 region: 'center',
                 margins: '2 2 2 0',
                 activeTab: 0,
