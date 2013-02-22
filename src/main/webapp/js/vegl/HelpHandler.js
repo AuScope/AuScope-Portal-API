@@ -8,35 +8,66 @@ Ext.define('vegl.HelpHandler', {
     statics : {
         manager : Ext.create('portal.util.help.InstructionManager', {}),
 
-        getMainHelp : function() {
-            return [Ext.create('portal.util.help.Instruction', {
-                highlightEl : 'vgl-tabs-panel',
-                title : 'Find data/layers',
-                description : 'In this panel a list of all available datasets in the form of layers will be presented to you. To visualise a layer, select it and press the "Add Layer to Map" button.<br/><br/>Further information about the data behind each layer can be displayed by clicking the icons alongside the layer name.'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : 'vgl-layers-panel',
-                title : 'Manage Layers',
-                description : 'Whenever you add a layer to the map, it will be listed in this window. Layers can be removed by selecting them and pressing "Remove Layer". Selecting a layer will also bring up any advanced filter options in the window below.'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : 'vgl-filter-panel',
-                title : 'Apply filters',
-                description : 'Some layers allow you to filter what data will get visualised on the map. If the layer supports filtering, additional options will be displayed in this window. Select "Apply Filter" to update the visualised data on the map'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : 'center_region',
-                anchor : 'right',
-                title : 'Visualise Data',
-                description : 'The map panel here is where all of the currently added layers will be visualised. You can pan and zoom the map to an area of interest if required.'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : 'gmap-subset-control',
-                anchor : 'right',
-                title : 'Select Data',
-                description : 'After reviewing one or more layers you can draw a region of interest using this button. All layers with data in the region you draw will be selected for use in a processing job. If the layer supports it, the data will be constrained to the region you select'
-            }),Ext.create('portal.util.help.Instruction', {
-                highlightEl : 'help-button',
-                anchor : 'bottom',
-                title : 'More information',
-                description : 'For futher information, please consult the online <a target="_blank" href="https://www.seegrid.csiro.au/wiki/NeCTARProjects/VglUserGuide">VGL wiki</a>.'
-            })];
+        /**
+         * Asynchronously start an animation (with the specified delay in ms) that will highlight
+         * the specified element with an animated arrow
+         *
+         * @param delay The delay in milli seconds
+         * @param element An Ext.Element to highlight
+         */
+        highlightElement : function(delay, element) {
+            var task = new Ext.util.DelayedTask(function() {
+                var arrowEl = Ext.getBody().createChild({
+                    tag : 'img',
+                    src : 'img/right-arrow.png',
+                    width : '32',
+                    height : '32',
+                    style : {
+                        'z-index' : 999999
+                    }
+                });
+
+                //Figure out the x location of the element (in absolute page coords)
+                var xLocation = element.getLeft();
+
+                Ext.create('Ext.fx.Animator', {
+                    target: arrowEl,
+                    duration: 7000,
+                    keyframes: {
+                        0: {
+                            opacity: 1,
+                        },
+                        20: {
+                            x: xLocation - 32
+                        },
+                        30: {
+                            x: xLocation - 52
+                        },
+                        40: {
+                            x: xLocation - 32
+                        },
+                        50: {
+                            x: xLocation - 52
+                        },
+                        60: {
+                            x: xLocation - 32
+                        },
+                        120: {
+
+                        },
+                        160: {
+                            opacity : 0
+                        }
+                    },
+                    listeners : {
+                        afteranimate : Ext.bind(function(arrowEl) {
+                            arrowEl.destroy();
+                        }, this, [arrowEl])
+                    }
+                });
+            });
+
+            task.delay(delay);
         }
     }
 
@@ -44,10 +75,42 @@ Ext.define('vegl.HelpHandler', {
     Ext.onReady(function() {
         var helpButtonEl = Ext.get('help-button');
 
+        //If its a new user - highlight the help button an in unobtrusive manner
+        if (window['NEW_SESSION'] === 'true') {
+            vegl.HelpHandler.highlightElement(5000, helpButtonEl);
+        }
+
         //Load help for main page
         if (window.location.pathname.endsWith('/gmap.html')) {
             helpButtonEl.on('click', function() {
-                vegl.HelpHandler.manager.showInstructions(vegl.HelpHandler.getMainHelp());
+                vegl.HelpHandler.manager.showInstructions([Ext.create('portal.util.help.Instruction', {
+                    highlightEl : 'vgl-tabs-panel',
+                    title : 'Find data/layers',
+                    description : 'In this panel a list of all available datasets in the form of layers will be presented to you. To visualise a layer, select it and press the "Add Layer to Map" button.<br/><br/>Further information about the data behind each layer can be displayed by clicking the icons alongside the layer name.'
+                }),Ext.create('portal.util.help.Instruction', {
+                    highlightEl : 'vgl-layers-panel',
+                    title : 'Manage Layers',
+                    description : 'Whenever you add a layer to the map, it will be listed in this window. Layers can be removed by selecting them and pressing "Remove Layer". Selecting a layer will also bring up any advanced filter options in the window below.'
+                }),Ext.create('portal.util.help.Instruction', {
+                    highlightEl : 'vgl-filter-panel',
+                    title : 'Apply filters',
+                    description : 'Some layers allow you to filter what data will get visualised on the map. If the layer supports filtering, additional options will be displayed in this window. Select "Apply Filter" to update the visualised data on the map'
+                }),Ext.create('portal.util.help.Instruction', {
+                    highlightEl : 'center_region',
+                    anchor : 'right',
+                    title : 'Visualise Data',
+                    description : 'The map panel here is where all of the currently added layers will be visualised. You can pan and zoom the map to an area of interest if required.'
+                }),Ext.create('portal.util.help.Instruction', {
+                    highlightEl : 'gmap-subset-control',
+                    anchor : 'right',
+                    title : 'Select Data',
+                    description : 'After reviewing one or more layers you can draw a region of interest using this button. All layers with data in the region you draw will be selected for use in a processing job. If the layer supports it, the data will be constrained to the region you select'
+                }),Ext.create('portal.util.help.Instruction', {
+                    highlightEl : 'help-button',
+                    anchor : 'bottom',
+                    title : 'More information',
+                    description : 'For futher information, please consult the online <a target="_blank" href="https://www.seegrid.csiro.au/wiki/NeCTARProjects/VglUserGuide">VGL wiki</a>.'
+                })]);
             });
         } else if (window.location.pathname.endsWith('/jobbuilder.html')) {
             helpButtonEl.on('click', function() {

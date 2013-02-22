@@ -23,6 +23,7 @@
          var VOCAB_SERVICE_URL = "${vocabServiceUrl}";
          var NVCL_WEB_SERVICE_IP = "${nvclWebServiceIP}";
          var WEB_CONTEXT = '<%= request.getContextPath() %>';
+         var NEW_SESSION = "${isNewSession}";
       </script>
 
 

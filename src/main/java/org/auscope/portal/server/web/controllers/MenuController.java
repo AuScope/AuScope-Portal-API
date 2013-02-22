@@ -9,6 +9,7 @@ import java.util.jar.Manifest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
@@ -99,6 +100,10 @@ public class MenuController {
     */
    @RequestMapping("/*.html")
    public ModelAndView handleHtmlToView(HttpServletRequest request, HttpServletResponse response) throws IOException {
+       //Detect whether this is a new session or not...
+       HttpSession session = request.getSession();
+       boolean isNewSession = session.getAttribute("existingSession") == null;
+       session.setAttribute("existingSession", true);
 
        //Decode our request to get the view name we are actually requesting
        String requestUri = request.getRequestURI();
@@ -115,6 +120,8 @@ public class MenuController {
 
        //Give the user the view they are actually requesting
        ModelAndView mav = new ModelAndView(resourceName);
+
+       mav.addObject("isNewSession", isNewSession);
 
        //Customise the model as required
        addGoogleKeys(mav); //always add the google keys
