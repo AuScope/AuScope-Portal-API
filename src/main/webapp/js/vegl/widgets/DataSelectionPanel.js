@@ -22,13 +22,13 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
         if (!config.cswRecords) {
             config.cswRecords = [];
         }
-        
+
         var dataItems = vegl.widgets.DataSelectionPanelRow.parseCswRecords(config.cswRecords, this.region);
 
         var groupingFeature = Ext.create('Ext.grid.feature.Grouping',{
             groupHeaderTpl: '{name} ({[values.rows.length]} {[values.rows.length > 1 ? "Items" : "Item"]})'
         });
-        
+
         var hideHeaders = true;
         if (typeof(config.hideHeaders) !== 'undefined' && config.hideHeaders != null) {
             hideHeaders = config.hideHeaders;
@@ -144,7 +144,7 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                     url : dlOptions.url,
                     localPath : dlOptions.localPath,
                     name : dlOptions.name,
-                    description : dlOptions.description,
+                    description : dlOptions.description
                 }],
                 buttons : [{
                     text : 'Save Changes',

@@ -35,7 +35,7 @@ Ext.define('vegl.HelpHandler', {
                     duration: 7000,
                     keyframes: {
                         0: {
-                            opacity: 1,
+                            opacity: 1
                         },
                         20: {
                             x: xLocation - 32
