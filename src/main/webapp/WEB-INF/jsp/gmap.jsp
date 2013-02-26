@@ -31,6 +31,7 @@
       <jsp:include page="../../portal-core/cssimports.htm"/>
       <%-- JS imports - relative paths back to the webapp directory --%>
       <jsp:include page="../../portal-core/jsimports.htm"/>
+      <jsp:include page="../../portal-core/jsimports-gmap.htm"/>
       <jsp:include page="../../jsimports.htm"/>
 
       <!-- To enable text selection within a Ext JS GridPanel -->

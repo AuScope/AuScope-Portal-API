@@ -21,24 +21,8 @@
     <script type="text/javascript" src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
 
     <!-- Portal Core Includes -->
-    <link rel="stylesheet" type="text/css" href="portal-core/css/styles.css">
-    <link rel="stylesheet" type="text/css" href="portal-core/js/ext-4.1.1a/resources/css/ext-all.css">
-    <link rel="stylesheet" type="text/css" href="portal-core/js/ext-4.1.1a/examples/ux/css/CheckHeader.css">
     <jsp:include page="../../portal-core/cssimports.htm"/>
-    <script type="text/javascript" src="portal-core/js/ext-4.1.1a/ext-all-debug.js"></script>
-    <script type="text/javascript" src="portal-core/js/ext-4.1.1a/examples/ux/Spotlight.js"></script>
-    <script type="text/javascript" src="portal-core/js/extjs-patches/ext-4.1.1a/EXTJSIV-6745.js"></script>
-    <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
-    <script type="text/javascript" src="portal-core/js/portal/widgets/grid/plugin/RowContextMenu.js"></script>
-    <script type="text/javascript" src="portal-core/js/portal/widgets/tab/ActivePreRenderTabPanel.js"></script>
-    <script type="text/javascript" src="portal-core/js/ext-4.1.1a/examples/ux/RowExpander.js"></script>
-    <script type="text/javascript" src="portal-core/js/portal/util/FileDownloader.js"></script>
-    <script type="text/javascript" src="portal-core/js/portal/util/ObservableMap.js"></script>
-    <script type="text/javascript" src="portal-core/js/portal/util/help/Instruction.js"></script>
-    <script type="text/javascript" src="portal-core/js/portal/util/help/InstructionManager.js"></script>
-    <script type="text/javascript" src="portal-core/js/extjs-ux-externals/form/plugin/FieldHelpText.js"></script>
-    <link rel="stylesheet" href="portal-core/js/extjs-ux-externals/form/plugin/FieldHelpText.css">
-    <script type="text/javascript" src="portal-core/js/portal/widgets/window/ErrorWindow.js"></script>
+    <jsp:include page="../../portal-core/jsimports.htm"/>
 
     <script type="text/javascript" src="mzExt/ux/form/field/Ext.ux.form.field.CodeMirror.411.js"></script>
 
