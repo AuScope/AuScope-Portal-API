@@ -22,7 +22,7 @@ public class VEGLSeriesDao extends HibernateDaoSupport {
      */
     public List<VEGLSeries> query(final String user, final String name,
                                  final String desc) {
-        String queryString = new String("from VEGLSeries s where");
+        String queryString = "from VEGLSeries s where";
         boolean first = true;
 
         if (StringUtils.isNotEmpty(user)) {

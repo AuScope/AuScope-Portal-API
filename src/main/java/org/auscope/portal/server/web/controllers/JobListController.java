@@ -12,8 +12,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -25,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
@@ -32,7 +31,7 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
-import org.auscope.portal.server.vegl.VglDownload;
+import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -59,13 +58,16 @@ public class JobListController extends BaseCloudController  {
 
     private VEGLJobManager jobManager;
     private FileStagingService fileStagingService;
+    private VGLJobStatusAndLogReader jobStatusLogReader;
 
     @Autowired
     public JobListController(VEGLJobManager jobManager, CloudStorageService[] cloudStorageServices,
-            FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices) {
+            FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
+            VGLJobStatusAndLogReader jobStatusLogReader) {
         super(cloudStorageServices, cloudComputeServices);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
+        this.jobStatusLogReader = jobStatusLogReader;
     }
 
     /**
@@ -92,6 +94,7 @@ public class JobListController extends BaseCloudController  {
         if (jobId != null) {
             try {
                 job = jobManager.getJobById(jobId.intValue());
+                logger.debug("Job [" + job.hashCode() + "] retrieved by jobManager [" + jobManager.hashCode() + "]");
             } catch (Exception ex) {
                 logger.error(String.format("Exception when accessing jobManager for job id '%1$s'", jobId), ex);
                 return null;
@@ -298,16 +301,12 @@ public class JobListController extends BaseCloudController  {
         }
 
         try {
-            // we need to update the job status because we don't know
-            // whether or not the job has already been run
-            updateJobStatus(job);
-
             // we need to inform the user that the job cancelling is aborted
             // because the job has already been processed.
             if (job.getStatus().equals(JobBuilderController.STATUS_DONE)) {
                 return generateJSONResponseMAV(false, null, "Cancelling of job aborted as it has already been processed.");
             }
-
+    
             // terminate the EMI instance
             terminateInstance(job);
         } catch (Exception e) {
@@ -331,12 +330,12 @@ public class JobListController extends BaseCloudController  {
                 oldJobStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
             logger.debug("Skipping finished or unsubmitted job "+job.getId());
         } else {
-            // We allow the job to be cancelled and re-submitted regardless
-            // of its termination status.
-            job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-            jobManager.saveJob(job);
-            jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
             try {
+                // We allow the job to be cancelled and re-submitted regardless
+                // of its termination status.
+                job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+                jobManager.saveJob(job);
+                jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
                 CloudComputeService cloudComputeService = getComputeService(job);
                 if (cloudComputeService == null) {
                     logger.error(String.format("No cloud compute service with id '%1$s' for job '%2$s'. Cloud VM cannot be terminated", job.getComputeServiceId(), job.getId()));
@@ -379,12 +378,7 @@ public class JobListController extends BaseCloudController  {
             //terminate the EMI instance
             try {
                 logger.info("Cancelling job with ID "+ job.getId());
-                // we need to update the job status because we don't know
-                // whether or not the job has already been run
-                updateJobStatus(job);
 
-                // we need to inform the user that the job cancelling is aborted
-                // because the job has already been processed.
                 if (job.getStatus().equals(JobBuilderController.STATUS_DONE)) {
                     logger.info("Cancelling of job aborted as it has already been processed.");
                     continue;
@@ -645,77 +639,6 @@ public class JobListController extends BaseCloudController  {
 
         return generateJSONResponseMAV(true, Arrays.asList(series), "");
     }
-    
-    /**
-     * Tests whether the specified list of files contain a non empty file with the specified file name
-     * @param files
-     * @param fileName
-     * @return
-     */
-    private boolean containsFile(CloudFileInformation[] files, String fileName) {
-        if (files == null) {
-            return false;
-        }
-
-        for (CloudFileInformation file : files) {
-            if (file.getName().endsWith(fileName) && file.getSize() > 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Looks at the specified job and determines what status the job should be in
-     * based upon uploaded files.
-     * @param job
-     */
-    private void updateJobStatus(VEGLJob job) {
-        String oldStatus = job.getStatus();
-        if (oldStatus == null) {
-            oldStatus = "";
-        }
-
-        //Don't lookup files for jobs that haven't been submitted or cancelled
-        if (oldStatus.equals(JobBuilderController.STATUS_UNSUBMITTED) ||
-                oldStatus.equals(JobBuilderController.STATUS_DONE)) {
-            return;
-        }
-
-        CloudStorageService cloudStorageService = getStorageService(job);
-        if (cloudStorageService == null) {
-            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. cannot update job status", job.getStorageServiceId(), job.getId()));
-            return;
-        }
-
-        //Get the output files for this job
-        CloudFileInformation[] results = null;
-        try {
-            results = cloudStorageService.listJobFiles(job);
-        } catch (Exception e) {
-            logger.warn("Unable to list output job files", e);
-        }
-
-        boolean jobStarted = containsFile(results, "workflow-version.txt");
-        boolean jobFinished = containsFile(results, VGL_LOG_FILE);
-
-        String newStatus = oldStatus;
-        if (jobFinished) {
-            newStatus = JobBuilderController.STATUS_DONE;
-            // Tidy the stage in area (we don't need it any more - all files are replicated in the cloud)
-            // Failure here is NOT fatal - it will just result in some residual files
-            fileStagingService.deleteStageInDirectory(job);
-        } else if (jobStarted) {
-            newStatus = JobBuilderController.STATUS_ACTIVE;
-        }
-
-        if (!newStatus.equals(oldStatus)) {
-            job.setStatus(newStatus);
-            jobManager.saveJob(job);
-            jobManager.createJobAuditTrail(oldStatus, job, "Job status updated.");
-        }
-    }
 
     /**
      * Returns a JSON object containing an array of jobs for the given series.
@@ -734,15 +657,12 @@ public class JobListController extends BaseCloudController  {
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
         }
-
+        
         List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue());
         if (seriesJobs == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs for the specified series.");
         }
 
-        for (VEGLJob job : seriesJobs) {
-            updateJobStatus(job);
-        }
         return generateJSONResponseMAV(true, seriesJobs, "");
     }
 
@@ -822,7 +742,7 @@ public class JobListController extends BaseCloudController  {
                     try {
                         os = fileStagingService.writeFile(newJob, cloudFile.getName());
 
-                        writeInputToOutputStream(is, os, 1024 * 1024, false);
+                        FileIOUtil.writeInputToOutputStream(is, os, 1024 * 1024, false);
                     } finally {
                         FileIOUtil.closeQuietly(os);
                         FileIOUtil.closeQuietly(is);
@@ -859,55 +779,14 @@ public class JobListController extends BaseCloudController  {
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The specified job does not exist.");
         }
-
-        CloudStorageService cloudStorageService = getStorageService(job);
-        if (cloudStorageService == null) {
-            return generateJSONResponseMAV(false, null, "The specified job doesn't have a storage service.");
-        }
-
-        //Download the logs from cloud storage
-        String logContents = null;
-        InputStream is = null;
+        
+        ModelMap namedSections = null;
         try {
-            is = cloudStorageService.getJobFile(job, VGL_LOG_FILE);
-            logContents = IOUtils.toString(is);
-        } catch (Exception ex) {
-            log.info("Unable to lookup job logs (accessing file): " + ex.getMessage());
-            log.debug("Exception:", ex);
-            return generateJSONResponseMAV(false, null, "The specified job hasn't uploaded any logs yet.");
-        } finally {
-            FileIOUtil.closeQuietly(is);
+            namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job);
+        } catch (PortalServiceException ex) {
+            return generateJSONResponseMAV(false, null, ex.getMessage());
         }
-
-        ModelMap namedSections = new ModelMap();
-        namedSections.put("Full", logContents); //always include the full log
-
-        //Iterate through looking for start/end matches. All text between a start/end
-        //tag will be snipped out and used in their own region/section
-        Pattern p = Pattern.compile("^#### (.*) (.+) ####$[\\n\\r]*", Pattern.MULTILINE);
-        Matcher m = p.matcher(logContents);
-        int start = 0;
-        String currentSectionName = null;
-        while (m.find()) {
-            String sectionName = m.group(1);
-            String delimiter = m.group(2);
-
-            //On a new match - record the location and name
-            if (delimiter.equals("start")) {
-                start = m.end();
-                currentSectionName = sectionName;
-            } else if (delimiter.equals("end")) {
-                //On a closing pattern - ensure we are closing the current region (we don't support nesting)
-                //Take the snippet of text and store it in our result map
-                if (sectionName.equals(currentSectionName)) {
-                    String regionText = logContents.substring(start, m.start());
-                    namedSections.put(sectionName, regionText);
-                    currentSectionName = null;
-                    start = 0;
-                }
-            }
-        }
-
+        
         return generateJSONResponseMAV(true, Arrays.asList(namedSections), "");
     }
 }

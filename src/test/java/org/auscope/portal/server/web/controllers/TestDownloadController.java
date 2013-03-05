@@ -11,6 +11,7 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.test.ByteBufferedServletOutputStream;
@@ -91,7 +92,7 @@ public class TestDownloadController extends PortalTestClass {
                 oneOf(mockHttpResponse).getOutputStream();will(returnValue(servletOutputStream));
 
                 // calling the service
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)));
+                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
                     will(returnValue(dummyJSONResponseIS));
             }
         });
@@ -147,9 +148,9 @@ public class TestDownloadController extends PortalTestClass {
                 oneOf(mockHttpResponse).getOutputStream();will(returnValue(servletOutputStream));
 
                 // calling the service
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)));
+                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
                 will(returnValue(dummyJSONResponseIS));
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)));
+                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
                 will(delayReturnValue(300,dummyJSONResponseNoMsgIS));
             }
         });
@@ -206,9 +207,9 @@ public class TestDownloadController extends PortalTestClass {
                 oneOf(mockHttpResponse).getOutputStream();will(returnValue(servletOutputStream));
 
                 // calling the service
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)));
+                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
                 will(throwException(new Exception("Exception test")));
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)));
+                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
                 will(delayReturnValue(100,dummyJSONResponseIS2));
             }
         });

@@ -1134,6 +1134,7 @@ public class TestJobBuilderController {
         final String name = "name";
         final String description = "desc";
         final Integer seriesId = 5431;
+        final boolean emailNotification = true;
 
         sessionVariables.put("doubleValue", 123.45);
         sessionVariables.put("intValue", 123);
@@ -1178,6 +1179,7 @@ public class TestJobBuilderController {
                                                         computeVmId,
                                                         storageServiceId,
                                                         null,
+                                                        emailNotification,
                                                         mockRequest);
 
         Assert.assertNotNull(mav);
@@ -1226,6 +1228,7 @@ public class TestJobBuilderController {
         final int seriesId = 12;
         final int jobId = 1234;
         final String newBaseKey = "base/key";
+        final boolean emailNotification = true;
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1239,6 +1242,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("storageServiceId");
             oneOf(mockJob).setStorageBaseKey(newBaseKey);
+            oneOf(mockJob).setEmailNotification(emailNotification);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("storageServiceId"));
@@ -1256,6 +1260,7 @@ public class TestJobBuilderController {
                                                         "computeVmId",
                                                         "storageServiceId",
                                                         "registeredUrl",
+                                                        emailNotification,
                                                         mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
@@ -1266,6 +1271,7 @@ public class TestJobBuilderController {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final int seriesId = 12;
         final int jobId = 1234;
+        final boolean emailNotification = true;
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1278,6 +1284,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setComputeVmId("computeVmId");
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("storageServiceId");
+            oneOf(mockJob).setEmailNotification(emailNotification);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId"));
@@ -1294,6 +1301,7 @@ public class TestJobBuilderController {
                                                         "computeVmId",
                                                         "storageServiceId",
                                                         "registeredUrl",
+                                                        emailNotification,
                                                         mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
@@ -1308,6 +1316,7 @@ public class TestJobBuilderController {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final int seriesId = 12;
         final int jobId = 1234;
+        final boolean emailNotification = true;
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1320,6 +1329,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setComputeVmId("computeVmId");
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("storageServiceId");
+            oneOf(mockJob).setEmailNotification(emailNotification);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId-thatDNE"));
@@ -1336,6 +1346,7 @@ public class TestJobBuilderController {
                                                         "computeVmId",
                                                         "storageServiceId",
                                                         "registeredUrl",
+                                                        emailNotification,
                                                         mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
@@ -1350,6 +1361,7 @@ public class TestJobBuilderController {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final int seriesId = 12;
         final int jobId = 1234;
+        final boolean emailNotification = true;
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1362,6 +1374,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setComputeVmId("computeVmId");
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("storageServiceId");
+            oneOf(mockJob).setEmailNotification(emailNotification);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId-thatDNE"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId"));
@@ -1378,6 +1391,7 @@ public class TestJobBuilderController {
                                                         "computeVmId",
                                                         "storageServiceId",
                                                         "registeredUrl",
+                                                        emailNotification,
                                                         mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));

@@ -374,6 +374,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="computeVmId", required=false) String computeVmId,
             @RequestParam(value="storageServiceId", required=false) String storageServiceId,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
+            @RequestParam(value="emailNotification", required=false) boolean emailNotification,
             HttpServletRequest request) throws ParseException {
 
         //Get our job
@@ -396,6 +397,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setName(name);
         job.setDescription(description);
         job.setComputeVmId(computeVmId);
+        job.setEmailNotification(emailNotification);
 
         //Updating the storage service means changing the base key
         if (storageServiceId != null) {
@@ -711,6 +713,7 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         if (succeeded) {
+            //jobMonitor.queue(curJob);
             jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job submitted.");
             return generateJSONResponseMAV(true, null, "");
         } else {

@@ -15,32 +15,95 @@
         </mvc:interceptor>
     </mvc:interceptors>
 
-   <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
-   <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->
-   <bean id="propertyConfigurer" class="org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer">
-      <property name="locations">
-         <list>
-            <value>classpath:config.properties</value>
-            <!--  Spring SpEL magic - use context parameter or the default war env.properties -->
-            <value>#{contextParameters['envPropertiesLocation'] ?: 'classpath:env.properties'}</value>
-         </list>
-      </property>
-   </bean>
+    <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
+    <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->
+    <bean id="propertyConfigurer" class="org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:config.properties</value>
+                <!--  Spring SpEL magic - use context parameter or the default war env.properties -->
+                <value>#{contextParameters['envPropertiesLocation'] ?: 'classpath:env.properties'}</value>
+            </list>
+        </property>
+    </bean>
 
-   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-      <property name="driverClassName" value="${jdbc.driverClass}"/>
-      <property name="url" value="${HOST.jdbc.url}"/>
-      <property name="username" value="${env.jdbc.user}"/>
-      <property name="password" value="${env.jdbc.password}"/>
-   </bean>
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driverClass}"/>
+        <property name="url" value="${HOST.jdbc.url}"/>
+        <property name="username" value="${env.jdbc.user}"/>
+        <property name="password" value="${env.jdbc.password}"/>
+    </bean>
 
-   <!-- This is the core threadpool shared by object instances throughout the portal -->
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${HOST.smtp.server}" />
+    </bean>
+
+    <bean id="templateMessage" class="org.springframework.mail.SimpleMailMessage">
+        <property name="from">
+            <value>
+                <![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]>
+            </value>
+        </property>
+        <property name="subject" value="VGL Job (%s/%s)" />
+    </bean>
+
+    <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+        <property name="velocityProperties">
+            <value>
+                resource.loader=class
+                class.resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+            </value>
+        </property>
+    </bean>
+    
+    <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor">
+    </bean>
+    
+    <bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">      
+        <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
+        <property name="dateFormat" value="EEE, d MMM yyyy HH:mm:ss" />
+        <property name="maxLengthForSeriesNameInSubject" value="15" />
+        <property name="maxLengthForJobNameInSubject" value="15" />
+        <property name="maxLinesForTail" value="5" />
+    </bean>
+    
+    <bean name="vglJobStatusMonitor" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass" value="org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor" />
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="jobManager" value-ref="veglJobManager"/>
+                <entry key="jobStatusLogReader" value-ref="jobStatusLogReader"/>
+                <entry key="jobStatusChangeListeners">
+                    <array>
+                        <bean class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor">
+                        </bean>
+                    </array>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <!-- Simple Trigger for vglJobStatusMonitor task, run every 30 seconds -->
+    <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+        <property name="jobDetail" ref="vglJobStatusMonitor" />
+        <property name="repeatInterval" value="30000" />
+        <property name="startDelay" value="10000" />
+    </bean>
+    
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="simpleTrigger" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- This is the core threadpool shared by object instances throughout the portal -->
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="corePoolSize" value="5" />
         <property name="maxPoolSize" value="5" />
         <property name="queueCapacity" value="25" />
     </bean>
-
 
     <bean id="httpServiceCaller" class="org.auscope.portal.core.server.http.HttpServiceCaller">
         <constructor-arg name="clientParams">
@@ -52,7 +115,7 @@
             </bean>
         </constructor-arg>
     </bean>
-
+    
     <bean id="viewCswRecordFactory" class="org.auscope.portal.core.view.ViewCSWRecordFactory">
     </bean>
 
@@ -79,7 +142,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="opendapService" class="org.auscope.portal.core.services.OpendapService">
+    <bean id="opendapService" class="org.auscope.portal.core.services.OpendapService" >
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
         <constructor-arg name="getDataMethodMaker">
             <bean class="org.auscope.portal.core.services.methodmakers.OPeNDAPGetDataMethodMaker">
@@ -228,9 +291,8 @@
         </constructor-arg>
     </bean>
 
-
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-   </bean>
+    </bean>
 
     <bean id="veglJobManager" class="org.auscope.portal.server.vegl.VEGLJobManager">
         <property name="veglJobDao" ref="veglJobDao"/>

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -31,7 +32,6 @@ public class VEGLJobDao extends HibernateDaoSupport {
      * Retrieves jobs that belong to a specific email
      *
      * @param emailAddress the email whose jobs are to be retrieved
-
      */
     @SuppressWarnings("unchecked")
     public List<VEGLJob> getJobsByEmail(final String emailAddress) {
@@ -39,7 +39,20 @@ public class VEGLJobDao extends HibernateDaoSupport {
             .findByNamedParam("from VEGLJob j where j.emailAddress=:email",
                     "email", emailAddress);
     }
-
+    
+    /**
+     * Retrieves jobs that are either pending or active.
+     * 
+     * @return a list of pending or active jobs.
+     */
+    @SuppressWarnings("unchecked")
+    public List<VEGLJob> getPendingOrActiveJobs() {
+        String query = "from VEGLJob j where lower(j.status)='" 
+                + JobBuilderController.STATUS_PENDING + "' or lower(j.status)='" 
+                + JobBuilderController.STATUS_ACTIVE + "'";
+        return (List<VEGLJob>) getHibernateTemplate().find(query);
+    }
+    
     /**
      * Retrieves the job with given ID.
      */

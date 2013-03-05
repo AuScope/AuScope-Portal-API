@@ -20,6 +20,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
 
     private String registeredUrl;
     private Integer seriesId;
+    private boolean emailNotification;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -38,8 +39,10 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param id ID for this job
      * @param description Description of this job
      * @param submitDate The date of submission for this job
+     * @param processDate The date when this job was processed
      * @param user The username of whoever is running this job
      * @param emailAddress The contact email for whoever is running this job
+     * @param emailNotification The email notification flag for this job
      * @param status The descriptive status of this job
      * @param ec2InstanceId The ID of the running AMI instance (not the actual AMI ID).
      * @param ec2Endpoint The endpoint for the elastic compute cloud
@@ -73,7 +76,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
         this.registeredUrl = registeredUrl;
     }
 
-
     /**
      * Gets the ID of the series this job belongs to
      * @return
@@ -88,6 +90,22 @@ public class VEGLJob extends CloudJob implements Cloneable {
      */
     public void setSeriesId(Integer seriesId) {
         this.seriesId = seriesId;
+    }
+    
+    /**
+     * Gets the email notification flag for this job
+     * @return
+     */
+    public boolean getEmailNotification() {
+        return emailNotification;
+    }
+
+    /**
+     * Sets the email notification flag for this job
+     * @param seriesId
+     */
+    public void setEmailNotification(boolean emailNotification) {
+        this.emailNotification = emailNotification;
     }
 
     /**

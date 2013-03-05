@@ -23,6 +23,7 @@ import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.core.services.responses.csw.CSWResponsibleParty;
 import org.auscope.portal.core.services.responses.wms.GetCapabilitiesRecord;
 import org.auscope.portal.core.services.responses.wms.GetCapabilitiesWMSLayerRecord;
+import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.core.view.ViewCSWRecordFactory;
 import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,6 +219,6 @@ public class WMSController extends BaseCSWController {
 
       String responseString = wmsService.getFeatureInfo(wmsUrl, infoFormat, queryLayers, "EPSG:4326", Math.min(lng1, lng2), Math.min(lat1, lat2), Math.max(lng1, lng2), Math.max(lat1, lat2), Integer.parseInt(width), Integer.parseInt(height), Double.parseDouble(longitude), Double.parseDouble(latitude), Integer.parseInt(x), Integer.parseInt(y), "", null);
       InputStream responseStream = new ByteArrayInputStream(responseString.getBytes());
-      this.writeInputToOutputStream(responseStream, response.getOutputStream(), 1024*1024, true);
+      FileIOUtil.writeInputToOutputStream(responseStream, response.getOutputStream(), 1024*1024, true);
    }
 }

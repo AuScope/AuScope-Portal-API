@@ -15,11 +15,11 @@ public class VEGLSeries implements Serializable {
 	/** A unique identifier for this series */
     private Integer id;
     /** The user owning this series */
-    private String  user;
+    private String user;
     /** A short name for this series */
-    private String  name;
+    private String name;
     /** A description of this series */
-    private String  description;
+    private String description;
 
     /**
      * Default constructor.
@@ -103,7 +103,7 @@ public class VEGLSeries implements Serializable {
         assert (name != null);
         this.name = name;
     }
-
+    
     /**
      * Returns a String representing the state of this <code>GeodesySeries</code>
      * object.

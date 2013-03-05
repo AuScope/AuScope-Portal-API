@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class VEGLJobManager {
     protected final Log logger = LogFactory.getLog(getClass());
-
+    
     private VEGLJobDao veglJobDao;
     private VEGLSeriesDao veglSeriesDao;
     private VGLJobAuditLogDao vglJobAuditLogDao;
@@ -29,6 +29,10 @@ public class VEGLJobManager {
         return veglJobDao.getJobsOfSeries(seriesId);
     }
 
+    public List<VEGLJob> getPendingOrActiveJobs() {
+        return veglJobDao.getPendingOrActiveJobs();
+    }
+    
     public VEGLJob getJobById(int jobId) {
         return veglJobDao.get(jobId);
     }
@@ -48,7 +52,7 @@ public class VEGLJobManager {
     public void saveJob(VEGLJob veglJob) {
         veglJobDao.save(veglJob);
     }
-
+    
     /**
      * Create the job life cycle audit trail. If the creation is unsuccessful, it
      * will silently fail and log the failure message to error log.

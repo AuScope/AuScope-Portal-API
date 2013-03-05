@@ -11,6 +11,7 @@
         <property name="emailAddress"/>
         <property name="user"/>
         <property name="submitDate"/>
+        <property name="processDate"/>
         <property name="status"/>
         <property name="computeServiceId"/>
         <property name="computeVmId"/>
@@ -21,6 +22,7 @@
         <property name="registeredUrl"/>
         <property name="seriesId"/>
         <property name="storageBaseKey"/>
+        <property name="emailNotification" type="yes_no" />
 
         <map name="jobParameters" lazy="false" cascade="all" inverse="true">
             <key column="jobId"/>
@@ -34,4 +36,3 @@
         </bag>
     </class>
 </hibernate-mapping>
-

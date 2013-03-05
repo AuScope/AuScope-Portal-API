@@ -184,6 +184,16 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     ptype: 'fieldhelptext',
                     text: 'Select a toolbox that contains software that you would like to use to process your data.'
                 }]
+            },{
+                xtype : 'checkboxfield',
+                fieldLabel : 'Email Notification',
+                name: 'emailNotification',
+                itemId : 'emailNotification',
+                checked: true,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Tick to receive email notification upon job processing.'
+                }]
             },
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'storageProvider' },
@@ -258,6 +268,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         var compute = this.getComponent('computeServiceId');
         var storage = this.getComponent('storageServiceId');
         var toolbox = this.getComponent('image-combo');
+        var emailNotification = this.getComponent('emailNotification');
 
         return [Ext.create('portal.util.help.Instruction', {
             highlightEl : name.getEl(),
@@ -284,6 +295,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             title : 'Storage Toolbox',
             anchor : 'bottom',
             description : 'A toolbox is a collection of software packages that will be made available to your job when it starts processing. Some toolboxes are restricted to authorised users for licensing reasons. You will not be able to choose a toolbox until after you select a compute provider.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : emailNotification.getEl(),
+            title : 'Job completion email notification',
+            anchor : 'bottom',
+            description : 'VGL will send out email notification to your email address upon job completion. Untick the checkbox if you don\'t want to receive the notification.'
         })];
     }
 });
