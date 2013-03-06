@@ -130,14 +130,13 @@ public class VGLJobStatusAndLogReader extends BaseCloudController {
         //Get the output files for this job
         CloudStorageService cloudStorageService = getStorageService(job);
         if (cloudStorageService == null) {
-            log.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. cannot update job status", job.getStorageServiceId(), job.getId()));
+            log.warn(String.format("No cloud storage service with id '%1$s' for job '%2$s'. cannot update job status", job.getStorageServiceId(), job.getId()));
             return job.getStatus();
         }
         CloudFileInformation[] results = null;
         try {
             results = cloudStorageService.listJobFiles(job);
         } catch (Exception e) {
-            log.warn("Unable to list output job files", e);
             return job.getStatus();
         }
 
