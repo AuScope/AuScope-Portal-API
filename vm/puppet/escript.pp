@@ -83,6 +83,7 @@ exec { "escript-co":
     command => "/usr/bin/svn co https://svn.esscc.uq.edu.au/svn/esys13/trunk escript_trunk",
     creates => "/tmp/escript_trunk",
     require => [Puppi::Netinstall["sympy"], Puppi::Netinstall["proj"], Puppi::Netinstall["gdal"], Puppi::Netinstall['openmpi'], Puppi::Netinstall['silo']],
+    timeout => 0,
 }
 # Copy vm_options.py to <hostname>_options.py AND set the mpi prefix to correct values
 exec { "escript-config":

@@ -55,6 +55,7 @@
     <script src="js/ScriptBuilder/templates/UbcGravityTemplate.js" type="text/javascript"></script>
     <script src="js/ScriptBuilder/templates/UbcMagneticTemplate.js" type="text/javascript"></script>
     <script src="js/ScriptBuilder/templates/EScriptGravityTemplate.js" type="text/javascript"></script>
+    <script src="js/ScriptBuilder/templates/EScriptJointTemplate.js" type="text/javascript"></script>
     <script src="js/ScriptBuilder/templates/UnderworldGocadTemplate.js" type="text/javascript"></script>
     <script type="text/javascript" src="js/ScriptBuilder/ScriptBuilder.js"></script>
     <script type="text/javascript" src="js/ScriptBuilder/InsertionPromptWindow.js"></script>

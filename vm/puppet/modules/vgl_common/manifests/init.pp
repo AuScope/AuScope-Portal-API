@@ -10,7 +10,7 @@ class vgl_common {
     }
     
     # Install default pip packages
-    package {  ["numpy", "boto", "pyproj"]:
+    package {  ["numpy", "boto", "pyproj", "swift"]:
         ensure => installed,
         provider => "pip",
         require => Class["python_pip"],
