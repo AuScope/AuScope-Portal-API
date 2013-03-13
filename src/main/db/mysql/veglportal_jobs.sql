@@ -41,6 +41,8 @@ CREATE TABLE `jobs` (
   `storageBaseKey` varchar(255) DEFAULT NULL,
   `registeredUrl` varchar(255) DEFAULT NULL,
   `seriesId` int(11) DEFAULT NULL,
+  `processDate` datetime DEFAULT NULL,
+  `emailNotification` char(1) DEFAULT 'N',
   PRIMARY KEY (`id`),
   KEY `SERIES` (`seriesId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
