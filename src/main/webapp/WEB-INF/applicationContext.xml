@@ -38,15 +38,6 @@
         <property name="host" value="${HOST.smtp.server}" />
     </bean>
 
-    <bean id="templateMessage" class="org.springframework.mail.SimpleMailMessage">
-        <property name="from">
-            <value>
-                <![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]>
-            </value>
-        </property>
-        <property name="subject" value="VGL Job (%s/%s)" />
-    </bean>
-
     <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
         <property name="velocityProperties">
             <value>
@@ -65,6 +56,8 @@
         <property name="maxLengthForSeriesNameInSubject" value="15" />
         <property name="maxLengthForJobNameInSubject" value="15" />
         <property name="maxLinesForTail" value="5" />
+        <property name="emailSender"><value><![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]></value></property>
+        <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
     
     <bean name="vglJobStatusMonitor" class="org.springframework.scheduling.quartz.JobDetailBean">

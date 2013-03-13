@@ -13,6 +13,16 @@ import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
+ * A task that monitors any pending or active VGL jobs. It
+ * will trigger JobStatusChangeListener(s) to run when the 
+ * job being processed changes its status.
+ * 
+ * The timing for running this task is configured in 
+ * applicationContext.xml file.
+ * 
+ * It uses VEGLJobManager to retrieve pending or active job(s)
+ * from the database and VGLJobStatusAndLogReader to poll
+ * each job execution status from s3 cloud storage.
  * 
  * @author Richard Goh
  */
@@ -23,14 +33,29 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     private VGLJobStatusAndLogReader jobStatusLogReader;
     private JobStatusChangeListener[] jobStatusChangeListeners;
     
+    /**
+     * Sets the job manager to be used for querying 
+     * pending or active jobs from VGL DB.
+     * @param jobManager
+     */
     public void setJobManager(VEGLJobManager jobManager) {
         this.jobManager = jobManager;
     }
     
+    /**
+     * Sets the job status log reader to be used for
+     * querying job status from S3 storage.
+     * @param jobStatusLogReader
+     */
     public void setJobStatusLogReader(VGLJobStatusAndLogReader jobStatusLogReader) {
         this.jobStatusLogReader = jobStatusLogReader;
     }
     
+    /**
+     * Sets a list of JobStatusChangeListener objects to be 
+     * used handling job status change.
+     * @param jobStatusChangeListeners
+     */
     public void setJobStatusChangeListeners(JobStatusChangeListener[] jobStatusChangeListeners) {
         this.jobStatusChangeListeners = jobStatusChangeListeners;
     }
@@ -48,10 +73,9 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext ctx)
-            throws JobExecutionException {        
+            throws JobExecutionException {
         List<VEGLJob> jobs = jobManager.getPendingOrActiveJobs();
-        LOG.trace("Number of pending or active job(s): [" + jobs.size()
-                + "] retrieved by JobManager [" + jobManager.hashCode() + "]");
+        LOG.trace("Number of pending or active job(s): [" + jobs.size() + "]");
 
         for (VEGLJob job : jobs) {
             String oldStatus = job.getStatus();

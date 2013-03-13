@@ -11,6 +11,16 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 
+/**
+ * A handler that provides the concrete implementation of 
+ * JobStatusChangeListener.
+ * 
+ * It uses VEGLJobManager to update job status and to create job
+ * audit trail record. In addition, it uses JobMailSender to
+ * send out email notification upon job processing.
+ * 
+ * @author Richard Goh
+ */
 public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
     private final Log LOG = LogFactory.getLog(getClass());
     

@@ -101,7 +101,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController {
      */
     public String getSectionedLog(VEGLJob job, String sectionName) {
         try {
-            HashMap sectLogs = getSectionedLogs(job);
+            HashMap sectLogs = getSectionedLogs(job);            
             return (String)sectLogs.get(sectionName);
         } catch (PortalServiceException ex) {
             log.debug(ex.getMessage());
@@ -142,7 +142,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController {
 
         boolean jobStarted = containsFile(results, "workflow-version.txt");
         boolean jobFinished = containsFile(results, JobListController.VGL_LOG_FILE);
-        
+                
         if (jobFinished) {
             return JobBuilderController.STATUS_DONE;
         } else if (jobStarted) {

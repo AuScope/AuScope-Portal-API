@@ -10,6 +10,19 @@ import org.auscope.portal.server.vegl.VEGLSeries;
  * @author Richard Goh
  */
 public interface JobMailSender {
+    /**
+     * Constructs job notification email content.
+     * 
+     * @param jobSeries The VEGLSeries object
+     * @param job The VEGLJob object 
+     * @return 
+     */
     public String constructMailContent(VEGLSeries jobSeries, VEGLJob job);
+    
+    /**
+     * Sends email with SMTP protocol.
+     * 
+     * @param job
+     */
     public void sendMail(VEGLJob job);
 }

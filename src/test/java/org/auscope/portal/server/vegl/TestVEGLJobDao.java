@@ -10,6 +10,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.auscope.portal.server.test.VGLPortalTestClass;
+import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,6 +96,28 @@ public class TestVEGLJobDao extends VGLPortalTestClass {
         vglJobList = testDao.getJobsByEmail(emailAddress2);
         Assert.assertNotNull(vglJobList);
         Assert.assertTrue(vglJobList.size() == 0);
+    }
+    
+    /**
+     * Test that the retrieving of pending or active jobs succeeds.
+     */
+    @Test
+    public void testGetPendingOrActiveJobs() {
+        final String query = "from VEGLJob j where lower(j.status)='" 
+                + JobBuilderController.STATUS_PENDING + "' or lower(j.status)='" 
+                + JobBuilderController.STATUS_ACTIVE + "'";
+        final List<VEGLJob> mockVGLJobList1 = Arrays.asList(
+                context.mock(VEGLJob.class, "mockVGLJob1"),
+                context.mock(VEGLJob.class, "mockVGLJob2"));
+
+        context.checking(new Expectations() {{
+            oneOf(mockTemplate).find(query);will(returnValue(mockVGLJobList1));
+        }});
+
+        // Test to ensure non-empty list is returned
+        List<VEGLJob> jobs = testDao.getPendingOrActiveJobs();
+        Assert.assertNotNull(jobs);
+        Assert.assertTrue(jobs.size() > 0);
     }
     
     /**

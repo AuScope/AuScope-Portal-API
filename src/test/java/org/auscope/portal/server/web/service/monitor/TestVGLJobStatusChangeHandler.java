@@ -24,9 +24,12 @@ public class TestVGLJobStatusChangeHandler extends PortalTestClass {
     
     @Before
     public void init() {
+        //Mock objects required for the unit tests
         mockJobManager = context.mock(VEGLJobManager.class);
         mockJobMailSender = context.mock(JobMailSender.class);
         mockJob = context.mock(VEGLJob.class);
+        
+        //This is the component under test
         handler = new VGLJobStatusChangeHandler(mockJobManager, 
                 mockJobMailSender);
     }
