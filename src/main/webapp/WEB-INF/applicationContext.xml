@@ -46,11 +46,11 @@
             </value>
         </property>
     </bean>
-    
+
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor">
     </bean>
-    
-    <bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">      
+
+    <bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">
         <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
         <property name="dateFormat" value="EEE, d MMM yyyy HH:mm:ss" />
         <property name="maxLengthForSeriesNameInSubject" value="15" />
@@ -59,7 +59,7 @@
         <property name="emailSender"><value><![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]></value></property>
         <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
-    
+
     <bean name="vglJobStatusMonitor" class="org.springframework.scheduling.quartz.JobDetailBean">
         <property name="jobClass" value="org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor" />
         <property name="jobDataAsMap">
@@ -75,14 +75,14 @@
             </map>
         </property>
     </bean>
-    
+
     <!-- Simple Trigger for vglJobStatusMonitor task, run every 30 seconds -->
     <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
         <property name="jobDetail" ref="vglJobStatusMonitor" />
         <property name="repeatInterval" value="30000" />
         <property name="startDelay" value="10000" />
     </bean>
-    
+
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="taskExecutor" ref="taskExecutor" />
         <property name="triggers">
@@ -109,7 +109,7 @@
             </bean>
         </constructor-arg>
     </bean>
-    
+
     <bean id="viewCswRecordFactory" class="org.auscope.portal.core.view.ViewCSWRecordFactory">
     </bean>
 
@@ -204,7 +204,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-0000002d"/>
+                    <constructor-arg name="imageId" value="ami-00000030"/>
                     <property name="name" value="escript"/>
                     <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
                     <property name="keywords">
@@ -252,7 +252,7 @@
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-0000043b"/>
+                    <constructor-arg name="imageId" value="ami-00000443"/>
                     <property name="name" value="escript"/>
                     <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
                     <property name="keywords">

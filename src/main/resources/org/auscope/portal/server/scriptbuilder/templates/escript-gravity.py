@@ -50,8 +50,28 @@ db.setVerticalExtents(depth=DEPTH, air_layer=AIR, num_cells=NE_Z)
 db.setPadding(PAD_X, PAD_Y)
 inv=GravityInversion()
 inv.setup(db)
-g, chi = inv.getForwardModel().getSurvey(0)
+g, chi =  db.getGravitySurveys()[0]
 density=inv.run()
-saveAndUpload('result.silo', density_mask=inv.getRegularization().location_of_set_m, gravity_anomaly=g[2], gravity_weight=chi[2], density=density)
+saveAndUpload('result.silo', gravity_anomaly=g, gravity_weight=chi, density=density)
 
 
+# Visualise result.silo using VisIt
+import visit
+visit.LaunchNowin()
+saveatts = visit.SaveWindowAttributes()
+saveatts.fileName = 'result-visit.png'
+saveatts.family = 0 # this disables appending of a number # other interesting attributes:
+saveatts.width = 1024
+saveatts.height = 768
+#saveatts.outputDirectory =
+saveatts.outputToCurrentDirectory = 1
+visit.SetSaveWindowAttributes(saveatts)
+visit.OpenDatabase('result.silo')
+visit.AddPlot('Contour', 'density') # or Pseudocolor
+c=visit.ContourAttributes()
+c.colorType=c.ColorByColorTable
+c.colorTableName = "hot"
+visit.SetPlotOptions(c)
+visit.DrawPlots()
+visit.SaveWindow()
+subprocess.call(["cloud", "upload", "result-visit.png", "result-visit.png", "--set-acl=public-read"])
