@@ -53,7 +53,7 @@ Ext.define('ScriptBuilder.templates.EScriptGravityTemplate', {
                 fieldLabel : 'Max Depth',
                 anchor : '-20',
                 name : 'max-depth',
-                value : 4000,
+                value : 40000,
                 allowBlank : false,
                 plugins: [{
                     ptype: 'fieldhelptext',

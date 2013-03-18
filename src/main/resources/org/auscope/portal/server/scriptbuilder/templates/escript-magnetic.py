@@ -13,10 +13,12 @@
 #
 ##############################################################################
 
-"""3D gravity inversion using netCDF data"""
+"""3D magnetic inversion example using netCDF data"""
 
 # Filename for input data
-DATASET = '${inversion-file}'
+DATASET='${inversion-file}'
+# background magnetic flux density (B_north, B_east, B_vertical)
+B_b = [${bb-north}, ${bb-east}, ${bb-vertical}]
 # maximum depth (in meters)
 DEPTH = ${max-depth}
 # buffer zone above data (in meters; 6-10km recommended)
@@ -35,7 +37,6 @@ import sys
 
 try:
     from esys.downunder import *
-    from esys.escript import unitsSI as U
     from esys.weipa import saveSilo
 except ImportError:
     line=["/opt/escript/bin/run-escript","-t4"]+sys.argv
@@ -46,18 +47,19 @@ def saveAndUpload(fn, **args):
     saveSilo(fn, **args)
     subprocess.call(["cloud", "upload", fn, fn, "--set-acl=public-read"])
 
-DATA_UNITS = 1e-6 * U.m/(U.sec**2)
-source=NetCdfData(DataSource.GRAVITY, DATASET, scale_factor=DATA_UNITS)
+DATA_UNITS = U.Nano * U.Tesla
+source=NetCdfData(DataSource.MAGNETIC, DATASET, scale_factor=DATA_UNITS)
 db=DomainBuilder()
 db.addSource(source)
 db.setVerticalExtents(depth=DEPTH, air_layer=AIR, num_cells=NE_Z)
 db.setFractionalPadding(PAD_X, PAD_Y)
-db.fixDensityBelow(depth=DEPTH)
-inv=GravityInversion()
+db.setBackgroundMagneticFluxDensity(B_b)
+db.fixSusceptibilityBelow(depth=DEPTH)
+inv=MagneticInversion()
 inv.setup(db)
-g, chi =  db.getGravitySurveys()[0]
-density=inv.run()
-saveAndUpload('result.silo', gravity_anomaly=g, gravity_weight=chi, density=density)
+B, w =  db.getMagneticSurveys()[0]
+susceptibility=inv.run()
+saveAndUpload('result.silo', magnetic_anomaly=B, magnetic_weight=w, susceptibility=susceptibility)
 print("Results saved in result.silo")
 
 
@@ -73,7 +75,7 @@ saveatts.resConstraint = saveatts.NoConstraint
 saveatts.outputToCurrentDirectory = 1
 visit.SetSaveWindowAttributes(saveatts)
 visit.OpenDatabase('result.silo')
-visit.AddPlot('Contour', 'density')
+visit.AddPlot('Contour', 'susceptibility')
 c=visit.ContourAttributes()
 c.colorType=c.ColorByColorTable
 c.colorTableName = "hot"

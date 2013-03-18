@@ -1,7 +1,7 @@
 /**
- * A template for generating a eScript joint gravity/magnetic inversion example.
+ * A template for generating a eScript magnetic inversion example.
  */
-Ext.define('ScriptBuilder.templates.EScriptJointTemplate', {
+Ext.define('ScriptBuilder.templates.EScriptMagneticTemplate', {
     extend : 'ScriptBuilder.templates.BaseTemplate',
 
     description : null,
@@ -17,41 +17,14 @@ Ext.define('ScriptBuilder.templates.EScriptJointTemplate', {
     requestScript : function(callback) {
         var jobId = this.wizardState.jobId;
 
-        this._getTemplatedScriptGui(callback, 'escript-joint.py', {
+        this._getTemplatedScriptGui(callback, 'escript-magnetic.py', {
             xtype : 'form',
-            width : 575,
-            height : 520,
+            width : 540,
+            height : 370,
             items : [{
                 xtype : 'combo',
-                fieldLabel : 'Magnetic Dataset',
-                name : 'magnetic-file',
-                allowBlank : false,
-                valueField : 'localPath',
-                displayField : 'localPath',
-                anchor : '-20',
-                plugins: [{
-                    ptype: 'fieldhelptext',
-                    text: 'The path to a NetCDF input file.'
-                }],
-                store : Ext.create('Ext.data.Store', {
-                    model : 'vegl.models.Download',
-                    proxy : {
-                        type : 'ajax',
-                        url : 'getAllJobInputs.do',
-                        extraParams : {
-                            jobId : jobId
-                        },
-                        reader : {
-                            type : 'json',
-                            root : 'data'
-                        }
-                    },
-                    autoLoad : true
-                })
-            },{
-                xtype : 'combo',
-                fieldLabel : 'Gravity Dataset',
-                name : 'gravity-file',
+                fieldLabel : 'Dataset',
+                name : 'inversion-file',
                 allowBlank : false,
                 valueField : 'localPath',
                 displayField : 'localPath',
@@ -106,7 +79,7 @@ Ext.define('ScriptBuilder.templates.EScriptJointTemplate', {
                 fieldLabel : 'Max Depth',
                 anchor : '-20',
                 name : 'max-depth',
-                value : 40000,
+                value : 4000,
                 allowBlank : false,
                 plugins: [{
                     ptype: 'fieldhelptext',
@@ -162,42 +135,6 @@ Ext.define('ScriptBuilder.templates.EScriptJointTemplate', {
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'The amount of horizontal padding in the Y direction. This affects end result, about 20% recommended'
-                }]
-            },{
-                xtype : 'fieldset',
-                title : 'Trade-off Factors',
-                margin : 5,
-                items : [{
-                    xtype : 'displayfield',
-                    anchor : '-20',
-                    hideLabel : true,
-                    fieldStyle : {
-                        //'font-style' : 'italic',
-                        'font-size' : '10px'
-                    },
-                    value : 'For a detailed description of these values, please consult the <a href="http://esys.esscc.uq.edu.au/esys13/nightly/inversion/inversion.pdf" target="_blank">escript inversion cookbook.</a>'
-                },{
-                    xtype : 'numberfield',
-                    fieldLabel : 'Mu Gravity',
-                    anchor : '-5',
-                    name : 'mu-gravity',
-                    value : 0.0,
-                    allowBlank : false,
-                    labelWidth : 83,
-                    minValue : 0,
-                    maxValue : 1,
-                    step : 0.1
-                },{
-                    xtype : 'numberfield',
-                    fieldLabel : 'Mu Magnetic',
-                    anchor : '-5',
-                    name : 'mu-magnetic',
-                    value : 0.0,
-                    allowBlank : false,
-                    minValue : 0,
-                    maxValue : 1,
-                    labelWidth : 83,
-                    step : 0.1
                 }]
             }]
         });

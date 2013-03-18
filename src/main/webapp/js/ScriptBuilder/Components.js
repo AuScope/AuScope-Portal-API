@@ -62,6 +62,12 @@ ScriptBuilder.Components.getEscriptExamples = function() {
             qtip : "Perform a gravity inversion using escript. Expects data in the form of a NetCDF file. Double click to use this example.",
             leaf : true
         },{
+            id   : "ScriptBuilder.templates.EScriptMagneticTemplate",
+            type : "s",
+            text : "Magnetic Inversion",
+            qtip : "Perform a magnetic inversion using escript. Expects data in the form of a NetCDF file. Double click to use this example.",
+            leaf : true
+        },{
             id   : "ScriptBuilder.templates.EScriptJointTemplate",
             type : "s",
             text : "Joint Inversion",
