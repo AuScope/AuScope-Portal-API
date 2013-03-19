@@ -106,6 +106,10 @@ visit.SaveWindow() # save susceptibility image
 visit.ChangeActivePlotsVar('density')
 saveatts.fileName = 'result-density.png'
 visit.SetSaveWindowAttributes(saveatts)
+v=visit.GetView3D()
+v.viewNormal=(-0.554924, 0.703901, 0.443377)
+v.viewUp=(0.272066, -0.3501, 0.896331)
+visit.SetView3D(v)
 visit.SaveWindow() # save density image
 visit.DeleteAllPlots()
 visit.CloseDatabase('result.silo')

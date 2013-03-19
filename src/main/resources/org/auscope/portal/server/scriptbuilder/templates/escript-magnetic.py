@@ -84,6 +84,10 @@ c.colorType=c.ColorByColorTable
 c.colorTableName = "hot"
 visit.SetPlotOptions(c)
 visit.DrawPlots()
+v=visit.GetView3D()
+v.viewNormal=(-0.554924, 0.703901, 0.443377)
+v.viewUp=(0.272066, -0.3501, 0.896331)
+visit.SetView3D(v)
 visit.SaveWindow()
 subprocess.call(["cloud", "upload", "result-visit.png", "result-visit.png", "--set-acl=public-read"])
 visit.DeleteAllPlots()
