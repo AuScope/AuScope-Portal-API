@@ -63,23 +63,23 @@ Ext.define('ScriptBuilder.templates.EScriptMagneticTemplate', {
                 },
                 items: [
                     {xtype: 'displayfield', value: '('},
-                    {xtype: 'numberfield',  name: 'bb-north', width: 80, value: 0},
+                    {xtype: 'numberfield',  name: 'bb-north', width: 80, value: 29800},
                     {xtype: 'displayfield', value: 'North ) ('},
-                    {xtype: 'numberfield',  name: 'bb-east', width: 80, value: 0},
+                    {xtype: 'numberfield',  name: 'bb-east', width: 80, value: 2780},
                     {xtype: 'displayfield', value: 'East ) ('},
-                    {xtype: 'numberfield',  name: 'bb-vertical', width: 80, value: 0},
+                    {xtype: 'numberfield',  name: 'bb-vertical', width: 80, value: -44000},
                     {xtype: 'displayfield', value: 'Vertical )'}
                 ],
                 plugins: [{
                     ptype: 'fieldhelptext',
-                    text: 'The background magnetic flux density.'
+                    text: 'The background magnetic flux density in <b>nano Tesla</b>. Values for Australia can be calculated at the <a href="http://www.ga.gov.au/oracle/geomag/agrfform.jsp" target="_blank">Geoscience Australia website</a>'
                 }]
             },{
                 xtype : 'numberfield',
                 fieldLabel : 'Max Depth',
                 anchor : '-20',
                 name : 'max-depth',
-                value : 4000,
+                value : 40000,
                 allowBlank : false,
                 plugins: [{
                     ptype: 'fieldhelptext',

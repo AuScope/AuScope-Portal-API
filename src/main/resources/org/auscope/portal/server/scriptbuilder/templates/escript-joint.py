@@ -53,6 +53,7 @@ def saveAndUpload(fn, **args):
     saveSilo(fn, **args)
     subprocess.call(["cloud", "upload", fn, fn, "--set-acl=public-read"])
 
+B_b=[b*U.Nano*U.Tesla for b in B_b]
 MAG_UNITS = U.Nano * U.Tesla
 GRAV_UNITS = 1e-6 * U.m/(U.sec**2)
 

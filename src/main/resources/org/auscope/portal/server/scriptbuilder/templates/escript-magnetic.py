@@ -17,7 +17,7 @@
 
 # Filename for input data
 DATASET='${inversion-file}'
-# background magnetic flux density (B_north, B_east, B_vertical)
+# background magnetic flux density (B_north, B_east, B_vertical) in nano Tesla.
 B_b = [${bb-north}, ${bb-east}, ${bb-vertical}]
 # maximum depth (in meters)
 DEPTH = ${max-depth}
@@ -37,6 +37,7 @@ import sys
 
 try:
     from esys.downunder import *
+    from esys.escript import unitsSI as U
     from esys.weipa import saveSilo
 except ImportError:
     line=["/opt/escript/bin/run-escript","-t4"]+sys.argv
@@ -47,6 +48,8 @@ def saveAndUpload(fn, **args):
     saveSilo(fn, **args)
     subprocess.call(["cloud", "upload", fn, fn, "--set-acl=public-read"])
 
+#Convert entered nano Tesla to Tesla
+B_b=[b*U.Nano*U.Tesla for b in B_b]
 DATA_UNITS = U.Nano * U.Tesla
 source=NetCdfData(DataSource.MAGNETIC, DATASET, scale_factor=DATA_UNITS)
 db=DomainBuilder()
