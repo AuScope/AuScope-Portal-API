@@ -18,7 +18,7 @@
 # Set parameters
 MAGNETIC_DATASET = '${magnetic-file}'
 GRAVITY_DATASET = '${gravity-file}'
-# background magnetic flux density (B_north, B_east, B_vertical)
+# background magnetic flux density (B_north, B_east, B_vertical) in nano Tesla.
 B_b = [${bb-north}, ${bb-east}, ${bb-vertical}]
 # amount of horizontal padding (this affects end result, about 20% recommended)
 PAD_X = ${x-padding}
