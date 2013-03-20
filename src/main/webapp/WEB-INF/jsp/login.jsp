@@ -12,7 +12,6 @@
          function loginWithProvider(provider) {
              var loginFrm = document.getElementById("login-form");
              loginFrm.openid_identifier.value = provider;
-             loginFrm.style = "display:none";
              loginFrm.submit();
          };
     </script>
