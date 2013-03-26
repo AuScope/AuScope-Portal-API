@@ -73,6 +73,7 @@ Ext.application({
         var mapCfg = {
             container : null,   //We will be performing a delayed render of this map
             layerStore : layerStore,
+            allowDataSelection : true,
             listeners : {
                 query : function(mapWrapper, queryTargets) {
                     queryTargetHandler.handleQueryTargets(mapWrapper, queryTargets);
@@ -80,7 +81,12 @@ Ext.application({
             }
         };
         var urlParams = Ext.Object.fromQueryString(window.location.search.substring(1));
-        var map = Ext.create('portal.map.gmap.GoogleMap', mapCfg);
+        var map = null;
+        if (urlParams && urlParams.map && urlParams.map === 'googleMap') {
+            map = Ext.create('portal.map.gmap.GoogleMap', mapCfg);
+        } else {
+            map = Ext.create('portal.map.openlayers.OpenLayersMap', mapCfg);
+        }
 
         var layersPanel = Ext.create('portal.widgets.panel.LayerPanel', {
             id : 'vgl-layers-panel',
@@ -209,32 +215,7 @@ Ext.application({
         map.renderToContainer(centerPanel);   //After our centerPanel is displayed, render our map into it
 
         // The subset button needs a handler for when the user draws a subset bbox on the map:
-        map.map.addControl(new GmapSubsetControl(function(nw, ne, se, sw) {
-          var bbox = Ext.create('portal.util.BBox', {
-            northBoundLatitude : nw.lat(),
-                southBoundLatitude : sw.lat(),
-                eastBoundLongitude : ne.lng(),
-                westBoundLongitude : sw.lng()
-          });
-
-          //Iterate all active layers looking for data sources (csw records) that intersect the selection
-          var intersectedRecords = [];
-          for (var layerIdx = 0; layerIdx < layerStore.getCount(); layerIdx++) {
-              var layer = layerStore.getAt(layerIdx);
-              var cswRecs = layer.get('cswRecords');
-              for (var recIdx = 0; recIdx < cswRecs.length; recIdx++) {
-                  var cswRecord = cswRecs[recIdx];
-                  var geoEls = cswRecord.get('geographicElements');
-                  for (var geoIdx = 0; geoIdx < geoEls.length; geoIdx++) {
-                      var bboxToCompare = geoEls[geoIdx];
-                      if (bbox.intersects(bboxToCompare)) {
-                          intersectedRecords.push(cswRecord);
-                          break;
-                      }
-                  }
-              }
-          }
-
+        map.on('dataSelect', function(map, bbox, intersectedRecords) {
           //Show a dialog allow users to confirm the selected data sources
           if (intersectedRecords.length > 0) {
               Ext.create('Ext.Window', {
@@ -274,6 +255,6 @@ Ext.application({
               }).show();
           }
 
-        }), new GControlPosition(G_ANCHOR_TOP_RIGHT, new GSize(405, 7)));
+        });
     }
 });
