@@ -8,7 +8,7 @@ Ext.define('vegl.layer.VeglRendererFactory', {
     /**
      * Creates a new instance of renderer based on the specified values
      */
-    _generateRenderer : function(wfsResources, wmsResources, proxyUrl, proxyCountUrl, iconUrl, iconSize, iconAnchor) {
+    _generateRenderer : function(source, wfsResources, wmsResources, proxyUrl, proxyCountUrl, iconUrl, iconSize, iconAnchor) {
         var icon = Ext.create('portal.map.Icon', {
             url : iconUrl,
             width : iconSize ? iconSize.width : 16,
@@ -16,6 +16,16 @@ Ext.define('vegl.layer.VeglRendererFactory', {
             anchorOffsetX : iconAnchor ? iconAnchor.x : 0,
             anchorOffsetY : iconAnchor ? iconAnchor.y : 0
         });
+
+        if (source instanceof portal.knownlayer.KnownLayer) {
+            switch (source.get('id')) {
+                case 'geophysics-datasets':
+                    return Ext.create('portal.layer.renderer.csw.CSWRenderer', {
+                        map : this.map,
+                        icon : icon
+                    });
+            }
+        }
 
         if (wmsResources.length > 0) {
             return Ext.create('portal.layer.renderer.wms.LayerRenderer', {map : this.map});
@@ -44,7 +54,7 @@ Ext.define('vegl.layer.VeglRendererFactory', {
         var wfsResources = portal.csw.OnlineResource.getFilteredFromArray(allOnlineResources, portal.csw.OnlineResource.WFS);
         var wcsResources = portal.csw.OnlineResource.getFilteredFromArray(allOnlineResources, portal.csw.OnlineResource.WCS);
 
-        return this._generateRenderer(wfsResources, wmsResources, knownLayer.get('proxyUrl'), knownLayer.get('proxyCountUrl'),
+        return this._generateRenderer(knownLayer, wfsResources, wmsResources, knownLayer.get('proxyUrl'), knownLayer.get('proxyCountUrl'),
                 knownLayer.get('iconUrl'), knownLayer.get('iconSize'), knownLayer.get('iconAnchor'));
     },
 
@@ -58,6 +68,6 @@ Ext.define('vegl.layer.VeglRendererFactory', {
         var wfsResources = portal.csw.OnlineResource.getFilteredFromArray(allOnlineResources, portal.csw.OnlineResource.WFS);
         var wcsResources = portal.csw.OnlineResource.getFilteredFromArray(allOnlineResources, portal.csw.OnlineResource.WCS);
 
-        return this._generateRenderer(wfsResources, wmsResources, undefined, undefined, undefined, undefined, undefined);
+        return this._generateRenderer(cswRecord, wfsResources, wmsResources, undefined, undefined, undefined, undefined, undefined);
     }
 });
