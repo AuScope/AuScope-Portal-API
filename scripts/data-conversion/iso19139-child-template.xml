@@ -20,7 +20,7 @@
                                codeListValue="utf8"/>
   </gmd:characterSet>
   <gmd:parentIdentifier>
-      <gco:CharacterString>{PARENT}</gco:CharacterString>
+      <gco:CharacterString>{PARENTUUID}</gco:CharacterString>
   </gmd:parentIdentifier>
   <gmd:hierarchyLevel>
       <gmd:MD_ScopeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ScopeCode"
@@ -135,10 +135,10 @@
                <gmd:onLine>
                   <gmd:CI_OnlineResource>
                      <gmd:linkage>
-                        <gmd:URL>{ONLINEWMSRESOURCE}</gmd:URL>
+                        <gmd:URL>{ONLINEWCSRESOURCE}</gmd:URL>
                      </gmd:linkage>
                      <gmd:protocol>
-                        <gco:CharacterString>OGC:WCS-1.0.0-http-get-coverage</gco:CharacterString>
+                        <gco:CharacterString>OGC:WCS</gco:CharacterString>
                      </gmd:protocol>
                      <gmd:name>
                         <gco:CharacterString>{LAYERNAME}</gco:CharacterString>
@@ -179,11 +179,7 @@
             </gmd:DQ_Scope>
          </gmd:scope>
          <gmd:lineage>
-            <gmd:LI_Lineage>
-               <gmd:statement gco:nilReason="missing">
-                  <gco:CharacterString/>
-               </gmd:statement>
-            </gmd:LI_Lineage>
+            <gmd:LI_Lineage/>
          </gmd:lineage>
       </gmd:DQ_DataQuality>
   </gmd:dataQualityInfo>

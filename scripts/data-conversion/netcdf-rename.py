@@ -25,28 +25,31 @@ changes = {'ppmug':{'long_name':'Radiometrics Uranium parts per million grid'},
 import glob
 
 for filetype in changes.keys():
-    for currfile in glob.glob('/projects/r17/shared/netCDF/*%s.warp.nc4' % filetype):
+    for currfile in glob.glob('/projects/r17/test/outputs/netCDF/*%s.nc4' % filetype):
         print filetype, currfile
-        try:
-            command = ['ncrename', '-h', '-v', 'Band1,%s' % filetype, currfile]
+	filename, extension = os.path.splitext(os.path.basename(currfile))
+	try:
+	    command = ['ncrename', '-h', '-v', 'Band1,%s' % filename, currfile]
             stdout, stderr = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+	    print(command)
             if stdout.strip() is not None:
                 print stdout
             if stderr.strip() is not None:
                 print stderr
-        except Exception, e:
-            print e
-            pass
+	except Exception, e:
+	    print e
+	    pass
 
-        try:
+	try:
             command = ['ncatted', '-a',
-                       'long_name,%s,o,c,%s' % (filetype, changes[filetype]['long_name']),
+                       'long_name,%s,o,c,%s' % (filename, changes[filetype]['long_name']),
                        currfile ]
             stdout, stderr = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+	    print(command)
             if stdout.strip() is not None:
                 print stdout
             if stderr.strip() is not None:
-                print stderr            
+                print stderr 
         except Exception, e:
             print e
             pass
