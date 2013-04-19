@@ -139,6 +139,7 @@ def createParentMetadataRecord(surveyId, datasetFileName, mydata):
             keywordList += re.findall(r"[\w']+", surveyMetadata['dataType'])
         if not keywordList:
             keywordList = [mydata['theme']] # If we have no overrides, use the read theme
+        keywordList = [s.strip() for s in keywordList if s.strip()] # Remove any empty elements and trailing whitespace
         if len(keywordList) < 5:
             keywordList += ['']*(5-len(keywordList)) # If we have less than 5 entries, pad it out to empty strings
         for x in range(0,5):
@@ -223,6 +224,7 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
         keywordList += [datasetMetadata['Datatype']]
     if not keywordList and mydata.has_key('theme'):
         keywordList = [mydata['theme']] # If we have no overrides, use the read theme
+    keywordList = [s.strip() for s in keywordList if s.strip()] # Remove any empty elements and trailing whitespace
     if len(keywordList) < 5:
         keywordList += ['']*(5-len(keywordList)) # If we have less than 5 entries, pad it out to empty strings
     for x in range(0,5):
