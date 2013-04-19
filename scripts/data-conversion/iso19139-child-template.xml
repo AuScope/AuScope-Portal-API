@@ -88,7 +88,19 @@
                   <gco:CharacterString>GA</gco:CharacterString>
                </gmd:keyword>
                <gmd:keyword>
-                  <gco:CharacterString>{THEME}</gco:CharacterString>
+                  <gco:CharacterString>{KEYWORD1}</gco:CharacterString>
+               </gmd:keyword>
+               <gmd:keyword>
+                  <gco:CharacterString>{KEYWORD2}</gco:CharacterString>
+               </gmd:keyword>
+               <gmd:keyword>
+                  <gco:CharacterString>{KEYWORD3}</gco:CharacterString>
+               </gmd:keyword>
+               <gmd:keyword>
+                  <gco:CharacterString>{KEYWORD4}</gco:CharacterString>
+               </gmd:keyword>
+               <gmd:keyword>
+                  <gco:CharacterString>{KEYWORD5}</gco:CharacterString>
                </gmd:keyword>
                <gmd:type>
                   <gmd:MD_KeywordTypeCode codeListValue="theme"
@@ -163,6 +175,15 @@
                         <gco:CharacterString>{LAYERNAME}</gco:CharacterString>
                      </gmd:description>
                   </gmd:CI_OnlineResource>
+                  <gmd:CI_OnlineResource>
+                     <gmd:linkage>
+                        <gmd:URL>{ONLINEWWWRESOURCE}</gmd:URL>
+                     </gmd:linkage>
+                     <gmd:protocol>
+                        <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>
+                     </gmd:protocol>
+                  </gmd:CI_OnlineResource>
+                  
                </gmd:onLine>
             </gmd:MD_DigitalTransferOptions>
          </gmd:transferOptions>

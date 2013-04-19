@@ -10,6 +10,4 @@ module load nco/4.2.4
 module load hdf5/1.8.7 
 module load python/2.7.3
 module load python/2.7.3-matplotlib
-#python scripts/warp-reproject.py
-python scripts/netcdf-rename.py
-python scripts/metadata.py
+python metadata.py

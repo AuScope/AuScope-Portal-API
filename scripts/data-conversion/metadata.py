@@ -6,7 +6,7 @@ Created on Tue Jan 29 21:09:09 2013
 @author: rmg599
 
 """
-import glob, os, fnmatch, uuid, netCDF4, logging, csv, xml.sax.saxutils
+import glob, os, fnmatch, uuid, netCDF4, logging, csv, xml.sax.saxutils, re
 
 formatter = logging.Formatter('%(asctime)s %(message)s')
 errlogger = logging.getLogger('metadata_bad')
@@ -33,10 +33,13 @@ def findFiles(starting_dir='.', pattern='*'):
             matches.append(os.path.join(root, filename))
     return matches
 
-additionalMetadata = {}
+# Keyed by survey ID
+additionalSurveyMetadata = {}
+# Keyed by filename
+additionalDatasetMetadata = {}
 
 templateFiles = {'child': {
-                    'filename':'/projects/r17/test/scripts/iso19139-child-template.xml',
+                    'filename':'/projects/r17/scripts/iso19139-child-template.xml',
                     'abstract':'{ABSTRACT}',
                     'uuid':'{UUID}',
                     'parent':'{PARENTUUID}',
@@ -49,10 +52,11 @@ templateFiles = {'child': {
                     'south':'{SOUTH}',
                     'wms-address':'{ONLINEWMSRESOURCE}',
                     'wcs-address':'{ONLINEWCSRESOURCE}',
+                    'www-address':'{ONLINEWWWRESOURCE}',
                     'layername':'{LAYERNAME}',
                     },
                  'parent': {
-                    'filename':'/projects/r17/test/scripts/iso19139-parent-template.xml',
+                    'filename':'/projects/r17/scripts/iso19139-parent-template.xml',
                     'parent':'{PARENTUUID}',
                     'title':'{TITLE}',
                     'date':'{DATE}',
@@ -68,15 +72,6 @@ templateFiles = {'child': {
 wmsServer="http://siss2.anu.edu.au/thredds/wms/ga/projects/"
 wcsServer="http://siss2.anu.edu.au/thredds/wcs/ga/projects/"
 
-'''build a list of files we care about....'''
-'''fileset = findFiles('/projects/r17/GA', '*pctkg.isi') + \
-          findFiles('/projects/r17/GA', '*demg.isi') + \
-          findFiles('/projects/r17/GA', '*doseg.isi') + \
-          findFiles('/projects/r17/GA', '*ppmthg.isi') + \
-          findFiles('/projects/r17/GA', '*ppmug.isi') + \
-          findFiles('/projects/r17/GA', '*timg.isi')'''
-#fileset = glob.glob('/projects/r17/test/data/*.isi')
-
 def isNumber(s):
     try:
         float(s)
@@ -84,40 +79,24 @@ def isNumber(s):
     except ValueError:
         return False
 
-def getMetadataOverride(surveyId, fieldName):
-    if surveyId in additionalMetadata:
-        mEntry = additionalMetadata[surveyId]
-        possibleValues = mEntry[fieldName]
-        if len(possibleValues):
-            return possibleValues[0]
-    
-    return None
-    
-def getMetadataOverrideKeywords(surveyId):
-    #Get every keyword
-    allKeywords = []
-    if surveyId in additionalMetadata:
-        mEntry = additionalMetadata[surveyId]
-        kw1Values = mEntry['keyword1']
-        kw2Values = mEntry['keyword2']
-        
-        if kw1Values is not None and len(kw1Values) > 0:
-            allKeywords = allKeywords + kw1Values
-        
-        if kw2Values is not None and len(kw2Values) > 0:
-            allKeywords = allKeywords + kw2Values        
-    
-    #Remove duplicates before returning
-    return list(set(allKeywords))
+'''
+This creates a parent metadata record if it doesn't already exist. If the file already exists, then this function
+will just read out its UUID
 
-def createParentMetadataRecord(mydata):
-    """This creates a parent metadata record
-    
-    Title - Surveyid from corresponding isi metadata file.
+returns the UUID of the newly created (or existing) parent metadata record
 
-    """
-    parentfile = '/projects/r17/test/outputs/metadata/P' + mydata['surveyid'] + '.xml'
-    if not os.path.exists(parentfile):
+'''
+def createParentMetadataRecord(surveyId, datasetFileName, mydata):
+    
+    parentfile = '/projects/r17/shared/metadata/P' + surveyId + '.xml'
+    if os.path.exists(parentfile):
+        f = open(parentfile, 'r')
+        contents = f.read()
+        f.close()
+        return re.search('<gmd:fileIdentifier xmlns:gmx="http://www.isotc211.org/2005/gmx"><gco:CharacterString>(.*)</gco:CharacterString>', contents).group(1)
+    else:
+        surveyMetadata = additionalSurveyMetadata[surveyId]
+    
         fileuuid=uuid.uuid4()
         
         outputTemplate = open(templateFiles['parent']['filename'], 'r').read()
@@ -127,30 +106,33 @@ def createParentMetadataRecord(mydata):
         outputTemplate = outputTemplate.replace(replaceVars['parent'], str(fileuuid))
         
         #Title
-        title = getMetadataOverride(mydata['surveyid'], 'title')
-        if title is None:
-            title = mydata['title']
+        title = mydata['title']
+        if surveyMetadata is not None:
+            title = surveyMetadata['title']
         title = xml.sax.saxutils.escape(title)
         outputTemplate = outputTemplate.replace(replaceVars['title'], title)
         
         #Date
-        date = getMetadataOverride(mydata['surveyid'], 'date')
-        if date is None and mydata.has_key('date'):
+        date = 'unknown'
+        if surveyMetadata is not None:
+            date = surveyMetadata['Beginning Time']
+        elif mydata.has_key('date'):
             date = mydata['date'].split('_')[0]
-        elif date is None:
-            date = 'unknown'
-        title = xml.sax.saxutils.escape(date)
+        date = xml.sax.saxutils.escape(date)
         outputTemplate = outputTemplate.replace(replaceVars['date'], date)
         
         #Abstract
-        abstract = getMetadataOverride(mydata['surveyid'], 'abstract')
-        if abstract is None:
-            abstract = str(mydata)
-        title = xml.sax.saxutils.escape(abstract)
+        abstract = str(mydata)
+        if surveyMetadata is not None:
+            abstract = surveyMetadata['abstract']
+        abstract = xml.sax.saxutils.escape(abstract)
         outputTemplate = outputTemplate.replace(replaceVars['abstract'], abstract)
         
         #Keywords
-        keywordList = getMetadataOverrideKeywords(mydata['surveyid'])
+        keywordList = []
+        if surveyMetadata is not None:
+            keywordList += surveyMetadata['surveyType'].split(' ')
+            keywordList += surveyMetadata['dataType'].split(' ')
         if not keywordList:
             keywordList = [mydata['theme']] # If we have no overrides, use the read theme
         if len(keywordList) < 5:
@@ -162,15 +144,25 @@ def createParentMetadataRecord(mydata):
         
         #GeographicBoundingBox
         north = mydata['north']
+        south = mydata['south']
+        east = mydata['east']
+        west = mydata['west']
+        if surveyMetadata is not None:
+            if isNumber(surveyMetadata['northBoundLatitude']):
+                north = surveyMetadata['northBoundLatitude']
+            if isNumber(surveyMetadata['southBoundLatitude']):
+                south = surveyMetadata['southBoundLatitude']
+            if isNumber(surveyMetadata['eastBoundLongitude']):
+                east = surveyMetadata['eastBoundLongitude']    
+            if isNumber(surveyMetadata['westBoundLongitude']):
+                west = surveyMetadata['westBoundLongitude']        
+        
         if not isNumber(north):
             north = '90'
-        south = mydata['south']
         if not isNumber(south):
             south = '-90'
-        east = mydata['east']
         if not isNumber(east):
             east = '180'
-        west = mydata['west']
         if not isNumber(west):
             west = '-180'
         outputTemplate = outputTemplate.replace(replaceVars['north'], xml.sax.saxutils.escape(north))
@@ -183,13 +175,12 @@ def createParentMetadataRecord(mydata):
         f.close()
         
         return fileuuid
-    else:
-        print parentfile, 'already exists'
-        return -1
 
-def createChildMetadataRecord(mydata):
+def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata):
     """This creates a child metadata record"""
     fileuuid=uuid.uuid4()
+    
+    datasetMetadata = additionalDatasetMetadata[currentFileBasePath]
     
     outputTemplate = open(templateFiles['child']['filename'], 'r').read()
     replaceVars = templateFiles['child']
@@ -198,31 +189,47 @@ def createChildMetadataRecord(mydata):
     outputTemplate = outputTemplate.replace(replaceVars['uuid'], str(fileuuid))
     
     #ParentIdentifier
-    outputTemplate = outputTemplate.replace(replaceVars['parent'], str(mydata['parentuuid']))   
+    outputTemplate = outputTemplate.replace(replaceVars['parent'], str(parentUUID))   
     
     #Title
-    if mydata.has_key('label'):
-        outputTemplate = outputTemplate.replace(replaceVars['title'], mydata['label'].replace('_', ' '))
-    else:
-        outputTemplate = outputTemplate.replace(replaceVars['title'], mydata['filename'])
-        
+    title = mydata['filename']
+    if datasetMetadata is not None:
+        title = datasetMetadata['LABEL'].replace('_', ' ')
+    elif mydata.has_key('label'):
+        title = mydata['label'].replace('_', ' ')
+    outputTemplate = outputTemplate.replace(replaceVars['title'], xml.sax.saxutils.escape(title))
+    
     #Abstract
-    outputTemplate = outputTemplate.replace(replaceVars['abstract'], str(mydata))
+    outputTemplate = outputTemplate.replace(replaceVars['abstract'], xml.sax.saxutils.escape(str(mydata)))
     
     #Date
-    if mydata.has_key('date'):
-        outputTemplate = outputTemplate.replace(replaceVars['date'], mydata['date'].split('_')[0])
-    else:
-        outputTemplate = outputTemplate.replace(replaceVars['date'], 'unknown')
+    date = 'unknown'
+    if datasetMetadata is not None:
+        date = datasetMetadata['DATE'].split('_')[0]
+    elif mydata.has_key('date'):
+        date = mydata['date'].split('_')[0]
+    outputTemplate = outputTemplate.replace(replaceVars['date'], date)
     
-    #Keyword
-    if mydata.has_key('theme'):
-        outputTemplate = outputTemplate.replace(replaceVars['theme'], mydata['theme'])
-    else:
-        outputTemplate = outputTemplate.replace(replaceVars['theme'], 'unknown')
-        
+    #Keywords
+    keywordList = []
+    if datasetMetadata is not None:
+        keywordList += datasetMetadata['Theme']
+        keywordList += datasetMetadata['Datatype']
+    if not keywordList and mydata.has_key('theme'):
+        keywordList = [mydata['theme']] # If we have no overrides, use the read theme
+    if len(keywordList) < 5:
+        keywordList += ['']*(5-len(keywordList)) # If we have less than 5 entries, pad it out to empty strings
+    for x in range(0,5):
+        key = '{KEYWORD%s}' % (x + 1)
+        value = xml.sax.saxutils.escape(keywordList[x])
+        outputTemplate = outputTemplate.replace(key, value)
+    
+    wwwAddress = ''
+    if datasetMetadata is not None:
+        wwwAddress = datasetMetadata['URL'] 
     outputTemplate = outputTemplate.replace(replaceVars['wcs-address'], wcsServer+mydata['filename']+'.nc4')
     outputTemplate = outputTemplate.replace(replaceVars['wms-address'], wmsServer+mydata['filename']+'.nc4')
+    outputTemplate = outputTemplate.replace(replaceVars['www-address'], wwwAddress + '.html')
     outputTemplate = outputTemplate.replace(replaceVars['layername'], mydata['filename'])
     
     #GeographicBoundingBox
@@ -231,7 +238,7 @@ def createChildMetadataRecord(mydata):
     outputTemplate = outputTemplate.replace(replaceVars['south'], mydata['south'])
     outputTemplate = outputTemplate.replace(replaceVars['east'], mydata['east'])
     
-    f = open('/projects/r17/test/outputs/metadata/' + mydata['filename'] + '.xml', 'w')
+    f = open('/projects/r17/shared/metadata/' + mydata['filename'] + '.xml', 'w')
     f.write(outputTemplate)
     f.close()
     
@@ -262,51 +269,29 @@ def _glob(path, *exts):
     return [f for files in [glob.glob(path + ext) for ext in exts] for f in files]
 
 
-# Parse the supporting metadata dictionaries. These provide 'override' information for various metadata fields keyed by survey id.
-print 'Parsing overriding-metadata.csv'
-csvfile = open('/projects/r17/test/scripts/overriding-metadata.csv', 'rb')
-csvReader = csv.DictReader(csvfile)
-for row in csvReader:
-    
-    if row['SURVEYID'] in additionalMetadata:
-        entry = additionalMetadata[row['SURVEYID']]
-    else:
-        entry = {}
-        entry['title'] = []
-        entry['abstract'] = []
-        entry['bbox'] = []
-        entry['keyword1'] = []
-        entry['keyword2'] = []
-        entry['date'] = []
-        additionalMetadata[row['SURVEYID']] = entry
-        
-    if row['TITLE']:
-        entry['title'].append(row['TITLE'])
-    if row['ABSTRACT']:
-        entry['abstract'].append(row['ABSTRACT'])    
-    if row['MINLON']:
-        bbox = {}
-        bbox['eastBoundLongitude'] = row['MAXLON']
-        bbox['westBoundLongitude'] = row['MINLON']
-        bbox['northBoundLatitude'] = row['MAXLAT']
-        bbox['southBoundLatitude'] = row['MINLAT']
-        entry['bbox'].append(bbox)
-    if row['KEYWORD1']:
-        entry['keyword1'].append(row['KEYWORD1'])    
-    if row['KEYWORD2']:
-        entry['keyword2'].append(row['KEYWORD2'])
-    if row['DATE']:
-        entry['date'].append(row['DATE'])
-csvfile.close()
-    
-    
+# Parse the supporting metadata dictionaries. These provide 'override' information for various metadata fields keyed by survey id filename.
+print 'Parsing overriding metadata csv files'
+surveycsvfile = open('/projects/r17/scripts/metadata/surveys.csv', 'rb')
+surveycsvReader = csv.DictReader(surveycsvfile)
+for row in surveycsvReader:
+    additionalSurveyMetadata[row['surveyId']] = row
+surveycsvfile.close()
+
+datasetcsvfile = open('/projects/r17/scripts/metadata/datasets.csv', 'rb')
+datasetcsvReader = csv.DictReader(datasetcsvfile)
+for row in datasetcsvReader:
+    additionalDatasetMetadata[row['Filename']] = row
+datasetcsvfile.close()
+
+
 # Parse the data files
 print 'Parsing data files'
-fileset = _glob('/projects/r17/test/data/', '*demg.isi', '*tmig.isi', '*doseg.isi', '*pctkg.isi', '*ppmthg.isi', '*ppmug.isi')
+fileset = _glob('/projects/r17/GA/', '*demg.isi', '*tmig.isi', '*doseg.isi', '*pctkg.isi', '*ppmthg.isi', '*ppmug.isi')
 
 for currentfile in sorted(fileset):
     try:
-        filename, extension = os.path.splitext(os.path.basename(currentfile))
+        currentFileBasePath = os.path.basename(currentfile)
+        filename, extension = os.path.splitext(currentFileBasePath)
         if '.ers.' not in filename and os.path.exists('/projects/r17/shared/netCDF/'+filename+'.nc4'):
             '''
                 Harvest currentfile's metadata into a "mydata" hashtable
@@ -317,48 +302,42 @@ for currentfile in sorted(fileset):
                 if '=' in line:
                     mydata[line.split('=')[0].strip().lower()] = line.split('=')[1].strip().replace('"','')
             f.close()
-
+            mydata['filename'] = filename
+            
+            # We need to figure out what survey id(s) this record belongs to. There's a few places we can look
+            surveyIdDict = {}
+            
+            # My data may have a survey ID
             if "surveyid" in mydata:
-                if mydata.get("surveyid") == "" or mydata.get("surveyid").lower() == "unknown":
-                    print currentfile, 'skipped as surveyid is unknown or empty'
-                    errlogger.error(currentfile + ' - skipped as surveyid is unknown or empty')
-	        else:
-                    print currentfile
-                    '''
-                    Harvest geographic bounding box coordinates from currentfile's 
-                    corresponding netCDF file and store them in "mydata" hastable
-                    ''' 
-                    data = netCDF4.Dataset('/projects/r17/shared/netCDF/'+filename+'.nc4','r', format='NETCDF4')
-                    mydata['north'] = str(data.variables['lat'][-1:][0])
-                    mydata['west'] = str(data.variables['lon'][0])
-                    mydata['south'] = str(data.variables['lat'][0])
-                    mydata['east'] = str(data.variables['lon'][-1:][0])
-                    data.close()
+                surveyId = mydata.get("surveyid")
+                if surveyId != "" and surveyId.lower() != "unknown":
+                    surveyIdDict[surveyId] = True
             
-                    '''
-                    Create parent metadata record for currentfile, 
-                    skip if it is already created
-                    '''
-                    if curSurveyId == "":
-                        curSurveyId = mydata['surveyid']
-                        parentUUID = createParentMetadataRecord(mydata)
-                    elif curSurveyId != mydata['surveyid']:
-                        curSurveyId = mydata['surveyid']
-                        parentUUID = createParentMetadataRecord(mydata)
             
-                    '''
-                    Create child metadata record for currentfile
-		    '''
-                    if parentUUID == -1:
-                        print currentfile, 'skipped as surveyid already exists'
-                        errlogger.error(currentfile + ' - skipped as surveyid already exists')
-		    else:
-                        mydata['parentuuid'] = parentUUID
-                        mydata['filename'] = filename
-                        createChildMetadataRecord(mydata)
-            else:
-                    print currentfile, 'skipped as surveyid does not exist'
-                    errlogger.error(currentfile + ' - skiped as surveyid does not exist')
+            # Lookup survey IDs from our CSV database
+            if currentFileBasePath in additionalDatasetMetadata:
+                surveyIds = additionalDatasetMetadata[currentFileBasePath]['SurveyID'].split('_')
+                for surveyId in surveyIds:
+                    surveyIdDict[surveyId] = True
+            
+            '''
+            Harvest geographic bounding box coordinates from currentfile's 
+            corresponding netCDF file and store them in "mydata" hastable
+            ''' 
+            data = netCDF4.Dataset('/projects/r17/shared/netCDF/'+filename+'.nc4','r', format='NETCDF4')
+            mydata['north'] = str(data.variables['lat'][-1:][0])
+            mydata['west'] = str(data.variables['lon'][0])
+            mydata['south'] = str(data.variables['lat'][0])
+            mydata['east'] = str(data.variables['lon'][-1:][0])
+            data.close()
+            
+            # We need to duplicate the child for each and every parent (unfortunately)
+            if not surveyIdDict:
+                errlogger.error(currentfile + ' - skipped as surveyid does not exist')
+            
+            for surveyId in surveyIdDict:
+                parentUUID = createParentMetadataRecord(surveyId, currentFileBasePath, mydata)
+                createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
                     
     except Exception, e:
         print e
