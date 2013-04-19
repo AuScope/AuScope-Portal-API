@@ -6,7 +6,7 @@ Created on Tue Jan 29 21:09:09 2013
 @author: rmg599
 
 """
-import glob, os, fnmatch, uuid, netCDF4, logging, csv, xml.sax.saxutils, re
+import glob, os, fnmatch, uuid, netCDF4, logging, csv, xml.sax.saxutils, re, traceback
 
 formatter = logging.Formatter('%(asctime)s %(message)s')
 errlogger = logging.getLogger('metadata_bad')
@@ -95,7 +95,9 @@ def createParentMetadataRecord(surveyId, datasetFileName, mydata):
         f.close()
         return re.search('<gmd:fileIdentifier xmlns:gmx="http://www.isotc211.org/2005/gmx"><gco:CharacterString>(.*)</gco:CharacterString>', contents).group(1)
     else:
-        surveyMetadata = additionalSurveyMetadata[surveyId]
+        surveyMetadata = None
+        if additionalSurveyMetadata.has_key(surveyId):
+            surveyMetadata =  additionalSurveyMetadata[surveyId]
     
         fileuuid=uuid.uuid4()
         
@@ -106,7 +108,9 @@ def createParentMetadataRecord(surveyId, datasetFileName, mydata):
         outputTemplate = outputTemplate.replace(replaceVars['parent'], str(fileuuid))
         
         #Title
-        title = mydata['title']
+        title = mydata['filename']
+        if  mydata.has_key('title'):
+            title = mydata['title']
         if surveyMetadata is not None:
             title = surveyMetadata['title']
         title = xml.sax.saxutils.escape(title)
@@ -131,8 +135,8 @@ def createParentMetadataRecord(surveyId, datasetFileName, mydata):
         #Keywords
         keywordList = []
         if surveyMetadata is not None:
-            keywordList += surveyMetadata['surveyType'].split(' ')
-            keywordList += surveyMetadata['dataType'].split(' ')
+            keywordList += re.findall(r"[\w']+", surveyMetadata['surveyType'])  
+            keywordList += re.findall(r"[\w']+", surveyMetadata['dataType'])
         if not keywordList:
             keywordList = [mydata['theme']] # If we have no overrides, use the read theme
         if len(keywordList) < 5:
@@ -180,7 +184,9 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
     """This creates a child metadata record"""
     fileuuid=uuid.uuid4()
     
-    datasetMetadata = additionalDatasetMetadata[currentFileBasePath]
+    datasetMetadata = None
+    if additionalDatasetMetadata.has_key(currentFileBasePath): 
+        datasetMetadata = additionalDatasetMetadata[currentFileBasePath]
     
     outputTemplate = open(templateFiles['child']['filename'], 'r').read()
     replaceVars = templateFiles['child']
@@ -213,8 +219,8 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
     #Keywords
     keywordList = []
     if datasetMetadata is not None:
-        keywordList += datasetMetadata['Theme']
-        keywordList += datasetMetadata['Datatype']
+        keywordList += [datasetMetadata['Theme']]
+        keywordList += [datasetMetadata['Datatype']]
     if not keywordList and mydata.has_key('theme'):
         keywordList = [mydata['theme']] # If we have no overrides, use the read theme
     if len(keywordList) < 5:
@@ -309,16 +315,17 @@ for currentfile in sorted(fileset):
             
             # My data may have a survey ID
             if "surveyid" in mydata:
-                surveyId = mydata.get("surveyid")
-                if surveyId != "" and surveyId.lower() != "unknown":
-                    surveyIdDict[surveyId] = True
-            
+                surveyIds = mydata.get("surveyid").split('_')
+                for surveyId in surveyIds:
+                    if surveyId != "" and surveyId.lower() != "unknown":
+                        surveyIdDict[surveyId] = True
             
             # Lookup survey IDs from our CSV database
             if currentFileBasePath in additionalDatasetMetadata:
                 surveyIds = additionalDatasetMetadata[currentFileBasePath]['SurveyID'].split('_')
                 for surveyId in surveyIds:
-                    surveyIdDict[surveyId] = True
+                    if surveyId != "" and surveyId.lower() != "unknown":
+                        surveyIdDict[surveyId] = True
             
             '''
             Harvest geographic bounding box coordinates from currentfile's 
@@ -340,5 +347,6 @@ for currentfile in sorted(fileset):
                 createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
                     
     except Exception, e:
-        print e
+        print 'Exception:', e
+        print traceback.format_exc()
         pass
