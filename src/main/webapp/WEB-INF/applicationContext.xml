@@ -76,10 +76,10 @@
         </property>
     </bean>
 
-    <!-- Simple Trigger for vglJobStatusMonitor task, run every 30 seconds -->
+    <!-- Simple Trigger for vglJobStatusMonitor task, run every 15 minutes -->
     <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
         <property name="jobDetail" ref="vglJobStatusMonitor" />
-        <property name="repeatInterval" value="30000" />
+        <property name="repeatInterval" value="900000" />
         <property name="startDelay" value="10000" />
     </bean>
 
