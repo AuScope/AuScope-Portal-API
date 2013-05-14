@@ -128,7 +128,7 @@ def createParentMetadataRecord(surveyId, datasetFileName, mydata):
             suppInfo = surveyMetadata['supplementalInformation']
             
             # Concetanate 3rd party organisation names
-            for x in range(0,6):
+            for x in range(0,5):
                 roleKey = 'party role%s' % (x + 1)
                 orgKey = 'organisation name%s' % (x + 1)
                 if surveyMetadata[roleKey]:
@@ -292,7 +292,8 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
         suppInfo += '%s=%s\n' % ('LinespacingMetres', datasetMetadata['LinespacingMetres'])
         suppInfo += '%s=%s\n' % ('CoordsysData', datasetMetadata['CoordsysData'])
         suppInfo += '%s=%s\n' % ('CellsizeMetres', datasetMetadata['CellsizeMetres'])
-    
+    outputTemplate = outputTemplate.replace('{SUPPINFO}', xml.sax.saxutils.escape(suppInfo))
+
     #Keywords
     keywordList = []
     if datasetMetadata is not None:
@@ -371,7 +372,6 @@ datasetcsvfile.close()
 # Parse the data files
 print 'Parsing data files'
 fileset = _glob('/projects/r17/GA/', '*demg.isi', '*tmig.isi', '*doseg.isi', '*pctkg.isi', '*ppmthg.isi', '*ppmug.isi')
-
 for currentfile in sorted(fileset):
     try:
         currentFileBasePath = os.path.basename(currentfile)
@@ -423,7 +423,7 @@ for currentfile in sorted(fileset):
             for surveyId in surveyIdDict:
                 parentUUID = createParentMetadataRecord(surveyId, currentFileBasePath, mydata)
                 createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
-                    
+                        
     except Exception, e:
         print 'Exception:', e
         print traceback.format_exc()
