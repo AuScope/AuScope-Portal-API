@@ -38,6 +38,17 @@
       <gco:CharacterString xmlns:srv="http://www.isotc211.org/2005/srv"
                            xmlns:gmx="http://www.isotc211.org/2005/gmx">1.0</gco:CharacterString>
   </gmd:metadataStandardVersion>
+  <gmd:referenceSystemInfo>
+      <gmd:MD_ReferenceSystem>
+         <gmd:referenceSystemIdentifier>
+            <gmd:RS_Identifier>
+               <gmd:code>
+                  <gco:CharacterString>GDA94</gco:CharacterString>
+               </gmd:code>
+            </gmd:RS_Identifier>
+         </gmd:referenceSystemIdentifier>
+      </gmd:MD_ReferenceSystem>
+  </gmd:referenceSystemInfo>
   <gmd:identificationInfo>
       <gmd:MD_DataIdentification>
          <gmd:citation xmlns:srv="http://www.isotc211.org/2005/srv">
@@ -45,6 +56,9 @@
                <gmd:title>
                   <gco:CharacterString>{TITLE}</gco:CharacterString>
                </gmd:title>
+               <gmd:alternateTitle>
+                  <gco:CharacterString>{ALTTITLE}</gco:CharacterString>
+               </gmd:alternateTitle>
                <gmd:date>
                   <gmd:CI_Date>
                      <gmd:date>
@@ -65,6 +79,13 @@
             <gmd:MD_ProgressCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ProgressCode"
                                  codeListValue="completed"/>
          </gmd:status>
+         <gmd:resourceConstraints>
+				<gmd:MD_LegalConstraints>
+					<gmd:otherConstraints>
+						<gco:CharacterString>{LICENCE}</gco:CharacterString>
+					</gmd:otherConstraints>
+				</gmd:MD_LegalConstraints>
+			</gmd:resourceConstraints>
          <gmd:spatialRepresentationType xmlns:srv="http://www.isotc211.org/2005/srv">
             <gmd:MD_SpatialRepresentationTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_SpatialRepresentationTypeCode"
                                                   codeListValue="grid"/>
@@ -128,6 +149,9 @@
                </gmd:geographicElement>
             </gmd:EX_Extent>
          </gmd:extent>
+         <gmd:supplementalInformation>
+           <gco:CharacterString>{SUPPINFO}</gco:CharacterString>
+         </gmd:supplementalInformation>
       </gmd:MD_DataIdentification>
   </gmd:identificationInfo>
   <gmd:distributionInfo>

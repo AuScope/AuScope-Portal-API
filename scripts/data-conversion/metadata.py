@@ -116,6 +116,26 @@ def createParentMetadataRecord(surveyId, datasetFileName, mydata):
         title = xml.sax.saxutils.escape(title)
         outputTemplate = outputTemplate.replace(replaceVars['title'], title)
         
+        #Alternate Title
+        altTitle = datasetFileName
+        if surveyMetadata is not None:
+            altTitle = surveyMetadata['alternateTitle']
+        outputTemplate = outputTemplate.replace('{ALTTITLE}', xml.sax.saxutils.escape(altTitle))
+        
+        #supplemental information (we will combine this with 3rd party organisation names)
+        suppInfo = ''
+        if surveyMetadata is not None:
+            suppInfo = surveyMetadata['supplementalInformation']
+            
+            # Concetanate 3rd party organisation names
+            for x in range(0,6):
+                roleKey = 'party role%s' % (x + 1)
+                orgKey = 'organisation name%s' % (x + 1)
+                if surveyMetadata[roleKey]:
+                    suppInfo += '\n%s=%s' %  (surveyMetadata[roleKey], surveyMetadata[orgKey])
+
+        outputTemplate = outputTemplate.replace('{SUPPINFO}', xml.sax.saxutils.escape(suppInfo))
+        
         #Date
         date = 'unknown'
         if surveyMetadata is not None:
@@ -132,7 +152,7 @@ def createParentMetadataRecord(surveyId, datasetFileName, mydata):
         abstract = xml.sax.saxutils.escape(abstract)
         outputTemplate = outputTemplate.replace(replaceVars['abstract'], abstract)
         
-        #Keywords
+        #Keywords (we need at least 5 due to the templates we are using)
         keywordList = []
         if surveyMetadata is not None:
             keywordList += re.findall(r"[\w']+", surveyMetadata['surveyType'])  
@@ -175,6 +195,43 @@ def createParentMetadataRecord(surveyId, datasetFileName, mydata):
         outputTemplate = outputTemplate.replace(replaceVars['south'], xml.sax.saxutils.escape(south))
         outputTemplate = outputTemplate.replace(replaceVars['east'], xml.sax.saxutils.escape(east))
         
+        #Contact Details
+        contact = {}
+        contact['name'] = ''
+        contact['position'] = ''
+        contact['organisation'] = 'Geoscience Australia'
+        contact['phone'] = '+61 2 6249 9966'
+        contact['fax'] = '+61 2 6249 9960'
+        contact['deliveryPoint'] = 'GPO Box 378'
+        contact['city'] = 'Canberra'
+        contact['administrativeArea'] = 'ACT'
+        contact['postalCode'] = '2601'
+        contact['country'] = 'Australia'
+        contact['url'] = 'http://www.ga.gov.au/'
+        contact['email'] = ''
+        if surveyMetadata is not None:
+            contactItems = surveyMetadata['Metadata Point of Contact'].split(';')
+            contact['name'] = contactItems[0]
+            contact['position'] = contactItems[1]
+            contact['organisation'] = contactItems[2]
+            contact['deliveryPoint'] = contactItems[3]
+            contact['phone'] = contactItems[4]
+            contact['fax'] = contactItems[5]
+            contact['email'] = contactItems[6]
+
+        outputTemplate = outputTemplate.replace('{CONTACTNAME}', xml.sax.saxutils.escape(contact['name']))
+        outputTemplate = outputTemplate.replace('{CONTACTORG}', xml.sax.saxutils.escape(contact['organisation']))
+        outputTemplate = outputTemplate.replace('{CONTACTPOSITION}', xml.sax.saxutils.escape(contact['position']))
+        outputTemplate = outputTemplate.replace('{CONTACTPHONE}', xml.sax.saxutils.escape(contact['phone']))
+        outputTemplate = outputTemplate.replace('{CONTACTFAX}', xml.sax.saxutils.escape(contact['fax']))
+        outputTemplate = outputTemplate.replace('{CONTACTDP}', xml.sax.saxutils.escape(contact['deliveryPoint']))
+        outputTemplate = outputTemplate.replace('{CONTACTCITY}', xml.sax.saxutils.escape(contact['city']))
+        outputTemplate = outputTemplate.replace('{CONTACTSTATE}', xml.sax.saxutils.escape(contact['administrativeArea']))
+        outputTemplate = outputTemplate.replace('{CONTACTPOSTCODE}', xml.sax.saxutils.escape(contact['postalCode']))
+        outputTemplate = outputTemplate.replace('{CONTACTCOUNTRY}', xml.sax.saxutils.escape(contact['country']))
+        outputTemplate = outputTemplate.replace('{CONTACTEMAIL}', xml.sax.saxutils.escape(contact['email']))
+        outputTemplate = outputTemplate.replace('{CONTACTURL}', xml.sax.saxutils.escape(contact['url']))
+        
         f = open(parentfile, 'w')
         f.write(outputTemplate)
         f.close()
@@ -206,8 +263,19 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
         title = mydata['label'].replace('_', ' ')
     outputTemplate = outputTemplate.replace(replaceVars['title'], xml.sax.saxutils.escape(title))
     
+    #Alternate title
+    altTitle = currentFileBasePath
+    outputTemplate = outputTemplate.replace('{ALTTITLE}', xml.sax.saxutils.escape(altTitle))
+    
     #Abstract
-    outputTemplate = outputTemplate.replace(replaceVars['abstract'], xml.sax.saxutils.escape(str(mydata)))
+    abstract = ''
+    outputTemplate = outputTemplate.replace(replaceVars['abstract'], xml.sax.saxutils.escape(abstract))
+    
+    #licence
+    licence = ''
+    if datasetMetadata is not None:
+        licence = datasetMetadata['Licence']
+    outputTemplate = outputTemplate.replace('{LICENCE}', xml.sax.saxutils.escape(licence))
     
     #Date
     date = 'unknown'
@@ -216,6 +284,14 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
     elif mydata.has_key('date'):
         date = mydata['date'].split('_')[0]
     outputTemplate = outputTemplate.replace(replaceVars['date'], date)
+    
+    #Supplemental Information
+    suppInfo = ''
+    if datasetMetadata is not None:
+        suppInfo += '%s=%s\n' % ('CELLSIZE_DECDEGREES', datasetMetadata['CELLSIZE_DECDEGREES'])
+        suppInfo += '%s=%s\n' % ('LinespacingMetres', datasetMetadata['LinespacingMetres'])
+        suppInfo += '%s=%s\n' % ('CoordsysData', datasetMetadata['CoordsysData'])
+        suppInfo += '%s=%s\n' % ('CellsizeMetres', datasetMetadata['CellsizeMetres'])
     
     #Keywords
     keywordList = []

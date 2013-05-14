@@ -22,44 +22,53 @@
   </gmd:hierarchyLevel>
   <gmd:contact>
       <gmd:CI_ResponsibleParty>
+         <gmd:individualName>
+            <gco:CharacterString>{CONTACTNAME}</gco:CharacterString>
+         </gmd:individualName>
          <gmd:organisationName>
-            <gco:CharacterString>Geoscience Australia</gco:CharacterString>
+            <gco:CharacterString>{CONTACTORG}</gco:CharacterString>
          </gmd:organisationName>
+         <gmd:positionName>
+            <gco:CharacterString>{CONTACTPOSITION}</gco:CharacterString>
+         </gmd:positionName>
          <gmd:contactInfo>
             <gmd:CI_Contact>
                <gmd:phone>
                   <gmd:CI_Telephone>
                      <gmd:voice>
-                        <gco:CharacterString>+61 2 6249 9966</gco:CharacterString>
+                        <gco:CharacterString>{CONTACTPHONE}</gco:CharacterString>
                      </gmd:voice>
                      <gmd:facsimile>
-                        <gco:CharacterString>+61 2 6249 9960</gco:CharacterString>
+                        <gco:CharacterString>{CONTACTFAX}</gco:CharacterString>
                      </gmd:facsimile>
                   </gmd:CI_Telephone>
                </gmd:phone>
                <gmd:address>
                   <gmd:CI_Address>
                      <gmd:deliveryPoint>
-                        <gco:CharacterString>GPO Box 378</gco:CharacterString>
+                        <gco:CharacterString>{CONTACTDP}</gco:CharacterString>
                      </gmd:deliveryPoint>
                      <gmd:city>
-                        <gco:CharacterString>Canberra</gco:CharacterString>
+                        <gco:CharacterString>{CONTACTCITY}</gco:CharacterString>
                      </gmd:city>
                      <gmd:administrativeArea>
-                        <gco:CharacterString>ACT</gco:CharacterString>
+                        <gco:CharacterString>{CONTACTSTATE}</gco:CharacterString>
                      </gmd:administrativeArea>
                      <gmd:postalCode>
-                        <gco:CharacterString>2601</gco:CharacterString>
+                        <gco:CharacterString>{CONTACTPOSTCODE}</gco:CharacterString>
                      </gmd:postalCode>
                      <gmd:country>
-                        <gco:CharacterString>Australia</gco:CharacterString>
+                        <gco:CharacterString>{CONTACTCOUNTRY}</gco:CharacterString>
                      </gmd:country>
+                     <gmd:electronicMailAddress>
+                        <gco:CharacterString>{CONTACTEMAIL}</gco:CharacterString>
+                     </gmd:electronicMailAddress>
                   </gmd:CI_Address>
                </gmd:address>
                <gmd:onlineResource>
                   <gmd:CI_OnlineResource>
                      <gmd:linkage>
-                        <gmd:URL>http://www.ga.gov.au/</gmd:URL>
+                        <gmd:URL>{CONTACTURL}</gmd:URL>
                      </gmd:linkage>
                   </gmd:CI_OnlineResource>
                </gmd:onlineResource>
@@ -88,7 +97,7 @@
          <gmd:referenceSystemIdentifier>
             <gmd:RS_Identifier>
                <gmd:code>
-                  <gco:CharacterString>WGS 1984</gco:CharacterString>
+                  <gco:CharacterString>GDA94</gco:CharacterString>
                </gmd:code>
             </gmd:RS_Identifier>
          </gmd:referenceSystemIdentifier>
@@ -101,6 +110,9 @@
                <gmd:title>
                   <gco:CharacterString>{TITLE}</gco:CharacterString>
                </gmd:title>
+               <gmd:alternateTitle>
+                  <gco:CharacterString>{ALTTITLE}</gco:CharacterString>
+               </gmd:alternateTitle>
                <gmd:date>
                   <gmd:CI_Date>
                      <gmd:date>
@@ -243,6 +255,9 @@
                </gmd:geographicElement>
             </gmd:EX_Extent>
          </gmd:extent>
+         <gmd:supplementalInformation>
+           <gco:CharacterString>{SUPPINFO}</gco:CharacterString>
+         </gmd:supplementalInformation>
       </gmd:MD_DataIdentification>
   </gmd:identificationInfo>  
 </gmd:MD_Metadata>
