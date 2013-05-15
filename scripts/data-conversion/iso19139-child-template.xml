@@ -214,18 +214,78 @@
       </gmd:MD_Distribution>
   </gmd:distributionInfo>
   <gmd:dataQualityInfo>
-      <gmd:DQ_DataQuality>
-         <gmd:scope>
-            <gmd:DQ_Scope>
-               <gmd:level>
-                  <gmd:MD_ScopeCode codeListValue="dataset"
+        <gmd:DQ_DataQuality>
+            <gmd:scope>
+                <gmd:DQ_Scope>
+                    <gmd:level>
+                        <gmd:MD_ScopeCode codeListValue="dataset"
                                     codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ScopeCode"/>
-               </gmd:level>
-            </gmd:DQ_Scope>
-         </gmd:scope>
-         <gmd:lineage>
-            <gmd:LI_Lineage/>
-         </gmd:lineage>
-      </gmd:DQ_DataQuality>
-  </gmd:dataQualityInfo>
+                    </gmd:level>
+                </gmd:DQ_Scope>
+            </gmd:scope>
+            <gmd:report>
+                <gmd:DQ_GriddedDataPositionalAccuracy>
+                    <gmd:nameOfMeasure>
+                        <gco:CharacterString>CellSize</gco:CharacterString>
+                    </gmd:nameOfMeasure>
+                    <gmd:result>
+                        <gmd:DQ_QuantitativeResult>
+                            <gmd:valueUnit>
+                                <gml:UnitDefinition>
+                                    <gml:identifier>metres</gml:identifier>
+                                    <gml:name>metres</gml:name>
+                                </gml:UnitDefinition>
+                            </gmd:valueUnit>
+                            <gmd:value>
+                                <gco:Record>{CELLSIZEM}</gco:Record>
+                            </gmd:value>
+                        </gmd:DQ_QuantitativeResult>
+                    </gmd:result>
+                </gmd:DQ_GriddedDataPositionalAccuracy>
+            </gmd:report>
+            <gmd:report>
+                <gmd:DQ_GriddedDataPositionalAccuracy>
+                    <gmd:nameOfMeasure>
+                        <gco:CharacterString>CellSize</gco:CharacterString>
+                    </gmd:nameOfMeasure>
+                    <gmd:result>
+                        <gmd:DQ_QuantitativeResult>
+                            <gmd:valueUnit>
+                                <gml:UnitDefinition>
+                                    <gml:identifier>decimal degrees</gml:identifier>
+                                    <gml:name>decimal degrees</gml:name>
+                                </gml:UnitDefinition>
+                            </gmd:valueUnit>
+                            <gmd:value>
+                                <gco:Record>{CELLSIZEDD}</gco:Record>
+                            </gmd:value>
+                        </gmd:DQ_QuantitativeResult>
+                    </gmd:result>
+                </gmd:DQ_GriddedDataPositionalAccuracy>
+            </gmd:report>
+            <gmd:report>
+                <gmd:DQ_GriddedDataPositionalAccuracy>
+                    <gmd:nameOfMeasure>
+                        <gco:CharacterString>LineSpacing</gco:CharacterString>
+                    </gmd:nameOfMeasure>
+                    <gmd:result>
+                        <gmd:DQ_QuantitativeResult>
+                            <gmd:valueUnit>
+                                <gml:UnitDefinition>
+                                    <gml:identifier>metres</gml:identifier>
+                                    <gml:name>metres</gml:name>
+                                </gml:UnitDefinition>
+                            </gmd:valueUnit>
+                            <gmd:value>
+                                <gco:Record>{LINESPACINGM}</gco:Record>
+                            </gmd:value>
+                        </gmd:DQ_QuantitativeResult>
+                    </gmd:result>
+                </gmd:DQ_GriddedDataPositionalAccuracy>
+            </gmd:report>
+            <gmd:lineage>
+                <gmd:LI_Lineage/>
+            </gmd:lineage>
+        </gmd:DQ_DataQuality>
+    </gmd:dataQualityInfo>
 </gmd:MD_Metadata>

@@ -246,6 +246,11 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
     if additionalDatasetMetadata.has_key(currentFileBasePath): 
         datasetMetadata = additionalDatasetMetadata[currentFileBasePath]
     
+    # This is a reference to the parent metadata record
+    surveyMetadata = None
+    if additionalSurveyMetadata.has_key(surveyId):
+        surveyMetadata =  additionalSurveyMetadata[surveyId]
+
     outputTemplate = open(templateFiles['child']['filename'], 'r').read()
     replaceVars = templateFiles['child']
     
@@ -268,7 +273,9 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
     outputTemplate = outputTemplate.replace('{ALTTITLE}', xml.sax.saxutils.escape(altTitle))
     
     #Abstract
-    abstract = ''
+    abstract = str(mydata)
+    if surveyMetadata is not None:
+        abstract = surveyMetadata['abstract']
     outputTemplate = outputTemplate.replace(replaceVars['abstract'], xml.sax.saxutils.escape(abstract))
     
     #licence
@@ -285,13 +292,20 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
         date = mydata['date'].split('_')[0]
     outputTemplate = outputTemplate.replace(replaceVars['date'], date)
     
+    #Data quality info
+    cellSizeM = 'Unknown'
+    cellSizeDd = 'Unknown'
+    lineSpacing = 'Unknown'
+    if datasetMetadata is not None:
+        cellSizeM = datasetMetadata['CellsizeMetres']
+        cellSizeDd = datasetMetadata['CELLSIZE_DECDEGREES']
+        lineSpacing = datasetMetadata['LinespacingMetres']
+    outputTemplate = outputTemplate.replace('{CELLSIZEM}', xml.sax.saxutils.escape(cellSizeM))
+    outputTemplate = outputTemplate.replace('{CELLSIZEDD}', xml.sax.saxutils.escape(cellSizeDd))
+    outputTemplate = outputTemplate.replace('{LINESPACINGM}', xml.sax.saxutils.escape(lineSpacing))
+
     #Supplemental Information
     suppInfo = ''
-    if datasetMetadata is not None:
-        suppInfo += '%s=%s\n' % ('CELLSIZE_DECDEGREES', datasetMetadata['CELLSIZE_DECDEGREES'])
-        suppInfo += '%s=%s\n' % ('LinespacingMetres', datasetMetadata['LinespacingMetres'])
-        suppInfo += '%s=%s\n' % ('CoordsysData', datasetMetadata['CoordsysData'])
-        suppInfo += '%s=%s\n' % ('CellsizeMetres', datasetMetadata['CellsizeMetres'])
     outputTemplate = outputTemplate.replace('{SUPPINFO}', xml.sax.saxutils.escape(suppInfo))
 
     #Keywords
