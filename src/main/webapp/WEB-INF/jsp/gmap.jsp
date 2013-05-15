@@ -37,6 +37,16 @@
             -khtml-user-select: text!important;
         }
         </style>
+        
+        <!-- To hide the Overlays in our open layers -->
+        <style type="text/css">
+        div.dataLayersDiv {
+            display: none;
+        }
+        div.dataLbl {
+        	display: none;
+        }
+        </style>
 
       <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
    </head>
