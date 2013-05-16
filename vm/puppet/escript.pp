@@ -20,6 +20,9 @@ class escript_packages {
 }
 class {"escript_packages": }
 
+# Install VisIt
+class {"visit": }
+
 # Note: At the time of writing the current OpenMPI package (openmpi-devel-1.5.4-1.el6.x86_64) is missing the necessary I/O component. 
 # Parts of escript require the I/O functionality and will not work. A bug was filed with CentOS who will 
 # hopefully fix the issue in an updated package (see http://bugs.centos.org/view.php?id=5931). 
