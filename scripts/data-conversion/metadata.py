@@ -122,19 +122,28 @@ def createParentMetadataRecord(surveyId, datasetFileName, mydata):
             altTitle = surveyMetadata['alternateTitle']
         outputTemplate = outputTemplate.replace('{ALTTITLE}', xml.sax.saxutils.escape(altTitle))
         
-        #supplemental information (we will combine this with 3rd party organisation names)
+        #supplemental information
         suppInfo = ''
-        if surveyMetadata is not None:
-            suppInfo = surveyMetadata['supplementalInformation']
-            
-            # Concetanate 3rd party organisation names
-            for x in range(0,5):
-                roleKey = 'party role%s' % (x + 1)
-                orgKey = 'organisation name%s' % (x + 1)
-                if surveyMetadata[roleKey]:
-                    suppInfo += '\n%s=%s' %  (surveyMetadata[roleKey], surveyMetadata[orgKey])
-
         outputTemplate = outputTemplate.replace('{SUPPINFO}', xml.sax.saxutils.escape(suppInfo))
+
+
+        #3rd party roles
+        roleOperator = 'Unknown'
+        roleContractor = 'Unknown'
+        roleProcessor = 'Unknown'
+        roleClient = 'Unknown'
+        roleOwner = 'Unknown'
+        if surveyMetadata is not None:
+            roleOperator = surveyMetadata['organisation name1']
+            roleContractor = surveyMetadata['organisation name2']
+            roleProcessor = surveyMetadata['organisation name3']
+            roleClient = surveyMetadata['organisation name4']
+            roleOwner = surveyMetadata['organisation name5']
+        outputTemplate = outputTemplate.replace('{ROLEOPERATOR}', xml.sax.saxutils.escape(roleOperator))
+        outputTemplate = outputTemplate.replace('{ROLECONTRACTOR}', xml.sax.saxutils.escape(roleContractor))
+        outputTemplate = outputTemplate.replace('{ROLEPROCESSOR}', xml.sax.saxutils.escape(roleProcessor))
+        outputTemplate = outputTemplate.replace('{ROLECLIENT}', xml.sax.saxutils.escape(roleClient))
+        outputTemplate = outputTemplate.replace('{ROLEOWNER}', xml.sax.saxutils.escape(roleOwner))
         
         #Date
         date = 'unknown'
@@ -284,6 +293,12 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
         licence = datasetMetadata['Licence']
     outputTemplate = outputTemplate.replace('{LICENCE}', xml.sax.saxutils.escape(licence))
     
+    #Reference System
+    refSystem = 'GDA94'
+    if datasetMetadata is not None:
+        refSystem = datasetMetadata['CoordsysData']
+    outputTemplate = outputTemplate.replace('{REFSYSTEM}', xml.sax.saxutils.escape(refSystem))
+
     #Date
     date = 'unknown'
     if datasetMetadata is not None:

@@ -43,7 +43,7 @@
          <gmd:referenceSystemIdentifier>
             <gmd:RS_Identifier>
                <gmd:code>
-                  <gco:CharacterString>GDA94</gco:CharacterString>
+                  <gco:CharacterString>{REFSYSTEM}</gco:CharacterString>
                </gmd:code>
             </gmd:RS_Identifier>
          </gmd:referenceSystemIdentifier>

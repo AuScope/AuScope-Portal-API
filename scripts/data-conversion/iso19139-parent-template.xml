@@ -139,6 +139,56 @@
             <gmd:MD_ProgressCode codeListValue="completed"
                                  codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ProgressCode"/>
          </gmd:status>
+         <gmd:pointOfContact>
+            <gmd:CI_ResponsibleParty>
+              <gmd:organisationName>
+                 <gco:CharacterString>{ROLEOPERATOR}</gco:CharacterString>
+              </gmd:organisationName>
+              <gmd:role>
+                 <gmd:CI_RoleCode>Operator - principalInvestigator</gmd:CI_RoleCode>
+              </gmd:role>
+           </gmd:CI_ResponsibleParty>
+         </gmd:pointOfContact>
+         <gmd:pointOfContact>
+            <gmd:CI_ResponsibleParty>
+              <gmd:organisationName>
+                 <gco:CharacterString>{ROLECONTRACTOR}</gco:CharacterString>
+              </gmd:organisationName>
+              <gmd:role>
+                 <gmd:CI_RoleCode>Contractor - resourceProvider</gmd:CI_RoleCode>
+              </gmd:role>
+           </gmd:CI_ResponsibleParty>
+         </gmd:pointOfContact>
+         <gmd:pointOfContact>
+            <gmd:CI_ResponsibleParty>
+              <gmd:organisationName>
+                 <gco:CharacterString>{ROLEPROCESSOR}</gco:CharacterString>
+              </gmd:organisationName>
+              <gmd:role>
+                 <gmd:CI_RoleCode>Processor</gmd:CI_RoleCode>
+              </gmd:role>
+           </gmd:CI_ResponsibleParty>
+         </gmd:pointOfContact>
+         <gmd:pointOfContact>
+            <gmd:CI_ResponsibleParty>
+              <gmd:organisationName>
+                 <gco:CharacterString>{ROLECLIENT}</gco:CharacterString>
+              </gmd:organisationName>
+              <gmd:role>
+                 <gmd:CI_RoleCode>Client</gmd:CI_RoleCode>
+              </gmd:role>
+           </gmd:CI_ResponsibleParty>
+         </gmd:pointOfContact>
+         <gmd:pointOfContact>
+            <gmd:CI_ResponsibleParty>
+              <gmd:organisationName>
+                 <gco:CharacterString>{ROLEOWNER}</gco:CharacterString>
+              </gmd:organisationName>
+              <gmd:role>
+                 <gmd:CI_RoleCode>Owner</gmd:CI_RoleCode>
+              </gmd:role>
+           </gmd:CI_ResponsibleParty>
+         </gmd:pointOfContact>
          <gmd:resourceMaintenance>
             <gmd:MD_MaintenanceInformation>
                <gmd:maintenanceAndUpdateFrequency>
@@ -233,7 +283,7 @@
                                      codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CharacterSetCode"/>
          </gmd:characterSet>
          <gmd:topicCategory>
-            <gmd:MD_TopicCategoryCode>boundaries</gmd:MD_TopicCategoryCode>
+            <gmd:MD_TopicCategoryCode>Geoscientific Information</gmd:MD_TopicCategoryCode>
          </gmd:topicCategory>
          <gmd:extent>
             <gmd:EX_Extent>
