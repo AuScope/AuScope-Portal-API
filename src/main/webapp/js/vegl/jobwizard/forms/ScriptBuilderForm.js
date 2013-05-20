@@ -19,7 +19,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
      */
     constructor: function(wizardState) {
         this.scriptBuilderFrm = Ext.create('ScriptBuilder.ScriptBuilder', {
-            wizardState : wizardState,
+            wizardState : wizardState
         });
 
         // Finally, build the main layout once all the pieces are ready.
