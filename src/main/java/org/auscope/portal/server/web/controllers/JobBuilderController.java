@@ -372,6 +372,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="seriesId", required=false) Integer seriesId,
             @RequestParam(value="computeServiceId", required=false) String computeServiceId,
             @RequestParam(value="computeVmId", required=false) String computeVmId,
+            @RequestParam(value="computeTypeId", required=false) String computeTypeId,
             @RequestParam(value="storageServiceId", required=false) String storageServiceId,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
@@ -397,6 +398,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setName(name);
         job.setDescription(description);
         job.setComputeVmId(computeVmId);
+        job.setComputeInstanceType(computeTypeId);
         job.setEmailNotification(emailNotification);
 
         //Updating the storage service means changing the base key
@@ -763,7 +765,6 @@ public class JobBuilderController extends BaseCloudController {
         //Load details from
         job.setUser((String) session.getAttribute("openID-Email"));
         job.setEmailAddress((String) session.getAttribute("openID-Email"));
-        job.setComputeInstanceType("m1.large");
         job.setComputeInstanceKey("vgl-developers");
         job.setName("VGL-Job " + new Date().toString());
         job.setDescription("");
@@ -834,6 +835,22 @@ public class JobBuilderController extends BaseCloudController {
             return generateJSONResponseMAV(true, images, "");
         } catch (Exception ex) {
             log.error("Unable to access image list:" + ex.getMessage(), ex);
+            return generateJSONResponseMAV(false);
+        }
+    }
+    
+    @RequestMapping("/getVmTypesForComputeService.do")
+    public ModelAndView getTypesForComputeService(HttpServletRequest request,
+                                        @RequestParam("computeServiceId") String computeServiceId) {
+        try {
+            CloudComputeService ccs = getComputeService(computeServiceId);
+            if (ccs == null) {
+                return generateJSONResponseMAV(false, null, "Unknown compute service");
+            }
+            
+            return generateJSONResponseMAV(true, ccs.getAvailableComputeTypes(), "");
+        } catch (Exception ex) {
+            log.error("Unable to access compute type list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
         }
     }

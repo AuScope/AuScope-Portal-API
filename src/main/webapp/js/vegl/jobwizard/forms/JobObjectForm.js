@@ -8,6 +8,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
     imageStore : null,
+    computeTypeStore : null,
     storageServicesStore : null,
     computeServicesStore : null,
 
@@ -22,6 +23,18 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             proxy: {
                 type: 'ajax',
                 url: 'getVmImagesForComputeService.do',
+                reader: {
+                   type: 'json',
+                   root : 'data'
+                }
+            }
+        });
+        
+        this.computeTypeStore = Ext.create('Ext.data.Store', {
+            model: 'vegl.models.ComputeType',
+            proxy: {
+                type: 'ajax',
+                url: 'getVmTypesForComputeService.do',
                 reader: {
                    type: 'json',
                    root : 'data'
@@ -84,6 +97,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                 if (responseObj.success) {
                                     //Loads the image store of user selected compute provider
                                     jobObjectFrm.imageStore.load({
+                                        params : {
+                                            computeServiceId : responseObj.data[0].computeServiceId
+                                        }
+                                    });
+                                    jobObjectFrm.computeTypeStore.load({
                                         params : {
                                             computeServiceId : responseObj.data[0].computeServiceId
                                         }
@@ -185,6 +203,27 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     text: 'Select a toolbox that contains software that you would like to use to process your data.'
                 }]
             },{
+                xtype : 'combo',
+                fieldLabel : 'Resources',
+                name: 'computeTypeId',
+                itemId : 'resource-combo',
+                displayField : 'description',
+                valueField : 'id',
+                allowBlank: false,
+                queryMode: 'local',
+                triggerAction: 'all',
+                typeAhead: true,
+                forceSelection: true,
+                store : this.computeTypeStore,
+                listConfig : {
+                    loadingText: 'Getting available resources...',
+                    emptyText: 'No matching resource configurations found. Select a different compute location.'
+                },
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select a compute resource configuration that is sufficient for your needs.'
+                }]
+            },{
                 xtype : 'checkboxfield',
                 fieldLabel : 'Email Notification',
                 name: 'emailNotification',
@@ -208,11 +247,17 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     onComputeSelect : function(combo, records) {
         if (!records.length) {
             this.imageStore.removeAll();
+            this.computeTypeStore.removeAll();
             return;
         }
 
         this.getComponent('image-combo').clearValue();
         this.imageStore.load({
+            params : {
+                computeServiceId : records[0].get('id')
+            }
+        });
+        this.computeTypeStore.load({
             params : {
                 computeServiceId : records[0].get('id')
             }
@@ -257,6 +302,13 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 // Store user selected toolbox into wizard state. That toolbox
                 // will be used to select relevant script templates or examples.
                 wizardState.toolbox = jobObjectFrm.getForm().findField("computeVmId").getRawValue();
+                
+                // Store selected resource limits into wizard state. These values will be included
+                // in template generation (to ensure valid numbers of CPU's are chosen etc)
+                var computeTypeId = jobObjectFrm.getComponent('resource-combo').getValue();
+                var computeType = jobObjectFrm.computeTypeStore.getById(computeTypeId);
+                wizardState.ncpus = computeType.get('vcpus');
+                wizardState.nrammb = computeType.get('ramMB');
                 callback(true);
             }
         });

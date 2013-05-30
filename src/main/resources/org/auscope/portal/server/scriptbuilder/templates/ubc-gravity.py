@@ -696,8 +696,8 @@ def main():
     sns_out = 'sens.out'
     inv_inp = 'inv.inp'
     inv_out = 'inv.out'
-    sensitivity_command = 'mpirun -np 4 --mca btl self,sm /opt/ubc/gzsen3d_MPI ' + sns_inp + ' > ' + sns_out
-    inversion_command = 'mpirun -np 4 --mca btl self,sm /opt/ubc/gzinv3d_MPI ' + inv_inp + ' > ' + inv_out
+    sensitivity_command = 'mpirun -np ${n-threads} --mca btl self,sm /opt/ubc/gzsen3d_MPI ' + sns_inp + ' > ' + sns_out
+    inversion_command = 'mpirun -np ${n-threads} --mca btl self,sm /opt/ubc/gzinv3d_MPI ' + inv_inp + ' > ' + inv_out
     print 'Sensitivity command: ' + sensitivity_command
     print 'Inversion command: ' + inversion_command
     sys.stdout.flush()

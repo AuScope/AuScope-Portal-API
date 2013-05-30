@@ -16,11 +16,12 @@ Ext.define('ScriptBuilder.templates.EScriptMagneticTemplate', {
      */
     requestScript : function(callback) {
         var jobId = this.wizardState.jobId;
+        var maxThreads = this.wizardState.ncpus;
 
         this._getTemplatedScriptGui(callback, 'escript-magnetic.py', {
             xtype : 'form',
             width : 540,
-            height : 370,
+            height : 410,
             items : [{
                 xtype : 'combo',
                 fieldLabel : 'Dataset',
@@ -48,6 +49,18 @@ Ext.define('ScriptBuilder.templates.EScriptMagneticTemplate', {
                     },
                     autoLoad : true
                 })
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'Max Threads',
+                anchor : '-20',
+                name : 'n-threads',
+                value : maxThreads,
+                allowBlank : false,
+                minValue : 1,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: Ext.String.format('The maximum number of execution threads to run (this job will have {0} CPUs)', maxThreads)
+                }]
             },{
                 xtype: 'fieldcontainer',
                 fieldLabel: 'Background B',

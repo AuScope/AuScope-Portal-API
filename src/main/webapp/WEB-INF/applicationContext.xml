@@ -184,6 +184,40 @@
         </constructor-arg>
         <property name="id" value="nci-openstack-compute"/>
         <property name="name" value="National Computing Infrastructure (Canberra)"/>
+        <property name="availableComputeTypes">
+        	<list>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.small"/>
+        			<property name="description" value="Small Instance - 1 CPU, 4 GB RAM"/>
+        			<property name="vcpus" value="1"/>
+        			<property name="ramMB" value="4096"/>
+        		</bean>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.medium"/>
+        			<property name="description" value="Medium Instance - 2 CPUs, 8 GB RAM"/>
+        			<property name="vcpus" value="2"/>
+        			<property name="ramMB" value="8192"/>
+        		</bean>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.large"/>
+        			<property name="description" value="Large Instance - 4 CPUs, 16 GB RAM"/>
+        			<property name="vcpus" value="4"/>
+        			<property name="ramMB" value="16384"/>
+        		</bean>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.xlarge"/>
+        			<property name="description" value="Extra Large Instance - 8 CPUs, 32 GB RAM"/>
+        			<property name="vcpus" value="8"/>
+        			<property name="ramMB" value="32768"/>
+        		</bean>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.xxlarge"/>
+        			<property name="description" value="Huge Instance - 16 CPUs, 64 GB RAM"/>
+        			<property name="vcpus" value="16"/>
+        			<property name="ramMB" value="65536"/>
+        		</bean>
+        	</list>
+        </property>
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
@@ -249,6 +283,40 @@
         </constructor-arg>
         <property name="id" value="nectar-openstack-compute"/>
         <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
+        <property name="availableComputeTypes">
+        	<list>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.small"/>
+        			<property name="description" value="Small Instance - 1 CPU, 4 GB RAM"/>
+        			<property name="vcpus" value="1"/>
+        			<property name="ramMB" value="4096"/>
+        		</bean>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.medium"/>
+        			<property name="description" value="Medium Instance - 2 CPUs, 8 GB RAM"/>
+        			<property name="vcpus" value="2"/>
+        			<property name="ramMB" value="8192"/>
+        		</bean>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.large"/>
+        			<property name="description" value="Large Instance - 4 CPUs, 16 GB RAM"/>
+        			<property name="vcpus" value="4"/>
+        			<property name="ramMB" value="16384"/>
+        		</bean>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.xlarge"/>
+        			<property name="description" value="Extra Large Instance - 8 CPUs, 32 GB RAM"/>
+        			<property name="vcpus" value="8"/>
+        			<property name="ramMB" value="32768"/>
+        		</bean>
+        		<bean class="org.auscope.portal.core.cloud.ComputeType">
+        			<constructor-arg name="id" value="m1.xxlarge"/>
+        			<property name="description" value="Huge Instance - 16 CPUs, 64 GB RAM"/>
+        			<property name="vcpus" value="16"/>
+        			<property name="ramMB" value="65536"/>
+        		</bean>
+        	</list>
+        </property>
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">

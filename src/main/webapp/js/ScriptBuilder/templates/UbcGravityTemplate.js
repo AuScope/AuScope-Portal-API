@@ -20,11 +20,12 @@ Ext.define('ScriptBuilder.templates.UbcGravityTemplate', {
      */
     requestScript : function(callback) {
         var jobId = this.wizardState.jobId;
+        var maxThreads = this.wizardState.ncpus;
 
         this._getTemplatedScriptGui(callback, this.getScriptName(), {
             xtype : 'form',
             width : 720,
-            height : 400,
+            height : 415,
             items : [{
                 xtype : 'combo',
                 itemId : 'dataset-combo',
@@ -57,6 +58,19 @@ Ext.define('ScriptBuilder.templates.UbcGravityTemplate', {
                 listeners : {
                     change : Ext.bind(this.onComboChange, this)
                 }
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'Max Threads',
+                anchor : '-10',
+                name : 'n-threads',
+                margin : '5 10 2 10',
+                value : maxThreads,
+                allowBlank : false,
+                minValue : 1,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: Ext.String.format('The maximum number of execution threads to run (this job will have {0} CPUs)', maxThreads)
+                }]
             },{
                 xtype : 'fieldset',
                 anchor: '-10',

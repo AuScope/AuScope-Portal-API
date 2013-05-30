@@ -29,6 +29,8 @@ NE_Z = ${vertical-mesh-elements}
 PAD_X = ${x-padding}
 PAD_Y = ${y-padding}
 
+N_THREADS = ${n-threads}
+
 ####### Do not change anything below this line #######
 
 import os
@@ -40,7 +42,7 @@ try:
     from esys.escript import unitsSI as U
     from esys.weipa import saveSilo
 except ImportError:
-    line=["/opt/escript/bin/run-escript","-t4"]+sys.argv
+    line=["/opt/escript/bin/run-escript","-t" + str(N_THREADS)]+sys.argv
     ret=subprocess.call(line)
     sys.exit(ret)
 

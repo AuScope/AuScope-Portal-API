@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import junit.framework.Assert;
 
 import org.apache.commons.collections.iterators.IteratorEnumeration;
+import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
@@ -1130,6 +1131,7 @@ public class TestJobBuilderController {
         final String baseKey = "base/key";
         final String storageServiceId = "storage-service";
         final String computeServiceId = "compute-service";
+        final String computeVmType = "compute-vm-type";
         final String computeVmId = "compute-vm";
         final String name = "name";
         final String description = "desc";
@@ -1177,6 +1179,7 @@ public class TestJobBuilderController {
                                                         seriesId,
                                                         computeServiceId,
                                                         computeVmId,
+                                                        computeVmType,
                                                         storageServiceId,
                                                         null,
                                                         emailNotification,
@@ -1194,7 +1197,7 @@ public class TestJobBuilderController {
         Assert.assertEquals(storageServiceId, newJob.getStorageServiceId());
         Assert.assertEquals(computeServiceId, newJob.getComputeServiceId());
         Assert.assertEquals(baseKey, newJob.getStorageBaseKey());
-        Assert.assertEquals("m1.large", newJob.getComputeInstanceType());
+        Assert.assertEquals(computeVmType, newJob.getComputeInstanceType());
 
         Map<String, VglParameter> params = newJob.getJobParameters();
         Assert.assertNotNull(params);
@@ -1228,6 +1231,7 @@ public class TestJobBuilderController {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final int seriesId = 12;
         final int jobId = 1234;
+        final String computeVmType = "compute-vm-type";
         final String newBaseKey = "base/key";
         final boolean emailNotification = true;
 
@@ -1244,6 +1248,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setStorageServiceId("storageServiceId");
             oneOf(mockJob).setStorageBaseKey(newBaseKey);
             oneOf(mockJob).setEmailNotification(emailNotification);
+            oneOf(mockJob).setComputeInstanceType(computeVmType);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("storageServiceId"));
@@ -1259,6 +1264,7 @@ public class TestJobBuilderController {
                                                         seriesId,
                                                         "computeServiceId",
                                                         "computeVmId",
+                                                        computeVmType,
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
@@ -1273,6 +1279,7 @@ public class TestJobBuilderController {
         final int seriesId = 12;
         final int jobId = 1234;
         final boolean emailNotification = true;
+        final String computeVmType = "compute-vm-type";
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1286,6 +1293,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("storageServiceId");
             oneOf(mockJob).setEmailNotification(emailNotification);
+            oneOf(mockJob).setComputeInstanceType(computeVmType);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId"));
@@ -1300,6 +1308,7 @@ public class TestJobBuilderController {
                                                         seriesId,
                                                         "computeServiceId",
                                                         "computeVmId",
+                                                        computeVmType,
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
@@ -1318,6 +1327,7 @@ public class TestJobBuilderController {
         final int seriesId = 12;
         final int jobId = 1234;
         final boolean emailNotification = true;
+        final String computeVmType = "compute-vm-type";
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1331,6 +1341,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("storageServiceId");
             oneOf(mockJob).setEmailNotification(emailNotification);
+            oneOf(mockJob).setComputeInstanceType(computeVmType);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId-thatDNE"));
@@ -1345,6 +1356,7 @@ public class TestJobBuilderController {
                                                         seriesId,
                                                         "computeServiceId",
                                                         "computeVmId",
+                                                        computeVmType,
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
@@ -1363,6 +1375,7 @@ public class TestJobBuilderController {
         final int seriesId = 12;
         final int jobId = 1234;
         final boolean emailNotification = true;
+        final String computeVmType = "compute-vm-type";
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1376,6 +1389,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("storageServiceId");
             oneOf(mockJob).setEmailNotification(emailNotification);
+            oneOf(mockJob).setComputeInstanceType(computeVmType);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId-thatDNE"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId"));
@@ -1390,6 +1404,7 @@ public class TestJobBuilderController {
                                                         seriesId,
                                                         "computeServiceId",
                                                         "computeVmId",
+                                                        computeVmType,
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
@@ -1576,4 +1591,44 @@ public class TestJobBuilderController {
         Assert.assertEquals(name, test.get("name"));
         Assert.assertEquals(id, test.get("id"));
     }
+    
+    /**
+     * Tests that getting a compute type list for a particular compute service returns no exceptions
+     * @throws Exception
+     */
+    @Test
+    public void testGetComputeTypes() throws Exception {
+        final String computeId = "compute-id";
+        final ComputeType[] result = new ComputeType[] {new ComputeType("test-compute-type")};
+
+        context.checking(new Expectations() {{
+            allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeId));
+            allowing(mockCloudComputeServices[0]).getAvailableComputeTypes();will(returnValue(result));
+        }});
+
+        ModelAndView mav = controller.getTypesForComputeService(mockRequest, computeId);
+
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Assert.assertSame(result, mav.getModel().get("data"));
+    }
+    
+    /**
+     * Tests that getting a compute type list for a particular compute service returns no exceptions
+     * @throws Exception
+     */
+    @Test
+    public void testGetComputeTypes_NoComputeService() throws Exception {
+        final String computeId = "compute-id";
+
+        context.checking(new Expectations() {{
+            allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeId));
+        }});
+
+        ModelAndView mav = controller.getTypesForComputeService(mockRequest, "non-matching-compute-id");
+
+        Assert.assertNotNull(mav);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
+    
 }
