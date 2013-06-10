@@ -572,6 +572,7 @@ public class TestJobBuilderController {
         final String storageEndpoint = "http://example.org";
         final String storageProvider = "provider";
         final String storageAuthVersion = "1.2.3";
+        final String regionName = null;
 
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
@@ -614,6 +615,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
@@ -787,6 +789,7 @@ public class TestJobBuilderController {
         final String storageAuthVersion = "1.2.3";
         final String storageEndpoint = "http://example.org";
         final String storageServiceId = "storage-service-id";
+        final String regionName = "region-name";
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
         jobObj.setComputeVmId(computeVmId);
@@ -820,6 +823,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
 
             //We should have 1 call to upload them
             oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
@@ -983,6 +987,7 @@ public class TestJobBuilderController {
         final String storageServiceId = "css";
         final String endpoint = "http://example.org";
         final String vmSh = "http://example2.org";
+        final String regionName = "region-name";
 
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);
@@ -998,6 +1003,7 @@ public class TestJobBuilderController {
             atLeast(1).of(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             atLeast(1).of(mockCloudStorageServices[0]).getEndpoint();will(returnValue(endpoint));
             atLeast(1).of(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            atLeast(1).of(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
         }});
 
         job.setStorageBaseKey("test/key");
@@ -1015,21 +1021,23 @@ public class TestJobBuilderController {
         Assert.assertTrue(contents.contains(storageAuthVersion));
         Assert.assertTrue(contents.contains(vmSh));
         Assert.assertTrue(contents.contains(endpoint));
+        Assert.assertTrue(contents.contains(regionName));
     }
 
     /**
      * Tests that Grid Submit Controller's usage of the bootstrap template correctly encodes an empty
-     * auth version (when required)
+     * string (when required)
      * @throws Exception
      */
     @Test
-    public void testCreateBootstrapForJob_NoAuthVersion() throws Exception {
+    public void testCreateBootstrapForJob_NoOptionalValues() throws Exception {
         final VEGLJob job = new VEGLJob(1234);
         final String bucket = "stora124e-Bucket";
         final String access = "213-asd-54";
         final String secret = "tops3cret";
         final String provider = "provider";
         final String storageAuthVersion = null;
+        final String regionName = null;
         final String computeServiceId = "ccs";
         final String storageServiceId = "css";
         final String endpoint = "http://example.org";
@@ -1049,6 +1057,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(endpoint));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
         }});
 
         job.setStorageBaseKey("test/key");
@@ -1056,6 +1065,7 @@ public class TestJobBuilderController {
         String contents = controller.createBootstrapForJob(job);
         Assert.assertNotNull(contents);
         Assert.assertTrue(contents.contains("STORAGE_AUTH_VERSION=\"\""));
+        Assert.assertTrue(contents.contains("OS_REGION_NAME=\"\""));
     }
 
     /**
