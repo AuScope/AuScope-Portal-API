@@ -168,10 +168,11 @@
         <constructor-arg name="provider" value="swift-keystone"/>
         <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
-        <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources (Queensland)"/>
         <property name="id" value="nectar-openstack-storage"/>
         <property name="bucket" value="vgl-portal"/>
         <property name="authVersion" value="2.0"/>
+        <property name="regionName" value="Qld"/>
     </bean>
 
     <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeService">

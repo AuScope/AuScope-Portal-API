@@ -554,7 +554,8 @@ public class JobBuilderController extends BaseCloudController {
             hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
             cloudStorageService.getEndpoint(), //STORAGE_ENDPOINT
             cloudStorageService.getProvider(), //STORAGE_TYPE
-            cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion() //STORAGE_AUTH_VERSION
+            cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion(), //STORAGE_AUTH_VERSION
+            cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName() //OS_REGION_NAME
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);

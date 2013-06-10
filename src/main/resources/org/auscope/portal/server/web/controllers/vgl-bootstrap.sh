@@ -17,6 +17,7 @@ export WORKFLOW_URL="{4}"
 export STORAGE_ENDPOINT="{5}"
 export STORAGE_TYPE="{6}"
 export STORAGE_AUTH_VERSION="{7}"
+export OS_REGION_NAME="{8}"
 
 # Load our profile so this run is the same as a regular user login (to make debugging easier)
 source /etc/profile
