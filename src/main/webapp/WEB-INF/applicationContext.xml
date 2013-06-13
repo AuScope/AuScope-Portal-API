@@ -222,7 +222,7 @@
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-0000000b"/>
+                    <constructor-arg name="imageId" value="ami-00000034"/>
                     <property name="name" value="UBC-GIF"/>
                     <property name="description"><value>A Centos 6 machine with the University of British Columbia's Geophysical inversion facility already installed.</value></property>
                     <property name="keywords">
@@ -239,7 +239,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-00000030"/>
+                    <constructor-arg name="imageId" value="ami-00000035"/>
                     <property name="name" value="escript"/>
                     <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
                     <property name="keywords">
@@ -255,7 +255,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-0000002e"/>
+                    <constructor-arg name="imageId" value="ami-00000036"/>
                     <property name="name" value="Underworld"/>
                     <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
                     <property name="keywords">
