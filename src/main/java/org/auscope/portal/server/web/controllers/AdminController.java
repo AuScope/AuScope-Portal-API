@@ -1,6 +1,7 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,11 +136,12 @@ public class AdminController {
      *
      * This method is intentionally avoiding the WFSService to focus on the WFS request/response (ignoring the XSLT pipeline)
      * @return
+     * @throws URISyntaxException
      */
     @RequestMapping("/testWFS.diag")
     public ModelAndView testWFS(@RequestParam("serviceUrls") String[] serviceUrls,
                                 @RequestParam("typeNames") String[] typeNames,
-                                @RequestParam("bbox") String bboxJson) {
+                                @RequestParam("bbox") String bboxJson) throws URISyntaxException {
 
         //No point in proceeding with test without a valid bbox
         FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
@@ -162,11 +164,12 @@ public class AdminController {
      *
      * Any duplicated serviceUrl + layer name combos will be culled
      * @return
+     * @throws URISyntaxException
      */
     @RequestMapping("/testWMS.diag")
     public ModelAndView testWMS(@RequestParam("serviceUrls") String[] serviceUrls,
                                 @RequestParam("layerNames") String[] layerNames,
-                                @RequestParam("bbox") String bboxJson) {
+                                @RequestParam("bbox") String bboxJson) throws URISyntaxException {
 
         //No point in proceeding with test without a valid bbox
         FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);

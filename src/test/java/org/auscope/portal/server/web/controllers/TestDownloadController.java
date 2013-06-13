@@ -7,12 +7,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.http.Header;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.message.BasicHeader;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.test.ByteBufferedServletOutputStream;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -92,8 +92,8 @@ public class TestDownloadController extends PortalTestClass {
                 oneOf(mockHttpResponse).getOutputStream();will(returnValue(servletOutputStream));
 
                 // calling the service
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
-                    will(returnValue(dummyJSONResponseIS));
+                oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
+                    will(returnValue(new MyHttpResponse(dummyJSONResponseIS)));
             }
         });
 
@@ -148,10 +148,10 @@ public class TestDownloadController extends PortalTestClass {
                 oneOf(mockHttpResponse).getOutputStream();will(returnValue(servletOutputStream));
 
                 // calling the service
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
-                will(returnValue(dummyJSONResponseIS));
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
-                will(delayReturnValue(300,dummyJSONResponseNoMsgIS));
+                oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
+                will(returnValue(new MyHttpResponse(dummyJSONResponseIS)));
+                oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
+                will(delayReturnValue(300,new MyHttpResponse(dummyJSONResponseNoMsgIS)));
             }
         });
 
@@ -207,10 +207,10 @@ public class TestDownloadController extends PortalTestClass {
                 oneOf(mockHttpResponse).getOutputStream();will(returnValue(servletOutputStream));
 
                 // calling the service
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
+                oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
                 will(throwException(new Exception("Exception test")));
-                oneOf(httpServiceCaller).getMethodResponseAsStream(with(any(HttpMethodBase.class)),with(any(HttpClient.class)));
-                will(delayReturnValue(100,dummyJSONResponseIS2));
+                oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
+                will(delayReturnValue(100,new MyHttpResponse(dummyJSONResponseIS2)));
             }
         });
 
@@ -253,7 +253,7 @@ public class TestDownloadController extends PortalTestClass {
 
         final String[] serviceUrls = { "http://someUrl" };
         final String dummyData = "dummyData";
-        final Header header = new Header("Content-Type", "text/xml");
+        //final Header header = new BasicHeader("Content-Type", "text/xml");
         final MyServletOutputStream servletOutputStream = new MyServletOutputStream(dummyData.length());
 
         context.checking(new Expectations() {
@@ -267,7 +267,7 @@ public class TestDownloadController extends PortalTestClass {
 
                 // calling the service
                 oneOf(httpServiceCaller).getMethodResponseAsBytes(
-                        with(any(HttpMethodBase.class)));
+                        with(any(HttpRequestBase.class)));
                 will(returnValue(dummyData.getBytes()));
             }
         });
@@ -304,7 +304,7 @@ public class TestDownloadController extends PortalTestClass {
     public void testDownloadDataAsZipWithPNG() throws Exception {
         final String[] serviceUrls = { "http://someUrl" };
         final String dummyData = "dummyData";
-        final Header header = new Header("Content-Type", "image/png");
+        //final Header header = new BasicHeader("Content-Type", "image/png");
         final MyServletOutputStream servletOutputStream = new MyServletOutputStream(dummyData.length());
 
         context.checking(new Expectations() {
@@ -318,7 +318,7 @@ public class TestDownloadController extends PortalTestClass {
 
                 // calling the service
                 oneOf(httpServiceCaller).getMethodResponseAsBytes(
-                        with(any(HttpMethodBase.class)));
+                        with(any(HttpRequestBase.class)));
                 will(returnValue(dummyData.getBytes()));
 
             }
