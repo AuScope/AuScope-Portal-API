@@ -216,12 +216,6 @@
         			<property name="vcpus" value="8"/>
         			<property name="ramMB" value="32768"/>
         		</bean>
-        		<bean class="org.auscope.portal.core.cloud.ComputeType">
-        			<constructor-arg name="id" value="m1.xxlarge"/>
-        			<property name="description" value="Huge Instance - 16 CPUs, 64 GB RAM"/>
-        			<property name="vcpus" value="16"/>
-        			<property name="ramMB" value="65536"/>
-        		</bean>
         	</list>
         </property>
         <property name="availableImages">
