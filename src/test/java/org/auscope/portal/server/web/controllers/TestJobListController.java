@@ -2,7 +2,10 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -725,30 +728,34 @@ public class TestJobListController extends PortalTestClass {
         final InputStream is2 = new ByteArrayInputStream(file2Data);
         final InputStream is3 = new ByteArrayInputStream(file3Data);
         final ReadableServletOutputStream outStream = new ReadableServletOutputStream();
-
+        final String jobName = "job WITH !()[]#$%@\\/;\"'";
+        final Date submitDate = new SimpleDateFormat("yyyyMMdd").parse("19861009");
+        
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            allowing(mockJob).getName();will(returnValue(jobName));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
-
+            allowing(mockJob).getSubmitDate();will(returnValue(submitDate));
+            
             oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey1);will(returnValue(is1));
             oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey2);will(returnValue(is2));
             oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey3);will(returnValue(is3));
 
             //Ensure our response stream gets written to
             oneOf(mockResponse).setContentType("application/zip");
-            allowing(mockResponse).setHeader(with(any(String.class)), with(any(String.class)));
+            oneOf(mockResponse).setHeader("Content-Disposition", "attachment; filename=\"jobfiles_job_WITH________________19861009.zip\"");
             oneOf(mockResponse).getOutputStream();will(returnValue(outStream));
         }});
 
         //Returns null on success
         ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files);
         Assert.assertNull(mav);
-
+        
         //Lets decompose our zip stream to verify everything got written correctly
         ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(outStream.getDataWritten()));
         byte[] buf = null;

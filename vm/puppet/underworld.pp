@@ -61,18 +61,20 @@ $uwBuildDir='/usr/local/underworld'
 exec {'uw-checkout':
     command => "/usr/bin/hg clone https://www.underworldproject.org/hg/stgUnderworld $uwBuildDir",
     require => [Puppi::Netinstall['petsc'], Puppi::Netinstall['hdf5']],
-    before => Exec['uw-obtainrepos'],
+    before => Exec['uw-importers'],
     creates => $uwBuildDir,
     logoutput => on_failure,
 }
-exec {'uw-obtainrepos':
+
+exec {'uw-importers':
     cwd => "$uwBuildDir",
-    creates => "$uwBuildDir/GocadToolbox",
-    command => "$uwBuildDir/obtainRepositories.py --with-gocadtoolbox=1",
+    creates => "$uwBuildDir/ImportersToolbox",
+    command => "$uwBuildDir/obtainRepositories.py --with-importers=1",
     before => Exec['uw-configure'],
     logoutput => on_failure,
     timeout => 0,
 }
+
 exec {'uw-configure':
     cwd => "$uwBuildDir",
     creates => "$uwBuildDir/config.cfg",
@@ -104,7 +106,7 @@ export PETSC_DIR=/usr/local/petsc-3.1-p8-openmpi-1.6.1-opt
 export HDF5_DIR=/usr/local/hdf5-1.8.10
 export LD_LIBRARY_PATH=$HDF5_DIR/lib:$PETSC_DIR/lib:$LD_LIBRARY_PATH
 export UNDERWORLD_HOME=/usr/local/underworld
-export PATH=$UNDERWORLD_HOME/build/bin:$UNDERWORLD_HOME/GocadToolbox/script/:$PATH'
+export PATH=$UNDERWORLD_HOME/build/bin:$UNDERWORLD_HOME/ImportersToolbox/script/:$PATH'
 file {"underworld-profile-env":
     path => "/etc/profile.d/underworld.sh",
     ensure => present,

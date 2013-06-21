@@ -9,6 +9,7 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -541,10 +542,16 @@ public class JobListController extends BaseCloudController  {
         String[] fileKeys = filesParam.split(",");
         logger.debug("Archiving " + fileKeys.length + " file(s) of job " + jobId);
 
+        //Create a filename that is semi-unique to the job (and slightly human readable)
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String downloadFileName = String.format("jobfiles_%1$s_%2$s.zip", job.getName(), sdf.format(job.getSubmitDate()));
+        downloadFileName = downloadFileName.replaceAll("[^0-9a-zA-Z_.]", "_");
+        
+        
         //Start writing our data to a zip archive (which is being streamed to user)
         try {
             response.setContentType("application/zip");
-            response.setHeader("Content-Disposition", "attachment; filename=\"jobfiles.zip\"");
+            response.setHeader("Content-Disposition", String.format("attachment; filename=\"%1$s\"", downloadFileName));
 
             boolean readOneOrMoreFiles = false;
             ZipOutputStream zout = new ZipOutputStream(

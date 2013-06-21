@@ -76,10 +76,10 @@
         </property>
     </bean>
 
-    <!-- Simple Trigger for vglJobStatusMonitor task, run every 15 minutes -->
+    <!-- Simple Trigger for vglJobStatusMonitor task, run every 5 minutes -->
     <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
         <property name="jobDetail" ref="vglJobStatusMonitor" />
-        <property name="repeatInterval" value="900000" />
+        <property name="repeatInterval" value="300000" />
         <property name="startDelay" value="10000" />
     </bean>
 
@@ -254,7 +254,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-00000036"/>
+                    <constructor-arg name="imageId" value="ami-00000037"/>
                     <property name="name" value="Underworld"/>
                     <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
                     <property name="keywords">
@@ -331,7 +331,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-0000024c"/>
+                    <constructor-arg name="imageId" value="ami-0000052f"/>
                     <property name="name" value="Underworld"/>
                     <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
                     <property name="keywords">
