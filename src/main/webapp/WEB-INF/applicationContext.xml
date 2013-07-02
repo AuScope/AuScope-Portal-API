@@ -47,8 +47,6 @@
         </property>
     </bean>
 
-    <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor">
-    </bean>
 
     <bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">
         <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
@@ -59,26 +57,32 @@
         <property name="emailSender"><value><![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]></value></property>
         <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
+    
+    <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
+    
+    <bean name="jobStatusMonitor" class="org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor">
+    	<constructor-arg name="jobStatusReader" ref="jobStatusLogReader"/>
+    	<constructor-arg name="jobStatusChangeListeners">
+    		<array>
+                <bean class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor"/>
+            </array>
+    	</constructor-arg>
+    </bean>
+    
 
-    <bean name="vglJobStatusMonitor" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean name="vglJobStatusMonitorDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
         <property name="jobClass" value="org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor" />
         <property name="jobDataAsMap">
             <map>
                 <entry key="jobManager" value-ref="veglJobManager"/>
-                <entry key="jobStatusLogReader" value-ref="jobStatusLogReader"/>
-                <entry key="jobStatusChangeListeners">
-                    <array>
-                        <bean class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor">
-                        </bean>
-                    </array>
-                </entry>
+                <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
             </map>
         </property>
     </bean>
 
     <!-- Simple Trigger for vglJobStatusMonitor task, run every 5 minutes -->
     <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
-        <property name="jobDetail" ref="vglJobStatusMonitor" />
+        <property name="jobDetail" ref="vglJobStatusMonitorDetail" />
         <property name="repeatInterval" value="300000" />
         <property name="startDelay" value="10000" />
     </bean>
