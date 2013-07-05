@@ -172,16 +172,28 @@
         <property name="bucket" value="vegl-portal"/>
     </bean>
 
-    <bean id="cloudStorageService-nectar" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+    <bean id="cloudStorageService-nectar-qld" class="org.auscope.portal.core.services.cloud.CloudStorageService">
         <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
         <constructor-arg name="provider" value="swift-keystone"/>
         <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
         <property name="name" value="National eResearch Collaboration Tools and Resources (Queensland)"/>
-        <property name="id" value="nectar-openstack-storage"/>
+        <property name="id" value="nectar-openstack-storage-qld"/>
         <property name="bucket" value="vgl-portal"/>
         <property name="authVersion" value="2.0"/>
         <property name="regionName" value="Qld"/>
+    </bean>
+    
+    <bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+        <constructor-arg name="provider" value="swift-keystone"/>
+        <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
+        <property name="id" value="nectar-openstack-storage-melb"/>
+        <property name="bucket" value="vgl-portal"/>
+        <property name="authVersion" value="2.0"/>
+        <property name="regionName" value="Melbourne"/>
     </bean>
 
     <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeService">
