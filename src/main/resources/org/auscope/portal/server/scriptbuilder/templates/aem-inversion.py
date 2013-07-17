@@ -47,7 +47,7 @@ class Configurator(file):
         self.run(file);
         self.LogFile  = '${LogFile}'
         self.SystemFile = '${SystemFile}'
-        self.InputFile   = '${InputFile}'
+        self.InputFile   = ${InputFile}
         self.OutputDataFile  = '${OutputDataFile}'
         self.OutputHeaderFile = '${OutputHeaderFile}'
         self.run(file);

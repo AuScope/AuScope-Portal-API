@@ -20,6 +20,9 @@ ScriptBuilder.Components.getComponents = function(selectedToolbox) {
         case "underworld":
             comps.children.push(ScriptBuilder.Components.getUnderworldExamples());
             break;
+        case "aem-inversion":
+            comps.children.push(ScriptBuilder.Components.getAEMExamples());
+            break;
         default:
             comps.children.push(ScriptBuilder.Components.getUBCExamples());
             comps.children.push(ScriptBuilder.Components.getEscriptExamples());
@@ -72,6 +75,21 @@ ScriptBuilder.Components.getEscriptExamples = function() {
             type : "s",
             text : "Joint Inversion",
             qtip : "Perform a joint gravity/magnetic inversion using escript. Expects both datasets to be in the form of seperate NetCDF files. Double click to use this example.",
+            leaf : true
+        }]
+    };
+};
+
+ScriptBuilder.Components.getAEMExamples = function() {
+    return {
+        text : "AEM Inversion Examples",
+        type : "category",
+        expanded : true,
+        children : [{
+            id   : "ScriptBuilder.templates.AEMInversionTemplate",
+            type : "s",
+            text : "AEM Inversion",
+            qtip : "Perform a AEM inversion using some script. To be completed",
             leaf : true
         }]
     };
