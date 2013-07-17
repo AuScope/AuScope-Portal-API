@@ -47,8 +47,6 @@
         </property>
     </bean>
 
-    <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor">
-    </bean>
 
     <bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">
         <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
@@ -59,27 +57,33 @@
         <property name="emailSender"><value><![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]></value></property>
         <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
+    
+    <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
+    
+    <bean name="jobStatusMonitor" class="org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor">
+    	<constructor-arg name="jobStatusReader" ref="jobStatusLogReader"/>
+    	<constructor-arg name="jobStatusChangeListeners">
+    		<array>
+                <bean class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor"/>
+            </array>
+    	</constructor-arg>
+    </bean>
+    
 
-    <bean name="vglJobStatusMonitor" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean name="vglJobStatusMonitorDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
         <property name="jobClass" value="org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor" />
         <property name="jobDataAsMap">
             <map>
                 <entry key="jobManager" value-ref="veglJobManager"/>
-                <entry key="jobStatusLogReader" value-ref="jobStatusLogReader"/>
-                <entry key="jobStatusChangeListeners">
-                    <array>
-                        <bean class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor">
-                        </bean>
-                    </array>
-                </entry>
+                <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
             </map>
         </property>
     </bean>
 
-    <!-- Simple Trigger for vglJobStatusMonitor task, run every 15 minutes -->
+    <!-- Simple Trigger for vglJobStatusMonitor task, run every 5 minutes -->
     <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
-        <property name="jobDetail" ref="vglJobStatusMonitor" />
-        <property name="repeatInterval" value="900000" />
+        <property name="jobDetail" ref="vglJobStatusMonitorDetail" />
+        <property name="repeatInterval" value="300000" />
         <property name="startDelay" value="10000" />
     </bean>
 
@@ -100,13 +104,8 @@
     </bean>
 
     <bean id="httpServiceCaller" class="org.auscope.portal.core.server.http.HttpServiceCaller">
-        <constructor-arg name="clientParams">
-            <bean class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
-                <!--  15 minutes -->
-                <property name="connectionTimeout" value="900000"/>
-                <!--  15 minutes -->
-                <property name="soTimeout" value="900000"/>
-            </bean>
+        <constructor-arg type="int" name="connectionTimeOut">
+            <value>900000</value>
         </constructor-arg>
     </bean>
 
@@ -135,6 +134,14 @@
             </bean>
         </constructor-arg>
     </bean>
+    
+    <bean id="wfsService" class="org.auscope.portal.server.web.service.SimpleWfsService">
+        <constructor-arg name="httpServiceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="wfsMethodMaker">
+            <bean class="org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker">
+            </bean>
+        </constructor-arg>
+    </bean>
 
     <bean id="opendapService" class="org.auscope.portal.core.services.OpendapService" >
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
@@ -144,11 +151,21 @@
         </constructor-arg>
     </bean>
 
+	<bean id= "WMSMethodMaker" class="org.auscope.portal.core.services.methodmakers.WMSMethodMaker">
+        <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
+    </bean>
+
+    <bean id= "WMS_1_3_0_MethodMaker" class="org.auscope.portal.core.services.methodmakers.WMS_1_3_0_MethodMaker">
+        <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
+    </bean>
+
     <bean id="wmsService" class="org.auscope.portal.core.services.WMSService">
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
         <constructor-arg name="methodMaker">
-            <bean class="org.auscope.portal.core.services.methodmakers.WMSMethodMaker">
-            </bean>
+            <list>
+               <ref bean="WMSMethodMaker"/>
+               <ref bean="WMS_1_3_0_MethodMaker"/>
+            </list>
         </constructor-arg>
     </bean>
 
@@ -163,16 +180,28 @@
         <property name="bucket" value="vegl-portal"/>
     </bean>
 
-    <bean id="cloudStorageService-nectar" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+    <bean id="cloudStorageService-nectar-qld" class="org.auscope.portal.core.services.cloud.CloudStorageService">
         <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
         <constructor-arg name="provider" value="swift-keystone"/>
         <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
         <property name="name" value="National eResearch Collaboration Tools and Resources (Queensland)"/>
-        <property name="id" value="nectar-openstack-storage"/>
+        <property name="id" value="nectar-openstack-storage-qld"/>
         <property name="bucket" value="vgl-portal"/>
         <property name="authVersion" value="2.0"/>
         <property name="regionName" value="Qld"/>
+    </bean>
+    
+    <bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+        <constructor-arg name="provider" value="swift-keystone"/>
+        <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
+        <property name="id" value="nectar-openstack-storage-melb"/>
+        <property name="bucket" value="vgl-portal"/>
+        <property name="authVersion" value="2.0"/>
+        <property name="regionName" value="Melbourne"/>
     </bean>
 
     <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeService">
@@ -210,12 +239,6 @@
         			<property name="description" value="Extra Large Instance - 8 CPUs, 32 GB RAM"/>
         			<property name="vcpus" value="8"/>
         			<property name="ramMB" value="32768"/>
-        		</bean>
-        		<bean class="org.auscope.portal.core.cloud.ComputeType">
-        			<constructor-arg name="id" value="m1.xxlarge"/>
-        			<property name="description" value="Huge Instance - 16 CPUs, 64 GB RAM"/>
-        			<property name="vcpus" value="16"/>
-        			<property name="ramMB" value="65536"/>
         		</bean>
         	</list>
         </property>
@@ -255,7 +278,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-00000036"/>
+                    <constructor-arg name="imageId" value="ami-00000038"/>
                     <property name="name" value="Underworld"/>
                     <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
                     <property name="keywords">
@@ -332,7 +355,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-0000024c"/>
+                    <constructor-arg name="imageId" value="ami-00000534"/>
                     <property name="name" value="Underworld"/>
                     <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
                     <property name="keywords">

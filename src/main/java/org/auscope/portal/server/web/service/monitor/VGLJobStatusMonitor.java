@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.core.services.cloud.monitor.JobStatusChangeListener;
+import org.auscope.portal.core.cloud.CloudJob;
+import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
-import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -30,8 +30,7 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     private final Log LOG = LogFactory.getLog(getClass());
     
     private VEGLJobManager jobManager;
-    private VGLJobStatusAndLogReader jobStatusLogReader;
-    private JobStatusChangeListener[] jobStatusChangeListeners;
+    private JobStatusMonitor jobStatusMonitor;
     
     /**
      * Sets the job manager to be used for querying 
@@ -43,48 +42,24 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     }
     
     /**
-     * Sets the job status log reader to be used for
-     * querying job status from S3 storage.
-     * @param jobStatusLogReader
+     * Sets the JobStatusMonitor to be used by this class
+     * @param jobStatusMonitor
      */
-    public void setJobStatusLogReader(VGLJobStatusAndLogReader jobStatusLogReader) {
-        this.jobStatusLogReader = jobStatusLogReader;
-    }
-    
-    /**
-     * Sets a list of JobStatusChangeListener objects to be 
-     * used handling job status change.
-     * @param jobStatusChangeListeners
-     */
-    public void setJobStatusChangeListeners(JobStatusChangeListener[] jobStatusChangeListeners) {
-        this.jobStatusChangeListeners = jobStatusChangeListeners;
-    }
-    
-    private void statusChanged(VEGLJob job, String newStatus, String oldStatus) {
-        for (JobStatusChangeListener l : jobStatusChangeListeners) {
-            try {
-                l.handleStatusChange(job, newStatus, oldStatus);
-            } catch (Exception ex) {
-                //Simply log it if the event handler fails and move on
-                LOG.error("An error has occurred while handling status change event.", ex);
-            }
-        }
+    public void setJobStatusMonitor(JobStatusMonitor jobStatusMonitor) {
+        this.jobStatusMonitor = jobStatusMonitor;
     }
 
     @Override
     protected void executeInternal(JobExecutionContext ctx)
             throws JobExecutionException {
         List<VEGLJob> jobs = jobManager.getPendingOrActiveJobs();
-        LOG.trace("Number of pending or active job(s): [" + jobs.size() + "]");
-
-        for (VEGLJob job : jobs) {
-            String oldStatus = job.getStatus();
-            String newStatus = jobStatusLogReader.getJobStatus(job);
-            if (newStatus != null && !newStatus.equals(oldStatus)) {
-                statusChanged(job, newStatus, oldStatus);
-            } else {
-                LOG.trace("Skip bad or status quo job. Job id: " + job.getId());
-            }
+        
+        try {
+            jobStatusMonitor.statusUpdate(jobs);
+        } catch (Exception ex) {
+            LOG.info(String.format("Error update jobs: %1$s", ex.getMessage()));
+            LOG.debug("Exception:", ex);
+            throw new JobExecutionException(ex);
         }
     }
 }

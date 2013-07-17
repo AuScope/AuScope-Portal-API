@@ -16,6 +16,7 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
      */
     requestScript : function(callback) {
         var jobId = this.wizardState.jobId;
+        var maxThreads = this.wizardState.ncpus;
 
         var jobInputsStore = Ext.create('Ext.data.Store', {
             model : 'vegl.models.Download',
@@ -36,19 +37,33 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
         //
         this._getTemplatedScriptGui(callback, 'underworld-gocad.py', {
             xtype : 'form',
-            width : 400,
-            height : 300,
+            width : 450,
+            height : 510,
             items : [{
+                xtype : 'numberfield',
+                fieldLabel : 'Max Threads',
+                anchor : '-20',
+                name : 'n-threads',
+                value : maxThreads,
+                allowBlank : false,
+                minValue : 1,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: Ext.String.format('The maximum number of execution threads to run (this job will have {0} CPUs)', maxThreads)
+                }]
+            },{
                 xtype : 'combo',
                 fieldLabel : 'Voxel Set',
                 name : 'voxet-filename',
                 allowBlank : false,
                 valueField : 'localPath',
                 displayField : 'localPath',
+                emptyText : '(eg: *.vo files)',
+                submitEmptyText : false,
                 anchor : '-20',
                 plugins: [{
                     ptype: 'fieldhelptext',
-                    text: 'The file path to the voxel set input.'
+                    text: 'The file path to the voxel set input'
                 }],
                 store : jobInputsStore
             },{
@@ -58,6 +73,8 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
                 allowBlank : false,
                 valueField : 'localPath',
                 displayField : 'localPath',
+                emptyText : '(eg: KeyToVoxet.csv)',
+                submitEmptyText : false,
                 anchor : '-20',
                 plugins: [{
                     ptype: 'fieldhelptext',
@@ -67,13 +84,56 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
             },{
                 xtype : 'textfield',
                 fieldLabel : 'Materials Property',
-                anchor : '100%',
+                anchor : '-20',
                 name : 'materials-property',
                 value : 'Geology',
                 allowBlank : false
             },{
                 xtype : 'fieldset',
                 anchor : '100%',
+                title : 'Compute Resolution',
+                margin : '0 20 0 20',
+                items : [{
+                    xtype : 'numberfield',
+                    name : 'n-fem-x',
+                    itemId : 'n-fem-x',
+                    anchor : '100%',
+                    fieldLabel : 'X Axis Elements',
+                    allowDecimals : false,
+                    value : 16,
+                    plugins: [{
+                        ptype: 'fieldhelptext',
+                        text: 'Number of Finite Element Mesh elements along X axis'
+                    }]
+                },{
+                    xtype : 'numberfield',
+                    name : 'n-fem-y',
+                    itemId : 'n-fem-y',
+                    anchor : '100%',
+                    fieldLabel : 'Y Axis Elements',
+                    allowDecimals : false,
+                    value : 16,
+                    plugins: [{
+                        ptype: 'fieldhelptext',
+                        text: 'Number of Finite Element Mesh elements along Y axis'
+                    }]
+                },{
+                    xtype : 'numberfield',
+                    name : 'n-fem-z',
+                    itemId : 'n-fem-z',
+                    anchor : '100%',
+                    fieldLabel : 'Z Axis Elements',
+                    allowDecimals : false,
+                    value : 16,
+                    plugins: [{
+                        ptype: 'fieldhelptext',
+                        text: 'Number of Finite Element Mesh elements along Z axis'
+                    }]
+                }]
+            },{
+                xtype : 'fieldset',
+                anchor : '100%',
+                margin : '0 20 20 20',
                 checkboxToggle : true,
                 checkboxName : 'use-boundary-conditions',
                 title : 'Lower Boundary Conditions',
@@ -98,9 +158,11 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
                     fieldLabel : 'Flux',
                     itemId : 'lower-boundary-flux',
                     decimalPrecision : 6,
+                    value : 0.03,
+                    step : 0.01,
                     plugins: [{
                         ptype: 'fieldhelptext',
-                        text: 'The lower boundary flux condition value.'
+                        text: 'The lower boundary flux condition value in W/m^2'
                     }]
                 },{
                     xtype : 'hiddenfield',

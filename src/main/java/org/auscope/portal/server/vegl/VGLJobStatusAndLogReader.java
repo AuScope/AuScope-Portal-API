@@ -11,13 +11,14 @@ import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.monitor.JobStatusReader;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.web.controllers.BaseCloudController;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
 import org.springframework.ui.ModelMap;
 
-public class VGLJobStatusAndLogReader extends BaseCloudController {
+public class VGLJobStatusAndLogReader extends BaseCloudController implements JobStatusReader {
 
     private VEGLJobManager jobManager;
 

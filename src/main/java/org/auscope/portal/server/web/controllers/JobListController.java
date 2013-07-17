@@ -9,6 +9,7 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,8 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.services.cloud.monitor.JobStatusException;
+import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -59,15 +62,18 @@ public class JobListController extends BaseCloudController  {
     private VEGLJobManager jobManager;
     private FileStagingService fileStagingService;
     private VGLJobStatusAndLogReader jobStatusLogReader;
+    private JobStatusMonitor jobStatusMonitor;
 
     @Autowired
     public JobListController(VEGLJobManager jobManager, CloudStorageService[] cloudStorageServices,
             FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
-            VGLJobStatusAndLogReader jobStatusLogReader) {
+            VGLJobStatusAndLogReader jobStatusLogReader,
+            JobStatusMonitor jobStatusMonitor) {
         super(cloudStorageServices, cloudComputeServices);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.jobStatusLogReader = jobStatusLogReader;
+        this.jobStatusMonitor = jobStatusMonitor;
     }
 
     /**
@@ -541,10 +547,16 @@ public class JobListController extends BaseCloudController  {
         String[] fileKeys = filesParam.split(",");
         logger.debug("Archiving " + fileKeys.length + " file(s) of job " + jobId);
 
+        //Create a filename that is semi-unique to the job (and slightly human readable)
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String downloadFileName = String.format("jobfiles_%1$s_%2$s.zip", job.getName(), sdf.format(job.getSubmitDate()));
+        downloadFileName = downloadFileName.replaceAll("[^0-9a-zA-Z_.]", "_");
+        
+        
         //Start writing our data to a zip archive (which is being streamed to user)
         try {
             response.setContentType("application/zip");
-            response.setHeader("Content-Disposition", "attachment; filename=\"jobfiles.zip\"");
+            response.setHeader("Content-Disposition", String.format("attachment; filename=\"%1$s\"", downloadFileName));
 
             boolean readOneOrMoreFiles = false;
             ZipOutputStream zout = new ZipOutputStream(
@@ -652,7 +664,8 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/listJobs.do")
     public ModelAndView listJobs(HttpServletRequest request,
                                  HttpServletResponse response,
-                                 @RequestParam("seriesId") Integer seriesId) {
+                                 @RequestParam("seriesId") Integer seriesId,
+                                 @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh) {
         VEGLSeries series = attemptGetSeries(seriesId, request);
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
@@ -661,6 +674,15 @@ public class JobListController extends BaseCloudController  {
         List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue());
         if (seriesJobs == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs for the specified series.");
+        }
+        
+        if (forceStatusRefresh) {
+            try {
+                jobStatusMonitor.statusUpdate(seriesJobs);
+            } catch (JobStatusException e) {
+                log.info("There was an error updating one or more jobs: " + e.getMessage());
+                log.debug("Exception(s): ", e);
+            }
         }
 
         return generateJSONResponseMAV(true, seriesJobs, "");

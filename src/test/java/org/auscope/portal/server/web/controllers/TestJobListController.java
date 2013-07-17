@@ -2,7 +2,10 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -17,6 +20,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.jmock.ReadableServletOutputStream;
 import org.auscope.portal.jmock.VEGLJobMatcher;
@@ -25,6 +29,7 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
+import org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,10 +50,12 @@ public class TestJobListController extends PortalTestClass {
     private FileStagingService mockFileStagingService;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
+    private JobStatusMonitor mockJobStatusMonitor;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
     private HttpSession mockSession;
     private JobListController controller;
+    
 
     /**
      * Load our mock objects
@@ -60,6 +67,7 @@ public class TestJobListController extends PortalTestClass {
         mockFileStagingService = context.mock(FileStagingService.class);
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
+        mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockRequest = context.mock(HttpServletRequest.class);
         mockSession = context.mock(HttpSession.class);
@@ -71,7 +79,7 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager, 
                 mockCloudStorageServices, mockFileStagingService, 
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader);
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor);
     }
 
 
@@ -725,30 +733,34 @@ public class TestJobListController extends PortalTestClass {
         final InputStream is2 = new ByteArrayInputStream(file2Data);
         final InputStream is3 = new ByteArrayInputStream(file3Data);
         final ReadableServletOutputStream outStream = new ReadableServletOutputStream();
-
+        final String jobName = "job WITH !()[]#$%@\\/;\"'";
+        final Date submitDate = new SimpleDateFormat("yyyyMMdd").parse("19861009");
+        
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            allowing(mockJob).getName();will(returnValue(jobName));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
-
+            allowing(mockJob).getSubmitDate();will(returnValue(submitDate));
+            
             oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey1);will(returnValue(is1));
             oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey2);will(returnValue(is2));
             oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey3);will(returnValue(is3));
 
             //Ensure our response stream gets written to
             oneOf(mockResponse).setContentType("application/zip");
-            allowing(mockResponse).setHeader(with(any(String.class)), with(any(String.class)));
+            oneOf(mockResponse).setHeader("Content-Disposition", "attachment; filename=\"jobfiles_job_WITH________________19861009.zip\"");
             oneOf(mockResponse).getOutputStream();will(returnValue(outStream));
         }});
 
         //Returns null on success
         ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files);
         Assert.assertNull(mav);
-
+        
         //Lets decompose our zip stream to verify everything got written correctly
         ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(outStream.getDataWritten()));
         byte[] buf = null;
@@ -947,7 +959,7 @@ public class TestJobListController extends PortalTestClass {
     }
 
     /**
-     * Tests that listing a job succeeds (as well as correctly updating job statuses)
+     * Tests that listing a job succeeds 
      * @throws Exception
      */
     @Test
@@ -970,23 +982,42 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
-
-            //Different job statuses are treated differently
-            allowing(mockJobs.get(0)).getStatus();will(returnValue(JobBuilderController.STATUS_ACTIVE));
-            allowing(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_UNSUBMITTED));
-            allowing(mockJobs.get(2)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
-            allowing(mockJobs.get(3)).getStatus();will(returnValue(JobBuilderController.STATUS_PENDING));
-            allowing(mockJobs.get(0)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockJobs.get(0)).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(mockJobs.get(1)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockJobs.get(1)).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(mockJobs.get(2)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockJobs.get(2)).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(mockJobs.get(3)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockJobs.get(3)).getComputeServiceId();will(returnValue(computeServiceId));
         }});
 
-        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false);
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+        Assert.assertArrayEquals(mockJobs.toArray(), ((List<VEGLJob>) mav.getModel().get("data")).toArray());
+    }
+    
+    /**
+     * Tests that listing a job succeeds (as well as correctly updating job statuses)
+     * @throws Exception
+     */
+    @Test
+    public void testListJobsWithStatusUpdate() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int seriesId = 1234;
+        final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
+        final List<VEGLJob> mockJobs = Arrays.asList(
+                context.mock(VEGLJob.class, "mockJobActive"),
+                context.mock(VEGLJob.class, "mockJobUnsubmitted"),
+                context.mock(VEGLJob.class, "mockJobDone"),
+                context.mock(VEGLJob.class, "mockJobPending")
+        );
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            allowing(mockSeries).getUser();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
+            
+            oneOf(mockJobStatusMonitor).statusUpdate(mockJobs);
+        }});
+
+        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, true);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertArrayEquals(mockJobs.toArray(), ((List<VEGLJob>) mav.getModel().get("data")).toArray());
     }
@@ -1010,7 +1041,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
         }});
 
-        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
@@ -1030,7 +1061,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 

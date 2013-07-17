@@ -243,7 +243,7 @@ Ext.define('vegl.widgets.JobsPanel', {
 
     _onRefresh : function(btn) {
         if (this.currentSeries) {
-            this.listJobsForSeries(this.currentSeries);
+            this.listJobsForSeries(this.currentSeries, true);
             this.queryById('btnRegister').setDisabled(true);
         }
     },
@@ -273,11 +273,14 @@ Ext.define('vegl.widgets.JobsPanel', {
      *
      * series - either a vegl.models.Series object
      */
-    listJobsForSeries : function(series) {
+    listJobsForSeries : function(series, forceStatusRefresh) {
         this.currentSeries = series;
         var store = this.getStore();
         var ajaxProxy = store.getProxy();
         ajaxProxy.extraParams.seriesId = series.get('id');
+        if (forceStatusRefresh) {
+            ajaxProxy.extraParams.forceStatusRefresh = true;
+        }
         store.load();
     },
 

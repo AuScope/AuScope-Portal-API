@@ -130,6 +130,48 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
             });
             popup.show();
             break;
+        case portal.csw.OnlineResource.WFS:
+            var popup = Ext.create('Ext.window.Window', {
+                layout : 'fit',
+                width : 700,
+                height : 450,
+                modal : true,
+                title : 'Subset of ' + dataItem.get('name'),
+                items : [{
+                    xtype : 'wfssubsetpanel',
+                    itemId : 'subset-panel',
+                    bodyPadding : 10,
+                    region : Ext.create('portal.util.BBox', dlOptions),
+                    featureType : dlOptions.featureType,
+                    serviceUrl : dlOptions.serviceUrl,
+                    name : dlOptions.name,
+                    localPath : dlOptions.localPath,
+                    description : dlOptions.description,
+                    outputFormat : dlOptions.outputFormat,
+                    srsName : dlOptions.srsName
+                }],
+                buttons : [{
+                    text : 'Save Changes',
+                    iconCls : 'add',
+                    align : 'right',
+                    scope : this,
+                    handler : function(btn) {
+                        var parentWindow = btn.findParentByType('window');
+                        var panel = parentWindow.getComponent('subset-panel');
+
+                        var params = panel.getForm().getValues();
+
+                        params.serviceUrl = params.serviceUrl;
+                        
+                        dataItem.set('downloadOptions', params);
+                        this._updateDescription(dataItem);
+
+                        parentWindow.close();
+                    }
+                }]
+            });
+            popup.show();
+            break;
         default:
             var popup = Ext.create('Ext.window.Window', {
                 layout : 'fit',
@@ -223,6 +265,15 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                 }
             });
             break;
+        case portal.csw.OnlineResource.WFS:
+            Ext.Ajax.request({
+                url : 'addWfsRequestToSession.do',
+                params : row.get('downloadOptions'),
+                callback : function(options, success, response) {
+                    responseHandler(success);
+                }
+            });
+            break;
         default:
             Ext.Ajax.request({
                 url : 'addDownloadRequestToSession.do',
@@ -253,6 +304,16 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                     var approxTotal = Ext.util.Format.number(response.roundedTotal, '0,000');
                     var approxSize = Ext.util.Format.fileSize(vegl.util.WCSUtil.roundToApproximation(response.width * response.height * 4));
                     dataItem.set('description', Ext.util.Format.format('Approximately <b>{0}</b> data points in total.<br>Uncompressed that\'s roughly {1}', approxTotal, approxSize));
+                }
+            });
+        } else if (or.get('type') === portal.csw.OnlineResource.WFS) {
+            dataItem.set('description', 'Loading size details...');
+            vegl.util.WFSUtil.estimateFeatureCount(dlOptions, or.get('url'), dlOptions.featureType, dataItem, function(success, errorMsg, response, dataItem) {
+                if (!success) {
+                    dataItem.set('description', errorMsg);
+                } else {
+                    var total = Ext.util.Format.number(response.total, '0,000');
+                    dataItem.set('description', Ext.util.Format.format('Approximately <b>{0}</b> features have been selected.', total));
                 }
             });
         } else {
@@ -344,6 +405,7 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
                         description : onlineResource.get('description'),
                         url : onlineResource.get('url'),
                         localPath : '/tmp/' + onlineResource.get('name'),
+                        crs : (defaultBbox ? defaultBbox.crs : ''),
                         eastBoundLongitude : (defaultBbox ? defaultBbox.eastBoundLongitude : 0),
                         northBoundLatitude : (defaultBbox ? defaultBbox.northBoundLatitude : 0),
                         southBoundLatitude : (defaultBbox ? defaultBbox.southBoundLatitude : 0),
@@ -358,6 +420,12 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
                     delete newItem.downloadOptions.url;
                     newItem.downloadOptions.format = 'nc';
                     newItem.downloadOptions.layerName = newItem.name;
+                    break;
+                case portal.csw.OnlineResource.WFS:
+                    newItem.description = 'Loading size details...';
+                    delete newItem.downloadOptions.url;
+                    newItem.downloadOptions.serviceUrl = onlineResource.get('url');
+                    newItem.downloadOptions.featureType = newItem.name;
                     break;
                 case portal.csw.OnlineResource.WWW:
                     break;
