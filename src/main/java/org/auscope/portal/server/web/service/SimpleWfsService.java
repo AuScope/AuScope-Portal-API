@@ -54,7 +54,7 @@ public class SimpleWfsService extends BaseWFSService {
      * @throws PortalServiceException 
      */
     public String getFeatureRequestAsString(String wfsUrl, String featureType, FilterBoundingBox bbox, Integer maxFeatures, String srsName, String outputFormat) throws PortalServiceException {
-        if (srsName == null) {
+        if (srsName == null || srsName.isEmpty()) {
             srsName = BaseWFSService.DEFAULT_SRS;
         }
         

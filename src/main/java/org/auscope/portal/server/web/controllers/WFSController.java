@@ -42,7 +42,7 @@ public class WFSController extends BasePortalController {
     @RequestMapping("/getFeatureCount.do")
     public ModelAndView requestFeatureCount(@RequestParam("serviceUrl") final String serviceUrl,
                                            @RequestParam("typeName") final String featureType,
-                                           @RequestParam(required = false, value = "bboxCrs") final String bboxCrs,
+                                           @RequestParam(required = false, value = "crs") final String bboxCrs,
                                            @RequestParam(required = false, value = "northBoundLatitude") final Double northBoundLatitude,
                                            @RequestParam(required = false, value = "southBoundLatitude") final Double southBoundLatitude,
                                            @RequestParam(required = false, value = "eastBoundLongitude") final Double eastBoundLongitude,

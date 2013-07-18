@@ -24,7 +24,7 @@ Ext.define('vegl.util.WFSUtil', {
         Ext.Ajax.request({
             url : 'getFeatureCount.do',
             params : {
-                bboxCrs : bbox.crs,
+                crs : bbox.crs,
                 northBoundLatitude : bbox.northBoundLatitude,
                 southBoundLatitude : bbox.southBoundLatitude,
                 eastBoundLongitude : bbox.eastBoundLongitude,

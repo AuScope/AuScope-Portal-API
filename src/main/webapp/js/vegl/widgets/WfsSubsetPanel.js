@@ -89,7 +89,7 @@ Ext.define('vegl.widgets.WfsSubsetPanel', {
                     {xtype: 'displayfield', value: 'South ) ('},
                     {xtype: 'numberfield',  name: 'eastBoundLongitude', width: 80, value : region.eastBoundLongitude, listeners : {change : Ext.bind(this.updateSelectionSize, this)}},
                     {xtype: 'displayfield', value: 'East )'},
-                    {xtype: 'hiddenfield', name : 'bboxCrs', value: config.region.crs}
+                    {xtype: 'hiddenfield', name : 'crs', value: region.crs}
                 ],
                 plugins: [{
                     ptype: 'fieldhelptext',
@@ -118,7 +118,7 @@ Ext.define('vegl.widgets.WfsSubsetPanel', {
                 allowBlank : true,
                 plugins: [{
                     ptype: 'fieldhelptext',
-                    text: 'The response features can be reprojected to a preferred coordinate reference system. Leave this blank if you don\'t want to reproject.'
+                    text: 'The response features can be reprojected to a preferred coordinate reference system. The default response value is EPSG:4326.'
                 }]
             },{
                 xtype : 'textfield',

@@ -177,7 +177,7 @@ public class JobDownloadController extends BasePortalController {
     public ModelAndView addWfsRequestToSession(@RequestParam("serviceUrl") final String serviceUrl,
                                            @RequestParam("featureType") final String featureType,
                                            @RequestParam(required = false, value = "srsName") final String srsName,
-                                           @RequestParam(required = false, value = "bboxCrs") final String bboxCrs,
+                                           @RequestParam(required = false, value = "crs") final String bboxCrs,
                                            @RequestParam(required = false, value = "northBoundLatitude") final Double northBoundLatitude,
                                            @RequestParam(required = false, value = "southBoundLatitude") final Double southBoundLatitude,
                                            @RequestParam(required = false, value = "eastBoundLongitude") final Double eastBoundLongitude,
