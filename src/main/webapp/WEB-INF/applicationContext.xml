@@ -134,6 +134,14 @@
             </bean>
         </constructor-arg>
     </bean>
+    
+    <bean id="wfsService" class="org.auscope.portal.server.web.service.SimpleWfsService">
+        <constructor-arg name="httpServiceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="wfsMethodMaker">
+            <bean class="org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker">
+            </bean>
+        </constructor-arg>
+    </bean>
 
     <bean id="opendapService" class="org.auscope.portal.core.services.OpendapService" >
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>

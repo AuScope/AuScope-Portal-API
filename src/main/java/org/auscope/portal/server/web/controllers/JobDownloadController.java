@@ -10,8 +10,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.server.vegl.VglDownload;
+import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +36,12 @@ public class JobDownloadController extends BasePortalController {
 
     protected final Log logger = LogFactory.getLog(getClass());
     private PortalPropertyPlaceholderConfigurer hostConfigurer;
+    private SimpleWfsService wfsService;
 
     @Autowired
-    public JobDownloadController(PortalPropertyPlaceholderConfigurer hostConfigurer) {
+    public JobDownloadController(PortalPropertyPlaceholderConfigurer hostConfigurer, SimpleWfsService wfsService) {
         this.hostConfigurer = hostConfigurer;
+        this.wfsService = wfsService;
     }
 
     /**
@@ -157,6 +161,59 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setSouthBoundLatitude(southBoundLatitude);
         newDownload.setWestBoundLongitude(westBoundLongitude);
 
+        addDownloadToSession(request, newDownload);
+
+        return generateJSONResponseMAV(true, null, "");
+    }
+    
+    /**
+     * Generate a WFS GetFeature request but don't execute it. Instead stores it as a VglDownload into the user session 
+     *
+     * @param serviceUrl The WFS endpoint
+     * @param featureType The feature type name to query
+     * @param maxFeatures [Optional] The maximum number of features to query
+     */
+    @RequestMapping("/addWfsRequestToSession.do")
+    public ModelAndView addWfsRequestToSession(@RequestParam("serviceUrl") final String serviceUrl,
+                                           @RequestParam("featureType") final String featureType,
+                                           @RequestParam(required = false, value = "srsName") final String srsName,
+                                           @RequestParam(required = false, value = "crs") final String bboxCrs,
+                                           @RequestParam(required = false, value = "northBoundLatitude") final Double northBoundLatitude,
+                                           @RequestParam(required = false, value = "southBoundLatitude") final Double southBoundLatitude,
+                                           @RequestParam(required = false, value = "eastBoundLongitude") final Double eastBoundLongitude,
+                                           @RequestParam(required = false, value = "westBoundLongitude") final Double westBoundLongitude,
+                                           @RequestParam(required = false, value = "outputFormat") final String outputFormat,
+                                           @RequestParam(required = false, value = "maxFeatures") Integer maxFeatures,
+                                           @RequestParam("name") final String name,
+                                           @RequestParam("description") final String description,
+                                           @RequestParam("localPath") final String localPath,
+                                           HttpServletRequest request) throws Exception {
+
+        FilterBoundingBox bbox = null;
+        if (northBoundLatitude != null) {
+            bbox = FilterBoundingBox.parseFromValues(bboxCrs, northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude);
+        }
+        
+        String response = null;
+        
+        try {
+            response = wfsService.getFeatureRequestAsString(serviceUrl, featureType, bbox, maxFeatures, srsName, outputFormat);
+        } catch (Exception ex) {
+            log.warn(String.format("Exception generating service request for '%2$s' from '%1$s': %3$s", serviceUrl, featureType, ex));
+            log.debug("Exception: ", ex);
+            return generateExceptionResponse(ex, serviceUrl);
+        }
+        
+        VglDownload newDownload = new VglDownload();
+        newDownload.setName(name);
+        newDownload.setDescription(description);
+        newDownload.setLocalPath(localPath);
+        newDownload.setUrl(response);
+        newDownload.setNorthBoundLatitude(northBoundLatitude);
+        newDownload.setEastBoundLongitude(eastBoundLongitude);
+        newDownload.setSouthBoundLatitude(southBoundLatitude);
+        newDownload.setWestBoundLongitude(westBoundLongitude);
+        
         addDownloadToSession(request, newDownload);
 
         return generateJSONResponseMAV(true, null, "");
