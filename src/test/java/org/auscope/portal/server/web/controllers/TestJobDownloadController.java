@@ -10,8 +10,11 @@ import javax.servlet.http.HttpSession;
 import junit.framework.Assert;
 
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
+import org.auscope.portal.core.services.responses.wfs.WFSGetCapabilitiesResponse;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VglDownload;
+import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,11 +30,12 @@ public class TestJobDownloadController extends PortalTestClass {
     private HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
     private HttpServletResponse mockResponse = context.mock(HttpServletResponse.class);
     private HttpSession mockSession = context.mock(HttpSession.class);
+    private SimpleWfsService mockWfsService = context.mock(SimpleWfsService.class);
     private JobDownloadController controller;
 
     @Before
     public void setup() {
-        controller = new JobDownloadController(mockHostConfigurer);
+        controller = new JobDownloadController(mockHostConfigurer, mockWfsService);
     }
 
     @Test
@@ -156,6 +160,57 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(description, download.getDescription());
         Assert.assertEquals(localPath, download.getLocalPath());
         Assert.assertEquals(serviceUrl, download.getUrl());
+    }
+    
+    @Test
+    public void testAddWfsDownloadRequestToSession() throws Exception {
+        final Double northBoundLatitude = 2.0;
+        final Double eastBoundLongitude = 4.0;
+        final Double southBoundLatitude = 1.0;
+        final Double westBoundLongitude = 3.0;
+        final String srsName = "EPSG:4326";
+        final String bboxSrs = "EPSG:4387";
+        final String featureType = "test:featureType";
+        final String name = "name";
+        final String description = "desc";
+        final String localPath = "localPath";
+        final String serviceUrl = "http://example.org/wfs";
+        final String outputFormat = "o-f";
+        final Integer maxFeatures = null;
+        final List<VglDownload> downloads = new ArrayList<VglDownload>();
+        final String wfsRequestString = serviceUrl + "?request=param";
+        
+        final String[] expectedFormats = new String[] {"format1", "format2"};
+        final WFSGetCapabilitiesResponse mockResponse = context.mock(WFSGetCapabilitiesResponse.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+
+            oneOf(mockWfsService).getFeatureRequestAsString(with(serviceUrl), with(featureType), with(any(FilterBoundingBox.class)), with(maxFeatures), with(srsName), with(outputFormat));
+            will(returnValue(wfsRequestString));
+            
+            allowing(mockResponse).getGetFeatureOutputFormats();will(returnValue(expectedFormats));
+            
+            oneOf(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(downloads));
+            oneOf(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
+        }});
+
+        ModelAndView mav = controller.addWfsRequestToSession(serviceUrl, featureType, srsName, bboxSrs, 
+                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, 
+                outputFormat, maxFeatures, name, description, localPath, mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue(((Boolean) mav.getModel().get("success")));
+
+        Assert.assertEquals(1, downloads.size());
+        VglDownload download = downloads.get(0);
+        Assert.assertEquals(northBoundLatitude, download.getNorthBoundLatitude());
+        Assert.assertEquals(eastBoundLongitude, download.getEastBoundLongitude());
+        Assert.assertEquals(southBoundLatitude, download.getSouthBoundLatitude());
+        Assert.assertEquals(westBoundLongitude, download.getWestBoundLongitude());
+        Assert.assertEquals(name, download.getName());
+        Assert.assertEquals(description, download.getDescription());
+        Assert.assertEquals(localPath, download.getLocalPath());
+        Assert.assertEquals(wfsRequestString, download.getUrl());
     }
     
     /**

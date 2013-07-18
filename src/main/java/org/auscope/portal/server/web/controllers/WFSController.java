@@ -47,7 +47,7 @@ public class WFSController extends BasePortalController {
                                            @RequestParam(required = false, value = "southBoundLatitude") final Double southBoundLatitude,
                                            @RequestParam(required = false, value = "eastBoundLongitude") final Double eastBoundLongitude,
                                            @RequestParam(required = false, value = "westBoundLongitude") final Double westBoundLongitude,
-                                           @RequestParam(required = false, value = "maxFeatures", defaultValue="0") int maxFeatures) throws Exception {
+                                           @RequestParam(required = false, value = "maxFeatures") Integer maxFeatures) throws Exception {
 
         FilterBoundingBox bbox = null;
         if (northBoundLatitude != null) {
@@ -80,7 +80,7 @@ public class WFSController extends BasePortalController {
      * @return
      */
     @RequestMapping("/getFeatureRequestOutputFormats.do")
-    public ModelAndView requestFeatureRequestString(@RequestParam("serviceUrl") final String serviceUrl) {
+    public ModelAndView getFeatureRequestOutputFormats(@RequestParam("serviceUrl") final String serviceUrl) {
         WFSGetCapabilitiesResponse response = null;
         try {
             response = wfsService.getCapabilitiesResponse(serviceUrl);

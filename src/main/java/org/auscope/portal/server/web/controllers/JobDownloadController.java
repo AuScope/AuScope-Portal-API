@@ -174,7 +174,7 @@ public class JobDownloadController extends BasePortalController {
      * @param maxFeatures [Optional] The maximum number of features to query
      */
     @RequestMapping("/addWfsRequestToSession.do")
-    public ModelAndView requestFeatureRequestString(@RequestParam("serviceUrl") final String serviceUrl,
+    public ModelAndView addWfsRequestToSession(@RequestParam("serviceUrl") final String serviceUrl,
                                            @RequestParam("featureType") final String featureType,
                                            @RequestParam(required = false, value = "srsName") final String srsName,
                                            @RequestParam(required = false, value = "bboxCrs") final String bboxCrs,
