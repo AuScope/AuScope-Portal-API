@@ -111,4 +111,39 @@ public class TestWFSController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean)mav.getModel().get("success")); 
     }
+    
+    @Test
+    public void testRequestFeature() throws Exception {
+        final String gmlBlob = "gmlBlob";
+        final String wfsUrl = "http://service/wfs";
+        final String featureType = "type:name";
+        final String featureId = "feature-id";
+
+        context.checking(new Expectations() {{
+            oneOf(mockWfsService).getWfsFeature(wfsUrl, featureType, featureId);will(returnValue(gmlBlob));
+        }});
+
+        ModelAndView modelAndView = controller.requestFeature(wfsUrl, featureType, featureId);
+        Assert.assertNotNull(modelAndView);
+        ModelMap dataObj = (ModelMap) modelAndView.getModel().get("data");
+        Assert.assertTrue((Boolean) modelAndView.getModel().get("success"));
+        Assert.assertNotNull(dataObj);
+        Assert.assertEquals(gmlBlob, dataObj.get("gml"));
+    }
+    
+    @Test
+    public void testRequestFeature_ServiceError() throws Exception {
+        final String gmlBlob = "gmlBlob";
+        final String wfsUrl = "http://service/wfs";
+        final String featureType = "type:name";
+        final String featureId = "feature-id";
+
+        context.checking(new Expectations() {{
+            oneOf(mockWfsService).getWfsFeature(wfsUrl, featureType, featureId);will(throwException(new PortalServiceException("error")));
+        }});
+
+        ModelAndView modelAndView = controller.requestFeature(wfsUrl, featureType, featureId);
+        Assert.assertNotNull(modelAndView);
+        Assert.assertFalse((Boolean) modelAndView.getModel().get("success"));
+    }
 }

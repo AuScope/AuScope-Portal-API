@@ -30,10 +30,13 @@ Ext.define('vegl.layer.VeglQuerierFactory', {
             }
         }
 
-        if (wfsResources.length > 0) {
+        if (wfsResources.length > 0 && wmsResources.length > 0) {
             cfg.parser = Ext.create('vegl.layer.querier.wfs.VeglParser', {});
             cfg.knownLayerParser = Ext.create('vegl.layer.querier.wfs.VeglKnownLayerParser', {});
-
+            return Ext.create('portal.layer.querier.wfs.WFSWithMapQuerier', cfg);
+        } else if (wfsResources.length > 0) {
+            cfg.parser = Ext.create('vegl.layer.querier.wfs.VeglParser', {});
+            cfg.knownLayerParser = Ext.create('vegl.layer.querier.wfs.VeglKnownLayerParser', {});
             return Ext.create('portal.layer.querier.wfs.WFSQuerier', cfg);
         } else if (wcsResources.length > 0) {
             return Ext.create('portal.layer.querier.coverage.WCSQuerier',cfg);

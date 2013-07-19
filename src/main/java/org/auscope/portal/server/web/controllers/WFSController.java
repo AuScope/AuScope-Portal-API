@@ -99,4 +99,29 @@ public class WFSController extends BasePortalController {
         return generateJSONResponseMAV(true, convertedItems, "");
     }
 
+    /**
+     * Given a service Url, a feature type and a specific feature ID, this function will fetch the specific feature and
+     * then convert it into KML to be displayed, assuming that the response will be complex feature GeoSciML
+     * @param serviceUrl
+     * @param featureType
+     * @param featureId
+     * @param request
+     * @return
+     */
+    @RequestMapping("/requestFeature.do")
+    public ModelAndView requestFeature(@RequestParam("serviceUrl") final String serviceUrl,
+                                       @RequestParam("typeName") final String featureType,
+                                       @RequestParam("featureId") final String featureId) throws Exception {
+        String response = null;
+        try {
+            response = wfsService.getWfsFeature(serviceUrl, featureType, featureId);
+        } catch (Exception ex) {
+            log.warn(String.format("Exception getting '%2$s' with id '%4$s' from '%1$s': %3$s", serviceUrl, featureType, ex, featureId));
+            log.debug("Exception: ", ex);
+            return generateExceptionResponse(ex, serviceUrl);
+        }
+
+        //Return a transform response to be consistent with Portal Core stack. We don't actually use the KML so just return a blank element
+        return generateJSONResponseMAV(true, response, "<kml/>", null);
+    }
 }

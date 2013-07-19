@@ -9,6 +9,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker.ResultType;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
+import org.auscope.portal.core.services.responses.ows.OWSExceptionParser;
 import org.auscope.portal.core.services.responses.wfs.WFSCountResponse;
 
 /**
@@ -62,6 +63,28 @@ public class SimpleWfsService extends BaseWFSService {
             return this.wfsMethodMaker.makeGetMethod(wfsUrl, featureType, maxFeatures, ResultType.Results, srsName, bbox, outputFormat).getURI().toString();
         } catch (URISyntaxException e) {
             throw new PortalServiceException(null, e);
+        }
+    }
+    
+    /**
+     * Makes a WFS request to the specified service, returns the resulting GML
+     * @param serviceUrl The service endpoint to query
+     * @param featureType The feature type to request
+     * @param featureId The specific feature to request
+     * @return
+     * @throws PortalServiceException
+     */
+    public String getWfsFeature(String serviceUrl, String featureType, String featureId) throws PortalServiceException {
+        HttpRequestBase method = null;
+        try {
+            method = generateWFSRequest(serviceUrl, featureType, featureId, null, null, null, null);
+            String wfs = httpServiceCaller.getMethodResponseAsString(method);
+            
+            OWSExceptionParser.checkForExceptionResponse(wfs);
+            
+            return wfs;
+        } catch (Exception ex) {
+            throw new PortalServiceException(method, ex);
         }
     }
 }
