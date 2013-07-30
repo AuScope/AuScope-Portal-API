@@ -109,7 +109,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="viewCswRecordFactory" class="org.auscope.portal.core.view.ViewCSWRecordFactory">
+    <bean id="viewCswRecordFactory" class="org.auscope.portal.server.web.service.csw.ViewGriddedCSWRecordFactory">
     </bean>
 
     <bean id="viewKnownLayerFactory" class="org.auscope.portal.core.view.ViewKnownLayerFactory">
@@ -119,6 +119,9 @@
         <constructor-arg name="executor" ref="taskExecutor"/>
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
         <constructor-arg name="cswServiceList" ref="cswServiceList"/> <!-- This is pulled from the profile xml -->
+        <constructor-arg name="transformerFactory">
+        	<bean class="org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory"/>
+        </constructor-arg>
         <property name="forceGetMethods" value="true"/>
     </bean>
 

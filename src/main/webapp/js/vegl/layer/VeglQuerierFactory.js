@@ -26,7 +26,7 @@ Ext.define('vegl.layer.VeglQuerierFactory', {
             if (knownLayer.get('id') === 'gocad-models') {
                 return Ext.create('vegl.layer.querier.csw.SelectableCSWQuerier', cfg);
             } else if (knownLayer.get('id') === 'geophysics-datasets') {
-                return Ext.create('vegl.layer.querier.csw.CSWQuerier', cfg);
+                return Ext.create('vegl.layer.querier.csw.GAProjectsQuerier', cfg);
             }
         }
 
