@@ -22,10 +22,8 @@
                 <ref bean="knownTypeGswaThMerge" />
                 <ref bean="knownTypeGswaTcMerge" />
                 <ref bean="knownTypeGswaKMerge" />
-                
                 <ref bean="knownTypeGAAemSurvey" />
                 <ref bean="knownTypeGAGravitySurvey" />
-                
             </list>
         </constructor-arg>
     </bean>
