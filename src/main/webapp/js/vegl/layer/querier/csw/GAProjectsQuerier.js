@@ -38,6 +38,18 @@ Ext.define('vegl.layer.querier.csw.GAProjectsQuerier', {
         var cellSizeDD = this._getFirstMatchingGridInfoValue(griddedInfo, "CellSize", "decimal degrees");
         var lineSpacingM = this._getFirstMatchingGridInfoValue(griddedInfo, "LineSpacing", "metres");
         
+        //Configure default download options
+        var wcsResources = portal.csw.OnlineResource.getFilteredFromArray(cswRecord.get('onlineResources'), portal.csw.OnlineResource.WCS);
+        var dlOptions = null;
+        var wcsResource = null;
+        if (wcsResources.length > 0) {
+            var geoEls = cswRecord.get('geographicElements');
+            var defaultBbox = (geoEls.length > 0) ? geoEls[0] : null;
+            
+            wcsResource = wcsResources[0];
+            dlOptions = vegl.util.DataSelectionUtil.createDownloadOptionsForResource(wcsResource, cswRecord, defaultBbox);
+        }
+        
         //Build a preview URL
         var geoEls = cswRecord.get('geographicElements');
         var wmsResources = portal.csw.OnlineResource.getFilteredFromArray(cswRecord.get('onlineResources'), portal.csw.OnlineResource.WMS);
@@ -70,6 +82,15 @@ Ext.define('vegl.layer.querier.csw.GAProjectsQuerier', {
         
         return {
             title : title,
+            _dlOptions : dlOptions,
+            _wcsResource : wcsResource,
+            listeners : {
+                render : Ext.bind(function(container, eOpts, dlOptions, wcsResource) {
+                    //Save our dlOptions to this container for our buttons to write/retrieve
+                    container._dlOptions = dlOptions;
+                    container._wcsResource = wcsResource;
+                }, this, [dlOptions, wcsResource], true)
+            },
             items : [{
                 xtype : 'label',
                 style : 'font-size: 11px; font-style:normal;',
@@ -137,12 +158,38 @@ Ext.define('vegl.layer.querier.csw.GAProjectsQuerier', {
                 xtype : 'button',
                 iconCls : 'add',
                 text : 'Capture this grid',
-                style : 'position: absolute; bottom: 10px; left: 5px'
+                hidden : dlOptions === null,
+                style : 'position: absolute; bottom: 10px; left: 5px',
+                handler : function(btn) {
+                    var dlOptions = btn.ownerCt._dlOptions;
+                    var wcsResource = btn.ownerCt._wcsResource;
+                    
+                    var myMask = new Ext.LoadMask(this, {msg: "Capturing grid..."});
+                    myMask.show();
+                    
+                    vegl.util.DataSelectionUtil.saveDownloadOptionsInSession(wcsResource, dlOptions, function(success) {
+                        myMask.hide();
+                        if (success) {
+                            Ext.Msg.alert('Request Saved', 'Your dataset has been saved. You can either continue selecting more data or <a href="jobbuilder.html">create a job</a> to process your existing selections.');
+                        } else {
+                            Ext.Msg.alert('Error saving data', 'There were one or more errors when saving some of the datasets you selected');
+                        }
+                    });
+                }
             },{
                 xtype : 'button',
                 iconCls : 'edit',
                 text : 'Edit this grid',
-                style : 'position: absolute; bottom: 10px; left: 130px'
+                hidden : dlOptions === null,
+                style : 'position: absolute; bottom: 10px; left: 130px',
+                handler : function(btn) {
+                    var dlOptions = btn.ownerCt._dlOptions;
+                    var wcsResource = btn.ownerCt._wcsResource;
+                    vegl.util.DataSelectionUtil.showDownloadOptionsForResource(wcsResource, dlOptions, Ext.bind(function(newDlOptions) {
+                        this.ownerCt._dlOptions = newDlOptions;
+                    }, btn));
+                }
+                    
             }]
         };
     },

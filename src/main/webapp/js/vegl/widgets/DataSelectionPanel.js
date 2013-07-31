@@ -86,128 +86,10 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
         var or = dataItem.get('onlineResource');
         var dlOptions = dataItem.get('downloadOptions');
 
-        //Depending on the resource type, open an appropriate edit window
-        switch (or.get('type')) {
-        case portal.csw.OnlineResource.WCS:
-            var popup = Ext.create('Ext.window.Window', {
-                layout : 'fit',
-                width : 700,
-                height : 400,
-                modal : true,
-                title : 'Subset of ' + dataItem.get('name'),
-                items : [{
-                    xtype : 'erddapsubsetpanel',
-                    itemId : 'subset-panel',
-                    region : Ext.create('portal.util.BBox', dlOptions),
-                    coverageName : dlOptions.layerName,
-                    coverageUrl : or.get('url'),
-                    name : dlOptions.name,
-                    localPath : dlOptions.localPath,
-                    description : dlOptions.description,
-                    dataType : dlOptions.format
-                }],
-                buttons : [{
-                    text : 'Save Changes',
-                    iconCls : 'add',
-                    align : 'right',
-                    scope : this,
-                    handler : function(btn) {
-                        var parentWindow = btn.findParentByType('window');
-                        var panel = parentWindow.getComponent('subset-panel');
-
-                        var params = panel.getForm().getValues();
-
-                        //The ERDDAP subset panel doesn't use coverage name for anything but size estimation
-                        //Therefore we need to manually preserve it ourselves
-                        params.layerName = dlOptions.layerName;
-
-                        dataItem.set('downloadOptions', params);
-                        this._updateDescription(dataItem);
-
-                        parentWindow.close();
-                    }
-                }]
-            });
-            popup.show();
-            break;
-        case portal.csw.OnlineResource.WFS:
-            var popup = Ext.create('Ext.window.Window', {
-                layout : 'fit',
-                width : 700,
-                height : 450,
-                modal : true,
-                title : 'Subset of ' + dataItem.get('name'),
-                items : [{
-                    xtype : 'wfssubsetpanel',
-                    itemId : 'subset-panel',
-                    bodyPadding : 10,
-                    region : Ext.create('portal.util.BBox', dlOptions),
-                    featureType : dlOptions.featureType,
-                    serviceUrl : dlOptions.serviceUrl,
-                    name : dlOptions.name,
-                    localPath : dlOptions.localPath,
-                    description : dlOptions.description,
-                    outputFormat : dlOptions.outputFormat,
-                    srsName : dlOptions.srsName
-                }],
-                buttons : [{
-                    text : 'Save Changes',
-                    iconCls : 'add',
-                    align : 'right',
-                    scope : this,
-                    handler : function(btn) {
-                        var parentWindow = btn.findParentByType('window');
-                        var panel = parentWindow.getComponent('subset-panel');
-
-                        var params = panel.getForm().getValues();
-
-                        params.serviceUrl = params.serviceUrl;
-                        
-                        dataItem.set('downloadOptions', params);
-                        this._updateDescription(dataItem);
-
-                        parentWindow.close();
-                    }
-                }]
-            });
-            popup.show();
-            break;
-        default:
-            var popup = Ext.create('Ext.window.Window', {
-                layout : 'fit',
-                width : 700,
-                height : 400,
-                modal : true,
-                title : 'Download from ' + dataItem.get('name'),
-                items : [{
-                    xtype : 'filedownloadpanel',
-                    itemId : 'download-panel',
-                    region : Ext.create('portal.util.BBox', dlOptions),
-                    url : dlOptions.url,
-                    localPath : dlOptions.localPath,
-                    name : dlOptions.name,
-                    description : dlOptions.description
-                }],
-                buttons : [{
-                    text : 'Save Changes',
-                    iconCls : 'add',
-                    align : 'right',
-                    scope : this,
-                    handler : function(btn) {
-                        var parentWindow = btn.findParentByType('window');
-                        var panel = parentWindow.getComponent('download-panel');
-                        var params = panel.getForm().getValues();
-
-                        dataItem.set('downloadOptions', params);
-                        this._updateDescription(dataItem);
-
-                        parentWindow.close();
-                    }
-                }]
-            });
-            popup.show();
-            break;
-        }
+        vegl.util.DataSelectionUtil.showDownloadOptionsForResource(or, dlOptions, Ext.bind(function(updatedDlOptions) {
+            dataItem.set('downloadOptions', updatedDlOptions);
+            this._updateDescription(dataItem);
+        }, this));
     },
 
     /**
@@ -247,42 +129,9 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
 
         //Different data sources have different functions to save
         for (var i = 0; i < selectedRows.length; i++) {
-            this._saveRowIntoSession(selectedRows[i], responseHandler);
-        }
-    },
-
-    /**
-     * Saves a vegl.widgets.DataSelectionPanelRow into the user session
-     */
-    _saveRowIntoSession : function(row, responseHandler) {
-        switch (row.get('onlineResource').get('type')) {
-        case portal.csw.OnlineResource.WCS:
-            Ext.Ajax.request({
-                url : 'addErddapRequestToSession.do',
-                params : row.get('downloadOptions'),
-                callback : function(options, success, response) {
-                    responseHandler(success);
-                }
-            });
-            break;
-        case portal.csw.OnlineResource.WFS:
-            Ext.Ajax.request({
-                url : 'addWfsRequestToSession.do',
-                params : row.get('downloadOptions'),
-                callback : function(options, success, response) {
-                    responseHandler(success);
-                }
-            });
-            break;
-        default:
-            Ext.Ajax.request({
-                url : 'addDownloadRequestToSession.do',
-                params : row.get('downloadOptions'),
-                callback : function(options, success, response) {
-                    responseHandler(success);
-                }
-            });
-            break;
+            vegl.util.DataSelectionUtil.saveDownloadOptionsInSession(selectedRows[i].get('onlineResource'), 
+                    selectedRows[i].get('downloadOptions'), 
+                    responseHandler);
         }
     },
 
@@ -392,6 +241,10 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
             for (var i = 0; i < resources.length; i++) {
                 var onlineResource = resources[i];
 
+                if (!vegl.util.DataSelectionUtil.isResourceSupported(onlineResource)) {
+                    continue;
+                }
+                
                 //Set the defaults of our new item
                 newItem = {
                     resourceType : portal.csw.OnlineResource.typeToString(onlineResource.get('type')),
@@ -400,40 +253,8 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
                     selected : true,
                     cswRecord : cswRecord,
                     onlineResource : onlineResource,
-                    downloadOptions : {
-                        name : 'Subset of ' + onlineResource.get('name'),
-                        description : onlineResource.get('description'),
-                        url : onlineResource.get('url'),
-                        localPath : '/tmp/' + onlineResource.get('name'),
-                        crs : (defaultBbox ? defaultBbox.crs : ''),
-                        eastBoundLongitude : (defaultBbox ? defaultBbox.eastBoundLongitude : 0),
-                        northBoundLatitude : (defaultBbox ? defaultBbox.northBoundLatitude : 0),
-                        southBoundLatitude : (defaultBbox ? defaultBbox.southBoundLatitude : 0),
-                        westBoundLongitude : (defaultBbox ? defaultBbox.westBoundLongitude : 0)
-                    }
+                    downloadOptions : vegl.util.DataSelectionUtil.createDownloadOptionsForResource (onlineResource, cswRecord, defaultBbox)
                 };
-
-                //Add/subtract info based on resource type
-                switch(onlineResource.get('type')) {
-                case portal.csw.OnlineResource.WCS:
-                    newItem.description = 'Loading size details...';
-                    delete newItem.downloadOptions.url;
-                    newItem.downloadOptions.format = 'nc';
-                    newItem.downloadOptions.layerName = newItem.name;
-                    break;
-                case portal.csw.OnlineResource.WFS:
-                    newItem.description = 'Loading size details...';
-                    delete newItem.downloadOptions.url;
-                    newItem.downloadOptions.serviceUrl = onlineResource.get('url');
-                    newItem.downloadOptions.featureType = newItem.name;
-                    break;
-                case portal.csw.OnlineResource.WWW:
-                    break;
-
-                //We don't support EVERY type
-                default:
-                    continue;
-                }
 
                 dataItems.push(Ext.create('vegl.widgets.DataSelectionPanelRow', newItem));
             }
