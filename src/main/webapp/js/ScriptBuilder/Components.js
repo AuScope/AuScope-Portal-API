@@ -76,6 +76,12 @@ ScriptBuilder.Components.getEscriptExamples = function() {
             text : "Joint Inversion",
             qtip : "Perform a joint gravity/magnetic inversion using escript. Expects both datasets to be in the form of seperate NetCDF files. Double click to use this example.",
             leaf : true
+        },{
+            id   : "ScriptBuilder.templates.EScriptGravityPointTemplate",
+            type : "s",
+            text : "Gravity Inversion",
+            qtip : "Perform a gravity inversion using escript. Expects data in the form of a simple wfs file. Double click to use this example.",
+            leaf : true
         }]
     };
 };
