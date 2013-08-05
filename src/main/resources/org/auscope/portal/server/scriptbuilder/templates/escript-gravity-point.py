@@ -15,11 +15,13 @@
 
 ####### Start of data preparation #########
 
-#! /usr/bin/python2.7
+#!/usr/bin/python2.7
 import csv
 import xml.etree.ElementTree as ET
 import sys
 import subprocess
+import os
+
 
 # File name for pre process input file
 DATAFILE = '${inversion-file}'
@@ -41,7 +43,8 @@ class Vgl(file):
     def writeToCSV(self,dictionaryData,filename):
         with open(filename,'w') as f:
             writer = csv.DictWriter(f,fieldnames=self.header);
-            writer.writeheader();
+            #python2.7 only- writer.writeheader();
+			writer.writerow(dict((fn,fn) for fn in writer.fieldnames));
             for d in dictionaryData:
                 writer.writerow(d);
 
@@ -71,18 +74,19 @@ class Vgl(file):
                 csvArray.append(dict);
         return csvArray;
 
+
 def main(args):
     Vgl(DATAFILE);
-    p = subprocess.Popen(["gdal_grid", "-zfield", "Elevation", "-a", "invdist:power=2.0:smoothing=1.0", "-txe", "85000", "89000", "-tye", "894000", "890000", "-outsize", "400", "400", "-of", "netCDF", "-ot", "Float64", "-l", "dem", "dem.vrt", "dem.nc", "--config", "GDAL_NUM_THREADS", "ALL_CPUS"],stdout=subprocess.PIPE);
-    output, err = p.communicate()
-    print  output
+    p = subprocess.call(["gdal_grid", "-zfield", "elevation", "-a", "invdist:power=2.0:smoothing=1.0", "-txe", "85000", "89000", "-tye", "894000", "890000", "-outsize", "400", "400", "-of", "netCDF", "-ot", "Float64", "-l", "dem", "dem.vrt", "dem.nc", "--config", "GDAL_NUM_THREADS", "ALL_CPUS"]);
+	subprocess.call(["cloud", "upload", "dem.nc", "dem.nc", "--set-acl=public-read"]);	
+	subprocess.call(["cloud", "upload", "dem.csv", "dem.csv", "--set-acl=public-read"]);
+	subprocess.call(["cloud", "upload", "dem.vrt", "dem.vrt", "--set-acl=public-read"]);
+	
 
 
 if __name__ == '__main__':
     main(sys.argv)
-				
-				
-				
+			
 
 ####### End of data preparation #########
 
@@ -92,7 +96,7 @@ if __name__ == '__main__':
 """3D gravity inversion using netCDF data"""
 
 # Filename for post process input data 
-DATASET = "dem.nc" 
+DATASET = "/root/dem.nc" 
 # maximum depth (in meters)
 DEPTH = ${max-depth}
 # buffer zone above data (in meters; 6-10km recommended)
@@ -107,9 +111,7 @@ N_THREADS = ${n-threads}
 
 ####### Do not change anything below this line #######
 
-import os
-import subprocess
-import sys
+
 
 try:
     from esys.downunder import *
@@ -124,6 +126,8 @@ def saveAndUpload(fn, **args):
     saveSilo(fn, **args)
     subprocess.call(["cloud", "upload", fn, fn, "--set-acl=public-read"])
 
+
+print("Processing GDAL file now");
 DATA_UNITS = 1e-6 * U.m/(U.sec**2)
 source=NetCdfData(DataSource.GRAVITY, DATASET, scale_factor=DATA_UNITS)
 db=DomainBuilder()

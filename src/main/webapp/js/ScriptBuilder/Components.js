@@ -79,7 +79,7 @@ ScriptBuilder.Components.getEscriptExamples = function() {
         },{
             id   : "ScriptBuilder.templates.EScriptGravityPointTemplate",
             type : "s",
-            text : "Gravity Inversion",
+            text : "Gravity Point Inversion",
             qtip : "Perform a gravity inversion using escript. Expects data in the form of a simple wfs file. Double click to use this example.",
             leaf : true
         }]
