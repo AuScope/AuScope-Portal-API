@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import glob, os, fnmatch, uuid, netCDF4, logging, csv, xml.sax.saxutils, re, traceback
+import glob, os, fnmatch, uuid, netCDF4, logging, csv, xml.sax.saxutils, re, traceback, numpy
 
 formatter = logging.Formatter('%(asctime)s %(message)s')
 errlogger = logging.getLogger('metadata_bad')
@@ -66,7 +66,7 @@ with open('/projects/r17/shared/wmsthredds/variables.xml', 'w') as xmlOut:
             filename, extension = os.path.splitext(currentFileBasePath)
             if '.ers.' not in filename and os.path.exists('/projects/r17/shared/netCDF/'+filename+'.nc4'):
                 data = netCDF4.Dataset('/projects/r17/shared/netCDF/'+filename+'.nc4','r', format='NETCDF4')
-                variableData = data.variables[filename][:]
+                variableData = numpy.ma.masked_invalid(data.variables[filename][:], copy=False)
                 upperBound = variableData.max()
                 lowerBound = variableData.min()
                 data.close()
