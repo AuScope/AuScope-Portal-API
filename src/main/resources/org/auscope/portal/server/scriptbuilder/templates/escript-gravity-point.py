@@ -51,7 +51,7 @@ class Vgl(file):
         dics = self.getXMLDict(file);
         self.writeToCSV(dics,"dem.csv");
         self.writeVRT("dem.vrt");
-
+		self.convertToGridWithGDAL();
 
     def writeToCSV(self,dictionaryData,filename):
         with open(filename,'w') as f:
@@ -104,22 +104,21 @@ class Vgl(file):
         return csvArray;
 
 
-def main(args):
-    Vgl(DATAFILE);
-	print self.srs;
-    print "latMax:"+str(self.latMax);
-    print "latMin:"+str(self.latMin);
-    print "longMax:"+str(self.longMax);
-    print "longMin:"+str(self.longMin);
-    p = subprocess.call(["gdal_grid", "-zfield", "elevation","-a_srs",self.srs, "-a", "invdist:power=2.0:smoothing=1.0", "-txe", str(self.longMin), str(self.longMax), "-tye", str(self.latMin), str(self.latMax), "-outsize", "400", "400", "-of", "netCDF", "-ot", "Float64", "-l", "dem", "dem.vrt", "dem.nc", "--config", "GDAL_NUM_THREADS", "ALL_CPUS"]);
-	subprocess.call(["cloud", "upload", "dem.nc", "dem.nc", "--set-acl=public-read"]);	
-	subprocess.call(["cloud", "upload", "dem.csv", "dem.csv", "--set-acl=public-read"]);
-	subprocess.call(["cloud", "upload", "dem.vrt", "dem.vrt", "--set-acl=public-read"]);
+	def convertToGridWithGDAL(self):		
+		print self.srs;
+		print "latMax:"+str(self.latMax);
+		print "latMin:"+str(self.latMin);
+		print "longMax:"+str(self.longMax);
+		print "longMin:"+str(self.longMin);
+		p = subprocess.call(["gdal_grid", "-zfield", "elevation","-a_srs",self.srs, "-a", "invdist:power=2.0:smoothing=1.0", "-txe", str(self.longMin), str(self.longMax), "-tye", str(self.latMin), str(self.latMax), "-outsize", "400", "400", "-of", "netCDF", "-ot", "Float64", "-l", "dem", "dem.vrt", "dem.nc", "--config", "GDAL_NUM_THREADS", "ALL_CPUS"]);
+		subprocess.call(["cloud", "upload", "dem.nc", "dem.nc", "--set-acl=public-read"]);	
+		subprocess.call(["cloud", "upload", "dem.csv", "dem.csv", "--set-acl=public-read"]);
+		subprocess.call(["cloud", "upload", "dem.vrt", "dem.vrt", "--set-acl=public-read"]);
 	
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    Vgl(DATAFILE);
 			
 
 ####### End of data preparation #########
