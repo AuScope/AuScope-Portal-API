@@ -87,20 +87,21 @@ class Vgl(file):
                 dict={};
                 dict['elevation'] = gravitypoints.find('{http://ga.gov.au/}spherical_cap_bouguer_anomaly').text;
                 points = (gravitypoints.find('{http://www.opengis.net/gml}location/{http://www.opengis.net/gml}Point/{http://www.opengis.net/gml}pos').text).split();
-                dict['lat'] = points[0];
-                dict['long']= points[1];
-                if (float(points[1]) > self.longMax):
-					self.longMax=float(points[1]);
-                if (float(points[1]) < self.longMin):
-					self.longMin=float(points[1]);
-                if (float(points[0]) > self.latMax):
-					self.latMax=float(points[0]);
-                if (float(points[0]) < self.latMin):
-					self.latMin=float(points[0]);				
+                #we will eventually need to add some smarts to determine lat/long long/lat
+				dict['lat'] = points[1];
+                dict['long']= points[0];
+                if (float(points[0]) > self.longMax):
+					self.longMax=float(points[0]);
+                if (float(points[0]) < self.longMin):
+					self.longMin=float(points[0]);
+                if (float(points[1]) > self.latMax):
+					self.latMax=float(points[1]);
+                if (float(points[1]) < self.latMin):
+					self.latMin=float(points[1]);				
                 csvArray.append(dict);
 				
 		self.srs=(root[0][0].find('{http://www.opengis.net/gml}location/{http://www.opengis.net/gml}Point')).get('srsName');
-		self.srs=self.srs[-9:];		
+		self.srs='EPSG:' + self.srs[-4:];		
         return csvArray;
 
 
