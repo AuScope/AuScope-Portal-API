@@ -1,3 +1,4 @@
+#!/usr/bin/python2.6
 
 ##############################################################################
 #
@@ -15,16 +16,28 @@
 
 ####### Start of data preparation #########
 
-#!/usr/bin/python2.7
+
 import csv
 import xml.etree.ElementTree as ET
 import sys
 import subprocess
 import os
 
+N_THREADS = ${n-threads}
+DATAFILE = '${inversion-file}'
+
+try:
+    from esys.downunder import *
+    from esys.escript import unitsSI as U
+    from esys.weipa import saveSilo
+except ImportError:
+    line=["/opt/escript/bin/run-escript","-t" + str(N_THREADS)]+sys.argv
+    ret=subprocess.call(line)
+    sys.exit(ret)
+
 
 # File name for pre process input file
-DATAFILE = '${inversion-file}'
+
 
 
 class Vgl(file):
@@ -64,6 +77,11 @@ class Vgl(file):
         tree = ET.parse(filename);
         root = tree.getroot();
         csvArray=[];
+		self.latMin=90.00;
+        self.latMax=-90.00;
+        self.longMin=180.00;
+        self.longMax=-180.00;
+
         for featureMembers in root:
             for gravitypoints in featureMembers:
                 dict={};
@@ -71,13 +89,29 @@ class Vgl(file):
                 points = (gravitypoints.find('{http://www.opengis.net/gml}location/{http://www.opengis.net/gml}Point/{http://www.opengis.net/gml}pos').text).split();
                 dict['lat'] = points[0];
                 dict['long']= points[1];
+                if (float(points[1]) > self.longMax):
+					self.longMax=float(points[1]);
+                if (float(points[1]) < self.longMin):
+					self.longMin=float(points[1]);
+                if (float(points[0]) > self.latMax):
+					self.latMax=float(points[0]);
+                if (float(points[0]) < self.latMin):
+					self.latMin=float(points[0]);				
                 csvArray.append(dict);
+				
+		self.srs=(root[0][0].find('{http://www.opengis.net/gml}location/{http://www.opengis.net/gml}Point')).get('srsName');
+		self.srs=self.srs[-9:];		
         return csvArray;
 
 
 def main(args):
     Vgl(DATAFILE);
-    p = subprocess.call(["gdal_grid", "-zfield", "elevation", "-a", "invdist:power=2.0:smoothing=1.0", "-txe", "85000", "89000", "-tye", "894000", "890000", "-outsize", "400", "400", "-of", "netCDF", "-ot", "Float64", "-l", "dem", "dem.vrt", "dem.nc", "--config", "GDAL_NUM_THREADS", "ALL_CPUS"]);
+	print self.srs;
+    print "latMax:"+str(self.latMax);
+    print "latMin:"+str(self.latMin);
+    print "longMax:"+str(self.longMax);
+    print "longMin:"+str(self.longMin);
+    p = subprocess.call(["gdal_grid", "-zfield", "elevation","-a_srs",self.srs, "-a", "invdist:power=2.0:smoothing=1.0", "-txe", str(self.longMin), str(self.longMax), "-tye", str(self.latMin), str(self.latMax), "-outsize", "400", "400", "-of", "netCDF", "-ot", "Float64", "-l", "dem", "dem.vrt", "dem.nc", "--config", "GDAL_NUM_THREADS", "ALL_CPUS"]);
 	subprocess.call(["cloud", "upload", "dem.nc", "dem.nc", "--set-acl=public-read"]);	
 	subprocess.call(["cloud", "upload", "dem.csv", "dem.csv", "--set-acl=public-read"]);
 	subprocess.call(["cloud", "upload", "dem.vrt", "dem.vrt", "--set-acl=public-read"]);
@@ -107,20 +141,13 @@ NE_Z = ${vertical-mesh-elements}
 PAD_X = ${x-padding}
 PAD_Y = ${y-padding}
 
-N_THREADS = ${n-threads}
+
 
 ####### Do not change anything below this line #######
 
 
 
-try:
-    from esys.downunder import *
-    from esys.escript import unitsSI as U
-    from esys.weipa import saveSilo
-except ImportError:
-    line=["/opt/escript/bin/run-escript","-t" + str(N_THREADS)]+sys.argv
-    ret=subprocess.call(line)
-    sys.exit(ret)
+
 
 def saveAndUpload(fn, **args):
     saveSilo(fn, **args)
