@@ -15,6 +15,7 @@
     <scm>
         <connection>scm:svn:https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk</connection>
         <developerConnection>scm:svn:https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk</developerConnection>
+		<url>https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk</url>
     </scm>
 
     <!-- Build Configuration -->
@@ -38,7 +39,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.1</version>
+                <version>1.2</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -49,7 +50,7 @@
                 </executions>
                 <configuration>
                     <doCheck>false</doCheck>
-                    <doUpdate>true</doUpdate>
+                    <doUpdate>false</doUpdate>
                     <timestampFormat>{0,date,dd-MM-yyyy HH:mm}</timestampFormat>
                 </configuration>
             </plugin>
