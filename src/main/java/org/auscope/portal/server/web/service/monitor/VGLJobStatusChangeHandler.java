@@ -10,29 +10,31 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A handler that provides the concrete implementation of 
+ * A handler that provides the concrete implementation of
  * JobStatusChangeListener.
- * 
+ *
  * It uses VEGLJobManager to update job status and to create job
  * audit trail record. In addition, it uses JobMailSender to
  * send out email notification upon job processing.
- * 
+ *
  * @author Richard Goh
  */
 public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
     private final Log LOG = LogFactory.getLog(getClass());
-    
+
     private VEGLJobManager jobManager;
     private JobMailSender jobMailSender;
 
-    public VGLJobStatusChangeHandler(VEGLJobManager jobManager, 
+
+    public VGLJobStatusChangeHandler(VEGLJobManager jobManager,
             JobMailSender jobMailSender) {
         this.jobManager = jobManager;
         this.jobMailSender = jobMailSender;
     }
-    
+
     @Override
     public void handleStatusChange(CloudJob job, String newStatus, String oldStatus) {
         if (!newStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
@@ -41,9 +43,9 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
             vglJob.setStatus(newStatus);
             jobManager.saveJob(vglJob);
             jobManager.createJobAuditTrail(oldStatus, vglJob, "Job status updated.");
-            if (newStatus.equals(JobBuilderController.STATUS_DONE) 
+            if ((newStatus.equals(JobBuilderController.STATUS_DONE) || newStatus.equals(JobBuilderController.STATUS_ERROR))
                     && vglJob.getEmailNotification()) {
-                //Send job completion email notification. Exception in sending 
+                //Send job completion email notification. Exception in sending
                 //the notification won't be propagated to the calling method.
                 jobMailSender.sendMail(vglJob);
                 LOG.trace("Job completion email notification sent. Job id: " + vglJob.getId());

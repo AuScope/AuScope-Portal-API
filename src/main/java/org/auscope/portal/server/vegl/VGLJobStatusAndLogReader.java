@@ -119,9 +119,11 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
             return null;
         }
 
-        //If the job is currently in the done/saved state - do absolutely nothing.
+        //If the job is currently in the done/saved IN_QUEUE or ERROR state - do absolutely nothing.
         if (job.getStatus().equals(JobBuilderController.STATUS_DONE) ||
-                job.getStatus().equals(JobBuilderController.STATUS_UNSUBMITTED)) {
+                job.getStatus().equals(JobBuilderController.STATUS_UNSUBMITTED) ||
+                        job.getStatus().equals(JobBuilderController.STATUS_INQUEUE) ||
+                                job.getStatus().equals(JobBuilderController.STATUS_ERROR)) {
             return job.getStatus();
         }
 

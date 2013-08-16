@@ -74,7 +74,7 @@ public class TestJobBuilderController {
         mockResponse = context.mock(HttpServletResponse.class);
         mockSession = context.mock(HttpSession.class);
         //Object Under Test
-        controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices);
+        controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices, null);
     }
 
     /**
@@ -1601,7 +1601,7 @@ public class TestJobBuilderController {
         Assert.assertEquals(name, test.get("name"));
         Assert.assertEquals(id, test.get("id"));
     }
-    
+
     /**
      * Tests that getting a compute type list for a particular compute service returns no exceptions
      * @throws Exception
@@ -1622,7 +1622,7 @@ public class TestJobBuilderController {
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertSame(result, mav.getModel().get("data"));
     }
-    
+
     /**
      * Tests that getting a compute type list for a particular compute service returns no exceptions
      * @throws Exception
@@ -1640,5 +1640,5 @@ public class TestJobBuilderController {
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
-    
+
 }

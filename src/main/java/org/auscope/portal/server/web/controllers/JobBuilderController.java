@@ -34,9 +34,13 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
+import org.auscope.portal.server.vegl.VGLQueueJob;
+import org.auscope.portal.server.vegl.VGLTimePollQueue;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
+import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -72,21 +76,32 @@ public class JobBuilderController extends BaseCloudController {
     public static final String STATUS_DONE = "Done";
     public static final String STATUS_DELETED = "Deleted";
     public static final String STATUS_UNSUBMITTED = "Saved";
+    public static final String STATUS_INQUEUE = "In Queue";
+    public static final String STATUS_ERROR = "ERROR";
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
     public static final String DOWNLOAD_SCRIPT = "vgl-download.sh";
+    private static VGLPollingJobQueueManager queueManager;
+    VGLJobStatusChangeHandler vglJobStatusChangeHandler;
+
+    static{
+        VGLTimePollQueue queue= new VGLTimePollQueue();
+        queueManager=new VGLPollingJobQueueManager(queue);
+
+    }
 
     @Autowired
     public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
             PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService[] cloudStorageServices,
-            CloudComputeService[] cloudComputeServices) {
+            CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler) {
         super(cloudStorageServices, cloudComputeServices);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.hostConfigurer = hostConfigurer;
         this.cloudStorageServices = cloudStorageServices;
         this.cloudComputeServices = cloudComputeServices;
+        this.vglJobStatusChangeHandler=vglJobStatusChangeHandler;
     }
 
     /**
@@ -687,7 +702,20 @@ public class JobBuilderController extends BaseCloudController {
                             userDataString = createBootstrapForJob(curJob);
 
                             // launch the ec2 instance
-                            instanceId = cloudComputeService.executeJob(curJob, userDataString);
+                            try{
+                                instanceId = cloudComputeService.executeJob(curJob, userDataString);
+                            }catch(PortalServiceException e){
+                                //only for this specific error we wanna queue the job
+                                if(e.getErrorCorrection()!= null && e.getErrorCorrection().contains("Quota exceeded")){
+                                    queueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
+                                    curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
+                                    jobManager.saveJob(curJob);
+                                    jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job submitted.");
+                                    return generateJSONResponseMAV(true, null, "");
+                                }else{
+                                    throw e;
+                                }
+                            }
                             logger.info("Launched instance: " + instanceId);
                             // set reference as instanceId for use when killing a job
                             curJob.setComputeInstanceId(instanceId);
@@ -839,7 +867,7 @@ public class JobBuilderController extends BaseCloudController {
             return generateJSONResponseMAV(false);
         }
     }
-    
+
     @RequestMapping("/getVmTypesForComputeService.do")
     public ModelAndView getTypesForComputeService(HttpServletRequest request,
                                         @RequestParam("computeServiceId") String computeServiceId) {
@@ -848,7 +876,7 @@ public class JobBuilderController extends BaseCloudController {
             if (ccs == null) {
                 return generateJSONResponseMAV(false, null, "Unknown compute service");
             }
-            
+
             return generateJSONResponseMAV(true, ccs.getAvailableComputeTypes(), "");
         } catch (Exception ex) {
             log.error("Unable to access compute type list:" + ex.getMessage(), ex);

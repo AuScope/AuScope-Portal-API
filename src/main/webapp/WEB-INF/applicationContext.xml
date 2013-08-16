@@ -48,6 +48,8 @@
     </bean>
 
 
+
+
     <bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">
         <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
         <property name="dateFormat" value="EEE, d MMM yyyy HH:mm:ss" />
@@ -58,7 +60,9 @@
         <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
 
+
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
+    <bean name="VGLJobStatusChangeHandler" class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor"/>
 
     <bean name="jobStatusMonitor" class="org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor">
         <constructor-arg name="jobStatusReader" ref="jobStatusLogReader"/>
@@ -68,7 +72,6 @@
             </array>
         </constructor-arg>
     </bean>
-
 
     <bean name="vglJobStatusMonitorDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
         <property name="jobClass" value="org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor" />
@@ -120,7 +123,7 @@
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
         <constructor-arg name="cswServiceList" ref="cswServiceList"/> <!-- This is pulled from the profile xml -->
         <constructor-arg name="transformerFactory">
-        	<bean class="org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory"/>
+            <bean class="org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory"/>
         </constructor-arg>
         <property name="forceGetMethods" value="true"/>
     </bean>
@@ -137,7 +140,7 @@
             </bean>
         </constructor-arg>
     </bean>
-    
+
     <bean id="wfsService" class="org.auscope.portal.server.web.service.SimpleWfsService">
         <constructor-arg name="httpServiceCaller" ref="httpServiceCaller"/>
         <constructor-arg name="wfsMethodMaker">
@@ -194,7 +197,7 @@
         <property name="authVersion" value="2.0"/>
         <property name="regionName" value="Qld"/>
     </bean>
-    
+
     <bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageService">
         <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
         <constructor-arg name="provider" value="swift-keystone"/>

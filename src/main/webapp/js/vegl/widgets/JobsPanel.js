@@ -120,13 +120,13 @@ Ext.define('vegl.widgets.JobsPanel', {
                         type : 'json',
                         root : 'data'
                     },
-					listeners : {
-                    	exception : function(proxy, response, operation) {
-                    		responseObj = Ext.JSON.decode(response.responseText);
-                    		errorMsg = responseObj.msg;
-                        	errorInfo = responseObj.debugInfo;
-                    		portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
-                    	}
+                    listeners : {
+                        exception : function(proxy, response, operation) {
+                            responseObj = Ext.JSON.decode(response.responseText);
+                            errorMsg = responseObj.msg;
+                            errorInfo = responseObj.debugInfo;
+                            portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                        }
                     }
                 }
             }),
@@ -234,8 +234,8 @@ Ext.define('vegl.widgets.JobsPanel', {
         }, this);
 
         popup.on('close', function() {
-        	//refresh selected job description
-        	this.fireEvent('refreshJobDescription', selectedJob);
+            //refresh selected job description
+            this.fireEvent('refreshJobDescription', selectedJob);
         }, this);
 
         popup.show();
@@ -264,6 +264,10 @@ Ext.define('vegl.widgets.JobsPanel', {
             return '<span style="color:blue;">' + value + '</span>';
         } else if (value === vegl.models.Job.STATUS_PENDING) {
             return '<span style="color:#e59900;">' + value + '</span>';
+        } else if (value === vegl.models.Job.STATUS_INQUEUE) {
+            return '<span style="color:green;">' + value + '</span>';
+        } else if (value === vegl.models.Job.STATUS_ERROR) {
+            return '<span style="color:red;">' + value + '</span>';
         }
         return value;
     },

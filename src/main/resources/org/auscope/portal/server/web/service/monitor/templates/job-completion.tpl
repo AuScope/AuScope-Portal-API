@@ -4,6 +4,7 @@ Your VGL job has been processed.
 
 Job details:
 ------------
+Job Status: ${status}
 Job id: ${jobId}
 Job series: ${seriesName}
 Job name: ${jobName}
