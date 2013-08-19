@@ -710,7 +710,7 @@ public class JobBuilderController extends BaseCloudController {
                                     queueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
                                     curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
                                     jobManager.saveJob(curJob);
-                                    jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job submitted.");
+                                    jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
                                     return generateJSONResponseMAV(true, null, "");
                                 }else{
                                     throw e;
@@ -965,5 +965,9 @@ public class JobBuilderController extends BaseCloudController {
         allInputs.addAll(job.getJobDownloads());
 
         return generateJSONResponseMAV(true, allInputs, "");
+    }
+
+    public VGLPollingJobQueueManager getVGLPollingJobQueueManager(){
+        return this.queueManager;
     }
 }

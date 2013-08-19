@@ -26,7 +26,7 @@ public class VGLPollingJobQueueManager {
     }
 
     public void initialize() {
-        scheduler.scheduleAtFixedRate(jobQueue, 3, 3, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(jobQueue, 30, 30, TimeUnit.MINUTES);
 
     }
 

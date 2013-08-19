@@ -28,6 +28,7 @@ import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
@@ -849,6 +850,102 @@ public class TestJobBuilderController {
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
     }
+
+
+
+
+
+    /**
+     * Tests that job submission fails correctly when files cannot be uploaded to S3
+     * @throws Exception
+     */
+    @Test
+    public void testJobSubmissionWithQueue_ExecuteFailure() throws Exception {
+        //Instantiate our job object
+        final VEGLJob jobObj = new VEGLJob(13);
+        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+
+        final String computeVmId = "compute-vmi-id";
+        final String computeServiceId = "compute-service-id";
+
+        final File mockFile1 = context.mock(File.class, "MockFile1");
+        final File mockFile2 = context.mock(File.class, "MockFile2");
+        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
+        final OutputStream mockOutputStream = context.mock(OutputStream.class);
+        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
+        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final String storageBucket = "storage-bucket";
+        final String storageAccess = "213-asd-54";
+        final String storageSecret = "tops3cret";
+        final String storageProvider = "provider";
+        final String storageAuthVersion = "1.2.3";
+        final String storageEndpoint = "http://example.org";
+        final String storageServiceId = "storage-service-id";
+        final String regionName = "region-name";
+        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
+
+        jobObj.setComputeVmId(computeVmId);
+        //As submitJob method no longer explicitly checks for empty storage credentials,
+        //we need to manually set the storageBaseKey property to avoid NullPointerException
+        jobObj.setStorageBaseKey("storageBaseKey");
+        //By default, a job is in SAVED state
+        jobObj.setStatus(jobInSavedState);
+        jobObj.setComputeServiceId(computeServiceId);
+        jobObj.setStorageServiceId(storageServiceId);
+
+        context.checking(new Expectations() {{
+            //We should have 1 call to our job manager to get our job object and 1 call to save it
+            oneOf(mockJobManager).getJobById(jobObj.getId());will(returnValue(jobObj));
+
+            oneOf(mockFileStagingService).writeFile(jobObj, JobBuilderController.DOWNLOAD_SCRIPT);
+            will(returnValue(mockOutputStream));
+            allowing(mockOutputStream).close();
+
+            //We should have 1 call to get our stage in files
+            oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
+
+            //We allow calls to the Configurer which simply extract values from our property file
+            allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
+
+            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
+            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue(storageBucket));
+            allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
+            allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
+            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
+            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
+            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
+            allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
+
+            //We should have 1 call to upload them
+            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
+
+            //We should have access control check to ensure user has permission to run the job
+            oneOf(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+            oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
+            oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
+            oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"testRole1"}));
+
+            oneOf(mockJobManager).saveJob(jobObj);
+
+            allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
+
+            //And finally 1 call to execute the job (which will throw PortalServiceException indicating failure)
+            oneOf(mockCloudComputeServices[0]).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(new PortalServiceException("Some random error","Some error correction with Quota exceeded")));
+
+            //We should have 1 call to our job manager to create a job audit trail record
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Job Placed in Queue");
+        }});
+
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+        VGLPollingJobQueueManager qm= controller.getVGLPollingJobQueueManager();
+        Assert.assertTrue(qm.getQueue().hasJob());
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Assert.assertEquals(JobBuilderController.STATUS_INQUEUE, jobObj.getStatus());
+    }
+
+
 
     /**
      * Tests that job submission fails correctly when user specifies a storage service that DNE
