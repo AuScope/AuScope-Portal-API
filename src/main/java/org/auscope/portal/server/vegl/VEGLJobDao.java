@@ -39,20 +39,33 @@ public class VEGLJobDao extends HibernateDaoSupport {
             .findByNamedParam("from VEGLJob j where j.emailAddress=:email",
                     "email", emailAddress);
     }
-    
+
     /**
      * Retrieves jobs that are either pending or active.
-     * 
+     *
      * @return a list of pending or active jobs.
      */
     @SuppressWarnings("unchecked")
     public List<VEGLJob> getPendingOrActiveJobs() {
-        String query = "from VEGLJob j where lower(j.status)='" 
-                + JobBuilderController.STATUS_PENDING + "' or lower(j.status)='" 
+        String query = "from VEGLJob j where lower(j.status)='"
+                + JobBuilderController.STATUS_PENDING + "' or lower(j.status)='"
                 + JobBuilderController.STATUS_ACTIVE + "'";
         return (List<VEGLJob>) getHibernateTemplate().find(query);
     }
-    
+
+    /**getInQueueJobs
+     * Retrieves jobs that are either pending or active.
+     *
+     * @return a list of pending or active jobs.
+     */
+    @SuppressWarnings("unchecked")
+    public List<VEGLJob> getInQueueJobs() {
+        String query = "from VEGLJob j where lower(j.status)='"
+                + JobBuilderController.STATUS_INQUEUE + "'";
+
+        return (List<VEGLJob>) getHibernateTemplate().find(query);
+    }
+
     /**
      * Retrieves the job with given ID.
      */

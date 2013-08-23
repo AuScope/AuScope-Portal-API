@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
+import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -35,6 +36,9 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
+import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
+import org.auscope.portal.server.vegl.VGLQueueJob;
+import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -63,17 +67,41 @@ public class JobListController extends BaseCloudController  {
     private FileStagingService fileStagingService;
     private VGLJobStatusAndLogReader jobStatusLogReader;
     private JobStatusMonitor jobStatusMonitor;
+    private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
 
     @Autowired
     public JobListController(VEGLJobManager jobManager, CloudStorageService[] cloudStorageServices,
             FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
             VGLJobStatusAndLogReader jobStatusLogReader,
-            JobStatusMonitor jobStatusMonitor) {
-        super(cloudStorageServices, cloudComputeServices);
+            JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
+            PortalPropertyPlaceholderConfigurer hostConfigurer) {
+        super(cloudStorageServices, cloudComputeServices,hostConfigurer);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.jobStatusLogReader = jobStatusLogReader;
         this.jobStatusMonitor = jobStatusMonitor;
+        this.initializeQueue();
+    }
+
+    protected void initializeQueue() {
+        try{
+            VGLPollingJobQueueManager queueManager = VGLPollingJobQueueManager.getInstance();
+            if(queueManager.getQueue().hasJob()){
+                //a fail safe catch all
+                return;
+            }
+            List<VEGLJob> seriesJobs = jobManager.getInQueueJobs();
+            for(VEGLJob curJob:seriesJobs){
+                CloudComputeService cloudComputeService = getComputeService(curJob);
+                String userDataString = null;
+                userDataString = createBootstrapForJob(curJob);
+                queueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
+            }
+        }catch(Exception e){
+            logger.error("Error initializing job queue",e);
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -312,7 +340,7 @@ public class JobListController extends BaseCloudController  {
             if (job.getStatus().equals(JobBuilderController.STATUS_DONE)) {
                 return generateJSONResponseMAV(false, null, "Cancelling of job aborted as it has already been processed.");
             }
-    
+
             // terminate the EMI instance
             terminateInstance(job);
         } catch (Exception e) {
@@ -551,8 +579,8 @@ public class JobListController extends BaseCloudController  {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String downloadFileName = String.format("jobfiles_%1$s_%2$s.zip", job.getName(), sdf.format(job.getSubmitDate()));
         downloadFileName = downloadFileName.replaceAll("[^0-9a-zA-Z_.]", "_");
-        
-        
+
+
         //Start writing our data to a zip archive (which is being streamed to user)
         try {
             response.setContentType("application/zip");
@@ -670,12 +698,12 @@ public class JobListController extends BaseCloudController  {
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
         }
-        
+
         List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue());
         if (seriesJobs == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs for the specified series.");
         }
-        
+
         if (forceStatusRefresh) {
             try {
                 jobStatusMonitor.statusUpdate(seriesJobs);
@@ -801,14 +829,14 @@ public class JobListController extends BaseCloudController  {
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The specified job does not exist.");
         }
-        
+
         ModelMap namedSections = null;
         try {
             namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job);
         } catch (PortalServiceException ex) {
             return generateJSONResponseMAV(false, null, ex.getMessage());
         }
-        
+
         return generateJSONResponseMAV(true, Arrays.asList(namedSections), "");
     }
 }

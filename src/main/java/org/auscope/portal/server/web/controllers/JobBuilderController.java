@@ -69,7 +69,6 @@ public class JobBuilderController extends BaseCloudController {
 
     private VEGLJobManager jobManager;
     private FileStagingService fileStagingService;
-    private PortalPropertyPlaceholderConfigurer hostConfigurer;
 
     public static final String STATUS_PENDING = "Pending";
     public static final String STATUS_ACTIVE = "Active";
@@ -82,27 +81,23 @@ public class JobBuilderController extends BaseCloudController {
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
     public static final String DOWNLOAD_SCRIPT = "vgl-download.sh";
-    private static VGLPollingJobQueueManager queueManager;
     VGLJobStatusChangeHandler vglJobStatusChangeHandler;
 
-    static{
-        VGLTimePollQueue queue= new VGLTimePollQueue();
-        queueManager=new VGLPollingJobQueueManager(queue);
 
-    }
 
     @Autowired
     public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
             PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler) {
-        super(cloudStorageServices, cloudComputeServices);
+        super(cloudStorageServices, cloudComputeServices,hostConfigurer);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
-        this.hostConfigurer = hostConfigurer;
         this.cloudStorageServices = cloudStorageServices;
         this.cloudComputeServices = cloudComputeServices;
         this.vglJobStatusChangeHandler=vglJobStatusChangeHandler;
+
     }
+
 
     /**
      * Returns a JSON object containing a populated VEGLJob object.
@@ -539,43 +534,6 @@ public class JobBuilderController extends BaseCloudController {
         return generateJSONResponseMAV(true, job.getJobDownloads(), "");
     }
 
-    /**
-     * Loads the bootstrap shell script template as a string.
-     * @return
-     * @throws IOException
-     */
-    private String getBootstrapTemplate() throws IOException {
-        InputStream is = this.getClass().getResourceAsStream("vgl-bootstrap.sh");
-        String template = IOUtils.toString(is);
-        return template.replaceAll("\r", ""); //Windows style file endings have a tendency to sneak in via StringWriter and the like
-    }
-
-    /**
-     * Creates a bootstrap shellscript for job that will be sent to
-     * cloud VM instance to kick start the work for job.
-     * @param job
-     * @return
-     * @throws IOException
-     */
-    public String createBootstrapForJob(VEGLJob job) throws IOException {
-        String bootstrapTemplate = getBootstrapTemplate();
-        CloudStorageService cloudStorageService = getStorageService(job);
-
-        Object[] arguments = new Object[] {
-            cloudStorageService.getBucket(), //STORAGE_BUCKET
-            job.getStorageBaseKey().replace("//", "/"), //STORAGE_BASE_KEY_PATH
-            cloudStorageService.getAccessKey(), //STORAGE_ACCESS_KEY
-            cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
-            hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
-            cloudStorageService.getEndpoint(), //STORAGE_ENDPOINT
-            cloudStorageService.getProvider(), //STORAGE_TYPE
-            cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion(), //STORAGE_AUTH_VERSION
-            cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName() //OS_REGION_NAME
-        };
-
-        String result = MessageFormat.format(bootstrapTemplate, arguments);
-        return result;
-    }
 
     /**
      * Gets the list of authorised images for the specified job owned by user
@@ -707,7 +665,7 @@ public class JobBuilderController extends BaseCloudController {
                             }catch(PortalServiceException e){
                                 //only for this specific error we wanna queue the job
                                 if(e.getErrorCorrection()!= null && e.getErrorCorrection().contains("Quota exceeded")){
-                                    queueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
+                                    VGLPollingJobQueueManager.getInstance().addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
                                     curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
                                     jobManager.saveJob(curJob);
                                     jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
@@ -967,7 +925,5 @@ public class JobBuilderController extends BaseCloudController {
         return generateJSONResponseMAV(true, allInputs, "");
     }
 
-    public VGLPollingJobQueueManager getVGLPollingJobQueueManager(){
-        return this.queueManager;
-    }
+
 }

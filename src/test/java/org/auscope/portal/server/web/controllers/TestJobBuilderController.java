@@ -939,7 +939,7 @@ public class TestJobBuilderController {
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
-        VGLPollingJobQueueManager qm= controller.getVGLPollingJobQueueManager();
+        VGLPollingJobQueueManager qm= VGLPollingJobQueueManager.getInstance();
         Assert.assertTrue(qm.getQueue().hasJob());
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_INQUEUE, jobObj.getStatus());
