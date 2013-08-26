@@ -25,7 +25,7 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
             items : [{
                 xtype : 'combo',
                 fieldLabel : 'Dataset',
-                name : 'InputFile',
+                name : 'wfs-input-xml',
                 allowBlank : false,
                 valueField : 'localPath',
                 displayField : 'localPath',
@@ -49,6 +49,18 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
                     },
                     autoLoad : true
                 })
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'Max Threads',
+                anchor : '-20',
+                name : 'n-threads',
+                value : maxThreads,
+                allowBlank : false,
+                minValue : 1,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: Ext.String.format('The maximum number of execution threads to run (this job will have {0} CPUs)', maxThreads)
+                }]
             }]
         });
     }
