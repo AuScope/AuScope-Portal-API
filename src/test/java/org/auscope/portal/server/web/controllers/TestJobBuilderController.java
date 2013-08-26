@@ -36,6 +36,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.ui.ModelMap;
@@ -76,6 +77,11 @@ public class TestJobBuilderController {
         mockSession = context.mock(HttpSession.class);
         //Object Under Test
         controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices, null);
+    }
+
+    @After
+    public void destroy(){
+        VGLPollingJobQueueManager.getInstance().getQueue().clear();
     }
 
     /**

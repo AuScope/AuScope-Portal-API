@@ -35,6 +35,7 @@ import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor;
 import org.jmock.Expectations;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,6 +91,11 @@ public class TestJobListController extends PortalTestClass {
                 mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer);
     }
 
+    @After
+    public void destroy(){
+        VGLPollingJobQueueManager.getInstance().getQueue().clear();
+    }
+
 
     public static VEGLJobMatcher aVeglJob(Integer id) {
         return new VEGLJobMatcher(id);
@@ -100,7 +106,7 @@ public class TestJobListController extends PortalTestClass {
     }
 
     @Test
-    public void testInitizeQueue(){
+    public void testInitizeQueue() throws InterruptedException{
 
 
         final String storageBucket = "storage-bucket";
@@ -148,8 +154,12 @@ public class TestJobListController extends PortalTestClass {
                 mockCloudStorageServices, mockFileStagingService,
                 mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer);
 
+
         VGLPollingJobQueueManager queueManager = VGLPollingJobQueueManager.getInstance();
-        Assert.assertTrue(queueManager.getQueue().hasJob());
+        //Assert.assertTrue(queueManager.getQueue().hasJob());
+
+        Assert.assertEquals(2, queueManager.getQueue().size());
+
     }
 
     /**
