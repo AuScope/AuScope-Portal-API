@@ -1,10 +1,6 @@
 #! /usr/bin/python2.7
-import csv
+import csv, sys, os, subprocess, glob, time, datetime
 import xml.etree.ElementTree as ET
-import sys
-import os
-import subprocess
-import time, datetime
 
 class Vgl(file):
 
@@ -57,7 +53,7 @@ class Vgl(file):
  
     def run(self,file):
         dics = self.getVglXMLDict(file);
-        self.writeToCSV(dics,"out.csv");
+        self.writeToCSV(dics,"aemInput.dat");
 
     def replace_all(self,text, dic):
         for i, j in dic.iteritems():
@@ -79,7 +75,6 @@ class Vgl(file):
         for featureMembers in root:
             for aemsurveys in featureMembers:
                 dict={};
-                dict['id'] = aemsurveys.find('{http://ga.gov.au}id').text;
                 dict['line'] = aemsurveys.find('{http://ga.gov.au}line').text;
                 dict['flight'] = aemsurveys.find('{http://ga.gov.au}flight').text;
                 dict['fid'] = aemsurveys.find('{http://ga.gov.au}fid').text;
@@ -108,15 +103,12 @@ class Vgl(file):
                 dict['tx_height'] = aemsurveys.find('{http://ga.gov.au}tx_height').text;
                 dict['hsep_raw'] = aemsurveys.find('{http://ga.gov.au}hsep_raw').text;
                 dict['vsep_raw'] = aemsurveys.find('{http://ga.gov.au}vsep_raw').text;
-                
                 dict['tx_height_std'] = aemsurveys.find('{http://ga.gov.au}tx_height_std').text;
                 dict['hsep_std'] = aemsurveys.find('{http://ga.gov.au}hsep_std').text;
                 dict['vsep_std'] = aemsurveys.find('{http://ga.gov.au}vsep_std').text;
-                
                 dict['txrx_dx_gps'] = 0 # Not yet mapped
                 dict['txrx_dy_gps'] = 0 # Not yet mapped
                 dict['txrx_dz_gps'] = 0 # Not yet mapped
-                
                 dict['emx_nonhprg1'] = aemsurveys.find('{http://ga.gov.au}emx_nonhprg1').text;
                 dict['emx_nonhprg2'] = aemsurveys.find('{http://ga.gov.au}emx_nonhprg2').text;
                 dict['emx_nonhprg3'] = aemsurveys.find('{http://ga.gov.au}emx_nonhprg3').text;
@@ -132,7 +124,6 @@ class Vgl(file):
                 dict['emx_nonhprg13'] = aemsurveys.find('{http://ga.gov.au}emx_nonhprg13').text;
                 dict['emx_nonhprg14'] = aemsurveys.find('{http://ga.gov.au}emx_nonhprg14').text;
                 dict['emx_nonhprg15'] = aemsurveys.find('{http://ga.gov.au}emx_nonhprg15').text;
-
                 dict['emx_hprg1'] = aemsurveys.find('{http://ga.gov.au}emx_hprg1').text;
                 dict['emx_hprg2'] = aemsurveys.find('{http://ga.gov.au}emx_hprg2').text;
                 dict['emx_hprg3'] = aemsurveys.find('{http://ga.gov.au}emx_hprg3').text;
@@ -148,7 +139,6 @@ class Vgl(file):
                 dict['emx_hprg13'] = aemsurveys.find('{http://ga.gov.au}emx_hprg13').text;
                 dict['emx_hprg14'] = aemsurveys.find('{http://ga.gov.au}emx_hprg14').text;
                 dict['emx_hprg15'] = aemsurveys.find('{http://ga.gov.au}emx_hprg15').text;
-
                 dict['x_sferics'] = aemsurveys.find('{http://ga.gov.au}x_sferics').text;
                 dict['x_lowfreq'] = aemsurveys.find('{http://ga.gov.au}x_lowfreq').text;
                 dict['x_powerline'] = aemsurveys.find('{http://ga.gov.au}x_powerline').text;
@@ -197,8 +187,6 @@ class Vgl(file):
                 dict['z_geofact'] = aemsurveys.find('{http://ga.gov.au}z_geofact').text;                   
                 csvArray.append(dict);
         return csvArray;
-        
-Vgl("aemsurveys.xml");
     
 controlFileString = """
 Control Begin
@@ -225,9 +213,9 @@ Control Begin
                 YComponentPrimary = UNAVAILABLE
                 ZComponentPrimary = UNAVAILABLE
 
-                XComponentSecondary = Column 30
+                XComponentSecondary = Column 27
                 YComponentSecondary = UNAVAILABLE
-                ZComponentSecondary = -Column 68
+                ZComponentSecondary = -Column 65
 
                 StdDevXComponentWindows = UNAVAILABLE
                 StdDevYComponentWindows = UNAVAILABLE
@@ -264,7 +252,7 @@ Control Begin
         Options End
 
         InputOutput Begin
-                InputFile   = out.csv
+                InputFile   = aemInput.dat
                 HeaderLines = 0
                 Subsample   = 1
 
@@ -286,9 +274,9 @@ Control Begin
                         TX_Roll         = Column 20
                         TX_Pitch        = -Column 19
                         TX_Yaw          = 0
-                        TXRX_DX         = Column 24
-                        TXRX_DY         = -Column 25
-                        TXRX_DZ         = Column 26
+                        TXRX_DX         = Column 22
+                        TXRX_DY         = 0
+                        TXRX_DZ         = Column 23
                         RX_Roll         = 0
                         RX_Pitch        = 0
                         RX_Yaw          = 0
@@ -300,9 +288,9 @@ Control Begin
                         TotalFieldReconstruction End
 
                         ReferenceModel Begin
-                                TXRX_DX      = Column 24
+                                TXRX_DX      = Column 22
                                 TXRX_DY      = 0
-                                TXRX_DZ      = Column 26
+                                TXRX_DZ      = Column 23
                                 RX_Pitch     = 0
                                 Conductivity   = 0.01
                                 Thickness      = 4.00 4.40 4.84 5.32 5.86 6.44 7.09 7.79 8.57 9.43 10.37 11.41 12.55 13.81 15.19 16.71 18.38 20.22 22.24 24.46 26.91 29.60 32.56 35.82 39.40 43.34 47.67 52.44 57.68
@@ -409,7 +397,12 @@ cloudUpload("tempest.stm", "tempest.stm")
 
 
 Vgl("${wfs-input-xml}");
-cloudUpload("out.csv", "out.csv")
+cloudUpload("aemInput.dat", "aemInput.dat")
 
-subprocess.call(["mpirun", "-n", "${n-threads}", "/root/code/bin/galeisbs.exe", ""])
-    
+subprocess.call(["mpirun", "-n", "${n-threads}", "/root/code/bin/galeisbs.exe", "galeisbs.con"])
+
+inversionFiles = glob.glob('inversion.output.*')
+print 'About to upload the following files:'
+print inversionFiles
+for fn in inversionFiles:
+    cloudUpload(fn, fn)
