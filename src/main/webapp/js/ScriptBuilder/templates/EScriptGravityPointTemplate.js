@@ -18,6 +18,25 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
         var jobId = this.wizardState.jobId;
         var maxThreads = this.wizardState.ncpus;
 
+        var jobStore = Ext.create('Ext.data.Store', {
+            model : 'vegl.models.Download',
+            proxy : {
+                type : 'ajax',
+                url : 'getAllJobInputs.do',
+                extraParams : {
+                    jobId : jobId
+                },
+                reader : {
+                    type : 'json',
+                    root : 'data'
+                }
+            },
+            autoLoad : true
+        });
+
+        var ratioY = 1;
+        var ratioX = 1;
+
         this._getTemplatedScriptGui(callback, 'escript-gravity-point.py', {
             xtype : 'form',
             width : 450,
@@ -34,21 +53,22 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                     ptype: 'fieldhelptext',
                     text: 'The path to a NetCDF input file.'
                 }],
-                store : Ext.create('Ext.data.Store', {
-                    model : 'vegl.models.Download',
-                    proxy : {
-                        type : 'ajax',
-                        url : 'getAllJobInputs.do',
-                        extraParams : {
-                            jobId : jobId
-                        },
-                        reader : {
-                            type : 'json',
-                            root : 'data'
-                        }
-                    },
-                    autoLoad : true
-                })
+                store : jobStore,
+                listeners:{
+                    'select': function( combo, records, eOpts ){
+                        var x = Math.abs(records[0].get('eastBoundLongitude') - records[0].get('westBoundLongitude'));
+                        var y = Math.abs(records[0].get('northBoundLatitude') - records[0].get('southBoundLatitude'));
+                        ratioY = y/x;
+                        ratioX = x/y;
+                        var xSizeField = Ext.getCmp('EScriptGravityPointXSize');
+                        var ySizeField = Ext.getCmp('EScriptGravityPointYSize');
+
+                        ySizeField.setValue(ratioY * xSizeField.getValue());
+
+
+                    }
+                }
+
             },{
                 xtype : 'numberfield',
                 fieldLabel : 'Max Threads',
@@ -125,28 +145,48 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                 }]
             },{
                 xtype : 'numberfield',
+                id  : 'EScriptGravityPointXSize',
                 fieldLabel : 'X Size',
                 anchor : '-20',
                 name : 'xsize',
-                value : 200,
+                value : 150,
+                decimalPrecision : 0,
                 allowBlank : false,
                 minValue : 1,
                 maxValue : 500,
                 step : 1,
+                listeners:{
+                    'change' : function(field, newValue, oldValue, eOpts ){
+                        var ySizeField = Ext.getCmp('EScriptGravityPointYSize');
+                        ySizeField.suspendEvents();
+                        ySizeField.setValue(ratioY * newValue);
+                        ySizeField.resumeEvents();
+                    }
+                },
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'size of the x axis output file in pixels and lines'
                 }]
             },{
                 xtype : 'numberfield',
+                id  : 'EScriptGravityPointYSize',
                 fieldLabel : 'Y Size',
                 anchor : '-20',
                 name : 'ysize',
-                value : 200,
+                value : 150,
+                decimalPrecision : 0,
                 allowBlank : false,
                 minValue : 1,
                 maxValue : 500,
                 step : 1,
+                listeners:{
+                    'change' : function(field, newValue, oldValue, eOpts ){
+                        var xSizeField = Ext.getCmp('EScriptGravityPointXSize');
+                        xSizeField.suspendEvents();
+                        xSizeField.setValue(ratioX * newValue);
+                        xSizeField.resumeEvents();
+                    }
+                },
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'size of the x axis output file in pixels and lines'
