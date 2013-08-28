@@ -63,4 +63,21 @@ public class VGLQueueJob implements Job {
         return curJob.toString();
     }
 
+    public VEGLJob getVEGLJob(){
+        return curJob;
+    }
+
+    public boolean equals(Object j){
+        if(!(j instanceof VGLQueueJob)){
+            return false;
+        }else{
+            VGLQueueJob job=(VGLQueueJob)j;
+            if(this.curJob.getId()==job.getVEGLJob().getId()){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+
 }

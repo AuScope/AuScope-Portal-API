@@ -25,6 +25,8 @@ import os
 
 N_THREADS = ${n-threads}
 DATAFILE = '${inversion-file}'
+XSIZE = ${xsize}
+YSIZE = ${ysize}
 
 try:
     from esys.downunder import *
@@ -87,7 +89,7 @@ class Vgl(file):
         for featureMembers in root:
             for gravitypoints in featureMembers:
                 dict={};
-                dict['elevation'] = gravitypoints.find('{http://ga.gov.au/}spherical_cap_bouguer_anomaly').text;
+                dict['elevation'] = gravitypoints.find('{http://ga.gov.au}spherical_cap_bouguer_anomaly').text;
                 points = (gravitypoints.find('{http://www.opengis.net/gml}location/{http://www.opengis.net/gml}Point/{http://www.opengis.net/gml}pos').text).split();
                 #we will eventually need to add some smarts to determine lat/long long/lat
 				dict['lat'] = points[lat];
@@ -113,7 +115,7 @@ class Vgl(file):
 		print "latMin:"+str(self.latMin);
 		print "longMax:"+str(self.longMax);
 		print "longMin:"+str(self.longMin);
-		p = subprocess.call(["gdal_grid", "-zfield", "elevation","-a_srs",self.srs, "-a", "invdist:power=2.0:smoothing=1.0", "-txe", str(self.longMin), str(self.longMax), "-tye", str(self.latMin), str(self.latMax), "-outsize", "400", "400", "-of", "netCDF", "-ot", "Float64", "-l", "dem", "dem.vrt", "dem.nc", "--config", "GDAL_NUM_THREADS", "ALL_CPUS"]);
+		p = subprocess.call(["gdal_grid", "-zfield", "elevation","-a_srs",self.srs, "-a", "invdist:power=2.0:smoothing=1.0", "-txe", str(self.longMin), str(self.longMax), "-tye", str(self.latMin), str(self.latMax), "-outsize", str(XSIZE), str(YSIZE), "-of", "netCDF", "-ot", "Float64", "-l", "dem", "dem.vrt", "dem.nc", "--config", "GDAL_NUM_THREADS", "ALL_CPUS"]);
 		subprocess.call(["cloud", "upload", "dem.nc", "dem.nc", "--set-acl=public-read"]);	
 		subprocess.call(["cloud", "upload", "dem.csv", "dem.csv", "--set-acl=public-read"]);
 		subprocess.call(["cloud", "upload", "dem.vrt", "dem.vrt", "--set-acl=public-read"]);

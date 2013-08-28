@@ -67,9 +67,4 @@ public class VGLTimePollQueue extends AbstractJobQueue{
     }
 
 
-
-
-
-
-
 }

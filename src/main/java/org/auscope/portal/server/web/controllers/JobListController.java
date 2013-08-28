@@ -363,7 +363,14 @@ public class JobListController extends BaseCloudController  {
         if (oldJobStatus.equals(JobBuilderController.STATUS_DONE) ||
                 oldJobStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
             logger.debug("Skipping finished or unsubmitted job "+job.getId());
-        } else {
+        }else if(oldJobStatus.equals(JobBuilderController.STATUS_INQUEUE)){
+            VGLPollingJobQueueManager queueManager=VGLPollingJobQueueManager.getInstance();
+            VGLQueueJob dummyQueueJobForRemoval = new VGLQueueJob(null,null,job,"",null);
+            queueManager.getQueue().remove(dummyQueueJobForRemoval);
+            job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+            jobManager.saveJob(job);
+            jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+        }else {
             try {
                 // We allow the job to be cancelled and re-submitted regardless
                 // of its termination status.

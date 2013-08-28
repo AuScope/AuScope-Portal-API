@@ -106,7 +106,7 @@ public class TestJobListController extends PortalTestClass {
     }
 
     @Test
-    public void testInitizeQueue() throws InterruptedException{
+    public void testInitizeQueueNDelete() throws InterruptedException{
 
 
         final String storageBucket = "storage-bucket";
@@ -116,6 +116,9 @@ public class TestJobListController extends PortalTestClass {
         final String storageProvider = "provider";
         final String storageAuthVersion = "1.2.3";
         final String regionName = null;
+
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
 
         final List<VEGLJob> queueMockJobs = Arrays.asList(
                 context.mock(VEGLJob.class, "queueMockJob1"),
@@ -148,6 +151,24 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
+            //Here on start is the delete mock
+
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+
+            allowing(queueMockJobs.get(1)).getUser();will(returnValue(userEmail));
+            //allowing(queueMockJobs.get(0)).getUser();will(returnValue(userEmail));
+
+            oneOf(queueMockJobManager).getJobById(jobId);will(returnValue(queueMockJobs.get(1)));
+
+            allowing(queueMockJobs.get(1)).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(queueMockJobs.get(1)).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(queueMockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_INQUEUE));
+            allowing(queueMockJobs.get(0)).getId();will(returnValue(5555));
+            allowing(queueMockJobs.get(1)).getId();will(returnValue(jobId));
+            oneOf(queueMockJobs.get(1)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+            oneOf(queueMockJobManager).saveJob(queueMockJobs.get(1));
+            oneOf(queueMockJobManager).createJobAuditTrail(JobBuilderController.STATUS_INQUEUE, queueMockJobs.get(1), "Job cancelled by user.");
         }});
 
         JobListController myController = new JobListController(queueMockJobManager,
@@ -159,6 +180,11 @@ public class TestJobListController extends PortalTestClass {
         //Assert.assertTrue(queueManager.getQueue().hasJob());
 
         Assert.assertEquals(2, queueManager.getQueue().size());
+
+        myController.killJob(mockRequest, mockResponse, jobId);
+
+        Assert.assertEquals(1, queueManager.getQueue().size());
+
 
     }
 

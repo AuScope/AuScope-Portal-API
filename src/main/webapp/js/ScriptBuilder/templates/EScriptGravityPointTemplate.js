@@ -21,7 +21,7 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
         this._getTemplatedScriptGui(callback, 'escript-gravity-point.py', {
             xtype : 'form',
             width : 450,
-            height : 390,
+            height : 450,
             items : [{
                 xtype : 'combo',
                 fieldLabel : 'Dataset',
@@ -122,6 +122,34 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'The amount of horizontal padding in the Y direction. This affects end result, about 20% recommended'
+                }]
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'X Size',
+                anchor : '-20',
+                name : 'xsize',
+                value : 200,
+                allowBlank : false,
+                minValue : 1,
+                maxValue : 500,
+                step : 1,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'size of the x axis output file in pixels and lines'
+                }]
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'Y Size',
+                anchor : '-20',
+                name : 'ysize',
+                value : 200,
+                allowBlank : false,
+                minValue : 1,
+                maxValue : 500,
+                step : 1,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'size of the x axis output file in pixels and lines'
                 }]
             }]
         });
