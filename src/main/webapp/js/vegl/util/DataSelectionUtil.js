@@ -30,6 +30,8 @@ Ext.define('vegl.util.DataSelectionUtil', {
      * the type of the online resource. Its use is only intended within this class 
      */
     vegl.util.DataSelectionUtil.createDownloadOptionsForResource = function(or, cswRecord, defaultBbox) {
+        var dsBounds = cswRecord.get('geographicElements').length ? cswRecord.get('geographicElements')[0] : null; 
+        
         //Set the defaults of our new item
         var downloadOptions = {
             name : 'Subset of ' + or.get('name'),
@@ -40,7 +42,11 @@ Ext.define('vegl.util.DataSelectionUtil', {
             eastBoundLongitude : (defaultBbox ? defaultBbox.eastBoundLongitude : 0),
             northBoundLatitude : (defaultBbox ? defaultBbox.northBoundLatitude : 0),
             southBoundLatitude : (defaultBbox ? defaultBbox.southBoundLatitude : 0),
-            westBoundLongitude : (defaultBbox ? defaultBbox.westBoundLongitude : 0)
+            westBoundLongitude : (defaultBbox ? defaultBbox.westBoundLongitude : 0),
+            dsEastBoundLongitude : (dsBounds ? dsBounds.eastBoundLongitude : null),
+            dsNorthBoundLatitude : (dsBounds ? dsBounds.northBoundLatitude : null),
+            dsSouthBoundLatitude : (dsBounds ? dsBounds.southBoundLatitude : null),
+            dsWestBoundLongitude : (dsBounds ? dsBounds.westBoundLongitude : null)
         };
 
         //Add/subtract info based on resource type
@@ -111,7 +117,8 @@ Ext.define('vegl.util.DataSelectionUtil', {
                         //The ERDDAP subset panel doesn't use coverage name for anything but size estimation
                         //Therefore we need to manually preserve it ourselves
                         params.layerName = dlOptions.layerName;
-
+                        params = Ext.apply(dlOptions, params);
+                        
                         parentWindow.close();
                         
                         callback(params);
@@ -207,6 +214,22 @@ Ext.define('vegl.util.DataSelectionUtil', {
     vegl.util.DataSelectionUtil.saveDownloadOptionsInSession = function(or, dlOptions, callback) {
         switch (or.get('type')) {
         case portal.csw.OnlineResource.WCS:
+            
+            //Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
+            //will fail. To workaround this, we need to crop our selection to the dataset bounds
+            if (dlOptions.dsEastBoundLongitude != null && (dlOptions.dsEastBoundLongitude < dlOptions.eastBoundLongitude)) {
+                dlOptions.eastBoundLongitude = dlOptions.dsEastBoundLongitude;
+            }
+            if (dlOptions.dsWestBoundLongitude != null && (dlOptions.dsWestBoundLongitude > dlOptions.westBoundLongitude)) {
+                dlOptions.westBoundLongitude = dlOptions.dsWestBoundLongitude;
+            }
+            if (dlOptions.dsNorthBoundLatitude != null && (dlOptions.dsNorthBoundLatitude < dlOptions.northBoundLatitude)) {
+                dlOptions.northBoundLatitude = dlOptions.dsNorthBoundLatitude;
+            }
+            if (dlOptions.dsSouthBoundLatitude != null && (dlOptions.dsSouthBoundLatitude > dlOptions.southBoundLatitude)) {
+                dlOptions.southBoundLatitude = dlOptions.dsSouthBoundLatitude;
+            }
+            
             Ext.Ajax.request({
                 url : 'addErddapRequestToSession.do',
                 params : dlOptions,
