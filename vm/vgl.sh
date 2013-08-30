@@ -116,7 +116,7 @@ echo "#### Python end ####"
 
 echo "#### Time start ####"
 totalComputeTime=`expr $computeEndTime - $computeStartTime`
-totalDownloadTime=`exprt $downloadEndTime - $downloadStartTime`
+totalDownloadTime=`expr $downloadEndTime - $downloadStartTime`
 echo "Total compute time was `expr $totalComputeTime / 3600` hour(s), `expr $totalComputeTime % 3600 / 60` minutes and `expr $totalComputeTime % 60` seconds"
 echo "Total time to download input data was `expr $totalDownloadTime / 3600` hour(s), `expr $totalDownloadTime % 3600 / 60` minutes and `expr $totalDownloadTime % 60` seconds"
 echo "#### Time end ####"
