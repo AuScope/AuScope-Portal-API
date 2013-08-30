@@ -90,11 +90,13 @@ cloud upload workflow-version.txt workflow-version.txt
 #Download our input files from swift storage and load them into files in the current working directory
 echo "Downloading inputfiles from S3..."
 echo "cloud list"
+downloadStartTime=`date +%s`
 for line in `cloud list`;do
        downloadOutputFile=`basename "${line}"`
        echo "cloud download ${downloadOutputFile} ${downloadOutputFile} ${downloadOutputFile}"
        cloud download ${downloadOutputFile} ${downloadOutputFile} ${downloadOutputFile}
 done
+downloadEndTime=`date +%s`
 echo "... finished downloading input files"
 
 #With our input files in place we can make our subset requests
@@ -107,8 +109,17 @@ cd $WORKING_DIR
 chmod +x "$VEGL_SCRIPT_PATH"
 echo "About to execute ${VEGL_SCRIPT_PATH} as a python script"
 echo "#### Python start ####"
+computeStartTime=`date +%s`
 python $VEGL_SCRIPT_PATH
+computeEndTime=`date +%s`
 echo "#### Python end ####"
+
+echo "#### Time start ####"
+totalComputeTime=`expr $computeEndTime - $computeStartTime`
+totalDownloadTime=`exprt $downloadEndTime - $downloadStartTime`
+echo "Total compute time was `expr $totalComputeTime / 3600` hour(s), `expr $totalComputeTime % 3600 / 60` minutes and `expr $totalComputeTime % 60` seconds"
+echo "Total time to download input data was `expr $totalDownloadTime / 3600` hour(s), `expr $totalDownloadTime % 3600 / 60` minutes and `expr $totalDownloadTime % 60` seconds"
+echo "#### Time end ####"
 cd $WORKING_DIR
 
 #Finally upload our logs for debug purposes
