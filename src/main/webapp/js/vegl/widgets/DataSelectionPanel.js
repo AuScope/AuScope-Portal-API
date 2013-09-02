@@ -54,8 +54,20 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                 renderer: Ext.bind(this._nameRenderer, this)
             },{
                 dataIndex: 'description',
-                width: 280,
+                width: 260,
                 renderer: Ext.bind(this._descriptionRenderer, this)
+            },{
+                xtype: 'actioncolumn',
+                width:30,
+                sortable: false,
+                items: [{
+                    icon: 'img/download.png',
+                    tooltip: 'Download this data to your local machine now',
+                    scope : this,
+                    handler: function(grid, rowIndex, colIndex, item, e, record) {
+                        this._handleRowDownload(record);
+                    }
+                }]
             },{
                 xtype: 'actioncolumn',
                 width:30,
@@ -90,6 +102,23 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
             dataItem.set('downloadOptions', updatedDlOptions);
             this._updateDescription(dataItem);
         }, this));
+    },
+    
+    /**
+     * Handles the editing of a row by showing a popup and then updating the row description upon completion
+     */
+    _handleRowDownload : function(dataItem) {
+        var or = dataItem.get('onlineResource');
+        var dlOptions = dataItem.get('downloadOptions');
+
+        vegl.util.DataSelectionUtil.makeDownloadUrl(or, dlOptions, false, function(success, dl) {
+            if (!success) {
+                Ext.Msg.alert('Download Error', 'There was an error generating your download URL. Please try again in a few minutes or consider refreshing this page.');
+                return;
+            }
+            
+            portal.util.FileDownloader.downloadFile(dl.get('url'));
+        });
     },
 
     /**
@@ -129,8 +158,9 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
 
         //Different data sources have different functions to save
         for (var i = 0; i < selectedRows.length; i++) {
-            vegl.util.DataSelectionUtil.saveDownloadOptionsInSession(selectedRows[i].get('onlineResource'), 
+            vegl.util.DataSelectionUtil.makeDownloadUrl(selectedRows[i].get('onlineResource'), 
                     selectedRows[i].get('downloadOptions'), 
+                    true,
                     responseHandler);
         }
     },

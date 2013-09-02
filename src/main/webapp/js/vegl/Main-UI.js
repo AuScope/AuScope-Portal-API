@@ -219,7 +219,7 @@ Ext.application({
           //Show a dialog allow users to confirm the selected data sources
           if (intersectedRecords.length > 0) {
               Ext.create('Ext.Window', {
-                  width : 700,
+                  width : 710,
                   maxHeight : 400,
                   title : 'Confirm which datasets you wish to select',
                   modal : true,

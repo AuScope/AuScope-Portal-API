@@ -18,6 +18,7 @@ import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -39,7 +40,7 @@ public class TestJobDownloadController extends PortalTestClass {
     }
 
     @Test
-    public void testAddErddapRequestToSession() throws Exception {
+    public void testMakeErddapUrlSaveSession() throws Exception {
         final Double northBoundLatitude = 2.0;
         final Double eastBoundLongitude = 4.0;
         final Double southBoundLatitude = 1.0;
@@ -62,10 +63,21 @@ public class TestJobDownloadController extends PortalTestClass {
             oneOf(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
         }});
 
-        ModelAndView mav = controller.addErddapRequestToSession(northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, format, layerName, name, description, localPath, mockRequest, mockResponse);
+        ModelAndView mav = controller.makeErddapUrl(northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, format, layerName, name, description, localPath, true, mockRequest, mockResponse);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
 
+        //Check response
+        Assert.assertNotNull(mav.getModel().get("data"));
+        ModelMap data = (ModelMap) mav.getModel().get("data");
+        Assert.assertEquals(northBoundLatitude, data.get("northBoundLatitude"));
+        Assert.assertEquals(eastBoundLongitude, data.get("eastBoundLongitude"));
+        Assert.assertEquals(southBoundLatitude, data.get("southBoundLatitude"));
+        Assert.assertEquals(westBoundLongitude, data.get("westBoundLongitude"));
+        Assert.assertEquals(name, data.get("name"));
+        Assert.assertTrue(data.get("url").toString().contains(serviceUrl));
+        
+        //Check session variables
         Assert.assertEquals(1, downloads.size());
         VglDownload download = downloads.get(0);
         Assert.assertEquals(northBoundLatitude, download.getNorthBoundLatitude());
@@ -81,53 +93,41 @@ public class TestJobDownloadController extends PortalTestClass {
     }
     
     @Test
-    public void testAddSelectedResourcesToSession() {
-        final Double[] northBoundLatitude = { 2.0, 3.0 };
-        final Double[] eastBoundLongitude = { 4.0, 5.0 };
-        final Double[] southBoundLatitude = { 1.0, 2.0 };
-        final Double[] westBoundLongitude = { 3.0, 4.0 };
-        final String[] name = { "name1", "name2" };
-        final String[] description = { "desc1", "desc2" };
-        final String[] localPath = { "localPath1", "localPath2" };
-        final String[] serviceUrl = { "http://example.org/service1", "http://example.org/service2" };
-        
-        final List<VglDownload> downloads = new ArrayList<VglDownload>();
-        
+    public void testMakeErddapUrlNotSaveSession() throws Exception {
+        final Double northBoundLatitude = 2.0;
+        final Double eastBoundLongitude = 4.0;
+        final Double southBoundLatitude = 1.0;
+        final Double westBoundLongitude = 3.0;
+        final String format = "nc";
+        final String layerName = "layer";
+        final String name = "name";
+        final String description = "desc";
+        final String localPath = "localPath";
+        final String serviceUrl = "http://example.org/service";
+
         context.checking(new Expectations() {{
+            oneOf(mockHostConfigurer).resolvePlaceholder("HOST.erddapservice.url");will(returnValue(serviceUrl));
+
             allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(downloads));
-            allowing(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
-        }});        
-        
-        ModelAndView mav = controller.addSelectedResourcesToSession(serviceUrl, name, description, localPath, northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, mockRequest);
+        }});
+
+        ModelAndView mav = controller.makeErddapUrl(northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, format, layerName, name, description, localPath, false, mockRequest, mockResponse);
         Assert.assertNotNull(mav);
-        Assert.assertTrue(((Boolean) mav.getModel().get("success")));        
-        
-        Assert.assertEquals(2, downloads.size());
-        
-        VglDownload download1 = downloads.get(0);
-        Assert.assertEquals(northBoundLatitude[0], download1.getNorthBoundLatitude());
-        Assert.assertEquals(eastBoundLongitude[0], download1.getEastBoundLongitude());
-        Assert.assertEquals(southBoundLatitude[0], download1.getSouthBoundLatitude());
-        Assert.assertEquals(westBoundLongitude[0], download1.getWestBoundLongitude());
-        Assert.assertEquals(name[0], download1.getName());
-        Assert.assertEquals(description[0], download1.getDescription());
-        Assert.assertEquals(localPath[0], download1.getLocalPath());
-        Assert.assertEquals(serviceUrl[0], download1.getUrl());
-        
-        VglDownload download2 = downloads.get(1);
-        Assert.assertEquals(northBoundLatitude[1], download2.getNorthBoundLatitude());
-        Assert.assertEquals(eastBoundLongitude[1], download2.getEastBoundLongitude());
-        Assert.assertEquals(southBoundLatitude[1], download2.getSouthBoundLatitude());
-        Assert.assertEquals(westBoundLongitude[1], download2.getWestBoundLongitude());
-        Assert.assertEquals(name[1], download2.getName());
-        Assert.assertEquals(description[1], download2.getDescription());
-        Assert.assertEquals(localPath[1], download2.getLocalPath());
-        Assert.assertEquals(serviceUrl[1], download2.getUrl());
+        Assert.assertTrue(((Boolean) mav.getModel().get("success")));
+
+        //Check response
+        Assert.assertNotNull(mav.getModel().get("data"));
+        ModelMap data = (ModelMap) mav.getModel().get("data");
+        Assert.assertEquals(northBoundLatitude, data.get("northBoundLatitude"));
+        Assert.assertEquals(eastBoundLongitude, data.get("eastBoundLongitude"));
+        Assert.assertEquals(southBoundLatitude, data.get("southBoundLatitude"));
+        Assert.assertEquals(westBoundLongitude, data.get("westBoundLongitude"));
+        Assert.assertEquals(name, data.get("name"));
+        Assert.assertTrue(data.get("url").toString().contains(serviceUrl));
     }
 
     @Test
-    public void testAddDownloadRequestToSession() throws Exception {
+    public void testMakeDownloadUrlSaveSession() throws Exception {
         final Double northBoundLatitude = 2.0;
         final Double eastBoundLongitude = 4.0;
         final Double southBoundLatitude = 1.0;
@@ -146,10 +146,21 @@ public class TestJobDownloadController extends PortalTestClass {
             oneOf(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
         }});
 
-        ModelAndView mav = controller.addDownloadRequestToSession(serviceUrl, name, description, localPath, northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, mockRequest);
+        ModelAndView mav = controller.makeDownloadUrl(serviceUrl, name, description, localPath, northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, true, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
 
+        //Check response
+        Assert.assertNotNull(mav.getModel().get("data"));
+        ModelMap data = (ModelMap) mav.getModel().get("data");
+        Assert.assertEquals(northBoundLatitude, data.get("northBoundLatitude"));
+        Assert.assertEquals(eastBoundLongitude, data.get("eastBoundLongitude"));
+        Assert.assertEquals(southBoundLatitude, data.get("southBoundLatitude"));
+        Assert.assertEquals(westBoundLongitude, data.get("westBoundLongitude"));
+        Assert.assertEquals(name, data.get("name"));
+        Assert.assertEquals(serviceUrl, data.get("url"));
+        
+        //Check session variables
         Assert.assertEquals(1, downloads.size());
         VglDownload download = downloads.get(0);
         Assert.assertEquals(northBoundLatitude, download.getNorthBoundLatitude());
@@ -163,7 +174,37 @@ public class TestJobDownloadController extends PortalTestClass {
     }
     
     @Test
-    public void testAddWfsDownloadRequestToSession() throws Exception {
+    public void testMakeDownloadUrlNotSaveSession() throws Exception {
+        final Double northBoundLatitude = 2.0;
+        final Double eastBoundLongitude = 4.0;
+        final Double southBoundLatitude = 1.0;
+        final Double westBoundLongitude = 3.0;
+        final String name = "name";
+        final String description = "desc";
+        final String localPath = "localPath";
+        final String serviceUrl = "http://example.org/service";
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+        }});
+
+        ModelAndView mav = controller.makeDownloadUrl(serviceUrl, name, description, localPath, northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, false, mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue(((Boolean) mav.getModel().get("success")));
+
+        //Check response
+        Assert.assertNotNull(mav.getModel().get("data"));
+        ModelMap data = (ModelMap) mav.getModel().get("data");
+        Assert.assertEquals(northBoundLatitude, data.get("northBoundLatitude"));
+        Assert.assertEquals(eastBoundLongitude, data.get("eastBoundLongitude"));
+        Assert.assertEquals(southBoundLatitude, data.get("southBoundLatitude"));
+        Assert.assertEquals(westBoundLongitude, data.get("westBoundLongitude"));
+        Assert.assertEquals(name, data.get("name"));
+        Assert.assertEquals(serviceUrl, data.get("url"));
+    }
+    
+    @Test
+    public void testMakeWfsUrlSaveSession() throws Exception {
         final Double northBoundLatitude = 2.0;
         final Double eastBoundLongitude = 4.0;
         final Double southBoundLatitude = 1.0;
@@ -195,12 +236,23 @@ public class TestJobDownloadController extends PortalTestClass {
             oneOf(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
         }});
 
-        ModelAndView mav = controller.addWfsRequestToSession(serviceUrl, featureType, srsName, bboxSrs, 
+        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs, 
                 northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, 
-                outputFormat, maxFeatures, name, description, localPath, mockRequest);
+                outputFormat, maxFeatures, name, description, localPath, true, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
 
+        //Check response
+        Assert.assertNotNull(mav.getModel().get("data"));
+        ModelMap data = (ModelMap) mav.getModel().get("data");
+        Assert.assertEquals(northBoundLatitude, data.get("northBoundLatitude"));
+        Assert.assertEquals(eastBoundLongitude, data.get("eastBoundLongitude"));
+        Assert.assertEquals(southBoundLatitude, data.get("southBoundLatitude"));
+        Assert.assertEquals(westBoundLongitude, data.get("westBoundLongitude"));
+        Assert.assertEquals(name, data.get("name"));
+        Assert.assertEquals(wfsRequestString, data.get("url"));
+        
+        //Check session variables
         Assert.assertEquals(1, downloads.size());
         VglDownload download = downloads.get(0);
         Assert.assertEquals(northBoundLatitude, download.getNorthBoundLatitude());
@@ -211,6 +263,52 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(description, download.getDescription());
         Assert.assertEquals(localPath, download.getLocalPath());
         Assert.assertEquals(wfsRequestString, download.getUrl());
+    }
+    
+    @Test
+    public void testMakeWfsUrlNotSaveSession() throws Exception {
+        final Double northBoundLatitude = 2.0;
+        final Double eastBoundLongitude = 4.0;
+        final Double southBoundLatitude = 1.0;
+        final Double westBoundLongitude = 3.0;
+        final String srsName = "EPSG:4326";
+        final String bboxSrs = "EPSG:4387";
+        final String featureType = "test:featureType";
+        final String name = "name";
+        final String description = "desc";
+        final String localPath = "localPath";
+        final String serviceUrl = "http://example.org/wfs";
+        final String outputFormat = "o-f";
+        final Integer maxFeatures = null;
+        final String wfsRequestString = serviceUrl + "?request=param";
+        
+        final String[] expectedFormats = new String[] {"format1", "format2"};
+        final WFSGetCapabilitiesResponse mockResponse = context.mock(WFSGetCapabilitiesResponse.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+
+            oneOf(mockWfsService).getFeatureRequestAsString(with(serviceUrl), with(featureType), with(any(FilterBoundingBox.class)), with(maxFeatures), with(srsName), with(outputFormat));
+            will(returnValue(wfsRequestString));
+            
+            allowing(mockResponse).getGetFeatureOutputFormats();will(returnValue(expectedFormats));
+        }});
+
+        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs, 
+                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, 
+                outputFormat, maxFeatures, name, description, localPath, false, mockRequest);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue(((Boolean) mav.getModel().get("success")));
+
+        //Check response
+        Assert.assertNotNull(mav.getModel().get("data"));
+        ModelMap data = (ModelMap) mav.getModel().get("data");
+        Assert.assertEquals(northBoundLatitude, data.get("northBoundLatitude"));
+        Assert.assertEquals(eastBoundLongitude, data.get("eastBoundLongitude"));
+        Assert.assertEquals(southBoundLatitude, data.get("southBoundLatitude"));
+        Assert.assertEquals(westBoundLongitude, data.get("westBoundLongitude"));
+        Assert.assertEquals(name, data.get("name"));
+        Assert.assertEquals(wfsRequestString, data.get("url"));
     }
     
     /**

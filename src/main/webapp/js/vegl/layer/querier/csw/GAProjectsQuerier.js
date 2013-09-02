@@ -167,7 +167,7 @@ Ext.define('vegl.layer.querier.csw.GAProjectsQuerier', {
                     var myMask = new Ext.LoadMask(this, {msg: "Capturing grid..."});
                     myMask.show();
                     
-                    vegl.util.DataSelectionUtil.saveDownloadOptionsInSession(wcsResource, dlOptions, function(success) {
+                    vegl.util.DataSelectionUtil.makeDownloadUrl(wcsResource, dlOptions, true, function(success) {
                         myMask.hide();
                         if (success) {
                             Ext.Msg.alert('Request Saved', 'Your dataset has been saved. You can either continue selecting more data or <a href="jobbuilder.html">create a job</a> to process your existing selections.');

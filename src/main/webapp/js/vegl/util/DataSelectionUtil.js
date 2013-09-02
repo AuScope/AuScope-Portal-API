@@ -203,15 +203,31 @@ Ext.define('vegl.util.DataSelectionUtil', {
     };
     
     /**
-     * Save the specified set of download options for the specified online resource
-     * as a single download request. The request will be stored into the user session
+     * Create a download request URL (in the form of a Download object). 
+     * The request can optionally be stored into the user session
      * for use later in the job submit phase of the workflow.
      * 
      * @param or portal.csw.OnlineResource The resource to query
      * @param dlOptions Object The current state of download options.
-     * @param callback function(Boolean) called whenever the save request returns. Success is passed as the first parameter
+     * @param saveInSession Boolean Should this download be saved into the users session for use during job submit?
+     * @param callback function(Boolean, vegl.models.Download) called whenever the save request returns. Success is passed as the first parameter
      */
-    vegl.util.DataSelectionUtil.saveDownloadOptionsInSession = function(or, dlOptions, callback) {
+    vegl.util.DataSelectionUtil.makeDownloadUrl = function(or, dlOptions, saveInSession, callback) {
+        
+        var ajaxResponseHandler = function(options, success, response, callback) {
+            if (!success) {
+                callback(false, null);
+                return;
+            }
+            var responseObj = Ext.JSON.decode(response.responseText);
+            if (!responseObj || !responseObj.success) {
+                callback(false, null);
+                return;
+            }
+            
+            callback(true, Ext.create('vegl.models.Download', responseObj.data));
+        };
+        
         switch (or.get('type')) {
         case portal.csw.OnlineResource.WCS:
             
@@ -231,29 +247,23 @@ Ext.define('vegl.util.DataSelectionUtil', {
             }
             
             Ext.Ajax.request({
-                url : 'addErddapRequestToSession.do',
-                params : dlOptions,
-                callback : function(options, success, response) {
-                    callback(success);
-                }
+                url : 'makeErddapUrl.do',
+                params : Ext.apply({saveSession : saveInSession}, dlOptions),
+                callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
             });
             break;
         case portal.csw.OnlineResource.WFS:
             Ext.Ajax.request({
-                url : 'addWfsRequestToSession.do',
-                params : dlOptions,
-                callback : function(options, success, response) {
-                    callback(success);
-                }
+                url : 'makeWfsUrl.do',
+                params : Ext.apply({saveSession : saveInSession}, dlOptions),
+                callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
             });
             break;
         default:
             Ext.Ajax.request({
-                url : 'addDownloadRequestToSession.do',
-                params : dlOptions,
-                callback : function(options, success, response) {
-                    callback(success);
-                }
+                url : 'makeDownloadUrl.do',
+                params : Ext.apply({saveSession : saveInSession}, dlOptions),
+                callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
             });
             break;
         }

@@ -16,6 +16,7 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -44,6 +45,19 @@ public class JobDownloadController extends BasePortalController {
         this.wfsService = wfsService;
     }
 
+    private ModelMap toView(VglDownload dl) {
+        ModelMap map = new ModelMap();
+        map.put("url", dl.getUrl());
+        map.put("northBoundLatitude", dl.getNorthBoundLatitude());
+        map.put("southBoundLatitude", dl.getSouthBoundLatitude());
+        map.put("eastBoundLongitude", dl.getEastBoundLongitude());
+        map.put("westBoundLongitude", dl.getWestBoundLongitude());
+        map.put("name", dl.getName());
+        map.put("description", dl.getDescription());
+        map.put("localPath", dl.getLocalPath());
+        return map;
+    }
+    
     /**
      * Utility for adding a single VglDownload object to the session based array of VglDownload objects.
      * @param request
@@ -65,44 +79,12 @@ public class JobDownloadController extends BasePortalController {
     }
 
     /**
-     * Adds user selected file(s) or download request(s) to the session wide SESSION_OWNLOAD_LIST list.
-     * @return ModelAndView response object.
-     */
-    @RequestMapping("/addSelectedResourcesToSession.do")
-    public ModelAndView addSelectedResourcesToSession(@RequestParam("url") String[] url,
-            @RequestParam("name") String[] name,
-            @RequestParam("description") String[] description,
-            @RequestParam("localPath") String[] localPath,
-            @RequestParam("northBoundLatitude") final Double[] northBoundLatitude,
-            @RequestParam("eastBoundLongitude") final Double[] eastBoundLongitude,
-            @RequestParam("southBoundLatitude") final Double[] southBoundLatitude,
-            @RequestParam("westBoundLongitude") final Double[] westBoundLongitude,
-            HttpServletRequest request) {
-
-        for (int i = 0; i < url.length; i++) {
-            VglDownload newDownload = new VglDownload();
-            newDownload.setName(name[i]);
-            newDownload.setDescription(description[i]);
-            newDownload.setLocalPath(localPath[i]);
-            newDownload.setUrl(url[i]);
-            newDownload.setNorthBoundLatitude(northBoundLatitude[i]);
-            newDownload.setEastBoundLongitude(eastBoundLongitude[i]);
-            newDownload.setSouthBoundLatitude(southBoundLatitude[i]);
-            newDownload.setWestBoundLongitude(westBoundLongitude[i]);
-
-            addDownloadToSession(request, newDownload);
-        }
-
-        return generateJSONResponseMAV(true, null, "");
-    }
-
-    /**
-     * Adds a new download request to the session wide SESSION_OWNLOAD_LIST list. This list
-     * will be added to the next job the user creates
+     * Creates a new VGL Download object from a remote URL. The Download object is returned. If saveSession
+     * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list.
      * @return
      */
-    @RequestMapping("/addDownloadRequestToSession.do")
-    public ModelAndView addDownloadRequestToSession(@RequestParam("url") String url,
+    @RequestMapping("/makeDownloadUrl.do")
+    public ModelAndView makeDownloadUrl(@RequestParam("url") String url,
             @RequestParam("name") String name,
             @RequestParam("description") String description,
             @RequestParam("localPath") String localPath,
@@ -110,6 +92,7 @@ public class JobDownloadController extends BasePortalController {
             @RequestParam("eastBoundLongitude") final Double eastBoundLongitude,
             @RequestParam("southBoundLatitude") final Double southBoundLatitude,
             @RequestParam("westBoundLongitude") final Double westBoundLongitude,
+            @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
             HttpServletRequest request) {
 
         VglDownload newDownload = new VglDownload();
@@ -122,19 +105,21 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setSouthBoundLatitude(southBoundLatitude);
         newDownload.setWestBoundLongitude(westBoundLongitude);
 
-        addDownloadToSession(request, newDownload);
+        if (saveSession) {
+            addDownloadToSession(request, newDownload);
+        }
 
-        return generateJSONResponseMAV(true, null, "");
+        return generateJSONResponseMAV(true, toView(newDownload), "");
     }
 
     /**
-     * Adds a new ERDDAP request to the session wide SESSION_OWNLOAD_LIST list. This list
-     * will be added to the next job the user creates
+     * Creates a new VGL Download object from a some ERDDAP parameters. The Download object is returned. If saveSession
+     * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list.
      * @return
      * @throws Exception
      */
-    @RequestMapping("/addErddapRequestToSession.do")
-    public ModelAndView addErddapRequestToSession(@RequestParam("northBoundLatitude") final Double northBoundLatitude,
+    @RequestMapping("/makeErddapUrl.do")
+    public ModelAndView makeErddapUrl(@RequestParam("northBoundLatitude") final Double northBoundLatitude,
                                 @RequestParam("eastBoundLongitude") final Double eastBoundLongitude,
                                 @RequestParam("southBoundLatitude") final Double southBoundLatitude,
                                 @RequestParam("westBoundLongitude") final Double westBoundLongitude,
@@ -143,6 +128,7 @@ public class JobDownloadController extends BasePortalController {
                                 @RequestParam("name") final String name,
                                 @RequestParam("description") final String description,
                                 @RequestParam("localPath") final String localPath,
+                                @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                 HttpServletRequest request,
                                 HttpServletResponse response) throws Exception {
 
@@ -161,20 +147,23 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setSouthBoundLatitude(southBoundLatitude);
         newDownload.setWestBoundLongitude(westBoundLongitude);
 
-        addDownloadToSession(request, newDownload);
+        if (saveSession) {
+            addDownloadToSession(request, newDownload);
+        }
 
-        return generateJSONResponseMAV(true, null, "");
+        return generateJSONResponseMAV(true, toView(newDownload), "");
     }
     
     /**
-     * Generate a WFS GetFeature request but don't execute it. Instead stores it as a VglDownload into the user session 
+     * Creates a new VGL Download object from some WFS parameters. The Download object is returned. If saveSession
+     * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list. 
      *
      * @param serviceUrl The WFS endpoint
      * @param featureType The feature type name to query
      * @param maxFeatures [Optional] The maximum number of features to query
      */
-    @RequestMapping("/addWfsRequestToSession.do")
-    public ModelAndView addWfsRequestToSession(@RequestParam("serviceUrl") final String serviceUrl,
+    @RequestMapping("/makeWfsUrl.do")
+    public ModelAndView makeWfsUrl(@RequestParam("serviceUrl") final String serviceUrl,
                                            @RequestParam("featureType") final String featureType,
                                            @RequestParam(required = false, value = "srsName") final String srsName,
                                            @RequestParam(required = false, value = "crs") final String bboxCrs,
@@ -187,6 +176,7 @@ public class JobDownloadController extends BasePortalController {
                                            @RequestParam("name") final String name,
                                            @RequestParam("description") final String description,
                                            @RequestParam("localPath") final String localPath,
+                                           @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                            HttpServletRequest request) throws Exception {
 
         FilterBoundingBox bbox = null;
@@ -214,9 +204,11 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setSouthBoundLatitude(southBoundLatitude);
         newDownload.setWestBoundLongitude(westBoundLongitude);
         
-        addDownloadToSession(request, newDownload);
+        if (saveSession) {
+            addDownloadToSession(request, newDownload);
+        }
 
-        return generateJSONResponseMAV(true, null, "");
+        return generateJSONResponseMAV(true, toView(newDownload), "");
     }
     
     /**
