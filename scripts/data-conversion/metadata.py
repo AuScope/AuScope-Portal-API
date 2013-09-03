@@ -352,7 +352,7 @@ def createChildMetadataRecord(surveyId, currentFileBasePath, parentUUID, mydata)
     outputTemplate = outputTemplate.replace(replaceVars['south'], mydata['south'])
     outputTemplate = outputTemplate.replace(replaceVars['east'], mydata['east'])
     
-    f = open('/projects/r17/shared/metadata/' + mydata['filename'] + '.xml', 'w')
+    f = open('/projects/r17/shared/metadata/' + mydata['filename'] + '-' + surveyId  + '.xml', 'w')
     f.write(outputTemplate)
     f.close()
     
