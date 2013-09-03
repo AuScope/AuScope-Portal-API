@@ -12,6 +12,7 @@
             </security:authorize>
 
             <li><a id="help-button">Help<span></span></a></li>
+            <li><a href="https://www.seegrid.csiro.au/wiki/NeCTARProjects/VglUserGuide">Wiki<span></span></a></li>
             <li <%if (request.getRequestURL().toString().contains("/gmap.jsp")) {%>class="current" <%} %>><a href="gmap.html">VGL Portal<span></span></a></li>
             <li <%if (request.getRequestURL().toString().contains("/jobbuilder.jsp")) {%>class="current" <%} %>><a href="jobbuilder.html">Submit Jobs<span></span></a></li>
             <li <%if (request.getRequestURL().toString().contains("/joblist.jsp")) {%>class="current" <%} %>><a href="joblist.html">Monitor Jobs<span></span></a></li>
@@ -26,9 +27,9 @@
          </ul>
       </div>
       <span id="latlng" class="input-text"></span>
-      
+
       <%if (request.getRequestURL().toString().contains("/gmap.jsp")) {%>
-      	<div id="permalinkicon"><a href="javascript:void(0)"><img src="img/link.png" width="16" height="16"/></a></div>
-      	<div id="permalink"><a href="javascript:void(0)">Permanent Link</a></div>
+          <div id="permalinkicon"><a href="javascript:void(0)"><img src="img/link.png" width="16" height="16"/></a></div>
+          <div id="permalink"><a href="javascript:void(0)">Permanent Link</a></div>
       <%} %>
    </div>
