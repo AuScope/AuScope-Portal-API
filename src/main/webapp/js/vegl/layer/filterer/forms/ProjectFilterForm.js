@@ -10,20 +10,8 @@ Ext.define('vegl.layer.filterer.forms.ProjectFilterForm', {
     constructor : function(config) {
         //First build our keyword/resource data from our list of CSWRecords
         var cswRecords = config.layer.get('cswRecords');
-        var keywordData = {}; //store the counts of keywords keyed by the keyword name
         var resourceData = {}; //sotre the counts of providers keyed by provider names
         for (var i = 0; i < cswRecords.length; i++) {
-            //Add keywords
-            var keywordArray = cswRecords[i].get('descriptiveKeywords');
-            for (var j = 0; j < keywordArray.length; j++) {
-                var keyword = keywordArray[j];
-                if (keywordData[keyword]) {
-                    keywordData[keyword]++;
-                } else {
-                    keywordData[keyword] = 1;
-                }
-            }
-
             //Add resource providers
             var resourceProvider = cswRecords[i].get('resourceProvider');
             if (resourceData[resourceProvider]) {
@@ -32,21 +20,24 @@ Ext.define('vegl.layer.filterer.forms.ProjectFilterForm', {
                 resourceData[resourceProvider] = 1;
             }
         }
-
-        //Turn that keyword data into something we can plug into a store
-        var keywordList = [];
-        for (var keyword in keywordData) {
-            var temp={};
-            temp.keyword=keyword;
-            temp.count=keywordData[keyword];
-            keywordList.push(temp);
-        }
+        
+        //We will have easy to read labels mapping to a set of equivalent keywords
+        var keywordList = [{
+            label : 'Elevation Grid',
+            keywords : ['ELE', 'ELEVATION']
+        }, {
+            label : 'Magnetics Grid',
+            keywords : ['MAG', 'MAGNETICS']
+        }, {
+            label : 'Radiometrics Grid',
+            keywords : ['RAD', 'RADIOMETRICS']
+        }];
         var keywordStore = Ext.create('Ext.data.Store', {
-            fields      : ['keyword', 'count'],
+            fields      : ['keywords', 'label'],
             data        : keywordList
         });
 
-        //Do the same for our resource data
+        //Map our resource data into a form that can be used by an Ext store
         var providerList = [];
         for (var provider in resourceData) {
             var temp={};
@@ -81,19 +72,18 @@ Ext.define('vegl.layer.filterer.forms.ProjectFilterForm', {
                     name: 'title'
                 },{
                     xtype: 'combo',
-                    tpl: '<tpl for="."><li style="word-wrap" data-qtip="{keyword} - {count} record(s)" class="x-boundlist-item" role="option" >{keyword}</li></tpl>',
                     tplWriteMode: 'set',
                     anchor: '100%',
                     queryMode: 'local',
                     name: 'keyword',
-                    fieldLabel: 'keyword',
+                    fieldLabel: 'Keyword',
                     labelAlign: 'left',
                     forceSelection: true,
                     store: keywordStore,
                     triggerAction: 'all',
                     typeAhead: true,
-                    displayField:'keyword',
-                    valueField:'keyword',
+                    displayField:'label',
+                    valueField:'keywords',
                     autoScroll: true
                 },{
                     xtype: 'combo',
