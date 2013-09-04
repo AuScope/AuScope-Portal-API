@@ -8,6 +8,7 @@ import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusChangeListener;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,14 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
 
     private VEGLJobManager jobManager;
     private JobMailSender jobMailSender;
+    private VGLJobStatusAndLogReader jobStatusLogReader;
 
 
     public VGLJobStatusChangeHandler(VEGLJobManager jobManager,
-            JobMailSender jobMailSender) {
+            JobMailSender jobMailSender, VGLJobStatusAndLogReader jobStatusLogReader) {
         this.jobManager = jobManager;
         this.jobMailSender = jobMailSender;
+        this.jobStatusLogReader=jobStatusLogReader;
     }
 
     @Override
@@ -40,6 +43,7 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
         if (!newStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
             VEGLJob vglJob = (VEGLJob)job;
             vglJob.setProcessDate(new Date());
+            this.setProcessDuration(vglJob,newStatus);
             vglJob.setStatus(newStatus);
             jobManager.saveJob(vglJob);
             jobManager.createJobAuditTrail(oldStatus, vglJob, "Job status updated.");
@@ -50,6 +54,15 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
                 jobMailSender.sendMail(vglJob);
                 LOG.trace("Job completion email notification sent. Job id: " + vglJob.getId());
             }
+        }
+    }
+
+
+
+    public void setProcessDuration(VEGLJob job,String newStatus){
+        if (newStatus.equals(JobBuilderController.STATUS_DONE) || newStatus.equals(JobBuilderController.STATUS_ERROR)){
+            String time = this.jobStatusLogReader.getSectionedLog(job, "Time");
+            job.setProcessTimeLog(time);
         }
     }
 }

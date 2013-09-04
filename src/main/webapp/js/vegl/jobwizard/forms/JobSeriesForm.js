@@ -112,6 +112,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                 itemId : 'jobspanel-seriesjobs',
                 title : 'Other Jobs in selected series',
                 hideRegisterButton : true,
+                showProcessDuration : true,
                 flex : 1,
                 jobSeriesFrm : jobSeriesObj,
                 listeners : {

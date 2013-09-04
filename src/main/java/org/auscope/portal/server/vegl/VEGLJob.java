@@ -21,6 +21,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private String registeredUrl;
     private Integer seriesId;
     private boolean emailNotification;
+    private String processTimeLog;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -61,6 +62,22 @@ public class VEGLJob extends CloudJob implements Cloneable {
     }
 
     /**
+     * Sets the processTimeLog
+     * @param String time
+     */
+    public void setProcessTimeLog(String processTimeLog) {
+       this.processTimeLog=processTimeLog;
+
+    }
+
+    /**
+     * @return the processTimeLog
+     */
+    public String getProcessTimeLog() {
+        return processTimeLog;
+    }
+
+    /**
      * Gets where this job has been registered
      * @return
      */
@@ -91,7 +108,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     public void setSeriesId(Integer seriesId) {
         this.seriesId = seriesId;
     }
-    
+
     /**
      * Gets the email notification flag for this job
      * @return
@@ -221,4 +238,8 @@ public class VEGLJob extends CloudJob implements Cloneable {
                 + seriesId + ", id=" + id + ", name=" + name + ", description="
                 + description + "]";
     }
+
+
+
+
 }

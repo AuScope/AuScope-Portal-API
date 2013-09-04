@@ -103,6 +103,32 @@ Ext.define('vegl.widgets.JobsPanel', {
             }
         });
 
+
+
+        var displayColumns = [{ header: 'Job Name', sortable: true, flex : 1, dataIndex: 'name'},
+         { header: 'Submit Date', width: 160, sortable: true, dataIndex: 'submitDate', renderer: Ext.util.Format.dateRenderer('d M Y, H:i:s')},
+         { header: 'Status', sortable: true, dataIndex: 'status', width : 100, renderer: this._jobStatusRenderer}];
+
+
+
+        if(config.showProcessDuration==true){
+            displayColumns.push({
+                header: 'Processed Time Log',
+                width: 320,
+                sortable: true,
+                dataIndex: 'processTimeLog',
+                renderer:function(val){
+                    var result=val.replace("Total time","<br>Total time");
+                    return '<div style="white-space:normal !important;">'+ result +'</div>';
+                }
+
+            })
+        }
+
+
+
+
+
         Ext.apply(config, {
             plugins : [{
                 ptype : 'rowcontextmenu',
@@ -130,9 +156,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                     }
                 }
             }),
-            columns: [{ header: 'Job Name', sortable: true, flex : 1, dataIndex: 'name'},
-                      { header: 'Submit Date', width: 160, sortable: true, dataIndex: 'submitDate', renderer: Ext.util.Format.dateRenderer('d M Y, H:i:s')},
-                      { header: 'Status', sortable: true, dataIndex: 'status', width : 100, renderer: this._jobStatusRenderer}],
+            columns: displayColumns,
             buttons: [{
                 text: 'Register to GeoNetwork',
                 itemId : 'btnRegister',
@@ -166,6 +190,15 @@ Ext.define('vegl.widgets.JobsPanel', {
         this.on('select', this._onJobSelection, this);
         this.on('selectionchange', this._onSelectionChange, this);
     },
+
+
+    _timeDiffinMinutes: function(d1, d2) {
+        var t2 = d2.getTime();
+        var t1 = d1.getTime();
+
+        return parseInt((t2-t1)/(3600*1000));
+    },
+
 
     _onSelectionChange : function(sm) {
         var selections = this.getSelectionModel().getSelection();
@@ -477,6 +510,8 @@ Ext.define('vegl.widgets.JobsPanel', {
 
         popup.show();
     },
+
+
 
     /**
      * Submits the specified job to the cloud for processing

@@ -29,6 +29,7 @@ Ext.define('vegl.models.Job', {
                 return new Date(value.time);
             }
         }}, //When this job was submitted to the cloud
+        { name: 'processTimeLog', type: 'String'},
         { name: 'status', type: 'string'}, //The status of the job
 
         { name: 'computeVmId', type: 'string'}, //the ID of the VM that will be used to run this job

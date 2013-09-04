@@ -12,6 +12,7 @@
         <property name="user"/>
         <property name="submitDate"/>
         <property name="processDate"/>
+        <property name="processTimeLog"/>
         <property name="status"/>
         <property name="computeServiceId"/>
         <property name="computeVmId"/>
