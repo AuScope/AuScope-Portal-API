@@ -227,28 +227,28 @@ Control Begin
         Earth End
 
         Options Begin
-                SolveConductivity = yes
-                SolveThickness    = no
+                SolveConductivity = ${solve-conductivity}
+                SolveThickness    = ${solve-thickness}
 
-                SolveTX_Height = no
-                SolveTX_Roll = no
-                SolveTX_Pitch = no
-                SolveTX_Yaw = no
-                SolveTXRX_DX = yes
-                SolveTXRX_DY = no
-                SolveTXRX_DZ = yes
-                SolveRX_Roll = no
-                SolveRX_Pitch = yes
-                SolveRX_Yaw = no
+                SolveTX_Height = ${solve-txheight}
+                SolveTX_Roll = ${solve-txroll}
+                SolveTX_Pitch = ${solve-txpitch}
+                SolveTX_Yaw = ${solve-txyaw}
+                SolveTXRX_DX = ${solve-txrxdx}
+                SolveTXRX_DY = ${solve-txrxdy}
+                SolveTXRX_DZ = ${solve-txrxdz}
+                SolveRX_Roll = ${solve-rxroll}
+                SolveRX_Pitch = ${solve-rxpitch}
+                SolveRX_Yaw = ${solve-rxyaw}
 
-                AlphaConductivity = 1.0
-                AlphaThickness    = 0.0
-                AlphaGeometry     = 1.0
-                AlphaSmoothness   = 1000000 //Set to 0 for no vertical conductivity smoothing
+                AlphaConductivity = ${alpha-conductivity}
+                AlphaThickness    = ${alpha-thickness}
+                AlphaGeometry     = ${alpha-geometry}
+                AlphaSmoothness   = ${alpha-smoothness}
 
-                MinimumPhiD = 1.0
-                MinimumPercentageImprovement = 1.0
-                MaximumIterations = 100
+                MinimumPhiD = ${min-phi-d}
+                MinimumPercentageImprovement = ${min-percentage-imp}
+                MaximumIterations = ${max-iterations}
         Options End
 
         InputOutput Begin
