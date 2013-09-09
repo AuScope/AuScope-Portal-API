@@ -144,6 +144,7 @@ NE_Z = ${vertical-mesh-elements}
 # amount of horizontal padding (this affects end result, about 20% recommended)
 PAD_X = ${x-padding}
 PAD_Y = ${y-padding}
+MU_GRAVITY = ${mu-gravity}
 
 
 
@@ -168,6 +169,9 @@ db.setFractionalPadding(PAD_X, PAD_Y)
 db.fixDensityBelow(depth=DEPTH)
 inv=GravityInversion()
 inv.setup(db)
+inv.getCostFunction().setTradeOffFactorsModels([MU_GRAVITY])
+inv.getCostFunction().setTradeOffFactorsRegularization(mu = [1.,1.], mu_c=1.)
+
 g, chi =  db.getGravitySurveys()[0]
 density=inv.run()
 saveAndUpload('result.silo', gravity_anomaly=g, gravity_weight=chi, density=density)
