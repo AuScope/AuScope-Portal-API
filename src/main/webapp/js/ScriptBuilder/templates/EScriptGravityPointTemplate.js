@@ -46,7 +46,7 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                     fieldLabel : 'X Size',
                     anchor : '-20',
                     name : 'xsize',
-                    value : 150,
+                    emptyText : 'Please select a dataset first',
                     decimalPrecision : 0,
                     allowBlank : false,
                     minValue : 1,
@@ -62,7 +62,7 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                     },
                     plugins: [{
                         ptype: 'fieldhelptext',
-                        text: 'size of the x axis output file in pixels and lines'
+                        text: 'The width of the grid that the selected gravity points will be projected on to'
                     }]
                 },{
                     xtype : 'numberfield',
@@ -70,7 +70,7 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                     fieldLabel : 'Y Size',
                     anchor : '-20',
                     name : 'ysize',
-                    value : 150,
+                    emptyText : 'Please select a dataset first',
                     decimalPrecision : 0,
                     allowBlank : false,
                     minValue : 1,
@@ -86,7 +86,7 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                     },
                     plugins: [{
                         ptype: 'fieldhelptext',
-                        text: 'size of the x axis output file in pixels and lines'
+                        text: 'The height of the grid that the selected gravity points will be projected on to'
                     }]
                 }]
             };
@@ -221,7 +221,7 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                         ratioX = x/y;
                         var xSizeField = Ext.getCmp('EScriptGravityPointXSize');
                         var ySizeField = Ext.getCmp('EScriptGravityPointYSize');
-
+                        ySizeField.setValue(150);
                         ySizeField.setValue(ratioY * xSizeField.getValue());
 
 
