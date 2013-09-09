@@ -221,9 +221,7 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                         ratioX = x/y;
                         var xSizeField = Ext.getCmp('EScriptGravityPointXSize');
                         var ySizeField = Ext.getCmp('EScriptGravityPointYSize');
-                        ySizeField.setValue(150);
-                        ySizeField.setValue(ratioY * xSizeField.getValue());
-
+                        xSizeField.setValue(150);
 
                     }
                 }
