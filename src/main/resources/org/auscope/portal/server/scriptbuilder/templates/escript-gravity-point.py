@@ -169,8 +169,8 @@ db.setFractionalPadding(PAD_X, PAD_Y)
 db.fixDensityBelow(depth=DEPTH)
 inv=GravityInversion()
 inv.setup(db)
-inv.getCostFunction().setTradeOffFactorsModels([MU_GRAVITY])
-inv.getCostFunction().setTradeOffFactorsRegularization(mu = [1.,1.], mu_c=1.)
+inv.getCostFunction().setTradeOffFactorsModels(MU_GRAVITY)
+
 
 g, chi =  db.getGravitySurveys()[0]
 density=inv.run()
