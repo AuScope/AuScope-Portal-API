@@ -103,6 +103,40 @@ Ext.define('vegl.widgets.JobsPanel', {
             }
         });
 
+        var columns = [{ 
+            header: 'Job Name', 
+            sortable: true, 
+            flex : config.showProcessDuration ? undefined : 1, 
+            width : config.showProcessDuration ? 180 : undefined, 
+            dataIndex: 'name'
+         },{ 
+             header: 'Submit Date', 
+             width: 160, 
+             sortable: true, 
+             dataIndex: 'submitDate', 
+             renderer: Ext.util.Format.dateRenderer('d M Y, H:i:s')
+         },{ 
+             header: 'Status', 
+             sortable: true, 
+             dataIndex: 'status', 
+             width : 100, 
+             renderer: this._jobStatusRenderer
+         }];
+        
+        if (config.showProcessDuration) {
+            columns.push({
+                header: 'Processed Time Log',
+                flex : config.showProcessDuration ? 1 : undefined,
+                hidden : !config.showProcessDuration,         
+                sortable: true,
+                dataIndex: 'processTimeLog',
+                renderer:function(val) {
+                    var result=val.replace("Total time","<br>Total time");
+                    return '<div style="white-space:normal !important;">'+ result +'</div>';
+                }
+            });
+        }
+        
         Ext.apply(config, {
             plugins : [{
                 ptype : 'rowcontextmenu',
@@ -130,35 +164,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                     }
                 }
             }),
-            columns: [{ 
-                header: 'Job Name', 
-                sortable: true, 
-                flex : config.showProcessDuration ? undefined : 1, 
-                width : config.showProcessDuration ? 180 : undefined, 
-                dataIndex: 'name'
-             },{ 
-                 header: 'Submit Date', 
-                 width: 160, 
-                 sortable: true, 
-                 dataIndex: 'submitDate', 
-                 renderer: Ext.util.Format.dateRenderer('d M Y, H:i:s')
-             },{ 
-                 header: 'Status', 
-                 sortable: true, 
-                 dataIndex: 'status', 
-                 width : 100, 
-                 renderer: this._jobStatusRenderer
-             },{
-                 header: 'Processed Time Log',
-                 flex : config.showProcessDuration ? 1 : undefined,
-                 hidden : !config.showProcessDuration,         
-                 sortable: true,
-                 dataIndex: 'processTimeLog',
-                 renderer:function(val) {
-                     var result=val.replace("Total time","<br>Total time");
-                     return '<div style="white-space:normal !important;">'+ result +'</div>';
-                 }
-            }],
+            columns: columns,
             buttons: [{
                 text: 'Register to GeoNetwork',
                 itemId : 'btnRegister',
