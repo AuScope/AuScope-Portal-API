@@ -210,48 +210,20 @@
         <property name="regionName" value="Melbourne"/>
     </bean>
 
+	<bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
+
     <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeService">
+    	<constructor-arg name="provider" value="NovaEc2"/>
         <constructor-arg name="endpoint" value="http://openstack.nci.org.au:8773/services/Cloud"/>
-        <constructor-arg name="credentials">
-            <bean class="com.amazonaws.auth.BasicAWSCredentials">
-                <constructor-arg name="accessKey" value="${env.nci.ec2.accesskey}"/>
-                <constructor-arg name="secretKey" value="${env.nci.ec2.secretkey}"/>
-            </bean>
-        </constructor-arg>
+        <constructor-arg name="accessKey" value="${env.nci.ec2.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nci.ec2.secretkey}"/>
         <property name="id" value="nci-openstack-compute"/>
         <property name="name" value="National Computing Infrastructure (Canberra)"/>
-        <property name="availableComputeTypes">
-            <list>
-                <bean class="org.auscope.portal.core.cloud.ComputeType">
-                    <constructor-arg name="id" value="m1.small"/>
-                    <property name="description" value="Small Instance - 1 CPU, 4 GB RAM"/>
-                    <property name="vcpus" value="1"/>
-                    <property name="ramMB" value="4096"/>
-                </bean>
-                <bean class="org.auscope.portal.core.cloud.ComputeType">
-                    <constructor-arg name="id" value="m1.medium"/>
-                    <property name="description" value="Medium Instance - 2 CPUs, 8 GB RAM"/>
-                    <property name="vcpus" value="2"/>
-                    <property name="ramMB" value="8192"/>
-                </bean>
-                <bean class="org.auscope.portal.core.cloud.ComputeType">
-                    <constructor-arg name="id" value="m1.large"/>
-                    <property name="description" value="Large Instance - 4 CPUs, 16 GB RAM"/>
-                    <property name="vcpus" value="4"/>
-                    <property name="ramMB" value="16384"/>
-                </bean>
-                <bean class="org.auscope.portal.core.cloud.ComputeType">
-                    <constructor-arg name="id" value="m1.xlarge"/>
-                    <property name="description" value="Extra Large Instance - 8 CPUs, 32 GB RAM"/>
-                    <property name="vcpus" value="8"/>
-                    <property name="ramMB" value="32768"/>
-                </bean>
-            </list>
-        </property>
+        <property name="groupName" value ="vgl-#{inetAddress.hostName.toLowerCase()}"/>
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-00000034"/>
+                    <constructor-arg name="imageId" value="nova/ami-00000034"/>
                     <property name="name" value="UBC-GIF"/>
                     <property name="description"><value>A Centos 6 machine with the University of British Columbia's Geophysical inversion facility already installed.</value></property>
                     <property name="keywords">
@@ -268,7 +240,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-00000035"/>
+                    <constructor-arg name="imageId" value="nova/ami-00000035"/>
                     <property name="name" value="escript"/>
                     <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
                     <property name="keywords">
@@ -284,7 +256,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-00000038"/>
+                    <constructor-arg name="imageId" value="nova/ami-00000038"/>
                     <property name="name" value="Underworld"/>
                     <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
                     <property name="keywords">
@@ -300,7 +272,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-0000003d"/>
+                    <constructor-arg name="imageId" value="nova/ami-0000003d"/>
                     <property name="name" value="AEM-Inversion"/>
                     <property name="description"><value>A Centos 6 machine with AEM Inversion already installed.</value></property>
                     <property name="keywords">
@@ -320,53 +292,17 @@
     </bean>
 
     <bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeService">
-        <constructor-arg name="endpoint" value="https://nova.rc.nectar.org.au:8773/services/Cloud"/>
-        <constructor-arg name="credentials">
-            <bean class="com.amazonaws.auth.BasicAWSCredentials">
-                <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
-                <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
-            </bean>
-        </constructor-arg>
+    	<constructor-arg name="provider" value="NovaKeystone"/>
+        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+        <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
         <property name="id" value="nectar-openstack-compute"/>
         <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
-        <property name="availableComputeTypes">
-            <list>
-                <bean class="org.auscope.portal.core.cloud.ComputeType">
-                    <constructor-arg name="id" value="m1.small"/>
-                    <property name="description" value="Small Instance - 1 CPU, 4 GB RAM"/>
-                    <property name="vcpus" value="1"/>
-                    <property name="ramMB" value="4096"/>
-                </bean>
-                <bean class="org.auscope.portal.core.cloud.ComputeType">
-                    <constructor-arg name="id" value="m1.medium"/>
-                    <property name="description" value="Medium Instance - 2 CPUs, 8 GB RAM"/>
-                    <property name="vcpus" value="2"/>
-                    <property name="ramMB" value="8192"/>
-                </bean>
-                <bean class="org.auscope.portal.core.cloud.ComputeType">
-                    <constructor-arg name="id" value="m1.large"/>
-                    <property name="description" value="Large Instance - 4 CPUs, 16 GB RAM"/>
-                    <property name="vcpus" value="4"/>
-                    <property name="ramMB" value="16384"/>
-                </bean>
-                <bean class="org.auscope.portal.core.cloud.ComputeType">
-                    <constructor-arg name="id" value="m1.xlarge"/>
-                    <property name="description" value="Extra Large Instance - 8 CPUs, 32 GB RAM"/>
-                    <property name="vcpus" value="8"/>
-                    <property name="ramMB" value="32768"/>
-                </bean>
-                <bean class="org.auscope.portal.core.cloud.ComputeType">
-                    <constructor-arg name="id" value="m1.xxlarge"/>
-                    <property name="description" value="Huge Instance - 16 CPUs, 64 GB RAM"/>
-                    <property name="vcpus" value="16"/>
-                    <property name="ramMB" value="65536"/>
-                </bean>
-            </list>
-        </property>
+        <property name="groupName" value ="vgl-#{inetAddress.hostName.toLowerCase()}"/>
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-000007e3"/>
+                    <constructor-arg name="imageId" value="Melbourne/96130956-ad24-4d77-8155-b7f1fb688fd1"/>
                     <property name="name" value="escript"/>
                     <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
                     <property name="keywords">
@@ -377,7 +313,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-00000534"/>
+                    <constructor-arg name="imageId" value="Melbourne/e4dfe8cc-3b07-41c9-8b53-b82960797769"/>
                     <property name="name" value="Underworld"/>
                     <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
                     <property name="keywords">
@@ -388,7 +324,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ami-000007f8"/>
+                    <constructor-arg name="imageId" value="Melbourne/7de4bbf8-16aa-41e7-b64f-1791c88220ec"/>
                     <property name="name" value="AEM-Inversion"/>
                     <property name="description"><value>A Centos 6 machine with AEM Inversion already installed.</value></property>
                     <property name="keywords">

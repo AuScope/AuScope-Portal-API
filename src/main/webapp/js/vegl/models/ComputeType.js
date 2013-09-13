@@ -10,7 +10,12 @@ Ext.define('vegl.models.ComputeType', {
         { name: 'vcpus', type: 'string' }, //How many virtual CPUs
         { name: 'ramMB', type: 'string' }, //How much RAM (roughly) in MB does this  compute type offer
         { name: 'rootDiskGB', type: 'string' }, //How much does the root disk of this compute type offer (in GB)
-        { name: 'ephemeralDiskGB', type: 'string' } //How much does the Ephemeral disk of this compute type offer (in GB)
+        { name: 'ephemeralDiskGB', type: 'string' }, //How much does the Ephemeral disk of this compute type offer (in GB)
+        { name: 'longDescription', type: 'string', convert: function(v, rec) {
+                var name = rec.get('description') ? rec.get('description') : rec.get('id');
+                return Ext.util.Format.format('{0} - {1} CPU(s), {2} MB RAM', name, rec.get('vcpus'), rec.get('ramMB'));
+            }
+        } //Long description of this compute type (calculated dynamically)
     ],
 
     idProperty : 'id'

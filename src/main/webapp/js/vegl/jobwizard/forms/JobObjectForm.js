@@ -207,7 +207,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 fieldLabel : 'Resources',
                 name: 'computeTypeId',
                 itemId : 'resource-combo',
-                displayField : 'description',
+                displayField : 'longDescription',
                 valueField : 'id',
                 allowBlank: false,
                 queryMode: 'local',
