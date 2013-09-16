@@ -78,7 +78,7 @@
             </bean>
         </property>
     </bean>
-    
+
     <bean id="KnownTypeGeophysicsDatasets" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
         <constructor-arg name="id" value="geophysics-datasets"/>
         <constructor-arg name="knownLayerSelector">
@@ -103,7 +103,7 @@
             </bean>
         </property>
     </bean>
-       
+
     <bean id="knownTypeGswaMagMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
         <constructor-arg name="id" value="gswa-magmerge"/>
         <constructor-arg name="knownLayerSelector">
@@ -164,7 +164,7 @@
         <property name="group" value="Geological Survey of Western Australia"/>
     </bean>
 
-	 <bean id="knownTypeGAAemSurvey" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+     <bean id="knownTypeGAAemSurvey" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
         <constructor-arg name="id" value="ga-aem"/>
         <constructor-arg name="knownLayerSelector">
             <bean class="org.auscope.portal.core.view.knownlayer.WFSSelector">
@@ -175,7 +175,31 @@
         <property name="description" value=""/>
         <property name="group" value="Geoscience Australia"/>
     </bean>
-    
+
+    <bean id="knownTypeGARumJungleAEM" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="ga-rum-jungle-aem"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WFSSelector">
+                <constructor-arg name="featureTypeName" value="ga:rum_jungle_aem"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="Rum Jungle Airbone Electromagnetic Survey"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geoscience Australia"/>
+    </bean>
+
+    <bean id="knownTypeGAWoolnerAEM" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="ga-woolner-aem"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WFSSelector">
+                <constructor-arg name="featureTypeName" value="ga:woolner_aem"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="Woolner Airbone Electromagnetic Survey"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geoscience Australia"/>
+    </bean>
+
     <bean id="knownTypeGAGravitySurvey" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
         <constructor-arg name="id" value="ga-gravity"/>
         <constructor-arg name="knownLayerSelector">

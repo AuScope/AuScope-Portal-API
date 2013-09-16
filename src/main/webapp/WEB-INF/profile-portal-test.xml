@@ -23,6 +23,8 @@
                 <ref bean="knownTypeGswaTcMerge" />
                 <ref bean="knownTypeGswaKMerge" />
                 <ref bean="knownTypeGAAemSurvey" />
+                <ref bean="knownTypeGARumJungleAEM" />
+                <ref bean="knownTypeGAWoolnerAEM" />
                 <ref bean="knownTypeGAGravitySurvey" />
             </list>
         </constructor-arg>
