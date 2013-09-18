@@ -210,10 +210,10 @@
         <property name="regionName" value="Melbourne"/>
     </bean>
 
-	<bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
+    <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
 
     <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeService">
-    	<constructor-arg name="provider" value="NovaEc2"/>
+        <constructor-arg name="provider" value="NovaEc2"/>
         <constructor-arg name="endpoint" value="http://openstack.nci.org.au:8773/services/Cloud"/>
         <constructor-arg name="accessKey" value="${env.nci.ec2.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nci.ec2.secretkey}"/>
@@ -240,7 +240,7 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="nova/ami-00000035"/>
+                    <constructor-arg name="imageId" value="nova/ami-0000003e"/>
                     <property name="name" value="escript"/>
                     <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
                     <property name="keywords">
@@ -292,7 +292,7 @@
     </bean>
 
     <bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeService">
-    	<constructor-arg name="provider" value="NovaKeystone"/>
+        <constructor-arg name="provider" value="NovaKeystone"/>
         <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
         <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
