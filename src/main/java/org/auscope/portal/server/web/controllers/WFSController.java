@@ -8,6 +8,7 @@ import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.methodmakers.filter.SimpleBBoxFilter;
 import org.auscope.portal.core.services.responses.wfs.WFSCountResponse;
 import org.auscope.portal.core.services.responses.wfs.WFSGetCapabilitiesResponse;
+import org.auscope.portal.server.web.service.SimpleFeatureProperty;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -123,5 +124,18 @@ public class WFSController extends BasePortalController {
 
         //Return a transform response to be consistent with Portal Core stack. We don't actually use the KML so just return a blank element
         return generateJSONResponseMAV(true, response, "<kml/>", null);
+    }
+    
+    @RequestMapping("/describeSimpleFeature.do")
+    public ModelAndView requestFeature(@RequestParam("serviceUrl") final String serviceUrl,
+                                        @RequestParam("typeName") final String typeName) {
+        try {
+            List<SimpleFeatureProperty> fts = wfsService.describeSimpleFeature(serviceUrl, typeName);
+            return generateJSONResponseMAV(true, fts, "");
+        } catch (Exception ex) {
+            log.warn(String.format("Exception getting '%2$s' from '%1$s': %3$s", serviceUrl, typeName, ex));
+            log.debug("Exception: ", ex);
+            return generateExceptionResponse(ex, serviceUrl);
+        }
     }
 }
