@@ -180,7 +180,7 @@
         <constructor-arg name="provider" value="swift"/>
         <constructor-arg name="accessKey" value="${env.nci.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nci.storage.secretkey}"/>
-        <property name="relaxHostName" value="true"/>
+        <constructor-arg name="relaxHostName" value="true"/>
         <property name="id" value="nci-openstack-storage"/>
         <property name="name" value="National Computing Infrastructure (Canberra)"/>
         <property name="bucket" value="vegl-portal"/>
@@ -191,11 +191,11 @@
         <constructor-arg name="provider" value="swift-keystone"/>
         <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
+        <constructor-arg name="regionName" value="Qld"/>
         <property name="name" value="National eResearch Collaboration Tools and Resources (Queensland)"/>
         <property name="id" value="nectar-openstack-storage-qld"/>
         <property name="bucket" value="vgl-portal"/>
         <property name="authVersion" value="2.0"/>
-        <property name="regionName" value="Qld"/>
     </bean>
 
     <bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageService">
@@ -203,11 +203,11 @@
         <constructor-arg name="provider" value="swift-keystone"/>
         <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
+        <constructor-arg name="regionName" value="Melbourne"/>
         <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
         <property name="id" value="nectar-openstack-storage-melb"/>
         <property name="bucket" value="vgl-portal"/>
         <property name="authVersion" value="2.0"/>
-        <property name="regionName" value="Melbourne"/>
     </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>

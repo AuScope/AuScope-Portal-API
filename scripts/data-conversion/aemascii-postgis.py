@@ -120,29 +120,29 @@ sqlInsertFormat = "INSERT INTO \"aemsurveys\" (line, flight, fid, project_fas, p
 
 print 'Creating create table statements'
 with open('/projects/r17/shared/aemsql/create-table.sql', 'w') as fout:
-	fout.write(sqlCreateTable)
+    fout.write(sqlCreateTable)
 
 
 print 'Creating insert statements'
 with open('/projects/r17/Point_Data/aem/Paterson_North_Final_EM.asc', 'rb') as northin, open('/projects/r17/Point_Data/aem/Paterson_South_Final_EM.asc', 'rb') as southin, open('/projects/r17/shared/aemsql/insert.sql', 'w') as fout:
-	northin = csv.reader(northin, delimiter=' ')
+    northin = csv.reader(northin, delimiter=' ')
         southin = csv.reader(southin, delimiter=' ')
 
-	fout.write('BEGIN;\n')
+    fout.write('BEGIN;\n')
 
-	# Write out insert statements in smaller transaction chunks
-	counter = 1
-	txnSize = 10000
-	for row in itertools.chain(northin, southin):
-		row = filter(None, row)
+    # Write out insert statements in smaller transaction chunks
+    counter = 1
+    txnSize = 10000
+    for row in itertools.chain(northin, southin):
+        row = filter(None, row)
                 fout.write(sqlInsertFormat.format(*row))
-		if counter % txnSize == 0:
-			fout.write('COMMIT;\n')
-			fout.write('BEGIN;\n')
-		counter = counter + 1
-		
+        if counter % txnSize == 0:
+            fout.write('COMMIT;\n')
+            fout.write('BEGIN;\n')
+        counter = counter + 1
+        
 
-	fout.write('COMMIT;\n')
+    fout.write('COMMIT;\n')
 
 print 'done'
 
