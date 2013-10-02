@@ -52,7 +52,7 @@ public class TestSimpleWfsService extends PortalTestClass {
         SimpleFeatureProperty sf0 = result.get(0);
         Assert.assertEquals(1, sf0.getMaxOccurs());
         Assert.assertEquals(1, sf0.getMinOccurs());
-        Assert.assertEquals(0, sf0.getIndex());
+        Assert.assertEquals(1, sf0.getIndex());
         Assert.assertEquals("xsd:int", sf0.getTypeName());
         Assert.assertEquals("id", sf0.getName());
         Assert.assertFalse(sf0.isNillable());
@@ -60,7 +60,7 @@ public class TestSimpleWfsService extends PortalTestClass {
         SimpleFeatureProperty sf17 = result.get(17);
         Assert.assertEquals(1, sf17.getMaxOccurs());
         Assert.assertEquals(0, sf17.getMinOccurs());
-        Assert.assertEquals(17, sf17.getIndex());
+        Assert.assertEquals(18, sf17.getIndex());
         Assert.assertEquals("xsd:double", sf17.getTypeName());
         Assert.assertEquals("infinite_slab_bouguer_anomaly", sf17.getName());
         Assert.assertTrue(sf17.isNillable());
