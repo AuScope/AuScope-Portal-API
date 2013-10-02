@@ -33,6 +33,7 @@
     <script type="text/javascript" src="js/vegl/models/Parameter.js"></script>
     <script type="text/javascript" src="js/vegl/models/Download.js"></script>
     <script type="text/javascript" src="js/vegl/models/ComputeType.js"></script>
+    <script type="text/javascript" src="js/vegl/models/SimpleFeatureProperty.js"></script>
 
     <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>

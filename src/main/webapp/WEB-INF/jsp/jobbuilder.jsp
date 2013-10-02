@@ -37,6 +37,7 @@
     <script type="text/javascript" src="js/vegl/models/Series.js"></script>
     <script type="text/javascript" src="js/vegl/models/MachineImage.js"></script>
     <script type="text/javascript" src="js/vegl/models/ComputeType.js"></script>
+    <script type="text/javascript" src="js/vegl/models/SimpleFeatureProperty.js"></script>
 
     <script src="portal-core/js/portal/util/UnimplementedFunction.js" type="text/javascript"></script>
     <script src="portal-core/js/portal/widgets/grid/plugin/RowContextMenu.js" type="text/javascript"></script>

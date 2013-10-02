@@ -16,7 +16,7 @@ public class SimpleFeatureProperty {
         private boolean nillable;
         /** xsd:element type attribute */
         private String typeName;
-        /** The sequence index of this element*/
+        /** The sequence index of this element - This index is 1 based*/
         private int index;
         
         /**
@@ -26,7 +26,7 @@ public class SimpleFeatureProperty {
          * @param name xsd:element name attribute
          * @param nillable xsd:element nillable attribute
          * @param typeName xsd:element type attribute
-         * @param index The sequence index of this element
+         * @param index The sequence index of this element - This index is 1 based
          */
         public SimpleFeatureProperty(int maxOccurs, int minOccurs, String name,
                 boolean nillable, String typeName, int index) {
@@ -120,7 +120,7 @@ public class SimpleFeatureProperty {
         }
 
         /**
-         * The sequence index of this element
+         * The sequence index of this element - This index is 1 based
          * @return
          */
         public int getIndex() {
@@ -128,7 +128,7 @@ public class SimpleFeatureProperty {
         }
 
         /**
-         * The sequence index of this element
+         * The sequence index of this element - This index is 1 based
          * @param index
          */
         public void setIndex(int index) {

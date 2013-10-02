@@ -41,8 +41,9 @@ Ext.define('ScriptBuilder.templates.BaseTemplate', {
      * callback(Number status, String script) - called by the template when a script snippet has finished templating.
      * templateName - the name of the template to use
      * formPanel - and Ext.form.Panel or equivalent constructor object that will be shown in the popup window
+     * includeEmptyText - Whether the form field's empty text will be included in the template (defaults to false)
      */
-    _getTemplatedScriptGui : function(callback, templateName, formPanel) {
+    _getTemplatedScriptGui : function(callback, templateName, formPanel, includeEmptyText) {
         var popup = Ext.create('Ext.window.Window', {
             title : 'Enter Parameters',
             layout : 'fit',
@@ -60,7 +61,7 @@ Ext.define('ScriptBuilder.templates.BaseTemplate', {
                     var panel = parent.getComponent(0);
 
                     if (panel.getForm().isValid()) {
-                        var additionalParams = panel.getForm().getValues();
+                        var additionalParams = panel.getForm().getValues(false, false, includeEmptyText, false);
 
                         //We need to close our window when finished so we wrap callback
                         //with a function that ensures closing BEFORE the callback is executed

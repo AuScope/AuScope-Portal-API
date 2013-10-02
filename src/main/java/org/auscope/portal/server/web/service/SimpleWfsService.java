@@ -99,7 +99,14 @@ public class SimpleWfsService extends BaseWFSService {
         }
     }
     
-    
+    /**
+     * Utility for making a DescribeFeatureType request for a SF0 feature. The resulting
+     * simple schema will be parsed into a collection of SimpleFeatureProperty elements
+     * @param serviceUrl The WFS endpoint to query
+     * @param featureType The feature type name to describe
+     * @return
+     * @throws PortalServiceException
+     */
     public List<SimpleFeatureProperty> describeSimpleFeature(String serviceUrl, String featureType) throws PortalServiceException {
         
         HttpRequestBase request = null;
@@ -128,7 +135,7 @@ public class SimpleWfsService extends BaseWFSService {
                         n.getAttributes().getNamedItem("name").getTextContent(), 
                         Boolean.parseBoolean(n.getAttributes().getNamedItem("nillable").getTextContent()), 
                         n.getAttributes().getNamedItem("type").getTextContent(),
-                        i);
+                        i + 1);
                 
                 featureTypes.add(sft);
             }
