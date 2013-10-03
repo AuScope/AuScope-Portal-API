@@ -15,7 +15,7 @@
     <scm>
         <connection>scm:svn:https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk</connection>
         <developerConnection>scm:svn:https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk</developerConnection>
-		<url>https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk</url>
+        <url>https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk</url>
     </scm>
 
     <!-- Build Configuration -->
@@ -146,6 +146,24 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>emma-maven-plugin</artifactId>
                 <version>1.0-alpha-2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
