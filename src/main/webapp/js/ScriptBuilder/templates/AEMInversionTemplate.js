@@ -411,8 +411,10 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
         }, true);
     },
     
-    _unsetDataSelection : function(parentForm) {
-        this.propertyStore.removeAll();
+    _unsetDataSelection : function(parentForm, clearStore) {
+        if (clearStore) {
+            this.propertyStore.removeAll();
+        }
         
         var mappingColumns = parentForm.query('xcombo');
         Ext.each(mappingColumns, function(xcombo) {
@@ -421,6 +423,8 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
     },
     
     _loadDefaultValues : function(parentForm, typeName) {
+        this._unsetDataSelection(parentForm, false);
+        
         var mapping = this.defaultMappings[typeName];
         if (!mapping) {
             return;
@@ -431,7 +435,7 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
     
     _handleDatasetSelection : function(parentForm, download) {
         if (!download) {
-            this._unsetDataSelection(parentForm);
+            this._unsetDataSelection(parentForm, true);
             return;
         }
         
@@ -439,14 +443,14 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
         var url = download.get('url');
         var parts = url.split('?');
         if (parts.length != 2) {
-            this._unsetDataSelection(parentForm);
+            this._unsetDataSelection(parentForm, true);
             return;
         }
         
         //Make sure we have a WFS URL
         var params = Ext.Object.fromQueryString(parts[1]);
         if (params.service != 'WFS' || !params.typeName) {
-            this._unsetDataSelection(parentForm);
+            this._unsetDataSelection(parentForm, true);
             return;
         }
         
