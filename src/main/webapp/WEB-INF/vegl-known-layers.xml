@@ -211,4 +211,16 @@
         <property name="description" value=""/>
         <property name="group" value="Geoscience Australia"/>
     </bean>
+    
+    <bean id="knownTypeMusgraveAem" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="csiro-musgrave-aem"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WFSSelector">
+                <constructor-arg name="featureTypeName" value="ga:musgrave_aem"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="Musgrave Airbone Electromagnetic Survey"/>
+        <property name="description" value=""/>
+        <property name="group" value="CSIRO"/>
+    </bean>
 </beans>

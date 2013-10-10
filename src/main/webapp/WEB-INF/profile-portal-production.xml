@@ -26,6 +26,7 @@
                 <ref bean="knownTypeGARumJungleAEM" />
                 <ref bean="knownTypeGAWoolnerAEM" />
                 <ref bean="knownTypeGAGravitySurvey" />
+                <ref bean="knownTypeMusgraveAem" />
             </list>
         </constructor-arg>
     </bean>
