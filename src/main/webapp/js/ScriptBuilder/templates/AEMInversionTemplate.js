@@ -100,38 +100,38 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
         
         var systemTab = {
             title : 'EM System Options',
+            defaults : {
+                decimalPrecision : 8,
+                labelWidth : 150
+            },
             items : [{
                 xtype : 'numberfield',
-                fieldLabel : 'Conductivity',
+                fieldLabel : 'X Multiplicative Noise',
                 anchor : '-20',
-                name : 'alpha-conductivity',
-                value : 1.0,
+                name : 'xmulti-noise',
+                value : 2.26,
+                allowBlank : false
+            },{
+                xtype : 'textfield',
+                fieldLabel : 'X Additive Noise',
+                anchor : '-20',
+                name : 'xadd-noise',
+                value : '0.0119 0.0117 0.0093 0.0061 0.0057 0.0054 0.0051 0.0048 0.0046 0.0044 0.0043 0.0040 0.0034 0.0026 0.0034',
                 allowBlank : false
             },{
                 xtype : 'numberfield',
-                fieldLabel : 'Thickness',
+                fieldLabel : 'Z Multiplicative Noise',
                 anchor : '-20',
-                name : 'alpha-thickness',
-                value : 0.0,
+                name : 'zmulti-noise',
+                value : 3.74,
                 allowBlank : false
             },{
-                xtype : 'numberfield',
-                fieldLabel : 'Geometry',
+                xtype : 'textfield',
+                fieldLabel : 'Z Additive Noise',
                 anchor : '-20',
-                name : 'alpha-geometry',
-                value : 1.0,
+                name : 'zadd-noise',
+                value : '0.0094 0.0084 0.0067 0.0047 0.0045 0.0043 0.0041 0.0039 0.0036 0.0034 0.0033 0.0030 0.0024 0.0017 0.0019',
                 allowBlank : false
-            },{
-                xtype : 'numberfield',
-                fieldLabel : 'Smoothness',
-                anchor : '-20',
-                name : 'alpha-smoothness',
-                value : 1000000,
-                allowBlank : false,
-                plugins: [{
-                    ptype: 'fieldhelptext',
-                    text: 'Set to 0 for no vertical conductivity smoothing'
-                }]
             },{
                 xtype : 'fieldset',
                 title : 'EM Column Mappings',
@@ -203,8 +203,12 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
             }]
         };
         
-        var optionsTab = {
-            title : 'General Options',
+        var executionOptionsTab = {
+            title : 'Execution Options',
+            defaults : {
+                decimalPrecision : 8,
+                labelWidth : 150
+            },
             items : [{
                 xtype : 'numberfield',
                 fieldLabel : 'Min Phi D',
@@ -257,6 +261,148 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
                     { boxLabel : 'Solve RX_Pitch', name : 'solve-rxpitch', checked : true},
                     { boxLabel : 'Solve RX_Yaw', name : 'solve-rxyaw', checked : false}
                 ]
+            }]
+        };
+        
+        var generalOptionsTab = {
+            title : 'General Options',
+            items : [{
+                xtype : 'fieldset',
+                title : 'Alpha Options',
+                defaults : {
+                    decimalPrecision : 8,
+                    labelWidth : 150
+                },
+                items : [{
+                
+                    xtype : 'numberfield',
+                    fieldLabel : 'Alpha Conductivity',
+                    anchor : '-20',
+                    name : 'alpha-conductivity',
+                    value : 1.0,
+                    allowBlank : false
+                },{
+                    xtype : 'numberfield',
+                    fieldLabel : 'Alpha Thickness',
+                    anchor : '-20',
+                    name : 'alpha-thickness',
+                    value : 0.0,
+                    allowBlank : false
+                },{
+                    xtype : 'numberfield',
+                    fieldLabel : 'Alpha Geometry',
+                    anchor : '-20',
+                    name : 'alpha-geometry',
+                    value : 1.0,
+                    allowBlank : false
+                },{
+                    xtype : 'numberfield',
+                    fieldLabel : 'Alpha Smoothness',
+                    anchor : '-20',
+                    name : 'alpha-smoothness',
+                    value : 1000000,
+                    allowBlank : false,
+                    plugins: [{
+                        ptype: 'fieldhelptext',
+                        text: 'Set to 0 for no vertical conductivity smoothing'
+                    }]
+                }]
+            },{
+                xtype : 'numberfield',
+                fieldLabel : 'Earth Layers',
+                anchor : '-20',
+                name : 'earth-layers',
+                itemId : 'earth-layers',
+                value : 30,
+                minValue : 1,
+                allowDecimals : false,
+                allowBlank : false
+            },{
+                xtype: 'fieldcontainer',
+                fieldLabel: 'Thickness',
+                msgTarget: 'under',
+                anchor: '-20',
+                layout: {
+                    type: 'hbox',
+                    defaultMargins: {top: 0, right: 5, bottom: 0, left: 0}
+                },
+                defaults: {
+                    hideLabel: true,
+                    decimalPrecision : 8
+                },
+                items: [{
+                    xtype : 'textfield',
+                    //width : 450,
+                    name : 'thickness',
+                    itemId : 'thickness',
+                    flex : 1,
+                    value : '4.00 4.40 4.84 5.32 5.86 6.44 7.09 7.79 8.57 9.43 10.37 11.41 12.55 13.81 15.19 16.71 18.38 20.22 22.24 24.46 26.91 29.60 32.56 35.82 39.40 43.34 47.67 52.44 57.68',
+                    allowBlank : false
+                },{
+                    xtype : 'button',
+                    text : 'Recalculate',
+                    scope : this,
+                    handler : function(btn) {
+                        var thicknessField = btn.ownerCt.queryById('thickness');
+                        var earthLayersField = btn.ownerCt.ownerCt.queryById('earth-layers');
+                        
+                        //We show a popup containing a from and to values. From there
+                        //we use the _logspace function to generate a range of thickness values 
+                        var popup = Ext.create('Ext.Window', {
+                           width : 520,
+                           height : 120,
+                           modal : true,
+                           title : 'Enter Values',
+                           _thicknessField : thicknessField, //store a reference to lookup later
+                           _earthLayersField : earthLayersField, //store a reference to lookup later
+                           _logspaceFn : this._logspace, //store a reference to lookup later
+                           layout: {
+                               type: 'hbox',
+                               defaultMargins: {top: 0, right: 5, bottom: 0, left: 0}
+                           },
+                           bodyPadding : '20 10 0 10',
+                           defaults: {
+                               hideLabel: true,
+                               decimalPrecision : 8
+                           },
+                           buttons: [{
+                               xtype: 'button', 
+                               text: 'OK',
+                               iconCls : 'submit-icon',
+                               handler : function(btn) {
+                                   var w = btn.ownerCt.ownerCt;
+                                   var from = w.query("#from")[0].getValue();
+                                   var to = w.query("#to")[0].getValue();
+                                   if (!from && !to) {
+                                       w.close();
+                                       return;
+                                   }
+                                   
+                                   var thicknessField = w._thicknessField;
+                                   var earthLayersField = w._earthLayersField;
+                                   var logSpaceFn = w._logspaceFn;
+                                   
+                                   var nLayers = earthLayersField.getValue();
+                                   if (!nLayers) {
+                                       w.close();
+                                       return;
+                                   }
+                                   
+                                   var thicknessValues = logSpaceFn(from, to, nLayers);
+                                   thicknessField.setValue(thicknessValues.join(' '));
+                                   w.close();
+                               }
+                           }],
+                           items: [{xtype: 'displayfield', value: 'Generate a log spaced spread of thickness values from '},
+                                   {xtype: 'numberfield',  name: 'from', width: 80, itemId : 'from'},
+                                   {xtype: 'displayfield', value: 'to '},
+                                   {xtype: 'numberfield',  name: 'to', width: 80, itemId : 'to'}],
+                           
+                        });
+                        
+                        popup.show();
+                    }
+                }]
             }]
         };
         
@@ -406,7 +552,7 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
                     padding : '20',
                     border : false
                 },
-                items : [systemTab, optionsTab, columnsTab]
+                items : [systemTab, executionOptionsTab, generalOptionsTab, columnsTab]
             }]
         }, true);
     },
@@ -462,6 +608,20 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
             scope : this,
             callback : Ext.bind(this._loadDefaultValues, this, [parentForm, params.typeName])
         });
+    },
+    
+    /**
+     * Creates an array of numbers ranging from -> to. The step value will increase exponentially
+     */
+    _logspace : function(from, to, len) {
+        var base = Math.pow(to / from, 1 / len);
+        var arr = new Array(len);
+          
+        for (var i = 1; i <= len; i++) {
+            arr[i - 1] = from * Math.pow(base, i);
+        }
+        
+        return arr
     }
 
 });

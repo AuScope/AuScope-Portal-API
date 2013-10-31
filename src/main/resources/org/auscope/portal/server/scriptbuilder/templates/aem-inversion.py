@@ -18,10 +18,10 @@ Control Begin
                 ReconstructPrimaryFieldFromInputGeometry = yes
 
                 EstimateNoiseFromModel = yes
-                XMultiplicativeNoise   = 2.26
-                XAdditiveNoise  = 0.0119 0.0117 0.0093 0.0061 0.0057 0.0054 0.0051 0.0048 0.0046 0.0044 0.0043 0.0040 0.0034 0.0026 0.0034
-                ZMultiplicativeNoise   = 3.74
-                ZAdditiveNoise  = 0.0094 0.0084 0.0067 0.0047 0.0045 0.0043 0.0041 0.0039 0.0036 0.0034 0.0033 0.0030 0.0024 0.0017 0.0019
+                XMultiplicativeNoise   = ${xmulti-noise}
+                XAdditiveNoise  = ${xadd-noise} 
+                ZMultiplicativeNoise   = ${zmulti-noise}
+                ZAdditiveNoise  = ${zadd-noise}
 
                 XComponentPrimary = ${column-xcomponentprimary}
                 YComponentPrimary = ${column-ycomponentprimary}
@@ -37,7 +37,7 @@ Control Begin
         EMSystem1 End
 
         Earth Begin
-                NumberOfLayers = 30
+                NumberOfLayers = ${earth-layers}
         Earth End
 
         Options Begin
@@ -107,7 +107,7 @@ Control Begin
                                 TXRX_DZ      = ${column-txrxdz}
                                 RX_Pitch     = ${column-rxpitch}
                                 Conductivity   = 0.01
-                                Thickness      = 4.00 4.40 4.84 5.32 5.86 6.44 7.09 7.79 8.57 9.43 10.37 11.41 12.55 13.81 15.19 16.71 18.38 20.22 22.24 24.46 26.91 29.60 32.56 35.82 39.40 43.34 47.67 52.44 57.68
+                                Thickness      = ${thickness}
                         ReferenceModel End
 
                         StdDevReferenceModel Begin
@@ -237,3 +237,19 @@ print 'About to upload the following files:'
 print inversionFiles
 for fn in inversionFiles:
     cloudUpload(fn, fn)
+    
+# Concatenate output files for easier parsing
+ascFiles = sorted(glob.glob('inversion.output.*.asc'))
+with open('inversion.output.asc.combined', 'w') as outfile:
+    for fname in ascFiles:
+        with open(fname) as infile:
+            for line in infile:
+                outfile.write(line)
+cloudUpload('inversion.output.asc.combined', 'inversion.output.asc.combined')
+logFiles = sorted(glob.glob('inversion.output.*.log'))
+with open('inversion.output.log.combined', 'w') as outfile:
+    for fname in logFiles:
+        with open(fname) as infile:
+            for line in infile:
+                outfile.write(line)
+cloudUpload('inversion.output.log.combined', 'inversion.output.log.combined')
