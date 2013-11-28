@@ -38,7 +38,7 @@
         <constructor-arg>
             <list>
                 <ref bean="cswVeglProduction" />
-                <ref bean="cswModelLibTest" />
+                <ref bean="cswModelLibProduction" />
             </list>
         </constructor-arg>
     </bean>
