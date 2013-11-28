@@ -235,4 +235,28 @@
         <property name="description" value="Western Area 70001"/>
         <property name="group" value="CSIRO"/>
     </bean>
+    
+    <bean id="knownTypeAshburtonAem" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="csiro-ashburton-aem"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WFSSelector">
+                <constructor-arg name="featureTypeName" value="ga:ashburton_aem"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="Ashburton Airbone Electromagnetic Survey"/>
+        <property name="description" value=""/>
+        <property name="group" value="CSIRO"/>
+    </bean>
+    
+    <bean id="knownTypeCunyuAem" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="csiro-cunyu-aem"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WFSSelector">
+                <constructor-arg name="featureTypeName" value="ga:cunyu_z_aem"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="Cunyu Airbone Electromagnetic Survey"/>
+        <property name="description" value=""/>
+        <property name="group" value="CSIRO"/>
+    </bean>
 </beans>
