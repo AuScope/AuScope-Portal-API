@@ -27,6 +27,7 @@
                 <ref bean="knownTypeGAWoolnerAEM" />
                 <ref bean="knownTypeGAGravitySurvey" />
                 <ref bean="knownTypeMusgraveAem" />
+                <ref bean="knownTypeWesternAreaAem" />
             </list>
         </constructor-arg>
     </bean>
@@ -35,7 +36,7 @@
         <constructor-arg>
             <list>
                 <ref bean="cswVeglProduction" />
-                <ref bean="cswModelLibTest" />
+                <ref bean="cswModelLibProduction" />
             </list>
         </constructor-arg>
     </bean>

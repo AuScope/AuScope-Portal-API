@@ -223,4 +223,16 @@
         <property name="description" value=""/>
         <property name="group" value="CSIRO"/>
     </bean>
+    
+    <bean id="knownTypeWesternAreaAem" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="csiro-western-area-aem"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WFSSelector">
+                <constructor-arg name="featureTypeName" value="ga:western_area_aem"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="Western Area Airbone Electromagnetic Survey"/>
+        <property name="description" value="Western Area 70001"/>
+        <property name="group" value="CSIRO"/>
+    </bean>
 </beans>
