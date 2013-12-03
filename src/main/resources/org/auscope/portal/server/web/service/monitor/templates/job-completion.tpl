@@ -17,7 +17,7 @@ Job execution log:
 ------------------
 ${jobExecLogSnippet}
 
-Go to http://vgl.auscope.au to download or publish your job results.
+Go to http://vgl.csiro.au to download or publish your job results.
 
 Yours sincerely,
 cg-admin@csiro.au
