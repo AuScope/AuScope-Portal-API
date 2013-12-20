@@ -6,43 +6,12 @@
 # svnUrl - The base VGL URL where additional puppet modules will be downloaded from. Defaults to "https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk"
 # pathSuffix - Will be appended to svnUrl to form the base url that will be recursively downloaded for modules. Defaults to "vm/puppet/modules/"
 
-sudo sh -c \
-'sudo cat > /etc/yum.repos.d/puppet.repo << EOF
-[puppetlabs]
-name=Puppet Labs Packages
-baseurl=http://yum.puppetlabs.com/el/\$releasever/products/\$basearch/
-enabled=1
-gpgcheck=1
-gpgkey=http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
-EOF'
+sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
+yum install puppet -y
 
-sudo yum install -y ruby
-if [ $? -ne 0 ]
-then
-    echo "Failed installing ruby"
-    exit 1
-fi
-
-sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-if [ $? -ne 0 ]
-then
-    echo "Failed to add epel repository using RPM"
-    exit 1
-fi
-
-sudo yum --enablerepo=epel install -y puppet
-if [ $? -ne 0 ]
-then
-    echo "Failed to install puppet"
-    exit 1
-fi
-
-#yum --enablerepo=epel,epel-puppet install -y puppet-server
-#sudo yum install -y puppet-server
-
-sudo sh -c 'echo "    server = master.local" >> /etc/puppet/puppet.conf'
-sudo service puppet restart
-sudo chkconfig puppet on
+#sudo sh -c 'echo "    server = master.local" >> /etc/puppet/puppet.conf'
+#sudo service puppet restart
+#sudo chkconfig puppet on
 
 #/////////////////////////////
 #Install Additional Modules
