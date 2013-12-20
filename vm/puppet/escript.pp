@@ -18,6 +18,13 @@ class escript_packages {
         require => Class["epel"],
     }
 }
+
+package {"matplotlib":
+        ensure => installed,
+        provider => "pip",
+        require => [Class["python_pip"], Package["numpy"]],
+}
+
 class {"escript_packages": }
 
 # Install VisIt
