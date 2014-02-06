@@ -18,7 +18,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.swing.text.html.CSS;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -835,7 +834,7 @@ public class JobBuilderController extends BaseCloudController {
             if (ccs == null) {
                 return generateJSONResponseMAV(false, null, "Unknown compute service");
             }
-            log.info("CloudComputeService ccs = " + ccs);
+
             return generateJSONResponseMAV(true, ccs.getAvailableComputeTypes(), "");
         } catch (Exception ex) {
             log.error("Unable to access compute type list:" + ex.getMessage(), ex);
@@ -853,10 +852,8 @@ public class JobBuilderController extends BaseCloudController {
 
         for (CloudComputeService ccs : cloudComputeServices) {
             ModelMap map = new ModelMap();
-            map.put("id", ccs.getId());         
+            map.put("id", ccs.getId());
             map.put("name", ccs.getName());
-            System.out.println("CloudComputeService ID : " + ccs.getId());
-            System.out.println("CloudComputeService Name : " + ccs.getName());
             simpleComputeServices.add(map);
         }
 
