@@ -24,13 +24,6 @@ class aem_packages {
 class {"aem_packages": }
 
 
-# Create symlink for mpiCC
-file { '/usr/bin/mpiCC':
-   ensure => 'link',
-   target => '/usr/lib64/openmpi/bin/mpiCC',
-}
- 
-
 
 # Todo : Install ga-aem code (awaiting GA paper work to be done to make the code public)
 
