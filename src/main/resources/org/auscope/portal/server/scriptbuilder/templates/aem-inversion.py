@@ -229,7 +229,7 @@ with open("aemInput.dat",'w') as f:
 cloudUpload("aemInput.dat", "aemInput.dat")
 
 # Execute AEM Process via MPI
-subprocess.call(["mpirun", "-n", "${n-threads}", "/root/code/bin/galeisbs.exe", "galeisbs.con"])
+subprocess.call(["mpirun", "-n", "${n-threads}", "/root/code/bin/galeisbs.exe", "galeisbs.con"],shell=True)
 
 # Upload results
 inversionFiles = glob.glob('inversion.output.*')
