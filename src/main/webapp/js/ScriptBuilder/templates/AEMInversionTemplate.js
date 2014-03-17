@@ -44,7 +44,40 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
             'column-txpitch' : '-Column 13',
             'column-txrxdx' : 'Column 60',
             'column-txrxdz' : 'Column 61'
+        },
+        'ga:western_area_aem' : {
+            'column-xcomponentsecondary' : 'Column 24',
+            'column-zcomponentsecondary' : '-Column 62',
+            'column-surveynumber' : 'Column 1',
+            'column-flightnumber' : 'Column 3',
+            'column-linenumber' : 'Column 2',
+            'column-fidnumber' : 'Column 4',
+            'column-easting' : 'Column 7',
+            'column-northing' : 'Column 8',
+            'column-groundelevation' : 'Column 13',
+            'column-altimeter' : 'Column 10',
+            'column-txheight' : 'Column 11',
+            'column-txpitch' : '-Column 16',
+            'column-txrxdx' : 'Column 18',
+            'column-txrxdz' : 'Column 19'
+        },
+        'ga:ashburton_aem' : {
+            'column-xcomponentsecondary' : 'Column 23',
+            'column-zcomponentsecondary' : '-Column 61',
+            'column-surveynumber' : 'Column 1',
+            'column-flightnumber' : 'Column 3',
+            'column-linenumber' : 'Column 2',
+            'column-fidnumber' : 'Column 4',
+            'column-easting' : 'Column 7',
+            'column-northing' : 'Column 8',
+            'column-groundelevation' : 'Column 12',
+            'column-txheight' : 'Column 10',
+            'column-txroll' : 'Column 16',            
+            'column-txpitch' : '-Column 19',
+            'column-txrxdx' : 'Column 17',
+            'column-txrxdz' : 'Column 18'
         }
+        
     },
 
     constructor : function(config) {
