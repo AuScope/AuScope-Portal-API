@@ -29,7 +29,7 @@
                 <ref bean="knownTypeMusgraveAem" />
                 <ref bean="knownTypeWesternAreaAem" />
                 <ref bean="knownTypeAshburtonAem" />
-                <ref bean="knownTypeCunyuAem" />
+                <!-- <ref bean="knownTypeCunyuAem" />  -->
             </list>
         </constructor-arg>
     </bean>

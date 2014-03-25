@@ -77,6 +77,24 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
             'column-txrxdx' : 'Column 17',
             'column-txrxdz' : 'Column 18'
         }
+        /**
+         * cunyu_aem layer doesn't seems to run well with the existing AEM Inversion program and it doesn't have 
+         * columns to map to TXRX_DX and TXRX_DZ - which all other working AEM layers have. 
+         * ,
+        'ga:cunyu_aem' : {
+            'column-xcomponentsecondary' : 'Column 16',
+            'column-zcomponentsecondary' : '-Column 41',
+            'column-surveynumber' : 'Column 1',
+            'column-flightnumber' : 'Column 3',
+            'column-linenumber' : 'Column 2',
+            'column-fidnumber' : 'Column 4',
+            'column-easting' : 'Column 9',
+            'column-northing' : 'Column 10',
+            'column-groundelevation' : 'Column 12',
+            'column-txheight' : 'Column 13',
+            'column-txroll' : 'Column 15',            
+            'column-txpitch' : '-Column 14'
+        } */
         
     },
 
