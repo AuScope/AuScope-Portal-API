@@ -86,15 +86,15 @@ Ext.define('vegl.HelpHandler', {
                 vegl.HelpHandler.manager.showInstructions([Ext.create('portal.util.help.Instruction', {
                     highlightEl : 'vgl-tabs-panel',
                     title : 'Find data/layers',
-                    description : 'In this panel a list of all available datasets in the form of layers will be presented to you. To visualise a layer, select it and press the "Add Layer to Map" button.<br/><br/>Further information about the data behind each layer can be displayed by clicking the icons alongside the layer name.'
-                }),Ext.create('portal.util.help.Instruction', {
-                    highlightEl : 'vgl-layers-panel',
-                    title : 'Manage Layers',
-                    description : 'Whenever you add a layer to the map, it will be listed in this window. Layers can be removed by selecting them and pressing "Remove Layer". Selecting a layer will also bring up any advanced filter options in the window below.'
+                    description : 'In this panel a list of all available datasets in the form of layers will be presented to you.  Select the layer you would like to visualise.  Selecting a layer will also bring up any advanced filter options in the window below. <br/><br/>Further information about the data behind each layer can be displayed by clicking the icons alongside the layer name.'
                 }),Ext.create('portal.util.help.Instruction', {
                     highlightEl : 'vgl-filter-panel',
                     title : 'Apply filters',
-                    description : 'Some layers allow you to filter what data will get visualised on the map. If the layer supports filtering, additional options will be displayed in this window. Select "Apply Filter" to update the visualised data on the map'
+                    description : 'Some layers allow you to filter what data will get visualised on the map. If the layer supports filtering, additional options will be displayed in this window. Select "Add to Map" to update the visualised data on the map'
+                }),Ext.create('portal.util.help.Instruction', {
+                    highlightEl : 'vgl-layers-panel',
+                    title : 'Manage Layers',
+                    description : 'Whenever you add a layer to the map, it will be listed in this window. Layers can be removed by selecting them and pressing "Remove Layer".'
                 }),Ext.create('portal.util.help.Instruction', {
                     highlightEl : 'center_region',
                     anchor : 'right',
@@ -139,7 +139,7 @@ Ext.define('vegl.HelpHandler', {
                     highlightEl : jobsP.getEl(),
                     title : 'Manage Jobs',
                     anchor : 'right',
-                    description : 'After selecting a series, a list of all jobs belonging to that series will be displayed here. Selecting a job will bring up information about that job in the details panel. You can manage individual jobs by right clicking them or by selecting a job and pressing \'Actions\'<br/><br/>If you\'d like more information about the job states, please consult the <a target="_blank" href="https://www.seegrid.csiro.au/wiki/NeCTARProjects/VglUserGuide">VGL wiki</a>.'
+                    description : 'After selecting a series, a list of all jobs belonging to that series will be displayed here. Selecting a job will bring up information about that job in the details panel. You can manage individual jobs by right clicking them or by selecting a job and pressing \'Actions\'<br/><br/>If you\'d like more information about the job states, please consult the <a target="_blank" href="https://www.seegrid.csiro.au/wiki/NeCTARProjects/Vhirl/WebHome">VHIRL wiki</a>.'
                 }),Ext.create('portal.util.help.Instruction', {
                     highlightEl : detailsP.getEl(),
                     title : 'Inspect Job',
