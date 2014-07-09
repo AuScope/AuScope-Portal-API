@@ -92,12 +92,25 @@ Ext.application({
             id : 'vgl-layers-panel',
             title : 'Active Layers',
             region : 'south',
+            flex : 2,
+            split : true,
             store : layerStore,
             map : map,
             height: 250,
             split: true,
             allowDebugWindow : isDebugMode,
             listeners : {
+                itemclick : function(sm,record, eOpts){
+                    var allTabPanels = tabsPanel.items.items;
+                    for (var i=0; i< allTabPanels.length; i++){
+                        var tabPanelSelectedRecord = allTabPanels[i].getStore().getById(record.get('id'));
+                        if(tabPanelSelectedRecord){
+                            allTabPanels[i].getSelectionModel().select([tabPanelSelectedRecord], false);
+                            tabsPanel.setActiveTab(allTabPanels[i]);
+                            break;
+                        }
+                    }
+                },
                 removelayerrequest: function(sourceGrid, record) {
                     filterPanel.clearFilter();
                 }
@@ -108,7 +121,6 @@ Ext.application({
         var handleFilterSelectionComplete =  function(){
             var activePanel = tabsPanel.activeTab;
             activePanel.addSelectedLayerToActive();
-
         };
         
         /**
@@ -116,7 +128,11 @@ Ext.application({
          */
         var filterPanel = Ext.create('portal.widgets.panel.FilterPanel', {
             id : 'vgl-filter-panel',
+            title : 'Filter',
             region: 'center',
+            width : '100%',
+            //maxHeight : 350, //VT:settings for vbox layout
+            height : 100,
             layerPanel : layersPanel,
             map : map,
             listeners : {
@@ -135,35 +151,59 @@ Ext.application({
         //Utility function for adding a new layer to the map
         //record must be a CSWRecord or KnownLayer
         var handleAddRecordToMap = function(sourceGrid, record) {
-            var newLayer = null;
-
-            //Ensure the layer DNE first
-            var existingRecord = layerStore.getById(record.get('id'));
-            if (existingRecord) {
-                layersPanel.getSelectionModel().select([existingRecord], false);
-                return;
+            if (!(record instanceof Array)) {
+                record = [record];
             }
 
-            //Turn our KnownLayer/CSWRecord into an actual Layer
-            if (record instanceof portal.csw.CSWRecord) {               
-                newLayer = record.get('layer');
-            } else {
-                newLayer = record.get('layer');
-            }
-
-            //We may need to show a popup window with copyright info
-            var cswRecords = newLayer.get('cswRecords');
-            for (var i = 0; i < cswRecords.length; i++) {
-                if (cswRecords[i].hasConstraints()) {
-                    Ext.create('portal.widgets.window.CSWRecordConstraintsWindow', {
-                        cswRecords : cswRecords
-                    }).show();
-                    break;
+            for( var z = 0; z < record.length; z++) {
+                var newLayer = null;
+                
+                //Ensure the layer DNE first
+                var existingRecord = layerStore.getById(record[z].get('id'));
+                if (existingRecord) {
+                    layersPanel.getSelectionModel().select([existingRecord], false);
+                    return;
+                 }
+    
+                //Turn our KnownLayer/CSWRecord into an actual Layer
+                if (record[z] instanceof portal.csw.CSWRecord) {
+                    newLayer = record[z].get('layer');
+                } else {
+                    newLayer = record[z].get('layer');
                 }
+    
+                //if newLayer is undefined, it must have come from some other source like mastercatalogue
+                if (!newLayer){
+                    newLayer = layerFactory.generateLayerFromCSWRecord(record[z])
+                    //we want it to display immediately.
+                    newLayer.set('displayed',true);
+                }
+    
+                //We may need to show a popup window with copyright info
+                var cswRecords = newLayer.get('cswRecords');
+                for (var i = 0; i < cswRecords.length; i++) {
+                    if (cswRecords[i].hasConstraints()) {
+                        var popup = Ext.create('portal.widgets.window.CSWRecordConstraintsWindow', {
+                            width : 625,
+                            cswRecords : cswRecords
+                        });
+    
+                        popup.show();
+    
+                        //HTML images may take a moment to load which stuffs up our layout
+                        //This is a horrible, horrible workaround.
+                        var task = new Ext.util.DelayedTask(function(){
+                            popup.doLayout();
+                        });
+                        task.delay(1000);
+    
+                        break;
+                    }
+                }
+    
+                layerStore.insert(0,newLayer); //this adds the layer to our store
+                layersPanel.getSelectionModel().select([newLayer], false); //this ensures it gets selected
             }
-
-            layerStore.add(newLayer); //this adds the layer to our store
-            layersPanel.getSelectionModel().select([newLayer], false); //this ensures it gets selected
         };
 
         var knownLayersPanel = Ext.create('portal.widgets.panel.KnownLayerPanel', {
@@ -202,7 +242,7 @@ Ext.application({
          * Used as a placeholder for the tree and details panel on the left of screen
          */
         var westPanel = {
-            layout: 'border',
+            layout: 'border',//VT: vbox doesn't support splitbar unless we custom it.
             region:'west',
             border: false,
             split:true,
