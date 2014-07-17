@@ -2,11 +2,13 @@ package org.auscope.portal.server.web.controllers;
 
 import java.util.Arrays;
 import java.util.Date;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.auscope.portal.core.cloud.CloudFileInformation;
+import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.GeonetworkService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
@@ -38,6 +40,7 @@ public class TestGeonetworkController {
 
     private VEGLJobManager mockJobManager;
     private GeonetworkService mockGNService;
+    private PortalUser mockPortalUser;
     private CloudStorageService[] cloudStorageServices;
     private CloudComputeService[] cloudComputeServices;
 
@@ -50,6 +53,7 @@ public class TestGeonetworkController {
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockGNService = context.mock(GeonetworkService.class);
+        mockPortalUser = context.mock(PortalUser.class);
         cloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
         cloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
 
@@ -72,15 +76,13 @@ public class TestGeonetworkController {
         final VGLSignature userSignature = new VGLSignature(1, userEmail);
 
         context.checking(new Expectations() {{
-            //We should make a single call to the database for job objects
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             //We should have a single call to the database for user signature object
             oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
         }});
 
-        ModelAndView mav = controller.getUserSignature(mockRequest);
+        ModelAndView mav = controller.getUserSignature(mockRequest, mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -95,15 +97,13 @@ public class TestGeonetworkController {
         final String userEmail = "user@test.org";
 
         context.checking(new Expectations() {{
-            //We should have a call to http request session to get user's email
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             //We should have a single call to the database for user signature object
             oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.getUserSignature(mockRequest);
+        ModelAndView mav = controller.getUserSignature(mockRequest, mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -117,12 +117,10 @@ public class TestGeonetworkController {
         final HttpSession mockSession = context.mock(HttpSession.class);
 
         context.checking(new Expectations() {{
-            //We should have a call to http request session to get user's email
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(null));
+
         }});
 
-        ModelAndView mav = controller.getUserSignature(mockRequest);
+        ModelAndView mav = controller.getUserSignature(mockRequest, null);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -182,8 +180,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             //We should have a single call to the database for user signature object
             oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
@@ -225,7 +222,7 @@ public class TestGeonetworkController {
             allowing(mockContext).getRealPath("/");will(returnValue("src/main/webapp"));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertEquals(registeredUrl, mav.getModel().get("data"));
@@ -245,7 +242,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -270,7 +267,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -319,8 +316,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             //We should have a single call to the database for user signature object
             oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
@@ -332,7 +328,7 @@ public class TestGeonetworkController {
             oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -387,8 +383,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             //We should have a single call to the database for user signature object
             oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
@@ -426,7 +421,7 @@ public class TestGeonetworkController {
             allowing(mockContext).getRealPath("/");will(returnValue("src/main/webapp"));
         }});
 
-        ModelAndView mav = controller.insertRecord(jobId, mockRequest);
+        ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }

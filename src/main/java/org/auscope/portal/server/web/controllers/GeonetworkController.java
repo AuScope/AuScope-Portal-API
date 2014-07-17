@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
+import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.GeonetworkService;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -32,6 +33,7 @@ import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLSignature;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -173,9 +175,8 @@ public class GeonetworkController extends BaseCloudController {
     }
 
     @RequestMapping("/secure/getUserSignature.do")
-    public ModelAndView getUserSignature(HttpServletRequest request) {
+    public ModelAndView getUserSignature(HttpServletRequest request, @AuthenticationPrincipal PortalUser user) {
         //Get user email from session
-        String user = (String) request.getSession().getAttribute("openID-Email");
         if (user == null) {
             return generateJSONResponseMAV(false, null,
                     "Your session has timed out.",
@@ -187,7 +188,7 @@ public class GeonetworkController extends BaseCloudController {
         VGLSignature userSignature = null;
 
         try {
-            userSignature = jobManager.getSignatureByUser(user);
+            userSignature = jobManager.getSignatureByUser(user.getEmail());
         } catch (Exception ex) {
             logger.warn("Failed to retrieve signature for " + user, ex);
         }
@@ -208,7 +209,7 @@ public class GeonetworkController extends BaseCloudController {
      * @throws Exception
      */
     @RequestMapping("/secure/insertRecord.do")
-    public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request) throws Exception {
+    public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request, @AuthenticationPrincipal PortalUser user) throws Exception {
         //Lookup our appropriate job
         VEGLJob job = jobManager.getJobById(jobId);
         if (job == null) {
@@ -222,7 +223,6 @@ public class GeonetworkController extends BaseCloudController {
         }
 
         //Get user email from session
-        String user = (String) request.getSession().getAttribute("openID-Email");
         if (user == null) {
             logger.debug("Unable to get user email as user session has expired.");
             return generateJSONResponseMAV(false, null,
@@ -233,12 +233,12 @@ public class GeonetworkController extends BaseCloudController {
         try {
             //Store or update user signature so that the details can be re-used
             //in subsequent registration process
-            VGLSignature userSignature = jobManager.getSignatureByUser(user);
+            VGLSignature userSignature = jobManager.getSignatureByUser(user.getEmail());
             if (userSignature == null) {
                 logger.debug("Create a new signature as the user doesn't have one.");
                 userSignature = new VGLSignature();
             }
-            userSignature.setUser(user);
+            userSignature.setUser(user.getEmail());
             userSignature.setIndividualName(request.getParameter("individualName"));
             userSignature.setOrganisationName(request.getParameter("organisationName"));
             userSignature.setPositionName(request.getParameter("positionName"));

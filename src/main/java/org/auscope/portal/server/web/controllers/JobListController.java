@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -40,6 +41,7 @@ import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -112,14 +114,13 @@ public class JobListController extends BaseCloudController  {
      * @param jobId
      * @return The VEGLJob object on success or null otherwise.
      */
-    private VEGLJob attemptGetJob(Integer jobId, HttpServletRequest request) {
+    private VEGLJob attemptGetJob(Integer jobId, PortalUser user) {
         logger.info("Getting job with ID " + jobId);
 
         VEGLJob job = null;
-        String user = (String)request.getSession().getAttribute("openID-Email");
 
         //Check we have a user email
-        if (user == null || user.isEmpty()) {
+        if (user == null || user.getEmail() == null) {
             logger.warn("The current session is missing an email attribute");
             return null;
         }
@@ -141,7 +142,7 @@ public class JobListController extends BaseCloudController  {
         }
 
         //Check user matches job
-        if (!user.equals(job.getUser())) {
+        if (!user.getEmail().equals(job.getUser())) {
             logger.warn(String.format("%1$s's attempt to fetch %2$s's job denied!", user, job.getUser()));
             return null;
         }
@@ -157,12 +158,11 @@ public class JobListController extends BaseCloudController  {
      * @param jobId
      * @return The VEGLSeries object on success or null otherwise.
      */
-    private VEGLSeries attemptGetSeries(Integer seriesId, HttpServletRequest request) {
+    private VEGLSeries attemptGetSeries(Integer seriesId, PortalUser user) {
         VEGLSeries series = null;
-        String user = (String)request.getSession().getAttribute("openID-Email");
 
         //Check we have a user email
-        if (user == null || user.isEmpty()) {
+        if (user == null || user.getEmail() == null) {
             logger.warn("The current session is missing an email attribute");
             return null;
         }
@@ -183,7 +183,7 @@ public class JobListController extends BaseCloudController  {
         }
 
         //Check user matches job
-        if (!user.equals(series.getUser())) {
+        if (!user.getEmail().equals(series.getUser())) {
             logger.warn(String.format("%1$s's attempt to fetch %2$s's job denied!", user, series.getUser()));
             return null;
         }
@@ -202,14 +202,14 @@ public class JobListController extends BaseCloudController  {
      */
     @RequestMapping("/secure/mySeries.do")
     public ModelAndView mySeries(HttpServletRequest request,
-                                 HttpServletResponse response) {
+                                 HttpServletResponse response,
+                                 @AuthenticationPrincipal PortalUser user) {
 
-        String user = (String)request.getSession().getAttribute("openID-Email");
-        if (user == null || user.isEmpty()) {
+        if (user == null || user.getEmail() == null) {
             logger.warn("No email attached to session");
             return generateJSONResponseMAV(false, null, "No email attached to session");
         }
-        List<VEGLSeries> series = jobManager.querySeries(user, null, null);
+        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), null, null);
 
         logger.debug("Returning " + series);
         return generateJSONResponseMAV(true, series, "");
@@ -227,10 +227,11 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/deleteJob.do")
     public ModelAndView deleteJob(HttpServletRequest request,
                                 HttpServletResponse response,
-                                @RequestParam("jobId") Integer jobId) {
+                                @RequestParam("jobId") Integer jobId,
+                                @AuthenticationPrincipal PortalUser user) {
         logger.info("Deleting job with ID " + jobId);
 
-        VEGLJob job = attemptGetJob(jobId, request);
+        VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The requested job was not found.");
         }
@@ -258,9 +259,10 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/deleteSeriesJobs.do")
     public ModelAndView deleteSeriesJobs(HttpServletRequest request,
                                        HttpServletResponse response,
-                                       @RequestParam("seriesId") Integer seriesId) {
+                                       @RequestParam("seriesId") Integer seriesId,
+                                       @AuthenticationPrincipal PortalUser user) {
 
-        VEGLSeries series = attemptGetSeries(seriesId, request);
+        VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup series.");
         }
@@ -326,10 +328,11 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/killJob.do")
     public ModelAndView killJob(HttpServletRequest request,
                                 HttpServletResponse response,
-                                @RequestParam("jobId") Integer jobId) {
+                                @RequestParam("jobId") Integer jobId,
+                                @AuthenticationPrincipal PortalUser user) {
         logger.info("Cancelling job with ID "+jobId);
 
-        VEGLJob job = attemptGetJob(jobId, request);
+        VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job to kill.");
         }
@@ -401,9 +404,10 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/killSeriesJobs.do")
     public ModelAndView killSeriesJobs(HttpServletRequest request,
                                        HttpServletResponse response,
-                                       @RequestParam("seriesId") Integer seriesId) {
+                                       @RequestParam("seriesId") Integer seriesId,
+                                       @AuthenticationPrincipal PortalUser user) {
 
-        VEGLSeries series = attemptGetSeries(seriesId, request);
+        VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup series.");
         }
@@ -452,10 +456,11 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/jobFiles.do")
     public ModelAndView jobFiles(HttpServletRequest request,
                                  HttpServletResponse response,
-                                 @RequestParam("jobId") Integer jobId) {
+                                 @RequestParam("jobId") Integer jobId,
+                                 @AuthenticationPrincipal PortalUser user) {
         logger.info("Getting job files for job ID " + jobId);
 
-        VEGLJob job = attemptGetJob(jobId, request);
+        VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The requested job was not found.");
         }
@@ -494,9 +499,10 @@ public class JobListController extends BaseCloudController  {
                                      HttpServletResponse response,
                                      @RequestParam("jobId") Integer jobId,
                                      @RequestParam("filename") String fileName,
-                                     @RequestParam("key") String key) {
+                                     @RequestParam("key") String key,
+                                     @AuthenticationPrincipal PortalUser user) {
 
-        VEGLJob job = attemptGetJob(jobId, request);
+        VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job object.");
         }
@@ -561,10 +567,11 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView downloadAsZip(HttpServletRequest request,
                                       HttpServletResponse response,
                                       @RequestParam("jobId") Integer jobId,
-                                      @RequestParam("files") String filesParam) {
+                                      @RequestParam("files") String filesParam,
+                                      @AuthenticationPrincipal PortalUser user) {
 
         //Lookup our job and check input files
-        VEGLJob job = attemptGetJob(jobId, request);
+        VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job object.");
         }
@@ -642,17 +649,20 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView querySeries(HttpServletRequest request,
                                     HttpServletResponse response,
                                     @RequestParam(required=false, value="qSeriesName") String qName,
-                                    @RequestParam(required=false, value="qSeriesDesc") String qDesc) {
+                                    @RequestParam(required=false, value="qSeriesDesc") String qDesc,
+                                    @AuthenticationPrincipal PortalUser user) {
 
-        //User can only query his/her own job series
-        String qUser = (String)request.getSession().getAttribute("openID-Email");
-
-        if (StringUtils.isEmpty(qName) && StringUtils.isEmpty(qDesc)) {
-            logger.debug("No query parameters provided. Will return "+qUser+"'s series.");
+        if (user == null) {
+            return generateJSONResponseMAV(false);
         }
 
-        logger.debug("qUser="+qUser+", qName="+qName+", qDesc="+qDesc);
-        List<VEGLSeries> series = jobManager.querySeries(qUser, qName, qDesc);
+        //User can only query his/her own job series
+        if (StringUtils.isEmpty(qName) && StringUtils.isEmpty(qDesc)) {
+            logger.debug("No query parameters provided. Will return "+user+"'s series.");
+        }
+
+        logger.debug("qUser="+user.getEmail()+", qName="+qName+", qDesc="+qDesc);
+        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), qName, qDesc);
 
         logger.debug("Returning list of "+series.size()+" series.");
         return generateJSONResponseMAV(true, series, "");
@@ -670,10 +680,10 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/createSeries.do")
     public ModelAndView createSeries(HttpServletRequest request,
                                     @RequestParam("seriesName") String seriesName,
-                                    @RequestParam("seriesDescription") String seriesDescription) {
-        String openIdEmail = (String)request.getSession().getAttribute("openID-Email");
+                                    @RequestParam("seriesDescription") String seriesDescription,
+                                    @AuthenticationPrincipal PortalUser user) {
         VEGLSeries series = new VEGLSeries();
-        series.setUser(openIdEmail);
+        series.setUser(user.getEmail());
         series.setName(seriesName);
         series.setDescription(seriesDescription);
 
@@ -700,8 +710,9 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView listJobs(HttpServletRequest request,
                                  HttpServletResponse response,
                                  @RequestParam("seriesId") Integer seriesId,
-                                 @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh) {
-        VEGLSeries series = attemptGetSeries(seriesId, request);
+                                 @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
+                                 @AuthenticationPrincipal PortalUser user) {
+        VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
         }
@@ -755,11 +766,12 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView duplicateJob(HttpServletRequest request,
                                 HttpServletResponse response,
                                 @RequestParam("jobId") Integer jobId,
-                                @RequestParam(required=false, value="file") String[] files) {
+                                @RequestParam(required=false, value="file") String[] files,
+                                @AuthenticationPrincipal PortalUser user) {
         logger.info("Duplicate a new job from job ID "+ jobId);
 
         //Lookup the job we are cloning
-        VEGLJob oldJob = attemptGetJob(jobId, request);
+        VEGLJob oldJob = attemptGetJob(jobId, user);
         if (oldJob == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job to duplicate.");
         }
@@ -830,9 +842,9 @@ public class JobListController extends BaseCloudController  {
      * @return
      */
     @RequestMapping("/secure/getSectionedLogs.do")
-    public ModelAndView getSectionedLogs(HttpServletRequest request, @RequestParam("jobId") Integer jobId) {
+    public ModelAndView getSectionedLogs(HttpServletRequest request, @RequestParam("jobId") Integer jobId, @AuthenticationPrincipal PortalUser user) {
         //Lookup the job whose logs we are accessing
-        VEGLJob job = attemptGetJob(jobId, request);
+        VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The specified job does not exist.");
         }

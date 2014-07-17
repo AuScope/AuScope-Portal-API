@@ -21,6 +21,7 @@ import org.apache.commons.collections.iterators.IteratorEnumeration;
 import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -61,6 +62,7 @@ public class TestJobBuilderController {
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
     private HttpSession mockSession;
+    private PortalUser mockPortalUser;
 
     private JobBuilderController controller;
 
@@ -70,6 +72,7 @@ public class TestJobBuilderController {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockFileStagingService = context.mock(FileStagingService.class);
         mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
+        mockPortalUser = context.mock(PortalUser.class);
         mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
         mockRequest = context.mock(HttpServletRequest.class);
@@ -1253,7 +1256,6 @@ public class TestJobBuilderController {
 
         sessionVariables.put("doubleValue", 123.45);
         sessionVariables.put("intValue", 123);
-        sessionVariables.put("openID-Email", "email@example.org");
         sessionVariables.put("notExtracted", new Object()); //this should NOT be requested
 
         context.checking(new Expectations() {{
@@ -1262,11 +1264,12 @@ public class TestJobBuilderController {
 
             oneOf(mockSession).getAttributeNames();will(returnValue(new IteratorEnumeration(sessionVariables.keySet().iterator())));
             allowing(mockSession).getAttribute("doubleValue");will(returnValue(sessionVariables.get("doubleValue")));
-            allowing(mockSession).getAttribute("intValue");will(returnValue(sessionVariables.get("intValue")));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(sessionVariables.get("openID-Email")));
+            allowing(mockSession).getAttribute("intValue");will(returnValue(sessionVariables.get("intValue")));;
             allowing(mockSession).getAttribute("notExtracted");will(returnValue(sessionVariables.get("notExtracted")));
             allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(null));
             allowing(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, null);
+
+            allowing(mockPortalUser).getEmail();will(returnValue("email@example.org"));
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
@@ -1296,7 +1299,8 @@ public class TestJobBuilderController {
                                                         storageServiceId,
                                                         null,
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
@@ -1314,7 +1318,7 @@ public class TestJobBuilderController {
 
         Map<String, VglParameter> params = newJob.getJobParameters();
         Assert.assertNotNull(params);
-        Assert.assertEquals(3, params.size());
+        Assert.assertEquals(2, params.size());
 
         String paramToTest = "doubleValue";
         VglParameter param = params.get(paramToTest);
@@ -1327,12 +1331,6 @@ public class TestJobBuilderController {
         Assert.assertNotNull(param);
         Assert.assertEquals("number", param.getType());
         Assert.assertEquals(sessionVariables.get(paramToTest).toString(), param.getValue());
-
-        paramToTest = "openID-Email";
-        param = params.get(paramToTest);
-        Assert.assertNotNull(param);
-        Assert.assertEquals("string", param.getType());
-        Assert.assertEquals(sessionVariables.get(paramToTest), param.getValue());
     }
 
     /**
@@ -1381,7 +1379,8 @@ public class TestJobBuilderController {
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1425,7 +1424,8 @@ public class TestJobBuilderController {
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1473,7 +1473,8 @@ public class TestJobBuilderController {
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1521,7 +1522,8 @@ public class TestJobBuilderController {
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }

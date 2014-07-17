@@ -2,7 +2,6 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -32,8 +32,6 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
-import org.auscope.portal.server.vegl.VglMachineImage;
-import org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor;
 import org.jmock.Expectations;
 import org.junit.After;
 import org.junit.Assert;
@@ -56,6 +54,7 @@ public class TestJobListController extends PortalTestClass {
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
     private PortalPropertyPlaceholderConfigurer mockHostConfigurer;
+    private PortalUser mockPortalUser;
     private JobStatusMonitor mockJobStatusMonitor;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
@@ -78,6 +77,7 @@ public class TestJobListController extends PortalTestClass {
         mockResponse = context.mock(HttpServletResponse.class);
         mockRequest = context.mock(HttpServletRequest.class);
         mockSession = context.mock(HttpSession.class);
+        mockPortalUser = context.mock(PortalUser.class);
         final List<VEGLJob> mockJobs=new ArrayList<VEGLJob>();
 
         context.checking(new Expectations() {{
@@ -152,9 +152,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             //Here on start is the delete mock
-
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             allowing(queueMockJobs.get(1)).getUser();will(returnValue(userEmail));
             //allowing(queueMockJobs.get(0)).getUser();will(returnValue(userEmail));
@@ -181,7 +179,7 @@ public class TestJobListController extends PortalTestClass {
 
         Assert.assertEquals(2, queueManager.getQueue().size());
 
-        myController.killJob(mockRequest, mockResponse, jobId);
+        myController.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
 
         Assert.assertEquals(1, queueManager.getQueue().size());
 
@@ -198,13 +196,12 @@ public class TestJobListController extends PortalTestClass {
         final List<VEGLSeries> seriesList = Arrays.asList(series);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).querySeries(userEmail, null, null);will(returnValue(seriesList));
         }});
 
-        ModelAndView mav = controller.mySeries(mockRequest, mockResponse);
+        ModelAndView mav = controller.mySeries(mockRequest, mockResponse, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -214,11 +211,23 @@ public class TestJobListController extends PortalTestClass {
     @Test
     public void testMySeriesNoEmail() {
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(null));
+            allowing(mockPortalUser).getEmail();will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.mySeries(mockRequest, mockResponse);
+        ModelAndView mav = controller.mySeries(mockRequest, mockResponse, mockPortalUser);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests getting a series when there is no email address in the user's session
+     */
+    @Test
+    public void testMySeriesNoUser() {
+        context.checking(new Expectations() {{
+
+        }});
+
+        ModelAndView mav = controller.mySeries(mockRequest, mockResponse, null);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -232,8 +241,7 @@ public class TestJobListController extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
@@ -250,7 +258,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
         }});
 
-        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -264,8 +272,7 @@ public class TestJobListController extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
@@ -284,7 +291,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).deleteJobFiles(mockJob); //this must occur if the job isnt registered
         }});
 
-        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -299,15 +306,14 @@ public class TestJobListController extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
-        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -320,13 +326,12 @@ public class TestJobListController extends PortalTestClass {
         final int jobId = 1234;
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -343,8 +348,7 @@ public class TestJobListController extends PortalTestClass {
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
@@ -369,7 +373,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).deleteSeries(mockSeries);
         }});
 
-        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -384,14 +388,13 @@ public class TestJobListController extends PortalTestClass {
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
         }});
 
-        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -404,13 +407,12 @@ public class TestJobListController extends PortalTestClass {
         final int seriesId = 1234;
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -425,15 +427,14 @@ public class TestJobListController extends PortalTestClass {
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -448,8 +449,7 @@ public class TestJobListController extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
@@ -463,7 +463,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PENDING, mockJob, "Job cancelled by user.");
         }});
 
-        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -477,14 +477,13 @@ public class TestJobListController extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
         }});
 
-        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -499,15 +498,14 @@ public class TestJobListController extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             allowing(mockJob).getUser();will(returnValue(jobEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
         }});
 
-        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -520,13 +518,12 @@ public class TestJobListController extends PortalTestClass {
         final int jobId = 1234;
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -545,8 +542,7 @@ public class TestJobListController extends PortalTestClass {
                 context.mock(VEGLJob.class, "mockJobPending"));
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
@@ -581,7 +577,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PENDING, mockJobs.get(3), "Job cancelled by user.");
         }});
 
-        ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -596,14 +592,13 @@ public class TestJobListController extends PortalTestClass {
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
         }});
 
-        ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -616,13 +611,12 @@ public class TestJobListController extends PortalTestClass {
         final int seriesId = 1234;
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId);
+        ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -641,8 +635,7 @@ public class TestJobListController extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
@@ -652,7 +645,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(fileDetails));
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertSame(fileDetails, mav.getModel().get("data"));
     }
@@ -668,15 +661,14 @@ public class TestJobListController extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(jobEmail));
 
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -689,14 +681,13 @@ public class TestJobListController extends PortalTestClass {
         final int jobId = 1234;
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
 
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -711,8 +702,7 @@ public class TestJobListController extends PortalTestClass {
 
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
@@ -722,7 +712,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -741,8 +731,7 @@ public class TestJobListController extends PortalTestClass {
         final ReadableServletOutputStream outStream = new ReadableServletOutputStream();
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
@@ -758,7 +747,7 @@ public class TestJobListController extends PortalTestClass {
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key);
+        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key, mockPortalUser);
         Assert.assertNull(mav);
 
         Assert.assertArrayEquals(data, outStream.getDataWritten());
@@ -777,15 +766,14 @@ public class TestJobListController extends PortalTestClass {
         final String fileName = "fileName.txt";
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key);
+        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key, mockPortalUser);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
@@ -800,14 +788,13 @@ public class TestJobListController extends PortalTestClass {
         final String fileName = "fileName.txt";
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key);
+        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key, mockPortalUser);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
@@ -834,8 +821,7 @@ public class TestJobListController extends PortalTestClass {
         final Date submitDate = new SimpleDateFormat("yyyyMMdd").parse("19861009");
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getName();will(returnValue(jobName));
@@ -855,7 +841,7 @@ public class TestJobListController extends PortalTestClass {
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files);
+        ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files, mockPortalUser);
         Assert.assertNull(mav);
 
         //Lets decompose our zip stream to verify everything got written correctly
@@ -906,15 +892,13 @@ public class TestJobListController extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
-
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files);
+        ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files, mockPortalUser);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
@@ -928,14 +912,13 @@ public class TestJobListController extends PortalTestClass {
         final String files = "filekey1,filekey2";
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files);
+        ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files, mockPortalUser);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
@@ -953,14 +936,13 @@ public class TestJobListController extends PortalTestClass {
                 context.mock(VEGLSeries.class, "mockSeries2"));
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).querySeries(qUser, qName, qDescription);will(returnValue(series));
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.querySeries(mockRequest, mockResponse, qName, qDescription);
+        ModelAndView mav = controller.querySeries(mockRequest, mockResponse, qName, qDescription, mockPortalUser);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertSame(series, mav.getModel().get("data"));
     }
@@ -978,14 +960,13 @@ public class TestJobListController extends PortalTestClass {
                 context.mock(VEGLSeries.class, "mockSeries2"));
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).querySeries(userEmail, null, null);will(returnValue(series));
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.querySeries(mockRequest, mockResponse, qName, qDescription);
+        ModelAndView mav = controller.querySeries(mockRequest, mockResponse, qName, qDescription, mockPortalUser);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertSame(series, mav.getModel().get("data"));
     }
@@ -1006,14 +987,13 @@ public class TestJobListController extends PortalTestClass {
         final String qDescription = "description";
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));
         }});
 
         //Returns MAV on failure
-        ModelAndView mav = controller.createSeries(mockRequest, qName, qDescription);
+        ModelAndView mav = controller.createSeries(mockRequest, qName, qDescription, mockPortalUser);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         VEGLSeries actualSeries = ((List<VEGLSeries>) mav.getModel().get("data")).get(0);
         Assert.assertNotNull(actualSeries);
@@ -1044,14 +1024,13 @@ public class TestJobListController extends PortalTestClass {
         final String qDescription = "description";
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));will(throwException(new MyDataAccessException()));
         }});
 
         //Returns MAV on failure
-        ModelAndView mav = controller.createSeries(mockRequest, qName, qDescription);
+        ModelAndView mav = controller.createSeries(mockRequest, qName, qDescription, mockPortalUser);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
@@ -1072,8 +1051,7 @@ public class TestJobListController extends PortalTestClass {
         );
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
@@ -1081,7 +1059,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
         }});
 
-        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false);
+        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false, mockPortalUser);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertArrayEquals(mockJobs.toArray(), ((List<VEGLJob>) mav.getModel().get("data")).toArray());
     }
@@ -1103,8 +1081,7 @@ public class TestJobListController extends PortalTestClass {
         );
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
@@ -1114,7 +1091,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobStatusMonitor).statusUpdate(mockJobs);
         }});
 
-        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, true);
+        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, true, mockPortalUser);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertArrayEquals(mockJobs.toArray(), ((List<VEGLJob>) mav.getModel().get("data")).toArray());
     }
@@ -1131,14 +1108,13 @@ public class TestJobListController extends PortalTestClass {
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
         }});
 
-        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false);
+        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false, mockPortalUser);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
@@ -1152,13 +1128,12 @@ public class TestJobListController extends PortalTestClass {
         final int seriesId = 1234;
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false);
+        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false, mockPortalUser);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
@@ -1187,8 +1162,7 @@ public class TestJobListController extends PortalTestClass {
         final ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
 
         context.checking(new Expectations() {{
-            allowing(mockRequest).getSession();will(returnValue(mockSession));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId);will(returnValue(existingJob));
             allowing(mockJobManager).saveJob(with(aNonMatchingVeglJob(jobId)));
@@ -1206,7 +1180,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)), with(any(String.class)));
         }});
 
-        ModelAndView mav = controller.duplicateJob(mockRequest, mockResponse, jobId, files);
+        ModelAndView mav = controller.duplicateJob(mockRequest, mockResponse, jobId, files, mockPortalUser);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
 
         byte[] fis1Data = bos1.toByteArray();
