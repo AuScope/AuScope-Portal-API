@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.AbstractView;
 
 /**
  * User: Mathew Wyatt
@@ -113,6 +114,7 @@ public class TestCSWCacheController extends PortalTestClass {
 
         //Run the method, get our response rendered as a JSONObject
         ModelAndView mav = cswController.getCSWRecords();
+        ((AbstractView) mav.getView()).setExposePathVariables(false);
         mav.getView().render(mav.getModel(), mockHttpRequest, mockHttpResponse);
         JSONObject jsonObj = JSONObject.fromObject(actualJSONResponse.toString());
 
@@ -161,6 +163,7 @@ public class TestCSWCacheController extends PortalTestClass {
 
         //Run the method, get our response rendered as a JSONObject
         ModelAndView mav = cswController.getCSWRecords();
+        ((AbstractView) mav.getView()).setExposePathVariables(false);
         mav.getView().render(mav.getModel(), mockHttpRequest, mockHttpResponse);
         JSONObject jsonObj = JSONObject.fromObject(actualJSONResponse.toString());
 

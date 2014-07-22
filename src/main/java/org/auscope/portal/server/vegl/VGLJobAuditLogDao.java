@@ -14,6 +14,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class VGLJobAuditLogDao extends HibernateDaoSupport {
     protected final Log logger = LogFactory.getLog(getClass());
 
+    public VGLJobAuditLogDao() {
+        super();
+    }
+
     /**
      * Retrieves the audit logs of a given job ID.
      *

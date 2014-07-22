@@ -21,6 +21,7 @@ import org.apache.commons.collections.iterators.IteratorEnumeration;
 import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -61,6 +62,7 @@ public class TestJobBuilderController {
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
     private HttpSession mockSession;
+    private PortalUser mockPortalUser;
 
     private JobBuilderController controller;
 
@@ -70,6 +72,7 @@ public class TestJobBuilderController {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockFileStagingService = context.mock(FileStagingService.class);
         mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
+        mockPortalUser = context.mock(PortalUser.class);
         mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
         mockRequest = context.mock(HttpServletRequest.class);
@@ -570,7 +573,6 @@ public class TestJobBuilderController {
         final Sequence jobFileSequence = context.sequence("jobFileSequence"); //this makes sure we aren't deleting directories before uploading (and other nonsense)
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
-        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
         final String storageBucket = "storage-bucket";
         final String storageAccess = "213-asd-54";
@@ -581,8 +583,6 @@ public class TestJobBuilderController {
         final String storageAuthVersion = "1.2.3";
         final String regionName = null;
 
-        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
-
         jobObj.setComputeVmId(computeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
         jobObj.setStorageBaseKey("base/key");
@@ -591,11 +591,10 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have access control check to ensure user has permission to run the job
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
             oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"testRole2"}));
+            allowing(mockRequest).isUserInRole("testRole2");will(returnValue(true));
 
             //We should have 1 call to our job manager to get our job object and 1 call to save it
             oneOf(mockJobManager).getJobById(jobObj.getId());will(returnValue(jobObj));
@@ -658,11 +657,9 @@ public class TestJobBuilderController {
         final String injectedComputeVmId = "injected-compute-vmi-id";
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final String errorDescription = "You do not have the permission to submit this job for processing.";
         final String storageServiceId = "cssid";
 
-        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
         jobObj.setComputeVmId(injectedComputeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
         jobObj.setComputeServiceId(computeServiceId);
@@ -679,7 +676,7 @@ public class TestJobBuilderController {
 
             //We should have access control check to ensure user has permission to run the job
             oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
+            allowing(mockRequest).isUserInRole("a-different-role");will(returnValue(false));
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
             oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"a-different-role"}));
@@ -726,7 +723,6 @@ public class TestJobBuilderController {
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final String computeServiceId = "id-1";
         final String storageServiceId = "id-2";
         jobObj.setComputeVmId(computeVmId);
@@ -734,18 +730,16 @@ public class TestJobBuilderController {
         jobObj.setComputeServiceId(computeServiceId);
         jobObj.setStorageServiceId(storageServiceId);
 
-        sessionVariables.put("user-roles", new String[] {"testRole1"});
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId());will(returnValue(jobObj));
 
             //We should have access control check to ensure user has permission to run the job
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
             oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"testRole1"}));
+            allowing(mockRequest).isUserInRole("testRole1");will(returnValue(true));
 
 
             oneOf(mockFileStagingService).writeFile(jobObj, JobBuilderController.DOWNLOAD_SCRIPT);
@@ -787,7 +781,6 @@ public class TestJobBuilderController {
         final File mockFile2 = context.mock(File.class, "MockFile2");
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
-        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
         final String storageBucket = "storage-bucket";
         final String storageAccess = "213-asd-54";
@@ -797,7 +790,6 @@ public class TestJobBuilderController {
         final String storageEndpoint = "http://example.org";
         final String storageServiceId = "storage-service-id";
         final String regionName = "region-name";
-        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
         jobObj.setComputeVmId(computeVmId);
         //As submitJob method no longer explicitly checks for empty storage credentials,
@@ -836,11 +828,10 @@ public class TestJobBuilderController {
             oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
 
             //We should have access control check to ensure user has permission to run the job
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
             oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"testRole1"}));
+            allowing(mockRequest).isUserInRole("testRole1");will(returnValue(true));
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
@@ -878,7 +869,6 @@ public class TestJobBuilderController {
         final File mockFile2 = context.mock(File.class, "MockFile2");
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
-        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
         final String storageBucket = "storage-bucket";
         final String storageAccess = "213-asd-54";
@@ -888,7 +878,6 @@ public class TestJobBuilderController {
         final String storageEndpoint = "http://example.org";
         final String storageServiceId = "storage-service-id";
         final String regionName = "region-name";
-        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
         jobObj.setComputeVmId(computeVmId);
         //As submitJob method no longer explicitly checks for empty storage credentials,
@@ -927,11 +916,10 @@ public class TestJobBuilderController {
             oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
 
             //We should have access control check to ensure user has permission to run the job
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
             oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"testRole1"}));
+            allowing(mockRequest).isUserInRole("testRole1");will(returnValue(true));
 
             oneOf(mockJobManager).saveJob(jobObj);
 
@@ -1178,20 +1166,15 @@ public class TestJobBuilderController {
     @SuppressWarnings("rawtypes")
     @Test
     public void testListImages() throws Exception {
-        final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final String computeServiceId = "compute-service-id";
         final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
 
-        sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
-
         context.checking(new Expectations() {{
-            oneOf(mockRequest).getSession();will(returnValue(mockSession));
-            oneOf(mockSession).getAttribute("user-roles");will(returnValue(sessionVariables.get("user-roles")));
-
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(images));
 
             oneOf(images[0]).getPermissions();will(returnValue(new String[] {"testRole2"}));
+            allowing(mockRequest).isUserInRole("testRole2");will(returnValue(true));
         }});
 
         ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId);
@@ -1253,7 +1236,6 @@ public class TestJobBuilderController {
 
         sessionVariables.put("doubleValue", 123.45);
         sessionVariables.put("intValue", 123);
-        sessionVariables.put("openID-Email", "email@example.org");
         sessionVariables.put("notExtracted", new Object()); //this should NOT be requested
 
         context.checking(new Expectations() {{
@@ -1262,11 +1244,12 @@ public class TestJobBuilderController {
 
             oneOf(mockSession).getAttributeNames();will(returnValue(new IteratorEnumeration(sessionVariables.keySet().iterator())));
             allowing(mockSession).getAttribute("doubleValue");will(returnValue(sessionVariables.get("doubleValue")));
-            allowing(mockSession).getAttribute("intValue");will(returnValue(sessionVariables.get("intValue")));
-            allowing(mockSession).getAttribute("openID-Email");will(returnValue(sessionVariables.get("openID-Email")));
+            allowing(mockSession).getAttribute("intValue");will(returnValue(sessionVariables.get("intValue")));;
             allowing(mockSession).getAttribute("notExtracted");will(returnValue(sessionVariables.get("notExtracted")));
             allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(null));
             allowing(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, null);
+
+            allowing(mockPortalUser).getEmail();will(returnValue("email@example.org"));
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
@@ -1296,7 +1279,8 @@ public class TestJobBuilderController {
                                                         storageServiceId,
                                                         null,
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
@@ -1314,7 +1298,7 @@ public class TestJobBuilderController {
 
         Map<String, VglParameter> params = newJob.getJobParameters();
         Assert.assertNotNull(params);
-        Assert.assertEquals(3, params.size());
+        Assert.assertEquals(2, params.size());
 
         String paramToTest = "doubleValue";
         VglParameter param = params.get(paramToTest);
@@ -1327,12 +1311,6 @@ public class TestJobBuilderController {
         Assert.assertNotNull(param);
         Assert.assertEquals("number", param.getType());
         Assert.assertEquals(sessionVariables.get(paramToTest).toString(), param.getValue());
-
-        paramToTest = "openID-Email";
-        param = params.get(paramToTest);
-        Assert.assertNotNull(param);
-        Assert.assertEquals("string", param.getType());
-        Assert.assertEquals(sessionVariables.get(paramToTest), param.getValue());
     }
 
     /**
@@ -1381,7 +1359,8 @@ public class TestJobBuilderController {
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1425,7 +1404,8 @@ public class TestJobBuilderController {
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1473,7 +1453,8 @@ public class TestJobBuilderController {
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1521,7 +1502,8 @@ public class TestJobBuilderController {
                                                         "storageServiceId",
                                                         "registeredUrl",
                                                         emailNotification,
-                                                        mockRequest);
+                                                        mockRequest,
+                                                        mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }

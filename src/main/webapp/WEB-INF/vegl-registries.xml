@@ -9,8 +9,8 @@
     <bean id="cswVeglProduction" class="org.auscope.portal.core.services.csw.CSWServiceItem">
         <constructor-arg name="id" value="cswVeglProduction"/>
         <constructor-arg name="title" value="SISS ANU Geonetwork"/>
-        <constructor-arg name="serviceUrl" value="http://vgl.csiro.au/geonetwork/srv/eng/csw"/>
-        <constructor-arg name="recordInformationUrl" value="http://vgl.csiro.au/geonetwork/srv/eng/main.home?uuid=%1$s"/>
+        <constructor-arg name="serviceUrl" value="http://siss1.anu.edu.au/geonetwork/srv/en/csw"/>
+        <constructor-arg name="recordInformationUrl" value="http://siss1.anu.edu.au/geonetwork/srv/en/main.home?uuid=%1$s"/>
         <property name="userName" value="${env.outputgeonetwork.user}"/>
         <property name="password" value="${env.outputgeonetwork.password}"/>
     </bean>

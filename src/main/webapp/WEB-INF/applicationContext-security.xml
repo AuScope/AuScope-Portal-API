@@ -4,183 +4,71 @@
          xmlns:beans="http://www.springframework.org/schema/beans"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.springframework.org/schema/beans
-                             http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                             http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
                              http://www.springframework.org/schema/security
-                             http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+                             http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
-
-
-    <!--The following is for the portal to bind with the CSIRO LDAP  -->
-    <!--
-   <http auto-config="false" session-fixation-protection="none" access-denied-page="/access_error.html">
-      <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR" />
-      <intercept-url pattern="/**" filters="none" />
-      <form-login login-page="/login.html" authentication-failure-url="/login.html?login_error=1"/>
-      <s:anonymous/>
-      <s:logout logout-success-url="/gmap.html"/>
-   </http>
-
-
-
-   <beans:bean id="ldapProvider" class="org.auscope.portal.server.web.security.PortalLDAPAuthenticationProvider">
-        <s:custom-authentication-provider />
-        <beans:property name="providerUrl" value="ldap://nxwa1-kf.nexus.csiro.au:389/dc=nexus,dc=csiro,dc=au"/>
-        <beans:property name="userSearchBase" value="ou=People"/>
-        <beans:property name="userSearchFilter" value="(employeeID={0})"/>
-        <beans:property name="groupSearchBase" value="ou=Groups"/>
-        <beans:property name="groupSearchFilter" value="(member={0})"/>
-        <beans:property name="rolePrefix" value="ROLE_"/>
-        <beans:property name="convertToUpperCase" value="true"/>
-        <beans:property name="searchSubTree" value="true"/>
-    </beans:bean>
-       -->
-
-
-     <!-- The following is pre authentication for usage with Shibboleth -->
-   <!--  <beans:bean id="entryPoint"
-        class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" >
-    </beans:bean>
-
-   <http auto-config="false" entry-point-ref="entryPoint" access-denied-page="/access_error.html">
-    <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR" />
-      <intercept-url pattern="/**" filters="none" />
-      <custom-filter ref="preAuthenticatedProcessingFilter" position="PRE_AUTH_FILTER" />
-      <s:anonymous/>
-       <s:logout logout-success-url="/gmap.html"/>
-      <session-management session-fixation-protection="none" />
-
-      <s:logout logout-success-url="/ShibLogout"/>
-   </http>
-
-   -->
-
-   <authentication-manager alias="authenticationManager">
-        <authentication-provider ref="preAuthenticatedAuthenticationProvider" user-service-ref="portalUserDetailsService"/>
-   </authentication-manager>
-
-   <!-- We use our own user details service so that we can assign ROLE_USER to users that authenticate with AAF but are unknown to us
--->
-    <beans:bean id="portalUserDetailsService"
-        class="org.auscope.portal.server.web.security.PortalUserDetailsService">
-        <beans:constructor-arg index="0" value="ROLE_USER" />
-        <beans:constructor-arg index="1">
-            <beans:list>
-                <!-- Administrators -->
-                <!-- Josh.Vote@csiro.au -->
-                <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                    <beans:constructor-arg name="name" value="http://joshvote.myopenid.com/" />
-                    <beans:constructor-arg name="credentials" value="" />
-                    <beans:constructor-arg name="grantedAuthorities">
-                        <beans:list>
-                            <beans:value>ROLE_USER</beans:value>
-                            <beans:value>ROLE_ADMINISTRATOR</beans:value>
-                            <beans:value>ROLE_UBC</beans:value>
-                        </beans:list>
-                    </beans:constructor-arg>
-                </beans:bean>
-                <!-- Richard.Goh@csiro.au -->
-                <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                    <beans:constructor-arg name="name" value="http://rgoh.myopenid.com/" />
-                    <beans:constructor-arg name="credentials" value="" />
-                    <beans:constructor-arg name="grantedAuthorities">
-                        <beans:list>
-                            <beans:value>ROLE_USER</beans:value>
-                            <beans:value>ROLE_ADMINISTRATOR</beans:value>
-                            <beans:value>ROLE_UBC</beans:value>
-                        </beans:list>
-                    </beans:constructor-arg>
-                </beans:bean>
-
-                <!-- Privileged Users -->
-                <!-- Peter.Milligan@ga.gov.au -->
-                <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                    <beans:constructor-arg name="name" value="http://prm.myopenid.com/" />
-                    <beans:constructor-arg name="credentials" value="" />
-                    <beans:constructor-arg name="grantedAuthorities">
-                        <beans:list>
-                            <beans:value>ROLE_USER</beans:value>
-                            <beans:value>ROLE_UBC</beans:value>
-                        </beans:list>
-                    </beans:constructor-arg>
-                </beans:bean>
-
-                <!-- Carina.Kemp@ga.gov.au -->
-                <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                    <beans:constructor-arg name="name" value="http://carinakemp.myopenid.com/" />
-                    <beans:constructor-arg name="credentials" value="" />
-                    <beans:constructor-arg name="grantedAuthorities">
-                        <beans:list>
-                            <beans:value>ROLE_USER</beans:value>
-                            <beans:value>ROLE_UBC</beans:value>
-                        </beans:list>
-                    </beans:constructor-arg>
-                </beans:bean>
-                
-                <!-- Millie.Crowe@ga.gov.au -->
-                <beans:bean class="org.auscope.portal.server.web.security.PortalUser">
-                    <beans:constructor-arg name="name" value="http://millie-crowe.myopenid.com/" />
-                    <beans:constructor-arg name="credentials" value="" />
-                    <beans:constructor-arg name="grantedAuthorities">
-                        <beans:list>
-                            <beans:value>ROLE_USER</beans:value>
-                            <beans:value>ROLE_UBC</beans:value>
-                        </beans:list>
-                    </beans:constructor-arg>
-                </beans:bean>
-            </beans:list>
-        </beans:constructor-arg>
-    </beans:bean>
-
- <!--<authentication-manager alias="authenticationManager" >
-        <authentication-provider ref="preAuthenticatedAuthenticationProvider" user-service-ref="myUserDetailsService"/>
-   </authentication-manager>
-
-   --><!--<beans:bean id="preAuthenticatedProcessingFilter"
-            class="org.auscope.portal.server.web.security.PreAuthenticatedProcessingFilter">
-      <beans:property name="authenticationManager" ref="authenticationManager" />
-   </beans:bean>
-
-   --><!--<beans:bean id="preAuthenticatedAuthenticationProvider"
-            class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-      <beans:property name="preAuthenticatedUserDetailsService">
-         <beans:bean id="userDetailsServiceWrapper"
-                  class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
-            <beans:property name="userDetailsService" ref="myUserDetailsService"/>
-         </beans:bean>
-      </beans:property>
-    </beans:bean>
-
-   <beans:bean id="myUserDetailsService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
-      <beans:property name="dataSource" ref="dataSource"/>
-   </beans:bean>
-
-    -->
-    <beans:bean id="preAuthenticatedAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-        <beans:property name="preAuthenticatedUserDetailsService">
-            <beans:bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
-                <beans:property name="userDetailsService" ref="portalUserDetailsService"/>
-            </beans:bean>
-        </beans:property>
-    </beans:bean>
-
-    <beans:bean id="preAuthenticatedProcessingFilter" class="org.auscope.portal.server.web.security.PreAuthenticatedProcessingFilter">
-      <beans:property name="authenticationManager" ref="authenticationManager" />
-   </beans:bean>
-
-   <http auto-config='true' disable-url-rewriting="true">
+   <http entry-point-ref="oAuth2EntryPoint">
         <intercept-url pattern="/gridsubmit.html" access="ROLE_USER"/>
         <intercept-url pattern="/jobbuilder.html" access="ROLE_USER"/>
+        <intercept-url pattern="/login.html" access="ROLE_USER"/>
         <intercept-url pattern="/joblist.html" access="ROLE_USER"/>
         <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR"/>
         <intercept-url pattern="/*.diag" access="ROLE_ADMINISTRATOR"/>
-        <intercept-url pattern="/login.html*" filters="none"/>
-        <custom-filter ref="preAuthenticatedProcessingFilter" position="PRE_AUTH_FILTER" />
-        <logout/>
-        <openid-login login-page="/login.html">
-            <attribute-exchange>
-                <openid-attribute name="email" type="http://schema.openid.net/contact/email" required="true" count="1"/>
-            </attribute-exchange>
-        </openid-login>
+        <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
+        <logout logout-success-url="/gmap.html"/>
     </http>
+
+    <beans:bean id="oAuth2EntryPoint" class="com.racquettrack.security.oauth.OAuth2AuthenticationEntryPoint">
+        <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
+    </beans:bean>
+
+    <beans:bean id="oauth2AuthFilter" class="com.racquettrack.security.oauth.OAuth2AuthenticationFilter">
+        <beans:constructor-arg name="defaultFilterProcessesUrl" value="/oauth/callback"/>
+        <beans:property name="authenticationManager" ref="authenticationManager"/>
+        <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
+    </beans:bean>
+
+    <beans:bean id="oauth2AuthenticationProvider" class="com.racquettrack.security.oauth.OAuth2AuthenticationProvider">
+        <beans:property name="authenticatedUserDetailsService" ref="oAuth2UserDetailsService"/>
+        <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
+    </beans:bean>
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider ref="oauth2AuthenticationProvider">
+        </authentication-provider>
+    </authentication-manager>
+
+    <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2ServiceProperties">
+        <beans:constructor-arg name="redirectUri" value="http://localhost:8080/VGL-Portal/oauth/callback"/>
+        <beans:constructor-arg name="clientId" value="846190443294.apps.googleusercontent.com"/>
+        <beans:constructor-arg name="clientSecret" value="olbN-jZomKFDjsxtH3y1Lp_1"/>
+    </beans:bean>
+
+    <beans:bean id="simpleUserLoader" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2UserDetailsLoader">
+        <beans:constructor-arg name="defaultRole" value="ROLE_USER"/>
+        <beans:constructor-arg name="rolesByUser">
+            <beans:map>
+                <!-- Joshua Vote -->
+                <beans:entry key="105810302719127403909">
+                    <beans:list>
+                        <beans:value>ROLE_ADMINISTRATOR</beans:value>
+                        <beans:value>ROLE_UBC</beans:value>
+                    </beans:list>
+                </beans:entry>
+            </beans:map>
+        </beans:constructor-arg>
+    </beans:bean>
+
+    <beans:bean id="oAuth2DefaultUserInfoProvider" class="com.racquettrack.security.oauth.DefaultOAuth2UserInfoProvider">
+        <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
+    </beans:bean>
+
+    <beans:bean id="oAuth2UserDetailsService" class="com.racquettrack.security.oauth.OAuth2UserDetailsService">
+        <beans:property name="oAuth2UserDetailsLoader" ref="simpleUserLoader"/>
+        <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
+        <beans:property name="oAuth2UserInfoProvider" ref="oAuth2DefaultUserInfoProvider"/>
+    </beans:bean>
+
 
 </beans:beans>

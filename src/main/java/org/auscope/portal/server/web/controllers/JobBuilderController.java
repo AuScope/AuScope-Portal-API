@@ -2,10 +2,8 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,13 +17,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -36,13 +34,13 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VGLQueueJob;
-import org.auscope.portal.server.vegl.VGLTimePollQueue;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -386,7 +384,8 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="storageServiceId", required=false) String storageServiceId,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
-            HttpServletRequest request) throws ParseException {
+            HttpServletRequest request,
+            @AuthenticationPrincipal PortalUser user) throws ParseException {
 
         //Get our job
         VEGLJob job = null;
@@ -394,7 +393,7 @@ public class JobBuilderController extends BaseCloudController {
             //If we have an ID - look up the job, otherwise create a job
             if (id == null) {
                 //Job creation involves a fair bit of initialisation on the server
-                job = initialiseVEGLJob(request.getSession());
+                job = initialiseVEGLJob(request.getSession(), user);
             } else {
                 job = jobManager.getJobById(id);
             }
@@ -557,7 +556,6 @@ public class JobBuilderController extends BaseCloudController {
             return new ArrayList<MachineImage>();
         }
 
-        List<String> userRoles = Arrays.asList((String[])request.getSession().getAttribute("user-roles"));
         List<MachineImage> authorisedImages = new ArrayList<MachineImage>();
 
         for (MachineImage img : ccs.getAvailableImages()) {
@@ -569,7 +567,7 @@ public class JobBuilderController extends BaseCloudController {
                     authorisedImages.add(img);
                 } else {
                     for (String validRole : permissions) {
-                        if (userRoles.contains(validRole)) {
+                        if (request.isUserInRole(validRole)) {
                             authorisedImages.add(img);
                             break;
                         }
@@ -719,7 +717,7 @@ public class JobBuilderController extends BaseCloudController {
      * @param email
      * @return
      */
-    private VEGLJob initialiseVEGLJob(HttpSession session) throws PortalServiceException {
+    private VEGLJob initialiseVEGLJob(HttpSession session, PortalUser user) throws PortalServiceException {
         VEGLJob job = new VEGLJob();
 
         //Start by saving our job to set its ID
@@ -750,8 +748,8 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         //Load details from
-        job.setUser((String) session.getAttribute("openID-Email"));
-        job.setEmailAddress((String) session.getAttribute("openID-Email"));
+        job.setUser(user.getEmail());
+        job.setEmailAddress(user.getEmail());
         job.setComputeInstanceKey("vgl-developers");
         job.setName("VGL-Job " + new Date().toString());
         job.setDescription("");
