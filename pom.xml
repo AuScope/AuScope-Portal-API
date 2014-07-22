@@ -159,7 +159,7 @@
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>1.7</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <powermock.version>1.4.12</powermock.version>
+        <powermock.version>1.5.5</powermock.version>
     </properties>
 
     <repositories>
