@@ -556,7 +556,6 @@ public class JobBuilderController extends BaseCloudController {
             return new ArrayList<MachineImage>();
         }
 
-        List<String> userRoles = Arrays.asList((String[])request.getSession().getAttribute("user-roles"));
         List<MachineImage> authorisedImages = new ArrayList<MachineImage>();
 
         for (MachineImage img : ccs.getAvailableImages()) {
@@ -568,7 +567,7 @@ public class JobBuilderController extends BaseCloudController {
                     authorisedImages.add(img);
                 } else {
                     for (String validRole : permissions) {
-                        if (userRoles.contains(validRole)) {
+                        if (request.isUserInRole(validRole)) {
                             authorisedImages.add(img);
                             break;
                         }
