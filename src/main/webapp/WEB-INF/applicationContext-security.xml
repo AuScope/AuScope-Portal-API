@@ -41,8 +41,8 @@
 
     <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2ServiceProperties">
         <beans:constructor-arg name="redirectUri" value="http://localhost:8080/VGL-Portal/oauth/callback"/>
-        <beans:constructor-arg name="clientId" value="846190443294.apps.googleusercontent.com"/>
-        <beans:constructor-arg name="clientSecret" value="olbN-jZomKFDjsxtH3y1Lp_1"/>
+        <beans:constructor-arg name="clientId" value="${env.oauth2.google.clientid}"/>
+        <beans:constructor-arg name="clientSecret" value="${env.oauth2.google.clientsecret}"/>
     </beans:bean>
 
     <beans:bean id="simpleUserLoader" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2UserDetailsLoader">
