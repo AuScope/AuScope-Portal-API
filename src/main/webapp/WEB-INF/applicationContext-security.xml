@@ -40,7 +40,7 @@
     </authentication-manager>
 
     <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2ServiceProperties">
-        <beans:constructor-arg name="redirectUri" value="http://localhost:8080/VGL-Portal/oauth/callback"/>
+        <beans:constructor-arg name="redirectUri" value="/oauth/callback"/>
         <beans:constructor-arg name="clientId" value="${env.oauth2.google.clientid}"/>
         <beans:constructor-arg name="clientSecret" value="${env.oauth2.google.clientsecret}"/>
     </beans:bean>
