@@ -59,16 +59,16 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                	<overlays>
-                		<overlay>
-                			   <groupId>org.auscope.portal</groupId>
-		                       <artifactId>portal-core</artifactId>
-		                       <type>jar</type>
-		                       <includes>
-		                       		<include>portal-core/**/*</include>
-		                       </includes>
-                		</overlay>
-                	</overlays>
+                    <overlays>
+                        <overlay>
+                               <groupId>org.auscope.portal</groupId>
+                               <artifactId>portal-core</artifactId>
+                               <type>jar</type>
+                               <includes>
+                                    <include>portal-core/**/*</include>
+                               </includes>
+                        </overlay>
+                    </overlays>
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
