@@ -59,6 +59,16 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
+                    <overlays>
+                        <overlay>
+                               <groupId>org.auscope.portal</groupId>
+                               <artifactId>portal-core</artifactId>
+                               <type>jar</type>
+                               <includes>
+                                    <include>portal-core/**/*</include>
+                               </includes>
+                        </overlay>
+                    </overlays>
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -186,6 +196,7 @@
         <targetJdk>1.7</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>1.5.5</powermock.version>
+        <portal.core.version>1.1.0-SNAPSHOT</portal.core.version>
     </properties>
 
     <repositories>
@@ -216,7 +227,7 @@
         <dependency>
             <groupId>org.auscope.portal</groupId>
             <artifactId>portal-core</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>${portal.core.version}</version>
         </dependency>
         <dependency>
             <groupId>taglibs</groupId>
