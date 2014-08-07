@@ -3,7 +3,7 @@
 # Originally sourced from http://awaseroot.wordpress.com/2012/09/01/new-script-install-puppet-on-centos/
 # Usage:
 # installPuppet-centos.sh [svnUrl] [pathSuffix]
-# svnUrl - The base VGL URL where additional puppet modules will be downloaded from. Defaults to "https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk"
+# svnUrl - The base VGL URL where additional puppet modules will be downloaded from. Defaults to "https://github.com/AuScope/VEGL-Portal/trunk"
 # pathSuffix - Will be appended to svnUrl to form the base url that will be recursively downloaded for modules. Defaults to "vm/puppet/modules/"
 
 sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
@@ -36,7 +36,7 @@ fi
 
 # VGL Portal Custom Modules - download from user specified SVN (or default)
 yum install -y wget 
-baseUrl="https://svn.auscope.org/subversion/AuScopePortal/VEGL-Portal/trunk/"
+baseUrl="https://github.com/AuScope/VEGL-Portal/trunk"
 pathSuffix="/vm/puppet/modules/"
 tmpModulesDir="/tmp/modules/"
 rm -rf "$tmpModulesDir"
