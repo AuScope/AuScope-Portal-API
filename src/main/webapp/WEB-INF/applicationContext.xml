@@ -191,7 +191,9 @@
         <constructor-arg name="provider" value="swift-keystone"/>
         <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
+        <constructor-arg name="relaxHostName" value="false"/>
         <constructor-arg name="regionName" value="Qld"/>
+        <constructor-arg name="stripExpectHeader" value="true"/>
         <property name="name" value="National eResearch Collaboration Tools and Resources (Queensland)"/>
         <property name="id" value="nectar-openstack-storage-qld"/>
         <property name="bucket" value="vgl-portal"/>
@@ -204,6 +206,8 @@
         <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
         <constructor-arg name="regionName" value="Melbourne"/>
+        <constructor-arg name="relaxHostName" value="false"/>
+        <constructor-arg name="stripExpectHeader" value="true"/>
         <property name="name" value="National eResearch Collaboration Tools and Resources (Melbourne)"/>
         <property name="id" value="nectar-openstack-storage-melb"/>
         <property name="bucket" value="vgl-portal"/>
