@@ -74,7 +74,7 @@ public class WMSController extends BaseCSWController {
         CSWRecord[] records;
         int invalidLayerCount = 0;
         try {
-            GetCapabilitiesRecord capabilitiesRec = wmsService.getWmsCapabilities(serviceUrl);
+            GetCapabilitiesRecord capabilitiesRec = wmsService.getWmsCapabilities(serviceUrl,null);
 
             List<CSWRecord> cswRecords = new ArrayList<CSWRecord>();
 
@@ -165,7 +165,7 @@ public class WMSController extends BaseCSWController {
     @RequestMapping("/getLayerFormats.do")
     public ModelAndView getLayerFormats(@RequestParam("serviceUrl") String serviceUrl) throws Exception {
         try {
-            GetCapabilitiesRecord capabilitiesRec = wmsService.getWmsCapabilities(serviceUrl);
+            GetCapabilitiesRecord capabilitiesRec = wmsService.getWmsCapabilities(serviceUrl,null);
 
             List<ModelMap> data = new ArrayList<ModelMap>();
             for (String format : capabilitiesRec.getGetMapFormats()) {
@@ -183,44 +183,46 @@ public class WMSController extends BaseCSWController {
     }
 
     /**
-    *
-    * @param request
-    * @param response
-    * @param wmsUrl
-    * @param latitude
-    * @param longitude
-    * @param queryLayers
-    * @param x
-    * @param y
-    * @param bbox A CSV string formatted in the form - longitude,latitude,longitude,latitude
-    * @param width
-    * @param height
-    * @param infoFormat
-    * @throws Exception
-    */
-   @RequestMapping("/wmsMarkerPopup.do")
-   public void wmsUnitPopup(HttpServletRequest request,
-                            HttpServletResponse response,
-                            @RequestParam("WMS_URL") String wmsUrl,
-                            @RequestParam("lat") String latitude,
-                            @RequestParam("lng") String longitude,
-                            @RequestParam("QUERY_LAYERS") String queryLayers,
-                            @RequestParam("x") String x,
-                            @RequestParam("y") String y,
-                            @RequestParam("BBOX") String bbox,
-                            @RequestParam("WIDTH") String width,
-                            @RequestParam("HEIGHT") String height,
-                            @RequestParam("INFO_FORMAT") String infoFormat,
-                            @RequestParam("SLD") String sld) throws Exception {
+     *
+     * @param request
+     * @param response
+     * @param wmsUrl
+     * @param latitude
+     * @param longitude
+     * @param queryLayers
+     * @param x
+     * @param y
+     * @param bbox A CSV string formatted in the form - longitude,latitude,longitude,latitude
+     * @param width
+     * @param height
+     * @param infoFormat
+     * @throws Exception
+     */
+    @RequestMapping("/wmsMarkerPopup.do")
+    public void wmsUnitPopup(HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam("WMS_URL") String wmsUrl,
+            @RequestParam("lat") String latitude,
+            @RequestParam("lng") String longitude,
+            @RequestParam("QUERY_LAYERS") String queryLayers,
+            @RequestParam("x") String x,
+            @RequestParam("y") String y,
+            @RequestParam("BBOX") String bbox,
+            @RequestParam("WIDTH") String width,
+            @RequestParam("HEIGHT") String height,
+            @RequestParam("INFO_FORMAT") String infoFormat,
+            @RequestParam("SLD") String sld,
+            @RequestParam(value="postMethod", defaultValue = "false") Boolean  postMethod,
+            @RequestParam("version") String version) throws Exception {
 
-      String[] bboxParts = bbox.split(",");
-      double lng1 = Double.parseDouble(bboxParts[0]);
-      double lng2 = Double.parseDouble(bboxParts[2]);
-      double lat1 = Double.parseDouble(bboxParts[1]);
-      double lat2 = Double.parseDouble(bboxParts[3]);
-      String sldDecoded=URLDecoder.decode(sld,"UTF-8");
-      String responseString = wmsService.getFeatureInfo(wmsUrl, infoFormat, queryLayers, "EPSG:3857", Math.min(lng1, lng2), Math.min(lat1, lat2), Math.max(lng1, lng2), Math.max(lat1, lat2), Integer.parseInt(width), Integer.parseInt(height), Double.parseDouble(longitude), Double.parseDouble(latitude), (int)(Double.parseDouble(x)), (int)(Double.parseDouble(y)), "",sldDecoded,false);
-      InputStream responseStream = new ByteArrayInputStream(responseString.getBytes());
-      FileIOUtil.writeInputToOutputStream(responseStream, response.getOutputStream(), 1024 * 1024, true);
-   }
+        String[] bboxParts = bbox.split(",");
+        double lng1 = Double.parseDouble(bboxParts[0]);
+        double lng2 = Double.parseDouble(bboxParts[2]);
+        double lat1 = Double.parseDouble(bboxParts[1]);
+        double lat2 = Double.parseDouble(bboxParts[3]);
+        String sldDecoded=URLDecoder.decode(sld,"UTF-8");
+        String responseString = wmsService.getFeatureInfo(wmsUrl, infoFormat, queryLayers, "EPSG:3857", Math.min(lng1, lng2), Math.min(lat1, lat2), Math.max(lng1, lng2), Math.max(lat1, lat2), Integer.parseInt(width), Integer.parseInt(height), Double.parseDouble(longitude), Double.parseDouble(latitude), (int)(Double.parseDouble(x)), (int)(Double.parseDouble(y)), "",sldDecoded,postMethod,version);
+        InputStream responseStream = new ByteArrayInputStream(responseString.getBytes());
+        FileIOUtil.writeInputToOutputStream(responseStream, response.getOutputStream(), 1024 * 1024, true);
+    }
 }
