@@ -787,7 +787,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setUser(user.getEmail());
         job.setEmailAddress(user.getEmail());
         job.setComputeInstanceKey("vgl-developers");
-        job.setName("VGL-Job " + new Date().toString());
+        job.setName("VL-Job " + new Date().toString());
         job.setDescription("");
         job.setStatus(STATUS_UNSUBMITTED);
 

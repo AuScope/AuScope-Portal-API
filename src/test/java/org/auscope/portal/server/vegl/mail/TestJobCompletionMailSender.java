@@ -69,7 +69,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         jobCompMailSender.setMaxLengthForJobNameInSubject(15);
         jobCompMailSender.setMaxLinesForTail(5);
         jobCompMailSender.setEmailSender("test-admin@email.com");
-        jobCompMailSender.setEmailSubject("VGL Job (%s/%s)");
+        jobCompMailSender.setEmailSubject("VL Job (%s/%s)");
     }
 
     /**
