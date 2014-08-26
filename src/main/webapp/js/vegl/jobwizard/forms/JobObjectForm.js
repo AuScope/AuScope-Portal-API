@@ -122,10 +122,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 name: 'name',
                 itemId : 'name',
                 fieldLabel: 'Job Name',
-                value : Ext.util.Format.format('VGL Job {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
+                value : Ext.util.Format.format('myJob about zzz at {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
                 plugins: [{
                     ptype: 'fieldhelptext',
-                    text: 'Enter an optional descriptive name for your job here.'
+                    text: 'Enter a useful name for your job here.'
                 }],
                 allowBlank: true
             },{
@@ -351,7 +351,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             highlightEl : emailNotification.getEl(),
             title : 'Job completion email notification',
             anchor : 'bottom',
-            description : 'VGL will send out email notification to your email address upon job completion. Untick the checkbox if you don\'t want to receive the notification.'
+            description : 'The VL will send out email notification to your email address upon job completion. Untick the checkbox if you don\'t want to receive the notification.'
         })];
     }
 });

@@ -3,7 +3,7 @@
  * ScriptBuilder library.
  *
  * This file is a reworking of the AuScope Virtual Rock Lab (VRL) project ScriptBuilder.js
- * for the purpose of fitting into a VEGL 'Job Wizard' model
+ * for the purpose of fitting into a VL 'Job Wizard' model
  *
  * Original Author - Cihan Altinay
  * Author - Josh Vote

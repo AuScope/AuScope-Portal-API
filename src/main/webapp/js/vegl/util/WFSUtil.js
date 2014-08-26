@@ -36,7 +36,7 @@ Ext.define('vegl.util.WFSUtil', {
             scope : this,
             callback : function(options, success, response) {
                 if (!success) {
-                    cb(false, 'Error estimating size: Couldn\'t contact VGL server.', null, cbOpts);
+                    cb(false, "Error estimating size: Couldn't contact VL server.", null, cbOpts);
                     return;
                 }
 
