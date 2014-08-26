@@ -6,7 +6,7 @@
 # Some constants
 export VGL_BOOTSTRAP_VERSION="1"
 export WORKING_DIR="/root"
-export WORKFLOW_SCRIPT="$WORKING_DIR/vgl.sh"
+export WORKFLOW_SCRIPT="$WORKING_DIR/vl.sh"
 
 # These will be replaced with hardcoded values by the VGL Portal (varying for each job)
 export STORAGE_BUCKET="{0}"

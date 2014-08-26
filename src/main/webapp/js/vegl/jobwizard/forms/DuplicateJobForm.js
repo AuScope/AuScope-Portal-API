@@ -29,7 +29,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
             filters : [
                 function(item) {
                     //These two files should not be copyable
-                    return item.get('name') !== 'vegl.sh.log' && item.get('name') !== 'workflow-version.txt';
+                    return item.get('name') !== 'vl.sh.log' && item.get('name') !== 'workflow-version.txt';
                 }
             ],
             proxy : {

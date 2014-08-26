@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # chkconfig: 2345 90 10
-# description: vgl.sh - Shell Script performing the "workflow" of the VGL VM
+# description: vl.sh - Shell Script performing the "workflow" of the VGL VM
 # NOTE: Please ensure that VEGL_WORKFLOW_VERSION gets incremented with any changes
 
 #configure our environment
 export VGL_WORKFLOW_VERSION="1"
-export VEGL_LOG_FILE_NAME="vegl.sh.log"
+export VEGL_LOG_FILE_NAME="vl.sh.log"
 export VEGL_LOG_FILE="${WORKING_DIR}/$VEGL_LOG_FILE_NAME"
 export EC2_METADATA_SCRIPT="${WORKING_DIR}/ec2-metadata"
 export FINAL_SLEEP_LENGTH="15m"
