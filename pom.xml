@@ -60,13 +60,21 @@
                 <version>2.4</version>
                 <configuration>
                     <overlays>
+                        <!--
+                            m2e consumes overlay dependencies causing the
+                            portal-core jar to be omitted when running in
+                            tomcat. Workaround is to use the sources jar
+                            for the overlay; this then has to be a provided
+                            dependency to prevent inclusion in the war.
+                        -->
                         <overlay>
-                            <groupId>org.auscope.portal</groupId>
-                            <artifactId>portal-core</artifactId>
-                            <type>jar</type>
-                            <includes>
-                                <include>portal-core/**/*</include>
-                            </includes>
+                               <groupId>org.auscope.portal</groupId>
+                               <artifactId>portal-core</artifactId>
+                               <classifier>sources</classifier>
+                               <type>jar</type>
+                               <includes>
+                                    <include>portal-core/**/*</include>
+                               </includes>
                         </overlay>
                     </overlays>
                     <archive>
@@ -207,6 +215,39 @@
                 </executions>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.jacoco</groupId>
+                                        <artifactId>
+                                            jacoco-maven-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [0.7.1.201405082137,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>prepare-agent</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <!-- Project properties -->
@@ -251,6 +292,14 @@
             <groupId>org.auscope.portal</groupId>
             <artifactId>portal-core</artifactId>
             <version>${portal.core.version}</version>
+        </dependency>
+        <!-- m2e overlay workaround (see above) -->
+        <dependency>
+            <groupId>org.auscope.portal</groupId>
+            <artifactId>portal-core</artifactId>
+            <version>${portal.core.version}</version>
+            <classifier>sources</classifier>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>taglibs</groupId>
