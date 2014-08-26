@@ -153,6 +153,49 @@ public class JobDownloadController extends BasePortalController {
 
         return generateJSONResponseMAV(true, toView(newDownload), "");
     }
+
+    /**
+     * Creates a new VGL Download object from some NCSS parameters. The Download object is returned. If saveSession
+     * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list.
+     * @return
+     * @throws Exception
+     */
+    
+    @RequestMapping("/makeNetcdfsubseserviceUrl.do")
+    public ModelAndView makeNetcdfsubsetserviceUrl(@RequestParam("url") String url,
+    							@RequestParam("northBoundLatitude") final Double northBoundLatitude,
+                                @RequestParam("eastBoundLongitude") final Double eastBoundLongitude,
+                                @RequestParam("southBoundLatitude") final Double southBoundLatitude,
+                                @RequestParam("westBoundLongitude") final Double westBoundLongitude,
+                                @RequestParam("name") final String name,
+                                @RequestParam("description") final String description,
+                                @RequestParam("localPath") final String localPath,
+                                @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
+                                HttpServletRequest request,
+                                HttpServletResponse response) throws Exception {
+
+        //String serviceUrl = hostConfigurer.resolvePlaceholder("HOST.erddapservice.url");
+        CSWGeographicBoundingBox bbox = new CSWGeographicBoundingBox(westBoundLongitude, eastBoundLongitude, southBoundLatitude, northBoundLatitude);
+        String netcdfsubsetserviceUrl = getNetcdfSubsetUrl(bbox, url, name, "nc");
+
+        // Append this download list to the existing list of download objects
+        VglDownload newDownload = new VglDownload();
+        newDownload.setName(name);
+        newDownload.setDescription(description);
+        newDownload.setLocalPath(localPath);
+        newDownload.setUrl(netcdfsubsetserviceUrl);
+        newDownload.setNorthBoundLatitude(northBoundLatitude);
+        newDownload.setEastBoundLongitude(eastBoundLongitude);
+        newDownload.setSouthBoundLatitude(southBoundLatitude);
+        newDownload.setWestBoundLongitude(westBoundLongitude);
+
+        if (saveSession) {
+            addDownloadToSession(request, newDownload);
+        }
+
+        return generateJSONResponseMAV(true, toView(newDownload), "");
+    }
+    
     
     /**
      * Creates a new VL Download object from some WFS parameters. The Download object is returned. If saveSession
@@ -249,4 +292,30 @@ public class JobDownloadController extends BasePortalController {
 
         return url;
     }
+
+    /**
+     * Takes the co-ordinates of a user drawn bounding box and constructs an Netcdf
+     * subset request URL.
+     *
+     * @param coords The lat/lon co-ordinates of the user drawn bounding box
+     * @param serviceUrl The remote URL to query
+     * @param layerName The coverage layername to request
+     * @return The NCSS subset request URL
+     */
+    private String getNetcdfSubsetUrl(CSWGeographicBoundingBox bbox, String serviceUrl, String name, String format) {
+        logger.debug(String.format("serviceUrl='%1$s' bbox='%2$s' layerName='%3$s'", serviceUrl, bbox, name));
+        
+        // convert bbox co-ordinates to an netcdfsubsetservice dimension string
+        String netcdfsubsetserviceDimensions = "&spatial=bb" +
+        		"&north="+ bbox.getNorthBoundLatitude() +
+        		"&south=" + bbox.getSouthBoundLatitude() +
+        		"&west=" + bbox.getWestBoundLongitude() +
+        		"&east="+ bbox.getEastBoundLongitude();
+        String otherParams = "&temporal=all&time_start=&time_end=&horizStride=";
+
+        String url = serviceUrl + "?var=" + name + netcdfsubsetserviceDimensions + otherParams;
+
+        return url;
+    }
+
 }

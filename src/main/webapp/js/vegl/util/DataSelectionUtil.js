@@ -16,6 +16,7 @@ Ext.define('vegl.util.DataSelectionUtil', {
         case portal.csw.OnlineResource.WCS:            
         case portal.csw.OnlineResource.WFS:
         case portal.csw.OnlineResource.WWW:
+        case portal.csw.OnlineResource.NCSS:
             return true;
             
         default:
@@ -37,6 +38,7 @@ Ext.define('vegl.util.DataSelectionUtil', {
             name : 'Subset of ' + or.get('name'),
             description : or.get('description'),
             url : or.get('url'),
+            method : 'POST',
             localPath : '/tmp/' + or.get('name'),
             crs : (defaultBbox ? defaultBbox.crs : ''),
             eastBoundLongitude : (defaultBbox ? defaultBbox.eastBoundLongitude : 0),
@@ -57,10 +59,22 @@ Ext.define('vegl.util.DataSelectionUtil', {
             downloadOptions.layerName = or.get('name');
             break;
         case portal.csw.OnlineResource.WFS:
-            
+
             delete downloadOptions.url;
             downloadOptions.serviceUrl = or.get('url');
             downloadOptions.featureType = or.get('name');
+            break;
+        case portal.csw.OnlineResource.NCSS:
+            downloadOptions.name = or.get('name');
+            downloadOptions.method = 'GET';
+            //delete eastBoundLongitude;
+            //delete northBoundLatitude;
+            //delete southBoundLatitude;
+            //delete westBoundLongitude;
+
+            //delete downloadOptions.url;
+            //downloadOptions.serviceUrl = or.get('url');
+            //downloadOptions.featureType = or.get('name');
             break;
         case portal.csw.OnlineResource.WWW:
             break;
@@ -166,6 +180,47 @@ Ext.define('vegl.util.DataSelectionUtil', {
                 }]
             }).show();
             break;
+        case portal.csw.OnlineResource.NCSS:
+            Ext.create('Ext.window.Window', {
+                layout : 'fit',
+                width : 700,
+                height : 400,
+                modal : true,
+                title : or.get('name'),
+                items : [{
+                    xtype : 'netcdfsubsetpanel',
+                    itemId : 'subset-panel',
+                    region : Ext.create('portal.util.BBox', dlOptions),
+                    coverageName : dlOptions.layerName,
+                    coverageUrl : or.get('url'),
+                    name : dlOptions.name,
+                    localPath : dlOptions.localPath,
+                    description : dlOptions.description,
+                    dataType : dlOptions.format
+                }],
+                buttons : [{
+                    text : 'Save Changes',
+                    iconCls : 'add',
+                    align : 'right',
+                    scope : this,
+                    handler : function(btn) {
+                        var parentWindow = btn.findParentByType('window');
+                        var panel = parentWindow.getComponent('subset-panel');
+
+                        var params = panel.getForm().getValues();
+
+                        //The ERDDAP subset panel doesn't use coverage name for anything but size estimation
+                        //Therefore we need to manually preserve it ourselves
+                        params.layerName = dlOptions.layerName;
+                        params = Ext.apply(dlOptions, params);
+
+                        parentWindow.close();
+
+                        callback(params);
+                    }
+                }]
+            }).show();
+            break;
         default:
             Ext.create('Ext.window.Window', {
                 layout : 'fit',
@@ -259,6 +314,14 @@ Ext.define('vegl.util.DataSelectionUtil', {
                 callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
             });
             break;
+        case portal.csw.OnlineResource.NCSS:
+            Ext.Ajax.request({
+                url : 'makeNetcdfsubseserviceUrl.do',
+                params : Ext.apply({saveSession : saveInSession}, dlOptions),
+                callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
+            });
+            break;
+
         default:
             Ext.Ajax.request({
                 url : 'makeDownloadUrl.do',

@@ -110,14 +110,14 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
     _handleRowDownload : function(dataItem) {
         var or = dataItem.get('onlineResource');
         var dlOptions = dataItem.get('downloadOptions');
-
+        
         vegl.util.DataSelectionUtil.makeDownloadUrl(or, dlOptions, false, function(success, dl) {
             if (!success) {
                 Ext.Msg.alert('Download Error', 'There was an error generating your download URL. Please try again in a few minutes or consider refreshing this page.');
                 return;
             }
 
-            portal.util.FileDownloader.downloadFile(dl.get('url'));
+            portal.util.FileDownloader.downloadFile(dl.get('url'),[],dlOptions.method);
         });
     },
 
@@ -178,7 +178,6 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
 
         // WCS resources have their description based on the selected region (whatever that may be)
         if (or.get('type') === portal.csw.OnlineResource.WCS) {
-
             dataItem.set('description', 'Loading size details...');
             vegl.util.WCSUtil.estimateCoverageSize(dlOptions, or.get('url'), dlOptions.layerName, dataItem, function(success, errorMsg, response, dataItem) {
                 if (!success) {
@@ -199,6 +198,17 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                     dataItem.set('description', Ext.util.Format.format('Approximately <b>{0}</b> features have been selected.', total));
                 }
             });
+        } else if (or.get('type') === portal.csw.OnlineResource.NCSS) {
+            dataItem.set('description', 'Size estimation currently unavailable.');
+ //           vegl.util.WCSUtil.estimateCoverageSize(dlOptions, or.get('url'), dlOptions.layerName, dataItem, function(success, errorMsg, response, dataItem) {
+ //               if (!success) {
+ //                   dataItem.set('description', errorMsg);
+ //               } else {
+ //                   var approxTotal = Ext.util.Format.number(response.roundedTotal, '0,000');
+ //                   var approxSize = Ext.util.Format.fileSize(vegl.util.WCSUtil.roundToApproximation(response.width * response.height * 4));
+ //                   dataItem.set('description', Ext.util.Format.format('Approximately <b>{0}</b> data points in total.<br>Uncompressed that\'s roughly {1}', approxTotal, approxSize));
+ //               }
+ //           });
         } else {
             //Otherwise the description is pulled direct from the online resource
             dataItem.set('description', or.get('description'));
