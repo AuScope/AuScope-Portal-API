@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ScriptBuilderService {
-    public static final String SCRIPT_FILE_NAME = "vegl_script.py";
+    public static final String SCRIPT_FILE_NAME = "vl_script.py";
 
     private final Log logger = LogFactory.getLog(getClass());
 

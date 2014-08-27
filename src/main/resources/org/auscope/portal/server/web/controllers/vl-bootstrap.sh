@@ -22,10 +22,10 @@ export OS_REGION_NAME="{8}"
 # Load our profile so this run is the same as a regular user login (to make debugging easier)
 source /etc/profile
 
-echo "------ VEGL Bootstrap Script ---------"
+echo "------ VL Bootstrap Script ---------"
 echo "                                      "
 echo "------ Printing Environment ----------"
-echo "VEGL_BOOTSTRAP_VERSION = $VEGL_BOOTSTRAP_VERSION"
+echo "VL_BOOTSTRAP_VERSION = $VL_BOOTSTRAP_VERSION"
 echo "WORKING_DIR = $WORKING_DIR"
 echo "WORKFLOW_URL = $WORKFLOW_URL"
 echo "WORKFLOW_SCRIPT = $WORKFLOW_SCRIPT"

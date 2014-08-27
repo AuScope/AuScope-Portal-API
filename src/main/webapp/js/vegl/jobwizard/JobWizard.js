@@ -1,5 +1,5 @@
 /**
- * A GUI widget for stringing together a collection BaseJobWizardForm objects into a Job Wizard for VEGL
+ * A GUI widget for stringing together a collection BaseJobWizardForm objects into a Job Wizard for VL
  *
  * A JobWizard is a specialised Ext.Panel
  */
