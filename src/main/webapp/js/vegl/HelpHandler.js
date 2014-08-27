@@ -1,5 +1,5 @@
 /**
- * Configures the help messages depending on what VGL page is or isn't loaded.
+ * Configures the help messages depending on what VL page is or isn't loaded.
  *
  * This is seperated from the top level JS files so there is a physical distinction between
  * this help logic and the logic that runs the actual page.

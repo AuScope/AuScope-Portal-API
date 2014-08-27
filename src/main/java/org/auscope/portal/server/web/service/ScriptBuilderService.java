@@ -81,7 +81,7 @@ public class ScriptBuilderService {
     }
 
     /**
-     * Loads the saved VGL script source with a specified job ID
+     * Loads the saved VL script source with a specified job ID
      * @param jobId
      * @return the file contents if the script file exists otherwise an empty string if the script file doesn't exist or is empty.
      * @throws PortalServiceException
@@ -91,7 +91,7 @@ public class ScriptBuilderService {
         try {
             //Lookup our job
             VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
-            //Load script from VGL server's filesystem
+            //Load script from VL server's filesystem
             is = jobFileService.readFile(job, SCRIPT_FILE_NAME);
             String script = null;
             if (is == null) {

@@ -9,7 +9,7 @@ admin.VglDiagnosticFunctions.ClearCswCache = Ext.create('admin.DiagnosticFunctio
             url : 'updateCSWCache.do',
             callback : function(options, success, response) {
                 if (!success) {
-                    callback(false, 'Unable to connect to VGL server.');
+                    callback(false, 'Unable to connect to VL server.');
                     return;
                 }
 

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # chkconfig: 2345 90 10
-# description: vgl-bootstrap.sh - Shell Script for managing the download and running of the VGL portal workflow script
-#              It is expected that the the VGL Portal will customise this script with appropriate values for each job
+# description: vl-bootstrap.sh - Shell Script for managing the download and running of the VL portal workflow script
+#              It is expected that the the VL Portal will customise this script with appropriate values for each job
 
 # Some constants
 export VGL_BOOTSTRAP_VERSION="1"
 export WORKING_DIR="/root"
 export WORKFLOW_SCRIPT="$WORKING_DIR/vl.sh"
 
-# These will be replaced with hardcoded values by the VGL Portal (varying for each job)
+# These will be replaced with hardcoded values by the VL Portal (varying for each job)
 export STORAGE_BUCKET="{0}"
 export STORAGE_BASE_KEY_PATH="{1}"
 export STORAGE_ACCESS_KEY="{2}"

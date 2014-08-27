@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # chkconfig: 2345 90 10
-# description: vl.sh - Shell Script performing the "workflow" of the VGL VM
+# description: vl.sh - Shell Script performing the "workflow" of the VL VM
 # NOTE: Please ensure that VEGL_WORKFLOW_VERSION gets incremented with any changes
 
 #configure our environment

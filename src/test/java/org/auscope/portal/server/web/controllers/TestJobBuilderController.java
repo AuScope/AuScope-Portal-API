@@ -1082,7 +1082,7 @@ public class TestJobBuilderController {
         final int maxFileSize = 21847;
         final int safeFileSize = maxFileSize - 1024; //arbitrary number to account for long strings being injected into bootstrap
 
-        String contents = ResourceUtil.loadResourceAsString("org/auscope/portal/server/web/controllers/vgl-bootstrap.sh");
+        String contents = ResourceUtil.loadResourceAsString("org/auscope/portal/server/web/controllers/vl-bootstrap.sh");
 
         Assert.assertNotNull(contents);
         Assert.assertTrue("Bootstrap is empty!", contents.length() > 0);

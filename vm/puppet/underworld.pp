@@ -2,7 +2,7 @@
 # puppet module install stahnma/epel
 # ln -s /usr/bin/pip-python /usr/bin/pip
 
-#Get the common VGL components
+#Get the common VL components
 import "vgl_common"
 import "epel"
 import "python_pip"

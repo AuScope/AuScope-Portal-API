@@ -13,7 +13,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
- * A task that monitors any pending or active VGL jobs. It
+ * A task that monitors any pending or active VL jobs. It
  * will trigger JobStatusChangeListener(s) to run when the 
  * job being processed changes its status.
  * 
@@ -34,7 +34,7 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     
     /**
      * Sets the job manager to be used for querying 
-     * pending or active jobs from VGL DB.
+     * pending or active jobs from VL DB.
      * @param jobManager
      */
     public void setJobManager(VEGLJobManager jobManager) {

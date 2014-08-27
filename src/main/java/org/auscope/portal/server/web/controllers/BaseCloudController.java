@@ -98,7 +98,7 @@ public abstract class BaseCloudController extends BasePortalController {
      * @throws IOException
      */
     private String getBootstrapTemplate() throws IOException {
-        InputStream is = this.getClass().getResourceAsStream("vgl-bootstrap.sh");
+        InputStream is = this.getClass().getResourceAsStream("vl-bootstrap.sh");
         String template = IOUtils.toString(is);
         return template.replaceAll("\r", ""); //Windows style file endings have a tendency to sneak in via StringWriter and the like
     }

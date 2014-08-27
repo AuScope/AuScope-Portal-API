@@ -79,7 +79,7 @@ public class JobDownloadController extends BasePortalController {
     }
 
     /**
-     * Creates a new VGL Download object from a remote URL. The Download object is returned. If saveSession
+     * Creates a new VL Download object from a remote URL. The Download object is returned. If saveSession
      * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list.
      * @return
      */
@@ -113,7 +113,7 @@ public class JobDownloadController extends BasePortalController {
     }
 
     /**
-     * Creates a new VGL Download object from a some ERDDAP parameters. The Download object is returned. If saveSession
+     * Creates a new VL Download object from a some ERDDAP parameters. The Download object is returned. If saveSession
      * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list.
      * @return
      * @throws Exception
@@ -155,7 +155,7 @@ public class JobDownloadController extends BasePortalController {
     }
     
     /**
-     * Creates a new VGL Download object from some WFS parameters. The Download object is returned. If saveSession
+     * Creates a new VL Download object from some WFS parameters. The Download object is returned. If saveSession
      * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list. 
      *
      * @param serviceUrl The WFS endpoint
@@ -213,7 +213,7 @@ public class JobDownloadController extends BasePortalController {
     
     /**
      * Get the number of download requests stored in user session. This method
-     * will be used by VGL frontend to check if any data set has been captured
+     * will be used by VL frontend to check if any data set has been captured
      * before creating a new job.
      * 
      * @param request The servlet request with query parameters

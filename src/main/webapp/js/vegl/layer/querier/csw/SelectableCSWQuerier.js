@@ -3,7 +3,7 @@
  * using the Querier interface
  *
  * The resulting Querier allows the selection of the CSWRecord online resources
- * such that they will be downloaded by a VGL job.
+ * such that they will be downloaded by a VL job.
  */
 Ext.define('vegl.layer.querier.csw.SelectableCSWQuerier', {
     extend: 'portal.layer.querier.Querier',
