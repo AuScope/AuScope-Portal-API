@@ -12,7 +12,7 @@ export FINAL_SLEEP_LENGTH="15m"
 export NTP_DATE_SERVER="pool.ntp.org"
 export CLOUD_STORAGE_WRAPPER_URL="https://raw.githubusercontent.com/AuScope/VEGL-Portal/master/vm/cloud.sh"
 export VL_SCRIPT_PATH="${WORKING_DIR}/vl_script.py"
-export SUBSET_REQUEST_PATH="${WORKING_DIR}/vgl-download.sh"
+export SUBSET_REQUEST_PATH="${WORKING_DIR}/vl-download.sh"
 export ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
 
 echo "VEGL Workflow Script... starting"

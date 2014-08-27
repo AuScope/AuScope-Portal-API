@@ -82,7 +82,7 @@ public class JobBuilderController extends BaseCloudController {
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
-    public static final String DOWNLOAD_SCRIPT = "vgl-download.sh";
+    public static final String DOWNLOAD_SCRIPT = "vl-download.sh";
     VGLJobStatusChangeHandler vglJobStatusChangeHandler;
 
 
