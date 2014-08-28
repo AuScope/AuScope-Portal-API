@@ -300,15 +300,15 @@ Ext.define('vegl.widgets.JobsPanel', {
         if (value === vegl.models.Job.STATUS_FAILED) {
             return '<span style="color:red;">' + value + '</span>';
         } else if (value === vegl.models.Job.STATUS_ACTIVE) {
-            return '<span style="color:green;">' + value + '</span>';
+            return '<span title="Currently running" style="color:green;">' + value + '</span>';
         } else if (value === vegl.models.Job.STATUS_DONE) {
-            return '<span style="color:blue;">' + value + '</span>';
-        } else if (value === vegl.models.Job.STATUS_PENDING) {
-            return '<span style="color:#e59900;">' + value + '</span>';
+            return '<span title="Job is done" style="color:blue;">' + value + '</span>';
+        } else if (value === vegl.models.Job.STATUS_PENDING || value === vegl.models.Job.STATUS_PROVISIONING) {
+            return '<span title="Waiting for resource" style="color:#e59900;">' + value + '</span>';
         } else if (value === vegl.models.Job.STATUS_INQUEUE) {
-            return '<span style="color:green;">' + value + '</span>';
+            return '<span title="Quota exceeded, placed in queue for resource" style="color:green;">' + value + '</span>';
         } else if (value === vegl.models.Job.STATUS_ERROR) {
-            return '<span style="color:red;">' + value + '</span>';
+            return '<span title="Error: check your email for error log" style="color:red;">' + value + '</span>';
         }
         return value;
     },

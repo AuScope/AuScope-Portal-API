@@ -7,10 +7,8 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.util.structure.Job;
-import org.auscope.portal.server.vegl.mail.JobCompletionMailSender;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class VGLQueueJob implements Job {
 
@@ -34,9 +32,9 @@ public class VGLQueueJob implements Job {
 
     }
 
-    public void updateErrorStatus(){
+    public void updateErrorStatus(Exception e){
         String oldStatus=curJob.getStatus();
-        this.curJob.setStatus(JobBuilderController.STATUS_ERROR);
+        this.curJob.setErrorStatus(e);
         jobManager.saveJob(curJob);
         vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldStatus);
     }
@@ -59,6 +57,7 @@ public class VGLQueueJob implements Job {
         }
     }
 
+    @Override
     public String toString(){
         return curJob.toString();
     }
@@ -67,6 +66,7 @@ public class VGLQueueJob implements Job {
         return curJob;
     }
 
+    @Override
     public boolean equals(Object j){
         if(!(j instanceof VGLQueueJob)){
             return false;

@@ -62,7 +62,7 @@ public class TestVGLTimePollQueue {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(job).run();will(throwException(new PortalServiceException("Some random Quota exceeded message","Some error")));
-            allowing(job).updateErrorStatus();
+            allowing(job).updateErrorStatus(with(any(Exception.class)));
         }});
 
         queue.addJob(job);

@@ -633,13 +633,16 @@ public class TestJobBuilderController {
             oneOf(mockCloudComputeServices[0]).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(instanceId));
 
             //We should have 1 call to our job manager to create a job audit trail record
-            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Job submitted.");
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
+            oneOf(mockJobManager).createJobAuditTrail("Provisioning", jobObj, "Set job to Pending");
+
         }});
 
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
 
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Thread.sleep(1000);
         Assert.assertEquals(instanceId, jobObj.getComputeInstanceId());
         Assert.assertEquals(JobBuilderController.STATUS_PENDING, jobObj.getStatus());
         Assert.assertNotNull(jobObj.getSubmitDate());
@@ -835,17 +838,20 @@ public class TestJobBuilderController {
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
+            oneOf(mockJobManager).saveJob(jobObj);
+
             //And finally 1 call to execute the job (which will throw PortalServiceException indicating failure)
             oneOf(mockCloudComputeServices[0]).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(new PortalServiceException("")));
 
-            //We should have 1 call to our job manager to create a job audit trail record
-            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "");
+            allowing(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)), with(any(String.class)));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
 
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
-        Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        //VT:wait a while for the thread to finish before getting the status.
+        Thread.sleep(1000);
+        Assert.assertEquals(JobBuilderController.STATUS_ERROR, jobObj.getStatus());
     }
 
 
@@ -929,10 +935,12 @@ public class TestJobBuilderController {
             oneOf(mockCloudComputeServices[0]).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(new PortalServiceException("Some random error","Some error correction with Quota exceeded")));
 
             //We should have 1 call to our job manager to create a job audit trail record
-            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Job Placed in Queue");
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
+
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+        Thread.sleep(2000);
         VGLPollingJobQueueManager qm= VGLPollingJobQueueManager.getInstance();
         Assert.assertTrue(qm.getQueue().hasJob());
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
@@ -1270,17 +1278,17 @@ public class TestJobBuilderController {
         }});
 
         ModelAndView mav = controller.updateOrCreateJob(null,  //The integer ID if not specified will trigger job creation
-                                                        name,
-                                                        description,
-                                                        seriesId,
-                                                        computeServiceId,
-                                                        computeVmId,
-                                                        computeVmType,
-                                                        storageServiceId,
-                                                        null,
-                                                        emailNotification,
-                                                        mockRequest,
-                                                        mockPortalUser);
+                name,
+                description,
+                seriesId,
+                computeServiceId,
+                computeVmId,
+                computeVmType,
+                storageServiceId,
+                null,
+                emailNotification,
+                mockRequest,
+                mockPortalUser);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
@@ -1350,17 +1358,17 @@ public class TestJobBuilderController {
         }});
 
         ModelAndView mav = controller.updateOrCreateJob(jobId,
-                                                        "name",
-                                                        "description",
-                                                        seriesId,
-                                                        "computeServiceId",
-                                                        "computeVmId",
-                                                        computeVmType,
-                                                        "storageServiceId",
-                                                        "registeredUrl",
-                                                        emailNotification,
-                                                        mockRequest,
-                                                        mockPortalUser);
+                "name",
+                "description",
+                seriesId,
+                "computeServiceId",
+                "computeVmId",
+                computeVmType,
+                "storageServiceId",
+                "registeredUrl",
+                emailNotification,
+                mockRequest,
+                mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1395,17 +1403,17 @@ public class TestJobBuilderController {
         }});
 
         ModelAndView mav = controller.updateOrCreateJob(jobId,
-                                                        "name",
-                                                        "description",
-                                                        seriesId,
-                                                        "computeServiceId",
-                                                        "computeVmId",
-                                                        computeVmType,
-                                                        "storageServiceId",
-                                                        "registeredUrl",
-                                                        emailNotification,
-                                                        mockRequest,
-                                                        mockPortalUser);
+                "name",
+                "description",
+                seriesId,
+                "computeServiceId",
+                "computeVmId",
+                computeVmType,
+                "storageServiceId",
+                "registeredUrl",
+                emailNotification,
+                mockRequest,
+                mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1444,17 +1452,17 @@ public class TestJobBuilderController {
         }});
 
         ModelAndView mav = controller.updateOrCreateJob(jobId,
-                                                        "name",
-                                                        "description",
-                                                        seriesId,
-                                                        "computeServiceId",
-                                                        "computeVmId",
-                                                        computeVmType,
-                                                        "storageServiceId",
-                                                        "registeredUrl",
-                                                        emailNotification,
-                                                        mockRequest,
-                                                        mockPortalUser);
+                "name",
+                "description",
+                seriesId,
+                "computeServiceId",
+                "computeVmId",
+                computeVmType,
+                "storageServiceId",
+                "registeredUrl",
+                emailNotification,
+                mockRequest,
+                mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1493,17 +1501,17 @@ public class TestJobBuilderController {
         }});
 
         ModelAndView mav = controller.updateOrCreateJob(jobId,
-                                                        "name",
-                                                        "description",
-                                                        seriesId,
-                                                        "computeServiceId",
-                                                        "computeVmId",
-                                                        computeVmType,
-                                                        "storageServiceId",
-                                                        "registeredUrl",
-                                                        emailNotification,
-                                                        mockRequest,
-                                                        mockPortalUser);
+                "name",
+                "description",
+                seriesId,
+                "computeServiceId",
+                "computeVmId",
+                computeVmType,
+                "storageServiceId",
+                "registeredUrl",
+                emailNotification,
+                mockRequest,
+                mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
