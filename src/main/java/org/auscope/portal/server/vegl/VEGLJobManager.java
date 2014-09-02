@@ -2,7 +2,7 @@ package org.auscope.portal.server.vegl;
 
 import java.util.Date;
 import java.util.List;
-
+import org.hibernate.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -65,6 +65,35 @@ public class VEGLJobManager {
      * @param message
      */
     public void createJobAuditTrail(String oldJobStatus, VEGLJob curJob, String message) {
+        VGLJobAuditLog vglJobAuditLog = null;
+        try {
+            vglJobAuditLog = new VGLJobAuditLog();
+            vglJobAuditLog.setJobId(curJob.getId());
+            vglJobAuditLog.setFromStatus(oldJobStatus);
+            vglJobAuditLog.setToStatus(curJob.getStatus());
+            vglJobAuditLog.setTransitionDate(new Date());
+            vglJobAuditLog.setMessage(message);
+
+            // Failure in the creation of the job life cycle audit trail is
+            // not critical hence we allow it to fail silently and log it.
+            vglJobAuditLogDao.save(vglJobAuditLog);
+        } catch (Exception ex) {
+            logger.warn("Error creating audit trail for job: " + vglJobAuditLog, ex);
+        }
+    }
+
+    /**
+     * Create the job life cycle audit trail. If the creation is unsuccessful, it
+     * will silently fail and log the failure message to error log.
+     * @param oldJobStatus
+     * @param curJob
+     * @param message
+     */
+    public void createJobAuditTrail(String oldJobStatus, VEGLJob curJob, Exception exception) {
+        String message = ExceptionUtils.getStackTrace(exception);
+        if(message.length() > 1000){
+            message = message.substring(0,1000);
+        }
         VGLJobAuditLog vglJobAuditLog = null;
         try {
             vglJobAuditLog = new VGLJobAuditLog();

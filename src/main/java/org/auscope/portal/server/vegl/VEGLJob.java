@@ -5,8 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
+import org.auscope.portal.server.web.controllers.JobBuilderController;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * A specialisation of a generic cloud job for the VEGL Portal
@@ -17,11 +22,12 @@ import org.auscope.portal.server.vegl.VglParameter.ParameterType;
  */
 public class VEGLJob extends CloudJob implements Cloneable {
     private static final long serialVersionUID = -57851899164623641L;
-
+    private final Log logger = LogFactory.getLog(this.getClass());
     private String registeredUrl;
     private Integer seriesId;
     private boolean emailNotification;
     private String processTimeLog;
+
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -34,6 +40,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     public VEGLJob() {
         super();
     }
+
 
     /**
      * Creates a fully initialised VEGLJob
@@ -66,7 +73,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param String time
      */
     public void setProcessTimeLog(String processTimeLog) {
-       this.processTimeLog=processTimeLog;
+        this.processTimeLog=processTimeLog;
 
     }
 

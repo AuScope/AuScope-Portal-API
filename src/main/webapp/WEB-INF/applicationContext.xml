@@ -59,7 +59,7 @@
         <property name="emailSender"><value><![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]></value></property>
         <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
-
+    
 
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
     <bean name="VGLJobStatusChangeHandler" class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor"/>
@@ -82,6 +82,10 @@
             </map>
         </property>
     </bean>
+    
+    <bean name="vglPollingJobQueueManagerDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass" value="org.auscope.portal.server.vegl.VGLPollingJobQueueManager" />       
+    </bean>
 
     <!-- Simple Trigger for vglJobStatusMonitor task, run every 5 minutes -->
     <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
@@ -89,12 +93,22 @@
         <property name="repeatInterval" value="300000" />
         <property name="startDelay" value="10000" />
     </bean>
+    
+    <!-- Simple Trigger for vglPollingJobQueueManagerDetail task, run every 30 minutes -->
+    <bean id="quotaExceededTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+        <property name="jobDetail" ref="vglPollingJobQueueManagerDetail" />
+        <property name="repeatInterval" value="1800000" />
+        <property name="startDelay" value="1800000" />
+        <!--property name="repeatInterval" value="300000" />
+        <property name="startDelay" value="300000" /-->
+    </bean>
 
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="taskExecutor" ref="taskExecutor" />
         <property name="triggers">
             <list>
                 <ref bean="simpleTrigger" />
+                <ref bean="quotaExceededTrigger" />
             </list>
         </property>
     </bean>
