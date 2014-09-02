@@ -34,9 +34,11 @@ public class VGLQueueJob implements Job {
 
     public void updateErrorStatus(Exception e){
         String oldStatus=curJob.getStatus();
-        this.curJob.setErrorStatus(e);
+        this.curJob.setStatus(JobBuilderController.STATUS_ERROR);
         jobManager.saveJob(curJob);
+        jobManager.createJobAuditTrail(oldStatus, curJob, e);
         vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldStatus);
+
     }
 
     @Override

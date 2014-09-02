@@ -69,6 +69,7 @@ public class JobBuilderController extends BaseCloudController {
 
     private VEGLJobManager jobManager;
     private FileStagingService fileStagingService;
+    private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
     public static final String STATUS_PENDING = "Pending";//VT:Request accepted by compute service
     public static final String STATUS_ACTIVE = "Active";//VT:Running
@@ -89,13 +90,14 @@ public class JobBuilderController extends BaseCloudController {
     @Autowired
     public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
             PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService[] cloudStorageServices,
-            CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler) {
+            CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,VGLPollingJobQueueManager vglPollingJobQueueManager) {
         super(cloudStorageServices, cloudComputeServices,hostConfigurer);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
         this.cloudComputeServices = cloudComputeServices;
         this.vglJobStatusChangeHandler=vglJobStatusChangeHandler;
+        this.vglPollingJobQueueManager = vglPollingJobQueueManager;
     }
 
 
@@ -723,7 +725,7 @@ public class JobBuilderController extends BaseCloudController {
             }catch(PortalServiceException e){
                 //only for this specific error we wanna queue the job
                 if(e.getErrorCorrection()!= null && e.getErrorCorrection().contains("Quota exceeded")){
-                    VGLPollingJobQueueManager.getInstance().addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
+                    vglPollingJobQueueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
                     String oldJobStatus = curJob.getStatus();
                     curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
                     jobManager.saveJob(curJob);
@@ -731,9 +733,9 @@ public class JobBuilderController extends BaseCloudController {
 
                 }else{
                     String oldJobStatus = curJob.getStatus();
-                    curJob.setErrorStatus(e);
+                    curJob.setStatus(JobBuilderController.STATUS_ERROR);
                     jobManager.saveJob(curJob);
-                    jobManager.createJobAuditTrail(oldJobStatus, curJob, "Error executing job:" + e.getMessage());
+                    jobManager.createJobAuditTrail(oldJobStatus, curJob, e);
                 }
             }
 

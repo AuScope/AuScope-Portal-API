@@ -60,6 +60,7 @@ public class TestJobListController extends PortalTestClass {
     private HttpServletResponse mockResponse;
     private HttpSession mockSession;
     private JobListController controller;
+    private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
 
     /**
@@ -79,6 +80,7 @@ public class TestJobListController extends PortalTestClass {
         mockSession = context.mock(HttpSession.class);
         mockPortalUser = context.mock(PortalUser.class);
         final List<VEGLJob> mockJobs=new ArrayList<VEGLJob>();
+        vglPollingJobQueueManager = new VGLPollingJobQueueManager();
 
         context.checking(new Expectations() {{
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
@@ -88,13 +90,14 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer);
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer,vglPollingJobQueueManager);
     }
 
     @After
     public void destroy(){
-        VGLPollingJobQueueManager.getInstance().getQueue().clear();
+        vglPollingJobQueueManager.getQueue().clear();
     }
+
 
 
     public static VEGLJobMatcher aVeglJob(Integer id) {
@@ -171,17 +174,16 @@ public class TestJobListController extends PortalTestClass {
 
         JobListController myController = new JobListController(queueMockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer);
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer,vglPollingJobQueueManager);
 
 
-        VGLPollingJobQueueManager queueManager = VGLPollingJobQueueManager.getInstance();
-        //Assert.assertTrue(queueManager.getQueue().hasJob());
 
-        Assert.assertEquals(2, queueManager.getQueue().size());
+
+        Assert.assertEquals(2, vglPollingJobQueueManager.getQueue().size());
 
         myController.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
 
-        Assert.assertEquals(1, queueManager.getQueue().size());
+        Assert.assertEquals(1, vglPollingJobQueueManager.getQueue().size());
 
 
     }
@@ -1048,7 +1050,7 @@ public class TestJobListController extends PortalTestClass {
                 context.mock(VEGLJob.class, "mockJobUnsubmitted"),
                 context.mock(VEGLJob.class, "mockJobDone"),
                 context.mock(VEGLJob.class, "mockJobPending")
-        );
+                );
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
@@ -1078,7 +1080,7 @@ public class TestJobListController extends PortalTestClass {
                 context.mock(VEGLJob.class, "mockJobUnsubmitted"),
                 context.mock(VEGLJob.class, "mockJobDone"),
                 context.mock(VEGLJob.class, "mockJobPending")
-        );
+                );
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));

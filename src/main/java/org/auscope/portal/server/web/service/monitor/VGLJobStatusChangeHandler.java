@@ -49,7 +49,7 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
             jobManager.createJobAuditTrail(oldStatus, vglJob, "Job status updated.");
             //VT: only status done we email here. Any error notification are mailed not by polling but
             //when the job has it status set to error;
-            if (newStatus.equals(JobBuilderController.STATUS_DONE) && vglJob.getEmailNotification()) {
+            if ((newStatus.equals(JobBuilderController.STATUS_DONE) && vglJob.getEmailNotification()) || newStatus.equals(JobBuilderController.STATUS_ERROR)) {
                 jobMailSender.sendMail(vglJob);
                 LOG.trace("Job completion email notification sent. Job id: " + vglJob.getId());
             }

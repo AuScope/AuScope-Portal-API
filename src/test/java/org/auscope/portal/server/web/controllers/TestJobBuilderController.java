@@ -27,6 +27,7 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.ResourceUtil;
+import org.auscope.portal.core.util.structure.Job;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
@@ -63,6 +64,7 @@ public class TestJobBuilderController {
     private HttpServletResponse mockResponse;
     private HttpSession mockSession;
     private PortalUser mockPortalUser;
+    private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
     private JobBuilderController controller;
 
@@ -78,14 +80,17 @@ public class TestJobBuilderController {
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockSession = context.mock(HttpSession.class);
+        vglPollingJobQueueManager = new VGLPollingJobQueueManager();
         //Object Under Test
-        controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices, null);
+        controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices, null,vglPollingJobQueueManager);
     }
 
     @After
     public void destroy(){
-        VGLPollingJobQueueManager.getInstance().getQueue().clear();
+        vglPollingJobQueueManager.getQueue().clear();
     }
+
+
 
     /**
      * Tests that retrieving job object succeeds.
@@ -937,12 +942,12 @@ public class TestJobBuilderController {
             //We should have 1 call to our job manager to create a job audit trail record
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
 
+
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
         Thread.sleep(2000);
-        VGLPollingJobQueueManager qm= VGLPollingJobQueueManager.getInstance();
-        Assert.assertTrue(qm.getQueue().hasJob());
+        Assert.assertTrue(vglPollingJobQueueManager.getQueue().hasJob());
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_INQUEUE, jobObj.getStatus());
     }
