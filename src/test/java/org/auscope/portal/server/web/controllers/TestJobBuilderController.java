@@ -30,10 +30,13 @@ import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.core.util.structure.Job;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
+import org.auscope.portal.server.vegl.mail.JobMailSender;
+import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
@@ -55,6 +58,8 @@ public class TestJobBuilderController {
         setImposteriser(ClassImposteriser.INSTANCE);
     }};
 
+
+
     private VEGLJobManager mockJobManager;
     private FileStagingService mockFileStagingService;
     private CloudStorageService[] mockCloudStorageServices;
@@ -65,6 +70,13 @@ public class TestJobBuilderController {
     private HttpSession mockSession;
     private PortalUser mockPortalUser;
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
+    private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
+
+
+
+    private JobMailSender mockJobMailSender;
+    private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
+
 
     private JobBuilderController controller;
 
@@ -80,9 +92,16 @@ public class TestJobBuilderController {
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockSession = context.mock(HttpSession.class);
+
+
+        mockJobMailSender = context.mock(JobMailSender.class);
+        mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
+
+
+        vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader);
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
         //Object Under Test
-        controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices, null,vglPollingJobQueueManager);
+        controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices, vglJobStatusChangeHandler,vglPollingJobQueueManager);
     }
 
     @After
@@ -197,7 +216,7 @@ public class TestJobBuilderController {
             will(returnValue(mockJob));
             //We should have a call to file staging service to get our files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(mockJob);
-            will(throwException(new Exception()));
+            will(throwException(new PortalServiceException("test exception","test exception")));
         }});
 
         ModelAndView mav = controller.listJobFiles(jobId);
@@ -404,7 +423,7 @@ public class TestJobBuilderController {
 
             //We should have a call to file staging service to update a file
             oneOf(mockFileStagingService).handleFileUpload(jobObj, mockMultipartRequest);
-            will(throwException(new Exception()));
+            will(throwException(new PortalServiceException("Test Exception","Test Exception")));
         }});
 
         ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString());
@@ -637,6 +656,8 @@ public class TestJobBuilderController {
             //And finally 1 call to execute the job
             oneOf(mockCloudComputeServices[0]).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(returnValue(instanceId));
 
+            oneOf(mockJobManager).saveJob(jobObj);
+
             //We should have 1 call to our job manager to create a job audit trail record
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
             oneOf(mockJobManager).createJobAuditTrail("Provisioning", jobObj, "Set job to Pending");
@@ -798,6 +819,7 @@ public class TestJobBuilderController {
         final String storageEndpoint = "http://example.org";
         final String storageServiceId = "storage-service-id";
         final String regionName = "region-name";
+        final PortalServiceException exception = new PortalServiceException("Some random error","Some error correction");
 
         jobObj.setComputeVmId(computeVmId);
         //As submitJob method no longer explicitly checks for empty storage credentials,
@@ -843,12 +865,20 @@ public class TestJobBuilderController {
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
-            oneOf(mockJobManager).saveJob(jobObj);
+            allowing(mockJobManager).saveJob(jobObj);
 
             //And finally 1 call to execute the job (which will throw PortalServiceException indicating failure)
-            oneOf(mockCloudComputeServices[0]).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(new PortalServiceException("")));
+            oneOf(mockCloudComputeServices[0]).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(exception));
 
-            allowing(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)), with(any(String.class)));
+            //We should have 1 call to our job manager to create a job audit trail record
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
+
+            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PROVISION, jobObj, exception);
+
+            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PROVISION, jobObj, "Job status updated.");
+
+            oneOf(mockJobMailSender).sendMail(jobObj);
+            oneOf(mockVGLJobStatusAndLogReader).getSectionedLog(jobObj, "Time");
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
@@ -856,7 +886,10 @@ public class TestJobBuilderController {
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         //VT:wait a while for the thread to finish before getting the status.
         Thread.sleep(1000);
+
         Assert.assertEquals(JobBuilderController.STATUS_ERROR, jobObj.getStatus());
+        Assert.assertTrue(jobObj.getProcessDate()!=null);
+
     }
 
 
@@ -932,7 +965,7 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"testRole1"}));
             allowing(mockRequest).isUserInRole("testRole1");will(returnValue(true));
 
-            oneOf(mockJobManager).saveJob(jobObj);
+            allowing(mockJobManager).saveJob(jobObj);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
@@ -942,6 +975,7 @@ public class TestJobBuilderController {
             //We should have 1 call to our job manager to create a job audit trail record
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
 
+            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PROVISION, jobObj, "Job Placed in Queue");
 
         }});
 
@@ -951,7 +985,6 @@ public class TestJobBuilderController {
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_INQUEUE, jobObj.getStatus());
     }
-
 
 
     /**
