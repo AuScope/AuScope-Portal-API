@@ -736,6 +736,7 @@ public class JobBuilderController extends BaseCloudController {
                     curJob.setStatus(JobBuilderController.STATUS_ERROR);
                     jobManager.saveJob(curJob);
                     jobManager.createJobAuditTrail(oldJobStatus, curJob, e);
+                    vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
                 }
             }
 
