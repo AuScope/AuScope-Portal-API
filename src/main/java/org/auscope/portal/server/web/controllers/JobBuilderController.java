@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,14 +69,16 @@ public class JobBuilderController extends BaseCloudController {
 
     private VEGLJobManager jobManager;
     private FileStagingService fileStagingService;
+    private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
-    public static final String STATUS_PENDING = "Pending";
-    public static final String STATUS_ACTIVE = "Active";
-    public static final String STATUS_DONE = "Done";
-    public static final String STATUS_DELETED = "Deleted";
-    public static final String STATUS_UNSUBMITTED = "Saved";
-    public static final String STATUS_INQUEUE = "In Queue";
-    public static final String STATUS_ERROR = "ERROR";
+    public static final String STATUS_PENDING = "Pending";//VT:Request accepted by compute service
+    public static final String STATUS_ACTIVE = "Active";//VT:Running
+    public static final String STATUS_PROVISION = "Provisioning";//VT:awaiting response from compute service
+    public static final String STATUS_DONE = "Done";//VT:Job done
+    public static final String STATUS_DELETED = "Deleted";//VT:Job deleted
+    public static final String STATUS_UNSUBMITTED = "Saved";//VT:Job saved, fail to submit for whatever reason.
+    public static final String STATUS_INQUEUE = "In Queue";//VT: quota exceeded, placed in queue.
+    public static final String STATUS_ERROR = "ERROR";//VT:Exception in job processing.
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
@@ -86,14 +90,14 @@ public class JobBuilderController extends BaseCloudController {
     @Autowired
     public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
             PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService[] cloudStorageServices,
-            CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler) {
+            CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,VGLPollingJobQueueManager vglPollingJobQueueManager) {
         super(cloudStorageServices, cloudComputeServices,hostConfigurer);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
         this.cloudComputeServices = cloudComputeServices;
         this.vglJobStatusChangeHandler=vglJobStatusChangeHandler;
-
+        this.vglPollingJobQueueManager = vglPollingJobQueueManager;
     }
 
 
@@ -180,9 +184,9 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/downloadInputFile.do")
     public ModelAndView downloadFile(HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     @RequestParam("jobId") String jobId,
-                                     @RequestParam("filename") String filename) throws Exception {
+            HttpServletResponse response,
+            @RequestParam("jobId") String jobId,
+            @RequestParam("filename") String filename) throws Exception {
 
         //Lookup our job and download the specified files (any exceptions will return a HTTP 503)
         VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
@@ -202,8 +206,8 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/uploadFile.do")
     public ModelAndView uploadFile(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                   @RequestParam("jobId") String jobId) {
+            HttpServletResponse response,
+            @RequestParam("jobId") String jobId) {
 
         //Lookup our job
         VEGLJob job = null;
@@ -241,7 +245,7 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/deleteFiles.do")
     public ModelAndView deleteFiles(@RequestParam("jobId") String jobId,
-                                    @RequestParam("fileName") String[] fileNames) {
+            @RequestParam("fileName") String[] fileNames) {
 
         VEGLJob job = null;
         try {
@@ -270,7 +274,7 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/deleteDownloads.do")
     public ModelAndView deleteDownloads(@RequestParam("jobId") String jobId,
-                                    @RequestParam("downloadId") Integer[] downloadIds) {
+            @RequestParam("downloadId") Integer[] downloadIds) {
 
         VEGLJob job = null;
         try {
@@ -592,10 +596,10 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/submitJob.do")
     public ModelAndView submitJob(HttpServletRequest request,
-                                  HttpServletResponse response,
-                                  @RequestParam("jobId") String jobId) {
+            HttpServletResponse response,
+            @RequestParam("jobId") String jobId) {
         boolean succeeded = false;
-        String instanceId = null, oldJobStatus = null, errorDescription = null, errorCorrection = null;
+        String oldJobStatus = null, errorDescription = null, errorCorrection = null;
         VEGLJob curJob = null;
 
         try {
@@ -657,27 +661,13 @@ public class JobBuilderController extends BaseCloudController {
                             String userDataString = null;
                             userDataString = createBootstrapForJob(curJob);
 
-                            // launch the ec2 instance
-                            try{
-                                instanceId = cloudComputeService.executeJob(curJob, userDataString);
-                            }catch(PortalServiceException e){
-                                //only for this specific error we wanna queue the job
-                                if(e.getErrorCorrection()!= null && e.getErrorCorrection().contains("Quota exceeded")){
-                                    VGLPollingJobQueueManager.getInstance().addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
-                                    curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
-                                    jobManager.saveJob(curJob);
-                                    jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
-                                    return generateJSONResponseMAV(true, null, "");
-                                }else{
-                                    throw e;
-                                }
-                            }
-                            logger.info("Launched instance: " + instanceId);
-                            // set reference as instanceId for use when killing a job
-                            curJob.setComputeInstanceId(instanceId);
-                            curJob.setStatus(STATUS_PENDING);
-                            curJob.setSubmitDate(new Date());
+                            oldJobStatus = curJob.getStatus();
+                            curJob.setStatus(JobBuilderController.STATUS_PROVISION);
                             jobManager.saveJob(curJob);
+                            jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to provisioning");
+
+                            ExecutorService es = Executors.newSingleThreadExecutor();
+                            es.execute(new CloudThreadedExecuteService(cloudComputeService,curJob,userDataString));
                             succeeded = true;
                         }
                     }
@@ -700,13 +690,58 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         if (succeeded) {
-            //jobMonitor.queue(curJob);
-            jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job submitted.");
             return generateJSONResponseMAV(true, null, "");
         } else {
             jobManager.createJobAuditTrail(oldJobStatus, curJob, errorDescription);
             return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
         }
+    }
+
+    private class CloudThreadedExecuteService implements Runnable{
+        CloudComputeService cloudComputeService;
+        VEGLJob curJob;
+        String userDataString;
+
+        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString ){
+            this.cloudComputeService = cloudComputeService;
+            this.curJob = curJob;
+            this.userDataString = userDataString;
+        }
+
+        @Override
+        public void run() {
+            String instanceId = null;
+            try{
+                instanceId = cloudComputeService.executeJob(curJob, userDataString);
+                logger.info("Launched instance: " + instanceId);
+                // set reference as instanceId for use when killing a job
+                curJob.setComputeInstanceId(instanceId);
+                String oldJobStatus = curJob.getStatus();
+                curJob.setStatus(STATUS_PENDING);
+                jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to Pending");
+                curJob.setSubmitDate(new Date());
+                jobManager.saveJob(curJob);
+
+            }catch(PortalServiceException e){
+                //only for this specific error we wanna queue the job
+                if(e.getErrorCorrection()!= null && e.getErrorCorrection().contains("Quota exceeded")){
+                    vglPollingJobQueueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
+                    String oldJobStatus = curJob.getStatus();
+                    curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
+                    jobManager.saveJob(curJob);
+                    jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
+
+                }else{
+                    String oldJobStatus = curJob.getStatus();
+                    curJob.setStatus(JobBuilderController.STATUS_ERROR);
+                    jobManager.saveJob(curJob);
+                    jobManager.createJobAuditTrail(oldJobStatus, curJob, e);
+                }
+            }
+
+        }
+
+
     }
 
     /**
@@ -814,7 +849,7 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/getVmImagesForComputeService.do")
     public ModelAndView getImagesForComputeService(HttpServletRequest request,
-                                        @RequestParam("computeServiceId") String computeServiceId) {
+            @RequestParam("computeServiceId") String computeServiceId) {
         try {
             List<MachineImage> images = getImagesForJobAndUser(request, computeServiceId);
             return generateJSONResponseMAV(true, images, "");
@@ -826,7 +861,7 @@ public class JobBuilderController extends BaseCloudController {
 
     @RequestMapping("/getVmTypesForComputeService.do")
     public ModelAndView getTypesForComputeService(HttpServletRequest request,
-                                        @RequestParam("computeServiceId") String computeServiceId) {
+            @RequestParam("computeServiceId") String computeServiceId) {
         try {
             CloudComputeService ccs = getComputeService(computeServiceId);
             if (ccs == null) {

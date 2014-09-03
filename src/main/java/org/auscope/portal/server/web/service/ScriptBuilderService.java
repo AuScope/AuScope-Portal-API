@@ -61,7 +61,7 @@ public class ScriptBuilderService {
         } catch (Exception ex) {
             logger.warn("Unable to lookup job with id " + jobId + ": " + ex.getMessage());
             logger.debug("exception:", ex);
-            throw new PortalServiceException(null, "Unable to lookup job with id " + jobId, ex);
+            throw new PortalServiceException("Unable to lookup job with id " + jobId, ex);
         }
 
         //Apply text contents to job stage in directory
@@ -74,7 +74,7 @@ public class ScriptBuilderService {
         } catch (Exception e) {
             logger.error("Couldn't write script file: " + e.getMessage());
             logger.debug("error: ", e);
-            throw new PortalServiceException(null, "Couldn't write script file for job with id " + jobId, e);
+            throw new PortalServiceException("Couldn't write script file for job with id " + jobId, e);
         } finally {
             FileIOUtil.closeQuietly(scriptFile);
         }

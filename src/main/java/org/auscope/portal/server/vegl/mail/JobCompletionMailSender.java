@@ -188,6 +188,7 @@ public class JobCompletionMailSender implements JobMailSender {
     /**
      * Constructs job completion notification email content.
      */
+    @Override
     public String constructMailContent(VEGLSeries jobSeries, VEGLJob job) {
 
         Date submitDate, processDate;
@@ -226,6 +227,7 @@ public class JobCompletionMailSender implements JobMailSender {
      * Sends job completion notification email with Spring
      * framework's MailSender.
      */
+    @Override
     public void sendMail(VEGLJob job) {
         VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
 
