@@ -196,7 +196,7 @@
         <targetJdk>1.7</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>1.5.5</powermock.version>
-        <portal.core.version>1.1.0-SNAPSHOT</portal.core.version>
+        <portal.core.version>2014-09-05_07-43-41</portal.core.version>
     </properties>
 
     <repositories>
