@@ -154,7 +154,7 @@
                     </includes>
                     <nosuffix>true</nosuffix>
                 </configuration>
-                <version>1.3.0</version>
+                <version>1.4.0</version>
             </plugin>
             <!--
                 This is needed for Emma Coverage to work with unit tests
