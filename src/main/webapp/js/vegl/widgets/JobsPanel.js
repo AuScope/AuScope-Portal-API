@@ -29,7 +29,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         this.jobSeriesFrm = config.jobSeriesFrm;
 
         this.cancelJobAction = new Ext.Action({
-            text: 'Cancel job',
+            text: 'Cancel',
             iconCls: 'cross-icon',
             scope : this,
             disabled : true,
@@ -42,7 +42,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         });
 
         this.deleteJobAction = new Ext.Action({
-            text: 'Delete job',
+            text: 'Delete',
             iconCls: 'cross-icon',
             scope : this,
             disabled : true,
@@ -55,7 +55,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         });
 
         this.duplicateJobAction = new Ext.Action({
-            text: 'Duplicate job',
+            text: 'Duplicate',
             iconCls: 'refresh-icon',
             scope : this,
             disabled : true,
@@ -73,7 +73,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         });
 
         this.editJobAction = new Ext.Action({
-            text: 'Edit job',
+            text: 'Edit',
             iconCls: 'edit-icon',
             scope : this,
             disabled : true,
@@ -91,7 +91,7 @@ Ext.define('vegl.widgets.JobsPanel', {
         });
 
         this.submitJobAction = new Ext.Action({
-            text: 'Submit job',
+            text: 'Submit',
             iconCls: 'submit-icon',
             scope : this,
             disabled : true,
@@ -103,31 +103,31 @@ Ext.define('vegl.widgets.JobsPanel', {
             }
         });
 
-        var columns = [{ 
-            header: 'Job Name', 
-            sortable: true, 
-            flex : config.showProcessDuration ? undefined : 1, 
-            width : config.showProcessDuration ? 180 : undefined, 
+        var columns = [{
+            header: 'Job Name',
+            sortable: true,
+            flex : config.showProcessDuration ? undefined : 1,
+            width : config.showProcessDuration ? 180 : undefined,
             dataIndex: 'name'
-         },{ 
-             header: 'Submit Date', 
-             width: 160, 
-             sortable: true, 
-             dataIndex: 'submitDate', 
+         },{
+             header: 'Submit Date',
+             width: 160,
+             sortable: true,
+             dataIndex: 'submitDate',
              renderer: Ext.util.Format.dateRenderer('d M Y, H:i:s')
-         },{ 
-             header: 'Status', 
-             sortable: true, 
-             dataIndex: 'status', 
-             width : 100, 
+         },{
+             header: 'Status',
+             sortable: true,
+             dataIndex: 'status',
+             width : 100,
              renderer: this._jobStatusRenderer
          }];
-        
+
         if (config.showProcessDuration) {
             columns.push({
                 header: 'Processed Time Log',
                 flex : config.showProcessDuration ? 1 : undefined,
-                hidden : !config.showProcessDuration,         
+                hidden : !config.showProcessDuration,
                 sortable: true,
                 dataIndex: 'processTimeLog',
                 renderer:function(val) {
@@ -136,13 +136,12 @@ Ext.define('vegl.widgets.JobsPanel', {
                 }
             });
         }
-        
+
         Ext.apply(config, {
             plugins : [{
-                ptype : 'rowcontextmenu',
-                contextMenu : Ext.create('Ext.menu.Menu', {
-                    items: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.editJobAction, this.submitJobAction]
-                })
+                ptype : 'inlinecontextmenu',
+                align : 'center',
+                actions: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.editJobAction, this.submitJobAction]
             }],
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.models.Job',
@@ -178,11 +177,6 @@ Ext.define('vegl.widgets.JobsPanel', {
                 tooltip : 'Refresh the list of jobs for the selected series',
                 iconCls: 'refresh-icon',
                 handler: Ext.bind(this._onRefresh, this)
-            }],
-            tbar: [{
-                text: 'Actions',
-                iconCls: 'folder-icon',
-                menu: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.editJobAction, this.submitJobAction]
             }]
         });
 

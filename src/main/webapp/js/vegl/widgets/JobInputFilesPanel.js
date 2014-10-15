@@ -20,7 +20,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
         //Action for downloading a single file
         this.downloadAction = new Ext.Action({
-            text: 'Download this input to your local machine.',
+            text: 'Download to your machine.',
             disabled: true,
             iconCls: 'disk-icon',
             scope : this,
@@ -42,7 +42,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
         //Action for deleting a single file
         this.deleteAction = new Ext.Action({
-            text: 'Delete this input.',
+            text: 'Delete.',
             disabled: true,
             iconCls: 'cross-icon',
             scope : this,
@@ -80,15 +80,9 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
                 groupHeaderTpl: '{name} ({[values.rows.length]} {[values.rows.length > 1 ? "Items" : "Item"]})'
             })],
             plugins : [{
-                ptype: 'rowexpander',
-                rowBodyTpl : [
-                    '<p>{description}</p><br>'
-                ]
-            },{
-                ptype : 'rowcontextmenu',
-                contextMenu : Ext.create('Ext.menu.Menu', {
-                    items: [this.downloadAction, this.deleteAction]
-                })
+                ptype : 'inlinecontextmenu',
+                align : 'left',
+                actions: [this.downloadAction, this.deleteAction]
             }],
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.widgets.JobInputFilesPanel.Item',
@@ -97,12 +91,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             }),
             columns: [{ header: 'Name', width: 200, sortable: true, dataIndex: 'name'},
                       { header: 'Location', width: 200, dataIndex: 'localPath'},
-                      { header: 'Details', flex : 1, dataIndex: 'details'}],
-            tbar: [{
-                text: 'Actions',
-                iconCls: 'folder-icon',
-                menu: [ this.downloadAction, this.deleteAction]
-            }]
+                      { header: 'Details', flex : 1, dataIndex: 'details'}]
         });
 
         this.callParent(arguments);

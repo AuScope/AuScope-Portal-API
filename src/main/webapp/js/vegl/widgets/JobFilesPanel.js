@@ -56,6 +56,10 @@ Ext.define('vegl.widgets.JobFilesPanel', {
 
         Ext.apply(config, {
             plugins : [{
+                ptype : 'inlinecontextmenu',
+                align : 'left',
+                actions : [this.downloadAction]
+            },{
                 ptype : 'rowcontextmenu',
                 contextMenu : Ext.create('Ext.menu.Menu', {
                     items: [this.downloadAction, this.downloadZipAction]

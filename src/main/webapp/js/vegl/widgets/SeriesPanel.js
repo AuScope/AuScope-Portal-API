@@ -45,10 +45,9 @@ Ext.define('vegl.widgets.SeriesPanel', {
 
         Ext.apply(config, {
             plugins : [{
-                ptype : 'rowcontextmenu',
-                contextMenu : Ext.create('Ext.menu.Menu', {
-                    items: [this.cancelSeriesAction, this.deleteSeriesAction]
-                })
+                ptype : 'inlinecontextmenu',
+                align : 'center',
+                actions: [this.cancelSeriesAction, this.deleteSeriesAction]
             }],
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.models.Series',
@@ -78,11 +77,6 @@ Ext.define('vegl.widgets.SeriesPanel', {
                 handler: Ext.bind(this.onQuerySeries, this),
                 cls: 'x-btn-text-icon',
                 iconCls: 'find-icon'
-            }],
-            tbar: [{
-                text: 'Actions',
-                iconCls: 'folder-icon',
-                menu: [ this.cancelSeriesAction, this.deleteSeriesAction]
             }]
         });
 
@@ -245,7 +239,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
                         scope : this,
                         callback : function(options, success, response) {
                             loadMask.hide();
-                            
+
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VGL server. Please try again later.');
                                 return;
