@@ -194,7 +194,7 @@
           <onLine xmlns="http://www.isotc211.org/2005/gmd">
             <CI_OnlineResource>
               <linkage>
-                <URL>http://vegl-portal.s3.amazonaws.com/VEGL-Josh.Vote_csiro.au-20110714_171902/output/vegl.sh.log</URL>
+                <URL>http://vegl-portal.s3.amazonaws.com/VEGL-Josh.Vote_csiro.au-20110714_171902/output/vl.sh.log</URL>
               </linkage>
               <protocol>
                 <CharacterString xmlns="http://www.isotc211.org/2005/gco">WWW:DOWNLOAD-1.0-ftp--download</CharacterString>
@@ -203,10 +203,10 @@
                 <CharacterString xmlns="http://www.isotc211.org/2005/gco" />
               </applicationProfile>
               <name>
-                <CharacterString xmlns="http://www.isotc211.org/2005/gco">vegl.sh.log</CharacterString>
+                <CharacterString xmlns="http://www.isotc211.org/2005/gco">vl.sh.log</CharacterString>
               </name>
               <description>
-                <CharacterString xmlns="http://www.isotc211.org/2005/gco">vegl.sh.log</CharacterString>
+                <CharacterString xmlns="http://www.isotc211.org/2005/gco">vl.sh.log</CharacterString>
               </description>
             </CI_OnlineResource>
           </onLine>

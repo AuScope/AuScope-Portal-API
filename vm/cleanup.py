@@ -3,7 +3,7 @@ CSIRO quick evil cleanup script
 
 Designed to delete instances from a endpoint we 'think' are shutdown.
 
-Tuned to work on NCI Essex release, tested for the VGL resevation owner @ 31st July 2012
+Tuned to work on NCI Essex release, tested for the VL resevation owner @ 31st July 2012
 
 Authors: Josh Vote, Terry Rankine
 '''

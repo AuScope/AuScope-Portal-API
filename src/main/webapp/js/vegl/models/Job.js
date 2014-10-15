@@ -1,6 +1,6 @@
 /**
  * A job is a collection of all input/processing/output information describing a single unit of work
- * within the VEGL workflow
+ * within the VL workflow
  */
 Ext.define('vegl.models.Job', {
     extend: 'Ext.data.Model',

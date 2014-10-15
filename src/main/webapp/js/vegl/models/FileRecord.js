@@ -1,5 +1,5 @@
 /**
- * A FileRecord represents a single input/output file being used by the VEGL workflow
+ * A FileRecord represents a single input/output file being used by the VL workflow
  */
 Ext.define('vegl.models.FileRecord', {
     extend: 'Ext.data.Model',

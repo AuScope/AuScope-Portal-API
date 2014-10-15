@@ -12,9 +12,9 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * Interceptor for handling user session expiry. Please refer to
- * applicationContext.xml file for a list of VGL paths this interceptor apply to.
+ * applicationContext.xml file for a list of VL paths this interceptor apply to.
  *
- * Important: Do not include VGL home page and its controller request mapping paths
+ * Important: Do not include VL home page and its controller request mapping paths
  * to the above interceptor mapping list as doing so will prevent the spatial layers
  * from loading.
  *

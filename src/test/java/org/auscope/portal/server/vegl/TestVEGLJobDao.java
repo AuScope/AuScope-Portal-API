@@ -121,7 +121,7 @@ public class TestVEGLJobDao extends VGLPortalTestClass {
     }
     
     /**
-     * Tests that the retrieving of a VGL job succeeds.
+     * Tests that the retrieving of a VL job succeeds.
      */
     @Test
     public void testGet() {
@@ -140,7 +140,7 @@ public class TestVEGLJobDao extends VGLPortalTestClass {
     }
     
     /**
-     * Tests that saving or updating a VGL job succeeds.
+     * Tests that saving or updating a VL job succeeds.
      */
     @Test
     public void testSave() {
@@ -154,7 +154,7 @@ public class TestVEGLJobDao extends VGLPortalTestClass {
     }
     
     /**
-     * Tests that deleting a VGL job succeeds.
+     * Tests that deleting a VL job succeeds.
      */
     @Test
     public void testDelete() {

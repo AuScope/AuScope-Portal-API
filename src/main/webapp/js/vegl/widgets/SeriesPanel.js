@@ -199,7 +199,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
                         callback : function(options, success, response) {
                             loadMask.hide();
                             if (!success) {
-                                this.fireEvent('error', this, 'There was an error communicating with the VEGL server. Please try again later.');
+                                this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
                                 return;
                             }
 
@@ -241,7 +241,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
                             loadMask.hide();
 
                             if (!success) {
-                                this.fireEvent('error', this, 'There was an error communicating with the VGL server. Please try again later.');
+                                this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
                                 return;
                             }
 

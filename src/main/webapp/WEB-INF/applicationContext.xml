@@ -212,7 +212,7 @@
         <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
         <property name="id" value="nectar-openstack-compute"/>
         <property name="name" value="National eResearch Collaboration Tools and Resources"/>
-        <property name="groupName" value ="vgl-#{inetAddress.hostName.toLowerCase()}"/>
+        <property name="groupName" value ="vl-#{inetAddress.hostName.toLowerCase()}"/>
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">

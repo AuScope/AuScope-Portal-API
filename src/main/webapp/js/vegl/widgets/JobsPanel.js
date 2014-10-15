@@ -374,7 +374,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                             loadMask.hide();
 
                             if (!success) {
-                                this.fireEvent('error', this, 'There was an error communicating with the VEGL server. Please try again later.');
+                                this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
                                 return;
                             }
 
@@ -418,7 +418,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                             loadMask.hide();
 
                             if (!success) {
-                                this.fireEvent('error', this, 'There was an error communicating with the VEGL server. Please try again later.');
+                                this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
                                 return;
                             }
 

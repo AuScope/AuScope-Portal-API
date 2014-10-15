@@ -117,7 +117,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final CloudFileInformation[] jobDoneFiles = new CloudFileInformation[] {
                 new CloudFileInformation("key3/workflow-version.txt", 100L, "http://public.url3/filename"),
                 new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
-                new CloudFileInformation("key3/vegl.sh.log", 102L, "http://public.url3/filename3"),
+                new CloudFileInformation("key3/vl.sh.log", 102L, "http://public.url3/filename3"),
         };
         
         context.checking(new Expectations() {{

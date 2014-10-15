@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Contains a number of administrative functions specific to the VGL Portal
+ * Contains a number of administrative functions specific to the VL Portal
  *
  * @author Josh Vote
  */

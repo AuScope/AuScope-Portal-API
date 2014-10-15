@@ -3,7 +3,7 @@ package org.auscope.portal.server.vegl;
 import java.io.Serializable;
 
 /**
- * Represents a remote file download step that occurs during a VGL job startup
+ * Represents a remote file download step that occurs during a VL job startup
  * @author Josh Vote
  *
  */

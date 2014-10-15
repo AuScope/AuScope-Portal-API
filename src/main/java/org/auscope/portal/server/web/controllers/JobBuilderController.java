@@ -82,7 +82,7 @@ public class JobBuilderController extends BaseCloudController {
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
-    public static final String DOWNLOAD_SCRIPT = "vgl-download.sh";
+    public static final String DOWNLOAD_SCRIPT = "vl-download.sh";
     VGLJobStatusChangeHandler vglJobStatusChangeHandler;
 
 
@@ -787,7 +787,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setUser(user.getEmail());
         job.setEmailAddress(user.getEmail());
         job.setComputeInstanceKey("vgl-developers");
-        job.setName("VGL-Job " + new Date().toString());
+        job.setName("VL-Job " + new Date().toString());
         job.setDescription("");
         job.setStatus(STATUS_UNSUBMITTED);
 

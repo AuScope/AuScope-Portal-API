@@ -3,7 +3,7 @@
  * ScriptBuilder library.
  *
  * This file is a reworking of the AuScope Virtual Rock Lab (VRL) project ScriptBuilder.js
- * for the purpose of fitting into a VEGL 'Job Wizard' model
+ * for the purpose of fitting into a VL 'Job Wizard' model
  *
  * Original Author - Cihan Altinay
  * Author - Josh Vote
@@ -44,7 +44,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         }]);
     },
 
-    // load script source from VGL server filesystem
+    // load script source from VL server filesystem
     loadSavedScript : function(jobId) {
         var loadMask = new Ext.LoadMask(Ext.getBody(), {
             msg : 'Loading saved script...',

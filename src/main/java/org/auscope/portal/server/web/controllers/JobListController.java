@@ -60,7 +60,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class JobListController extends BaseCloudController  {
 
     /** The name of the log file that the job will use*/
-    public static final String VGL_LOG_FILE = "vegl.sh.log";
+    public static final String VGL_LOG_FILE = "vl.sh.log";
 
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
