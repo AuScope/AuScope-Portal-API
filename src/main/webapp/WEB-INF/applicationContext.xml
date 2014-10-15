@@ -56,8 +56,8 @@
         <property name="maxLengthForSeriesNameInSubject" value="15" />
         <property name="maxLengthForJobNameInSubject" value="15" />
         <property name="maxLinesForTail" value="5" />
-        <property name="emailSender"><value><![CDATA[VHIRL Admin <noreply-cg-admin@csiro.au>]]></value></property>
-        <property name="emailSubject" value="VHIRL Job (%s/%s)" />
+        <property name="emailSender"><value><![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]></value></property>
+        <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
     
 
