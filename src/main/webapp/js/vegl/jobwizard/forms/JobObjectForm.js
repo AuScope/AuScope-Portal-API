@@ -29,7 +29,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             }
         });
-        
+
         this.computeTypeStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.ComputeType',
             proxy: {
@@ -122,7 +122,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 name: 'name',
                 itemId : 'name',
                 fieldLabel: 'Job Name',
-                value : Ext.util.Format.format('myJob about zzz at {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
+                value : Ext.util.Format.format('VGL Job - {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'Enter a useful name for your job here.'
@@ -302,7 +302,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 // Store user selected toolbox into wizard state. That toolbox
                 // will be used to select relevant script templates or examples.
                 wizardState.toolbox = jobObjectFrm.getForm().findField("computeVmId").getRawValue();
-                
+
                 // Store selected resource limits into wizard state. These values will be included
                 // in template generation (to ensure valid numbers of CPU's are chosen etc)
                 var computeTypeId = jobObjectFrm.getComponent('resource-combo').getValue();

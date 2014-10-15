@@ -4,7 +4,7 @@
 # NOTE: Please ensure that VL_WORKFLOW_VERSION gets incremented with any changes
 
 #configure our environment
-export VGL_WORKFLOW_VERSION="1"
+export VL_WORKFLOW_VERSION="1"
 export VL_LOG_FILE_NAME="vl.sh.log"
 export VL_LOG_FILE="${WORKING_DIR}/$VL_LOG_FILE_NAME"
 export EC2_METADATA_SCRIPT="${WORKING_DIR}/ec2-metadata"
@@ -15,7 +15,7 @@ export VL_SCRIPT_PATH="${WORKING_DIR}/vl_script.py"
 export SUBSET_REQUEST_PATH="${WORKING_DIR}/vl-download.sh"
 export ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
 
-echo "VEGL Workflow Script... starting"
+echo "VL Workflow Script... starting"
 echo "All future console output will be redirected to ${VL_LOG_FILE}"
 exec > >(tee -a "$VL_LOG_FILE")
 
@@ -24,10 +24,10 @@ source /etc/profile
 
 # Print environment variables (don't print any credentials here)
 echo "#### Environment start ####"
-echo "------ VEGL Workflow Script ----------"
+echo "------ VL Workflow Script ----------"
 echo "                                      "
 echo "------ Printing Environment ----------"
-echo "VGL_WORKFLOW_VERSION = ${VGL_WORKFLOW_VERSION}"
+echo "VL_WORKFLOW_VERSION = ${VL_WORKFLOW_VERSION}"
 echo "PATH = ${PATH}"
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 echo "WORKING_DIR = ${WORKING_DIR}"
