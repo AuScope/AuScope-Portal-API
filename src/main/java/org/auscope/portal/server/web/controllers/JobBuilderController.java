@@ -829,7 +829,7 @@ public class JobBuilderController extends BaseCloudController {
 
             for (VglDownload dl : job.getJobDownloads()) {
                 out.write(String.format("#Downloading %1$s\n", dl.getName()));
-                out.write(String.format("curl -L '%1$s' > \"%2$s\"\n", dl.getUrl(), dl.getLocalPath()));
+                out.write(String.format("curl -f -L '%1$s' -o \"%2$s\"\n", dl.getUrl(), dl.getLocalPath()));
             }
 
             return true;
