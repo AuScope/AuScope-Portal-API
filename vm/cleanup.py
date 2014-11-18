@@ -1,83 +1,116 @@
-'''
-CSIRO quick evil cleanup script
-
-Designed to delete instances from a endpoint we 'think' are shutdown.
-
-Tuned to work on NCI Essex release, tested for the VL resevation owner @ 31st July 2012
-
-Authors: Josh Vote, Terry Rankine
-'''
-
-import boto
+#!/usr/bin/env python
+from novaclient.client import Client
 import logging
-
-from boto.ec2.connection import EC2Connection
-from boto.ec2.regioninfo import *
+import smtplib
+import socket
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 '''logging.basicConfig(filename='example.log',level=logging.DEBUG)'''
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(levelname)s  %(message)s', level=logging.WARN)
+logging.root.setLevel(logging.WARN)
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+hostname = socket.gethostname()
 
 # An array of dictionaries representing info about each cloud
 # to poll
 clouds = [{
-    "name" : "NCI (Canberra)",
-    "owner":"a92448ea8ad34b0691b5669f50485f48",
-    "aws_access_key_id":"ENTER_AWS_ACCESS_KEY",
-    "aws_secret_access_key":"ENTER_AWS_SECRET_KEY",
-    "endpoint":"openstack.nci.org.au",
-    "path":"/services/Cloud",
-    "port":8773,
-    "is_secure" : False,
+    "name" : "NCI-VHIRL-private (Canberra)",
+    "username" : "USERNAME",
+    "password" : "PASSWORD",
+    "project" : "PROJECT",
+    "version": 2,
+    "auth": "http://130.56.241.100:5000/v2.0",
     "terminated_state" : unicode("shutoff"),
     "error_state" : unicode("error")
     },{
-    "name" : "NeCTAR (Melbourne)",
-    "owner":None,
-    "aws_access_key_id":"ENTER_AWS_ACCESS_KEY",
-    "aws_secret_access_key":"ENTER_AWS_SECRET_KEY",
-    "endpoint":"nova.rc.nectar.org.au",
-    "path":"/services/Cloud",
-    "port":8773,
-    "is_secure" : True,
-    "terminated_state" : unicode("stopped"),
+    "name" : "NeCTAR-VHIRL",
+    "username":"USERNAME",
+    "password":"PASSWORD",
+    "project" :"PROJECT",
+    "auth":"https://keystone.rc.nectar.org.au:5000/v2.0/",
+    "version": 2,
+    "terminated_state" : unicode("shutoff"),
     "error_state" : unicode("error")
 }]
 
 # Returns a connection for a given 'cloud' dictionary
 def setup(cloud):
-    region = RegionInfo(name=cloud["name"], endpoint=cloud["endpoint"])
-    connection = boto.connect_ec2(aws_access_key_id=cloud["aws_access_key_id"],
-                        aws_secret_access_key=cloud["aws_secret_access_key"],
-                        is_secure=cloud["is_secure"],
-                        region=region,
-                        port=cloud["port"],
-                        path=cloud["path"])
+    connection = Client(cloud["version"], cloud["username"], cloud["password"], cloud["project"], cloud["auth"])
     return connection
 
 def killthemall(connection, cloud):
-    reservations = connection.get_all_instances()
-    # import pdb; pdb.set_trace()
+    theList = connection.servers.list()
 
-    for reservation in reservations:
-        if (cloud["owner"] == None) or (reservation.owner_id == cloud["owner"]):
-            for instance in reservation.instances:
-                if instance.state == cloud["error_state"]:
-                    logger.warn("[%s] terminate error instance: %s" % (cloud["name"], instance.id))
-                    logger.debug("[%s] response: %s" % (cloud["name"], connection.terminate_instances([instance.id])))  
-                elif instance.state == cloud["terminated_state"]:
-                    logger.debug("%s\n%s\n\n\n\n" % (instance.id, instance.get_console_output().output))
-                    if "Power down." in instance.get_console_output().output \
-                            and \
-                        "Sending all processes the KILL signal" in instance.get_console_output().output:
-                        logger.warn("[%s] terminating %s, launch time = %s" % (cloud["name"], instance.id, instance.launch_time))
-                        logger.debug("[%s] response: %s" % (cloud["name"], connection.terminate_instances([instance.id])))
-                    else:
-                        logger.warn("[%s] powerdown not detected %s, launch time = %s" % (cloud["name"], instance.id, instance.launch_time))
-                else:
-                    logger.warn("[%s] dont terminate %s" % (cloud["name"], instance.id))
+    for server in theList:
+        serverConsole = "" 
+        try:
+            serverConsole = server.get_console_output()
+        except:
+            logger.error('server %s@%s console not available' % (server.name, cloud['name']))
+            pass
+        
+        if server.status.lower() == cloud["error_state"]:
+            logger.warn("[%s] terminate error instance: %s (%s)" % (cloud["name"], server.id, server.name))
+            response = server.delete()
+            logger.debug("[%s] deleted %s (%s) - response: %s" % (cloud["name"], server.id, server.name, response))
+            tellSomeone(server, cloud, response, serverConsole)
+        elif server.status.lower() == cloud["terminated_state"]:
+            logger.debug("%s\n%s\n\n\n\n" % (server.id, serverConsole))
+            if "Power down." in serverConsole \
+                    and \
+                "Sending all processes the KILL signal" in serverConsole:
+                logger.warn("[%s] terminating %s(%s), launch time = %s" % (cloud["name"], server.name, server.id, server.created))
+                logger.debug("[%s] response: %s" % (cloud["name"], server.delete()))
+            else:
+                logger.warn("[%s] powerdown not detected %s(%s), launch time = %s" % (cloud["name"], server.name, server.id, server.created))
+        elif server.status.lower() == "active":
+            if "No user-data available" in serverConsole and \
+               "Giving up" in serverConsole:
+                logger.warn("Doh! - found a broken one")
+                logger.warn("[%s] terminate error instance: %s (%s)" % (cloud["name"], server.id, server.name))
+                response = server.delete()
+                logger.warn("[%s] deleted %s (%s) - response: %s" % (cloud["name"], server.id, response))
+                tellSomeone(server, cloud, response, serverConsole)
+            else:
+                logger.info("[%s] dont terminate %s(%s) - it is %s" % (cloud["name"], server.name, server.id, server.status))
 
+        else:
+            logger.info("[%s] dont terminate %s(%s) - it is %s" % (cloud["name"], server.name, server.id, server.status))
+
+def tellSomeone(server, cloud, response, serverConsole):
+    msg = MIMEMultipart()
+
+    text = MIMEText( \
+"""Found another one:
+
+The system has another bad image - %s@%s.
+
+We did try to terminate it.
+Cloud response: %s.
+
+Regards,
+System Ghost @ %s.""" % (
+                   server.id,
+                   cloud,
+                   response,
+                   hostname
+                   ))
+    attachment = MIMEText(serverConsole)
+    attachment.add_header('Content-Disposition', 'attachment', filename="console.txt")
+    msg.attach(attachment)
+    msg.attach(text)
+    msg['Subject'] = "BAD Cloud machine"
+    msg['To'] = "cg-portal@csiro.au"
+    msg['From'] = "system-ghost@%s" % hostname
+
+
+    s = smtplib.SMTP('localhost')
+    s.sendmail(msg['From'], [msg['To']], msg.as_string())
+    s.quit()
 
 if __name__ == "__main__":
     for cloud in clouds:
