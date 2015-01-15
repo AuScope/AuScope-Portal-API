@@ -122,25 +122,6 @@ Ext.application({
             map = Ext.create('portal.map.openlayers.OpenLayersMap', mapCfg);
         }
 
-            flex : 2,
-            split : true,
-            height: '30%',
-                itemclick : function(sm,record, eOpts){
-                    var allTabPanels = tabsPanel.items.items;
-                    for (var i=0; i< allTabPanels.length; i++){
-                        var tabPanelSelectedRecord = allTabPanels[i].getStore().getById(record.get('id'));
-                        if(tabPanelSelectedRecord){
-                            allTabPanels[i].getSelectionModel().select([tabPanelSelectedRecord], false);
-                            tabsPanel.setActiveTab(allTabPanels[i]);
-                            break;
-                        }
-                    }
-                },
-
-            title : 'Filter',
-            width : '100%',
-            //maxHeight : 350, //VT:settings for vbox layout
-            height : 100,
         var layerFactory = Ext.create('portal.layer.LayerFactory', {
             map : map,
             formFactory : Ext.create('vegl.layer.filterer.VeglFormFactory', {map : map}),
@@ -158,28 +139,28 @@ Ext.application({
 
             for( var z = 0; z < record.length; z++) {
                 var newLayer = null;
-                
+
                 //Ensure the layer DNE first
                 var existingRecord = layerStore.getById(record[z].get('id'));
                 if (existingRecord) {
                     layersPanel.getSelectionModel().select([existingRecord], false);
                     return;
                  }
-    
+
                 //Turn our KnownLayer/CSWRecord into an actual Layer
                 if (record[z] instanceof portal.csw.CSWRecord) {
                     newLayer = record[z].get('layer');
                 } else {
                     newLayer = record[z].get('layer');
                 }
-    
+
                 //if newLayer is undefined, it must have come from some other source like mastercatalogue
                 if (!newLayer){
                     newLayer = layerFactory.generateLayerFromCSWRecord(record[z])
                     //we want it to display immediately.
                     newLayer.set('displayed',true);
                 }
-    
+
                 //We may need to show a popup window with copyright info
                 var cswRecords = newLayer.get('cswRecords');
                 for (var i = 0; i < cswRecords.length; i++) {
@@ -188,20 +169,20 @@ Ext.application({
                             width : 625,
                             cswRecords : cswRecords
                         });
-    
+
                         popup.show();
-    
+
                         //HTML images may take a moment to load which stuffs up our layout
                         //This is a horrible, horrible workaround.
                         var task = new Ext.util.DelayedTask(function(){
                             popup.doLayout();
                         });
                         task.delay(1000);
-    
+
                         break;
                     }
                 }
-    
+
                 layerStore.insert(0,newLayer); //this adds the layer to our store
                 layersPanel.getSelectionModel().select([newLayer], false); //this ensures it gets selected
             }
@@ -270,7 +251,7 @@ Ext.application({
 
         // basic tabs 1, built from existing content
         var tabsPanel = Ext.create('Ext.TabPanel', {
-            // Matches hard-coded id in portal-core/portal/js/layer/Layer.js            
+            // Matches hard-coded id in portal-core/portal/js/layer/Layer.js
             id : 'auscope-tabs-panel',
             title : 'Layers',
             activeTab : 0,
@@ -363,7 +344,7 @@ Ext.application({
           }
 
         });
-        
+
         //Create our permalink generation handler
         var permalinkHandler = function() {
             var mss = Ext.create('portal.util.permalink.MapStateSerializer');
@@ -377,8 +358,8 @@ Ext.application({
                     version : version
                 });
 
-                popup.show(); 
-            });            
+                popup.show();
+            });
         };
         Ext.get('permalink').on('click', permalinkHandler);
         Ext.get('permalinkicon').on('click', permalinkHandler);
@@ -389,7 +370,7 @@ Ext.application({
         if (urlParams && (urlParams.state || urlParams.s)) {
             var decodedString = urlParams.state ? urlParams.state : urlParams.s;
             var decodedVersion = urlParams.v;
-            
+
             deserializationHandler = Ext.create('portal.util.permalink.DeserializationHandler', {
                 knownLayerStore : knownLayerStore,
                 cswRecordStore : unmappedCSWRecordStore,
@@ -398,8 +379,8 @@ Ext.application({
                 map : map,
                 stateString : decodedString,
                 stateVersion : decodedVersion
-            });           
-            
+            });
+
         }
     }
 });
