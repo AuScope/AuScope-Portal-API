@@ -5,9 +5,7 @@
 <head>
     <title>VGL Portal - Access Error</title>
 
-    <link rel="stylesheet" type="text/css" href="css/styles.css">
-    <link rel="stylesheet" type="text/css" href="css/menu.css">
-    <link rel="stylesheet" type="text/css" href="css/grid-examples.css">
+    <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     <link rel="stylesheet" type="text/css" href="portal-core/css/styles.css">
 
     <style type="text/css">

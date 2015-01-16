@@ -1,40 +1,19 @@
+table.x-btn .x-btn-small td.x-btn-mc em a {
+    text-decoration: none;
+    display: block;
+    height: 12px;
+    padding-bottom: 2px;
+    padding-top: 2px;
+}
 
-    body {
-        margin: 0px;
-        padding: 0px;
-    }
+body.ext-opera  table.x-btn .x-btn-small td.x-btn-mc em a,
+body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
+    padding-top: 1px;
+}
 
-    #header-container {
-        width: 100%;
-        height: 100px;
-        background-color: #ffffff;
-    }
-
-    #logo {
-        float: left;
-        width: 531px;
-        height: 100px;
-    }
-
-    #logo h1 {
-        float: left;
-        margin: 0;
-        padding: 0;
-        width: 531px;
-    }
-
-    #logo h1 a {
-        padding: 0;
-        margin: 0;
-        width: 531px;
-        height: 100px;
-        display: block;
-        background: url( "../img/img-auscope-banner.gif" ) no-repeat top left;
-    }
-
-    #logo h1 a span {
-        display: none;
-    }
+body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
+    padding-bottom: 3px;
+}
 
 .jobdesc-title {
     font-weight: bold;
@@ -51,11 +30,11 @@
 }
 
 .disk-icon {
-    background-image: url("../img/disk.png") !important
+    background-image: url("../portal-core/img/disk.png") !important
 }
 
 .download-icon {
-    background-image: url("../img/download.png") !important
+    background-image: url("../portal-core/img/download.png") !important
 }
 
 .upload-icon {
@@ -67,11 +46,11 @@
 }
 
 .grid-icon {
-    background-image: url("../img/grid.png") !important
+    background-image: url("../portal-core/img/grid.png") !important
 }
 
 .refresh-icon {
-    background-image: url("../img/refresh.png") !important
+    background-image: url("../portal-core/img/refresh.png") !important
 }
 
 .settings-icon {
@@ -79,11 +58,11 @@
 }
 
 .find-icon {
-    background-image: url("../img/find.png") !important
+    background-image: url("../portal-core/img/find.png") !important
 }
 
 .cross-icon {
-    background-image: url("../img/delete.gif") !important
+    background-image: url("../portal-core/img/delete.gif") !important
 }
 
 .submit-icon {
@@ -91,7 +70,7 @@
 }
 
 .edit-icon {
-    background-image: url("../img/edit.png") !important
+    background-image: url("../portal-core/img/edit.png") !important
 }
 
 .openid_form p {
@@ -122,88 +101,3 @@
     padding-left: 25px !important;
 }
 
-    /*#menu {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        height: 100px;
-        width: auto;
-    }
-
-    #login {
-        float: right;
-        padding-right: 30px;
-        padding-top: 10px;
-    }
-
-    img {
-        border: none;
-    }
-
-    #nav {
-        float: right;
-        padding-top: 0px;
-        padding-right: 40px;
-    }
-
-    #nav ul {
-        text-align: left;
-        padding: 0px;
-        margin: 0px;
-    }
-
-    #nav ul li {
-        display: inline;
-        padding: 0px;
-        margin: 0px;
-    }
-
-    #nav-example {
-        background: url( "../img/navigation.gif" ) no-repeat;
-        width: 300px;
-        height: 38px;
-        margin: 0;
-        padding: 0;
-        float: right;
-        padding-right: 40px;
-    }
-
-    #nav-example span {
-        display: none;
-    }
-
-    #nav-example li, #nav-example a {
-        height: 38px;
-        display: block;
-    }
-
-    #nav-example li {
-        float: left;
-        list-style: none;
-        display: inline;
-    }
-
-    #nav-example-01 {
-        width: 100px;
-    }
-
-    #nav-example-02 {
-        width: 100px;
-    }
-
-    #nav-example-03 {
-        width: 100px;
-    }
-
-    #nav-example-01 a:hover {
-        background: url( "../img/navigation.gif" ) 0px -38px no-repeat;
-    }
-
-    #nav-example-02 a:hover {
-        background: url( "../img/navigation.gif" ) -100px -38px no-repeat;
-    }
-
-    #nav-example-03 a:hover {
-        background: url( "../img/navigation.gif" ) -200px -38px no-repeat;
-    }
-*/

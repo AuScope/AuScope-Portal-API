@@ -4,9 +4,9 @@
 
 <head>
     <title>AuScope VGL Workflow  - Monitor Jobs</title>
-    <link rel="stylesheet" type="text/css" href="css/styles.css">
-    <link rel="stylesheet" type="text/css" href="css/menu.css">
-    <link rel="stylesheet" type="text/css" href="css/grid-examples.css">
+    
+    <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
+    
     <style type="text/css">
       #sitenav-01 a {
         background: url( "img/navigation.gif" ) 0px -38px no-repeat;

@@ -199,7 +199,7 @@ Ext.application({
                 title : 'Featured Layers',
                 text : '<p1>This is where the portal groups data services with a common theme under a layer. This allows you to interact with multiple data providers using a common interface.</p><br><p>The underlying data services are discovered from a remote registry. If no services can be found for a layer, it will be disabled.</p1>',
                 showDelay : 100,
-                icon : 'img/information.png',
+                icon : 'portal-core/img/information.png',
                 dismissDelay : 30000
             }
         });
