@@ -1,0 +1,103 @@
+table.x-btn .x-btn-small td.x-btn-mc em a {
+    text-decoration: none;
+    display: block;
+    height: 12px;
+    padding-bottom: 2px;
+    padding-top: 2px;
+}
+
+body.ext-opera  table.x-btn .x-btn-small td.x-btn-mc em a,
+body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
+    padding-top: 1px;
+}
+
+body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
+    padding-bottom: 3px;
+}
+
+.jobdesc-title {
+    font-weight: bold;
+    font-size: medium;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.jobdesc-key {
+    font-weight: bold;
+}
+
+.jobdesc-content {
+}
+
+.disk-icon {
+    background-image: url("../portal-core/img/disk.png") !important
+}
+
+.download-icon {
+    background-image: url("../portal-core/img/download.png") !important
+}
+
+.upload-icon {
+    background-image: url("../img/upload.png") !important
+}
+
+.folder-icon {
+    background-image: url("../img/folder.png") !important
+}
+
+.grid-icon {
+    background-image: url("../portal-core/img/grid.png") !important
+}
+
+.refresh-icon {
+    background-image: url("../portal-core/img/refresh.png") !important
+}
+
+.settings-icon {
+    background-image: url("../img/settings.png") !important
+}
+
+.find-icon {
+    background-image: url("../portal-core/img/find.png") !important
+}
+
+.cross-icon {
+    background-image: url("../portal-core/img/delete.gif") !important
+}
+
+.submit-icon {
+    background-image: url("../img/submit.png") !important
+}
+
+.edit-icon {
+    background-image: url("../portal-core/img/edit.png") !important
+}
+
+.openid_form p {
+    text-align: left;
+    color: #f93;
+    font: bold 14px Verdana;
+    padding-bottom: 5px;
+}
+
+.openid_form td {
+    border: solid 1px #999;
+    padding: 40px;
+    padding-top: 30px;
+    background-color: #fafafa;
+}
+
+.openid_form input {
+    padding: 1px 6px;;
+}
+
+.openid_identifier {
+    width:300px;
+    background-image: url("../img/openid.png");
+    background-repeat: no-repeat;
+    background-position: 4px 4px;
+    height: 22px;
+    line-height: 22px;
+    padding-left: 25px !important;
+}
+

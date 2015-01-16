@@ -61,7 +61,7 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                 width:30,
                 sortable: false,
                 items: [{
-                    icon: 'img/download.png',
+                    icon: 'portal-core/img/download.png',
                     tooltip: 'Download this data to your local machine now',
                     scope : this,
                     handler: function(grid, rowIndex, colIndex, item, e, record) {
@@ -73,7 +73,7 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                 width:30,
                 sortable: false,
                 items: [{
-                    icon: 'img/edit.png',
+                    icon: 'portal-core/img/edit.png',
                     tooltip: 'Edit the download options',
                     scope : this,
                     handler: function(grid, rowIndex, colIndex, item, e, record) {
@@ -103,7 +103,7 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
             this._updateDescription(dataItem);
         }, this));
     },
-    
+
     /**
      * Handles the editing of a row by showing a popup and then updating the row description upon completion
      */
@@ -116,7 +116,7 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                 Ext.Msg.alert('Download Error', 'There was an error generating your download URL. Please try again in a few minutes or consider refreshing this page.');
                 return;
             }
-            
+
             portal.util.FileDownloader.downloadFile(dl.get('url'));
         });
     },
@@ -158,8 +158,8 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
 
         //Different data sources have different functions to save
         for (var i = 0; i < selectedRows.length; i++) {
-            vegl.util.DataSelectionUtil.makeDownloadUrl(selectedRows[i].get('onlineResource'), 
-                    selectedRows[i].get('downloadOptions'), 
+            vegl.util.DataSelectionUtil.makeDownloadUrl(selectedRows[i].get('onlineResource'),
+                    selectedRows[i].get('downloadOptions'),
                     true,
                     responseHandler);
         }
@@ -274,7 +274,7 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
                 if (!vegl.util.DataSelectionUtil.isResourceSupported(onlineResource)) {
                     continue;
                 }
-                
+
                 //Set the defaults of our new item
                 newItem = {
                     resourceType : portal.csw.OnlineResource.typeToString(onlineResource.get('type')),

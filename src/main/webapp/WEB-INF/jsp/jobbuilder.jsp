@@ -5,11 +5,9 @@
 
 <head>
     <title>VGL Portal - Build Job</title>
-    <link rel="stylesheet" type="text/css" href="css/styles.css">
-    <link rel="stylesheet" type="text/css" href="css/menu.css">
-    <link rel="stylesheet" type="text/css" href="css/grid-examples.css">
-    <link rel="stylesheet" type="text/css" href="portal-core/css/styles.css">
-
+    
+    <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
+    
     <style type="text/css">
       #sitenav-03 a {
         background: url( "img/navigation.gif" ) -200px -38px no-repeat;
