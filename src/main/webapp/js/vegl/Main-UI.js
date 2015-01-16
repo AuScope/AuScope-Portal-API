@@ -25,43 +25,6 @@ Ext.application({
                     type : 'json',
                     root : 'data'
                 }
-            },
-            autoLoad : true
-        });
-
-        //Our custom record store holds layers that the user has
-        //added to the map using a OWS URL entered through the
-        //custom layers panel
-        var customRecordStore = Ext.create('Ext.data.Store', {
-            model : 'portal.csw.CSWRecord',
-            proxy : {
-                type : 'ajax',
-                url : 'getCustomLayers.do',
-                reader : {
-                    type : 'json',
-                    root : 'data'
-                }
-            },
-            autoLoad : false,
-            data : [],
-            listeners : {
-                load  :  function(store, records, successful, eopts){
-                    if(!successful){
-                        Ext.Msg.show({
-                            title:'Error!',
-                            msg: 'Your WMS service has to support EPSG:3857 to be supported by Google map. You are seeing this error because either the URL is not valid or it does not conform to EPSG:3857 WMS layers standard',
-                            buttons: Ext.Msg.OK
-                        });
-                    }else{
-                        if(records.length === 0){
-                            Ext.Msg.show({
-                                title:'No WMS Layers!',
-                                msg: 'There are no WMS Layers in the given URL',
-                                buttons: Ext.Msg.OK
-                            });
-                        }
-                    }
-                }
             }
         });
 
@@ -72,21 +35,6 @@ Ext.application({
             proxy : {
                 type : 'ajax',
                 url : 'getKnownLayers.do',
-                reader : {
-                    type : 'json',
-                    root : 'data'
-                }
-            },
-            autoLoad : true
-        });
-
-        // Create the ResearchDataLayer store
-        var researchDataLayerStore = Ext.create('Ext.data.Store', {
-            model : 'portal.knownlayer.KnownLayer',
-            groupField: 'group',
-            proxy : {
-                type : 'ajax',
-                url : 'getResearchDataLayers.do',
                 reader : {
                     type : 'json',
                     root : 'data'
@@ -204,56 +152,9 @@ Ext.application({
             }
         });
 
-        var unmappedRecordsPanel = Ext.create('portal.widgets.panel.CSWRecordPanel', {
-            title : 'Registered',
-            store : unmappedCSWRecordStore,
-            activelayerstore : layerStore,
-            tooltip : {
-                title : 'Registered Layers',
-                text : 'The layers that appear here are the data services that were discovered in a remote registry but do not belong to any of the Featured Layers groupings.',
-                showDelay : 100,
-                dismissDelay : 30000
-            },
-            map : map,
-            layerFactory : layerFactory
-        });
-
-        var customRecordsPanel = Ext.create('portal.widgets.panel.CustomRecordPanel', {
-            title : 'Custom',
-            itemId : 'org-auscope-custom-record-panel',
-            store : customRecordStore,
-            activelayerstore : layerStore,
-            enableBrowse : true,//VT: if true browse catalogue option will appear
-            tooltip : {
-                title : 'Custom Data Layers',
-                text : 'This tab allows you to create your own layers from remote data services.',
-                showDelay : 100,
-                dismissDelay : 30000
-            },
-            map : map,
-            layerFactory : layerFactory
-        });
-
-        var researchDataPanel = Ext.create('portal.widgets.panel.KnownLayerPanel', {
-            title : 'Research Data',
-            store : researchDataLayerStore,
-            activelayerstore : layerStore,
-            enableBrowse : false,//VT: if true browse catalogue option will appear
-            map : map,
-            layerFactory : layerFactory,
-            tooltip : {
-                title : 'Research Data Layers',
-                text : '<p1>The layers in this tab represent past/present research activities and may contain partial or incomplete information.</p1>',
-                showDelay : 100,
-                dismissDelay : 30000
-            }
-        });
-
         // basic tabs 1, built from existing content
         var tabsPanel = Ext.create('Ext.TabPanel', {
-            // Matches hard-coded id in portal-core/portal/js/layer/Layer.js
-            id : 'auscope-tabs-panel',
-            title : 'Layers',
+            id : 'vgl-tabs-panel',
             activeTab : 0,
             region : 'center',
             split : true,
@@ -261,10 +162,7 @@ Ext.application({
             width : '100%',
             enableTabScroll : true,
             items:[
-                knownLayersPanel,
-                unmappedRecordsPanel,
-                customRecordsPanel,
-                researchDataPanel
+                knownLayersPanel
             ]
         });
 
