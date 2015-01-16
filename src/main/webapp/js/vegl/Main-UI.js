@@ -140,7 +140,7 @@ Ext.application({
 
         // basic tabs 1, built from existing content
         var tabsPanel = Ext.create('Ext.TabPanel', {
-            id : 'vgl-tabs-panel',
+            id : 'auscope-tabs-panel',
             activeTab : 0,
             region : 'center',
             split : true,
