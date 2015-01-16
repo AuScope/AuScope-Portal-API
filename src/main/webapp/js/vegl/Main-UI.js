@@ -14,20 +14,6 @@ Ext.application({
         var urlParams = Ext.Object.fromQueryString(window.location.search.substring(1));
         var isDebugMode = urlParams.debug;
 
-        //Create our CSWRecord store (holds all CSWRecords not mapped by known layers)
-        var unmappedCSWRecordStore = Ext.create('Ext.data.Store', {
-            model : 'portal.csw.CSWRecord',
-            groupField: 'contactOrg',
-            proxy : {
-                type : 'ajax',
-                url : 'getUnmappedCSWRecords.do',
-                reader : {
-                    type : 'json',
-                    root : 'data'
-                }
-            }
-        });
-
         //Create our KnownLayer store
         var knownLayerStore = Ext.create('Ext.data.Store', {
             model : 'portal.knownlayer.KnownLayer',
@@ -271,7 +257,6 @@ Ext.application({
 
             deserializationHandler = Ext.create('portal.util.permalink.DeserializationHandler', {
                 knownLayerStore : knownLayerStore,
-                cswRecordStore : unmappedCSWRecordStore,
                 layerFactory : layerFactory,
                 layerStore : layerStore,
                 map : map,
