@@ -4,3 +4,4 @@
 target/
 src/main/webapp/META-INF/
 src/main/resources/env.properties
+.pydevproject
