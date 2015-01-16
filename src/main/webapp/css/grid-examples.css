@@ -64,6 +64,51 @@
     background-image:url(../img/add.gif) !important;
 }
 
+.addall {
+    background-image:url(../img/addall.gif) !important;
+}
+
 .remove {
     background-image:url(../img/delete.gif) !important;
+}
+
+.trash {
+    background-image:url(../img/trash.png) !important;
+}
+
+.stop{
+    background-image:url(../img/drop-no.gif) !important;
+
+}
+
+.info {
+    background-image:url(../img/information.png) !important;
+}
+
+.download {
+    background-image:url(../img/download.png) !important;
+}
+
+.setting {
+    background-image:url(../img/setting.png) !important;
+}
+
+.visible_eye {
+    background-image:url(../img/eye.png) !important;
+}
+
+.link {
+    background-image:url(../img/link.png) !important;
+}
+
+.magglass {
+    background-image:url(../img/magglass.gif) !important;
+}
+
+.portrayal {
+    background-image:url(../img/picture-small.png) !important;
+}
+
+.data {
+    background-image:url(../img/binary-small.png) !important;
 }
