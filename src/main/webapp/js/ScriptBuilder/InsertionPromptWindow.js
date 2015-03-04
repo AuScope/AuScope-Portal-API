@@ -17,10 +17,7 @@ Ext.define('ScriptBuilder.InsertionPromptWindow', {
     },
 
     constructor : function(config) {
-        this.addEvents({
-            'select' : true
-        });
-
+       
         Ext.apply(config, {
             title : 'Insertion Options',
             buttonAlign : 'right',

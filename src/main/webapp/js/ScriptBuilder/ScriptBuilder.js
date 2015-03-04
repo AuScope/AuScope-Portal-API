@@ -15,25 +15,22 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
     constructor: function(config) {
         this.wizardState = config.wizardState;
         this.templateVariables = config.templateVariables;
-
-        this.sourceText = Ext.create('Ext.ux.form.field.CodeMirror', {
+        
+        this.sourceText =  Ext.create('Ext.form.FormPanel', {
             title : 'Script Source',
-            region : 'center',
-            cls : 'prettyprint',
-            mode : 'text/x-python',
-            showAutoIndent : false,
-            showLineNumbers : true,
-            listModes : [{text: "Python", mime: "text/x-python"},
-                         {text: "Plain text", mime: "text/plain"}],
-            modes: [{
-                mime:           ['text/plain'],
-                dependencies:   []
-            },{
-                mime:           ['text/x-python', 'python'],
-                dependencies:   ['CodeMirror-2.33/lib/python/python.js']
+            region : 'center',           
+            layout    : 'anchor',
+            items: [{
+                xtype     : 'codeeditor',                
+                mode      : 'javascript',
+                name      : 'message',
+                fieldLabel: 'Message',
+                anchor    : '100%'
             }]
         });
 
+            
+       
         this.componentsPanel = Ext.create('ScriptBuilder.ComponentTreePanel', {
             region : 'west',
             title : 'Available Templates',

@@ -23,7 +23,7 @@ Ext.application({
                 url : 'getKnownLayers.do',
                 reader : {
                     type : 'json',
-                    root : 'data'
+                    rootProperty : 'data'
                 }
             },
             autoLoad : true
@@ -159,10 +159,9 @@ Ext.application({
             layout: 'border',//VT: vbox doesn't support splitbar unless we custom it.
             region:'west',
             border: false,
-            split:true,
-            //margins: '100 0 0 0',
-            margins:'100 0 0 3',
-            width: 350,
+            split:true,           
+            margin:'100 0 0 3',
+            width: 370,
             items:[tabsPanel]
         };
 
@@ -172,8 +171,13 @@ Ext.application({
         var centerPanel = Ext.create('Ext.panel.Panel', {
             region: 'center',
             id: 'center_region',
-            margins: '100 0 0 0',
-            cmargins:'100 0 0 0'
+            margin: '100 0 0 0',
+            html : "<div style='width:100%; height:100%' id='center_region-map'></div>",
+            listeners: {
+                afterrender: function () {    
+                    map.renderToContainer(centerPanel,'center_region-map');   //After our centerPanel is displayed, render our map into it                                     
+                }
+            }
         });
 
         /**
@@ -184,8 +188,7 @@ Ext.application({
             items:[westPanel, centerPanel]
         });
 
-        map.renderToContainer(centerPanel);   //After our centerPanel is displayed, render our map into it
-
+        
         // The subset button needs a handler for when the user draws a subset bbox on the map:
         map.on('dataSelect', function(map, bbox, intersectedRecords) {
           //Show a dialog allow users to confirm the selected data sources

@@ -73,7 +73,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                     url : 'secure/jobFiles.do',
                     reader : {
                         type : 'json',
-                        root : 'data'
+                        rootProperty : 'data'
                     },
                     listeners : {
                         exception : function(proxy, response, operation) {

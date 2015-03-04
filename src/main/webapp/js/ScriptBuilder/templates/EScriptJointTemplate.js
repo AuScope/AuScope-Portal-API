@@ -44,7 +44,7 @@ Ext.define('ScriptBuilder.templates.EScriptJointTemplate', {
                         },
                         reader : {
                             type : 'json',
-                            root : 'data'
+                            rootProperty : 'data'
                         }
                     },
                     autoLoad : true
@@ -71,7 +71,7 @@ Ext.define('ScriptBuilder.templates.EScriptJointTemplate', {
                         },
                         reader : {
                             type : 'json',
-                            root : 'data'
+                            rootProperty : 'data'
                         }
                     },
                     autoLoad : true

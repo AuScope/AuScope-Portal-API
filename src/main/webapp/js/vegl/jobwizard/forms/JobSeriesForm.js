@@ -18,7 +18,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                 url : 'secure/mySeries.do',
                 reader : {
                     type : 'json',
-                    root : 'data'
+                    rootProperty : 'data'
                 },
                 listeners : {
                     exception : function(proxy, response, operation) {
@@ -85,9 +85,8 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                     displayField: 'name',
                     fieldLabel: 'Series Name',
                     listeners : {
-                        select : function(combo, records, index) {
-                            if (records.length > 0) {
-                                var record = records[0];
+                        select : function(combo, record, index) {
+                            if (record) {                                
                                 var descArea = jobSeriesObj.getSeriesDesc();
                                 descArea.setRawValue(record.get('description'));
 

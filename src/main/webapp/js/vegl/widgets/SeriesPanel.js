@@ -56,7 +56,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
                     url : 'secure/querySeries.do',
                     reader : {
                         type : 'json',
-                        root : 'data'
+                        rootProperty : 'data'
                     },
                     listeners : {
                         exception : function(proxy, response, operation) {
@@ -78,13 +78,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
                 cls: 'x-btn-text-icon',
                 iconCls: 'find-icon'
             }]
-        });
-
-        this.addEvents({
-            'selectseries' : true,
-            'refreshDetailsPanel' : true,
-            'error' : true
-        });
+        });   
 
         this.callParent(arguments);
 

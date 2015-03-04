@@ -25,6 +25,8 @@
 
       <%-- CSS imports - relative paths back to the webapp directory--%>
       <jsp:include page="../../portal-core/cssimports.htm"/>
+      <jsp:include page="../../cssimports.htm"/>
+      
       <%-- JS imports - relative paths back to the webapp directory --%>
       <jsp:include page="../../portal-core/jsimports.htm"/>
       <jsp:include page="../../portal-core/jsimports-openlayers.htm"/>

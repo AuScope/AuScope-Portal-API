@@ -44,7 +44,7 @@ Ext.define('vegl.widgets.WfsSubsetPanel', {
                 },
                 reader : {
                     type : 'json',
-                    root : 'data'
+                    rootProperty : 'data'
                 }
             }
         });

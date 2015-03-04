@@ -139,8 +139,12 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
 
         var totalResponses = 0;
         var totalErrors = 0;
+     
+        var myMask = new Ext.LoadMask({
+            msg : 'Saving selected datasets...',
+            target : this
+        });
 
-        var myMask = new Ext.LoadMask(this, {msg: "Saving selected datasets..."});
         myMask.show();
 
         //Simple handler for keeping track of how many requests we've sent vs how many responses we've received

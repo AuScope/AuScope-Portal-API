@@ -119,7 +119,7 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
                 },
                 reader : {
                     type : 'json',
-                    root : 'data'
+                    rootProperty : 'data'
                 }
             },
             autoLoad : true
@@ -132,7 +132,7 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
                 url : 'describeSimpleFeature.do',
                 reader : {
                     type : 'json',
-                    root : 'data'
+                    rootProperty : 'data'
                 }
             },
             autoLoad : false

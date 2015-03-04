@@ -151,7 +151,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                     extraParams : {seriesId : null},
                     reader : {
                         type : 'json',
-                        root : 'data'
+                        rootProperty : 'data'
                     },
                     listeners : {
                         exception : function(proxy, response, operation) {
@@ -180,12 +180,6 @@ Ext.define('vegl.widgets.JobsPanel', {
             }]
         });
 
-        this.addEvents({
-            'selectjob' : true,
-            'refreshDetailsPanel' : true,
-            'jobregistered' : true,
-            'error' : true
-        });
 
         this.callParent(arguments);
 

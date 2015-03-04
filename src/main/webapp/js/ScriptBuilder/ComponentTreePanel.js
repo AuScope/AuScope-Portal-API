@@ -17,11 +17,7 @@ Ext.define('ScriptBuilder.ComponentTreePanel', {
         });
 
         this.callParent(arguments);
-
-        this.addEvents({
-            'addcomponent' : true
-        });
-
+       
         this.on('itemdblclick', this._onDblClick, this);
     },
 

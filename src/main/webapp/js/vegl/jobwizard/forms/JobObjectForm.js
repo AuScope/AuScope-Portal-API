@@ -25,7 +25,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 url: 'getVmImagesForComputeService.do',
                 reader: {
                    type: 'json',
-                   root : 'data'
+                   rootProperty : 'data'
                 }
             }
         });
@@ -37,7 +37,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 url: 'getVmTypesForComputeService.do',
                 reader: {
                    type: 'json',
-                   root : 'data'
+                   rootProperty : 'data'
                 }
             }
         });
@@ -50,7 +50,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 url: 'getStorageServices.do',
                 reader: {
                    type: 'json',
-                   root : 'data'
+                   rootProperty : 'data'
                 }
             },
             autoLoad : true
@@ -65,7 +65,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 url: 'getComputeServices.do',
                 reader: {
                    type: 'json',
-                   root : 'data'
+                   rootProperty : 'data'
                 }
             },
             autoLoad : true
@@ -245,7 +245,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     },
 
     onComputeSelect : function(combo, records) {
-        if (!records.length) {
+        if (!records) {
             this.imageStore.removeAll();
             this.computeTypeStore.removeAll();
             return;

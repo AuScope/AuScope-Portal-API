@@ -28,7 +28,7 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
                 },
                 reader : {
                     type : 'json',
-                    root : 'data'
+                    rootProperty : 'data'
                 }
             },
             autoLoad : true

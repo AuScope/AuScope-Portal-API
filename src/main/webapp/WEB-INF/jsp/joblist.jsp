@@ -14,18 +14,19 @@
     </style>
 
     <%-- Code Mirror inclusions --%>
-    <link href="CodeMirror-2.33/lib/codemirror.css" type="text/css" rel="stylesheet" />
-    <script type="text/javascript" src="CodeMirror-2.33/lib/codemirror.js"></script>
-    <script type="text/javascript" src="CodeMirror-2.33/mode/python/python.js"></script>
-    <script type="text/javascript" src="CodeMirror-2.33/lib/util/formatting.js"></script>
-    <script type="text/javascript" src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
+	<link href="CodeMirror-5.0/lib/codemirror.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="CodeMirror-5.0/lib/codemirror.js"></script>
+	<script type="text/javascript" src="CodeMirror-5.0/mode/python/python.js"></script>
+	<script type="text/javascript" src="CodeMirror-5.0/mode/javascript/javascript.js"></script>
+	
 
     <!-- Portal Core Includes -->
     <jsp:include page="../../portal-core/cssimports.htm"/>
+    <jsp:include page="../../cssimports.htm"/>
     <jsp:include page="../../portal-core/jsimports.htm"/>
 
-    <script type="text/javascript" src="mzExt/ux/form/field/Ext.ux.form.field.CodeMirror.411.js"></script>
 
+    <script type="text/javascript" src="js/vegl/widgets/CodeEditorField.js"></script>
     <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
     <script type="text/javascript" src="js/vegl/models/Job.js"></script>
     <script type="text/javascript" src="js/vegl/models/Series.js"></script>

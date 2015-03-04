@@ -40,7 +40,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
                 },
                 reader : {
                     type : 'json',
-                    root : 'data'
+                    rootProperty : 'data'
                 }
             }
         });

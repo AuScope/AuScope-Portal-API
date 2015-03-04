@@ -4,8 +4,13 @@
 * Author - Josh Vote
 */
 Ext.namespace("JobBuilder");
+Ext.require([
+             'Ext.ux.form.plugin.FieldHelpText'         
+ ]);
 Ext.define('vegl.jobwizard.forms.BaseJobWizardForm', {
     extend : 'Ext.form.Panel',
+    
+    
 
     /**
      * State object that is shared by all wizard forms. Use it to communicate
@@ -28,17 +33,14 @@ Ext.define('vegl.jobwizard.forms.BaseJobWizardForm', {
     constructor: function(obj) {
         this.callParent(arguments);
 
-        this.wizardState = obj.wizardState;
-        this.addEvents('jobWizardActive',			//Fired whenever a job wizard form becomes active
-                       'jobWizardDeactive',			//Fired whenever a job wizard form deactivates
-                       'jobWizardLoadException');	//Fired whenever a job wizard form experiences problems loading from the server
+        this.wizardState = obj.wizardState;      
 
-        this.on('jobWizardActive', function() {
-            Ext.EventManager.on(window, 'beforeunload', this.onBeforeWindowUnload, this);
+        this.on('jobWizardActive', function() {            
+            window.addEventListener('beforeunload',this.onBeforeWindowUnload,this)
         }, this);
 
         this.on('jobWizardDeactive', function() {
-            Ext.EventManager.un(window, 'beforeunload', this.onBeforeWindowUnload, this);
+            window.removeEventListener('beforeunload',this.onBeforeWindowUnload,this)
         }, this);
     },
 

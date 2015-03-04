@@ -50,7 +50,7 @@ Ext.define('ScriptBuilder.templates.UbcGravityTemplate', {
                         },
                         reader : {
                             type : 'json',
-                            root : 'data'
+                            rootProperty : 'data'
                         }
                     },
                     autoLoad : true

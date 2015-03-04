@@ -44,7 +44,7 @@ Ext.define('ScriptBuilder.templates.EScriptGravityTemplate', {
                         },
                         reader : {
                             type : 'json',
-                            root : 'data'
+                            rootProperty : 'data'
                         }
                     },
                     autoLoad : true

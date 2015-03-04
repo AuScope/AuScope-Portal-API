@@ -44,7 +44,7 @@ Ext.define('ScriptBuilder.templates.EScriptMagneticTemplate', {
                         },
                         reader : {
                             type : 'json',
-                            root : 'data'
+                            rootProperty : 'data'
                         }
                     },
                     autoLoad : true
