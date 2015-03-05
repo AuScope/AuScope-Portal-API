@@ -354,19 +354,16 @@ Ext.define('vegl.widgets.JobsPanel', {
             closable: false,
             scope : this,
             fn: function(btn) {
-                if (btn == 'yes') {
-                    loadMask = new Ext.LoadMask(Ext.getBody(), {
-                        msg : 'Cancelling Job...',
-                        removeMask : true
-                    });
-                    loadMask.show();
+                if (btn == 'yes') {     
+                    
+                    Ext.getBody().mask('Cancelling Job...');
+                    
                     Ext.Ajax.request({
                         url: 'secure/killJob.do',
                         params: { 'jobId': job.get('id')},
                         scope : this,
-                        callback : function(options, success, response) {
-                            loadMask.hide();
-
+                        callback : function(options, success, response) {                            
+                            Ext.getBody().unmask();
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
                                 return;
@@ -398,18 +395,16 @@ Ext.define('vegl.widgets.JobsPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {
-                    loadMask = new Ext.LoadMask(Ext.getBody(), {
-                        msg : 'Deleting Job...',
-                        removeMask : true
-                    });
-                    loadMask.show();
+                    
+                    Ext.getBody().mask('Deleting Job...');
+                    
                     Ext.Ajax.request({
                         url: 'secure/deleteJob.do',
                         params: { 'jobId': job.get('id')},
                         timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
                         scope : this,
                         callback : function(options, success, response) {
-                            loadMask.hide();
+                            Ext.getBody().unmask();
 
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
@@ -515,11 +510,9 @@ Ext.define('vegl.widgets.JobsPanel', {
      * job - A vegl.models.Job object that will be submitted
      */
     submitJob : function(job) {
-        var loadMask = new Ext.LoadMask(Ext.getBody(), {
-            msg : 'Submitting Job...',
-            removeMask : true
-        });
-        loadMask.show();
+
+        Ext.getBody().mask('Submitting Job...');
+        
         Ext.Ajax.request({
             url : 'secure/submitJob.do',
             params : {
@@ -528,7 +521,7 @@ Ext.define('vegl.widgets.JobsPanel', {
             timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
             scope : this,
             callback : function(options, success, response) {
-                loadMask.hide();
+                Ext.getBody().unmask();
                 var responseObj;
                 var error = true;
                 if (success) {

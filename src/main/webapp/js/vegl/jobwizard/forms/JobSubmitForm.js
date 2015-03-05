@@ -22,12 +22,9 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
 
     //Validation means we go and submit the job
     beginValidation : function(callback) {
-        var jobSubmitFrm = this;
-        var loadMask = new Ext.LoadMask(Ext.getBody(), {
-            msg : 'Submitting Job...',
-            removeMask : true
-        });
-        loadMask.show();
+        var jobSubmitFrm = this;                
+        Ext.getBody().mask('Submitting Job...');
+        
         Ext.Ajax.request({
             url : 'secure/submitJob.do',
             params : {
@@ -35,7 +32,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
             },
             timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
             callback : function(options, success, response) {
-                loadMask.hide();
+                Ext.getBody().unmask();
                 var errorMsg, errorInfo;
 
                 if (success) {

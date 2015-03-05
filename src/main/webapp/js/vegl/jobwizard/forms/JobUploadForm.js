@@ -19,6 +19,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
             wizardState : wizardState,
             bodyStyle: 'padding:10px;',
             fileUpload: true,
+            header : false,
             frame: true,
             buttons: [],
             listeners : {

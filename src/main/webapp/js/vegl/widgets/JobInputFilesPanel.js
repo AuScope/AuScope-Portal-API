@@ -110,10 +110,11 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             return;
         }
 
-        //Fire off the first request for already uploaded input files
-        var loadMask = new Ext.LoadMask(Ext.getBody(), {
+        //Fire off the first request for already uploaded input files 
+        var loadMask = new Ext.LoadMask({
             msg : 'Requesting input files...',
-            removeMask : true
+            target : this,
+            removeMask : true            
         });
         loadMask.show();
 

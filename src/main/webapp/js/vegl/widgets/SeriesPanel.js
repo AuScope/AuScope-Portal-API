@@ -181,17 +181,15 @@ Ext.define('vegl.widgets.SeriesPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {
-                    loadMask = new Ext.LoadMask(Ext.getBody(), {
-                        msg : 'Cancelling Series Jobs...',
-                        removeMask : true
-                    });
-                    loadMask.show();
+
+                    Ext.getBody().mask('Cancelling Series Jobs...');
+                    
                     Ext.Ajax.request({
                         url: 'secure/killSeriesJobs.do',
                         params: { 'seriesId': series.get('id')},
                         scope : this,
-                        callback : function(options, success, response) {
-                            loadMask.hide();
+                        callback : function(options, success, response) {                            
+                            Ext.getBody().unmask();
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
                                 return;
@@ -222,17 +220,13 @@ Ext.define('vegl.widgets.SeriesPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {
-                    loadMask = new Ext.LoadMask(Ext.getBody(), {
-                        msg : 'Deleting Series...',
-                        removeMask : true
-                    });
-                    loadMask.show();
+                    Ext.getBody().mask('Deleting Series...');
                     Ext.Ajax.request({
                         url: 'secure/deleteSeriesJobs.do',
                         params: { 'seriesId': series.get('id')},
                         scope : this,
                         callback : function(options, success, response) {
-                            loadMask.hide();
+                            Ext.getBody().unmask();
 
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');

@@ -8,25 +8,24 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
     textEditMode : false,
     wizardState : null,
     templateVariables : null,
-
-    sourceText : null,
+    
+    editor  : null,
     componentsPanel : null,
 
     constructor: function(config) {
         this.wizardState = config.wizardState;
         this.templateVariables = config.templateVariables;
         
-        this.sourceText =  Ext.create('Ext.form.FormPanel', {
-            title : 'Script Source',
+        this.editor = Ext.create('vegl.widgets.CodeEditorField',{
+            mode      : 'python',
+            name      : 'scriptcodefield'         
+        })
+        
+        var editorPanel =  Ext.create('Ext.form.FormPanel', {            
             region : 'center',           
-            layout    : 'anchor',
-            items: [{
-                xtype     : 'codeeditor',                
-                mode      : 'javascript',
-                name      : 'message',
-                fieldLabel: 'Message',
-                anchor    : '100%'
-            }]
+            layout    : 'fit', 
+            scrollable  : true,
+            items: [this.editor]
         });
 
             
@@ -51,7 +50,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
                 layout : 'fit',
                 region : 'center',
                 title : 'Script Source',
-                items : [this.sourceText]
+                items : [editorPanel]
             }, this.componentsPanel]
         });
 
@@ -113,24 +112,24 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         var from = null;
         var to = null;
 
-        if (this.sourceText.editor.somethingSelected()) {
-            from = this.sourceText.editor.getCursor(true);
-            to = this.sourceText.editor.getCursor(false);
+        if (this.editor.somethingSelected()) {
+            from = this.editor.getCursor(true);
+            to = this.editor.getCursor(false);
         } else {
-            from = this.sourceText.editor.getCursor();
+            from = this.editor.getCursor();
         }
 
-        this.sourceText.editor.replaceRange(script, from, to);
+        this.editor.replaceRange(script, from, to);
     },
 
     /**
      * Replaces the current tab with the specified script
      */
     replaceScript : function(script) {
-        this.sourceText.setValue(script);
+        this.editor.setValue(script);
     },
 
     getScript : function() {
-        return this.sourceText.getValue();
+        return this.editor.getValue();
     }
 });

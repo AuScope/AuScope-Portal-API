@@ -63,6 +63,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
 
         this.callParent([{
             wizardState : wizardState,
+            header : false,
             bodyStyle: 'padding:10px;',
             fileUpload: true,
             frame: true,
@@ -85,12 +86,9 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
         this.updateFileList();
     },
 
-    deleteJobWithId : function(id) {
-        var loadMask = new Ext.LoadMask(Ext.getBody(), {
-            msg : 'Removing duplicate job...',
-            removeMask : true
-        });
-        loadMask.show();
+    deleteJobWithId : function(id) {      
+        
+        Ext.getBody().mask('Removing duplicate job...');
 
         //Tell the backend to remove duplicate job
         Ext.Ajax.request({
@@ -100,7 +98,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
             },
             scope : this,
             callback : function(options, success, response) {
-                loadMask.hide();
+                Ext.getBody().unmask();
             }
         });
     },
@@ -126,13 +124,9 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
         for (var i = 0; i < selectedFiles.length; i++) {
             filesToDuplicate.push(selectedFiles[i].get('name'));
         }
-        var jobId = this.wizardState.duplicateJobId;
-
-        var loadMask = new Ext.LoadMask(Ext.getBody(), {
-            msg : 'Duplicating Job...',
-            removeMask : true
-        });
-        loadMask.show();
+        var jobId = this.wizardState.duplicateJobId;        
+        
+        Ext.getBody().mask('Duplicating Job...');
 
         //Tell the backend to duplicate
         Ext.Ajax.request({
@@ -143,7 +137,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
             },
             scope : this,
             callback : function(options, success, response) {
-                loadMask.hide();
+                Ext.getBody().unmask();
 
                 if (success) {
                     var responseObj = Ext.JSON.decode(response.responseText);

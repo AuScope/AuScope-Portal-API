@@ -25,6 +25,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         // Finally, build the main layout once all the pieces are ready.
         this.callParent([{
             wizardState : wizardState,
+            header : false,
             layout : 'fit',
             listeners : {
                 jobWizardActive : function() {
@@ -46,11 +47,9 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
 
     // load script source from VL server filesystem
     loadSavedScript : function(jobId) {
-        var loadMask = new Ext.LoadMask(Ext.getBody(), {
-            msg : 'Loading saved script...',
-            removeMask : true
-        });
-        loadMask.show();
+
+        Ext.getBody().mask('Loading saved script...');
+        
         Ext.Ajax.request({
             url : 'getSavedScript.do',
             params : {
@@ -58,7 +57,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
             },
             scope : this,
             callback : function(options, success, response) {
-                loadMask.hide();
+                Ext.getBody().unmask();
                 var errorMsg, errorInfo;
 
                 if (success) {

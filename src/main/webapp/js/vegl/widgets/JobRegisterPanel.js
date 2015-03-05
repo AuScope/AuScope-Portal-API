@@ -172,11 +172,8 @@ Ext.define('vegl.widgets.JobRegisterPanel', {
         
         var selectedJob = this.job;
 
-        var loadMask = new Ext.LoadMask(Ext.getBody(), {
-            msg : 'Registering Job...',
-            removeMask : true
-        });
-        loadMask.show();
+
+        Ext.getBody().mask('Registering Job...');
         
         form.submit({
             url: 'secure/insertRecord.do',
@@ -184,7 +181,7 @@ Ext.define('vegl.widgets.JobRegisterPanel', {
                 jobId : this.jobId
             },
             success: function(form, action) {
-                loadMask.hide();
+                Ext.getBody().unmask();
                 if (!action.result.success) {
                     Ext.Msg.alert('Failure', 'Job registration failed. Please try again in a few minutes or report this error to cg_admin@csiro.au.');
                     return;
@@ -197,7 +194,7 @@ Ext.define('vegl.widgets.JobRegisterPanel', {
                 popupWin.close();
             },
             failure: function(form, action) {
-                loadMask.hide();
+                Ext.getBody().unmask();
                 responseObj = Ext.JSON.decode(action.response.responseText);
                 errorMsg = responseObj.msg;
                 errorInfo = responseObj.debugInfo;

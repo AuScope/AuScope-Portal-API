@@ -576,7 +576,7 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
                 listeners : {
                     //Upon selecting a new dataset
                     select : Ext.bind(function(combo, records) {
-                        this._handleDatasetSelection(combo.ownerCt, records.length ? records[0] : null);
+                        this._handleDatasetSelection(combo.ownerCt, records ? records : null);
                     }, this)
                 }
             },{

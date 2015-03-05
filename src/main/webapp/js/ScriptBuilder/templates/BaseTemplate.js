@@ -112,11 +112,11 @@ Ext.define('ScriptBuilder.templates.BaseTemplate', {
         denormaliseKvp(keys, values, this.getParameters());
         denormaliseKvp(keys, values, additionalParams);
 
-        var loadMask = new Ext.LoadMask(Ext.getBody(), {
-            msg : 'Loading script...',
-            removeMask : true
-        });
-        loadMask.show();
+       
+        
+        Ext.getBody().mask("Loading script...");
+        
+       
 
         Ext.Ajax.request({
             url : 'getTemplatedScript.do',
@@ -126,7 +126,7 @@ Ext.define('ScriptBuilder.templates.BaseTemplate', {
                 value : values
             },
             callback : function(options, success, response) {
-                loadMask.hide();
+                Ext.getBody().unmask();
 
                 if (!success) {
                     callback(ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_ERROR, null);

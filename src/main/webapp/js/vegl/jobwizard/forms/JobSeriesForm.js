@@ -36,6 +36,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
         this.callParent([{
             wizardState : wizardState,
             bodyStyle: 'padding:10px;',
+            header : false,
             frame: true,
             layout : {
                 type : 'vbox',

@@ -75,6 +75,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         this.callParent([{
             wizardState : wizardState,
             bodyStyle: 'padding:10px;',
+            header : false,
             frame: true,
             defaults: { anchor: "100%" },
             labelWidth: 150,
@@ -254,12 +255,12 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         this.getComponent('image-combo').clearValue();
         this.imageStore.load({
             params : {
-                computeServiceId : records[0].get('id')
+                computeServiceId : records.get('id')
             }
         });
         this.computeTypeStore.load({
             params : {
-                computeServiceId : records[0].get('id')
+                computeServiceId : records.get('id')
             }
         });
     },

@@ -215,8 +215,8 @@ Ext.define('ScriptBuilder.templates.EScriptGravityPointTemplate', {
                 store : jobStore,
                 listeners:{
                     'select': function( combo, records, eOpts ){
-                        var x = Math.abs(records[0].get('eastBoundLongitude') - records[0].get('westBoundLongitude'));
-                        var y = Math.abs(records[0].get('northBoundLatitude') - records[0].get('southBoundLatitude'));
+                        var x = Math.abs(records.get('eastBoundLongitude') - records.get('westBoundLongitude'));
+                        var y = Math.abs(records.get('northBoundLatitude') - records.get('southBoundLatitude'));
                         ratioY = y/x;
                         ratioX = x/y;
                         var xSizeField = Ext.getCmp('EScriptGravityPointXSize');
