@@ -164,7 +164,10 @@ Ext.define('vegl.layer.querier.csw.GAProjectsQuerier', {
                     var dlOptions = btn.ownerCt._dlOptions;
                     var wcsResource = btn.ownerCt._wcsResource;
                     
-                    var myMask = new Ext.LoadMask(this, {msg: "Capturing grid..."});
+                    var myMask = new Ext.LoadMask({
+                        msg: "Capturing grid...",
+                        target : this
+                            });
                     myMask.show();
                     
                     vegl.util.DataSelectionUtil.makeDownloadUrl(wcsResource, dlOptions, true, function(success) {

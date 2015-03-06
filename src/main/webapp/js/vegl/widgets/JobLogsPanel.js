@@ -25,10 +25,10 @@ Ext.define('vegl.widgets.JobLogsPanel', {
      * Reloads this store with all the jobs for the specified series
      */
     listLogsForJob : function(job) {
-        var loadMask = null;
+        var loadMaskElement = null;
         if (this.rendered) {
-            loadMask = new Ext.LoadMask(this.getEl(), {msg: 'Loading logs...'});
-            loadMask.show();
+            loadMaskElement = this.getEl();            
+            loadMaskElement.mask('Loading logs...');
         }
 
 
@@ -42,8 +42,8 @@ Ext.define('vegl.widgets.JobLogsPanel', {
             },
             scope : this,
             callback : function(options, success, response) {
-                if (loadMask) {
-                    loadMask.hide();
+                if (loadMaskElement) {
+                    loadMaskElement.unmask();
                 }
 
                 if (!success) {

@@ -181,10 +181,8 @@ Ext.define('ScriptBuilder.templates.UbcGravityTemplate', {
             return;
         }
 
-        var loadMask = new Ext.LoadMask(parentForm.getEl(), {
-            removeMask : true
-        });
-        loadMask.show();
+        var loadMaskElement = parentForm.getEl();
+        loadMaskElement.mask('Loading...');
 
         //Request for bbox reprojection and update the params
         Ext.Ajax.request({
@@ -196,7 +194,7 @@ Ext.define('ScriptBuilder.templates.UbcGravityTemplate', {
                 westBoundLongitude : download.get('westBoundLongitude')
             },
             callback : function(options, success, response) {
-                loadMask.hide();
+                loadMaskElement.unmask();
                 if (!success) {
                     return;
                 }
