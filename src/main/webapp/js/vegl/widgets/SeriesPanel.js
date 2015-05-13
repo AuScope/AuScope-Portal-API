@@ -16,7 +16,7 @@ Ext.define('vegl.widgets.SeriesPanel', {
     contextMenu : null,
 
     constructor : function(config) {
-
+        
         this.cancelSeriesAction = new Ext.Action({
             text: 'Cancel series jobs',
             iconCls: 'cross-icon',
@@ -42,48 +42,57 @@ Ext.define('vegl.widgets.SeriesPanel', {
                 }
             }
         });
+        
+        var seriesStore =Ext.create('Ext.data.Store', {
+            model : 'vegl.models.Series',
+            proxy : {
+                type : 'ajax',
+                url : 'secure/querySeries.do',
+                reader : {
+                    type : 'json',
+                    rootProperty : 'data'
+                },
+                listeners : {
+                    exception : function(proxy, response, operation) {
+                        responseObj = Ext.JSON.decode(response.responseText);
+                        errorMsg = responseObj.msg;
+                        errorInfo = responseObj.debugInfo;
+                        portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                    }
+                }
+            },               
+            autoLoad : true
+        });
 
         Ext.apply(config, {
-            plugins : [{
-                ptype : 'inlinecontextmenu',
-                align : 'center',
-                actions: [this.cancelSeriesAction, this.deleteSeriesAction]
-            }],
-            store : Ext.create('Ext.data.Store', {
-                model : 'vegl.models.Series',
-                proxy : {
-                    type : 'ajax',
-                    url : 'secure/querySeries.do',
-                    reader : {
-                        type : 'json',
-                        rootProperty : 'data'
-                    },
-                    listeners : {
-                        exception : function(proxy, response, operation) {
-                            responseObj = Ext.JSON.decode(response.responseText);
-                            errorMsg = responseObj.msg;
-                            errorInfo = responseObj.debugInfo;
-                            portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
-                        }
-                    }
-                },
-                autoLoad : true
-            }),
+//            plugins : [{
+//                ptype : 'inlinecontextmenu',
+//                align : 'center',
+//                actions: [this.cancelSeriesAction, this.deleteSeriesAction]
+//            }],
+            store : seriesStore,
             columns: [{ header: 'User', width: 150, sortable: true, dataIndex: 'user'},
-                      { header: 'Series Name', flex : 1, sortable: true, dataIndex: 'name'}],
-            buttons: [{
-                text: 'Query...',
-                tooltip: 'Displays the query dialog to search for job series',
-                handler: Ext.bind(this.onQuerySeries, this),
-                cls: 'x-btn-text-icon',
-                iconCls: 'find-icon'
-            }]
+                      { header: 'Series Name', flex : 1, sortable: true, dataIndex: 'name'}]
+//            buttons: [{
+//                text: 'Query...',
+//                tooltip: 'Displays the query dialog to search for job series',
+//                handler: Ext.bind(this.onQuerySeries, this),
+//                cls: 'x-btn-text-icon',
+//                iconCls: 'find-icon'
+//            }]
         });   
 
         this.callParent(arguments);
 
         this.on('select', this.onSeriesSelection, this);
-        this.on('selectionchange', this._onSelectionChange, this);
+        this.on('selectionchange', this._onSelectionChange, this);   
+        this.on('viewready', function(grid,eOpts){            
+            grid.store.on('load', function(store, records, successful, eOpts){
+                grid.selModel.doSelect(store.data.items[0]);
+            });            
+            
+        });
+       
     },
 
     _onSelectionChange : function(sm) {
