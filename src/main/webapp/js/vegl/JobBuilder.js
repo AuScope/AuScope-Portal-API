@@ -20,7 +20,8 @@ Ext.application({
                 layout: 'fit',
                 items: [ Ext.create('vegl.jobwizard.JobWizard', {
                     id : 'job-wizard-panel',
-                    forms : ['vegl.jobwizard.forms.JobObjectForm',
+                    forms : ['vegl.jobwizard.forms.JobSeriesForm',
+                             'vegl.jobwizard.forms.JobObjectForm',
                              'vegl.jobwizard.forms.JobUploadForm',
                              'vegl.jobwizard.forms.ScriptBuilderForm',
                              'vegl.jobwizard.forms.JobSubmitForm']
