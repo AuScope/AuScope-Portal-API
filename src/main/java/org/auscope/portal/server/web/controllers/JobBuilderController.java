@@ -34,6 +34,7 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.vegl.VglDownload;
@@ -448,6 +449,53 @@ public class JobBuilderController extends BaseCloudController {
         } catch (Exception ex) {
             logger.error("Error updating job " + job, ex);
             return generateJSONResponseMAV(false, null, "Error saving job");
+        }
+
+        return generateJSONResponseMAV(true, Arrays.asList(job), "");
+    }
+
+    /**
+     * Given an entire job object this function attempts to save the specified job with ID
+     * to the internal database. If the Job DNE (or id is null), the job will be created and
+     * have it's staging area initialised and other creation specific tasks performed.
+     *
+     * @return A JSON object with a success attribute that indicates whether
+     *         the job was successfully updated. The data object will contain the updated job
+     * @return
+     * @throws ParseException
+     */
+    @RequestMapping("/updateJobSeries.do")
+    public ModelAndView updateJobSeries(@RequestParam(value="id", required=true) Integer id,  //The integer ID if not specified will trigger job creation
+            @RequestParam(value="folderName", required=true) String folderName, //Name of the folder to move to
+            HttpServletRequest request,
+            @AuthenticationPrincipal PortalUser user) throws ParseException {
+
+        //Get our job
+        VEGLJob job = null;
+        Integer seriesId=null;
+        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), folderName, null);
+        if(series.isEmpty()){
+            return generateJSONResponseMAV(false, null,"Series not found");
+        }else{
+            seriesId=series.get(0).getId();
+        }
+
+        try {
+            job = jobManager.getJobById(id);
+        } catch (Exception ex) {
+            logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
+            return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
+        }
+
+        //Update our job from the request parameters
+        job.setSeriesId(seriesId);
+
+        //Save the VEGL job
+        try {
+            jobManager.saveJob(job);
+        } catch (Exception ex) {
+            logger.error("Error updating series for job " + job, ex);
+            return generateJSONResponseMAV(false, null, "Error updating series");
         }
 
         return generateJSONResponseMAV(true, Arrays.asList(job), "");

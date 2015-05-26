@@ -48,7 +48,7 @@ Ext.define('vegl.widgets.FolderPanel', {
             var folderRoot = treeStore.getRoot().firstChild
             folderRoot.set('text',records[0].get('user'))
             for(var i=0; i < records.length;i++){
-                folderRoot.insertChild(0, { text: records[i].get('name'), leaf: true })
+                folderRoot.insertChild(0, { id:records[i].get('id') ,text: records[i].get('name'), leaf: true })
             }
             folderRoot.expand(true);           
         })
@@ -62,7 +62,7 @@ Ext.define('vegl.widgets.FolderPanel', {
             tooltip: 'Add a folder for catagorizing',
             handler: Ext.bind(this.addFolderForm, this),
             cls: 'x-btn-text-icon',
-            iconCls: 'add'
+            iconCls: 'add'      
           }]
         });   
 
@@ -105,16 +105,20 @@ Ext.define('vegl.widgets.FolderPanel', {
             frameHeader : false,
             layout: 'fit',
             items: {
-                xtype: 'form',
+                xtype: 'form',                
                 defaultType: 'textfield',
                 items: [{
                     fieldLabel: 'Folder Name',
+                    margin : '5 5 5 5',
                     name: 'seriesName',
-                    allowBlank: false
+                    allowBlank: false  ,
+                    width : '90%'
                 },{
                     fieldLabel: 'Description',
                     name: 'seriesDesc',
-                    allowBlank: false
+                    margin : '5 5 5 5',
+                    allowBlank: false,
+                    width : '90%'
                 }],
                 buttons  : [{
                     text: 'Add',

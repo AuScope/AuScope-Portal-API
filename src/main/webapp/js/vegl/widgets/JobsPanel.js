@@ -164,6 +164,14 @@ Ext.define('vegl.widgets.JobsPanel', {
                 }
             }),
             columns: columns,
+            enableDragDrop:true,          
+            viewConfig: {
+                plugins: {
+                    ddGroup: 'grid2tree',
+                    ptype: 'gridviewdragdrop',
+                    enableDrop: false
+                }
+            },
             buttons: [{
                 text: 'Register to GeoNetwork',
                 itemId : 'btnRegister',

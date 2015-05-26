@@ -77,7 +77,7 @@ Ext.application({
             }
         });
 
-        var seriesPanel = Ext.create('vegl.widgets.FolderPanel', {
+        var folderPanel = Ext.create('vegl.widgets.FolderPanel', {
             title: 'Folder Organization',
             region: 'north',
             itemId : 'vgl-series-panel',
@@ -100,10 +100,28 @@ Ext.application({
                 error : onError
             }
         });
+        
+     
+        var me = this;
+       
 
         Ext.create('Ext.container.Viewport', {
             layout: 'border',
             id : 'vgl-joblist-viewport',
+            listeners:{
+              afterrender : function(vp,eOpts){
+                  var GridDropTarget = new Ext.dd.DropTarget(folderPanel.getEl(), {
+                      ddGroup    : 'grid2tree',
+                      notifyDrop: function(dragsource, event, data) {
+                          var folder = event.getTarget().textContent;
+                          me.updateJobSeries(data.records[0].get('id'),folder,function(){
+                              jobsPanel.refreshJobsForSeries();
+                          });
+                      }
+                      
+                  });
+              }  
+            },
             items: [{
                 xtype: 'box',
                 region: 'north',
@@ -116,7 +134,7 @@ Ext.application({
                 margins: '2 2 2 0',
                 layout: 'border',
                 width: 400,
-                items: [seriesPanel, jobsPanel]
+                items: [folderPanel, jobsPanel]
             },{
                 xtype : 'tabpanel',
                 title: 'Details',
@@ -127,6 +145,29 @@ Ext.application({
                 split: true,
                 items: [jobDetailsPanel, jobLogsPanel, jobFilesPanel]
             }]
+        });
+    },
+    
+    updateJobSeries : function(jobId,newSeriesId,callback){
+        Ext.Ajax.request({
+            url: 'updateJobSeries.do',
+            params: {
+                'id': jobId,
+                'folderName': newSeriesId
+            },
+            callback : function(options, success, response) {
+                if (success) {
+                    callback();
+                  return;
+                } else {
+                    errorMsg = "There was an internal error saving your series.";
+                    errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
+                }
+
+                portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
+               
+                return;
+            }
         });
     }
 });
