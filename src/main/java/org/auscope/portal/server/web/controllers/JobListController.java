@@ -700,9 +700,34 @@ public class JobListController extends BaseCloudController  {
         }else{
             return generateJSONResponseMAV(true, Arrays.asList(series.get(0)), "");
         }
+    }
 
+    /**
+     * Attempts to creates a new folder for the specified user.
+     * We are resusing existing code for series in place as folder
+     * The series object will be returned in a JSON response on success.
+     *
+     * @param seriesName
+     * @param seriesDescription
+     * @return
+     */
+    @RequestMapping("/secure/createFolder.do")
+    public ModelAndView createFolder(HttpServletRequest request,
+            @RequestParam("seriesName") String seriesName,
+            @RequestParam("seriesDescription") String seriesDescription,
+            @AuthenticationPrincipal PortalUser user) {
+        VEGLSeries series = new VEGLSeries();
+        series.setUser(user.getEmail());
+        series.setName(seriesName);
+        series.setDescription(seriesDescription);
 
-
+        try {
+            jobManager.saveSeries(series);
+        } catch (Exception ex) {
+            logger.error("failure saving series", ex);
+            return generateJSONResponseMAV(false, null, "Failure saving series");
+        }
+        return generateJSONResponseMAV(true);
 
     }
 

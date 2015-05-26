@@ -77,8 +77,8 @@ Ext.application({
             }
         });
 
-        var seriesPanel = Ext.create('vegl.widgets.SeriesPanel', {
-            title: 'Series List',
+        var seriesPanel = Ext.create('vegl.widgets.FolderPanel', {
+            title: 'Folder Organization',
             region: 'north',
             itemId : 'vgl-series-panel',
             height: 250,
