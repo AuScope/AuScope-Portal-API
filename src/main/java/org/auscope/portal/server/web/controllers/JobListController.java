@@ -683,7 +683,7 @@ public class JobListController extends BaseCloudController  {
             @AuthenticationPrincipal PortalUser user) {
 
 
-        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), null, null);
+        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), "default", null);
         if(series==null || series.isEmpty()){
             VEGLSeries newSeries = new VEGLSeries();
             newSeries.setUser(user.getEmail());

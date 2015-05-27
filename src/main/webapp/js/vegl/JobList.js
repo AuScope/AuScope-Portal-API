@@ -113,10 +113,17 @@ Ext.application({
                   var GridDropTarget = new Ext.dd.DropTarget(folderPanel.getEl(), {
                       ddGroup    : 'grid2tree',
                       notifyDrop: function(dragsource, event, data) {
-                          var folder = event.getTarget().textContent;
-                          me.updateJobSeries(data.records[0].get('id'),folder,function(){
-                              jobsPanel.refreshJobsForSeries();
-                          });
+                          var inprogressStatus=['Pending','Provisioning','In Queue'];
+                          if(Ext.Array.contains(inprogressStatus,data.records[0].get('status'))){
+                              Ext.Msg.alert('Warning', 'Please wait until the job has finished provisioning');
+                              return;
+                          }else{
+                              var folder = event.getTarget().textContent;
+                              me.updateJobSeries(data.records[0].get('id'),folder,function(){
+                                  jobsPanel.refreshJobsForSeries();
+                              });
+                          }
+                         
                       }
                       
                   });

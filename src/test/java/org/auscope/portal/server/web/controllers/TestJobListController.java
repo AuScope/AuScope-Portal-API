@@ -990,7 +990,7 @@ public class TestJobListController extends PortalTestClass {
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).querySeries(userEmail, null, null);will(returnValue(null));
+            oneOf(mockJobManager).querySeries(userEmail,qName, null);will(returnValue(null));
             oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));
         }});
 
@@ -1002,6 +1002,29 @@ public class TestJobListController extends PortalTestClass {
         Assert.assertEquals(userEmail, actualSeries.getUser());
         Assert.assertEquals(qName, actualSeries.getName());
         Assert.assertEquals(qDescription, actualSeries.getDescription());
+    }
+
+
+    /**
+     * Tests that creating a folder succeeds
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testCreateFolder() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final String qName = "default";
+        final String qDescription = "Everything will now come through to a single default series";
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+            oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));
+        }});
+
+        ModelAndView mav = controller.createFolder(mockRequest, qName, qDescription, mockPortalUser);
+
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+
     }
 
     /**
@@ -1027,7 +1050,7 @@ public class TestJobListController extends PortalTestClass {
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).querySeries(userEmail, null, null);will(returnValue(null));
+            oneOf(mockJobManager).querySeries(userEmail, qName, null);will(returnValue(null));
             oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));will(throwException(new MyDataAccessException()));
         }});
 

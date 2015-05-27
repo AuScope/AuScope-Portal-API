@@ -58,12 +58,18 @@ Ext.define('vegl.widgets.FolderPanel', {
             store : treeStore,
             rootVisible: false,
             buttons: [{
-            text: 'Add Folder',
-            tooltip: 'Add a folder for catagorizing',
-            handler: Ext.bind(this.addFolderForm, this),
-            cls: 'x-btn-text-icon',
-            iconCls: 'add'      
-          }]
+                text: 'Remove Folder',
+                tooltip: 'Delete all jobs from this folder.',
+                handler: Ext.bind(this.deleteSeries, this),
+                cls: 'x-btn-text-icon',
+                iconCls: 'remove'      
+              },{
+                text: 'Add Folder',
+                tooltip: 'Add a folder for catagorizing',
+                handler: Ext.bind(this.addFolderForm, this),
+                cls: 'x-btn-text-icon',
+                iconCls: 'add'      
+              }]
         });   
 
         this.callParent(arguments);
@@ -94,13 +100,14 @@ Ext.define('vegl.widgets.FolderPanel', {
     refresh : function(){
         this.store.getRoot().firstChild.removeAll();
         this.seriesStore.load();
+        this.fireEvent('refreshDetailsPanel');
     },
     
     addFolderForm : function(){
         var me = this;
         var win = Ext.create('Ext.window.Window', {
             title: 'Folder Name',
-            height: 150,
+            height: 220,
             width: 400,
             frameHeader : false,
             layout: 'fit',
@@ -108,6 +115,10 @@ Ext.define('vegl.widgets.FolderPanel', {
                 xtype: 'form',                
                 defaultType: 'textfield',
                 items: [{
+                    xtype:'displayfield',
+                    margin : '5 5 15 5',                    
+                    value : 'After creating the folder, you may drag and drop jobs from the job panel onto the folder. Please wait until the job have complete provisioning before attempting.'
+                },{
                     fieldLabel: 'Folder Name',
                     margin : '5 5 5 5',
                     name: 'seriesName',
@@ -144,7 +155,7 @@ Ext.define('vegl.widgets.FolderPanel', {
             },
             callback : function(options, success, response) {
                 if (success) {
-                    me.refresh();
+                    me.refresh();                   
                   return;
                 } else {
                     errorMsg = "There was an internal error saving your series.";
@@ -157,6 +168,46 @@ Ext.define('vegl.widgets.FolderPanel', {
             }
         });
         
+    },
+    
+    deleteSeries:function(){
+        var me = this;
+        if(this.getSelectionModel().getSelection()[0] && this.getSelectionModel().getSelection()[0].isLeaf()){
+            var seriesName = this.getSelectionModel().getSelection()[0].get('text')//VT: we only support single selection
+        }else{
+            Ext.Msg.alert('Warning', 'Please select a job folder first');
+        }
+        if(seriesName=='default'){
+            Ext.Msg.alert('Warning', 'We do not support the deletion of default folder. All new jobs are dropped in this folder');
+            return;
+        }
+        var seriesId = this.seriesStore.findRecord('name',seriesName).get('id')
+        
+        Ext.Msg.confirm('Delete Folder', 'Are you sure you want to delete this folder and it\'s jobs?', function(btn){
+            if (btn == 'yes'){
+                Ext.getBody().mask('Deleting folder...');
+                Ext.Ajax.request({
+                    url: 'secure/deleteSeriesJobs.do',
+                    params: {
+                        'seriesId': seriesId                        
+                    },
+                    callback : function(options, success, response) {
+                        Ext.getBody().unmask();
+                        if (success) {
+                            me.refresh();                           
+                          return;
+                        } else {
+                            errorMsg = "There was an internal error deleting your folder.";
+                            errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
+                        }
+
+                        portal.widgets.window.ErrorWindow.showText('Delete folder', errorMsg, errorInfo);
+                       
+                        return;
+                    }
+                });
+            }
+        });
     },
 
     onSeriesSelection : function(sm, series) {
