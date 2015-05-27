@@ -28,8 +28,10 @@ import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.core.util.structure.Job;
+import org.auscope.portal.jmock.VEGLSeriesMatcher;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VglDownload;
@@ -1409,6 +1411,62 @@ public class TestJobBuilderController {
                 mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests that the updateJob works as expected
+     * @throws Exception
+     */
+    @Test
+    public void testUpdateJobSeries() throws Exception {
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
+        final String folderName = "Name";
+        final int jobId = 1234;
+        final int newSeriesId=1111;
+        final boolean emailNotification = true;
+        final String userEmail = "exampleuser@email.com";
+        final ArrayList<VEGLSeries> series=new ArrayList<VEGLSeries>();
+        series.add(mockSeries);
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).querySeries(userEmail,folderName, null);will(returnValue(series));
+            oneOf(mockSeries).getId();will(returnValue(newSeriesId));
+            oneOf(mockJob).setSeriesId(newSeriesId);
+            oneOf(mockJobManager).saveJob(mockJob);
+        }});
+
+        ModelAndView mav = controller.updateJobSeries(jobId,folderName,mockRequest,mockPortalUser);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests that the updateJob works as expected
+     * @throws Exception
+     */
+    @Test
+    public void testUpdateJobSeriesError() throws Exception {
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
+        final String folderName = "Name";
+        final int jobId = 1234;
+        final String userEmail = "exampleuser@email.com";
+        final ArrayList<VEGLSeries> series=new ArrayList<VEGLSeries>();
+
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).querySeries(userEmail,folderName, null);will(returnValue(series));
+
+        }});
+
+        ModelAndView mav = controller.updateJobSeries(jobId,folderName,mockRequest,mockPortalUser);
+        Assert.assertNotNull(mav);
+        Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
     @Test
