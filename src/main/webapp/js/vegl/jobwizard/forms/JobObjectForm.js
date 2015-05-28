@@ -17,6 +17,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
      */
     constructor: function(wizardState) {
         var jobObjectFrm = this;
+        
+        this.createSeries(wizardState);
 
         this.imageStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.MachineImage',
@@ -268,10 +270,25 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     getTitle : function() {
         return "Enter job details...";
     },
+    
+  
+
+    getNumDownloadRequests : function() {
+        request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+        request.open("GET", "getNumDownloadRequests.do", false); //<-- false makes it a synchonous request!
+        request.send(null);
+        respObj = Ext.JSON.decode(request.responseText);
+        size = respObj.data;
+        return size;
+    },
 
     beginValidation : function(callback) {
         var jobObjectFrm = this;
-        var wizardState = this.wizardState;
+        var wizardState = this.wizardState; 
+        
+        var numDownloadReqs = this.getNumDownloadRequests();
+        
+        
 
         //Ensure we have entered all appropriate fields
         if (!jobObjectFrm.getForm().isValid()) {
@@ -310,9 +327,54 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 var computeType = jobObjectFrm.computeTypeStore.getById(computeTypeId);
                 wizardState.ncpus = computeType.get('vcpus');
                 wizardState.nrammb = computeType.get('ramMB');
-                callback(true);
+                
+                if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
+                    Ext.Msg.confirm('Confirm',
+                            'No data set has been captured. Do you want to continue?',
+                            function(button) {
+                                if (button === 'yes') {
+                                    wizardState.skipConfirmPopup = true;
+                                    callback(true);
+                                    return;
+                                } else {
+                                    callback(false);
+                                    return;
+                                }
+                        });
+                } else {
+                    callback(true);
+                    return;
+                }
+
             }
         });
+    },
+    
+    createSeries : function(wizardState) {
+   
+        Ext.Ajax.request({
+            url: 'secure/createSeries.do',               
+            callback : function(options, success, response) {
+                if (success) {
+                    var responseObj = Ext.JSON.decode(response.responseText);
+                    if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
+                        wizardState.seriesId = responseObj.data[0].id;                           
+                        return;
+                    } else {
+                        errorMsg = responseObj.msg;
+                        errorInfo = responseObj.debugInfo;
+                    }
+                } else {
+                    errorMsg = "There was an internal error saving your series.";
+                    errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
+                }
+
+                portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
+               
+                return;
+            }
+        });
+        
     },
 
     getHelpInstructions : function() {
