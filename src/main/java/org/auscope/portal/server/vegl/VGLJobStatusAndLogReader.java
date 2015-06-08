@@ -54,9 +54,24 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
             is = cloudStorageService.getJobFile(job, JobListController.VGL_LOG_FILE);
             logContents = IOUtils.toString(is);
         } catch (Exception ex) {
-            throw new PortalServiceException("The specified job hasn't uploaded any logs yet.");
+            log.debug(String.format("The job %1$s hasn't uploaded any logs yet.", job.getId()));
         } finally {
             FileIOUtil.closeQuietly(is);
+        }
+
+        //If we fail at that, download direct from the running instance
+        if (logContents == null) {
+            CloudComputeService compute = getComputeService(job);
+            if (compute == null) {
+                throw new PortalServiceException(
+                        "The specified job doesn't have a compute service.",
+                        "Please ensure you have chosen a compute provider for the job.");
+            }
+
+            logContents = compute.getConsoleLog(job);
+            if (logContents == null) {
+                throw new PortalServiceException("The specified job hasn't uploaded any logs yet");
+            }
         }
 
         ModelMap namedSections = new ModelMap();
@@ -86,6 +101,12 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
                     start = 0;
                 }
             }
+        }
+
+        //We have an unfinished section... let's include it anyway
+        if (currentSectionName != null) {
+            String regionText = logContents.substring(start);
+            namedSections.put(currentSectionName, regionText);
         }
 
         return namedSections;
