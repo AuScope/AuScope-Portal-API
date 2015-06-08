@@ -15,54 +15,58 @@ Ext.define('vegl.widgets.CodeEditorField', {
      * }
      */
     constructor : function(config) {
-    
+
 
         //Build our configuration object
-        Ext.apply(config, {            
+        Ext.apply(config, {
             listeners: {
                 render: function(obj,eopts){
-                    var element = document.getElementById(obj.getInputId());                    
+                    var element = document.getElementById(obj.getInputId());
                     this.editor = CodeMirror.fromTextArea(element,{
                         lineNumbers: true,
-                        mode: config.mode                        
+                        mode: config.mode
                     });
+
+                    if (config.value) {
+                        obj.setValue(config.value);
+                    }
                 }
             }
         });
 
         this.callParent(arguments);
 
-      
+
     },
-    
+
     setValue : function(script){
         if(this.editor){
             this.editor.setValue(script);
-        }               
+        }
     },
-    
+
     getValue : function(){
         if(this.editor){
             return this.editor.getValue();
         }else{
             return null;
         }
-        
+
     },
-    
+
     somethingSelected : function(){
         return this.editor.somethingSelected();
     },
-    
+
     getCursor : function(start){
         return this.editor.getCursor(start);
     },
-    
-  
+
+
     replaceRange : function(replacement,from,to,origin){
         return this.editor.replaceRange(replacement,from,to,origin);
-    }    
-   
-    
+    }
+
+
 });
 

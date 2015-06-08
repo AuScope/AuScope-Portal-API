@@ -27,7 +27,7 @@ Ext.define('vegl.widgets.JobLogsPanel', {
     listLogsForJob : function(job) {
         var loadMaskElement = null;
         if (this.rendered) {
-            loadMaskElement = this.getEl();            
+            loadMaskElement = this.getEl();
             loadMaskElement.mask('Loading logs...');
         }
 
@@ -66,7 +66,7 @@ Ext.define('vegl.widgets.JobLogsPanel', {
                         itemId : sectionName,
                         autoDestroy : true,
                         layout : 'fit',
-                        items : [Ext.create('Ext.ux.form.field.CodeMirror', {
+                        items : [Ext.create('vegl.widgets.CodeEditorField', {
                             title : 'Script Source',
                             mode : 'text/plain',
                             showAutoIndent : false,
