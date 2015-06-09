@@ -821,6 +821,7 @@ public class JobListController extends BaseCloudController  {
         newJob.setSubmitDate((Date)null);
         newJob.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
         newJob.setRegisteredUrl(null);
+        newJob.setComputeInstanceId(null);
 
         //Attempt to save the new job to the DB
         try {
