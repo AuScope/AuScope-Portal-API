@@ -4,9 +4,7 @@
 # NOTE: Please ensure that VL_WORKFLOW_VERSION gets incremented with any changes
 
 #configure our environment
-export VL_WORKFLOW_VERSION="1"
-export VL_LOG_FILE_NAME="vl.sh.log"
-export VL_LOG_FILE="${WORKING_DIR}/$VL_LOG_FILE_NAME"
+export VL_WORKFLOW_VERSION="2"
 export EC2_METADATA_SCRIPT="${WORKING_DIR}/ec2-metadata"
 export FINAL_SLEEP_LENGTH="15m"
 export NTP_DATE_SERVER="pool.ntp.org"
@@ -31,7 +29,6 @@ echo "VL_WORKFLOW_VERSION = ${VL_WORKFLOW_VERSION}"
 echo "PATH = ${PATH}"
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 echo "WORKING_DIR = ${WORKING_DIR}"
-echo "VL_LOG_FILE = ${VL_LOG_FILE}"
 echo "EC2_METADATA_SCRIPT = ${EC2_METADATA_SCRIPT}"
 echo "FINAL_SLEEP_LENGTH = ${FINAL_SLEEP_LENGTH}"
 echo "NTP_DATE_SERVER = ${NTP_DATE_SERVER}"
