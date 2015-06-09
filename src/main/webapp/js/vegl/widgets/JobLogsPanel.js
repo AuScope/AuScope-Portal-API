@@ -65,6 +65,7 @@ Ext.define('vegl.widgets.JobLogsPanel', {
                         title : sectionName,
                         itemId : sectionName,
                         autoDestroy : true,
+                        scrollable  : true,
                         layout : 'fit',
                         items : [Ext.create('vegl.widgets.CodeEditorField', {
                             title : 'Script Source',
