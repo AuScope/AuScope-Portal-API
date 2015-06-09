@@ -5,12 +5,12 @@
 */
 Ext.namespace("JobBuilder");
 Ext.require([
-             'Ext.ux.form.plugin.FieldHelpText'         
+             'Ext.ux.form.plugin.FieldHelpText'
  ]);
 Ext.define('vegl.jobwizard.forms.BaseJobWizardForm', {
     extend : 'Ext.form.Panel',
-    
-    
+
+
 
     /**
      * State object that is shared by all wizard forms. Use it to communicate
@@ -31,11 +31,17 @@ Ext.define('vegl.jobwizard.forms.BaseJobWizardForm', {
     additionalButtons : null,
 
     constructor: function(obj) {
+        if (!obj.style) {
+            obj.style = {};
+        }
+        obj.style['background-color'] = 'white';
+        obj.border = false;
+
         this.callParent(arguments);
 
-        this.wizardState = obj.wizardState;      
+        this.wizardState = obj.wizardState;
 
-        this.on('jobWizardActive', function() {            
+        this.on('jobWizardActive', function() {
             window.addEventListener('beforeunload',this.onBeforeWindowUnload,this)
         }, this);
 

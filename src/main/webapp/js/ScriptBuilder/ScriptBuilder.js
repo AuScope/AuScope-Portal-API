@@ -8,28 +8,28 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
     textEditMode : false,
     wizardState : null,
     templateVariables : null,
-    
+
     editor  : null,
     componentsPanel : null,
 
     constructor: function(config) {
         this.wizardState = config.wizardState;
         this.templateVariables = config.templateVariables;
-        
+
         this.editor = Ext.create('vegl.widgets.CodeEditorField',{
             mode      : 'python',
-            name      : 'scriptcodefield'         
+            name      : 'scriptcodefield'
         })
-        
-        var editorPanel =  Ext.create('Ext.form.FormPanel', {            
-            region : 'center',           
-            layout    : 'fit', 
+
+        var editorPanel =  Ext.create('Ext.form.FormPanel', {
+            region : 'center',
+            layout    : 'fit',
             scrollable  : true,
             items: [this.editor]
         });
 
-            
-       
+
+
         this.componentsPanel = Ext.create('ScriptBuilder.ComponentTreePanel', {
             region : 'west',
             title : 'Available Templates',
@@ -43,6 +43,10 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         Ext.apply(config, {
             layout : 'border',
             border : false,
+            margin: '10 0 0 0',
+            bodyStyle: {
+                'background-color': 'white'
+            },
             items: [{
                 xtype : 'panel',
                 border : false,
@@ -50,6 +54,10 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
                 layout : 'fit',
                 region : 'center',
                 title : 'Script Source',
+                margin: '0 0 0 10',
+                bodyStyle: {
+                    'background-color': 'white'
+                },
                 items : [editorPanel]
             }, this.componentsPanel]
         });

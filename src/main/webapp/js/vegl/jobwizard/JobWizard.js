@@ -111,7 +111,11 @@ Ext.define('vegl.jobwizard.JobWizard', {
         Ext.apply(config, {
             layout: 'card',
             activeItem: startingJobIndex,
-            defaults: { layout:'fit', frame: true, buttonAlign: 'right' },
+            defaults: { layout:'fit', buttonAlign: 'right' },
+            border: false,
+            style: {
+                'background-color' : 'white'
+            },
             items: items
         });
 

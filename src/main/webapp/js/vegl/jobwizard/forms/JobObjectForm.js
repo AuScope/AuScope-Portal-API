@@ -17,7 +17,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
      */
     constructor: function(wizardState) {
         var jobObjectFrm = this;
-        
+
         this.createSeries(wizardState);
 
         this.imageStore = Ext.create('Ext.data.Store', {
@@ -78,7 +78,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             wizardState : wizardState,
             bodyStyle: 'padding:10px;',
             header : false,
-            frame: true,
             defaults: { anchor: "100%" },
             labelWidth: 150,
             autoScroll: true,
@@ -270,8 +269,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     getTitle : function() {
         return "Enter job details...";
     },
-    
-  
+
+
 
     getNumDownloadRequests : function() {
         request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
@@ -284,11 +283,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
     beginValidation : function(callback) {
         var jobObjectFrm = this;
-        var wizardState = this.wizardState; 
-        
+        var wizardState = this.wizardState;
+
         var numDownloadReqs = this.getNumDownloadRequests();
-        
-        
+
+
 
         //Ensure we have entered all appropriate fields
         if (!jobObjectFrm.getForm().isValid()) {
@@ -327,7 +326,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 var computeType = jobObjectFrm.computeTypeStore.getById(computeTypeId);
                 wizardState.ncpus = computeType.get('vcpus');
                 wizardState.nrammb = computeType.get('ramMB');
-                
+
                 if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
                     Ext.Msg.confirm('Confirm',
                             'No data set has been captured. Do you want to continue?',
@@ -349,16 +348,16 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             }
         });
     },
-    
+
     createSeries : function(wizardState) {
-   
+
         Ext.Ajax.request({
-            url: 'secure/createSeries.do',               
+            url: 'secure/createSeries.do',
             callback : function(options, success, response) {
                 if (success) {
                     var responseObj = Ext.JSON.decode(response.responseText);
                     if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
-                        wizardState.seriesId = responseObj.data[0].id;                           
+                        wizardState.seriesId = responseObj.data[0].id;
                         return;
                     } else {
                         errorMsg = responseObj.msg;
@@ -370,11 +369,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
 
                 portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
-               
+
                 return;
             }
         });
-        
+
     },
 
     getHelpInstructions : function() {

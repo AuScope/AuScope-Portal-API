@@ -13,7 +13,7 @@ Ext.define('vegl.widgets.MachineImageCombo', {
         var listCfg = config.listConfig ? config.listConfig : {};
         listCfg.getInnerTpl = function() {
             // Custom rendering template for each item
-            return '<h3>{name}</h3>' +
+            return '<h3 style="margin:0px;">{name}</h3>' +
                    '{description}<br/>' +
                    '<ul>' +
                        '<tpl for="keywords"><li style="list-style:disc inside none;">{.}</li></tpl>' +
