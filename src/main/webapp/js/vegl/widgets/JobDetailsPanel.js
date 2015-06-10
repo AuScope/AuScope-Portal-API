@@ -6,25 +6,33 @@ Ext.define('vegl.widgets.DetailsPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widgets.detailspanel',
 
-    jobTemplate : null,
-    seriesTemplate : null,
-
     constructor : function(config) {
-        this.seriesTemplate = new Ext.Template(
-            '<p class="jobdesc-title">{name}</p><br/>',
-            '<p class="jobdesc-key">Description:</p><br/><p>{description}</p>');
-        this.seriesTemplate.compile();
-
-        this.jobTemplate = new Ext.Template(
-            '<p class="jobdesc-title">{name}</p>',
-            '<table width="100%"><col width="150px"></col><col class="jobdesc-content"></col>',
-            '<tr><td class="jobdesc-key">Description:</td><td>{description}</td></tr>',
-            '<tr><td class="jobdesc-key">Submitted on:</td><td>{submitDate}</td></tr>',
-            '<tr><td class="jobdesc-key">Geonetwork url:</td><td><a href="{registeredUrl}" target="_blank">{registeredUrl}</a></td></tr></table><br/>');
-            //'<p class="jobdesc-key">Description:</p><br/><p>{description}</p>');
-        this.jobTemplate.compile();
-
-        config.html = "";
+        Ext.apply(config, {
+            items: [{
+                xtype: 'label',
+                itemId: 'title',
+                cls: 'jobdesc-title'
+            },{
+                xtype: 'displayfield',
+                itemId: 'description',
+                fieldLabel: 'Description',
+                labelCls: 'jobdesc-key',
+                labelWidth: 120,
+                margin: '20 0 0 0'
+            },{
+                xtype: 'displayfield',
+                itemId: 'submitDate',
+                labelCls: 'jobdesc-key',
+                labelWidth: 120,
+                fieldLabel: 'Submitted on',
+            },{
+                xtype: 'displayfield',
+                itemId: 'registeredUrl',
+                labelCls: 'jobdesc-key',
+                labelWidth: 120,
+                fieldLabel: 'GeoNetwork url',
+            }]
+        });
 
         this.callParent(arguments);
     },
@@ -33,20 +41,33 @@ Ext.define('vegl.widgets.DetailsPanel', {
      * Updates the body of this panel with the contents of a vegl.models.Job
      */
     showDetailsForJob : function(job) {
-        this.jobTemplate.overwrite(this.getEl(), job.data);
+        this.down('#title').setText(job.get('name'));
+        this.down('#description').setValue(job.get('description'));
+        this.down('#submitDate').setValue(job.get('submitDate'));
+        this.down('#submitDate').setVisible(true);
+        this.down('#registeredUrl').setValue(job.get('registeredUrl'));
+        this.down('#registeredUrl').setVisible(true);
     },
 
     /**
      * Updates the body of this panel with the contents of a vegl.models.Series
      */
     showDetailsForSeries : function(series) {
-        this.seriesTemplate.overwrite(this.getEl(), series.data);
+        this.down('#title').setText(series.get('name'));
+        this.down('#description').setValue(series.get('description'));
+        this.down('#submitDate').setVisible(false);
+        this.down('#submitDate').setValue('');
+        this.down('#registeredUrl').setVisible(false);
+        this.down('#registeredUrl').setValue('');
     },
 
     /**
      * Updates the body of this panel with an empty string
      */
     cleanupDetails : function() {
-        this.getEl().setHTML("");
+        this.down('#title').setText('');
+        this.down('#description').setValue('');
+        this.down('#submitDate').setValue('');
+        this.down('#registeredUrl').setValue('');
     }
 });

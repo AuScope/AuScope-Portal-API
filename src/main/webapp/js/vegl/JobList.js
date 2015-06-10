@@ -100,14 +100,17 @@ Ext.application({
                 error : onError
             }
         });
-        
-     
+
+
         var me = this;
-       
+
 
         Ext.create('Ext.container.Viewport', {
             layout: 'border',
             id : 'vgl-joblist-viewport',
+            style: {
+                'background-color': 'white'
+            },
             listeners:{
               afterrender : function(vp,eOpts){
                   var GridDropTarget = new Ext.dd.DropTarget(folderPanel.getEl(), {
@@ -123,11 +126,11 @@ Ext.application({
                                   jobsPanel.refreshJobsForSeries();
                               });
                           }
-                         
+
                       }
-                      
+
                   });
-              }  
+              }
             },
             items: [{
                 xtype: 'box',
@@ -141,6 +144,9 @@ Ext.application({
                 margins: '2 2 2 0',
                 layout: 'border',
                 width: 400,
+                bodyStyle: {
+                    'background-color': 'white'
+                },
                 items: [folderPanel, jobsPanel]
             },{
                 xtype : 'tabpanel',
@@ -154,7 +160,7 @@ Ext.application({
             }]
         });
     },
-    
+
     updateJobSeries : function(jobId,newSeriesId,callback){
         Ext.Ajax.request({
             url: 'updateJobSeries.do',
@@ -172,7 +178,7 @@ Ext.application({
                 }
 
                 portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
-               
+
                 return;
             }
         });
