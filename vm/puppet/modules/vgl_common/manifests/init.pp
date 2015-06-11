@@ -4,9 +4,24 @@
 class vgl_common {
 
     # Install default packages
-    package { ["wget", "subversion", "mercurial", "ftp", "bzip2", "elfutils", "ntp", "ntpdate", "gcc", "gcc-c++", "make", "openssh", "openssh-clients", "swig", "libpng-devel", "freetype-devel", "atlas", "atlas-devel", "libffi-devel", "expect-dev"]: 
+    package { ["wget", "subversion", "mercurial", "ftp", "bzip2", "elfutils", "ntp", "ntpdate", "gcc", "make", "swig", "expect-dev", "gfortran"]: 
         ensure => installed,
         require => Class["epel"],
+    }
+    
+    case $::osfamily {
+        'redhat': {
+            package { ["atlas", "atlas-devel", "gcc-c++", "openssh", "openssh-clients", "libpng-devel", "freetype-devel", "libffi-devel"]: 
+                ensure => installed,
+                require => Class["epel"],
+            }
+        }
+        default: {
+            package { ["libatlas-dev", "openssh-server", "openssh-client", "libpng-dev", "libfreetype6-dev", "libffi-dev"]: 
+                ensure => installed,
+                require => Class["epel"],
+            }
+        }
     }
     
     # Install default pip packages

@@ -17,20 +17,20 @@ class escript_packages {
     #Install easy packages
     case $::osfamily {
         'redhat': {
-            package { ["blas-devel", "netcdf-devel", "suitesparse-devel"]: 
+            package { ["blas-devel", "netcdf-devel", "suitesparse-devel", "boost-devel"]: 
                 ensure => installed,
                 require => Class["epel"],
             }    
         }
         default: {
-            package { ["python-liblas", "liblas-dev", "libnetcdf-dev", "libsuitesparse-dev"]: 
+            package { ["python-liblas", "liblas-dev", "libnetcdf-dev", "libsuitesparse-dev", "libboost-all-dev", "libboost-python-dev", "libboost-dev"]: 
                 ensure => installed,
                 require => Class["epel"],
             }
         }
     }
 
-    package { ["boost-devel", "scons"]: 
+    package { ["scons"]: 
         ensure => installed,
         require => Class["epel"],
     }
@@ -120,16 +120,27 @@ class {"visit": }
 #Checkout, configure and install escript
 exec { "escript-co":
     cwd => "/tmp",
-    command => "/usr/bin/svn co https://svn.esscc.uq.edu.au/svn/esys13/trunk escript_trunk",
+    command => "/usr/bin/svn co --non-interactive --trust-server-cert https://svn.geocomp.uq.edu.au/svn/esys13/trunk escript_trunk",
     creates => "/tmp/escript_trunk",
     require => [Class["escript_packages"]],
     timeout => 0,
 }
 # Copy vm_options.py to <hostname>_options.py AND set the mpi prefix to correct values
-exec { "escript-config":
-    cwd => "/tmp/escript_trunk/scons",
-    command => "/bin/sed \"s/^mpi_prefix.*$/mpi_prefix = ['\\/usr\\/local\\/include', '\\/usr\\/local\\/lib']/g\" vm_options.py > `/bin/hostname | /bin/sed s/[^a-zA-Z0-9]/_/g`_options.py",
-    require => Exec["escript-co"],
+case $::osfamily {
+    'redhat': {
+        exec { "escript-config":
+            cwd => "/tmp/escript_trunk/scons",
+            command => "/bin/sed \"s/^mpi_prefix.*$/mpi_prefix = ['\\/usr\\/local\\/include', '\\/usr\\/local\\/lib']/g\" vm_options.py > `/bin/hostname | /bin/sed s/[^a-zA-Z0-9]/_/g`_options.py",
+            require => Exec["escript-co"],
+        }    
+    }
+    default: {
+        exec { "escript-config":
+            cwd => "/tmp/escript_trunk/scons",
+            command => "/bin/sed \"s/^mpi_prefix.*$/mpi_prefix = ['\\/usr\\/lib\\/openmpi\\/lib']/g\" vm_options.py > `/bin/hostname | /bin/sed s/[^a-zA-Z0-9]/_/g`_options.py",
+            require => Exec["escript-co"],
+        }
+    }
 }
 exec { "escript-install":
     cwd => "/tmp/escript_trunk",
