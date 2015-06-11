@@ -25,7 +25,13 @@ class vgl_common {
     
     # Install startup bootstrap
     $curl_cmd = "/usr/bin/curl"
-    $bootstrapLocation = "/etc/rc.d/rc.local"
+    $bootstrapLocation = "/etc/rc.local"
+    case $::osfamily {
+        'redhat': {
+            $bootstrapLocation = "/etc/rc.d/rc.local"
+        }
+    }
+    
     exec { "get-bootstrap":
         before => File[$bootstrapLocation],
         command => "$curl_cmd -L https://raw.githubusercontent.com/AuScope/VEGL-Portal/master/vm/ec2-run-user-data.sh > $bootstrapLocation",

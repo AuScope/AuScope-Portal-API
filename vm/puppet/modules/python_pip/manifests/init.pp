@@ -3,8 +3,20 @@
 class python_pip {
 
     # Install Python
-    package { ["python", "python-devel"]: 
+    package { "python": 
         ensure => installed,
+    }
+    case $::osfamily {
+        'redhat': {
+            package { "python-devel": 
+                ensure => installed,
+            }    
+        }
+        default: {
+            package { "python-dev": 
+                ensure => installed,
+            }
+        }
     }
     
     # Install Python-Pip
