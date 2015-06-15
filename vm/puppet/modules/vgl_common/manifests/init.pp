@@ -17,7 +17,7 @@ class vgl_common {
             }
         }
         default: {
-            package { ["libatlas-dev", "openssh-server", "openssh-client", "libpng-dev", "libfreetype6-dev", "libffi-dev"]: 
+            package { ["libatlas-dev", "libatlas-base-dev", "openssh-server", "openssh-client", "libpng-dev", "libfreetype6-dev", "libffi-dev"]: 
                 ensure => installed,
                 require => Class["epel"],
             }

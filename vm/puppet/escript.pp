@@ -135,10 +135,28 @@ case $::osfamily {
         }    
     }
     default: {
+        $scons_cfg_contents = '# Puppet generated SCONS config for debian
+from templates.jessie_options import *
+prefix = '/opt/escript'
+verbose = True
+openmp = True
+mpi = 'OPENMPI'
+netcdf = True
+netcdf_prefix = ['/usr/include/', '/usr/lib']
+umfpack = True
+lapack = 'clapack'
+silo = True
+'
+        file {"debian-scons-cfg-env":
+            path => "/tmp/escript-scons-debian.py",
+            ensure => present,
+            content => $scons_cfg_contents,
+            require => Exec["escript-co"],
+        }
         exec { "escript-config":
             cwd => "/tmp/escript_trunk/scons",
-            command => "/bin/sed \"s/^mpi_prefix.*$/mpi_prefix = ['\\/usr\\/lib\\/openmpi\\/lib']/g\" vm_options.py > `/bin/hostname | /bin/sed s/[^a-zA-Z0-9]/_/g`_options.py",
-            require => Exec["escript-co"],
+            command => "/bin/cp /tmp/escript-scons-debian.py `/bin/hostname | /bin/sed s/[^a-zA-Z0-9]/_/g`_options.py",
+            require => File["debian-scons-cfg-env"],
         }
     }
 }
