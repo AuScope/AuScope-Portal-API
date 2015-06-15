@@ -137,14 +137,14 @@ case $::osfamily {
     default: {
         $scons_cfg_contents = '# Puppet generated SCONS config for debian
 from templates.jessie_options import *
-prefix = '/opt/escript'
+prefix = \'/opt/escript\' 
 verbose = True
 openmp = True
-mpi = 'OPENMPI'
+mpi = \'OPENMPI\' 
 netcdf = True
-netcdf_prefix = ['/usr/include/', '/usr/lib']
+netcdf_prefix = [\'/usr/include/\', \'/usr/lib\']
 umfpack = True
-lapack = 'clapack'
+lapack = \'clapack\'
 silo = True
 '
         file {"debian-scons-cfg-env":
