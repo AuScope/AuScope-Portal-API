@@ -51,10 +51,10 @@ echo "executing workflow script $WORKFLOW_SCRIPT"
 
 # If we have unbuffer - lets use that to get stdout as it gets written
 # otherwise we just get the buffered version
-if command -v uanbuffer > /dev/null 2>&1 ; then
-  unbuffer $WORKFLOW_SCRIPT | tee -a "$VL_LOG_FILE"
+if command -v unbuffer > /dev/null 2>&1 ; then
+  unbuffer $WORKFLOW_SCRIPT 2>&1 | tee -a "$VL_LOG_FILE"
 else
-  $WORKFLOW_SCRIPT | tee -a "$VL_LOG_FILE"
+  $WORKFLOW_SCRIPT 2>&1 | tee -a "$VL_LOG_FILE"
 fi
 
 
