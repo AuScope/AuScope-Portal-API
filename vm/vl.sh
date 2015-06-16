@@ -14,8 +14,6 @@ export SUBSET_REQUEST_PATH="${WORKING_DIR}/vl-download.sh"
 export ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
 
 echo "VL Workflow Script... starting"
-echo "All future console output will be redirected to ${VL_LOG_FILE}"
-exec > >(tee -a "$VL_LOG_FILE")
 
 echo "Loading system wide profile:"
 source /etc/profile
