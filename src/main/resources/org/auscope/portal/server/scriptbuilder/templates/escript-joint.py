@@ -55,6 +55,9 @@ def saveAndUpload(fn, **args):
     saveSilo(fn, **args)
     subprocess.call(["cloud", "upload", fn, fn, "--set-acl=public-read"])
 
+def statusCallback(k, x, Jx, g_Jx, norm_dx):
+     print("Iteration %d complete. Error=%e" % (k, norm_dx))
+
 B_b=[b*U.Nano*U.Tesla for b in B_b]
 MAG_UNITS = U.Nano * U.Tesla
 GRAV_UNITS = 1e-6 * U.m/(U.sec**2)
@@ -73,6 +76,7 @@ db.fixSusceptibilityBelow(depth=DEPTH)
 
 inv=JointGravityMagneticInversion()
 inv.setup(db)
+inv.setSolverCallback(statusCallback)
 inv.getCostFunction().setTradeOffFactorsModels([mu_gravity, mu_magnetic])
 inv.getCostFunction().setTradeOffFactorsRegularization(mu = [1.,1.], mu_c=1.)
 

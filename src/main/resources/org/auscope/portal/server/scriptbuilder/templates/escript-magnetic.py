@@ -50,6 +50,9 @@ def saveAndUpload(fn, **args):
     saveSilo(fn, **args)
     subprocess.call(["cloud", "upload", fn, fn, "--set-acl=public-read"])
 
+def statusCallback(k, x, Jx, g_Jx, norm_dx):
+     print("Iteration %d complete. Error=%e" % (k, norm_dx))
+
 #Convert entered nano Tesla to Tesla
 B_b=[b*U.Nano*U.Tesla for b in B_b]
 DATA_UNITS = U.Nano * U.Tesla
@@ -62,6 +65,7 @@ db.setBackgroundMagneticFluxDensity(B_b)
 db.fixSusceptibilityBelow(depth=DEPTH)
 inv=MagneticInversion()
 inv.setup(db)
+inv.setSolverCallback(statusCallback)
 B, w =  db.getMagneticSurveys()[0]
 susceptibility=inv.run()
 saveAndUpload('result.silo', magnetic_anomaly=B, magnetic_weight=w, susceptibility=susceptibility)

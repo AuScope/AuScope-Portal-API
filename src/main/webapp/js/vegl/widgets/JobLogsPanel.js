@@ -13,7 +13,24 @@ Ext.define('vegl.widgets.JobLogsPanel', {
 
         Ext.apply(config, {
             autoScroll : true,
-            items : []
+            items : [],
+            dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                items: [{
+                    xtype: 'tbfill'
+                },{
+                    xtype: 'button',
+                    text: 'Refresh',
+                    iconCls: 'refresh-icon',
+                    scope: this,
+                    handler: function() {
+                        if (this.currentJob) {
+                            this.listLogsForJob(this.currentJob);
+                        }
+                    }
+                }]
+            }]
         });
 
         this.callParent(arguments);

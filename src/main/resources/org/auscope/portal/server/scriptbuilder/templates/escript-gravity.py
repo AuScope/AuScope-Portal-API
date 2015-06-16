@@ -48,6 +48,11 @@ def saveAndUpload(fn, **args):
     saveSilo(fn, **args)
     subprocess.call(["cloud", "upload", fn, fn, "--set-acl=public-read"])
 
+def statusCallback(k, x, Jx, g_Jx, norm_dx):
+     print("Iteration %d complete. Error=%e" % (k, norm_dx))
+
+
+
 DATA_UNITS = 1e-6 * U.m/(U.sec**2)
 source=NetCdfData(DataSource.GRAVITY, DATASET, scale_factor=DATA_UNITS)
 db=DomainBuilder()
@@ -57,6 +62,7 @@ db.setFractionalPadding(PAD_X, PAD_Y)
 db.fixDensityBelow(depth=DEPTH)
 inv=GravityInversion()
 inv.setup(db)
+inv.setSolverCallback(statusCallback)
 g, chi =  db.getGravitySurveys()[0]
 density=inv.run()
 saveAndUpload('result.silo', gravity_anomaly=g, gravity_weight=chi, density=density)
