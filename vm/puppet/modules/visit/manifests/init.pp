@@ -8,24 +8,24 @@ class visit {
 
     #Get build_visit script
     exec { "visit-dl":
-        cwd => "/tmp",
+        cwd => "/mnt",
         command => "/usr/bin/wget http://portal.nersc.gov/project/visit/releases/2.9.2/build_visit2_9_2",
-        creates => "/tmp/build_visit2_9_2",
+        creates => "/mnt/build_visit2_9_2",
         require => [Package["python-libxml2"], Package["xutils-dev"], Package["libglu-dev"], Package["libglu1"], Package["libglu1-mesa-dev"], Package["libxt-dev"]],
         timeout => 0,
     }
     
     #Strip out any console questions
     exec { "visit-strip":
-        cwd => "/tmp",
+        cwd => "/mnt",
         command => "/bin/sed 's/read RESPONSE/RESPONSE=\"yes\"/g' build_visit2_9_2 > build_visit_stripped",
-        creates => "/tmp/build_visit_stripped",
+        creates => "/mnt/build_visit_stripped",
         timeout => 0,
         require => Exec["visit-dl"],
     }
     
     exec { "visit-build":
-        cwd => "/tmp",
+        cwd => "/mnt",
         command => "/bin/bash build_visit_stripped --mesa --console --silo",
         timeout => 0,
         require => Exec["visit-dl"],
