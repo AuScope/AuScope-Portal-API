@@ -1,16 +1,17 @@
 # Installs VisIt binaries and libraries: https://wci.llnl.gov/codes/visit
 class visit {
 
-    package {"xutils-dev":
+    package {["xutils-dev", "python-libxml2", "libglu-dev", "libglu1", "libglu1-mesa-dev", "libxt-dev"]:
         ensure => installed,
     }
+    
 
     #Get build_visit script
     exec { "visit-dl":
         cwd => "/tmp",
         command => "/usr/bin/wget http://portal.nersc.gov/project/visit/releases/2.9.2/build_visit2_9_2",
         creates => "/tmp/build_visit2_9_2",
-        require => Package["xutils-dev"],
+        require => [Package["python-libxml2"], Package["xutils-dev"], Package["libglu-dev"], Package["libglu1"], Package["libglu1-mesa-dev"], Package["libxt-dev"]],
         timeout => 0,
     }
     
