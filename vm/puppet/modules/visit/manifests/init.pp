@@ -28,19 +28,25 @@ class visit {
         cwd => "/mnt",
         command => "/bin/bash build_visit_stripped --mesa --console --silo",
         timeout => 0,
-        require => Exec["visit-dl"],
+        require => Exec["visit-strip"],
+    }
+    
+    exec { "visit-install":
+        cwd => "/mnt",
+        command => "/bin/cp -R /mnt/visit2.9.2/src/lib /usr/lib/visit2_9_2",
+        timeout => 0,
+        require => Exec["visit-build"],
     }
 
 
     $visitShContent= '# Environment for visit
-export VISITINSTALL=/usr/local/visit2_9_1.linux-x86_64
-export PATH=$VISITINSTALL/bin:$PATH
-export PYTHONPATH=$VISITINSTALL/2.9.1/linux-x86_64/lib/site-packages:$PYTHONPATH
+export VISITINSTALL=/usr/lib/visit2_9_2
+export PYTHONPATH=$VISITINSTALL/site-packages:$PYTHONPATH
 '
     file {"visit-profile-env":
         path => "/etc/profile.d/visit.sh",
         ensure => present,
         content => $visitShContent,
-        require => Exec["visit-build"],
+        require => Exec["visit-install"],
     }
 }
