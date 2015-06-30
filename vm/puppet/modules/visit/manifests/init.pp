@@ -31,22 +31,67 @@ class visit {
         require => Exec["visit-strip"],
     }
     
-    exec { "visit-install":
-        cwd => "/mnt",
-        command => "/bin/cp -R /mnt/visit2.9.2/src/lib /usr/lib/visit2_9_2",
-        timeout => 0,
+    file { ["/usr/local/visit", "/usr/local/visit/2.9.2"]:
+        ensure => "directory",
         require => Exec["visit-build"],
+    }
+    
+    file { '/usr/local/visit/current':
+       ensure => 'link',
+       target => '2.9.2',
+       require => File["/usr/local/visit/2.9.2"],
+    }
+    
+    exec { "visit-install-lib":
+        cwd => "/mnt",
+        command => "/bin/cp -R /mnt/visit2.9.2/src/lib /usr/local/visit/current",
+        timeout => 0,
+        creates => "/usr/local/visit/current/lib",
+        require => File["/usr/local/visit/current"],
+    }
+    
+    exec { "visit-install-bin":
+        cwd => "/mnt",
+        command => "/bin/cp -R /mnt/visit2.9.2/src/bin /usr/local/visit/current",
+        timeout => 0,
+        creates => "/usr/local/visit/current/bin",
+        require => File["/usr/local/visit/current"],
+    }
+    
+    exec { "visit-install-exe":
+        cwd => "/mnt",
+        command => "/bin/cp -R /mnt/visit2.9.2/src/exe /usr/local/visit/current",
+        timeout => 0,
+        creates => "/usr/local/visit/current/exe",
+        require => File["/usr/local/visit/current"],
+    }
+    
+    exec { "visit-install-plugins":
+        cwd => "/mnt",
+        command => "/bin/cp -R /mnt/visit2.9.2/src/plugins /usr/local/visit/current",
+        timeout => 0,
+        creates => "/usr/local/visit/current/plugins",
+        require => File["/usr/local/visit/current"],
+    }
+    
+    exec { "visit-install-version":
+        cwd => "/mnt",
+        command => "/bin/cp /mnt/visit2.9.2/src/VERSION /usr/local/visit/current/VERSION",
+        timeout => 0,
+        creates => "/usr/local/visit/current/VERSION",
+        require => File["/usr/local/visit/current"],
     }
 
 
     $visitShContent= '# Environment for visit
-export VISITINSTALL=/usr/lib/visit2_9_2
-export PYTHONPATH=$VISITINSTALL/site-packages:$PYTHONPATH
+export VISITINSTALL=/usr/local/visit/current
+export PATH=$VISITINSTALL/bin:$PATH
+export PYTHONPATH=$VISITINSTALL/lib/site-packages:$PYTHONPATH
 '
     file {"visit-profile-env":
         path => "/etc/profile.d/visit.sh",
         ensure => present,
         content => $visitShContent,
-        require => Exec["visit-install"],
+        require => [Exec["visit-install-lib"], Exec["visit-install-bin"]],
     }
 }
