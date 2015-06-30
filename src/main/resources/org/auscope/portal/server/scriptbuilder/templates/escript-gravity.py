@@ -49,7 +49,7 @@ def saveAndUpload(fn, **args):
     subprocess.call(["cloud", "upload", fn, fn, "--set-acl=public-read"])
 
 def statusCallback(k, x, Jx, g_Jx, norm_dx):
-     print("Iteration %d complete. Error=%e" % (k, norm_dx))
+     print("Iteration %s complete. Error=%s" % (k, norm_dx))
 
 
 

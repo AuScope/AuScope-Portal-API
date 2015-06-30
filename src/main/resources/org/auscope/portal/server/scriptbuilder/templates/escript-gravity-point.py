@@ -158,6 +158,8 @@ def saveAndUpload(fn, **args):
     saveSilo(fn, **args)
     subprocess.call(["cloud", "upload", fn, fn, "--set-acl=public-read"])
 
+def statusCallback(k, x, Jx, g_Jx, norm_dx):
+     print("Iteration %s complete. Error=%s" % (k, norm_dx))
 
 print("Processing GDAL file now");
 DATA_UNITS = 1e-6 * U.m/(U.sec**2)
@@ -169,6 +171,7 @@ db.setFractionalPadding(PAD_X, PAD_Y)
 db.fixDensityBelow(depth=DEPTH)
 inv=GravityInversion()
 inv.setup(db)
+inv.setSolverCallback(statusCallback)
 inv.getCostFunction().setTradeOffFactorsModels(MU_GRAVITY)
 
 
