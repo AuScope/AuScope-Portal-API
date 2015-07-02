@@ -10,6 +10,8 @@ class visit {
     file { ["/usr/local/visit"]:
         ensure => "directory",
     }
+    
+    ln -s /usr/lib/x86_64-linux-gnu/libpython2.7.so /usr/lib/libpython2.7.so
 
     #Get build_visit script
     exec { "visit-dl":
@@ -18,6 +20,13 @@ class visit {
         creates => "/mnt/build_visit2_9_2",
         require => [File["/usr/local/visit"], Package["python-libxml2"], Package["xutils-dev"], Package["libglu-dev"], Package["libglu1"], Package["libglu1-mesa-dev"], Package["libxt-dev"], Package["libqt4-dev"], Package["libqt4-opengl-dev"]],
         timeout => 0,
+    }
+    
+    # The build_visit script is pretty fussy about where libpython can exist
+    # It will be *somewhere* so just fake this file if it DNE
+    file { '/usr/lib/libpython2.7.so':
+        ensure => 'present',
+        require => Exec["visit-dl"],
     }
     
     #Strip out any console questions
@@ -46,6 +55,6 @@ export PYTHONPATH=$VISITINSTALL/lib/site-packages:$PYTHONPATH
         path => "/etc/profile.d/visit.sh",
         ensure => present,
         content => $visitShContent,
-        require => [Exec["visit-install-lib"], Exec["visit-install-bin"]],
+        require => [Exec["visit-build"]],
     }
 }
