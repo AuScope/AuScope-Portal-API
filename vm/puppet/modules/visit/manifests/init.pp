@@ -40,7 +40,7 @@ class visit {
     
     exec { "visit-build":
         cwd => "/mnt",
-        command => "/bin/bash build_visit_stripped --mesa --console --silo --system-python --system-qt --prefix /usr/local/visit",
+        command => "/bin/bash build_visit_stripped --mesa --console --silo --visit --system-python --system-qt --prefix /usr/local/visit",
         timeout => 0,
         require => Exec["visit-strip"],
     }
