@@ -47,9 +47,8 @@ class visit {
 
     $visitShContent= '# Environment for visit
 export VISITINSTALL=/usr/local/visit/current
-export PATH=$VISITINSTALL/bin:/usr/local/vtk/6.1.0/bin:$PATH
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/visit/current/lib
-export PYTHONPATH=$VISITINSTALL/lib/site-packages:$PYTHONPATH
+export PATH=$VISITINSTALL/bin:/usr/local/visit/bin:$PATH
+export PYTHONPATH=$VISITINSTALL/linux-x86_64/lib/site-packages:$PYTHONPATH
 '
     file {"visit-profile-env":
         path => "/etc/profile.d/visit.sh",
