@@ -11,8 +11,6 @@ class visit {
         ensure => "directory",
     }
     
-    ln -s /usr/lib/x86_64-linux-gnu/libpython2.7.so /usr/lib/libpython2.7.so
-
     #Get build_visit script
     exec { "visit-dl":
         cwd => "/mnt",
