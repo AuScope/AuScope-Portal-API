@@ -19,7 +19,7 @@ class python_pip {
             }    
         }
         default: {
-            package { "python-dev": 
+            package { ["python-dev", "python-setuptools"]: 
                 ensure => installed,
             }
             
@@ -29,7 +29,7 @@ class python_pip {
                 cwd => "/tmp",
                 command => "/usr/bin/easy_install pip",
                 creates => "/usr/local/bin/pip",
-                require => [Package["python"]],
+                require => [Package["python"], Package["python-setuptools"]],
                 timeout => 0,
             }
         }

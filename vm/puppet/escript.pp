@@ -113,18 +113,13 @@ class escript_packages {
 
 class {"escript_packages": }
 
-# Install VisIt
-class {"visit":
-    require => Class["vgl_common"],
-}
-
 
 #Checkout, configure and install escript
 exec { "escript-co":
     cwd => "/tmp",
     command => "/usr/bin/svn co --non-interactive --trust-server-cert https://svn.geocomp.uq.edu.au/svn/esys13/trunk escript_trunk",
     creates => "/tmp/escript_trunk",
-    require => [Class["escript_packages"], Class["visit"]],
+    require => [Class["escript_packages"]],
     timeout => 0,
 }
 # Copy vm_options.py to <hostname>_options.py AND set the mpi prefix to correct values
@@ -175,4 +170,9 @@ file {"escript-profile-env":
     ensure => present,
     content => $escriptShContent,
     require => Exec['escript-install'],
+}
+
+# Install VisIt
+class {"visit":
+    require => [Class["vgl_common"], Exec['escript-install']],
 }
