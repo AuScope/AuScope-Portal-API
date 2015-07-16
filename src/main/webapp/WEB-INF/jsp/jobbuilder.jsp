@@ -23,10 +23,10 @@
     <script type="text/javascript" src="CodeMirror-5.0/addon/scroll/simplescrollbars.js"></script>
 
 
-    <!-- Portal Core Includes -->
+    <!-- Portal Core Includes -->    
+    <jsp:include page="../../portal-core/jsimports.htm"/>
     <jsp:include page="../../portal-core/cssimports.htm"/>
     <jsp:include page="../../cssimports.htm"/>
-    <jsp:include page="../../portal-core/jsimports.htm"/>
 
     <!-- component includes -->
     <script type="text/javascript" src="js/vegl/widgets/CodeEditorField.js"></script>  

@@ -151,9 +151,10 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
         
         var systemTab = {
             title : 'EM System Options',
+            layout : 'anchor',           
             defaults : {
                 decimalPrecision : 8,
-                labelWidth : 150
+                labelWidth : 140
             },
             items : [{
                 xtype : 'numberfield',
@@ -186,6 +187,7 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
             },{
                 xtype : 'fieldset',
                 title : 'EM Column Mappings',
+                layout : 'fit',
                 padding : '0 0 0 20',
                 items :[{
                     layout : 'column',
@@ -256,9 +258,10 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
         
         var executionOptionsTab = {
             title : 'Execution Options',
+            layout : 'anchor',
             defaults : {
                 decimalPrecision : 8,
-                labelWidth : 150
+                labelWidth : 140
             },
             items : [{
                 xtype : 'numberfield',
@@ -317,12 +320,13 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
         
         var generalOptionsTab = {
             title : 'General Options',
+            layout : 'anchor',           
             items : [{
                 xtype : 'fieldset',
                 title : 'Alpha Options',
                 defaults : {
                     decimalPrecision : 8,
-                    labelWidth : 150
+                    labelWidth : 140
                 },
                 items : [{
                 
@@ -400,8 +404,8 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
                         //We show a popup containing a from and to values. From there
                         //we use the _logspace function to generate a range of thickness values 
                         var popup = Ext.create('Ext.Window', {
-                           width : 520,
-                           height : 120,
+                           width : 530,
+                           height : 140,
                            modal : true,
                            title : 'Enter Values',
                            _thicknessField : thicknessField, //store a reference to lookup later
@@ -461,7 +465,7 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
         var columnComboDefaults = Ext.apply(Ext.clone(mappingComboDefaults), {emptyText : '0'});
         
         var columnsTab = {
-            title : 'Input Data Mappings',
+            title : 'Input Data Mappings',                       
             layout : 'column',
             items : [{
                 columnWidth: 0.5,
@@ -557,8 +561,8 @@ Ext.define('ScriptBuilder.templates.AEMInversionTemplate', {
         
         this._getTemplatedScriptGui(callback, 'aem-inversion.py', {
             xtype : 'form',
-            width : 710,
-            height : 510,
+            width : 720,
+            height : 570,
             items : [{
                 xtype : 'combo',
                 fieldLabel : 'Dataset',

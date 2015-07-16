@@ -238,13 +238,13 @@
                     </property>
                 </bean>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="Melbourne/2ee27674-2f62-4c47-ad54-f41e6ca3c42a"/>                   
+                    <constructor-arg name="imageId" value="Melbourne/371352ae-0d48-497c-8f07-b9c808155604"/>                   
                     <property name="name" value="AEM-Inversion"/>
                     <property name="description"><value>A Centos 6 machine with AEM Inversion already installed.</value></property>
                     <property name="keywords">
                         <array>
                             <value>AEM-Inversion</value>
-                            <value>centos6</value>
+                            <value>debian8</value>
                         </array>
                     </property>
                     <property name="permissions">
