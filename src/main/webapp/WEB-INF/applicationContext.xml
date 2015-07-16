@@ -216,7 +216,7 @@
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="Melbourne/3e9007e7-3e93-42c9-8f46-0ed849e6f364"/>
+                    <constructor-arg name="imageId" value="Melbourne/07005d01-0dc8-4e2d-9eba-cdc36349a463"/>
                     <property name="name" value="escript"/>
                     <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
                     <property name="keywords">
