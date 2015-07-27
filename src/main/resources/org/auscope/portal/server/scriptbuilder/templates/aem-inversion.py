@@ -188,7 +188,7 @@ System End
 def cloudUpload(inFilePath, cloudKey):
     cloudBucket = os.environ["STORAGE_BUCKET"]
     cloudDir = os.environ["STORAGE_BASE_KEY_PATH"]
-    queryPath = (cloudBucket + "/" + cloudDir + "/" + cloudKey).replace("//", "/")
+    queryPath = (cloudBucket + "/" + cloudDir + "/" + cloudKey).replace("//", "/") 
     retcode = subprocess.call(["cloud", "upload", cloudKey, inFilePath, "--set-acl=public-read"])
     print ("cloudUpload: " + inFilePath + " to " + queryPath + " returned " + str(retcode))
 
