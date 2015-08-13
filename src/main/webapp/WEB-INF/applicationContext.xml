@@ -218,7 +218,8 @@
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
                     <constructor-arg name="imageId" value="Melbourne/07005d01-0dc8-4e2d-9eba-cdc36349a463"/>
                     <property name="name" value="escript"/>
-                    <property name="description"><value>A Centos 6 machine with escript already installed.</value></property>
+                    <property name="description"><value>A Debian (Jessie) machine with escript already installed.</value></property>
+                    <property name="minimumDiskGB" value="10"/>
                     <property name="keywords">
                         <array>
                             <value>escript</value>
@@ -241,6 +242,7 @@
                     <constructor-arg name="imageId" value="Melbourne/19121286-6d84-4dba-8e60-fcca85812421"/>                   
                     <property name="name" value="AEM-Inversion"/>
                     <property name="description"><value>A Debian 8 machine with AEM Inversion already installed.</value></property>
+                    <property name="minimumDiskGB" value="10"/>
                     <property name="keywords">
                         <array>
                             <value>AEM-Inversion</value>

@@ -203,7 +203,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'Select a toolbox that contains software that you would like to use to process your data.'
-                }]
+                }],
+                listeners : {
+                    select : Ext.bind(this.onImageSelect, this)
+                }
             },{
                 xtype : 'combo',
                 fieldLabel : 'Resources',
@@ -254,14 +257,26 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         }
 
         this.getComponent('image-combo').clearValue();
+        this.getComponent('resource-combo').clearValue();
         this.imageStore.load({
             params : {
                 computeServiceId : records.get('id')
             }
         });
+    },
+
+    onImageSelect : function(combo, records) {
+        if (!records) {
+            this.computeTypeStore.removeAll();
+            return;
+        }
+
+        this.getComponent('resource-combo').clearValue();
+        var selectedComputeService = this.getComponent('computeServiceId').getSelection();
         this.computeTypeStore.load({
             params : {
-                computeServiceId : records.get('id')
+                computeServiceId : selectedComputeService.get('id'),
+                machineImageId : records.get('imageId')
             }
         });
     },
@@ -269,8 +284,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     getTitle : function() {
         return "Enter job details...";
     },
-
-
 
     getNumDownloadRequests : function() {
         request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));

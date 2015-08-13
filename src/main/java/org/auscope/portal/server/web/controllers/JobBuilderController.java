@@ -910,14 +910,29 @@ public class JobBuilderController extends BaseCloudController {
 
     @RequestMapping("/getVmTypesForComputeService.do")
     public ModelAndView getTypesForComputeService(HttpServletRequest request,
-            @RequestParam("computeServiceId") String computeServiceId) {
+            @RequestParam("computeServiceId") String computeServiceId,
+            @RequestParam("machineImageId") String machineImageId) {
         try {
             CloudComputeService ccs = getComputeService(computeServiceId);
             if (ccs == null) {
                 return generateJSONResponseMAV(false, null, "Unknown compute service");
             }
 
-            return generateJSONResponseMAV(true, ccs.getAvailableComputeTypes(), "");
+            List<MachineImage> images = getImagesForJobAndUser(request, computeServiceId);
+            MachineImage selectedImage = null;
+            for (MachineImage image : images) {
+                if (image.getImageId().equals(machineImageId)) {
+                    selectedImage = image;
+                    break;
+                }
+            }
+
+            if (selectedImage == null) {
+                return generateJSONResponseMAV(false, null, "Unknown/Unauthorised machine image");
+            }
+
+
+            return generateJSONResponseMAV(true, ccs.getAvailableComputeTypes(null, null, selectedImage.getMinimumDiskGB()), "");
         } catch (Exception ex) {
             log.error("Unable to access compute type list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
