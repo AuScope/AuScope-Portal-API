@@ -171,7 +171,7 @@
                 <constructor-arg name="featureTypeName" value="ga:aemsurveys"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Paterson Airbone Electromagnetic Survey"/>
+        <property name="name" value="Paterson Airborne Electromagnetic Survey"/>
         <property name="description" value=""/>
         <property name="group" value="Geoscience Australia"/>
     </bean>
@@ -183,7 +183,7 @@
                 <constructor-arg name="featureTypeName" value="ga:rum_jungle_aem"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Rum Jungle Airbone Electromagnetic Survey"/>
+        <property name="name" value="Rum Jungle Airborne Electromagnetic Survey"/>
         <property name="description" value=""/>
         <property name="group" value="Geoscience Australia"/>
     </bean>
@@ -195,7 +195,7 @@
                 <constructor-arg name="featureTypeName" value="ga:woolner_aem"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Woolner Airbone Electromagnetic Survey"/>
+        <property name="name" value="Woolner Airborne Electromagnetic Survey"/>
         <property name="description" value=""/>
         <property name="group" value="Geoscience Australia"/>
     </bean>
@@ -219,7 +219,7 @@
                 <constructor-arg name="featureTypeName" value="ga:musgrave_aem"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Musgrave Airbone Electromagnetic Survey"/>
+        <property name="name" value="Musgrave Airborne Electromagnetic Survey"/>
         <property name="description" value=""/>
         <property name="group" value="CSIRO"/>
     </bean>
@@ -231,7 +231,7 @@
                 <constructor-arg name="featureTypeName" value="ga:western_area_aem"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Western Area Airbone Electromagnetic Survey"/>
+        <property name="name" value="Western Area Airborne Electromagnetic Survey"/>
         <property name="description" value="Western Area 70001"/>
         <property name="group" value="CSIRO"/>
     </bean>
@@ -243,7 +243,7 @@
                 <constructor-arg name="featureTypeName" value="ga:ashburton_aem"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Ashburton Airbone Electromagnetic Survey"/>
+        <property name="name" value="Ashburton Airborne Electromagnetic Survey"/>
         <property name="description" value=""/>
         <property name="group" value="CSIRO"/>
     </bean>
@@ -257,7 +257,7 @@
                 <constructor-arg name="featureTypeName" value="ga:cunyu_aem"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Cunyu Airbone Electromagnetic Survey"/>
+        <property name="name" value="Cunyu Airborne Electromagnetic Survey"/>
         <property name="description" value=""/>
         <property name="group" value="CSIRO"/>
     </bean>  -->
