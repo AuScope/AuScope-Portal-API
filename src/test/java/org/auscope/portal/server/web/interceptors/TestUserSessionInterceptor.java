@@ -1,7 +1,6 @@
 package org.auscope.portal.server.web.interceptors;
 
-import static org.powermock.api.support.membermodification.MemberMatcher.method;
-import static org.powermock.api.support.membermodification.MemberModifier.suppress;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,13 +8,12 @@ import javax.servlet.http.HttpSession;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.server.security.oauth2.PortalUser;
-import org.auscope.portal.core.view.JSONView;
-import org.auscope.portal.server.test.VGLPortalTestClass;
+import org.auscope.portal.core.test.PortalTestClass;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -23,8 +21,7 @@ import org.springframework.security.core.Authentication;
  *
  * @author Richard Goh
  */
-@PrepareForTest({JSONView.class})
-public class TestUserSessionInterceptor extends VGLPortalTestClass {
+public class TestUserSessionInterceptor extends PortalTestClass {
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
     private HttpSession mockSession;
@@ -42,9 +39,6 @@ public class TestUserSessionInterceptor extends VGLPortalTestClass {
         mockSession = context.mock(HttpSession.class);
         mockAuth = context.mock(Authentication.class);
         mockUser = context.mock(PortalUser.class);
-
-        //Just don't bother about testing this method
-        suppress(method(JSONView.class, "render"));
 
         testInterceptor = new UserSessionInterceptor();
     }
@@ -75,9 +69,15 @@ public class TestUserSessionInterceptor extends VGLPortalTestClass {
      */
     @Test
     public void testPreHandle_UserSessionExpired() throws Exception {
+        final PrintWriter pw = new PrintWriter(new ByteArrayOutputStream());
+
         context.checking(new Expectations() {{
             allowing(mockRequest).getUserPrincipal(); will(returnValue(null));
+            allowing(mockRequest).getAttribute(with(any(String.class)));will(returnValue(null));
+            allowing(mockResponse).setContentType(with(any(String.class)));
+            allowing(mockResponse).getWriter();will(returnValue(pw));
         }});
+
 
         boolean result = testInterceptor.preHandle(mockRequest, mockResponse, null);
         Assert.assertFalse(result);

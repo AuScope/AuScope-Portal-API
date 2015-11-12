@@ -267,9 +267,9 @@
         <jetty.version>6.1.26</jetty.version>
         <hibernate.version>3.6.7.Final</hibernate.version>
         <log4j.version>1.2.16</log4j.version>
-        <targetJdk>1.7</targetJdk>
+        <targetJdk>1.8</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <powermock.version>1.5.5</powermock.version>
+        <powermock.version>1.6.3</powermock.version>
         <portal.core.version>1.4.0-SNAPSHOT</portal.core.version>
         <httpclient.version>4.3.5</httpclient.version>
     </properties>
@@ -348,9 +348,9 @@
             <version>${hibernate.version}</version>
         </dependency>
         <dependency>
-            <groupId>javassist</groupId>
+            <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
+            <version>3.20.0-GA</version>
         </dependency>
         <dependency>
             <groupId>com.jhlabs</groupId>
