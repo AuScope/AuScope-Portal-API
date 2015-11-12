@@ -19,6 +19,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.collections.iterators.IteratorEnumeration;
 import org.auscope.portal.core.cloud.ComputeType;
+import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.security.oauth2.PortalUser;
@@ -27,8 +28,6 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.ResourceUtil;
-import org.auscope.portal.core.util.structure.Job;
-import org.auscope.portal.jmock.VEGLSeriesMatcher;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
@@ -1798,14 +1797,20 @@ public class TestJobBuilderController {
     @Test
     public void testGetComputeTypes() throws Exception {
         final String computeId = "compute-id";
+        final String imageId = "image-id";
         final ComputeType[] result = new ComputeType[] {new ComputeType("test-compute-type")};
+        final MachineImage[] machineImages = new MachineImage[] {new MachineImage("another-image"), new MachineImage(imageId)};
+
+        machineImages[0].setMinimumDiskGB(200);
+        machineImages[1].setMinimumDiskGB(1000);
 
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeId));
-            allowing(mockCloudComputeServices[0]).getAvailableComputeTypes();will(returnValue(result));
+            allowing(mockCloudComputeServices[0]).getAvailableComputeTypes(null, null, 1000);will(returnValue(result));
+            allowing(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(machineImages));
         }});
 
-        ModelAndView mav = controller.getTypesForComputeService(mockRequest, computeId);
+        ModelAndView mav = controller.getTypesForComputeService(mockRequest, computeId, imageId);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
@@ -1819,12 +1824,13 @@ public class TestJobBuilderController {
     @Test
     public void testGetComputeTypes_NoComputeService() throws Exception {
         final String computeId = "compute-id";
+        final String imageId = "image-id";
 
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeId));
         }});
 
-        ModelAndView mav = controller.getTypesForComputeService(mockRequest, "non-matching-compute-id");
+        ModelAndView mav = controller.getTypesForComputeService(mockRequest, "non-matching-compute-id", "image-id");
 
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
