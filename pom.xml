@@ -250,12 +250,22 @@
         </pluginManagement>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.spring.platform</groupId>
+                <artifactId>platform-bom</artifactId>
+                <version>1.1.2.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
     <!-- Project properties -->
     <properties>
         <jetty.version>6.1.26</jetty.version>
-        <spring.version>3.2.10.RELEASE</spring.version>
-        <spring.security.version>3.2.4.RELEASE</spring.security.version>
-        <hibernate.version>3.2.7.ga</hibernate.version>
+        <hibernate.version>3.6.7.Final</hibernate.version>
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>1.7</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -334,8 +344,13 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate</artifactId>
+            <artifactId>hibernate-core</artifactId>
             <version>${hibernate.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.12.1.GA</version>
         </dependency>
         <dependency>
             <groupId>com.jhlabs</groupId>
@@ -345,7 +360,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>${spring.security.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -364,29 +378,25 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>${spring.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-            <version>${spring.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-taglibs</artifactId>
-            <version>${spring.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
             <scope>compile</scope>
         </dependency>
         <!-- Added for job monitoring -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>1.8.6</version>
+            <version>2.2.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="
@@ -32,6 +33,10 @@
         <property name="url" value="${HOST.jdbc.url}"/>
         <property name="username" value="${env.jdbc.user}"/>
         <property name="password" value="${env.jdbc.password}"/>
+    </bean>
+    
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
@@ -73,7 +78,7 @@
         </constructor-arg>
     </bean>
 
-    <bean name="vglJobStatusMonitorDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean name="vglJobStatusMonitorDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor" />
         <property name="jobDataAsMap">
             <map>
@@ -83,19 +88,19 @@
         </property>
     </bean>
     
-    <bean name="vglPollingJobQueueManagerDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean name="vglPollingJobQueueManagerDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="org.auscope.portal.server.vegl.VGLPollingJobQueueManager" />       
     </bean>
 
     <!-- Simple Trigger for vglJobStatusMonitor task, run every 5 minutes -->
-    <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="vglJobStatusMonitorDetail" />
         <property name="repeatInterval" value="300000" />
         <property name="startDelay" value="10000" />
     </bean>
     
     <!-- Simple Trigger for vglPollingJobQueueManagerDetail task, run every 30 minutes -->
-    <bean id="quotaExceededTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    <bean id="quotaExceededTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="vglPollingJobQueueManagerDetail" />
         <property name="repeatInterval" value="1800000" />
         <property name="startDelay" value="1800000" />
@@ -309,5 +314,4 @@
             <value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>
         </property>
     </bean>
-
 </beans>

@@ -7,10 +7,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class VGLSignatureDao extends HibernateDaoSupport {
     protected final Log logger = LogFactory.getLog(getClass());
-    
+
     /**
      * Retrieves the signature of a given user.
-     * 
+     *
      * @param user the user email address
      * @return user VGLSignature object. null if the user's exact and domain
      *         signature cannot be found
@@ -19,7 +19,7 @@ public class VGLSignatureDao extends HibernateDaoSupport {
         VGLSignature userSignature = null;
 
         // Look up user's signature from the database using exact match
-        Query q = getSession().createQuery(
+        Query q = getSessionFactory().getCurrentSession().createQuery(
                 "from VGLSignature s where s.user=:user");
         userSignature = (VGLSignature) q.setParameter("user", user)
                 .uniqueResult();

@@ -11,7 +11,6 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A handler that provides the concrete implementation of
