@@ -31,7 +31,8 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class AdminController {
 
-    private final Log log = LogFactory.getLog(getClass());
+    @SuppressWarnings("unused")
+	private final Log log = LogFactory.getLog(getClass());
 
     /** For accessing the various CSW's*/
     private List<CSWServiceItem> cswServiceList;
@@ -47,14 +48,14 @@ public class AdminController {
      * Creates a new instance of this class
      */
     @Autowired
-    public AdminController(@Qualifier(value = "cswServiceList") ArrayList cswServiceList,
+    public AdminController(@Qualifier(value = "cswServiceList") ArrayList<CSWServiceItem> cswServiceList,
             PortalPropertyPlaceholderConfigurer portalProperties,
             VglAdminService adminService) {
         this.portalProperties = portalProperties;
         this.adminService = adminService;
         this.cswServiceList = new ArrayList<CSWServiceItem>();
         for (int i = 0; i < cswServiceList.size(); i++) {
-            this.cswServiceList.add((CSWServiceItem) cswServiceList.get(i));
+            this.cswServiceList.add(cswServiceList.get(i));
         }
     }
 

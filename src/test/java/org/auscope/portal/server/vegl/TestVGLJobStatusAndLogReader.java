@@ -1,9 +1,6 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
-import java.util.HashMap;
-
-import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
 import org.auscope.portal.core.cloud.CloudFileInformation;
@@ -15,8 +12,10 @@ import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
 import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.ui.ModelMap;
 
 /**
  * Unit tests for VGLJobStatusAndLogReader.
@@ -232,7 +231,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE);will(returnValue(logContents));
         }});
 
-        HashMap map = jobStatLogReader.getSectionedLogs(mockJob);
+        ModelMap map = jobStatLogReader.getSectionedLogs(mockJob);
 
         //There should be 3 sections (we don't care about line ending formats - normalise it to unix style \n)
         Assert.assertEquals(4, map.keySet().size());

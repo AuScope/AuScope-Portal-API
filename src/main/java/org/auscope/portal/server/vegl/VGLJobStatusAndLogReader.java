@@ -1,7 +1,6 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +38,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      * @param job
      * @return
      */
-    public HashMap getSectionedLogs(VEGLJob job) throws PortalServiceException {
+    public ModelMap getSectionedLogs(VEGLJob job) throws PortalServiceException {
         CloudStorageService cloudStorageService = getStorageService(job);
         if (cloudStorageService == null) {
             throw new PortalServiceException(
@@ -120,7 +119,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      */
     public String getSectionedLog(VEGLJob job, String sectionName) {
         try {
-            HashMap sectLogs = getSectionedLogs(job);
+        	ModelMap sectLogs = getSectionedLogs(job);
             return (String)sectLogs.get(sectionName);
         } catch (PortalServiceException ex) {
             log.debug(ex.getMessage());

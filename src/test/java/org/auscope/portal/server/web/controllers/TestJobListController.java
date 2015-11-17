@@ -1009,7 +1009,6 @@ public class TestJobListController extends PortalTestClass {
      * Tests that creating a folder succeeds
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void testCreateFolder() throws Exception {
         final String userEmail = "exampleuser@email.com";
