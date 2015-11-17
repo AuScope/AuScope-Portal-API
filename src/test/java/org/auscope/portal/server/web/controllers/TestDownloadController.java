@@ -7,12 +7,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.Header;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.message.BasicHeader;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.test.ByteBufferedServletOutputStream;
 import org.auscope.portal.core.test.PortalTestClass;

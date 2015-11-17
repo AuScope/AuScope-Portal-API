@@ -12,7 +12,6 @@ import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BasePortalController;
-import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.methodmakers.OPeNDAPGetDataMethodMaker.OPeNDAPFormat;
 import org.auscope.portal.core.services.responses.opendap.AbstractViewVariable;

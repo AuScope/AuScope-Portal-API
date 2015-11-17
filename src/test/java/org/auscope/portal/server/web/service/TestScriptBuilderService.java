@@ -6,14 +6,13 @@ import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -73,7 +72,7 @@ public class TestScriptBuilderService extends PortalTestClass {
 
         service.saveScript(jobId.toString(), script);
     }
-    
+
     @Test(expected=PortalServiceException.class)
     public void testSaveScript_Exception() throws Exception {
         final String script = "#a pretend script\n";

@@ -7,8 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import junit.framework.Assert;
-
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.wfs.WFSGetCapabilitiesResponse;
@@ -16,6 +14,7 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.ui.ModelMap;
@@ -76,7 +75,7 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(westBoundLongitude, data.get("westBoundLongitude"));
         Assert.assertEquals(name, data.get("name"));
         Assert.assertTrue(data.get("url").toString().contains(serviceUrl));
-        
+
         //Check session variables
         Assert.assertEquals(1, downloads.size());
         VglDownload download = downloads.get(0);
@@ -91,7 +90,7 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertTrue(download.getUrl().contains("." + format));
         Assert.assertTrue(download.getUrl().contains(layerName));
     }
-    
+
     @Test
     public void testMakeErddapUrlNotSaveSession() throws Exception {
         final Double northBoundLatitude = 2.0;
@@ -159,7 +158,7 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(westBoundLongitude, data.get("westBoundLongitude"));
         Assert.assertEquals(name, data.get("name"));
         Assert.assertEquals(serviceUrl, data.get("url"));
-        
+
         //Check session variables
         Assert.assertEquals(1, downloads.size());
         VglDownload download = downloads.get(0);
@@ -172,7 +171,7 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(localPath, download.getLocalPath());
         Assert.assertEquals(serviceUrl, download.getUrl());
     }
-    
+
     @Test
     public void testMakeDownloadUrlNotSaveSession() throws Exception {
         final Double northBoundLatitude = 2.0;
@@ -202,7 +201,7 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(name, data.get("name"));
         Assert.assertEquals(serviceUrl, data.get("url"));
     }
-    
+
     @Test
     public void testMakeWfsUrlSaveSession() throws Exception {
         final Double northBoundLatitude = 2.0;
@@ -220,7 +219,7 @@ public class TestJobDownloadController extends PortalTestClass {
         final Integer maxFeatures = null;
         final List<VglDownload> downloads = new ArrayList<VglDownload>();
         final String wfsRequestString = serviceUrl + "?request=param";
-        
+
         final String[] expectedFormats = new String[] {"format1", "format2"};
         final WFSGetCapabilitiesResponse mockResponse = context.mock(WFSGetCapabilitiesResponse.class);
 
@@ -229,15 +228,15 @@ public class TestJobDownloadController extends PortalTestClass {
 
             oneOf(mockWfsService).getFeatureRequestAsString(with(serviceUrl), with(featureType), with(any(FilterBoundingBox.class)), with(maxFeatures), with(srsName), with(outputFormat));
             will(returnValue(wfsRequestString));
-            
+
             allowing(mockResponse).getGetFeatureOutputFormats();will(returnValue(expectedFormats));
-            
+
             oneOf(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(downloads));
             oneOf(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
         }});
 
-        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs, 
-                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, 
+        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs,
+                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude,
                 outputFormat, maxFeatures, name, description, localPath, true, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
@@ -251,7 +250,7 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(westBoundLongitude, data.get("westBoundLongitude"));
         Assert.assertEquals(name, data.get("name"));
         Assert.assertEquals(wfsRequestString, data.get("url"));
-        
+
         //Check session variables
         Assert.assertEquals(1, downloads.size());
         VglDownload download = downloads.get(0);
@@ -264,7 +263,7 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(localPath, download.getLocalPath());
         Assert.assertEquals(wfsRequestString, download.getUrl());
     }
-    
+
     @Test
     public void testMakeWfsUrlNotSaveSession() throws Exception {
         final Double northBoundLatitude = 2.0;
@@ -281,7 +280,7 @@ public class TestJobDownloadController extends PortalTestClass {
         final String outputFormat = "o-f";
         final Integer maxFeatures = null;
         final String wfsRequestString = serviceUrl + "?request=param";
-        
+
         final String[] expectedFormats = new String[] {"format1", "format2"};
         final WFSGetCapabilitiesResponse mockResponse = context.mock(WFSGetCapabilitiesResponse.class);
 
@@ -290,12 +289,12 @@ public class TestJobDownloadController extends PortalTestClass {
 
             oneOf(mockWfsService).getFeatureRequestAsString(with(serviceUrl), with(featureType), with(any(FilterBoundingBox.class)), with(maxFeatures), with(srsName), with(outputFormat));
             will(returnValue(wfsRequestString));
-            
+
             allowing(mockResponse).getGetFeatureOutputFormats();will(returnValue(expectedFormats));
         }});
 
-        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs, 
-                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, 
+        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs,
+                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude,
                 outputFormat, maxFeatures, name, description, localPath, false, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
@@ -310,9 +309,9 @@ public class TestJobDownloadController extends PortalTestClass {
         Assert.assertEquals(name, data.get("name"));
         Assert.assertEquals(wfsRequestString, data.get("url"));
     }
-    
+
     /**
-     * Tests that get the number of download items stored 
+     * Tests that get the number of download items stored
      * in user session works as expected
      */
     @Test
@@ -322,7 +321,7 @@ public class TestJobDownloadController extends PortalTestClass {
         final VglDownload d2 = new VglDownload(2);
         vglDownloads.add(d1);
         vglDownloads.add(d2);
-        
+
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(vglDownloads));
@@ -333,10 +332,10 @@ public class TestJobDownloadController extends PortalTestClass {
         Integer numDownloads = (Integer) mav.getModel().get("data");
         Assert.assertEquals(new Integer(2), numDownloads);
     }
-    
+
     /**
-     * Tests that get the number of download items stored 
-     * in user session works as expected when jobDownloadList 
+     * Tests that get the number of download items stored
+     * in user session works as expected when jobDownloadList
      * attribute can't be found in user session (meaning user
      * has captured any data set).
      */
@@ -346,10 +345,10 @@ public class TestJobDownloadController extends PortalTestClass {
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             allowing(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(null));
         }});
-        
+
         ModelAndView mav = controller.getNumDownloadRequests(mockRequest);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Integer numDownloads = (Integer) mav.getModel().get("data");
         Assert.assertEquals(new Integer(0), numDownloads);
-    }    
+    }
 }

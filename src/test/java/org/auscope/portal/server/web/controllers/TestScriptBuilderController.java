@@ -3,13 +3,14 @@ package org.auscope.portal.server.web.controllers;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
+
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;

@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.jmock.SimpleMailMessageMatcher;
@@ -16,6 +14,7 @@ import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.jmock.Expectations;

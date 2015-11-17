@@ -3,7 +3,7 @@ package org.auscope.portal.server.vegl;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
