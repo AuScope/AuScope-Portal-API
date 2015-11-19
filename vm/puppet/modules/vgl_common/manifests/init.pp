@@ -55,7 +55,7 @@ class vgl_common {
     
     exec { "get-bootstrap":
         before => File[$bootstrapLocation],
-        command => "$curl_cmd -L https://raw.githubusercontent.com/AuScope/VEGL-Portal/master/vm/ec2-run-user-data.sh > $bootstrapLocation",
+        command => "$curl_cmd -L https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/ec2-run-user-data.sh > $bootstrapLocation",
     }
     file { $bootstrapLocation: 
         ensure => present,
