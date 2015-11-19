@@ -4,7 +4,7 @@
 class vgl_common {
 
     # Install default packages
-    package { ["wget", "subversion", "mercurial", "ftp", "bzip2", "elfutils", "ntp", "ntpdate", "gcc", "make", "swig", "expect-dev", "gfortran"]: 
+    package { ["wget", "subversion", "mercurial", "ftp", "bzip2", "elfutils", "ntp", "ntpdate", "gcc", "make", "swig", "expect-dev", "gfortran", "build-essential", "curl"]: 
         ensure => installed,
         require => Class["epel"],
     }
