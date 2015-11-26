@@ -3,7 +3,7 @@
 # Originally sourced from http://awaseroot.wordpress.com/2012/09/01/new-script-install-puppet-on-centos/
 # Usage:
 # installPuppet-centos.sh [svnUrl] [pathSuffix]
-# gitUrl - The base VGL URL where additional puppet modules will be downloaded from. Defaults to "https://github.com/AuScope/VEGL-Portal/raw/master"
+# gitUrl - The base VGL URL where additional puppet modules will be downloaded from. Defaults to "https://github.com/AuScope/ANVGL-Portal/raw/master"
 # pathSuffix - Will be appended to gitUrl to form the base url that will be recursively downloaded for modules. Defaults to "vm/puppet/modules/"
 
 # /////////////////////////////
@@ -15,7 +15,7 @@
 # /////////////////////////////
 
 # baseUrl -- git repository url
-baseUrl="https://github.com/AuScope/VEGL-Portal.git"
+baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
 
 # branch -- branch in the git repo
 branch="master"

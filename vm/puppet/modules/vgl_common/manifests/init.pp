@@ -4,7 +4,7 @@
 class vgl_common {
 
     # Install default packages
-    package { ["wget", "subversion", "mercurial", "ftp", "bzip2", "elfutils", "ntp", "ntpdate", "gcc", "make", "swig", "expect-dev", "gfortran"]: 
+    package { ["wget", "subversion", "mercurial", "ftp", "bzip2", "elfutils", "ntp", "ntpdate", "gcc", "make", "swig", "expect-dev", "gfortran", "build-essential", "curl"]: 
         ensure => installed,
         require => Class["epel"],
     }
@@ -55,7 +55,7 @@ class vgl_common {
     
     exec { "get-bootstrap":
         before => File[$bootstrapLocation],
-        command => "$curl_cmd -L https://raw.githubusercontent.com/AuScope/VEGL-Portal/master/vm/ec2-run-user-data.sh > $bootstrapLocation",
+        command => "$curl_cmd -L https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/ec2-run-user-data.sh > $bootstrapLocation",
     }
     file { $bootstrapLocation: 
         ensure => present,
