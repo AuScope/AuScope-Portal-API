@@ -152,6 +152,13 @@ Ext.application({
             ]
         });
 
+        /* the footer, currently sits beneath tabsPanel */
+        var southPanel = {
+    		items : [{xtype: 'ANVGLFooter'}],
+    		layout : 'fit',
+            region :'south'
+        };
+        
         /**
          * Used as a placeholder for the tree and details panel on the left of screen
          */
@@ -162,7 +169,7 @@ Ext.application({
             split:true,           
             margin:'100 0 0 3',
             width: 370,
-            items:[tabsPanel]
+            items:[tabsPanel, southPanel]
         };
 
         /**
@@ -180,6 +187,8 @@ Ext.application({
             }
         });
 
+
+        
         /**
          * Add all the panels to the viewport
          */
@@ -187,7 +196,7 @@ Ext.application({
             layout:'border',
             items:[westPanel, centerPanel]
         });
-
+		
         
         // The subset button needs a handler for when the user draws a subset bbox on the map:
         map.on('dataSelect', function(map, bbox, intersectedRecords) {

@@ -2,7 +2,10 @@
    <div id="header-container">
       <div id="logo">
          <h1>
-            <a href="#" onclick="window.open('about.html','AboutWin','toolbar=no, menubar=no,location=no,resizable=no,scrollbars=yes,statusbar=no,top=100,left=200,height=650,width=450');return false"><img alt="VGL Header" src="img/img-auscope-banner.gif"></a>
+            <a href="#" onclick="window.open('about.html','AboutWin','toolbar=no, menubar=no,location=no,resizable=no,scrollbars=yes,statusbar=no,top=100,left=200,height=650,width=450');return false">
+				<span class="sr-only">Government of Western Australia - Department of Mines and Petroleum</span>
+				<span id="app-title">Virtual Geophysics Laboratory</span>
+           </a>
          </h1>
       </div>
       <div id="menu">
