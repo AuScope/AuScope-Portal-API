@@ -13,11 +13,34 @@ Ext.application({
 
         var urlParams = Ext.Object.fromQueryString(window.location.search.substring(1));
         var isDebugMode = urlParams.debug;
-
-        //Create our KnownLayer store
+        
+        var layersSorter = new Ext.util.Sorter({
+            sorterFn: function(record1, record2) {
+            	// 'order' is always received on the JSON
+            	// if it is an empty string, the layers are sorted on layer name, ascending
+                var order1 = (record1.data.order.length ? record1.data.order : record1.data.name);
+                var order2 = (record2.data.order.length ? record2.data.order : record2.data.name);
+                return order1 > order2 ? 1 : (order1 < order2 ? -1 : 0);
+            },
+            direction: 'ASC'
+        })
+        
+        var layersGrouper = new Ext.util.Grouper({
+            groupFn: function(item) {
+                return item.data.group;
+            },
+            sorterFn: function(record1, record2) {
+            	// 'order' is always received on the JSON
+            	// if it is an empty string, the groups are sorted on group name, ascending
+            	var order1 = (record1.data.order.length ? record1.data.order : record1.data.group);
+            	var order2 = (record2.data.order.length ? record2.data.order : record2.data.group);
+                return order1 > order2 ? 1 : (order1 < order2 ? -1 : 0);
+            },
+            direction: 'ASC'
+        });
+        
         var knownLayerStore = Ext.create('Ext.data.Store', {
             model : 'portal.knownlayer.KnownLayer',
-            groupField: 'group',
             proxy : {
                 type : 'ajax',
                 url : 'getKnownLayers.do',
@@ -26,8 +49,11 @@ Ext.application({
                     rootProperty : 'data'
                 }
             },
+            sorters: [layersSorter],
+            grouper: layersGrouper,
             autoLoad : true
         });
+        
 
         //Create our store for holding the set of
         //layers that have been added to the map
@@ -35,7 +61,6 @@ Ext.application({
 
         //We need something to handle the clicks on the map
         var queryTargetHandler = Ext.create('portal.layer.querier.QueryTargetHandler', {});
-
 
         //Create our map implementations
         var mapCfg = {
