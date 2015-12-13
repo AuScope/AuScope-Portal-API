@@ -83,3 +83,78 @@
     color: #15428B;
     font: 12px Arial, Tahoma, Helvetica, sans-serif;
 }
+
+
+/* ANVGL-12 updates */
+#header-container, 
+#logo {
+	height : 100px;
+	width : 100%;
+}
+
+#logo h1 {
+	width : 100%;
+}
+
+/* overwrites the background-image on portal-core to include application specific branding */
+#logo h1 a {
+	background : url('../img/logos/government-of-western-australia-department-of-mines-and-petroleum.jpg') no-repeat 0 0;
+	background-size : contain;
+	margin : 10px;
+	height : 80px;
+	width : 581px;
+	text-decoration : none;
+}
+
+#logo h1 a span#app-title {
+	display : inline-block;
+	color : #000;
+	font-size : 19px;
+	float : left;
+	line-height : 1.1;
+	margin-left : 400px;
+	margin-top : 22px;
+	
+}
+
+/* does not render on the interface; often used for web-accessibility  */
+.sr-only {
+    border: 0;
+    clip: rect(0,0,0,0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+#latlng {
+	top : 70px;
+}
+
+#permalink {
+	top : 80px;
+}
+
+#anvgl-footer {
+	height : 120px !important;
+}
+
+#anvgl-footer ul {
+	list-style-type : none;
+	margin : 0;
+	padding : 0;
+}
+
+#anvgl-footer li {
+	display : table-cell;
+	height : 90px;
+	margin : 0 10px 0 0;
+	vertical-align : middle;
+}
+
+#anvgl-footer li img {
+	width : 180px;
+}
+/* !ANVGL-12 updates */
