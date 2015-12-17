@@ -234,6 +234,17 @@
                         </array>
                     </property>
                 </bean>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ap-southeast-2/ami-736b3010"/>
+                    <property name="name" value="AEM-Inversion"/>
+                    <property name="description"><value>A Debian (Jessie) machine with aem already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>AEM-Inversion</value>
+                            <value>debian</value>
+                        </array>
+                    </property>
+                </bean>
             </list>
         </property>
     </bean>
