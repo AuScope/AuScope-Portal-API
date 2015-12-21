@@ -34,7 +34,7 @@
         <property name="username" value="${env.jdbc.user}"/>
         <property name="password" value="${env.jdbc.password}"/>
     </bean>
-
+    
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
@@ -64,7 +64,7 @@
         <property name="emailSender"><value><![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]></value></property>
         <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
-
+    
 
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
     <bean name="VGLJobStatusChangeHandler" class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor"/>
@@ -87,9 +87,9 @@
             </map>
         </property>
     </bean>
-
+    
     <bean name="vglPollingJobQueueManagerDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="org.auscope.portal.server.vegl.VGLPollingJobQueueManager" />
+        <property name="jobClass" value="org.auscope.portal.server.vegl.VGLPollingJobQueueManager" />       
     </bean>
 
     <!-- Simple Trigger for vglJobStatusMonitor task, run every 5 minutes -->
@@ -98,7 +98,7 @@
         <property name="repeatInterval" value="300000" />
         <property name="startDelay" value="10000" />
     </bean>
-
+    
     <!-- Simple Trigger for vglPollingJobQueueManagerDetail task, run every 30 minutes -->
     <bean id="quotaExceededTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="vglPollingJobQueueManagerDetail" />
@@ -194,18 +194,17 @@
         </constructor-arg>
     </bean>
 
-    <bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageService">
-        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
-        <constructor-arg name="provider" value="swift-keystone"/>
-        <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
-        <constructor-arg name="regionName" value="Melbourne"/>
+    <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+        <constructor-arg name="provider" value="aws-s3"/>
+        <constructor-arg name="endpoint"><null/></constructor-arg>
+        <constructor-arg name="accessKey" value="${env.aws.s3.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.aws.s3.secretkey}"/>
+        <constructor-arg name="regionName" value="ap-southeast-2"/>
         <constructor-arg name="relaxHostName" value="false"/>
         <constructor-arg name="stripExpectHeader" value="true"/>
-        <property name="name" value="National eResearch Collaboration Tools and Resources"/>
-        <property name="id" value="nectar-openstack-storage-melb"/>
-        <property name="bucket" value="vgl-portal"/>
-        <property name="authVersion" value="2.0"/>
+        <property name="name" value="Amazon Web Services - S3"/>
+        <property name="id" value="amazon-aws-storage-sydney"/>
+        <property name="bucket" value="anvgl-csiro"/>
     </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
@@ -213,11 +212,11 @@
     <bean id="cloudComputeService-aws" class="org.auscope.portal.core.services.cloud.CloudComputeService">
         <constructor-arg name="provider" value="AWSEc2"/>
         <constructor-arg name="endpoint"><null/></constructor-arg>
-<!--         <constructor-arg name="apiVersion"><null/></constructor-arg> -->
+        <constructor-arg name="apiVersion"><null/></constructor-arg>
         <constructor-arg name="accessKey" value="${env.aws.ec2.accesskey}"/>
         <constructor-arg name="secretKey" value="${env.aws.ec2.secretkey}"/>
-<!--         <constructor-arg name="httpServiceCaller" ref="httpServiceCaller"/> -->
-
+        <constructor-arg name="httpServiceCaller" ref="httpServiceCaller"/>
+        
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
         <property name="keypair" value="developers-anvgl-aws"/>
@@ -235,57 +234,14 @@
                         </array>
                     </property>
                 </bean>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeService">
-        <constructor-arg name="provider" value="NovaKeystone"/>
-        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
-        <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
-        <property name="id" value="nectar-openstack-compute"/>
-        <property name="name" value="National eResearch Collaboration Tools and Resources"/>
-        <property name="groupName" value ="vl-#{inetAddress.hostName.toLowerCase()}"/>
-        <property name="availableImages">
-            <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="Melbourne/07005d01-0dc8-4e2d-9eba-cdc36349a463"/>
-                    <property name="name" value="escript"/>
-                    <property name="description"><value>A Debian (Jessie) machine with escript already installed.</value></property>
-                    <property name="minimumDiskGB" value="10"/>
-                    <property name="keywords">
-                        <array>
-                            <value>escript</value>
-                            <value>centos6</value>
-                        </array>
-                    </property>
-                </bean>
-                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="Melbourne/e4dfe8cc-3b07-41c9-8b53-b82960797769"/>
-                    <property name="name" value="Underworld"/>
-                    <property name="description"><value>A Centos 6 machine with Underworld already installed.</value></property>
-                    <property name="keywords">
-                        <array>
-                            <value>Underworld</value>
-                            <value>centos6</value>
-                        </array>
-                    </property>
-                </bean>
-                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="Melbourne/19121286-6d84-4dba-8e60-fcca85812421"/>
+                    <constructor-arg name="imageId" value="ap-southeast-2/ami-736b3010"/>
                     <property name="name" value="AEM-Inversion"/>
-                    <property name="description"><value>A Debian 8 machine with AEM Inversion already installed.</value></property>
-                    <property name="minimumDiskGB" value="10"/>
+                    <property name="description"><value>A Debian (Jessie) machine with aem already installed.</value></property>
                     <property name="keywords">
                         <array>
                             <value>AEM-Inversion</value>
-                            <value>debian8</value>
-                        </array>
-                    </property>
-                    <property name="permissions">
-                        <array>
-                            <value>ROLE_USER</value>
+                            <value>debian</value>
                         </array>
                     </property>
                 </bean>
