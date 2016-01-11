@@ -25,7 +25,7 @@ Ext.application({
                 },
                 items: [{
                     id: 'job-submit-panel',
-                    maxWidth: 1150,
+                    width: 1000,
                     height: '100%',
                     bodyStyle: {
                         'background-color': 'white'
