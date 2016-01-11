@@ -7,8 +7,8 @@
         <title>Administration Diagnostics</title>
 
         <%-- Google Maps imports --%>
-        <script src="http://maps.google.com/maps?file=api&amp;v=2.X&amp;key=${googleKey}" type="text/javascript"></script>
-        <script src="http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js" type="text/javascript"></script>
+        <script src="https://maps.google.com/maps?file=api&amp;v=2.X&amp;key=${googleKey}" type="text/javascript"></script>
+        <script src="https://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js" type="text/javascript"></script>
 
         <%-- Open Layers Imports --%>
         <link rel="stylesheet" href="portal-core/js/OpenLayers-2.11/theme/default/style.css" type="text/css">
