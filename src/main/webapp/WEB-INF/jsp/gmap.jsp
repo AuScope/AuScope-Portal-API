@@ -5,15 +5,15 @@
 <!-- Credits for icons from http://www.fatcow.com/free-icons/ under http://creativecommons.org/licenses/by/3.0/us/-->
 <html xmlns:v="urn:schemas-microsoft-com:vml">
    <head>
-      <title>VGL Portal</title>
+      <title>ANVGL Portal</title>
 
       <meta name="description" content="Access geoscientific information from around Australia, via AuScopes national e-Research infrastructure.">
       <meta name="keywords" content="AuScope, Discovery, Resources, GeoSciML, Mineral Occurrence, Geologic Unit, Australia">
       <meta name="author" content="AuScope">
 
       <%-- Open Layers Imports --%>
-      <link rel="stylesheet" href="portal-core/js/OpenLayers-2.12/theme/default/style.css" type="text/css">
-      <script src="portal-core/js/OpenLayers-2.12/OpenLayers.js" type="text/javascript"></script>
+      <link rel="stylesheet" href="portal-core/js/OpenLayers-2.13.1/theme/default/style.css" type="text/css">
+      <script src="portal-core/js/OpenLayers-2.13.1/OpenLayers.js" type="text/javascript"></script>
 
       <script type="text/javascript">
          var VOCAB_SERVICE_URL = "${vocabServiceUrl}";
