@@ -80,7 +80,14 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                         this._handleRowEdit(record);
                     }
                 }]
-            }]
+            }],
+            listeners: {
+                afterrender: function(panel) {
+                    if (dataItems.length === 1) {
+                        panel.setSelection(dataItems[0]);
+                    }
+                }
+            }
         });
 
         this.callParent(arguments);
