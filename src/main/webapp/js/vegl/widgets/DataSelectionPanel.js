@@ -80,7 +80,14 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                         this._handleRowEdit(record);
                     }
                 }]
-            }]
+            }],
+            listeners: {
+                afterrender: function(panel) {
+                    if (dataItems.length === 1) {
+                        panel.setSelection(dataItems[0]);
+                    }
+                }
+            }
         });
 
         this.callParent(arguments);
@@ -117,7 +124,7 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
                 return;
             }
 
-            portal.util.FileDownloader.downloadFile(dl.get('url'));
+            portal.util.FileDownloader.downloadFile(dl.get('url'),[],dlOptions.method);
         });
     },
 
@@ -139,7 +146,7 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
 
         var totalResponses = 0;
         var totalErrors = 0;
-     
+
         var myMask = new Ext.LoadMask({
             msg : 'Saving selected datasets...',
             target : this
@@ -173,12 +180,11 @@ Ext.define('vegl.widgets.DataSelectionPanel', {
      * Updates the description text for the specified dataitem. The update may occur asynchronously
      */
     _updateDescription : function(dataItem) {
-        var or = dataItem.get('onlineResource');
+        var or = dataItem.get('estimateResource');
         var dlOptions = dataItem.get('downloadOptions');
 
         // WCS resources have their description based on the selected region (whatever that may be)
         if (or.get('type') === portal.csw.OnlineResource.WCS) {
-
             dataItem.set('description', 'Loading size details...');
             vegl.util.WCSUtil.estimateCoverageSize(dlOptions, or.get('url'), dlOptions.layerName, dataItem, function(success, errorMsg, response, dataItem) {
                 if (!success) {
@@ -266,28 +272,62 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
     extend : 'Ext.data.Model',
 
     statics : {
+        DATA_TYPE_PRIORITY: [portal.csw.OnlineResource.WCS, portal.csw.OnlineResource.NCSS, portal.csw.OnlineResource.WFS], //From low to high
+        ESTIMATE_TYPE_PRIORITY: [portal.csw.OnlineResource.WCS, portal.csw.OnlineResource.WFS], //From low to high
+
+        /**
+         * Given an array of OnlineResources, choose the first item in that array with the highest priority.
+         * (will only return resources that match vegl.util.DataSelectionUtil.isResourceSupported)
+         */
+        getHighestPriorityType: function(onlineResources, priorityArray) {
+            //Gets the priority for a single online resource or -1.
+            var getPriority = function(or) {
+                var currentPriority = -1;
+                Ext.each(priorityArray, function(pType, index) {
+                    if (or.get('type') === pType ) {
+                        currentPriority = index;
+                        return false;
+                    }
+                });
+                return currentPriority;
+            };
+
+            var highestPriority = -99;
+            var highestResource = null;
+            Ext.each(onlineResources, function(currentResource) {
+                if (vegl.util.DataSelectionUtil.isResourceSupported(currentResource)) {
+                    var currentPriority = getPriority(currentResource);
+                    if (currentPriority > highestPriority) {
+                        highestPriority = currentPriority;
+                        highestResource = currentResource;
+                    }
+                }
+            });
+
+            return highestResource;
+        },
+
         /**
          * Parses a single csw record and parent layer into an array of DataSelectionPanelRow items
          */
         parseCswRecord : function(cswRecord, defaultBbox) {
             var dataItems = [];
             var resources = cswRecord.get('onlineResources');
-            for (var i = 0; i < resources.length; i++) {
-                var onlineResource = resources[i];
 
-                if (!vegl.util.DataSelectionUtil.isResourceSupported(onlineResource)) {
-                    continue;
-                }
+            var preferredDataServiceResource = vegl.widgets.DataSelectionPanelRow.getHighestPriorityType(resources, vegl.widgets.DataSelectionPanelRow.DATA_TYPE_PRIORITY);
+            var preferredEstimateServiceResource = vegl.widgets.DataSelectionPanelRow.getHighestPriorityType(resources, vegl.widgets.DataSelectionPanelRow.ESTIMATE_TYPE_PRIORITY);
 
+            if (preferredDataServiceResource != null) {
                 //Set the defaults of our new item
-                newItem = {
-                    resourceType : portal.csw.OnlineResource.typeToString(onlineResource.get('type')),
-                    name : onlineResource.get('name'),
-                    description : onlineResource.get('description'),
+                var newItem = {
+                    resourceType : portal.csw.OnlineResource.typeToString(preferredDataServiceResource.get('type')),
+                    name : preferredDataServiceResource.get('name'),
+                    description : preferredDataServiceResource.get('description'),
                     selected : true,
                     cswRecord : cswRecord,
-                    onlineResource : onlineResource,
-                    downloadOptions : vegl.util.DataSelectionUtil.createDownloadOptionsForResource (onlineResource, cswRecord, defaultBbox)
+                    onlineResource : preferredDataServiceResource,
+                    estimateResource : preferredEstimateServiceResource,
+                    downloadOptions : vegl.util.DataSelectionUtil.createDownloadOptionsForResource (preferredDataServiceResource, cswRecord, defaultBbox)
                 };
 
                 dataItems.push(Ext.create('vegl.widgets.DataSelectionPanelRow', newItem));
@@ -325,6 +365,7 @@ Ext.define('vegl.widgets.DataSelectionPanelRow', {
              {name : 'description', type: 'string'},
              {name : 'selected', type: 'boolean'},
              {name : 'onlineResource', type: 'auto'},
+             {name : 'estimateResource', type: 'auto'}, //used for data estimation
              {name : 'cswRecord', type: 'auto'},
              {name : 'downloadOptions', type: 'auto'}
     ]
