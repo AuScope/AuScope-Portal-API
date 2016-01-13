@@ -42,24 +42,6 @@ Ext.define('vegl.widgets.NetcdfSubsetPanel', {
 
         Ext.apply(config, {
             items : [{
-                xtype : 'combo',
-                anchor : '100%',
-                editable : false,
-                forceSelection : true,
-                fieldLabel : 'Data Type',
-                mode : 'local',
-                store : fileTypeStore,
-                triggerAction : 'all',
-                typeAhead : false,
-                displayField : 'label',
-                valueField : 'urn',
-                value : dataType,
-                name : 'format',
-                plugins: [{
-                    ptype: 'fieldhelptext',
-                    text: 'The data format to request from the remote service.'
-                }]
-            },{
                 xtype: 'fieldcontainer',
                 fieldLabel: 'Region',
                 msgTarget: 'under',
@@ -86,15 +68,6 @@ Ext.define('vegl.widgets.NetcdfSubsetPanel', {
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'The spatial region subset to request from the data service. The values represent a WGS:84 bounding box.'
-                }]
-            },{
-                xtype : 'displayfield',
-                fieldLabel : 'Selection Size',
-                itemId : 'selection-size',
-                anchor : '100%',
-                plugins: [{
-                    ptype: 'fieldhelptext',
-                    text: 'This selection size is only an approximation. It should only be used as a rough gauge of how much data you are requesting.'
                 }]
             },{
                 xtype : 'textfield',
@@ -130,25 +103,5 @@ Ext.define('vegl.widgets.NetcdfSubsetPanel', {
         });
 
         this.callParent(arguments);
-
-        this.on('render', this.updateSelectionSize, this);
-    },
-
-    updateSelectionSize : function() {
-        var ssField = this.getComponent('selection-size');
-        var values = this.getForm().getValues();
-
-        ssField.setValue('Loading...');
-
-        vegl.util.WCSUtil.estimateCoverageSize(values, this.coverageUrl, this.coverageName, ssField, function(success, msg, response, ssField) {
-            if (!success) {
-                ssField.setValue(msg);
-                return;
-            }
-
-            var approxTotal = Ext.util.Format.number(vegl.util.WCSUtil.roundToApproximation(response.roundedTotal), '0,000');
-            var approxSize = Ext.util.Format.fileSize(vegl.util.WCSUtil.roundToApproximation(response.width * response.height * 4));
-            ssField.setValue(Ext.util.Format.format('Approximately <b>{0}</b> data points in total. Uncompressed that\'s roughly {1}', approxTotal, approxSize));
-        });
     }
 });
