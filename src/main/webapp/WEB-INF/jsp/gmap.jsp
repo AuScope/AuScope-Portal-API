@@ -49,9 +49,9 @@
         	display: none;
         }
         </style>
-
+        
       <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-      
+
       <script src="js/vegl/models/Download.js" type="text/javascript"></script>
    </head>
 
