@@ -4,39 +4,41 @@
 Ext.define('vegl.util.DataSelectionUtil', {
     singleton: true
 }, function() {
-    
+
     /**
      * Given an OnlineResource, work out whether the type of that resource is supported
      * for data selection.
-     * 
+     *
      * @param or portal.csw.OnlineResource The resource to query
      */
     vegl.util.DataSelectionUtil.isResourceSupported = function(or) {
         switch(or.get('type')) {
-        case portal.csw.OnlineResource.WCS:            
+        case portal.csw.OnlineResource.WCS:
         case portal.csw.OnlineResource.WFS:
         case portal.csw.OnlineResource.WWW:
+        case portal.csw.OnlineResource.NCSS:
             return true;
-            
+
         default:
             return false;
         }
     };
-    
+
     /**
      * Creates a default download options object based on an online resource and CSWrecord.
-     * 
+     *
      * The object itself is used to maintain the state of dataset download options specific to
-     * the type of the online resource. Its use is only intended within this class 
+     * the type of the online resource. Its use is only intended within this class
      */
     vegl.util.DataSelectionUtil.createDownloadOptionsForResource = function(or, cswRecord, defaultBbox) {
-        var dsBounds = cswRecord.get('geographicElements').length ? cswRecord.get('geographicElements')[0] : null; 
-        
+        var dsBounds = cswRecord.get('geographicElements').length ? cswRecord.get('geographicElements')[0] : null;
+
         //Set the defaults of our new item
         var downloadOptions = {
             name : 'Subset of ' + or.get('name'),
             description : or.get('description'),
             url : or.get('url'),
+            method : 'POST',
             localPath : '/tmp/' + or.get('name'),
             crs : (defaultBbox ? defaultBbox.crs : ''),
             eastBoundLongitude : (defaultBbox ? defaultBbox.eastBoundLongitude : 0),
@@ -51,34 +53,49 @@ Ext.define('vegl.util.DataSelectionUtil', {
 
         //Add/subtract info based on resource type
         switch(or.get('type')) {
-        case portal.csw.OnlineResource.WCS:            
+        case portal.csw.OnlineResource.WCS:
             delete downloadOptions.url;
             downloadOptions.format = 'nc';
             downloadOptions.layerName = or.get('name');
+            downloadOptions.coverageName = downloadOptions.layerName;
             break;
         case portal.csw.OnlineResource.WFS:
-            
+
             delete downloadOptions.url;
             downloadOptions.serviceUrl = or.get('url');
             downloadOptions.featureType = or.get('name');
             break;
+        case portal.csw.OnlineResource.NCSS:
+            downloadOptions.name = or.get('name');
+            downloadOptions.method = 'GET';
+            downloadOptions.layerName = or.get('name');
+            downloadOptions.coverageName = downloadOptions.layerName;
+            //delete eastBoundLongitude;
+            //delete northBoundLatitude;
+            //delete southBoundLatitude;
+            //delete westBoundLongitude;
+
+            //delete downloadOptions.url;
+            //downloadOptions.serviceUrl = or.get('url');
+            //downloadOptions.featureType = or.get('name');
+            break;
         case portal.csw.OnlineResource.WWW:
             break;
-            
+
         //We don't support EVERY type
         default:
             break;
         }
-        
+
         return downloadOptions;
     };
-    
+
     /**
      * Creates and shows a GUI widget for editing the download options specific to the type of or selected.
-     * 
+     *
      * The results of the editing (if successful) will be written to a generic object which can be used
      * in conjuction with other methods in this utility class
-     * 
+     *
      * @param or portal.csw.OnlineResource The resource to query
      * @param callback function(Object) Called when editing finishes (only on success). Contains the newly updated dlOptions
      * @param dlOptions Object The current state of download options.
@@ -118,9 +135,9 @@ Ext.define('vegl.util.DataSelectionUtil', {
                         //Therefore we need to manually preserve it ourselves
                         params.layerName = dlOptions.layerName;
                         params = Ext.apply(dlOptions, params);
-                        
+
                         parentWindow.close();
-                        
+
                         callback(params);
                     }
                 }]
@@ -160,7 +177,48 @@ Ext.define('vegl.util.DataSelectionUtil', {
                         params.serviceUrl = params.serviceUrl;
 
                         parentWindow.close();
-                        
+
+                        callback(params);
+                    }
+                }]
+            }).show();
+            break;
+        case portal.csw.OnlineResource.NCSS:
+            Ext.create('Ext.window.Window', {
+                layout : 'fit',
+                width : 700,
+                height : 400,
+                modal : true,
+                title : or.get('name'),
+                items : [{
+                    xtype : 'netcdfsubsetpanel',
+                    itemId : 'subset-panel',
+                    region : Ext.create('portal.util.BBox', dlOptions),
+                    coverageName : dlOptions.layerName,
+                    coverageUrl : or.get('url'),
+                    name : dlOptions.name,
+                    localPath : dlOptions.localPath,
+                    description : dlOptions.description,
+                    dataType : dlOptions.format
+                }],
+                buttons : [{
+                    text : 'Save Changes',
+                    iconCls : 'add',
+                    align : 'right',
+                    scope : this,
+                    handler : function(btn) {
+                        var parentWindow = btn.findParentByType('window');
+                        var panel = parentWindow.getComponent('subset-panel');
+
+                        var params = panel.getForm().getValues();
+
+                        //The ERDDAP subset panel doesn't use coverage name for anything but size estimation
+                        //Therefore we need to manually preserve it ourselves
+                        params.layerName = dlOptions.layerName;
+                        params = Ext.apply(dlOptions, params);
+
+                        parentWindow.close();
+
                         callback(params);
                     }
                 }]
@@ -193,7 +251,7 @@ Ext.define('vegl.util.DataSelectionUtil', {
                         var params = panel.getForm().getValues();
 
                         parentWindow.close();
-                        
+
                         callback(params);
                     }
                 }]
@@ -201,19 +259,19 @@ Ext.define('vegl.util.DataSelectionUtil', {
             break;
         }
     };
-    
+
     /**
-     * Create a download request URL (in the form of a Download object). 
+     * Create a download request URL (in the form of a Download object).
      * The request can optionally be stored into the user session
      * for use later in the job submit phase of the workflow.
-     * 
+     *
      * @param or portal.csw.OnlineResource The resource to query
      * @param dlOptions Object The current state of download options.
      * @param saveInSession Boolean Should this download be saved into the users session for use during job submit?
      * @param callback function(Boolean, vegl.models.Download) called whenever the save request returns. Success is passed as the first parameter
      */
     vegl.util.DataSelectionUtil.makeDownloadUrl = function(or, dlOptions, saveInSession, callback) {
-        
+
         var ajaxResponseHandler = function(options, success, response, callback) {
             if (!success) {
                 callback(false, null);
@@ -224,13 +282,13 @@ Ext.define('vegl.util.DataSelectionUtil', {
                 callback(false, null);
                 return;
             }
-            
+
             callback(true, Ext.create('vegl.models.Download', responseObj.data));
         };
-        
+
         switch (or.get('type')) {
         case portal.csw.OnlineResource.WCS:
-            
+
             //Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
             //will fail. To workaround this, we need to crop our selection to the dataset bounds
             if (dlOptions.dsEastBoundLongitude != null && (dlOptions.dsEastBoundLongitude < dlOptions.eastBoundLongitude)) {
@@ -245,7 +303,7 @@ Ext.define('vegl.util.DataSelectionUtil', {
             if (dlOptions.dsSouthBoundLatitude != null && (dlOptions.dsSouthBoundLatitude > dlOptions.southBoundLatitude)) {
                 dlOptions.southBoundLatitude = dlOptions.dsSouthBoundLatitude;
             }
-            
+
             Ext.Ajax.request({
                 url : 'makeErddapUrl.do',
                 params : Ext.apply({saveSession : saveInSession}, dlOptions),
@@ -259,6 +317,14 @@ Ext.define('vegl.util.DataSelectionUtil', {
                 callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
             });
             break;
+        case portal.csw.OnlineResource.NCSS:
+            Ext.Ajax.request({
+                url : 'makeNetcdfsubseserviceUrl.do',
+                params : Ext.apply({saveSession : saveInSession}, dlOptions),
+                callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
+            });
+            break;
+
         default:
             Ext.Ajax.request({
                 url : 'makeDownloadUrl.do',
