@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
+import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
@@ -931,8 +933,18 @@ public class JobBuilderController extends BaseCloudController {
                 return generateJSONResponseMAV(false, null, "Unknown/Unauthorised machine image");
             }
 
+            //Grab the compute types that are compatible with our disk requirements
+            ComputeType[] allTypes = ccs.getAvailableComputeTypes(null, null, selectedImage.getMinimumDiskGB());
 
-            return generateJSONResponseMAV(true, ccs.getAvailableComputeTypes(null, null, selectedImage.getMinimumDiskGB()), "");
+            //Filter further due to AWS HVM/PVM compatiblity. See ANVGL-16
+            Object[] filteredTypes = Arrays.stream(allTypes).filter(new Predicate<ComputeType>() {
+                @Override
+                public boolean test(ComputeType t) {
+                    return t.getId().startsWith("c3") || t.getId().startsWith("m3");
+                }
+            }).toArray();
+
+            return generateJSONResponseMAV(true, filteredTypes, "");
         } catch (Exception ex) {
             log.error("Unable to access compute type list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
