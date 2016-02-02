@@ -9,8 +9,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
     imageStore : null,
     computeTypeStore : null,
-    storageServicesStore : null,
-    computeServicesStore : null,
 
     /**
      * Creates a new JobObjectForm form configured to write/read to the specified global state
@@ -28,9 +26,13 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 reader: {
                    type: 'json',
                    rootProperty : 'data'
+                },
+                extraParams: {
+                    computeServiceId: 'aws-ec2-compute' //See ANVGL-35
                 }
             }
         });
+        this.imageStore.load();
 
         this.computeTypeStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.ComputeType',
@@ -43,36 +45,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             }
         });
-
-        this.storageServicesStore = Ext.create('Ext.data.Store', {
-            fields : [{name: 'id', type: 'string'},
-                      {name: 'name', type: 'string'}],
-            proxy: {
-                type: 'ajax',
-                url: 'getStorageServices.do',
-                reader: {
-                   type: 'json',
-                   rootProperty : 'data'
-                }
-            },
-            autoLoad : true
-        });
-        this.storageServicesStore.load();
-
-        this.computeServicesStore = Ext.create('Ext.data.Store', {
-            fields : [{name: 'id', type: 'string'},
-                      {name: 'name', type: 'string'}],
-            proxy: {
-                type: 'ajax',
-                url: 'getComputeServices.do',
-                reader: {
-                   type: 'json',
-                   rootProperty : 'data'
-                }
-            },
-            autoLoad : true
-        });
-        this.storageServicesStore.load();
 
         this.callParent([{
             wizardState : wizardState,
@@ -98,16 +70,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
                                 if (responseObj.success) {
                                     //Loads the image store of user selected compute provider
-                                    jobObjectFrm.imageStore.load({
-                                        params : {
-                                            computeServiceId : responseObj.data[0].computeServiceId
-                                        }
-                                    });
-                                    jobObjectFrm.computeTypeStore.load({
-                                        params : {
-                                            computeServiceId : responseObj.data[0].computeServiceId
-                                        }
-                                    });
                                     frm.setValues(responseObj.data[0]);
                                     jobObjectFrm.wizardState.jobId = frm.getValues().id;
                                 }
@@ -124,7 +86,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 name: 'name',
                 itemId : 'name',
                 fieldLabel: 'Job Name',
-                value : Ext.util.Format.format('VGL Job - {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
+                value : Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'Enter a useful name for your job here.'
@@ -141,50 +103,17 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }],
                 allowBlank: true
             },{
-                xtype : 'combo',
-                fieldLabel : 'Compute Provider',
+                //See ANVGL-35
+                xtype : 'hiddenfield',
+                itemId: 'computeServiceId',
                 name: 'computeServiceId',
-                itemId : 'computeServiceId',
-                allowBlank: false,
-                queryMode: 'local',
-                triggerAction: 'all',
-                displayField: 'name',
-                valueField : 'id',
-                typeAhead: true,
-                forceSelection: true,
-                store : this.computeServicesStore,
-                listConfig : {
-                    loadingText: 'Getting Compute Services...',
-                    emptyText: 'No compute services found.'
-                },
-                plugins: [{
-                    ptype: 'fieldhelptext',
-                    text: 'Select a location where your data will be processed. Different locations will have different toolboxes.'
-                }],
-                listeners : {
-                    select : Ext.bind(this.onComputeSelect, this)
-                }
+                value: 'aws-ec2-compute'
             },{
-                xtype : 'combo',
-                fieldLabel : 'Storage Provider',
+                //See ANVGL-35
+                xtype : 'hiddenfield',
+                itemId: 'storageServiceId',
                 name: 'storageServiceId',
-                itemId : 'storageServiceId',
-                allowBlank: false,
-                queryMode: 'local',
-                triggerAction: 'all',
-                displayField: 'name',
-                valueField : 'id',
-                typeAhead: true,
-                forceSelection: true,
-                store : this.storageServicesStore,
-                listConfig : {
-                    loadingText: 'Getting Storage Services...',
-                    emptyText: 'No storage services found.'
-                },
-                plugins: [{
-                    ptype: 'fieldhelptext',
-                    text: 'Select a location where your data will be stored.'
-                }]
+                value: 'amazon-aws-storage-sydney'
             },{
                 xtype : 'machineimagecombo',
                 fieldLabel : 'Toolbox',
@@ -249,18 +178,12 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         }]);
     },
 
-    onComputeSelect : function(combo, records) {
-        if (!records) {
-            this.imageStore.removeAll();
-            this.computeTypeStore.removeAll();
-            return;
-        }
-
+    loadImages : function() {
         this.getComponent('image-combo').clearValue();
         this.getComponent('resource-combo').clearValue();
         this.imageStore.load({
             params : {
-                computeServiceId : records.get('id')
+                computeServiceId : 'aws-ec2-compute' //See ANVGl-35
             }
         });
     },
@@ -272,10 +195,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         }
 
         this.getComponent('resource-combo').clearValue();
-        var selectedComputeService = this.getComponent('computeServiceId').getSelection();
+        var selectedComputeService = this.getComponent('computeServiceId').getValue();
         this.computeTypeStore.load({
             params : {
-                computeServiceId : selectedComputeService.get('id'),
+                computeServiceId : selectedComputeService,
                 machineImageId : records.get('imageId')
             }
         });
@@ -392,8 +315,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     getHelpInstructions : function() {
         var name = this.getComponent('name');
         var description = this.getComponent('description');
-        var compute = this.getComponent('computeServiceId');
-        var storage = this.getComponent('storageServiceId');
         var toolbox = this.getComponent('image-combo');
         var emailNotification = this.getComponent('emailNotification');
 
@@ -407,16 +328,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             title : 'Describe your job',
             anchor : 'bottom',
             description : 'Enter an optional description for your job here.'
-        }), Ext.create('portal.util.help.Instruction', {
-            highlightEl : compute.getEl(),
-            title : 'Compute Location',
-            anchor : 'bottom',
-            description : 'It is here where you can select a physical location where your job will be processed. Different locations may have access to different toolboxes.'
-        }), Ext.create('portal.util.help.Instruction', {
-            highlightEl : storage.getEl(),
-            title : 'Storage Location',
-            anchor : 'bottom',
-            description : 'It is here where you can select a physical location where your job inputs and outputs will be stored. It doesn\'t have to be the same location as the compute provider, but keeping them the same will often make jobs complete faster.'
         }), Ext.create('portal.util.help.Instruction', {
             highlightEl : toolbox.getEl(),
             title : 'Storage Toolbox',
