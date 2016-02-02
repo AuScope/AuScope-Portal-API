@@ -19,7 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Acts as a proxy to WFS's
- * 
+ *
  */
 @Controller
 public class WFSController extends BasePortalController {
@@ -73,10 +73,10 @@ public class WFSController extends BasePortalController {
 
         return generateJSONResponseMAV(true, new Integer(response.getNumberOfFeatures()), "");
     }
-    
+
     /**
      * Generate and execute a WFS GetCapabilities request to the specified WFS endpoint. Parse the result into
-     * an array of JSON objects {format: String} representing valid options for the GetFeature outputFormat parameter 
+     * an array of JSON objects {format: String} representing valid options for the GetFeature outputFormat parameter
      * @param serviceUrl WFS endpoint to query
      * @return
      */
@@ -90,13 +90,13 @@ public class WFSController extends BasePortalController {
             log.debug("Exception: ", ex);
             return generateExceptionResponse(ex, serviceUrl);
         }
-        
+
         //Convert the response from Strings to named JSON objects
         List<ModelMap> convertedItems = new ArrayList<ModelMap>(response.getGetFeatureOutputFormats().length);
         for (String of : response.getGetFeatureOutputFormats()) {
             convertedItems.add(new ModelMap("format", of));
         }
-        
+
         return generateJSONResponseMAV(true, convertedItems, "");
     }
 
@@ -123,9 +123,9 @@ public class WFSController extends BasePortalController {
         }
 
         //Return a transform response to be consistent with Portal Core stack. We don't actually use the KML so just return a blank element
-        return generateJSONResponseMAV(true, response, "<kml/>", null);
+        return generateNamedJSONResponseMAV(true, "gml", response, null);
     }
-    
+
     @RequestMapping("/describeSimpleFeature.do")
     public ModelAndView requestFeature(@RequestParam("serviceUrl") final String serviceUrl,
                                         @RequestParam("typeName") final String typeName) {
