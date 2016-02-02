@@ -204,7 +204,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setComputeInstanceId(this.getComputeInstanceId());
         newJob.setComputeInstanceKey(this.getComputeInstanceKey());
         newJob.setComputeInstanceType(this.getComputeInstanceType());
-        newJob.setComputeServiceId(this.getStorageServiceId());
+        newJob.setComputeServiceId(this.getComputeServiceId());
         newJob.setComputeVmId(this.getComputeVmId());
         newJob.setDescription(this.getDescription());
         newJob.setEmailAddress(this.getEmailAddress());
