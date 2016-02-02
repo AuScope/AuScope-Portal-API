@@ -1797,7 +1797,7 @@ public class TestJobBuilderController {
     public void testGetComputeTypes() throws Exception {
         final String computeId = "compute-id";
         final String imageId = "image-id";
-        final ComputeType[] result = new ComputeType[] {new ComputeType("test-compute-type")};
+        final ComputeType[] result = new ComputeType[] {new ComputeType("m3.test-compute-type")};
         final MachineImage[] machineImages = new MachineImage[] {new MachineImage("another-image"), new MachineImage(imageId)};
 
         machineImages[0].setMinimumDiskGB(200);
@@ -1813,7 +1813,10 @@ public class TestJobBuilderController {
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
-        Assert.assertSame(result, mav.getModel().get("data"));
+
+        Object[] actual = (Object[])mav.getModel().get("data");
+        Assert.assertEquals(result.length, actual.length);
+        Assert.assertSame(result[0], (ComputeType) actual[0]);
     }
 
     /**
