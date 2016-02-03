@@ -8,7 +8,9 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -16,7 +18,10 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
+import org.auscope.portal.server.web.service.scm.Problem;
+import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +43,9 @@ public class ScriptBuilderController extends BasePortalController {
     /** Handles saving scripts against a job*/
     private ScriptBuilderService sbService;
 
+    /** Handles SCM entries. */
+    private ScmEntryService scmEntryService;
+
     /**
      * Creates a new instance
      *
@@ -45,19 +53,25 @@ public class ScriptBuilderController extends BasePortalController {
      * @param jobManager
      */
     @Autowired
-    public ScriptBuilderController(ScriptBuilderService sbService) {
+    public ScriptBuilderController(ScriptBuilderService sbService,
+                                   ScmEntryService scmEntryService) {
         super();
         this.sbService = sbService;
+        this.scmEntryService = scmEntryService;
     }
 
     /**
      * Writes provided script text to a file in the specified jobs stage in directory
      *
+     * @param jobId
+     * @param sourceText
+     * @param solution
      * @return A JSON encoded response with a success flag
      */
     @RequestMapping("/secure/saveScript.do")
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
-                                  @RequestParam("sourceText") String sourceText) {
+                                   @RequestParam("sourceText") String sourceText,
+                                   @RequestParam("solutionId") String solutionId) {
 
         if (sourceText == null || sourceText.trim().isEmpty()) {
             return generateJSONResponseMAV(false, null, "No source text specified");
@@ -68,6 +82,17 @@ public class ScriptBuilderController extends BasePortalController {
         } catch (PortalServiceException ex) {
             logger.warn("Unable to save job script for job with id " + jobId + ": " + ex.getMessage());
             logger.debug("error:", ex);
+            return generateJSONResponseMAV(false, null, "Unable to write script file");
+        }
+
+        // Update job with vmId for solution if we have one.
+        try {
+            scmEntryService.updateJobForSolution(jobId, solutionId);
+        }
+        catch (PortalServiceException e) {
+            logger.warn("Failed to update job (" + jobId + ") for solution (" +
+                        solutionId + "): " + e.getMessage());
+            logger.debug("error: ", e);
             return generateJSONResponseMAV(false, null, "Unable to write script file");
         }
 
@@ -135,5 +160,47 @@ public class ScriptBuilderController extends BasePortalController {
         String finalTemplate = sbService.populateTemplate(templateString,
                 kvpMapping);
         return generateJSONResponseMAV(true, finalTemplate, "");
+    }
+
+    /**
+     * Return a JSON list of problems and their solutions.
+     */
+    @RequestMapping("/getSolutions.do")
+    public ModelAndView getSolutions() {
+        // Get the Solutions from the SSC
+        List<Solution> solutions = scmEntryService.getSolutions();
+
+        // Group solutions by the problem that they solve.
+        HashMap<String, Problem> problems = new HashMap<String, Problem>();
+        
+        for (Solution solution: solutions) {
+            String problemId = solution.getProblem().getId();
+            Problem problem = problems.get(problemId);
+            
+            if (problem == null) {
+                problem = solution.getProblem();
+                problem.setSolutions(new ArrayList<Solution>());
+                problems.put(problem.getId(), problem);
+            }
+            problem.getSolutions().add(solution);
+        }
+
+        // Return the result
+        return generateJSONResponseMAV(true, problems.values(), "");
+    }
+
+    /**
+     * Return the details for a solution.
+     *
+     * @param solutionId String solution id
+     *
+     */
+    @RequestMapping("/getSolution.do")
+    public ModelAndView getSolution(String solutionId) {
+        Solution solution = scmEntryService.getScmSolution(solutionId);
+
+        // Wrap the data in an array or list until the JSON response
+        // code is fixed.
+        return generateJSONResponseMAV(true, new Solution[] {solution}, "");
     }
 }
