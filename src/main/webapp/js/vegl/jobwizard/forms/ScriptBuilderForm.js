@@ -114,7 +114,8 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
             },
             params: {
                 'sourceText': sourceText,
-                'jobId': this.wizardState.jobId
+                'jobId': this.wizardState.jobId,
+                'solutionId': this.scriptBuilderFrm.getSolutionId()
             }
         });
     },
