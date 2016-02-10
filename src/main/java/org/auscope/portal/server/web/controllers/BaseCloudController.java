@@ -103,7 +103,16 @@ public abstract class BaseCloudController extends BasePortalController {
         return template.replaceAll("\r", ""); //Windows style file endings have a tendency to sneak in via StringWriter and the like
     }
 
-
+    /**
+     * Return the provisioning template as a string.
+     *
+     * @return String template
+     * @throws IOException if fails to load template resource
+     */
+    private String getProvisioningTemplate() throws IOException {
+        InputStream is = getClass().getResourceAsStream("vl-provisioning.sh");
+        return IOUtils.toString(is);
+    }
 
     /**
      * Creates a bootstrap shellscript for job that will be sent to
@@ -125,7 +134,8 @@ public abstract class BaseCloudController extends BasePortalController {
             cloudStorageService.getEndpoint(), //STORAGE_ENDPOINT
             cloudStorageService.getProvider(), //STORAGE_TYPE
             cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion(), //STORAGE_AUTH_VERSION
-            cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName() //OS_REGION_NAME
+            cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName(), //OS_REGION_NAME
+            getProvisioningTemplate() // PROVISIONING_TEMPLATE
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);
