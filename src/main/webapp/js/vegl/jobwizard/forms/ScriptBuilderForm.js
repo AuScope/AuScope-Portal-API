@@ -1,42 +1,43 @@
 /**
- * A job wizard form for allowing the user to create their own custom script using the
- * ScriptBuilder library.
- *
- * This file is a reworking of the AuScope Virtual Rock Lab (VRL) project ScriptBuilder.js
- * for the purpose of fitting into a VL 'Job Wizard' model
- *
- * Original Author - Cihan Altinay
- * Author - Josh Vote
- * Author - Richard Goh
+ * @author Cihan Altinay
+ * @author Josh Vote
+ * @author Richard Goh
  */
 Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
+    /** @lends ScriptBuilderForm */
+   
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
-
     scriptBuilderFrm : null,
 
     /**
-     * Creates a new ScriptBuilderForm form configured to write/read to the specified global state
+     * Creates a new ScriptBuilderForm form configured to write/read to the specified global state,
+     * A job wizard form for allowing the user to create their own custom script using the ScriptBuilder library.
+     * This file is a reworking of the AuScope Virtual Rock Lab (VRL) project ScriptBuilder.js for the purpose of fitting into a VL 'Job Wizard' model.
+     * @constructs
+     * @param {object} wizardState
      */
     constructor: function(wizardState) {
         this.scriptBuilderFrm = Ext.create('ScriptBuilder.ScriptBuilder', {
             wizardState : wizardState
         });
 
-        // Finally, build the main layout once all the pieces are ready.
+        // finally, build the main layout once all the pieces are ready.
         this.callParent([{
             wizardState : wizardState,
+            
             header : false,
             layout : 'fit',
+            
             listeners : {
                 jobWizardActive : function() {
-                    // Builds scriptbuilder component tree with user selected toolbox
-                    this.scriptBuilderFrm.buildComponentsPanel(wizardState.toolbox);
-
+                    // builds scriptbuilder component tree with user selected toolbox
+                    this.scriptBuilderFrm.buildComponentsPanel();
+                    
+                    // part of editing the workflow, when the user wishes to 'edit' or 'duplicate' the job
                     if (this.wizardState.userAction == 'edit' || this.wizardState.userAction == 'duplicate') {
                         this.loadSavedScript(this.wizardState.jobId);
-                        // Once the script is loaded into the memory,
-                        // we don't want it to be loaded again to prevent
-                        // unsaved changes.
+                        
+                        // once the script is loaded into the memory, we don't want it to be loaded again to prevent unsaved changes.
                         this.wizardState.userAction = null;
                     }
                 }
@@ -45,88 +46,124 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         }]);
     },
 
-    // load script source from VL server filesystem
+    
+    /**
+     * load script source from VL server filesystem
+     * @function
+     * @param {integer} jobId
+     */
     loadSavedScript : function(jobId) {
-
+        // mask body
         Ext.getBody().mask('Loading saved script...');
         
-        Ext.Ajax.request({
-            url : 'getSavedScript.do',
-            params : {
-                'jobId' : jobId
-            },
-            scope : this,
-            callback : function(options, success, response) {
-                Ext.getBody().unmask();
-                var errorMsg, errorInfo;
+        // fetch the script associated
+        try {
+            Ext.Ajax.request({
+                url : 'getSavedScript.do',
+                params : {
+                    'jobId' : jobId
+                },
+                scope : this,
+                callback : function(options, success, response) {
+                    // un-mark body
+                    Ext.getBody().unmask();
+                    var errorMsg, errorInfo;
 
-                if (success) {
-                    var responseObj = Ext.JSON.decode(response.responseText);
+                    if (success) {
+                        var responseObj = Ext.JSON.decode(response.responseText);
+                        if (responseObj.success) {
+                            this.scriptBuilderFrm.replaceScript(responseObj.data);
+                            return;
+                        } else {
+                            errorMsg = responseObj.msg;
+                            errorInfo = responseObj.debugInfo;
+                        }
+                    } else {
+                        errorMsg = "There was an error loading your script.";
+                        errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
+                    }
+
+                    //Create an error object and pass it to custom error window
+                    var errorObj = {
+                        title : 'Script Loading Error',
+                        message : errorMsg,
+                        info : errorInfo
+                    };
+
+                    var errorWin = Ext.create('portal.widgets.window.ErrorWindow', {
+                        errorObj : errorObj
+                    });
+                    errorWin.show();
+                }
+            });
+        } catch (exception) {
+            console.log("Exception: ScriptBuilderForm.loadSavedScript(), details below - ");
+            console.log(exception);
+        }
+    },
+
+    
+    /**
+     * stores the script along with the solutionId (string) for the job
+     * @function
+     * @param {object} callback
+     */
+    beginValidation : function(callback) {
+        // read the script from the interface
+        var sourceText = this.scriptBuilderFrm.getScript();
+        
+        // replace tab with 4 spaces whenever it occurs in the sourceText
+        sourceText = sourceText.replace(/\t/g,"\u0020\u0020\u0020\u0020");
+        
+        try {
+            Ext.Ajax.request({
+                url: 'secure/saveScript.do',
+                success: function(response, opts) {
+                    responseObj = Ext.JSON.decode(response.responseText);
                     if (responseObj.success) {
-                        this.scriptBuilderFrm.replaceScript(responseObj.data);
-                        return;
+                        // proceed to the next interface on the work-flow
+                        callback(true);
                     } else {
                         errorMsg = responseObj.msg;
                         errorInfo = responseObj.debugInfo;
+                        portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                        // do not proceed to the next interface on the work-flow
+                        callback(false);
                     }
-                } else {
-                    errorMsg = "There was an error loading your script.";
-                    errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
-                }
-
-                //Create an error object and pass it to custom error window
-                var errorObj = {
-                    title : 'Script Loading Error',
-                    message : errorMsg,
-                    info : errorInfo
-                };
-
-                var errorWin = Ext.create('portal.widgets.window.ErrorWindow', {
-                    errorObj : errorObj
-                });
-                errorWin.show();
-            }
-        });
-    },
-
-    // submit script source for storage at the server
-    beginValidation : function(callback) {
-        sourceText = this.scriptBuilderFrm.getScript();
-        // replace tab with 4 spaces whenever it occurs in the sourceText
-        sourceText = sourceText.replace(/\t/g,"\u0020\u0020\u0020\u0020");
-
-        Ext.Ajax.request({
-            url: 'secure/saveScript.do',
-            success: function(response, opts) {
-                responseObj = Ext.JSON.decode(response.responseText);
-                if (responseObj.success) {
-                    callback(true);
-                } else {
-                    errorMsg = responseObj.msg;
-                    errorInfo = responseObj.debugInfo;
-                    portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                },
+                failure: function(response, opts) {
+                    Ext.Msg.alert('Error', 'Error storing script file! Please try again in a few minutes');
+                    // do not proceed to the next interface on the work-flow
                     callback(false);
+                },
+                params: {
+                    'sourceText': sourceText,
+                    'jobId': this.wizardState.jobId,
+                    'solutionId': this.scriptBuilderFrm.getSolutionId()
                 }
-            },
-            failure: function(response, opts) {
-                Ext.Msg.alert('Error', 'Error storing script file! Please try again in a few minutes');
-                callback(false);
-            },
-            params: {
-                'sourceText': sourceText,
-                'jobId': this.wizardState.jobId,
-                'solutionId': this.scriptBuilderFrm.getSolutionId()
-            }
-        });
+            });    
+        } catch (exception) {
+            console.log("Exception: ScriptBuilderForm.beginValidation(), details below - ");
+            console.log(exception);
+        }
     },
 
+    
     /**
-     * [abstract] This function should return the title of the job wizard step.
+     * Title for the interface
+     * @function
+     * @return {string} 
      */
     getTitle : function() {
         return "Define your job script.";
     },
 
+    
+    /**
+     * Gets the help instructions for the interface
+     * @function
+     * @return {object} instance of 'portal.util.help.Instruction'
+     */
     getHelpInstructions : function() {
         var templates = this.scriptBuilderFrm.queryById('sb-templates-panel');
         var script = this.scriptBuilderFrm.queryById('sb-script-panel')
