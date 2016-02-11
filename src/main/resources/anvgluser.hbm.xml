@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="org.auscope.portal.server.web.security.ANVGLUser" table="users">
+        <id name="id" column="id">
+            <generator class="assigned"/>
+        </id>
+        <property name="fullName"/>
+        <property name="email"/>
+        
+        <bag name="authorities" lazy="false" cascade="all-delete-orphan" inverse="true">
+            <key column="userId" />
+            <one-to-many class="org.auscope.portal.server.web.security.ANVGLAuthority" />
+        </bag>
+    </class>
+</hibernate-mapping>
