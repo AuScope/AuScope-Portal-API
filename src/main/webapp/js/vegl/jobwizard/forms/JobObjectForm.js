@@ -1,23 +1,24 @@
 /**
- * Job wizard form for creating and editing a new Job Object
- *
- * Author - Josh Vote
+ * @author Josh Vote
  */
-
 Ext.define('vegl.jobwizard.forms.JobObjectForm', {
+    /** @lends JobObjectForm */
+
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
     imageStore : null,
     computeTypeStore : null,
 
     /**
+     * Job wizard form for creating and editing a new Job Object. 
      * Creates a new JobObjectForm form configured to write/read to the specified global state
+     * @constructs
+     * @param {object} wizardState
      */
     constructor: function(wizardState) {
         var jobObjectFrm = this;
-
-        this.createSeries(wizardState);
-
+        
+        // create the store, get the machine image
         this.imageStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.MachineImage',
             proxy: {
@@ -34,6 +35,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         });
         this.imageStore.load();
 
+        // create the store and get the compute type
         this.computeTypeStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.ComputeType',
             proxy: {
@@ -45,6 +47,38 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             }
         });
+
+        // create the store and get the storage services
+        this.storageServicesStore = Ext.create('Ext.data.Store', {
+            fields : [{name: 'id', type: 'string'},
+                      {name: 'name', type: 'string'}],
+            proxy: {
+                type: 'ajax',
+                url: 'getStorageServices.do',
+                reader: {
+                   type: 'json',
+                   rootProperty : 'data'
+                }
+            },
+            autoLoad : true
+        });
+        this.storageServicesStore.load();
+
+        // create the store and get the compute service
+        this.computeServicesStore = Ext.create('Ext.data.Store', {
+            fields : [{name: 'id', type: 'string'},
+                      {name: 'name', type: 'string'}],
+            proxy: {
+                type: 'ajax',
+                url: 'getComputeServices.do',
+                reader: {
+                   type: 'json',
+                   rootProperty : 'data'
+                }
+            },
+            autoLoad : true
+        });
+        this.storageServicesStore.load();
 
         this.callParent([{
             wizardState : wizardState,
@@ -187,7 +221,33 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             }
         });
     },
+    
+    
+    /**
+     * Handles the selection on 'Compute Provider'
+     * @function
+     */
+    onComputeSelect : function(combo, records) {
+        if (!records) {
+            this.imageStore.removeAll();
+            this.computeTypeStore.removeAll();
+            return;
+        }
 
+        this.getComponent('image-combo').clearValue();
+        this.getComponent('resource-combo').clearValue();
+        this.imageStore.load({
+            params : {
+                computeServiceId : 'aws-ec2-compute' //See ANVGl-35
+            }
+        });
+    },
+
+    
+    /**
+     * Handles the selection on 'Toolbox'
+     * @function
+     */
     onImageSelect : function(combo, records) {
         if (!records) {
             this.computeTypeStore.removeAll();
@@ -204,36 +264,27 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         });
     },
 
-    getTitle : function() {
-        return "Enter job details...";
-    },
-
-    getNumDownloadRequests : function() {
-        request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
-        request.open("GET", "getNumDownloadRequests.do", false); //<-- false makes it a synchonous request!
-        request.send(null);
-        respObj = Ext.JSON.decode(request.responseText);
-        size = respObj.data;
-        return size;
-    },
-
-    beginValidation : function(callback) {
+    
+    /**
+     * Updates the job with additional details on storage, computing provider etc.
+     * @function
+     * @param {object} callback
+     */
+    beginValidation: function(callback) {
         var jobObjectFrm = this;
         var wizardState = this.wizardState;
 
-        var numDownloadReqs = this.getNumDownloadRequests();
-
-
-
-        //Ensure we have entered all appropriate fields
+        // ensure we have entered all appropriate fields
         if (!jobObjectFrm.getForm().isValid()) {
             callback(false);
             return;
         }
 
-        //Then save the job to the database before proceeding
+        // then save the job to the database before proceeding
         var values = jobObjectFrm.getForm().getValues();
         values.seriesId = jobObjectFrm.wizardState.seriesId;
+        values.jobId = jobObjectFrm.wizardState.jobId;
+        
         Ext.Ajax.request({
             url : 'updateOrCreateJob.do',
             params : values,
@@ -252,10 +303,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
 
                 jobObjectFrm.wizardState.jobId = responseObj.data[0].id;
-                // Store user selected toolbox into wizard state. That toolbox
-                // will be used to select relevant script templates or examples.
+                // Store user selected toolbox into wizard state.
+                // That toolbox will be used to select relevant script templates or examples.
                 wizardState.toolbox = jobObjectFrm.getForm().findField("computeVmId").getRawValue();
-
+                
                 // Store selected resource limits into wizard state. These values will be included
                 // in template generation (to ensure valid numbers of CPU's are chosen etc)
                 var computeTypeId = jobObjectFrm.getComponent('resource-combo').getValue();
@@ -263,55 +314,27 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 wizardState.ncpus = computeType.get('vcpus');
                 wizardState.nrammb = computeType.get('ramMB');
 
-                if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
-                    Ext.Msg.confirm('Confirm',
-                            'No data set has been captured. Do you want to continue?',
-                            function(button) {
-                                if (button === 'yes') {
-                                    wizardState.skipConfirmPopup = true;
-                                    callback(true);
-                                    return;
-                                } else {
-                                    callback(false);
-                                    return;
-                                }
-                        });
-                } else {
-                    callback(true);
-                    return;
-                }
-
+                callback(true);
             }
         });
     },
 
-    createSeries : function(wizardState) {
-
-        Ext.Ajax.request({
-            url: 'secure/createSeries.do',
-            callback : function(options, success, response) {
-                if (success) {
-                    var responseObj = Ext.JSON.decode(response.responseText);
-                    if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
-                        wizardState.seriesId = responseObj.data[0].id;
-                        return;
-                    } else {
-                        errorMsg = responseObj.msg;
-                        errorInfo = responseObj.debugInfo;
-                    }
-                } else {
-                    errorMsg = "There was an internal error saving your series.";
-                    errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
-                }
-
-                portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
-
-                return;
-            }
-        });
-
+    
+    /**
+     * Title for the interface
+     * @function
+     * @return {string} 
+     */
+    getTitle : function() {
+        return "Enter job details...";
     },
-
+    
+    
+    /**
+     * Gets the help instructions for the interface
+     * @function
+     * @return {object} instance of 'portal.util.help.Instruction'
+     */
     getHelpInstructions : function() {
         var name = this.getComponent('name');
         var description = this.getComponent('description');
