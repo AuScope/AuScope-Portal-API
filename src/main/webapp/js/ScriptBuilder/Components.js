@@ -7,7 +7,6 @@ Ext.ns('ScriptBuilder.Components');
  * panel with the resulting tree.
  */
 ScriptBuilder.Components.getComponents = function(tree, fn) {
-
     Ext.Ajax.request({
     	url : "getSolutions.do",
         scope : this,
@@ -23,10 +22,9 @@ ScriptBuilder.Components.getComponents = function(tree, fn) {
                 
                 if (responseObj) {
                     var data, prob_id, children;
-                    
-	                    // Clear existing content in the tree
-	                    var root = tree.getRootNode();
-	                    root.removeAll(true);
+                   
+                    var root = tree.getRootNode();
+                    root.removeAll();
                     
                     for (var i in responseObj.data) {
                         var problem = responseObj.data[i];
@@ -44,7 +42,7 @@ ScriptBuilder.Components.getComponents = function(tree, fn) {
                                 leaf: true
                             });
                         }
-
+                        
                         root.appendChild({
                             text: problem.name,
                             type: "category",
