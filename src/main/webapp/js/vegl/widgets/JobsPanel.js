@@ -451,10 +451,12 @@ Ext.define('vegl.widgets.JobsPanel', {
                     duplicateJobId : job.get('id'),
                     userAction : 'duplicate'
                 },
-                forms : ['vegl.jobwizard.forms.DuplicateJobForm',
-                         'vegl.jobwizard.forms.JobObjectForm',
+                forms : [
+                         'vegl.jobwizard.forms.DuplicateJobForm',
                          'vegl.jobwizard.forms.ScriptBuilderForm',
-                         'vegl.jobwizard.forms.JobSubmitForm']
+                         'vegl.jobwizard.forms.JobObjectForm',
+                         'vegl.jobwizard.forms.JobSubmitForm'
+                 ]
             }]
         });
 
@@ -490,10 +492,12 @@ Ext.define('vegl.widgets.JobsPanel', {
                     seriesId : job.get('seriesId'),
                     userAction : 'edit'
                 },
-                forms : ['vegl.jobwizard.forms.JobObjectForm',
+                forms : [
                          'vegl.jobwizard.forms.JobUploadForm',
                          'vegl.jobwizard.forms.ScriptBuilderForm',
-                         'vegl.jobwizard.forms.JobSubmitForm']
+                         'vegl.jobwizard.forms.JobObjectForm',
+                         'vegl.jobwizard.forms.JobSubmitForm'
+                 ]
             }]
         });
 
