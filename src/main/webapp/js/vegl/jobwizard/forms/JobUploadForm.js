@@ -19,7 +19,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
      */
     constructor: function(wizardState) {
         var jobUploadFrm = this;
- 
+        
         // create a series
         this.createSeries(wizardState);
         
@@ -32,6 +32,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
             buttons: [],
             listeners : {
                     jobWizardActive : function() {
+                        
                         if (this.wizardState.userAction == 'edit') {
                             jobUploadFrm.getForm().load({
                                 url : 'getJobObject.do',
@@ -51,7 +52,8 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                             });
                         }
                         else {
-                            Ext.bind(jobUploadFrm.updateFileList, jobUploadFrm)
+                            // Ext.bind(jobUploadFrm.updateFileList, jobUploadFrm);
+                            jobUploadFrm.updateFileList();
                         }
                     }
             },
@@ -59,7 +61,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                 xtype : 'jobinputfilespanel',
                 itemId : 'files-panel',
                 currentJobId : wizardState.jobId,
-                title: 'Input files',
+                title: 'Input files (review)',
                 stripeRows: true,
                 anchor: '100% -20',
                 buttons : [{
@@ -93,7 +95,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
     updateFileList : function() {
         var filesPanel = this.getComponent('files-panel');
         filesPanel.currentJobId = this.wizardState.jobId;
-
+        
         filesPanel.updateFileStore();
     },
 
@@ -104,6 +106,8 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
      * @param {object} wizardState
      */
     createSeries : function(wizardState) {
+        var me = this;
+        
         try {
             Ext.Ajax.request({
                 url: 'secure/createSeries.do',
@@ -112,6 +116,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                         var responseObj = Ext.JSON.decode(response.responseText);
                         if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
                             wizardState.seriesId = responseObj.data[0].id;
+                            me.createJob(wizardState);
                             return;
                         } else {
                             errorMsg = responseObj.msg;
@@ -174,9 +179,6 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                             // toggle the flag
                             wizardState.skipConfirmPopup = true;
                             
-                            // proceed to 'create' a job
-                            me.createJob(callback);
-                            
                             // proceed to the next step
                             callback(true);
                             return;
@@ -188,7 +190,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                 });
         } else {
             // proceed to 'update' a job
-            me.updateJob(callback);
+            me.updateJob();
             
             callback(true);
             return; 
@@ -201,14 +203,12 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
      * @function
      * @param {object} callback
      */
-    createJob : function(callback) {
-        var me = this;
-        
-        var values = this.getForm().getValues();
+    createJob : function(wizardState) {
+        var values = {};
         values.seriesId = this.wizardState.seriesId;
-        values.name = Ext.util.Format.format('VGL Job - {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')); 
+        values.name = Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')); 
         
-        me.job(callback, values);
+        this.job(values);
     },
     
     
@@ -217,14 +217,14 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
      * @function
      * @param {object} callback
      */
-    updateJob : function(callback) {
+    updateJob : function() {
         var me = this;
         
         var values = this.getForm().getValues();
         values.seriesId = this.wizardState.seriesId;
         values.jobId = this.wizardState.jobId;
 
-        me.job(callback, values);
+        me.job(values);
     },
     
     
@@ -233,7 +233,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
      * @function
      * @param {object} callback
      */
-    job : function(callback, values) {
+    job : function(values) {
         var jobUploadFrm = this;
         var wizardState = this.wizardState;
         
@@ -244,21 +244,20 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                 callback : function(options, success, response) {
                     if (!success) {
                         portal.widgets.window.ErrorWindow.showText('Error saving details', 'There was an unexpected error when attempting to save the details on this form. Please try again in a few minutes.');
-                        callback(false);
-                        return;
                     }
     
                     var responseObj = Ext.JSON.decode(response.responseText);
+                    
                     if (!responseObj.success) {
                         portal.widgets.window.ErrorWindow.showText('Error saving details', 'There was an unexpected error when attempting to save the details on this form.', responseObj.msg);
-                        callback(false);
-                        return;
                     }
     
                     // if a jobId does not already exist (the first time)
-                    if(!!!jobUploadFrm.wizardState.jobId) {
-                        jobUploadFrm.wizardState.jobId = responseObj.data[0].id;
+                    if(!!!wizardState.jobId) {
+                        wizardState.jobId = responseObj.data[0].id;
+                        
                     }
+                    return responseObj.data[0].id;
                 }
             });
         } catch (exception) {
