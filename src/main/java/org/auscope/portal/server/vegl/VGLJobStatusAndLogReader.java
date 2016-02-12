@@ -15,16 +15,22 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.web.controllers.BaseCloudController;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
+import org.auscope.portal.server.web.service.ANVGLFileStagingService;
+import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.springframework.ui.ModelMap;
 
 public class VGLJobStatusAndLogReader extends BaseCloudController implements JobStatusReader {
 
     private VEGLJobManager jobManager;
+    private ANVGLProvenanceService anvglProvenanceService;
 
     public VGLJobStatusAndLogReader(VEGLJobManager jobManager,
-            CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices) {
+    		ANVGLFileStagingService anvglFileStagingService,
+            CloudStorageService[] cloudStorageServices,
+            CloudComputeService[] cloudComputeServices) {
         super(cloudStorageServices, cloudComputeServices);
         this.jobManager = jobManager;
+        this.anvglProvenanceService = new ANVGLProvenanceService(anvglFileStagingService, cloudStorageServices);
     }
 
     /**
@@ -164,6 +170,8 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         boolean jobFinished = containsFile(results, JobListController.VGL_LOG_FILE);
 
         if (jobFinished) {
+        	// Provenance
+        	anvglProvenanceService.createEntitiesForOutputs(job);
             return JobBuilderController.STATUS_DONE;
         } else if (jobStarted) {
             return JobBuilderController.STATUS_ACTIVE;

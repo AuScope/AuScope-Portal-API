@@ -11,6 +11,7 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
+import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,10 +30,12 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
     private CloudStorageService[] mockCloudStorageServices;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader jobStatLogReader;
+    private ANVGLFileStagingService mockFileStagingService;
 
     @Before
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
+        mockFileStagingService = context.mock(ANVGLFileStagingService.class);
         mockCloudStorageServices = new CloudStorageService[] { context.mock(CloudStorageService.class) };
         mockCloudComputeServices = new CloudComputeService[] { context.mock(CloudComputeService.class) };
 
@@ -41,7 +44,8 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         }});
 
         jobStatLogReader = new VGLJobStatusAndLogReader(mockJobManager,
-                mockCloudStorageServices, mockCloudComputeServices);
+        		mockFileStagingService, mockCloudStorageServices,
+        		mockCloudComputeServices);
     }
 
     /**

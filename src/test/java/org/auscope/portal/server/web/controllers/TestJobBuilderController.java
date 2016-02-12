@@ -34,7 +34,8 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.ANVGLFileStagingService;
+import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -71,7 +72,8 @@ public class TestJobBuilderController {
     private ANVGLUser mockPortalUser;
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
-
+    private ANVGLProvenanceService anvglProvenanceService;
+    private ANVGLFileStagingService mockAnvglFileStagingService;	// XXX Still need original FSS?
 
 
     private JobMailSender mockJobMailSender;
@@ -96,12 +98,17 @@ public class TestJobBuilderController {
 
         mockJobMailSender = context.mock(JobMailSender.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
+        
+        mockAnvglFileStagingService = context.mock(ANVGLFileStagingService.class);
+        anvglProvenanceService = new ANVGLProvenanceService(mockAnvglFileStagingService, mockCloudStorageServices);
 
 
         vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader);
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
         //Object Under Test
-        controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices, vglJobStatusChangeHandler,vglPollingJobQueueManager);
+        controller = new JobBuilderController(mockJobManager, mockFileStagingService,
+        		mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices,
+        		vglJobStatusChangeHandler, vglPollingJobQueueManager, anvglProvenanceService);
     }
 
     @After
