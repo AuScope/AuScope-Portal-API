@@ -38,9 +38,6 @@ Ext.define('ScriptBuilder.ComponentTreePanel', {
                 },
                 success: function(response) {
                     entry = Ext.JSON.decode(response.responseText);
-                    console.log("detailed solution for the entry - ");
-                    console.log(entry);
-                    
                     if (entry && entry.data) {
                         this.fireEvent('addcomponent', this, entry.data[0], name, description);
                         this.addEvents({'addcomponent' : true});
