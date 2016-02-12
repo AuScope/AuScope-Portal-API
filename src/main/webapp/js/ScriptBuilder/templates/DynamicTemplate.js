@@ -33,14 +33,8 @@ Ext.define('ScriptBuilder.templates.DynamicTemplate', {
         var item;
 
         if (this.entry) {
-        	
-        	console.log("this >>>>> ");
-        	console.log(this);
-        	
-        	if (this.entry.variables) {
-        		
-            	console.log("this.entry.variables.length - ");
-            	console.log(this.entry.variables.length);
+
+            if (this.entry.variables) {
         		
 	            this.entry.variables.forEach(function(variable, index) {
 	                item = {
