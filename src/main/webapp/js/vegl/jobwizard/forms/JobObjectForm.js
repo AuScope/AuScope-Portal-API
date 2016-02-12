@@ -2,7 +2,7 @@
  * @author Josh Vote
  */
 Ext.define('vegl.jobwizard.forms.JobObjectForm', {
-    /** @lends JobObjectForm */
+    /** @lends forms.JobObjectForm */
 
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
