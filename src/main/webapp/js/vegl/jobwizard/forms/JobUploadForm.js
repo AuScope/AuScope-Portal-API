@@ -206,7 +206,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
     createJob : function(wizardState) {
         var values = {};
         values.seriesId = this.wizardState.seriesId;
-        values.name = Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')); 
+        values.name = Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'd M Y g:i a')); 
         
         this.job(values);
     },
