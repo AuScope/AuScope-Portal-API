@@ -143,6 +143,10 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
         if (wizardState.jobId !== undefined) {
             params.id = wizardState.jobId;
         }
+        
+        if (typeof wizardState.name === "undefined") {
+            params.name = Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'd M Y g:i a'));
+        }
 
         Ext.Ajax.request({
             url : 'updateOrCreateJob.do',
@@ -199,9 +203,9 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
     },
 
     beginValidation : function(callback) {
+        var self = this;
         var radioGroup = this.getComponent('seriesRadioGroup');
         var numDownloadReqs = this.getNumDownloadRequests();
-        var self = this;
         var wizardState = this.wizardState;
 
         if (radioGroup.getValue().sCreateSelect === 0) {
@@ -232,8 +236,10 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                 return;
             }
         } else {
+            
             var seriesName = this.getSeriesCombo().getRawValue();
             var seriesDesc = this.getSeriesDesc().getRawValue();
+            
             if (Ext.isEmpty(seriesName) || Ext.isEmpty(seriesDesc)) {
                 Ext.Msg.alert('Create new series', 'Please specify a name and description for the new series.');
                 callback(false);
@@ -270,37 +276,35 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
 
     createSeries : function(seriesName, seriesDesc, callback) {
         var self = this;
+        var wizardState = this.wizardState;
         
-        return function() {
-
-            Ext.Ajax.request({
-                url: 'secure/createSeries.do',
-                params: {
-                    'seriesName': seriesName,
-                    'seriesDescription': seriesDesc
-                },
-                callback : function(options, success, response) {
-                    if (success) {
-                        var responseObj = Ext.JSON.decode(response.responseText);
-                        if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
-                            wizardState.seriesId = responseObj.data[0].id;
-                            self.createJob(callback);
-                            return;
-                        } else {
-                            errorMsg = responseObj.msg;
-                            errorInfo = responseObj.debugInfo;
-                        }
+        Ext.Ajax.request({
+            url: 'secure/createSeries.do',
+            params: {
+                'seriesName': seriesName,
+                'seriesDescription': seriesDesc
+            },
+            callback : function(options, success, response) {
+                if (success) {
+                    var responseObj = Ext.JSON.decode(response.responseText);
+                    if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
+                        wizardState.seriesId = responseObj.data[0].id;
+                        self.createJob(callback);
+                        return;
                     } else {
-                        errorMsg = "There was an internal error saving your series.";
-                        errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
+                        errorMsg = responseObj.msg;
+                        errorInfo = responseObj.debugInfo;
                     }
-
-                    portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
-                    callback(false);
-                    return;
+                } else {
+                    errorMsg = "There was an internal error saving your series.";
+                    errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
                 }
-            });
-        }
+
+                portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
+                callback(false);
+                return;
+            }
+        });
     },
 
     getHelpInstructions : function() {
