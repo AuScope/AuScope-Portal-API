@@ -77,9 +77,19 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                     },
                     listeners : {
                         exception : function(proxy, response, operation) {
+                            var errorMsg = "",
+                                errorInfo = "";
+                            
                             responseObj = Ext.JSON.decode(response.responseText);
-                            errorMsg = responseObj.msg;
-                            errorInfo = responseObj.debugInfo;
+                            
+                            if (responseObj && responseObj.msg) {
+                                errorMsg = responseObj.msg;    
+                            }
+                            
+                            if (responseObj && responseObj.debugInfo) {
+                                errorInfo = responseObj.debugInfo;    
+                            }
+                            
                             portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
                         }
                     }
