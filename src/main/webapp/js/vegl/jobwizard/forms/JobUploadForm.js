@@ -20,9 +20,6 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
     constructor: function(wizardState) {
         var jobUploadFrm = this;
         
-        // create a series
-        this.createSeries(wizardState);
-        
         // execute the parent class
         this.callParent([{
             wizardState : wizardState,
@@ -43,13 +40,13 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                                 failure : Ext.bind(jobUploadFrm.fireEvent, jobUploadFrm, ['jobWizardLoadException']),
                                 success : function(frm, action) {
                                     var responseObj = Ext.JSON.decode(action.response.responseText);
-                                    /*
+
                                     if (responseObj.success) {
-                                        jobUploadFrm.wizardState.jobId = frm.getValues().id;
+                                        jobUploadFrm.wizardState.jobId = responseObj.data[0].id;
                                     }
-                                    */
                                 }
                             });
+                            jobUploadFrm.updateFileList();
                         }
                         else {
                             // Ext.bind(jobUploadFrm.updateFileList, jobUploadFrm);
@@ -95,48 +92,9 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
     updateFileList : function() {
         var filesPanel = this.getComponent('files-panel');
         filesPanel.currentJobId = this.wizardState.jobId;
-        
         filesPanel.updateFileStore();
     },
 
-
-    /**
-     * Creates a series
-     * @function
-     * @param {object} wizardState
-     */
-    createSeries : function(wizardState) {
-        var me = this;
-        
-        try {
-            Ext.Ajax.request({
-                url: 'secure/createSeries.do',
-                callback : function(options, success, response) {
-                    if (success) {
-                        var responseObj = Ext.JSON.decode(response.responseText);
-                        if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
-                            wizardState.seriesId = responseObj.data[0].id;
-                            me.createJob(wizardState);
-                            return;
-                        } else {
-                            errorMsg = responseObj.msg;
-                            errorInfo = responseObj.debugInfo;
-                        }
-                    } else {
-                        errorMsg = "There was an internal error saving your series.";
-                        errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
-                    }
-                    portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
-                    return;
-                }
-            });
-        } catch (exception) {
-            console.log("Exception: JobUploadForm.createSeries(), details below - ");
-            console.log(exception);
-        }
-    },
-
-    
     /**
      * 
      * @function
@@ -159,114 +117,10 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
      * @function
      */
     beginValidation : function(callback) {
-        var me = this;
-        var wizardState = this.wizardState;
-        
-        var numDownloadReqs = this.getNumDownloadRequests();
-        
-        // set the pop-up flag to if it is not true
-        if (!!!wizardState.skipConfirmPopup) {
-            wizardState.skipConfirmPopup = false;
-        }
-        
-        // render the pop-up the first time the user proceeds with no data-set captured
-        if (wizardState.skipConfirmPopup === false && numDownloadReqs === 0) {
-            Ext.Msg.confirm('Confirm',
-                    'No data set has been captured. Do you want to continue?',
-                    function(button) {
-                        if (button === 'yes') {
-
-                            // toggle the flag
-                            wizardState.skipConfirmPopup = true;
-                            
-                            // proceed to the next step
-                            callback(true);
-                            return;
-                        } else {
-                            // do not proceed to the next step
-                            callback(false);
-                            return false;
-                        }
-                });
-        } else {
-            // proceed to 'update' a job
-            me.updateJob();
-            
-            callback(true);
-            return; 
-        };
+        callback(true);
     },
     
     
-    /**
-     * Creates a job
-     * @function
-     * @param {object} callback
-     */
-    createJob : function(wizardState) {
-        var values = {};
-        values.seriesId = this.wizardState.seriesId;
-        values.name = Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'd M Y g:i a')); 
-        
-        this.job(values);
-    },
-    
-    
-    /**
-     * Updates a job
-     * @function
-     * @param {object} callback
-     */
-    updateJob : function() {
-        var me = this;
-        
-        var values = this.getForm().getValues();
-        values.seriesId = this.wizardState.seriesId;
-        values.jobId = this.wizardState.jobId;
-
-        me.job(values);
-    },
-    
-    
-    /**
-     * Ajax call to create (or update) a job
-     * @function
-     * @param {object} callback
-     */
-    job : function(values) {
-        var jobUploadFrm = this;
-        var wizardState = this.wizardState;
-        
-        try {
-            Ext.Ajax.request({
-                url : 'updateOrCreateJob.do',
-                params : values,
-                callback : function(options, success, response) {
-                    if (!success) {
-                        portal.widgets.window.ErrorWindow.showText('Error saving details', 'There was an unexpected error when attempting to save the details on this form. Please try again in a few minutes.');
-                    }
-    
-                    var responseObj = Ext.JSON.decode(response.responseText);
-                    
-                    if (!responseObj.success) {
-                        portal.widgets.window.ErrorWindow.showText('Error saving details', 'There was an unexpected error when attempting to save the details on this form.', responseObj.msg);
-                    }
-    
-                    // if a jobId does not already exist (the first time)
-                    if(!!!wizardState.jobId) {
-                        wizardState.jobId = responseObj.data[0].id;
-                        
-                    }
-                    return responseObj.data[0].id;
-                }
-            });
-        } catch (exception) {
-            console.log("Exception: JobUploadForm.job(), details below - ");
-            console.log(exception);
-        }
-    },
-    
-
     /**
      * Title of the interface
      * @function
