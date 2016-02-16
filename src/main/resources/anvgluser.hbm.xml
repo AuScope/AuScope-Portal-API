@@ -8,6 +8,9 @@
         </id>
         <property name="fullName"/>
         <property name="email"/>
+        <property name="arnExecution"/>
+        <property name="arnStorage"/>
+        <property name="awsSecret"/>
         
         <bag name="authorities" lazy="false" cascade="all-delete-orphan" inverse="true">
             <key column="userId" />

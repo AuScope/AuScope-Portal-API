@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,6 +20,9 @@ public class ANVGLUser implements UserDetails, Serializable {
     private String fullName;
     private String email;
     private List<ANVGLAuthority> authorities;
+    private String arnExecution;
+    private String arnStorage;
+    private String awsSecret;
 
     public ANVGLUser() {
         this.authorities = new ArrayList<ANVGLAuthority>();
@@ -97,6 +101,41 @@ public class ANVGLUser implements UserDetails, Serializable {
         for (ANVGLAuthority auth : authorities) {
             auth.setParent(this);
         }
+    }
+
+    public String getArnExecution() {
+        return arnExecution;
+    }
+
+    public void setArnExecution(String arnExecution) {
+        this.arnExecution = arnExecution;
+    }
+
+    public String getArnStorage() {
+        return arnStorage;
+    }
+
+    public void setArnStorage(String arnStorage) {
+        this.arnStorage = arnStorage;
+    }
+
+    public String getAwsSecret() {
+        return awsSecret;
+    }
+
+    public void setAwsSecret(String awsSecret) {
+        this.awsSecret = awsSecret;
+    }
+
+    /**
+     * Returns true iff this ANVGLUser instance has all the relevant fields set that are required for
+     * submitting an AWS job. Returning false would indicate that the user has more data to enter before
+     * they can begin submitting jobs.
+     */
+    public boolean isFullyConfigured() {
+        return StringUtils.isNotEmpty(arnStorage) &&
+                StringUtils.isNotEmpty(awsSecret) &&
+                StringUtils.isNotEmpty(arnExecution);
     }
 
     @Override

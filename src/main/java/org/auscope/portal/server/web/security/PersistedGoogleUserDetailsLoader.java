@@ -1,11 +1,13 @@
 package org.auscope.portal.server.web.security;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.racquettrack.security.oauth.OAuth2UserDetailsLoader;
@@ -17,6 +19,10 @@ import com.racquettrack.security.oauth.OAuth2UserDetailsLoader;
  */
 public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader<ANVGLUser> {
 
+    public static final int SECRET_LENGTH = 32;
+
+
+    protected SecureRandom random;
     protected String defaultRole;
     protected Map<String, List<String>> rolesByUser;
     private ANVGLUserDao userDao;
@@ -40,7 +46,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     public PersistedGoogleUserDetailsLoader(String defaultRole, Map<String, List<String>> rolesByUser) {
         this.defaultRole = defaultRole;
         this.rolesByUser = new HashMap<String, List<String>>();
-
+        this.random = new SecureRandom();
         if (rolesByUser != null) {
             for (Entry<String, List<String>> entry : rolesByUser.entrySet()) {
                 List<String> authorityStrings = entry.getValue();
@@ -105,6 +111,10 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
         applyInfoToUser(newUser, userInfo);
         userDao.save(newUser); //create our new user
 
+        synchronized(this.random) {
+            String randomSecret = RandomStringUtils.random(SECRET_LENGTH, 0, 0, true, true, null, this.random);
+            newUser.setAwsSecret(randomSecret);
+        }
         newUser.setAuthorities(authorities);
         userDao.save(newUser); //apply authorities (so they inherit the ID)
 
