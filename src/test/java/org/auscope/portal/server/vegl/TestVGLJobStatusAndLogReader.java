@@ -1,6 +1,8 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.auscope.portal.core.cloud.CloudFileInformation;
@@ -35,7 +37,6 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
     @Before
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
-        mockFileStagingService = context.mock(ANVGLFileStagingService.class);
         mockCloudStorageServices = new CloudStorageService[] { context.mock(CloudStorageService.class) };
         mockCloudComputeServices = new CloudComputeService[] { context.mock(CloudComputeService.class) };
 
@@ -43,9 +44,8 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
         }});
 
-        jobStatLogReader = new VGLJobStatusAndLogReader(mockJobManager,
-        		mockFileStagingService, mockCloudStorageServices,
-        		mockCloudComputeServices);
+        jobStatLogReader = new VGLJobStatusAndLogReader(mockJobManager, mockFileStagingService,
+                mockCloudStorageServices, mockCloudComputeServices);
     }
 
     /**
@@ -71,6 +71,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobPendingFiles));
+            
+            
+            
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -123,6 +126,12 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
                 new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
                 new CloudFileInformation("key3/vl.sh.log", 102L, "http://public.url3/filename3"),
         };
+        
+        final List<VglDownload> downloads = new ArrayList<>();
+		VglDownload download = new VglDownload(1);
+		download.setUrl("http://portal-uploads.anvgl.org/file1");
+		download.setName("file1");
+		downloads.add(download);
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(mockJobId);will(returnValue(mockJob));
@@ -130,7 +139,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobDoneFiles));
+            allowing(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobDoneFiles));
+			allowing(mockJob).getUser();will(returnValue("JaneNg"));
+			allowing(mockJob).getJobDownloads();will(returnValue(downloads));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);

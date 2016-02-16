@@ -3,6 +3,7 @@ package org.auscope.portal.server.web.controllers;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.iterators.IteratorEnumeration;
+import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
@@ -62,7 +64,6 @@ public class TestJobBuilderController {
 
 
     private VEGLJobManager mockJobManager;
-    private FileStagingService mockFileStagingService;
     private CloudStorageService[] mockCloudStorageServices;
     private PortalPropertyPlaceholderConfigurer mockHostConfigurer;
     private CloudComputeService[] mockCloudComputeServices;
@@ -73,7 +74,7 @@ public class TestJobBuilderController {
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
     private ANVGLProvenanceService anvglProvenanceService;
-    private ANVGLFileStagingService mockAnvglFileStagingService;	// XXX Still need original FSS?
+    private ANVGLFileStagingService mockFileStagingService;
 
 
     private JobMailSender mockJobMailSender;
@@ -86,7 +87,7 @@ public class TestJobBuilderController {
     public void init() {
         //Mock objects required for Object Under Test
         mockJobManager = context.mock(VEGLJobManager.class);
-        mockFileStagingService = context.mock(FileStagingService.class);
+        mockFileStagingService = context.mock(ANVGLFileStagingService.class);
         mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
         mockPortalUser = context.mock(ANVGLUser.class);
         mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
@@ -95,13 +96,10 @@ public class TestJobBuilderController {
         mockResponse = context.mock(HttpServletResponse.class);
         mockSession = context.mock(HttpSession.class);
 
-
         mockJobMailSender = context.mock(JobMailSender.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
         
-        mockAnvglFileStagingService = context.mock(ANVGLFileStagingService.class);
-        anvglProvenanceService = new ANVGLProvenanceService(mockAnvglFileStagingService, mockCloudStorageServices);
-
+        anvglProvenanceService = new ANVGLProvenanceService(mockFileStagingService, mockCloudStorageServices);
 
         vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader);
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
@@ -613,6 +611,14 @@ public class TestJobBuilderController {
         final String storageProvider = "provider";
         final String storageAuthVersion = "1.2.3";
         final String regionName = null;
+        
+        //final String mockUser = "jo@me.com";
+        //final URI mockProfileUrl = new URI("https://plus.google.com/1");
+        final File activityFile = File.createTempFile("activity", ".ttl");
+        final String activityFileName = "activity.ttl";
+        final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
+        CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
+        final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
 
         jobObj.setComputeVmId(computeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
@@ -668,6 +674,11 @@ public class TestJobBuilderController {
             //We should have 1 call to our job manager to create a job audit trail record
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
             oneOf(mockJobManager).createJobAuditTrail("Provisioning", jobObj, "Set job to Pending");
+            
+            oneOf(mockRequest).getRequestURL();will(returnValue(new StringBuffer("http://mock.fake/secure/something")));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(jobObj)));will(returnValue(cloudList));
+            allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
+            allowing(mockCloudStorageServices[0]).uploadJobFiles(with(any(VEGLJob.class)), with(any(File[].class)));
 
         }});
 
@@ -827,6 +838,11 @@ public class TestJobBuilderController {
         final String storageServiceId = "storage-service-id";
         final String regionName = "region-name";
         final PortalServiceException exception = new PortalServiceException("Some random error","Some error correction");
+        final File activityFile = File.createTempFile("activity", ".ttl");
+        final String activityFileName = "activity.ttl";
+        final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
+        CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
+        final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
 
         jobObj.setComputeVmId(computeVmId);
         //As submitJob method no longer explicitly checks for empty storage credentials,
@@ -862,7 +878,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
 
             //We should have 1 call to upload them
-            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
+            allowing(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
 
             //We should have access control check to ensure user has permission to run the job
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
@@ -886,6 +902,10 @@ public class TestJobBuilderController {
 
             oneOf(mockJobMailSender).sendMail(jobObj);
             oneOf(mockVGLJobStatusAndLogReader).getSectionedLog(jobObj, "Time");
+            
+            oneOf(mockRequest).getRequestURL();will(returnValue(new StringBuffer("http://mock.fake/secure/something")));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(jobObj)));will(returnValue(cloudList));
+            allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
@@ -929,6 +949,11 @@ public class TestJobBuilderController {
         final String storageEndpoint = "http://example.org";
         final String storageServiceId = "storage-service-id";
         final String regionName = "region-name";
+        final File activityFile = File.createTempFile("activity", ".ttl");
+        final String activityFileName = "activity.ttl";
+        final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
+        CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
+        final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
 
         jobObj.setComputeVmId(computeVmId);
         //As submitJob method no longer explicitly checks for empty storage credentials,
@@ -983,6 +1008,11 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
 
             oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PROVISION, jobObj, "Job Placed in Queue");
+            
+            oneOf(mockRequest).getRequestURL();will(returnValue(new StringBuffer("http://mock.fake/secure/something")));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(jobObj)));will(returnValue(cloudList));
+            allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
+            allowing(mockCloudStorageServices[0]).uploadJobFiles(with(any(VEGLJob.class)), with(any(File[].class)));
 
         }});
 
