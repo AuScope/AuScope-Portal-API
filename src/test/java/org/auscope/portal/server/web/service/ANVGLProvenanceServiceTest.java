@@ -216,7 +216,12 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
                     .setNativeId(Integer.toString(jobID))
                     .setReportingSystemUri(new URI(serverURL))
                     .setGeneratedAtTime(new Date());            
-            ProvenanceReporter reporter = new ProvenanceReporter();
+            URI pURI = new URI(PROMSURI);
+            ProvenanceReporter reporter = context.mock(ProvenanceReporter.class);
+            context.checking(new Expectations() {{
+            	oneOf(reporter).postReport(pURI, report); will(returnValue(200));
+            }});
+            
             int resp = reporter.postReport(new URI(PROMSURI), report);
             Assert.assertTrue((resp == 200 || resp == 201));
         }
