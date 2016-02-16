@@ -282,6 +282,10 @@
     <bean id="vglSignatureDao" class="org.auscope.portal.server.vegl.VGLSignatureDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
+    
+    <bean id="anvglUserDao" class="org.auscope.portal.server.web.security.ANVGLUserDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
+    </bean>
 
     <bean id="veglSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
@@ -293,6 +297,8 @@
                 <value>vgljobsauditlog.hbm.xml</value>
                 <value>vgldownload.hbm.xml</value>
                 <value>vglsignature.hbm.xml</value>
+                <value>anvgluser.hbm.xml</value>
+                <value>anvglauthority.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

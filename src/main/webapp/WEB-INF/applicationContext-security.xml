@@ -45,7 +45,7 @@
         <beans:constructor-arg name="clientSecret" value="${env.oauth2.google.clientsecret}"/>
     </beans:bean>
 
-    <beans:bean id="simpleUserLoader" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2UserDetailsLoader">
+    <beans:bean id="simpleUserLoader" class="org.auscope.portal.server.web.security.PersistedGoogleUserDetailsLoader">
         <beans:constructor-arg name="defaultRole" value="ROLE_USER"/>
         <beans:constructor-arg name="rolesByUser">
             <beans:map>
@@ -58,6 +58,7 @@
                 </beans:entry>
             </beans:map>
         </beans:constructor-arg>
+        <beans:property name="userDao" ref="anvglUserDao"/>
     </beans:bean>
 
     <beans:bean id="oAuth2DefaultUserInfoProvider" class="com.racquettrack.security.oauth.DefaultOAuth2UserInfoProvider">
