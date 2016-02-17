@@ -11,6 +11,7 @@
         <property name="arnExecution"/>
         <property name="arnStorage"/>
         <property name="awsSecret"/>
+        <property name="acceptedTermsConditions"/>
         
         <bag name="authorities" lazy="false" cascade="all-delete-orphan" inverse="true">
             <key column="userId" />
