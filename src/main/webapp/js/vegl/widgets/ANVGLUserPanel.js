@@ -34,12 +34,16 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     itemId: 'email',
                     readOnly: true,
                     fieldLabel: 'Email',
-                    margin: '10 0 0 0',
+                    margin: '20 0 0 0',
                     anchor: '100%',
                     plugins: [{
                         ptype: 'fieldhelptext',
                         text: 'The email used that will be used to contact you (Modify this at accounts.google.com)'
-                    }]
+                    }],
+                    fieldStyle: {
+                        color: '#888888',
+                        'background-color': '#eeeeee'
+                    }
                 },{
                     xtype: 'textfield',
                     itemId: 'arnExecution',
@@ -47,6 +51,7 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     fieldLabel: 'Compute ARN',
                     anchor: '100%',
                     allowBlank: false,
+                    allowOnlyWhitespace: false,
                     plugins: [{
                         ptype: 'fieldhelptext',
                         text: 'The Amazon resource name describing the compute EC2 resource to be used for job execution'
@@ -58,6 +63,7 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     fieldLabel: 'Storage ARN',
                     anchor: '100%',
                     allowBlank: false,
+                    allowOnlyWhitespace: false,
                     plugins: [{
                         ptype: 'fieldhelptext',
                         text: 'The Amazon resource name describing the storage S3 resource to be used for job artifacts'
@@ -70,19 +76,51 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                 items: [{
                     xtype: 'tbfill'
                 },{
+                    xtype: 'label',
+                    itemId: 'status',
+                    style: {
+                        'color': 'gray'
+                    }
+                },{
                     xtype: 'button',
                     scale: 'large',
                     text: 'Download AWS Policy',
                     handler: function() {
-                        alert('TODO');
+                        Ext.MessageBox.alert('TODO', 'This functionality is yet to be developed...');
                     }
                 },{
                     xtype: 'button',
                     cls: 'important-button',
                     scale: 'large',
                     text: 'Save Changes',
-                    handler: function() {
-                        alert('TODO');
+                    handler: function(btn) {
+                        var formPanel = btn.up('userpanel').down('form');
+                        var statusLabel = btn.up('userpanel').down('#status');
+                        if (!formPanel.isValid()) {
+                            return;
+                        }
+
+                        statusLabel.setText('Saving your changes...');
+                        Ext.Ajax.request({
+                            url: 'secure/setUser.do',
+                            params: formPanel.getValues(),
+                            callback: function(options, success, response) {
+                                if (!success) {
+                                    statusLabel.setText('');
+                                    Ext.MessageBox.alert('Error', 'There was an error saving your changes. Please try refreshing the page.');
+                                    return;
+                                }
+
+                                var responseObj = Ext.JSON.decode(response.responseText);
+                                if (!responseObj.success) {
+                                    statusLabel.setText('');
+                                    Ext.MessageBox.alert('Error', 'There was an error saving your changes. Please try refreshing the page.');
+                                    return;
+                                }
+
+                                statusLabel.setText('Saved!');
+                            }
+                        });
                     }
                 }]
             }],

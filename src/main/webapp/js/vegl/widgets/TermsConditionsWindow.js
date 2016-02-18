@@ -5,6 +5,12 @@
  *  tccontent : String terms and conditions content
  * }
  *
+ *  Adds the following events:
+ *  {
+ *      accept: function(win) - called if the user accepts the T&C's
+ *      reject: function(win) - called if the user rejects the T&C's
+ *  }
+ *
  */
 Ext.define('vegl.widgets.TermsConditionsWindow', {
     extend : 'Ext.Window',
@@ -37,8 +43,9 @@ Ext.define('vegl.widgets.TermsConditionsWindow', {
                     scale: 'large',
                     text: 'Reject',
                     handler: function(btn) {
-                        alert('TODO');
-                        btn.up('tcwindow').close();
+                        var w = btn.up('tcwindow');
+                        w.fireEvent('reject', w);
+                        w.close();
                     }
                 },{
                     xtype: 'button',
@@ -46,8 +53,9 @@ Ext.define('vegl.widgets.TermsConditionsWindow', {
                     scale: 'large',
                     text: 'Accept',
                     handler: function(btn) {
-                        alert('TODO');
-                        btn.up('tcwindow').close();
+                        var w = btn.up('tcwindow');
+                        w.fireEvent('accept', w);
+                        w.close();
                     }
                 }]
             }]

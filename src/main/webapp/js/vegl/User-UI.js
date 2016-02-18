@@ -49,9 +49,9 @@ Ext.application({
                 },
                 items: [{
                     border: false,
-                    maxWidth: 1000,
+                    maxWidth: 800,
                     width: '100%',
-                    height: '100%',
+                    height: 300,
                     bodyStyle: {
                         'background-color': 'white'
                     },
@@ -93,7 +93,20 @@ Ext.application({
 
                                 if (!user.get('acceptedTermsConditions') || user.get('acceptedTermsConditions') < tcVersion) {
                                     Ext.create('vegl.widgets.TermsConditionsWindow', {
-                                        tccontent: tcHtml
+                                        tccontent: tcHtml,
+                                        listeners: {
+                                            accept: function() {
+                                                Ext.Ajax.request({
+                                                    url: 'secure/setUser.do',
+                                                    params: {
+                                                        acceptedTermsConditions: tcVersion
+                                                    }
+                                                });
+                                            },
+                                            reject: function() {
+                                                window.location.href = 'j_spring_security_logout';
+                                            }
+                                        }
                                     }).show();
                                 }
                             }

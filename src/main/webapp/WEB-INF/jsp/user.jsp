@@ -38,7 +38,7 @@
 			    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0a4d99', endColorstr='#3d9ce5',GradientType=0 ); /* IE6-9 */
 			        
 			}
-	    </style>
+	  </style>
       
       <%-- JS imports - relative paths back to the webapp directory --%>
       <jsp:include page="../../portal-core/jsimports.htm"/>
