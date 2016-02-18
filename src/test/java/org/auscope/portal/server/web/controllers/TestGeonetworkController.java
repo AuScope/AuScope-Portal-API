@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.GeonetworkService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
@@ -19,6 +18,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLSignature;
 import org.auscope.portal.server.vegl.VglDownload;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
@@ -40,7 +40,7 @@ public class TestGeonetworkController {
 
     private VEGLJobManager mockJobManager;
     private GeonetworkService mockGNService;
-    private PortalUser mockPortalUser;
+    private ANVGLUser mockPortalUser;
     private CloudStorageService[] cloudStorageServices;
     private CloudComputeService[] cloudComputeServices;
 
@@ -53,7 +53,7 @@ public class TestGeonetworkController {
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockGNService = context.mock(GeonetworkService.class);
-        mockPortalUser = context.mock(PortalUser.class);
+        mockPortalUser = context.mock(ANVGLUser.class);
         cloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
         cloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
 

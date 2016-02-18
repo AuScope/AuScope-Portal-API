@@ -11,10 +11,12 @@
    <http entry-point-ref="oAuth2EntryPoint">
         <intercept-url pattern="/gridsubmit.html" access="ROLE_USER"/>
         <intercept-url pattern="/jobbuilder.html" access="ROLE_USER"/>
+        <intercept-url pattern="/user.html" access="ROLE_USER"/>
         <intercept-url pattern="/login.html" access="ROLE_USER"/>
         <intercept-url pattern="/joblist.html" access="ROLE_USER"/>
         <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR"/>
         <intercept-url pattern="/*.diag" access="ROLE_ADMINISTRATOR"/>
+        <intercept-url pattern="/secure/*" access="ROLE_USER"/>
         <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
         <logout logout-success-url="/gmap.html"/>
     </http>
@@ -27,6 +29,10 @@
         <beans:constructor-arg name="defaultFilterProcessesUrl" value="/oauth/callback"/>
         <beans:property name="authenticationManager" ref="authenticationManager"/>
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
+        <beans:property name="authenticationSuccessHandler">
+            <beans:bean class="org.auscope.portal.server.web.security.RedirectUnconfiguredUserHandler">
+            </beans:bean>        
+        </beans:property>
     </beans:bean>
 
     <beans:bean id="oauth2AuthenticationProvider" class="com.racquettrack.security.oauth.OAuth2AuthenticationProvider">

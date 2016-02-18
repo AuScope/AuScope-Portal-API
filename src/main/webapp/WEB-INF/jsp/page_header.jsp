@@ -25,6 +25,7 @@
             </security:authorize>
 
             <security:authorize ifNotGranted="ROLE_ANONYMOUS">
+                <li <%if (request.getRequestURL().toString().contains("/user.jsp")) {%>class="current" <%} %>><a href="user.html">Account<span></span></a></li>
                 <li ><a href="j_spring_security_logout">Logout<span></span></a></li>
             </security:authorize>
          </ul>

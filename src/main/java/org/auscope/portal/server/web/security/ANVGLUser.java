@@ -23,6 +23,7 @@ public class ANVGLUser implements UserDetails, Serializable {
     private String arnExecution;
     private String arnStorage;
     private String awsSecret;
+    private Integer acceptedTermsConditions;
 
     public ANVGLUser() {
         this.authorities = new ArrayList<ANVGLAuthority>();
@@ -86,6 +87,22 @@ public class ANVGLUser implements UserDetails, Serializable {
         this.email = email;
     }
 
+    /**
+     * The version of the T&Cs that the user has last accepted (or null if none)
+     * @return
+     */
+    public Integer getAcceptedTermsConditions() {
+        return acceptedTermsConditions;
+    }
+
+    /**
+     * The version of the T&Cs that the user has last accepted (or null if none)
+     * @return
+     */
+    public void setAcceptedTermsConditions(Integer acceptedTermsConditions) {
+        this.acceptedTermsConditions = acceptedTermsConditions;
+    }
+
     @Override
     public String toString() {
         return "ANVGLUser [id=" + id + ", fullName=" + fullName + ", authorities=" + authorities + "]";
@@ -135,7 +152,9 @@ public class ANVGLUser implements UserDetails, Serializable {
     public boolean isFullyConfigured() {
         return StringUtils.isNotEmpty(arnStorage) &&
                 StringUtils.isNotEmpty(awsSecret) &&
-                StringUtils.isNotEmpty(arnExecution);
+                StringUtils.isNotEmpty(arnExecution) &&
+                acceptedTermsConditions != null &&
+                acceptedTermsConditions > 0;
     }
 
     @Override

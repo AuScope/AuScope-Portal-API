@@ -27,7 +27,6 @@ import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
-import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -42,6 +41,7 @@ import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -392,7 +392,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
             HttpServletRequest request,
-            @AuthenticationPrincipal PortalUser user) throws ParseException {
+            @AuthenticationPrincipal ANVGLUser user) throws ParseException {
 
         //Get our job
         VEGLJob job = null;
@@ -470,7 +470,7 @@ public class JobBuilderController extends BaseCloudController {
     public ModelAndView updateJobSeries(@RequestParam(value="id", required=true) Integer id,  //The integer ID if not specified will trigger job creation
             @RequestParam(value="folderName", required=true) String folderName, //Name of the folder to move to
             HttpServletRequest request,
-            @AuthenticationPrincipal PortalUser user) throws ParseException {
+            @AuthenticationPrincipal ANVGLUser user) throws ParseException {
 
         //Get our job
         VEGLJob job = null;
@@ -803,7 +803,7 @@ public class JobBuilderController extends BaseCloudController {
      * @param email
      * @return
      */
-    private VEGLJob initialiseVEGLJob(HttpSession session, PortalUser user) throws PortalServiceException {
+    private VEGLJob initialiseVEGLJob(HttpSession session, ANVGLUser user) throws PortalServiceException {
         VEGLJob job = new VEGLJob();
 
         //Start by saving our job to set its ID

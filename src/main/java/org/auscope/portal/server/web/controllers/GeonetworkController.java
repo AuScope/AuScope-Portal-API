@@ -17,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.GeonetworkService;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -32,6 +31,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLSignature;
 import org.auscope.portal.server.vegl.VglDownload;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -175,7 +175,7 @@ public class GeonetworkController extends BaseCloudController {
     }
 
     @RequestMapping("/secure/getUserSignature.do")
-    public ModelAndView getUserSignature(HttpServletRequest request, @AuthenticationPrincipal PortalUser user) {
+    public ModelAndView getUserSignature(HttpServletRequest request, @AuthenticationPrincipal ANVGLUser user) {
         //Get user email from session
         if (user == null) {
             return generateJSONResponseMAV(false, null,
@@ -209,7 +209,7 @@ public class GeonetworkController extends BaseCloudController {
      * @throws Exception
      */
     @RequestMapping("/secure/insertRecord.do")
-    public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request, @AuthenticationPrincipal PortalUser user) throws Exception {
+    public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request, @AuthenticationPrincipal ANVGLUser user) throws Exception {
         //Lookup our appropriate job
         VEGLJob job = jobManager.getJobById(jobId);
         if (job == null) {
