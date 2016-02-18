@@ -2,7 +2,7 @@
  * @author Josh Vote
  */
 Ext.define('vegl.jobwizard.forms.JobObjectForm', {
-    /** @lends forms.JobObjectForm */
+    /** @lends JobBuilder.JobObjectForm */
 
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
@@ -12,6 +12,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     computeServicesStore : null,
 
     /**
+     * Extends 'vegl.jobwizard.forms.BaseJobWizardForm'
      * Job wizard form for creating and editing a new Job Object. 
      * Creates a new JobObjectForm form configured to write/read to the specified global state
      * @constructs

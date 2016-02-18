@@ -4,12 +4,13 @@
  * @author Richard Goh
  */
 Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
-    /** @lends ScriptBuilderForm */
+    /** @lends JobBuilder.ScriptBuilderForm */
    
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
     scriptBuilderFrm : null,
 
     /**
+     * Extends 'vegl.jobwizard.forms.BaseJobWizardForm'
      * Creates a new ScriptBuilderForm form configured to write/read to the specified global state,
      * A job wizard form for allowing the user to create their own custom script using the ScriptBuilder library.
      * This file is a reworking of the AuScope Virtual Rock Lab (VRL) project ScriptBuilder.js for the purpose of fitting into a VL 'Job Wizard' model.

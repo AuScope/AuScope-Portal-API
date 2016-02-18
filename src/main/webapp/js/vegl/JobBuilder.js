@@ -6,10 +6,11 @@ Ext.application({
     
     /**
      * Creates the wizard towards a job submission: <br/>
+     * - Allows for selecting (or creating a new) series to submit jobs under
      * - Upload input files <br/>
      * - Select solution <br/>
      * - Select storage and resources <br/>
-     * - Review and submit
+     * - Review and submit (or save)
      * @constructs
      */
     launch : function() {
