@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
-import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -39,6 +38,7 @@ import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VGLQueueJob;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
@@ -116,7 +116,7 @@ public class JobListController extends BaseCloudController  {
      * @param jobId
      * @return The VEGLJob object on success or null otherwise.
      */
-    private VEGLJob attemptGetJob(Integer jobId, PortalUser user) {
+    private VEGLJob attemptGetJob(Integer jobId, ANVGLUser user) {
         logger.info("Getting job with ID " + jobId);
 
         VEGLJob job = null;
@@ -160,7 +160,7 @@ public class JobListController extends BaseCloudController  {
      * @param jobId
      * @return The VEGLSeries object on success or null otherwise.
      */
-    private VEGLSeries attemptGetSeries(Integer seriesId, PortalUser user) {
+    private VEGLSeries attemptGetSeries(Integer seriesId, ANVGLUser user) {
         VEGLSeries series = null;
 
         //Check we have a user email
@@ -205,7 +205,7 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/mySeries.do")
     public ModelAndView mySeries(HttpServletRequest request,
             HttpServletResponse response,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
 
         if (user == null || user.getEmail() == null) {
             logger.warn("No email attached to session");
@@ -230,7 +230,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView deleteJob(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
         logger.info("Deleting job with ID " + jobId);
 
         VEGLJob job = attemptGetJob(jobId, user);
@@ -262,7 +262,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView deleteSeriesJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
 
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
@@ -331,7 +331,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView killJob(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
         logger.info("Cancelling job with ID "+jobId);
 
         VEGLJob job = attemptGetJob(jobId, user);
@@ -406,7 +406,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView killSeriesJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
 
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
@@ -458,7 +458,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView jobFiles(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
         logger.info("Getting job files for job ID " + jobId);
 
         VEGLJob job = attemptGetJob(jobId, user);
@@ -501,7 +501,7 @@ public class JobListController extends BaseCloudController  {
             @RequestParam("jobId") Integer jobId,
             @RequestParam("filename") String fileName,
             @RequestParam("key") String key,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
 
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -569,7 +569,7 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @RequestParam("files") String filesParam,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
 
         //Lookup our job and check input files
         VEGLJob job = attemptGetJob(jobId, user);
@@ -651,7 +651,7 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam(required=false, value="qSeriesName") String qName,
             @RequestParam(required=false, value="qSeriesDesc") String qDesc,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -680,7 +680,7 @@ public class JobListController extends BaseCloudController  {
      */
     @RequestMapping("/secure/createSeries.do")
     public ModelAndView createSeries(HttpServletRequest request,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
 
 
         List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), "default", null);
@@ -715,7 +715,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView createFolder(HttpServletRequest request,
             @RequestParam("seriesName") String seriesName,
             @RequestParam("seriesDescription") String seriesDescription,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
         VEGLSeries series = new VEGLSeries();
         series.setUser(user.getEmail());
         series.setName(seriesName);
@@ -745,7 +745,7 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
@@ -801,7 +801,7 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @RequestParam(required=false, value="file") String[] files,
-            @AuthenticationPrincipal PortalUser user) {
+            @AuthenticationPrincipal ANVGLUser user) {
         logger.info("Duplicate a new job from job ID "+ jobId);
 
         //Lookup the job we are cloning
@@ -877,7 +877,7 @@ public class JobListController extends BaseCloudController  {
      * @return
      */
     @RequestMapping("/secure/getSectionedLogs.do")
-    public ModelAndView getSectionedLogs(HttpServletRequest request, @RequestParam("jobId") Integer jobId, @AuthenticationPrincipal PortalUser user) {
+    public ModelAndView getSectionedLogs(HttpServletRequest request, @RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
         //Lookup the job whose logs we are accessing
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {

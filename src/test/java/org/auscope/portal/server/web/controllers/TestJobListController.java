@@ -17,7 +17,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
-import org.auscope.portal.core.server.security.oauth2.PortalUser;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -32,6 +31,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.After;
 import org.junit.Assert;
@@ -54,7 +54,7 @@ public class TestJobListController extends PortalTestClass {
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
     private PortalPropertyPlaceholderConfigurer mockHostConfigurer;
-    private PortalUser mockPortalUser;
+    private ANVGLUser mockPortalUser;
     private JobStatusMonitor mockJobStatusMonitor;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
@@ -78,7 +78,7 @@ public class TestJobListController extends PortalTestClass {
         mockResponse = context.mock(HttpServletResponse.class);
         mockRequest = context.mock(HttpServletRequest.class);
         mockSession = context.mock(HttpSession.class);
-        mockPortalUser = context.mock(PortalUser.class);
+        mockPortalUser = context.mock(ANVGLUser.class);
         final List<VEGLJob> mockJobs=new ArrayList<VEGLJob>();
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
 
