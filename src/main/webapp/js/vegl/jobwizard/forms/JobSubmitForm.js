@@ -1,13 +1,15 @@
 /**
- * Job wizard form for reviewing and then submitting a job for prcessing
- *
- * Author - Josh Vote
+ * @author  Josh Vote
  */
 Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
+    /** @lends JobBuilder.JobSubmitForm */
     extend : 'vegl.jobwizard.forms.JobUploadForm',
 
     /**
+     * Extends 'vegl.jobwizard.forms.JobUploadForm'
+     * Job wizard form for reviewing and then submitting a job for processing
      * Creates a new JobObjectForm form configured to write/read to the specified global state
+     * @constructs
      */
     constructor: function(wizardState) {
         this.additionalButtons = [{

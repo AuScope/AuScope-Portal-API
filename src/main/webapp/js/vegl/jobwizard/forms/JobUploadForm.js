@@ -3,7 +3,7 @@
   */
 Ext.define('vegl.jobwizard.forms.JobUploadForm', {
    /** 
-     * @lends JobUploadForm 
+     * @lends JobSubmitForm.JobUploadForm 
      */ 
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
     
@@ -58,7 +58,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                 xtype : 'jobinputfilespanel',
                 itemId : 'files-panel',
                 currentJobId : wizardState.jobId,
-                title: 'Input files (review)',
+                title: 'Input files',
                 stripeRows: true,
                 anchor: '100% -20',
                 buttons : [{

@@ -55,14 +55,10 @@ ScriptBuilder.Components.getComponents = function(tree, fn) {
                     // Call the callback function fn
                     if (fn) { fn(); }
                 } else {
-                    console.log("No response");
-
                     errorMsg = responseObj.msg;
                     errorInfo = responseObj.debugInfo;
                 }
             } else {
-                console.log("no success");
-
                 errorMsg = "There was an error loading your script.";
                 errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
             }
