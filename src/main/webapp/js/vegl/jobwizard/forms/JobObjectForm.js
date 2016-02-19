@@ -81,6 +81,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         });
         this.storageServicesStore.load();
 
+        
+        // call the parent class
         this.callParent([{
             wizardState : wizardState,
             bodyStyle: 'padding:10px;',
@@ -89,28 +91,34 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             labelWidth: 150,
             autoScroll: true,
             listeners : {
-                //The first time this form is active create a new job object
                 jobWizardActive : function() {
-                    //If we have a jobId, load that, OTHERWISE the job will be created later
-                    if (jobObjectFrm.wizardState.jobId) {
-                        jobObjectFrm.getForm().load({
-                            url : 'getJobObject.do',
-                            waitMsg : 'Loading Job Object...',
-                            params : {
-                                jobId : jobObjectFrm.wizardState.jobId
-                            },
-                            failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
-                            success : function(frm, action) {
-                                var responseObj = Ext.JSON.decode(action.response.responseText);
+                    jobObjectFrm.getForm().load({
+                        url : 'getJobObject.do',
+                        waitMsg : 'Loading Job Object...',
+                        params : {
+                            jobId : jobObjectFrm.wizardState.jobId
+                        },
+                        failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
+                        success : function(frm, action) {
+                            var responseObj = Ext.JSON.decode(action.response.responseText);
 
-                                if (responseObj.success) {
-                                    //Loads the image store of user selected compute provider
-                                    frm.setValues(responseObj.data[0]);
-                                    jobObjectFrm.wizardState.jobId = frm.getValues().id;
-                                }
+                            if (responseObj.success) {
+                                // Loads the image store of user selected compute provider
+                                jobObjectFrm.imageStore.load({
+                                    params : {
+                                        computeServiceId : responseObj.data[0].computeServiceId
+                                    }
+                                });
+                                jobObjectFrm.computeTypeStore.load({
+                                    params : {
+                                        computeServiceId : responseObj.data[0].computeServiceId
+                                    }
+                                });
+                                frm.setValues(responseObj.data[0]);
+                                jobObjectFrm.wizardState.jobId = frm.getValues().id;
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             },
             fieldDefaults: {
@@ -150,6 +158,24 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 name: 'storageServiceId',
                 value: 'amazon-aws-storage-sydney'
             },{
+               itemId : 'storageServiceId',
+                allowBlank: false,
+                queryMode: 'local',
+                triggerAction: 'all',
+                displayField: 'name',
+                valueField : 'id',
+                typeAhead: true,
+                forceSelection: true,
+                store : this.storageServicesStore,
+                listConfig : {
+                    loadingText: 'Getting Storage Services...',
+                    emptyText: 'No storage services found.'
+                },
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select a location where your data will be stored.'
+                }]
+            }, {
                 xtype : 'machineimagecombo',
                 fieldLabel : 'Toolbox',
                 name: 'computeVmId',
@@ -271,7 +297,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
      * @function
      * @param {object} callback
      */
-    beginValidation: function(callback) {
+    beginValidation : function(callback) {
         var jobObjectFrm = this;
         var wizardState = this.wizardState;
 
