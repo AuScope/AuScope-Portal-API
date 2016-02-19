@@ -315,19 +315,18 @@ Ext.define('vegl.widgets.JobsPanel', {
      * series - either a vegl.models.Series object
      */
     listJobsForSeries : function(series, forceStatusRefresh) {
-        
-        console.log("Going to make the ajax call and fetch jobs for series - " + series.get('id'));
-        
         this.currentSeries = series;
+        
         var store = this.getStore();
+        
         var ajaxProxy = store.getProxy();
         ajaxProxy.extraParams.seriesId = series.get('id');
+        
         if (forceStatusRefresh) {
             ajaxProxy.extraParams.forceStatusRefresh = true;
         }
+
         store.load();
-        
-        console.log("done.");
     },
 
     /**
