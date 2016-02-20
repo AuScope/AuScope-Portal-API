@@ -2,7 +2,7 @@
  * @author Josh Vote
  */
 Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
-    /** lends JobBuilder.JobSeriesForm */
+    /** lends anvgl.JobBuilder.JobSeriesForm */
     
     // extend BaseJobWizardForm
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
@@ -15,6 +15,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
      */
     constructor: function(wizardState) {
         var jobSeriesObj = this;
+        
         var mySeriesStore = Ext.create('Ext.data.Store', {
             model : 'vegl.models.Series',
             proxy : {
@@ -65,7 +66,14 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                 }, {
                     name: 'sCreateSelect',
                     boxLabel: 'Create new series',
-                    inputValue: 1
+                    inputValue: 1,
+                    handler : function() {
+                        // delete the existing one if the user wishes to create a new 
+                        // as a new series is created only if there isn't one already 
+                        if (typeof wizardState.seriesId !== undefined) {
+                            delete wizardState.seriesId;
+                        }
+                    }
                 }]
             }, {
                 xtype: 'fieldset',
@@ -224,6 +232,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
             combo.getStore().removeAll();
             descText.setDisabled(false);
             descText.reset();
+            
         }
     },
 
@@ -292,16 +301,22 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                         'No data set has been captured. Do you want to continue?',
                         function(button) {
                             if (button === 'yes') {
-                                //Request our new series is created
-                                self.createSeries(seriesName, seriesDesc, callback);
+                                // request a new series be created for the workflow if one doesn't exist already
+                                if (!!!wizardState.seriesId) {
+                                    self.createSeries(seriesName, seriesDesc, callback);
+                                }
+                                callback(true);
                             } else {
                                 callback(false);
                                 return;
                             }
                     });
             } else {
-                //Request our new series is created
-                this.createSeries(seriesName, seriesDesc, callback);
+                // request a new series be created for the workflow if one doesn't exist already
+                if (!!!wizardState.seriesId) {
+                    this.createSeries(seriesName, seriesDesc, callback);
+                } 
+                callback(true);
             }
         }
     },
