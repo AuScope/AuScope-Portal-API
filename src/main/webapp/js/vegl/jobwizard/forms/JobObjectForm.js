@@ -17,6 +17,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
      * @param {object} wizardState
      */
     constructor: function(wizardState) {
+        console.log("Job Object Form constructs.");
+        
         var jobObjectFrm = this;
         
         // create the store, get the machine image
@@ -35,7 +37,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             }
         });
         this.imageStore.load();
-
+        
         // create the store and get the compute type
         this.computeTypeStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.ComputeType',
@@ -48,40 +50,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             }
         });
-
-        // create the store and get the storage services
-        this.storageServicesStore = Ext.create('Ext.data.Store', {
-            fields : [{name: 'id', type: 'string'},
-                      {name: 'name', type: 'string'}],
-            proxy: {
-                type: 'ajax',
-                url: 'getStorageServices.do',
-                reader: {
-                   type: 'json',
-                   rootProperty : 'data'
-                }
-            },
-            autoLoad : true
-        });
-        this.storageServicesStore.load();
-
-        // create the store and get the compute service
-        this.computeServicesStore = Ext.create('Ext.data.Store', {
-            fields : [{name: 'id', type: 'string'},
-                      {name: 'name', type: 'string'}],
-            proxy: {
-                type: 'ajax',
-                url: 'getComputeServices.do',
-                reader: {
-                   type: 'json',
-                   rootProperty : 'data'
-                }
-            },
-            autoLoad : true
-        });
-        this.storageServicesStore.load();
-
-        
+                
         // call the parent class
         this.callParent([{
             wizardState : wizardState,
@@ -91,34 +60,28 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             labelWidth: 150,
             autoScroll: true,
             listeners : {
+                //The first time this form is active create a new job object
                 jobWizardActive : function() {
-                    jobObjectFrm.getForm().load({
-                        url : 'getJobObject.do',
-                        waitMsg : 'Loading Job Object...',
-                        params : {
-                            jobId : jobObjectFrm.wizardState.jobId
-                        },
-                        failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
-                        success : function(frm, action) {
-                            var responseObj = Ext.JSON.decode(action.response.responseText);
+                    //If we have a jobId, load that, OTHERWISE the job will be created later
+                    if (jobObjectFrm.wizardState.jobId) {
+                        jobObjectFrm.getForm().load({
+                            url : 'getJobObject.do',
+                            waitMsg : 'Loading Job Object...',
+                            params : {
+                                jobId : jobObjectFrm.wizardState.jobId
+                            },
+                            failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
+                            success : function(frm, action) {
+                                var responseObj = Ext.JSON.decode(action.response.responseText);
 
-                            if (responseObj.success) {
-                                // Loads the image store of user selected compute provider
-                                jobObjectFrm.imageStore.load({
-                                    params : {
-                                        computeServiceId : responseObj.data[0].computeServiceId
-                                    }
-                                });
-                                jobObjectFrm.computeTypeStore.load({
-                                    params : {
-                                        computeServiceId : responseObj.data[0].computeServiceId
-                                    }
-                                });
-                                frm.setValues(responseObj.data[0]);
-                                jobObjectFrm.wizardState.jobId = frm.getValues().id;
+                                if (responseObj.success) {
+                                    //Loads the image store of user selected compute provider
+                                    frm.setValues(responseObj.data[0]);
+                                    jobObjectFrm.wizardState.jobId = frm.getValues().id;
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             },
             fieldDefaults: {
@@ -129,7 +92,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 name: 'name',
                 itemId : 'name',
                 fieldLabel: 'Job Name',
-                value : Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'Enter a useful name for your job here.'
@@ -158,24 +120,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 name: 'storageServiceId',
                 value: 'amazon-aws-storage-sydney'
             },{
-               itemId : 'storageServiceId',
-                allowBlank: false,
-                queryMode: 'local',
-                triggerAction: 'all',
-                displayField: 'name',
-                valueField : 'id',
-                typeAhead: true,
-                forceSelection: true,
-                store : this.storageServicesStore,
-                listConfig : {
-                    loadingText: 'Getting Storage Services...',
-                    emptyText: 'No storage services found.'
-                },
-                plugins: [{
-                    ptype: 'fieldhelptext',
-                    text: 'Select a location where your data will be stored.'
-                }]
-            }, {
                 xtype : 'machineimagecombo',
                 fieldLabel : 'Toolbox',
                 name: 'computeVmId',
@@ -237,6 +181,9 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             { xtype: 'hidden', name: 'vmSubsetUrl' }
             ]
         }]);
+        
+        console.log("Job Object Form constructed.");
+        
     },
 
     loadImages : function() {
@@ -251,27 +198,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     
     
     /**
-     * Handles the selection on 'Compute Provider'
-     * @function
-     */
-    onComputeSelect : function(combo, records) {
-        if (!records) {
-            this.imageStore.removeAll();
-            this.computeTypeStore.removeAll();
-            return;
-        }
-
-        this.getComponent('image-combo').clearValue();
-        this.getComponent('resource-combo').clearValue();
-        this.imageStore.load({
-            params : {
-                computeServiceId : 'aws-ec2-compute' //See ANVGl-35
-            }
-        });
-    },
-
-    
-    /**
      * Handles the selection on 'Toolbox'
      * @function
      */
@@ -283,6 +209,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
         this.getComponent('resource-combo').clearValue();
         var selectedComputeService = this.getComponent('computeServiceId').getValue();
+        var selectedComputeService = "aws-ec2-compute";
+
         this.computeTypeStore.load({
             params : {
                 computeServiceId : selectedComputeService,
@@ -293,14 +221,38 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
     
     /**
+     * Title for the interface
+     * @function
+     * @return {string} 
+     */
+    getTitle : function() {
+        return "Enter job details...";
+    },
+    
+    
+    getNumDownloadRequests : function() {
+        request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+        request.open("GET", "getNumDownloadRequests.do", false); //<-- false makes it a synchonous request!
+        request.send(null);
+        respObj = Ext.JSON.decode(request.responseText);
+        size = respObj.data;
+        return size;
+    },
+    
+    /**
      * Updates the job with additional details on storage, computing provider etc.
      * @function
      * @param {object} callback
      */
     beginValidation : function(callback) {
+        
+        console.log("Job Object Form beginValidation.");
+        
         var jobObjectFrm = this;
         var wizardState = this.wizardState;
 
+        var numDownloadReqs = this.getNumDownloadRequests();
+        
         // ensure we have entered all appropriate fields
         if (!jobObjectFrm.getForm().isValid()) {
             callback(false);
@@ -341,22 +293,30 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 wizardState.ncpus = computeType.get('vcpus');
                 wizardState.nrammb = computeType.get('ramMB');
 
-                callback(true);
+                if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
+                    Ext.Msg.confirm('Confirm',
+                            'No data set has been captured. Do you want to continue?',
+                            function(button) {
+                                if (button === 'yes') {
+                                    wizardState.skipConfirmPopup = true;
+                                    callback(true);
+                                    return;
+                                } else {
+                                    console.log("do not proceed.");
+                                    callback(false);
+                                    return;
+                                }
+                        });
+                } else {
+                    console.log("proceed.");
+                    callback(true);
+                    return;
+                }
+                
             }
         });
     },
 
-    
-    /**
-     * Title for the interface
-     * @function
-     * @return {string} 
-     */
-    getTitle : function() {
-        return "Enter job details...";
-    },
-    
-    
     /**
      * Gets the help instructions for the interface
      * @function
