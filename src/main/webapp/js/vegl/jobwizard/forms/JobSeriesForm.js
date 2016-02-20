@@ -73,6 +73,11 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
                         if (typeof wizardState.seriesId !== undefined) {
                             delete wizardState.seriesId;
                         }
+                        
+                        // clean up data store under 'Other Jobs in selected series' if a new seires it to be created
+                        if (this.checked) {
+                            jobSeriesObj.getComponent("jobspanel-seriesjobs").cleanupDataStore();
+                        }
                     }
                 }]
             }, {
