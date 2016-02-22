@@ -204,6 +204,7 @@ Ext.application({
             region: 'center',
             id: 'center_region',
             margin: '60 0 0 0',
+            border: false,
             html : "<div style='width:100%; height:100%' id='center_region-map'></div>",
             listeners: {
                 afterrender: function () {

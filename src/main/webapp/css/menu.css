@@ -1,6 +1,5 @@
 .header-container {
 	position:fixed;
-    overflow:hidden; 
     height:60px; 
     width:100%;    
     background-color: #1368ad;
@@ -28,7 +27,6 @@
 
 .menu {
 	position:fixed;
-	overflow:hidden; 
 	height:60px; /* trips haslayout, wrap floats IE */
 	top: 0px;
 	list-style:none;
@@ -40,8 +38,9 @@
 .menu-item {
 	display:inline-block;
 	height: 60px;
-	margin-right: 20px;
-	padding-top: 10px;
+	margin-right: 14px;
+	padding: 10px 12px 0 12px;
+	cursor: pointer;
 }
 
 .menu-item.current,
@@ -56,24 +55,56 @@
 	text-decoration: none;
 }
 
-.login-widget {
-	display:inline-block;
+.login-text a {
 	color: #ffffff;
-	height: 60px;
-    margin-right: 20px;
+	font-style: normal;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.login-widget {
+	color: #ddd;
+	font-style: italic;
+	margin: 0 20px 0 60px;
+}
+
+.dropdownicon {
+	display: inline-block;
+	width: 0; 
+    height: 0; 
+    margin: 0 0 1px 5px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #ddd;
 }
 
 .sub-menu {
 	display:none;
     position:absolute;
-    top:100%;
-    left:0;
-    background:#fff;
-    padding:0;
+    background: #f9f9f9;
+    padding:2px 5px 2px 5px;
+    min-width: 190px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
 
-.login-widget:hover > .sub-menu {
+.sub-menu a {
+	display: block;
+    text-decoration: none;
+    font:bold 14px/40px sans-serif;
+    color: black;
+    padding: 12px 16px;
+}
+
+.sub-menu a:hover {
+	background-color: #f1f1f1
+}
+
+.login-widget:hover .sub-menu {
 	display:block;
+}
+
+#latlng, #permalinkicon, #permalink {
+    display: none;
 }
 
 #anvgl-footer {

@@ -8,30 +8,36 @@
 	</div>
 	<div class="menu">
 		
-			<div class="menu-item"><a id="help-button">Help<span></span></a></div>
-			<div class="menu-item<%if (request.getRequestURL().toString().contains("/gmap.jsp")) {%> current<%} %>"><a href="gmap.html">Portal<span></span></a></div>
-			<div class="menu-item<%if (request.getRequestURL().toString().contains("/jobbuilder.jsp")) {%> current<%} %>"><a href="jobbuilder.html">Submit<span></span></a></div>
-			<div class="menu-item<%if (request.getRequestURL().toString().contains("/joblist.jsp")) {%> current<%} %>"><a href="joblist.html">Monitor<span></span></a></div>
+			<div class="menu-item"><a id="help-button">Help</a></div>
+			<div class="menu-item<%if (request.getRequestURL().toString().contains("/gmap.jsp")) {%> current<%} %>"><a href="gmap.html">Portal</a></div>
+			<div class="menu-item<%if (request.getRequestURL().toString().contains("/jobbuilder.jsp")) {%> current<%} %>"><a href="jobbuilder.html">Submit</a></div>
+			<div class="menu-item<%if (request.getRequestURL().toString().contains("/joblist.jsp")) {%> current<%} %>"><a href="joblist.html">Monitor</a></div>
 
 		
 
-		<div class="login-widget">
+		<div class="login-widget menu-item">
 			<security:authorize ifAllGranted="ROLE_ANONYMOUS">
-				<div class="button">Login</div>
+				<div class="login-text"><a href="login.html">Login</a></div>
 			</security:authorize>
 
 			<security:authorize ifNotGranted="ROLE_ANONYMOUS">
-				<div>Hello <security:authentication property="principal.email" />.<div class="dropdownicon"></div> 
+				<div>Hello <security:authentication property="principal.email" /><div class="dropdownicon"></div> 
 				</div>
 				
 				<div class="sub-menu">
 				    <security:authorize ifAllGranted="ROLE_ADMINISTRATOR">
-                        <div class="sub-menu-item"><a href="admin.html">Administration<span></span></a></div>
+                        <a href="admin.html">Administration</a>
                     </security:authorize>
-                    <div class="sub-menu-item"><a href="user.html">Profile<span></span></a></div>
-                    <div class="sub-menu-item"><a href="j_spring_security_logout">Logout<span></span></a></div>
+                    <a href="user.html">Profile</a>
+                    <a href="j_spring_security_logout">Logout</a>
 				</div>
 			</security:authorize>
 		</div>
 	</div>
+	
+	<div id="latlng"></div>
+	<%if (request.getRequestURL().toString().contains("/gmap.jsp")) {%>
+    <div id="permalinkicon"><a href="javascript:void(0)"><img src="portal-core/img/link.png" width="16" height="16"/></a></div>
+    <div id="permalink"><a href="javascript:void(0)">Permanent Link</a></div>
+    <%} %>
 </div>
