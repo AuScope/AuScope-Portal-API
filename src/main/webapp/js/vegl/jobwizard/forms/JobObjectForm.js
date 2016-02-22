@@ -2,7 +2,7 @@
  * @author Josh Vote
  */
 Ext.define('vegl.jobwizard.forms.JobObjectForm', {
-    /** @lends JobBuilder.JobObjectForm */
+    /** @lends anvgl.JobBuilder.JobObjectForm */
 
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
@@ -17,8 +17,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
      * @param {object} wizardState
      */
     constructor: function(wizardState) {
-        console.log("Job Object Form constructs.");
-        
         var jobObjectFrm = this;
         
         // create the store, get the machine image
@@ -121,7 +119,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 value: 'amazon-aws-storage-sydney'
             },{
                 xtype : 'machineimagecombo',
-                fieldLabel : 'Toolbox',
+                fieldLabel : 'Toolbox<span>*</span>',
                 name: 'computeVmId',
                 itemId : 'image-combo',
                 allowBlank: false,
@@ -143,7 +141,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             },{
                 xtype : 'combo',
-                fieldLabel : 'Resources',
+                fieldLabel : 'Resources<span>*</span>',
                 name: 'computeTypeId',
                 itemId : 'resource-combo',
                 displayField : 'longDescription',
@@ -181,11 +179,13 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             { xtype: 'hidden', name: 'vmSubsetUrl' }
             ]
         }]);
-        
-        console.log("Job Object Form constructed.");
-        
     },
 
+    
+    /**
+     * loads images for computerServiceId 'aws-ec2-compute'
+     * @function
+     */
     loadImages : function() {
         this.getComponent('image-combo').clearValue();
         this.getComponent('resource-combo').clearValue();
@@ -229,7 +229,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         return "Enter job details...";
     },
     
-    
+    /**
+     * getNumDownloadRequests
+     * @function
+     * @return {object} size 
+     */
     getNumDownloadRequests : function() {
         request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
         request.open("GET", "getNumDownloadRequests.do", false); //<-- false makes it a synchonous request!
@@ -245,9 +249,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
      * @param {object} callback
      */
     beginValidation : function(callback) {
-        
-        console.log("Job Object Form beginValidation.");
-        
         var jobObjectFrm = this;
         var wizardState = this.wizardState;
 
@@ -263,7 +264,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         var values = jobObjectFrm.getForm().getValues();
         values.seriesId = jobObjectFrm.wizardState.seriesId;
         values.jobId = jobObjectFrm.wizardState.jobId;
+        values.storageServiceId = "amazon-aws-storage-sydney";
+        values.computerServiceId = "aws-ec2-compute";
         
+        // update the job here
         Ext.Ajax.request({
             url : 'updateOrCreateJob.do',
             params : values,
@@ -302,21 +306,19 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                     callback(true);
                                     return;
                                 } else {
-                                    console.log("do not proceed.");
                                     callback(false);
                                     return;
                                 }
                         });
                 } else {
-                    console.log("proceed.");
                     callback(true);
                     return;
-                }
-                
+                }              
             }
         });
     },
 
+    
     /**
      * Gets the help instructions for the interface
      * @function

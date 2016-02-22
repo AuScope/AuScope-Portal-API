@@ -3,7 +3,7 @@
   */
 Ext.define('vegl.jobwizard.forms.JobUploadForm', {
    /** 
-     * @lends JobSubmitForm.JobUploadForm 
+     * @lends anvgl.JobSubmitForm.JobUploadForm 
      */ 
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
     

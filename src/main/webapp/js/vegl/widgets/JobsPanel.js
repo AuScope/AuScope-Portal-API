@@ -367,7 +367,6 @@ Ext.define('vegl.widgets.JobsPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {     
-                    
                     Ext.getBody().mask('Cancelling Job...');
                     
                     Ext.Ajax.request({

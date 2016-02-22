@@ -4,7 +4,7 @@
  * @author Richard Goh
  */
 Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
-    /** @lends JobBuilder.ScriptBuilderForm */
+    /** @lends anvgl.JobBuilder.ScriptBuilderForm */
    
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
     scriptBuilderFrm : null,
