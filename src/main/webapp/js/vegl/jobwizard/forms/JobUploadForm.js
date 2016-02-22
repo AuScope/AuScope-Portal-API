@@ -1,20 +1,26 @@
 /**
- * Job wizard form for handling uploads of custom user input files
- *
- * Author - Josh Vote
- */
+  * @author Josh Vote
+  */
 Ext.define('vegl.jobwizard.forms.JobUploadForm', {
+   /** 
+     * @lends JobSubmitForm.JobUploadForm 
+     */ 
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
-
-    uploadedFilesStore : null,
+    
     fileGrid : null,
-
+    uploadedFilesStore : null,
+    
     /**
+     * Job wizard form for handling uploads of custom user input files. First interface of the 4-step job submission work-flow.
      * Creates a new JobUploadForm form configured to write/read to the specified global state
+     *
+     * @constructs
+     * @param {object} wizardState
      */
     constructor: function(wizardState) {
         var jobUploadFrm = this;
-
+        
+        // execute the parent class
         this.callParent([{
             wizardState : wizardState,
             bodyStyle: 'padding:10px;',
@@ -22,7 +28,31 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
             header : false,
             buttons: [],
             listeners : {
-                jobWizardActive : Ext.bind(jobUploadFrm.updateFileList, jobUploadFrm)
+                    jobWizardActive : function() {
+                        
+                        if (this.wizardState.userAction == 'edit') {
+                            jobUploadFrm.getForm().load({
+                                url : 'getJobObject.do',
+                                waitMsg : 'Loading Job Object...',
+                                params : {
+                                    jobId : jobUploadFrm.wizardState.jobId
+                                },
+                                failure : Ext.bind(jobUploadFrm.fireEvent, jobUploadFrm, ['jobWizardLoadException']),
+                                success : function(frm, action) {
+                                    var responseObj = Ext.JSON.decode(action.response.responseText);
+
+                                    if (responseObj.success) {
+                                        jobUploadFrm.wizardState.jobId = responseObj.data[0].id;
+                                    }
+                                }
+                            });
+                            jobUploadFrm.updateFileList();
+                        }
+                        else {
+                            // Ext.bind(jobUploadFrm.updateFileList, jobUploadFrm);
+                            jobUploadFrm.updateFileList();
+                        }
+                    }
             },
             items: [{
                 xtype : 'jobinputfilespanel',
@@ -54,26 +84,63 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
         }]);
     },
 
-    //Refresh the server side file list
+    
+    /**
+     * Refresh the server side file list, and fetch all input-files associated with the job.
+     * @function
+     */
     updateFileList : function() {
         var filesPanel = this.getComponent('files-panel');
         filesPanel.currentJobId = this.wizardState.jobId;
         filesPanel.updateFileStore();
     },
 
-    //We don't validate on this form
+    /**
+     * 
+     * @function
+     */
+    getNumDownloadRequests : function() {
+        request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+        // 'false' makes it a synchonous request!
+        request.open("GET", "getNumDownloadRequests.do", false); 
+        request.send(null);
+        
+        respObj = Ext.JSON.decode(request.responseText);
+        size = respObj.data;
+        
+        return size;
+    },
+    
+    
+    /**
+     * When the user wishes to proceed to the next step and clicks 'Next'
+     * @function
+     */
     beginValidation : function(callback) {
         callback(true);
     },
-
+    
+    
+    /**
+     * Title of the interface
+     * @function
+     * @return {string} 
+     */
     getTitle : function() {
         return "Manage job input files...";
     },
 
+    
+    /**
+     * Gets the help instructions for the interface
+     * @function
+     * @return {object} instance of 'portal.util.help.Instruction'
+     */
     getHelpInstructions : function() {
         var filesPanel = this.getComponent('files-panel');
         var addButton = filesPanel.queryById('add-button');
-
+        
+        // return the help instructions for the interface
         return [Ext.create('portal.util.help.Instruction', {
             highlightEl : filesPanel.getEl(),
             title : 'Review Job Inputs',

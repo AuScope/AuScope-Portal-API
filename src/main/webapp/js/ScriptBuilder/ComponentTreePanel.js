@@ -8,8 +8,8 @@
  * }
  */
 Ext.define('ScriptBuilder.ComponentTreePanel', {
-    extend : 'Ext.tree.Panel',
-    alias : 'widget.sbcomponenttreepanel',
+    extend	: 'Ext.tree.Panel',
+    alias	: 'widget.sbcomponenttreepanel',
 
     constructor : function(config) {
         Ext.apply(config, {
@@ -17,17 +17,37 @@ Ext.define('ScriptBuilder.ComponentTreePanel', {
         });
 
         this.callParent(arguments);
-       
         this.on('itemdblclick', this._onDblClick, this);
     },
 
     _onDblClick : function(view, node, el, index, e, eOpts) {
         var componentName = node.get('id');
+
         var name = node.get('text');
         var description = node.get('qtip');
-
+        
         if (!Ext.isEmpty(componentName)) {
-            this.fireEvent('addcomponent', this, componentName, name, description);
+        	Ext.Ajax.request({
+                url: 'getSolution.do',
+                scope: this,
+                headers: {
+                    Accept: 'application/json'
+                },
+                params: {
+                    solutionId: componentName
+                },
+                success: function(response) {
+                    entry = Ext.JSON.decode(response.responseText);
+                    if (entry && entry.data) {
+                        this.fireEvent('addcomponent', this, entry.data[0], name, description);
+                        this.addEvents({'addcomponent' : true});
+                    }
+                },
+
+                failure: function(response) {
+                    console.log("Get detailed entry failed! " + response);
+                }
+            });
         }
     }
 });

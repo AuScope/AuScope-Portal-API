@@ -65,7 +65,7 @@
         <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
     
-
+    
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
     <bean name="VGLJobStatusChangeHandler" class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor"/>
 
@@ -304,5 +304,10 @@
         <property name="hibernateProperties">
             <value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>
         </property>
+    </bean>
+    
+    <!-- vegl.VLScmSnapshotDao -->
+     <bean id="vlScmSnapshotDao" class="org.auscope.portal.server.vegl.VLScmSnapshotDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
 </beans>

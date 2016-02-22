@@ -32,6 +32,13 @@ public class VglDownload implements Serializable, Cloneable {
     /** The job that owns this download*/
     private VEGLJob parent;
 
+    /** Organisation or person responsible for this data set */
+    private String owner;
+    /** Url of the data this is a subset of (if applicable) */
+    private String parentUrl;
+    /** Name of the data this is a subset of (if applicable) */
+    private String parentName;
+
 
     /**
      * Default constructor
@@ -191,6 +198,30 @@ public class VglDownload implements Serializable, Cloneable {
      */
     public void setWestBoundLongitude(Double westBoundLongitude) {
         this.westBoundLongitude = westBoundLongitude;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getParentUrl() {
+        return parentUrl;
+    }
+
+    public void setParentUrl(String parentUrl) {
+        this.parentUrl = parentUrl;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
     }
 
     /**
