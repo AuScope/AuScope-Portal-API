@@ -183,7 +183,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
     
     /**
-     * loads images for computerServiceId 'aws-ec2-compute'
+     * loads images for computeServiceId 'aws-ec2-compute'
      * @function
      */
     loadImages : function() {
@@ -265,7 +265,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         values.seriesId = jobObjectFrm.wizardState.seriesId;
         values.jobId = jobObjectFrm.wizardState.jobId;
         values.storageServiceId = "amazon-aws-storage-sydney";
-        values.computerServiceId = "aws-ec2-compute";
+        values.computeServiceId = "aws-ec2-compute";
         
         // update the job here
         Ext.Ajax.request({
