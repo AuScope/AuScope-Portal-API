@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 
 /**
  * Class for redirecting a user that isn't setup correctly to the user setup page.
@@ -27,7 +28,16 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
         if (principal instanceof ANVGLUser) {
             if (!((ANVGLUser) principal).isFullyConfigured()) {
                 response.sendRedirect("../user.html");
+                return;
             }
         }
+
+        DefaultSavedRequest savedRequest = (DefaultSavedRequest) request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST");
+        if (savedRequest != null) {
+            response.sendRedirect(savedRequest.getRequestURL());
+            return;
+        }
+
+        response.sendRedirect("../");
     }
 }
