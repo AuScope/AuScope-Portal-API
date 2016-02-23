@@ -13,7 +13,7 @@ Ext.application({
 
         var urlParams = Ext.Object.fromQueryString(window.location.search.substring(1));
         var isDebugMode = urlParams.debug;
-        
+
         var layersSorter = new Ext.util.Sorter({
             sorterFn: function(record1, record2) {
             	// 'order' is always received on the JSON
@@ -24,7 +24,7 @@ Ext.application({
             },
             direction: 'ASC'
         })
-        
+
         var layersGrouper = new Ext.util.Grouper({
             groupFn: function(item) {
                 return item.data.group;
@@ -38,7 +38,7 @@ Ext.application({
             },
             direction: 'ASC'
         });
-        
+
         var knownLayerStore = Ext.create('Ext.data.Store', {
             model : 'portal.knownlayer.KnownLayer',
             proxy : {
@@ -53,7 +53,7 @@ Ext.application({
             grouper: layersGrouper,
             autoLoad : true
         });
-        
+
 
         //Create our store for holding the set of
         //layers that have been added to the map
@@ -183,7 +183,7 @@ Ext.application({
     		layout : 'fit',
             region :'south'
         };
-        
+
         /**
          * Used as a placeholder for the tree and details panel on the left of screen
          */
@@ -191,8 +191,8 @@ Ext.application({
             layout: 'border',//VT: vbox doesn't support splitbar unless we custom it.
             region:'west',
             border: false,
-            split:true,           
-            margin:'100 0 0 3',
+            split:true,
+            margin:'60 0 0 3',
             width: 370,
             items:[tabsPanel, southPanel]
         };
@@ -203,17 +203,18 @@ Ext.application({
         var centerPanel = Ext.create('Ext.panel.Panel', {
             region: 'center',
             id: 'center_region',
-            margin: '100 0 0 0',
+            margin: '60 0 0 0',
+            border: false,
             html : "<div style='width:100%; height:100%' id='center_region-map'></div>",
             listeners: {
-                afterrender: function () {    
-                    map.renderToContainer(centerPanel,'center_region-map');   //After our centerPanel is displayed, render our map into it                                     
+                afterrender: function () {
+                    map.renderToContainer(centerPanel,'center_region-map');   //After our centerPanel is displayed, render our map into it
                 }
             }
         });
 
 
-        
+
         /**
          * Add all the panels to the viewport
          */
@@ -221,8 +222,8 @@ Ext.application({
             layout:'border',
             items:[westPanel, centerPanel]
         });
-		
-        
+
+
         // The subset button needs a handler for when the user draws a subset bbox on the map:
         map.on('dataSelect', function(map, bbox, intersectedRecords) {
           //Show a dialog allow users to confirm the selected data sources
