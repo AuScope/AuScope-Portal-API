@@ -42,6 +42,7 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -650,7 +651,8 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/secure/submitJob.do")
     public ModelAndView submitJob(HttpServletRequest request,
             HttpServletResponse response,
-            @RequestParam("jobId") String jobId) {
+            @RequestParam("jobId") String jobId,
+            @AuthenticationPrincipal ANVGLUser user) {
         boolean succeeded = false;
         String oldJobStatus = null, errorDescription = null, errorCorrection = null;
         VEGLJob curJob = null;
@@ -716,7 +718,7 @@ public class JobBuilderController extends BaseCloudController {
                             
                             // Provenance
                             anvglProvenanceService.setServerURL(request.getRequestURL().toString());
-                            anvglProvenanceService.createActivity(curJob/*, scmEntryService.getJobSolution(curJob), user*/);
+                            anvglProvenanceService.createActivity(curJob, user);
 
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);

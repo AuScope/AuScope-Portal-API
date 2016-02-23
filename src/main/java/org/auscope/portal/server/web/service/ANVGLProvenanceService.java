@@ -12,6 +12,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VglDownload;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -95,18 +96,17 @@ public class ANVGLProvenanceService {
      *            should be just about to execute, but not yet have started.
      * @return The TURTLE text.
      */
-    public final String createActivity(final VEGLJob job) {
+    public final String createActivity(final VEGLJob job, ANVGLUser user) {
         String jobURL = jobURL(job, serverURL());
         Activity anvglJob = null;
-        Set<Entity> inputs = createEntitiesForInputs(job);
+        Set<Entity> inputs = createEntitiesForInputs(job, user);
         try {
-        	URI user = new URI(MAIL + job.getUser());
             anvglJob = new Activity()
                     .setActivityUri(new URI(jobURL))
                     .setTitle(job.getName())
                     .setDescription(job.getDescription())
                     .setStartedAtTime(new Date())
-                    .setWasAssociatedWith(user)
+                    .setWasAssociatedWith(new URI(user.getId()))
                     .setUsedEntities(inputs);
         } catch (URISyntaxException ex) {
             LOGGER.error(String.format("Error parsing server name %s into URI.",
@@ -198,7 +198,7 @@ public class ANVGLProvenanceService {
      * @param job The virtual labs job we want to examine the inputs of.
      * @return An array of PROV-O entities. May be empty, but won't be null.
      */
-    public Set<Entity> createEntitiesForInputs(final VEGLJob job) {
+    public Set<Entity> createEntitiesForInputs(final VEGLJob job, ANVGLUser user) {
         Set<Entity> inputs = new HashSet<>();
         // Downloads first
         try {
@@ -206,13 +206,12 @@ public class ANVGLProvenanceService {
                 URI dataURI = new URI(dataset.getUrl());
                 URI baseURI = new URI(dataURI.getScheme() +
                         "://" + dataURI.getAuthority() + dataURI.getPath());
-                URI user = new URI(MAIL + job.getUser());
                 inputs.add((ServiceEntity) new ServiceEntity()
                         .setQuery(dataURI.getQuery())
                         .setServiceBaseUri(baseURI)
                         .setDataUri(dataURI)
                         .setDescription(dataset.getDescription())
-                        .setWasAttributedTo(user)
+                        .setWasAttributedTo(new URI(user.getId()))
                         .setTitle(dataset.getName()));
                 LOGGER.debug("New Input: " + dataset.getUrl());
             }
@@ -232,7 +231,7 @@ public class ANVGLProvenanceService {
                         job, information, serverURL()));
                 LOGGER.debug("New Input: " + inputURI.toString());
                 inputs.add(new Entity().setDataUri(inputURI)
-                        .setWasAttributedTo(new URI(MAIL + job.getUser())));
+                        .setWasAttributedTo(new URI(user.getId())));
             }
         } catch (PortalServiceException e) {
             LOGGER.error(String.format(

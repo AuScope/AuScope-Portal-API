@@ -10,7 +10,7 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VglDownload;
-import org.auscope.portal.server.web.security.User;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.After;
 import org.junit.Before;
@@ -33,8 +33,9 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     final String jobDescription = "Some job I made.";
     final String activityFileName = "activity.ttl";
     final String PROMSURI = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
+    final String mockUser = "jo@me.com";
     URI mockProfileUrl;
-    User mockPortalUser;
+    ANVGLUser mockPortalUser;
     
     List<VglDownload> downloads = new ArrayList<>();
     VEGLJob turtleJob;
@@ -66,7 +67,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     @Before
     public void setUp() throws Exception {
         preparedJob = context.mock(VEGLJob.class);
-        mockPortalUser = context.mock(User.class);
+        mockPortalUser = context.mock(ANVGLUser.class);
         final CloudStorageService store = context.mock(CloudStorageService.class);
         final CloudStorageService[] storageServices = {store};
         final ANVGLFileStagingService fileServer = context.mock(ANVGLFileStagingService.class);
@@ -138,10 +139,8 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
 
             allowing(turtleJob).getId();
             will(returnValue(1));
-            /*
-            allowing(mockPortalUser).getLink();
-            will(returnValue(mockProfileUrl));
-            */
+            
+            allowing(mockPortalUser).getId();will(returnValue(mockUser));
         }});
     }
 
@@ -152,7 +151,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
 
     @Test
     public void testCreateActivity() throws Exception {
-        String graph = ANVGLProvenanceService.createActivity(preparedJob/*, solution, mockPortalUser*/);
+        String graph = ANVGLProvenanceService.createActivity(preparedJob, mockPortalUser);
         Assert.assertTrue(graph.contains(initialTurtle));
         Assert.assertTrue(graph.contains(serviceTurtle));
         //Assert.assertTrue(graph.contains(intermediateTurtle));
@@ -177,7 +176,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
 
     @Test
     public void testCreateEntitiesForInputs() throws Exception {
-        Set<Entity> entities = ANVGLProvenanceService.createEntitiesForInputs(preparedJob/*, solution, mockPortalUser*/);
+        Set<Entity> entities = ANVGLProvenanceService.createEntitiesForInputs(preparedJob, mockPortalUser);
         Assert.assertNotNull(entities);
         Assert.assertEquals(3, entities.size());
     }

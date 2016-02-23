@@ -25,7 +25,6 @@ import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
-import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -38,6 +37,7 @@ import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -60,8 +60,6 @@ public class TestJobBuilderController {
     private Mockery context = new Mockery() {{
         setImposteriser(ClassImposteriser.INSTANCE);
     }};
-
-
 
     private VEGLJobManager mockJobManager;
     private CloudStorageService[] mockCloudStorageServices;
@@ -611,9 +609,9 @@ public class TestJobBuilderController {
         final String storageProvider = "provider";
         final String storageAuthVersion = "1.2.3";
         final String regionName = null;
-        
-        //final String mockUser = "jo@me.com";
-        //final URI mockProfileUrl = new URI("https://plus.google.com/1");
+
+        final String mockUser = "jo@me.com";
+        final URI mockProfileUrl = new URI("https://plus.google.com/1");
         final File activityFile = File.createTempFile("activity", ".ttl");
         final String activityFileName = "activity.ttl";
         final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
@@ -679,11 +677,13 @@ public class TestJobBuilderController {
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(jobObj)));will(returnValue(cloudList));
             allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
             allowing(mockCloudStorageServices[0]).uploadJobFiles(with(any(VEGLJob.class)), with(any(File[].class)));
-
+            
+            oneOf(mockPortalUser).getUsername();will(returnValue(mockUser));
+            allowing(mockPortalUser).getId();will(returnValue(mockUser));
         }});
 
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
 
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Thread.sleep(1000);
@@ -732,7 +732,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, errorDescription);
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
@@ -750,7 +750,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId));will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobId);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobId, mockPortalUser);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
@@ -805,7 +805,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "");
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
@@ -843,6 +843,7 @@ public class TestJobBuilderController {
         final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
         CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
         final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
+        final String mockUser = "jo@me.com";
 
         jobObj.setComputeVmId(computeVmId);
         //As submitJob method no longer explicitly checks for empty storage credentials,
@@ -906,9 +907,10 @@ public class TestJobBuilderController {
             oneOf(mockRequest).getRequestURL();will(returnValue(new StringBuffer("http://mock.fake/secure/something")));
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(jobObj)));will(returnValue(cloudList));
             allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
+            allowing(mockPortalUser).getId();will(returnValue(mockUser));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
 
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         //VT:wait a while for the thread to finish before getting the status.
@@ -954,6 +956,7 @@ public class TestJobBuilderController {
         final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
         CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
         final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
+        final String mockUser = "jo@me.com";
 
         jobObj.setComputeVmId(computeVmId);
         //As submitJob method no longer explicitly checks for empty storage credentials,
@@ -1014,9 +1017,11 @@ public class TestJobBuilderController {
             allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
             allowing(mockCloudStorageServices[0]).uploadJobFiles(with(any(VEGLJob.class)), with(any(File[].class)));
 
+            oneOf(mockPortalUser).getUsername();will(returnValue(mockUser));
+            allowing(mockPortalUser).getId();will(returnValue(mockUser));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
         Thread.sleep(2000);
         Assert.assertTrue(vglPollingJobQueueManager.getQueue().hasJob());
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
@@ -1060,7 +1065,7 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
@@ -1102,7 +1107,7 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
