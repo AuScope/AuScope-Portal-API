@@ -33,6 +33,10 @@
     right: 0px;
 	font:bold 14px/40px sans-serif;
     float: right;
+    
+    /* This is to minimise the craziness that occurs at small horizontal resolutions*/
+    background-color: #1368ad; 
+    white-space: nowrap;
 }
 
 .menu-item {
