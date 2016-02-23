@@ -197,8 +197,8 @@
     <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageService">
         <constructor-arg name="provider" value="aws-s3"/>
         <constructor-arg name="endpoint"><null/></constructor-arg>
-        <constructor-arg name="accessKey" value="${env.aws.s3.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.aws.s3.secretkey}"/>
+        <constructor-arg name="accessKey"><null/></constructor-arg>
+        <constructor-arg name="secretKey"><null/></constructor-arg>
         <constructor-arg name="regionName" value="ap-southeast-2"/>
         <constructor-arg name="relaxHostName" value="false"/>
         <constructor-arg name="stripExpectHeader" value="true"/>
@@ -213,8 +213,8 @@
         <constructor-arg name="provider" value="AWSEc2"/>
         <constructor-arg name="endpoint"><null/></constructor-arg>
         <constructor-arg name="apiVersion"><null/></constructor-arg>
-        <constructor-arg name="accessKey" value="${env.aws.ec2.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.aws.ec2.secretkey}"/>
+        <constructor-arg name="accessKey"><null/></constructor-arg>
+        <constructor-arg name="secretKey"><null/></constructor-arg>
         <constructor-arg name="httpServiceCaller" ref="httpServiceCaller"/>
         
         <property name="id" value="aws-ec2-compute"/>
