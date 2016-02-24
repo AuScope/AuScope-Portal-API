@@ -249,7 +249,7 @@
         </property>
     </bean>
 
-    <bean id="fileStagingService" class="org.auscope.portal.core.services.cloud.FileStagingService">
+    <bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">
         <constructor-arg name="stagingInformation">
             <bean class="org.auscope.portal.core.cloud.StagingInformation">
                 <constructor-arg name="stageInDirectory" value="${HOST.localStageInDir}"/>
