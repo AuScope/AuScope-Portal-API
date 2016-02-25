@@ -46,6 +46,18 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     }
                 },{
                     xtype: 'textfield',
+                    itemId: 'awsAccount',
+                    name: 'awsAccount',
+                    fieldLabel: 'AWS Account',
+                    anchor: '100%',
+                    allowBlank: false,
+                    allowOnlyWhitespace: false,
+                    plugins: [{
+                        ptype: 'fieldhelptext',
+                        text: 'The Amazon IAM account name which will be configured to run ANVGL virtual machines.'
+                    }]
+                },{
+                    xtype: 'textfield',
                     itemId: 'arnExecution',
                     name: 'arnExecution',
                     fieldLabel: 'Compute ARN',
@@ -86,7 +98,23 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     scale: 'large',
                     text: 'Download AWS Policy',
                     handler: function() {
-                        Ext.MessageBox.alert('TODO', 'This functionality is yet to be developed...');
+                        Ext.Ajax.request({
+                            url: 'secure/getCloudFormationScript.do',
+                            callback: function(options, success, response) {
+                                if (!success) {
+                                    Ext.MessageBox.alert('Error', 'There was an error accessing template. Please try refreshing the page');
+                                    return;
+                                }
+
+                                var responseObj = Ext.JSON.decode(response.responseText);
+                                if (!responseObj.success) {
+                                    Ext.MessageBox.alert('Error', 'There was an error generating template. Please try refreshing the page.');
+                                    return;
+                                }
+
+                                Ext.create('vegl.widgets.CloudFormationTemplateWindow', {content: responseObj.data}).show();
+                            }
+                        });
                     }
                 },{
                     xtype: 'button',
