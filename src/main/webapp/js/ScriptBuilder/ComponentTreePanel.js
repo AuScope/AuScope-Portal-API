@@ -40,7 +40,6 @@ Ext.define('ScriptBuilder.ComponentTreePanel', {
                     entry = Ext.JSON.decode(response.responseText);
                     if (entry && entry.data) {
                         this.fireEvent('addcomponent', this, entry.data[0], name, description);
-                        this.addEvents({'addcomponent' : true});
                     }
                 },
 
