@@ -1,120 +1,15 @@
-#menu {
+.header-container {
 	position:fixed;
-	overflow:hidden; /* wrap floats */
-	height:55px; /* trips haslayout, wrap floats IE */
-	list-style:none;
-    top: -15px;
-    right: 0px;
-	font:bold 14px/40px sans-serif;
-    float: right;
-    padding-right: 30px;    
+    height:60px; 
+    width:100%;    
+    background-color: #1368ad;
 }
 
-#logo {
-	position:fixed;
-}
-
-#menu li {
-	display:inline;
-}
-
-
-#menu a {
-	float:left;
-	position:relative;
-	padding-left:15px;
-    margin-left: 1px;
-	margin-right:15px;
-	text-decoration:none;
-	color:#EEE;
-	background:url(../img/nav.gif) 0 0px no-repeat;
-}
-
-#menu a span {
-	position:absolute;
-	top:0;
-	left:100%;
-	width:15px;
-	height:40px;
-	background:url(../img/nav.gif) -295px -0px no-repeat;
-}
-
-#menu .current a {
-	background-position:0 -40px;
-	background-color:#CCC;
-}
-
-#menu .current a span {
-	background-position:-295px -40px;
-}
-
-#menu a:active,
-#menu a:focus,
-#menu a:hover {
-
-	background-position:0px -40px;
-	background-color:#FF0;
-}
-
-#menu a:active span,
-#menu a:focus span,
-#menu a:hover span {
-	background-position:-295px -40px;
-}
-
-#latlng {
-	position:absolute;
-    top: 70px;
-    right: 120px;
-    color: #15428B;
-    font: 12px Arial, Tahoma, Helvetica, sans-serif;
-}
-
-#permalinkicon {
-	position:absolute;
-    top: 80px;
-    right: 97px;
-}
-
-#permalink {
-	position:absolute;
-    top: 80px;
-    right: 10px;
-    color: #15428B;
-    font: 12px Arial, Tahoma, Helvetica, sans-serif;
-}
-
-
-/* ANVGL-12 updates */
-#header-container, 
-#logo {
-	height : 100px;
-	width : 100%;
-}
-
-#logo h1 {
-	width : 100%;
-}
-
-/* overwrites the background-image on portal-core to include application specific branding */
-#logo h1 a {
-	background : url('../img/logos/government-of-western-australia-department-of-mines-and-petroleum.jpg') no-repeat 0 0;
-	background-size : contain;
-	margin : 10px;
-	height : 80px;
-	width : 678px;
-	text-decoration : none;
-}
-
-#logo h1 a span#app-title {
-	display : inline-block;
-	color : #000;
-	font-size : 19px;
-	float : left;
-	line-height : 1.1;
-	margin-left : 400px;
-	margin-top : 22px;
-	
+.banner {
+	width:700px;
+	height: 60px;
+	background:url(../img/banner.png) 0 0px no-repeat;
+	cursor: pointer;
 }
 
 /* does not render on the interface; often used for web-accessibility  */
@@ -129,12 +24,91 @@
     width: 1px;
 }
 
-#latlng {
-	top : 70px;
+
+.menu {
+	position:fixed;
+	height:60px; /* trips haslayout, wrap floats IE */
+	top: 0px;
+	list-style:none;
+    right: 0px;
+	font:bold 14px/40px sans-serif;
+    float: right;
+    
+    /* This is to minimise the craziness that occurs at small horizontal resolutions*/
+    background-color: #1368ad; 
+    white-space: nowrap;
 }
 
-#permalink {
-	top : 80px;
+.menu-item {
+	display:inline-block;
+	height: 60px;
+	margin-right: 14px;
+	padding: 10px 12px 0 12px;
+	cursor: pointer;
+}
+
+.menu-item.current,
+.menu-item:hover {
+	border-bottom-color: #ffffff;
+	border-bottom-width: 3px;
+	border-bottom-style: solid;
+}
+
+.menu-item a {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.login-text a {
+	color: #ffffff;
+	font-style: normal;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.login-widget {
+	color: #ddd;
+	font-style: italic;
+	margin: 0 20px 0 60px;
+}
+
+.dropdownicon {
+	display: inline-block;
+	width: 0; 
+    height: 0; 
+    margin: 0 0 1px 5px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #ddd;
+}
+
+.sub-menu {
+	display:none;
+    position:absolute;
+    background: #f9f9f9;
+    padding:2px 5px 2px 5px;
+    min-width: 190px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.sub-menu a {
+	display: block;
+    text-decoration: none;
+    font:bold 14px/40px sans-serif;
+    color: black;
+    padding: 12px 16px;
+}
+
+.sub-menu a:hover {
+	background-color: #f1f1f1
+}
+
+.login-widget:hover .sub-menu {
+	display:block;
+}
+
+#latlng, #permalinkicon, #permalink {
+    display: none;
 }
 
 #anvgl-footer {
