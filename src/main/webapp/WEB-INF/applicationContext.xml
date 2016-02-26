@@ -299,6 +299,7 @@
                 <value>vglsignature.hbm.xml</value>
                 <value>anvgluser.hbm.xml</value>
                 <value>anvglauthority.hbm.xml</value>
+                <value>scmentrysnapshot.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

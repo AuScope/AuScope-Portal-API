@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,9 @@ import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
+import org.auscope.portal.server.web.service.scm.Solution;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
@@ -76,7 +79,7 @@ public class TestJobBuilderController {
 
     private JobMailSender mockJobMailSender;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
-
+    private ScmEntryService mockScmEntryService;
 
     private JobBuilderController controller;
 
@@ -96,12 +99,12 @@ public class TestJobBuilderController {
 
         mockJobMailSender = context.mock(JobMailSender.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
-
+        mockScmEntryService = context.mock(ScmEntryService.class);
 
         vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader);
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
         //Object Under Test
-        controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices, vglJobStatusChangeHandler,vglPollingJobQueueManager);
+        controller = new JobBuilderController(mockJobManager, mockFileStagingService, mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices, vglJobStatusChangeHandler,vglPollingJobQueueManager, mockScmEntryService);
     }
 
     @After
@@ -607,6 +610,8 @@ public class TestJobBuilderController {
         final String storageAuthVersion = "1.2.3";
         final String regionName = null;
 
+        final Solution mockSolution = context.mock(Solution.class);
+
         jobObj.setComputeVmId(computeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
         jobObj.setStorageBaseKey("base/key");
@@ -614,6 +619,12 @@ public class TestJobBuilderController {
         jobObj.setStorageServiceId(storageServiceId);
 
         context.checking(new Expectations() {{
+            oneOf(mockScmEntryService).getJobSolution(jobObj);will(returnValue(mockSolution));
+            oneOf(mockSolution).getUri();will(returnValue("http://sssc.vhirl.org/solution1"));
+            oneOf(mockSolution).getDescription();will(returnValue("A Fake Solution"));
+            oneOf(mockSolution).getName();will(returnValue("FakeSol"));
+            oneOf(mockSolution).getCreatedAt();will(returnValue(new Date()));
+
             //We should have access control check to ensure user has permission to run the job
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
@@ -684,7 +695,11 @@ public class TestJobBuilderController {
         final VEGLJob jobObj = new VEGLJob(new Integer(13));
         final String computeServiceId = "ccsid";
         final String injectedComputeVmId = "injected-compute-vmi-id";
+        final File mockFile1 = context.mock(File.class, "MockFile1");
+        final File mockFile2 = context.mock(File.class, "MockFile2");
+        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        final OutputStream mockOutputStream = context.mock(OutputStream.class);
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
         final String errorDescription = "You do not have the permission to submit this job for processing.";
         final String storageServiceId = "cssid";
@@ -710,8 +725,19 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
             oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"a-different-role"}));
 
+            oneOf(mockFileStagingService).writeFile(jobObj, JobBuilderController.DOWNLOAD_SCRIPT);
+            will(returnValue(mockOutputStream));
+            allowing(mockOutputStream).close();
+
+            //We should have 1 call to get our stage in files
+            oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
+
+            //And one call to upload them (which we will mock as failing)
+            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));will(throwException(new PortalServiceException("")));
+
             //We should have 1 call to our job manager to create a job audit trail record
-            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, errorDescription);
+            //oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, errorDescription);
+            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "");
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString());
@@ -1313,6 +1339,8 @@ public class TestJobBuilderController {
 
             //We should have 1 call to our job manager to create a job audit trail record
             oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)), with(any(String.class)));
+
+            oneOf(mockCloudComputeServices[0]).getKeypair();
         }});
 
         ModelAndView mav = controller.updateOrCreateJob(null,  //The integer ID if not specified will trigger job creation
@@ -1371,6 +1399,7 @@ public class TestJobBuilderController {
         final String computeVmType = "compute-vm-type";
         final String newBaseKey = "base/key";
         final boolean emailNotification = true;
+        final String keypair = "vl-developers";
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1393,6 +1422,9 @@ public class TestJobBuilderController {
             oneOf(mockCloudStorageServices[0]).generateBaseKey(mockJob);will(returnValue(newBaseKey));
             //We should have 1 call to save our job
             oneOf(mockJobManager).saveJob(mockJob);
+
+            oneOf(mockCloudComputeServices[0]).getKeypair();will(returnValue(keypair));
+            oneOf(mockJob).setComputeInstanceKey(keypair);
         }});
 
         ModelAndView mav = controller.updateOrCreateJob(jobId,
@@ -1750,6 +1782,7 @@ public class TestJobBuilderController {
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getName();will(returnValue(name));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(id));
+            allowing(mockScmEntryService).getJobProviders(null);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.getComputeServices();

@@ -71,10 +71,29 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                             failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
                             success : function(frm, action) {
                                 var responseObj = Ext.JSON.decode(action.response.responseText);
-
                                 if (responseObj.success) {
-                                    //Loads the image store of user selected compute provider
-                                    frm.setValues(responseObj.data[0]);
+                                    //Loads the image store of user selected
+                                    //compute provider
+                                    var jobData = responseObj.data[0];
+
+                                    if (!Ext.isEmpty(jobData.computeServiceId)) {
+                                    }
+
+                                    // Store the vm type if specified
+                                    // in the job, and solutionId, for later use.
+                                    jobObjectFrm.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
+                                    jobObjectFrm.wizardState.solutionId = jobData.solutionId;
+
+                                    // Set form values from the jobData, but
+                                    // override {compute,storage}ServiceId since
+                                    // they are now constant values (see
+                                    // ANVGL-35)
+                                    frm.setValues(jobData);
+                                    frm.setValues({
+                                        computeServiceId: 'aws-ec2-compute',
+                                        storageServiceId: 'amazon-aws-storage-sydney'
+                                    });
+
                                     jobObjectFrm.wizardState.jobId = frm.getValues().id;
                                 }
                             }
