@@ -11,6 +11,7 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,15 +62,15 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, new ANVGLUser());will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobPendingFiles));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob), null, null);will(returnValue(jobPendingFiles));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob);
+        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
         Assert.assertEquals(JobBuilderController.STATUS_PENDING, status);
     }
 
@@ -91,15 +92,15 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, new ANVGLUser());will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobActiveFiles));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob), null, null);will(returnValue(jobActiveFiles));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob);
+        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
         Assert.assertEquals(JobBuilderController.STATUS_ACTIVE, status);
     }
 
@@ -121,15 +122,15 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, new ANVGLUser());will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobDoneFiles));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob), null, null);will(returnValue(jobDoneFiles));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob);
+        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
         Assert.assertEquals(JobBuilderController.STATUS_DONE, status);
     }
 
@@ -144,12 +145,12 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
             oneOf(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob);
+        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
         Assert.assertEquals(job123Status, status);
     }
 
@@ -163,11 +164,11 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
+            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(null));
             oneOf(mockJob).getId();will(returnValue(jobId));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob);
+        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
         Assert.assertNull(status);
     }
 
@@ -182,13 +183,13 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
             allowing(mockJob).getStorageServiceId();will(returnValue("does-not-exist"));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob);
+        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
         Assert.assertEquals(job123Status, status);
     }
 
@@ -204,14 +205,14 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("error")));
+            allowing(mockCloudStorageServices[0]).listJobFiles(mockJob, null, null);will(throwException(new PortalServiceException("error")));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob);
+        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
         Assert.assertEquals(job123Status, status);
     }
 
@@ -228,7 +229,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE);will(returnValue(logContents));
+            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE, null, null);will(returnValue(logContents));
         }});
 
         ModelMap map = jobStatLogReader.getSectionedLogs(mockJob);
@@ -276,7 +277,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE);will(throwException(new PortalServiceException("error")));
+            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE, null, null);will(throwException(new PortalServiceException("error")));
             oneOf(mockCloudComputeServices[0]).getConsoleLog(mockJob);will(returnValue(null));
         }});
 
@@ -298,7 +299,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE);will(throwException(new PortalServiceException("error")));
+            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE, null, null);will(throwException(new PortalServiceException("error")));
             oneOf(mockCloudComputeServices[0]).getConsoleLog(mockJob);will(throwException(new PortalServiceException("error")));
         }});
 
@@ -321,7 +322,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE);will(throwException(new PortalServiceException("error")));
+            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE, null, null);will(throwException(new PortalServiceException("error")));
             oneOf(mockCloudComputeServices[0]).getConsoleLog(mockJob);will(returnValue(logContents));
         }});
 
@@ -341,7 +342,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE);will(returnValue(logContents));
+            allowing(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE, null, null);will(returnValue(logContents));
         }});
 
         String result = jobStatLogReader.getSectionedLog(mockJob, "environment");
@@ -363,7 +364,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE);will(throwException(new PortalServiceException("error")));
+            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VGL_LOG_FILE, null, null);will(throwException(new PortalServiceException("error")));
             oneOf(mockCloudComputeServices[0]).getConsoleLog(mockJob);will(returnValue(null));
         }});
 

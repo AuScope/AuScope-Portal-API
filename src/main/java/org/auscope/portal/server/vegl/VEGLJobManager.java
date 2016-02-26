@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.server.web.security.ANVGLUser;
 
 /**
  * Class that talks to the data objects to retrieve or save data
@@ -38,9 +39,13 @@ public class VEGLJobManager {
         return veglJobDao.getInQueueJobs();
     }
 
-    public VEGLJob getJobById(int jobId) {
-        return veglJobDao.get(jobId);
+    public VEGLJob getJobById(int jobId, ANVGLUser user) {
+        return veglJobDao.get(jobId, user);
     }
+
+	public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role) {
+        return veglJobDao.get(jobId, stsArn, clientSecret, s3Role);
+	}
 
     public void deleteJob(VEGLJob job) {
         veglJobDao.deleteJob(job);
@@ -139,4 +144,5 @@ public class VEGLJobManager {
     public void setVglSignatureDao(VGLSignatureDao vglSignatureDao) {
         this.vglSignatureDao = vglSignatureDao;
     }
+
 }

@@ -4,9 +4,12 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.ANVGLUserDao;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -30,8 +33,17 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
 
     private VEGLJobManager jobManager;
     private JobStatusMonitor jobStatusMonitor;
+    private ANVGLUserDao jobUserDao;
+    
+    public ANVGLUserDao getJobUserDao() {
+		return jobUserDao;
+	}
 
-    /**
+	public void setJobUserDao(ANVGLUserDao jobUserDao) {
+		this.jobUserDao = jobUserDao;
+	}
+
+	/**
      * Sets the job manager to be used for querying
      * pending or active jobs from VL DB.
      * @param jobManager
@@ -52,7 +64,11 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext ctx)
             throws JobExecutionException {
         List<VEGLJob> jobs = jobManager.getPendingOrActiveJobs();
-
+        for (VEGLJob veglJob : jobs) {
+			ANVGLUser user = jobUserDao.getById(veglJob.getUser());
+			veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+			veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+		}
         try {
             jobStatusMonitor.statusUpdate(jobs);
         } catch (Exception ex) {

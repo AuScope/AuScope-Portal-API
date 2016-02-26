@@ -50,7 +50,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         String logContents = null;
         InputStream is = null;
         try {
-            is = cloudStorageService.getJobFile(job, JobListController.VGL_LOG_FILE);
+            is = cloudStorageService.getJobFile(job, JobListController.VGL_LOG_FILE, null, null);
             logContents = IOUtils.toString(is);
         } catch (Exception ex) {
             log.debug(String.format("The job %1$s hasn't uploaded any logs yet.", job.getId()));
@@ -131,10 +131,10 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      * Using the services internal to the class, determine the current status of this job. Service failure
      * will return the underlying job status
      */
-    public String getJobStatus(CloudJob cloudJob) {
+    public String getJobStatus(CloudJob cloudJob, String stsArn, String clientSecret, String s3Role) {
         //The service hangs onto the underlying job Object but the DB is the point of truth
         //Make sure we get an updated job object first!
-        VEGLJob job = jobManager.getJobById(cloudJob.getId());
+        VEGLJob job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role);
         if (job == null) {
             return null;
         }
@@ -155,7 +155,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         }
         CloudFileInformation[] results = null;
         try {
-            results = cloudStorageService.listJobFiles(job);
+            results = cloudStorageService.listJobFiles(job, stsArn, clientSecret);
         } catch (Exception e) {
             return job.getStatus();
         }

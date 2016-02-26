@@ -84,6 +84,7 @@
             <map>
                 <entry key="jobManager" value-ref="veglJobManager"/>
                 <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
+                <entry key="jobUserDao" value-ref="anvglUserDao"/>
             </map>
         </property>
     </bean>
@@ -197,8 +198,8 @@
     <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageService">
         <constructor-arg name="provider" value="aws-s3"/>
         <constructor-arg name="endpoint"><null/></constructor-arg>
-        <constructor-arg name="accessKey"><null/></constructor-arg>
-        <constructor-arg name="secretKey"><null/></constructor-arg>
+        <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.aws.secretkey}"/>
         <constructor-arg name="regionName" value="ap-southeast-2"/>
         <constructor-arg name="relaxHostName" value="false"/>
         <constructor-arg name="stripExpectHeader" value="true"/>
@@ -209,13 +210,11 @@
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
 
-    <bean id="cloudComputeService-aws" class="org.auscope.portal.core.services.cloud.CloudComputeService">
-        <constructor-arg name="provider" value="AWSEc2"/>
+    <bean id="cloudComputeService-aws" class="org.auscope.portal.core.services.cloud.CloudComputeServiceAws">
         <constructor-arg name="endpoint"><null/></constructor-arg>
         <constructor-arg name="apiVersion"><null/></constructor-arg>
-        <constructor-arg name="accessKey"><null/></constructor-arg>
-        <constructor-arg name="secretKey"><null/></constructor-arg>
-        <constructor-arg name="httpServiceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.aws.secretkey}"/>
         
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>

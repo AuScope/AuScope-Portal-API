@@ -7,6 +7,7 @@ import org.junit.Assert;
 
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.junit.Before;
 import org.junit.Test;
 import org.jmock.Expectations;
@@ -88,12 +89,12 @@ public class TestVEGLJobManager extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobDao).get(jobId1);will(returnValue(mockJob));
-            oneOf(mockJobDao).get(jobId2);will(returnValue(null));
+            oneOf(mockJobDao).get(jobId1, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobDao).get(jobId2, new ANVGLUser());will(returnValue(null));
         }});
         
-        Assert.assertNotNull(jobManager.getJobById(jobId1));
-        Assert.assertNull(jobManager.getJobById(jobId2));
+        Assert.assertNotNull(jobManager.getJobById(jobId1, new ANVGLUser()));
+        Assert.assertNull(jobManager.getJobById(jobId2, new ANVGLUser()));
     }
     
     /**
