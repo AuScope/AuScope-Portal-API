@@ -678,7 +678,6 @@ public class JobBuilderController extends BaseCloudController {
 
                 // we need to keep track of old job for audit trail purposes
                 oldJobStatus = curJob.getStatus();
-
                 // Assume user has permission since we're using images from the SSC
                 boolean permissionGranted = true;
 
@@ -925,14 +924,17 @@ public class JobBuilderController extends BaseCloudController {
 
             // Filter list to images suitable for job solution, if specified
             if (jobId != null) {
-                Set<String> vmIds = scmEntryService
-                    .getJobImages(jobId)
-                    .get(computeServiceId);
+                // Get images available to the current user
+                images = getImagesForJobAndUser(request, computeServiceId);
+                /*
+                Set<String> vmIds = scmEntryService.getJobImages(jobId).get(computeServiceId);
+                // Set<String> vmIds = scmEntryService.getJobImages(jobId).get(computeServiceId);
                 if (vmIds != null) {
                     for (String vmId: vmIds) {
                         images.add(new MachineImage(vmId));
                     }
                 }
+                */
             }
             else {
                 // Fall back on old behaviour based on configured images for now
@@ -1024,6 +1026,7 @@ public class JobBuilderController extends BaseCloudController {
     public ModelAndView getComputeServices(@RequestParam(value="jobId",
                                                          required=false)
                                            Integer jobId) {
+        
         Set<String> jobCCSIds = scmEntryService.getJobProviders(jobId);
 
         List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();
