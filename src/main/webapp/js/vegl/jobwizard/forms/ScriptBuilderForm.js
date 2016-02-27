@@ -112,13 +112,20 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
     beginValidation : function(callback) {
         // read the script from the interface
         var sourceText = this.scriptBuilderFrm.getScript();
+        var solutionId = this.scriptBuilderFrm.getSolutionId();
         
         // replace tab with 4 spaces whenever it occurs in the sourceText
         sourceText = sourceText.replace(/\t/g,"\u0020\u0020\u0020\u0020");
         
         try {
+            
             Ext.Ajax.request({
                 url: 'secure/saveScript.do',
+                params: {
+                    'sourceText': sourceText,
+                    'jobId': this.wizardState.jobId,
+                    'solutionId': solutionId
+                },
                 success: function(response, opts) {
                     responseObj = Ext.JSON.decode(response.responseText);
                     if (responseObj.success) {
@@ -136,11 +143,6 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
                     Ext.Msg.alert('Error', 'Error storing script file! Please try again in a few minutes');
                     // do not proceed to the next interface on the work-flow
                     callback(false);
-                },
-                params: {
-                    'sourceText': sourceText,
-                    'jobId': this.wizardState.jobId,
-                    'solutionId': this.scriptBuilderFrm.getSolutionId()
                 }
             });    
         } catch (exception) {
