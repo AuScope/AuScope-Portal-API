@@ -5,8 +5,10 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 
 import org.apache.commons.io.IOUtils;
+import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -116,17 +118,22 @@ public abstract class BaseCloudController extends BasePortalController {
         String bootstrapTemplate = getBootstrapTemplate();
         CloudStorageService cloudStorageService = getStorageService(job);
 
-        Object[] arguments = new Object[] {
-            cloudStorageService.getBucket(), //STORAGE_BUCKET
-            job.getStorageBaseKey().replace("//", "/"), //STORAGE_BASE_KEY_PATH
-            cloudStorageService.getAccessKey(), //STORAGE_ACCESS_KEY
-            cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
-            hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
-            cloudStorageService.getEndpoint(), //STORAGE_ENDPOINT
-            cloudStorageService.getProvider(), //STORAGE_TYPE
-            cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion(), //STORAGE_AUTH_VERSION
-            cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName() //OS_REGION_NAME
-        };
+        Object[] arguments;
+		try {
+			arguments = new Object[] {
+			    cloudStorageService.getBucket(job.getProperty(CloudJob.PROPERTY_CLIENT_SECRET)), //STORAGE_BUCKET
+			    job.getStorageBaseKey().replace("//", "/"), //STORAGE_BASE_KEY_PATH
+			    cloudStorageService.getAccessKey(), //STORAGE_ACCESS_KEY
+			    cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
+			    hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
+			    cloudStorageService.getEndpoint(), //STORAGE_ENDPOINT
+			    cloudStorageService.getProvider(), //STORAGE_TYPE
+			    cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion(), //STORAGE_AUTH_VERSION
+			    cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName() //OS_REGION_NAME
+			};
+		} catch (PortalServiceException e) {
+			throw new IOException(e);
+		}
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);
         return result;

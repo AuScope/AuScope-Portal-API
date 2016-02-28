@@ -205,7 +205,7 @@
         <constructor-arg name="stripExpectHeader" value="true"/>
         <property name="name" value="Amazon Web Services - S3"/>
         <property name="id" value="amazon-aws-storage-sydney"/>
-        <property name="bucket" value="anvgl-csiro"/>
+        <property name="bucket" value="anvgl-csiro-"/>
     </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>

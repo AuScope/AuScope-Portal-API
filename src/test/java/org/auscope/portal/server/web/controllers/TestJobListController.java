@@ -109,7 +109,7 @@ public class TestJobListController extends PortalTestClass {
     }
 
     @Test
-    public void testInitizeQueueNDelete() throws InterruptedException{
+    public void testInitizeQueueNDelete() throws InterruptedException, PortalServiceException{
 
 
         final String storageBucket = "storage-bucket";
@@ -142,7 +142,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(queueMockJobs.get(1)).getStorageBaseKey();will(returnValue(""));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue(storageBucket));
+            allowing(mockCloudStorageServices[0]).getBucket("foo");will(returnValue(storageBucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));

@@ -190,7 +190,7 @@ public class TestGeonetworkController {
 
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageServices[0]).listJobFiles(mockJob, null, null);will(returnValue(outputFileInfo));
-            allowing(cloudStorageServices[0]).getBucket();will(returnValue("s3-output-bucket"));
+            allowing(cloudStorageServices[0]).getBucket("foo");will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
@@ -393,7 +393,7 @@ public class TestGeonetworkController {
 
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageServices[0]).listJobFiles(mockJob, null, null);will(returnValue(outputFileInfo));
-            allowing(cloudStorageServices[0]).getBucket();will(returnValue("s3-output-bucket"));
+            allowing(cloudStorageServices[0]).getBucket("foo");will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));

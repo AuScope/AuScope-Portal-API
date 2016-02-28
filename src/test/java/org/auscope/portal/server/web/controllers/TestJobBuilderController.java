@@ -636,7 +636,7 @@ public class TestJobBuilderController {
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue(storageBucket));
+            allowing(mockCloudStorageServices[0]).getBucket("foo");will(returnValue(storageBucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
@@ -845,7 +845,7 @@ public class TestJobBuilderController {
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue(storageBucket));
+            allowing(mockCloudStorageServices[0]).getBucket("foo");will(returnValue(storageBucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
@@ -947,7 +947,7 @@ public class TestJobBuilderController {
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue(storageBucket));
+            allowing(mockCloudStorageServices[0]).getBucket("foo");will(returnValue(storageBucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
@@ -1133,7 +1133,7 @@ public class TestJobBuilderController {
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
             atLeast(1).of(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            atLeast(1).of(mockCloudStorageServices[0]).getBucket();will(returnValue(bucket));
+            atLeast(1).of(mockCloudStorageServices[0]).getBucket("foo");will(returnValue(bucket));
             atLeast(1).of(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
             atLeast(1).of(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
             atLeast(1).of(mockCloudStorageServices[0]).getProvider();will(returnValue(provider));
@@ -1187,7 +1187,7 @@ public class TestJobBuilderController {
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue(bucket));
+            allowing(mockCloudStorageServices[0]).getBucket("foo");will(returnValue(bucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(provider));
