@@ -65,7 +65,7 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
             throws JobExecutionException {
         List<VEGLJob> jobs = jobManager.getPendingOrActiveJobs();
         for (VEGLJob veglJob : jobs) {
-			ANVGLUser user = jobUserDao.getById(veglJob.getUser());
+			ANVGLUser user = jobUserDao.getByEmail(veglJob.getEmailAddress());
 			veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
 			veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
 		}
