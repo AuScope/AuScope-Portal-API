@@ -39,16 +39,9 @@ public class ANVGLProvenanceService {
     /** Document type for output. */
     private static final String TURTLE_FORMAT = "TTL";
 
-    public String getPromsUrl() {
-        return promsUrl;
-    }
-
-    public void setPromsUrl(String promsUrl) {
-        this.promsUrl = promsUrl;
-    }
-
     /* Can be changed in application context */
-    private String promsUrl = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com";
+    private final String promsUrl = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
+    private final String reportingSystemUrl = "http://anvgl.org.au/rs";
     private URI PROMSService = null;
 
     /** URL of the current webserver. Will need to be set by classes
@@ -246,17 +239,35 @@ public class ANVGLProvenanceService {
     }
 
     public void generateAndSaveReport(Activity activity, URI PROMSURI, VEGLJob job) {
-        Report report = new ExternalReport().setActivity(activity);
-        ((ExternalReport)report).setGeneratedAtTime(new Date());
-        ProvenanceReporter reporter = new ProvenanceReporter();
-        int resp = reporter.postReport(PROMSURI, report);
-        this.uploadModel(report.getGraph(), job);
-
-        StringWriter stringWriter = new StringWriter();
-        report.getGraph().write(new PrintWriter(stringWriter) , "TURTLE");
-        String reportString = stringWriter.toString();
-        LOGGER.info(reportString);
-        LOGGER.info(resp);
+    	String server = ANVGLServerURL.INSTANCE.get();
+    	try {
+    		URI serverURL = null;
+            try {
+                serverURL = new URI(server);
+            } catch (URISyntaxException e) {
+                LOGGER.error(String.format(
+                        "Error parsing system url %s into URIs.",
+                        server), e);
+            }
+	        Report report = new ExternalReport()
+	        		.setActivity(activity)
+	        		.setTitle(job.getName())
+	        		.setGeneratedAtTime(new Date())
+	        		.setNativeId(Integer.toString(job.getId()))
+	        		.setReportingSystemUri(new URI(reportingSystemUrl));
+	        ProvenanceReporter reporter = new ProvenanceReporter();
+	        int resp = reporter.postReport(PROMSURI, report);
+	        this.uploadModel(report.getGraph(), job);
+	
+	        StringWriter stringWriter = new StringWriter();
+	        report.getGraph().write(new PrintWriter(stringWriter) , "TURTLE");
+	        String reportString = stringWriter.toString();
+	        LOGGER.info(reportString);
+	        LOGGER.info(resp);
+    	} catch(Exception e) {
+    		LOGGER.error(e.getMessage());
+    		e.printStackTrace();
+    	}
     }
 
     /**

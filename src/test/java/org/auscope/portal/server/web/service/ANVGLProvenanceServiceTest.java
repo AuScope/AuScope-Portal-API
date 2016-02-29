@@ -209,18 +209,20 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             outputURL = serverURL + "/secure/jobFile.do?jobId=21&key=job-macgo-bt-everbloom_gmail_com-0000000021/20_yrRP_hazard_map.png";
             usedEntities.add(new Entity().setDataUri(new URI(outputURL)).setWasAttributedTo(mockProfileUrl).setTitle("20_yrRP_hazard_map.png"));
             activity.setUsedEntities(usedEntities);
-            ExternalReport report = new ExternalReport()
+            final ExternalReport report = new ExternalReport()
                     .setActivity(activity)
                     .setTitle(jobName)
                     .setNativeId(Integer.toString(jobID))
                     .setReportingSystemUri(new URI(serverURL))
                     .setGeneratedAtTime(new Date());            
-            URI pURI = new URI(PROMSURI);
-            ProvenanceReporter reporter = context.mock(ProvenanceReporter.class);
+            final URI pURI = new URI(PROMSURI);
+            /*
+            final ProvenanceReporter reporter = context.mock(ProvenanceReporter.class);
             context.checking(new Expectations() {{
             	oneOf(reporter).postReport(pURI, report); will(returnValue(200));
             }});
-            
+            */
+            ProvenanceReporter reporter = new ProvenanceReporter();
             int resp = reporter.postReport(new URI(PROMSURI), report);
             Assert.assertTrue((resp == 200 || resp == 201));
         }
