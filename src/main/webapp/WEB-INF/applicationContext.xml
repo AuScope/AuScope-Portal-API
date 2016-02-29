@@ -219,7 +219,7 @@
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
         <property name="keypair" value="developers-anvgl-aws"/>
-        <property name="zone" value="ap-southeast-2"/>
+        <property name="endpoint" value="ec2.ap-southeast-2.amazonaws.com"/>
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">

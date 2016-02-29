@@ -121,7 +121,7 @@ public abstract class BaseCloudController extends BasePortalController {
         Object[] arguments;
 		try {
 			arguments = new Object[] {
-			    cloudStorageService.getBucket(job.getProperty(CloudJob.PROPERTY_CLIENT_SECRET)), //STORAGE_BUCKET
+			    cloudStorageService.getBucket(job.getProperty(CloudJob.PROPERTY_STS_ARN)), //STORAGE_BUCKET
 			    job.getStorageBaseKey().replace("//", "/"), //STORAGE_BASE_KEY_PATH
 			    cloudStorageService.getAccessKey(), //STORAGE_ACCESS_KEY
 			    cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
