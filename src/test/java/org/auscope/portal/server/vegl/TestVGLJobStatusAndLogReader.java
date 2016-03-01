@@ -70,7 +70,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob), null, null);will(returnValue(jobPendingFiles));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
+        String status = jobStatLogReader.getJobStatus(mockJob);
         Assert.assertEquals(JobBuilderController.STATUS_PENDING, status);
     }
 
@@ -100,7 +100,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob), null, null);will(returnValue(jobActiveFiles));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
+        String status = jobStatLogReader.getJobStatus(mockJob);
         Assert.assertEquals(JobBuilderController.STATUS_ACTIVE, status);
     }
 
@@ -130,7 +130,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob), null, null);will(returnValue(jobDoneFiles));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
+        String status = jobStatLogReader.getJobStatus(mockJob);
         Assert.assertEquals(JobBuilderController.STATUS_DONE, status);
     }
 
@@ -150,7 +150,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getStatus();will(returnValue(job123Status));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
+        String status = jobStatLogReader.getJobStatus(mockJob);
         Assert.assertEquals(job123Status, status);
     }
 
@@ -168,7 +168,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             oneOf(mockJob).getId();will(returnValue(jobId));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
+        String status = jobStatLogReader.getJobStatus(mockJob);
         Assert.assertNull(status);
     }
 
@@ -189,7 +189,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getStorageServiceId();will(returnValue("does-not-exist"));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
+        String status = jobStatLogReader.getJobStatus(mockJob);
         Assert.assertEquals(job123Status, status);
     }
 
@@ -212,7 +212,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockCloudStorageServices[0]).listJobFiles(mockJob, null, null);will(throwException(new PortalServiceException("error")));
         }});
 
-        String status = jobStatLogReader.getJobStatus(mockJob, null, null, null);
+        String status = jobStatLogReader.getJobStatus(mockJob);
         Assert.assertEquals(job123Status, status);
     }
 
