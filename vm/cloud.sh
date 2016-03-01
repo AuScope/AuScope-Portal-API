@@ -41,8 +41,12 @@ fi
 #wrapper for aws upload
 if [[ "$STORAGE_TYPE" == aws* ]]
 then
-        export AWS_ACCESS_KEY_ID=$STORAGE_ACCESS_KEY
-        export AWS_SECRET_ACCESS_KEY=$STORAGE_SECRET_KEY
+		if [[ $STORAGE_ACCESS_KEY != "" ]]
+		then
+	        export AWS_ACCESS_KEY_ID=$STORAGE_ACCESS_KEY
+    	    export AWS_SECRET_ACCESS_KEY=$STORAGE_SECRET_KEY
+    	fi
+    	
         export AWS_DEFAULT_REGION=$OS_REGION_NAME
 
         if [[ "$1" == "list" ]]
