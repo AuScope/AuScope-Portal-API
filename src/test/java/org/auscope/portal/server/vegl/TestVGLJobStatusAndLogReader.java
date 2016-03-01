@@ -67,7 +67,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob), null, null);will(returnValue(jobPendingFiles));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobPendingFiles));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -97,7 +97,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob), null, null);will(returnValue(jobActiveFiles));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobActiveFiles));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -127,7 +127,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob), null, null);will(returnValue(jobDoneFiles));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobDoneFiles));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -209,7 +209,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).listJobFiles(mockJob, null, null);will(throwException(new PortalServiceException("error")));
+            allowing(mockCloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("error")));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);

@@ -68,13 +68,13 @@ public class GeonetworkController extends BaseCloudController {
      * @throws MalformedURLException
      * @throws CloudStorageException
      */
-    private CSWRecord jobToCSWRecord(HttpServletRequest request, VEGLJob job, VEGLSeries series, String stsArn, String clientSecret) throws Exception {
+    private CSWRecord jobToCSWRecord(HttpServletRequest request, VEGLJob job, VEGLSeries series) throws Exception {
         CloudStorageService cloudStorageService = getStorageService(job);
         if (cloudStorageService == null) {
             throw new Exception(String.format("storage service with ID %1$s DNE", job.getStorageServiceId()));
         }
 
-        CloudFileInformation[] outputFiles =  cloudStorageService.listJobFiles(job, stsArn, clientSecret);
+        CloudFileInformation[] outputFiles =  cloudStorageService.listJobFiles(job);
         List<CSWOnlineResourceImpl> onlineResources = new ArrayList<CSWOnlineResourceImpl>();
 
         //Add any output files to our online resources tab
@@ -257,7 +257,7 @@ public class GeonetworkController extends BaseCloudController {
             jobManager.saveSignature(userSignature);
 
             //Create an instance of our CSWRecord and transform it to a <gmd:MD_Metadata> record
-            CSWRecord record = jobToCSWRecord(request, job, jobSeries, user.getArnExecution(), user.getAwsSecret());
+            CSWRecord record = jobToCSWRecord(request, job, jobSeries);
 
             //Lets connect to geonetwork and then send our new record
             String metadataRecordUrl = gnService.makeCSWRecordInsertion(record);

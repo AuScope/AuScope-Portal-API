@@ -474,7 +474,7 @@ public class JobListController extends BaseCloudController  {
                 logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud files cannot be listed", job.getStorageServiceId(), job.getId()));
                 return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
             } else {
-                fileDetails = cloudStorageService.listJobFiles(job, user.getArnExecution(), user.getAwsSecret());
+                fileDetails = cloudStorageService.listJobFiles(job);
                 logger.info(fileDetails.length + " job files located");
             }
         } catch (Exception e) {
@@ -845,7 +845,7 @@ public class JobListController extends BaseCloudController  {
             //Lets setup a staging area for the input files
             fileStagingService.generateStageInDirectory(newJob);
             //Write every file to the local staging area
-            CloudFileInformation[] cloudFiles = cloudStorageService.listJobFiles(oldJob, user.getArnExecution(), user.getAwsSecret());
+            CloudFileInformation[] cloudFiles = cloudStorageService.listJobFiles(oldJob);
             for (CloudFileInformation cloudFile : cloudFiles) {
                 if (cloudFileIncluded(files, cloudFile)) {
                     InputStream is = cloudStorageService.getJobFile(oldJob, cloudFile.getName(), user.getArnExecution(), user.getAwsSecret());

@@ -94,11 +94,11 @@ public class VEGLJobDao extends HibernateDaoSupport {
         getHibernateTemplate().saveOrUpdate(job);
     }
 
-	public VEGLJob get(int id, String stsArn, String clientSecret, String s3Role) {
+    public VEGLJob get(int id, String stsArn, String clientSecret, String s3Role) {
         VEGLJob job = (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
         job.setProperty(CloudJob.PROPERTY_STS_ARN, stsArn);
         job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, clientSecret);
         job.setProperty(CloudJob.PROPERTY_S3_ROLE, s3Role);
         return job;
-	}
+    }
 }

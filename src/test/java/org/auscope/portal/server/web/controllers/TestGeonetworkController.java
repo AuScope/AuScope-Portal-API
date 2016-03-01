@@ -189,7 +189,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).saveSignature(userSignature);
 
             //Only 1 call to the job storage service for files
-            oneOf(cloudStorageServices[0]).listJobFiles(mockJob, null, null);will(returnValue(outputFileInfo));
+            oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(outputFileInfo));
             allowing(cloudStorageServices[0]).getBucket("foo");will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
@@ -325,7 +325,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).saveSignature(userSignature);
 
             //Only 1 call to the job storage service for files
-            oneOf(cloudStorageServices[0]).listJobFiles(mockJob, null, null);will(throwException(new PortalServiceException("")));
+            oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
         }});
 
         ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
@@ -392,7 +392,7 @@ public class TestGeonetworkController {
             oneOf(mockJobManager).saveSignature(userSignature);
 
             //Only 1 call to the job storage service for files
-            oneOf(cloudStorageServices[0]).listJobFiles(mockJob, null, null);will(returnValue(outputFileInfo));
+            oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(outputFileInfo));
             allowing(cloudStorageServices[0]).getBucket("foo");will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork

@@ -36,12 +36,12 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     private ANVGLUserDao jobUserDao;
     
     public ANVGLUserDao getJobUserDao() {
-		return jobUserDao;
-	}
+        return jobUserDao;
+    }
 
-	public void setJobUserDao(ANVGLUserDao jobUserDao) {
-		this.jobUserDao = jobUserDao;
-	}
+    public void setJobUserDao(ANVGLUserDao jobUserDao) {
+        this.jobUserDao = jobUserDao;
+    }
 
 	/**
      * Sets the job manager to be used for querying
@@ -65,10 +65,10 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
             throws JobExecutionException {
         List<VEGLJob> jobs = jobManager.getPendingOrActiveJobs();
         for (VEGLJob veglJob : jobs) {
-			ANVGLUser user = jobUserDao.getByEmail(veglJob.getEmailAddress());
-			veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
-			veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
-		}
+            ANVGLUser user = jobUserDao.getByEmail(veglJob.getEmailAddress());
+            veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+            veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+        }
         try {
             jobStatusMonitor.statusUpdate(jobs);
         } catch (Exception ex) {

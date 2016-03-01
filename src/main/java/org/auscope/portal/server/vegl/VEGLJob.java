@@ -20,12 +20,11 @@ import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 public class VEGLJob extends CloudJob implements Cloneable {
     private static final long serialVersionUID = -57851899164623641L;
     @SuppressWarnings("unused")
-	private final Log logger = LogFactory.getLog(this.getClass());
+    private final Log logger = LogFactory.getLog(this.getClass());
     private String registeredUrl;
     private Integer seriesId;
     private boolean emailNotification;
     private String processTimeLog;
-
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();

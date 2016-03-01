@@ -135,11 +135,11 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      * will return the underlying job status
      */
     public String getJobStatus(CloudJob cloudJob) {
-    	
-    	String stsArn= cloudJob.getProperty(CloudJob.PROPERTY_STS_ARN);
-    	String clientSecret= cloudJob.getProperty(CloudJob.PROPERTY_CLIENT_SECRET);
-    	String s3Role = cloudJob.getProperty(CloudJob.PROPERTY_S3_ROLE);
-    	
+
+        String stsArn = cloudJob.getProperty(CloudJob.PROPERTY_STS_ARN);
+        String clientSecret = cloudJob.getProperty(CloudJob.PROPERTY_CLIENT_SECRET);
+        String s3Role = cloudJob.getProperty(CloudJob.PROPERTY_S3_ROLE);
+
         //The service hangs onto the underlying job Object but the DB is the point of truth
         //Make sure we get an updated job object first!
         VEGLJob job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role);
@@ -163,7 +163,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         }
         CloudFileInformation[] results = null;
         try {
-            results = cloudStorageService.listJobFiles(job, stsArn, clientSecret);
+            results = cloudStorageService.listJobFiles(job);
         } catch (Exception e) {
             return job.getStatus();
         }

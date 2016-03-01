@@ -43,9 +43,9 @@ public class VEGLJobManager {
         return veglJobDao.get(jobId, user);
     }
 
-	public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role) {
+    public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role) {
         return veglJobDao.get(jobId, stsArn, clientSecret, s3Role);
-	}
+    }
 
     public void deleteJob(VEGLJob job) {
         veglJobDao.deleteJob(job);

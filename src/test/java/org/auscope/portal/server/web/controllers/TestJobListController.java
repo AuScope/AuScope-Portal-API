@@ -644,7 +644,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
 
-            oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob, null, null);will(returnValue(fileDetails));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(fileDetails));
         }});
 
         ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
@@ -711,7 +711,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
 
-            oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob, null, null);will(throwException(new PortalServiceException("")));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
         }});
 
         ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
@@ -1196,7 +1196,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockFileStagingService).writeFile(with(aNonMatchingVeglJob(jobId)), with(cloudFiles[1].getName()));will(returnValue(bos2));
 
             oneOf(mockCloudStorageServices[0]).generateBaseKey(with(aNonMatchingVeglJob(jobId)));will(returnValue(baseKey));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(aVeglJob(jobId)), null, null);will(returnValue(cloudFiles));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(aVeglJob(jobId)));will(returnValue(cloudFiles));
             oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[0].getName()), null, null);will(returnValue(is1));
             oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[1].getName()), null, null);will(returnValue(is2));
 
