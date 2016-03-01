@@ -22,12 +22,19 @@ public class VEGLJobDao extends HibernateDaoSupport {
      * It excludes jobs that are deleted.
      *
      * @param seriesID the ID of the series
+     * @param user 
      */
     @SuppressWarnings("unchecked")
-    public List<VEGLJob> getJobsOfSeries(final int seriesID) {
-        return (List<VEGLJob>) getHibernateTemplate()
+    public List<VEGLJob> getJobsOfSeries(final int seriesID, ANVGLUser user) {
+        List<VEGLJob> res = (List<VEGLJob>) getHibernateTemplate()
             .findByNamedParam("from VEGLJob j where j.seriesId=:searchID and lower(j.status)!='deleted'",
                     "searchID", seriesID);
+        for (VEGLJob job : res) {
+            job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+            job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+            job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage()); 
+        }
+        return res;
     }
 
     /**

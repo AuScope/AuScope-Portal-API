@@ -24,7 +24,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
@@ -245,7 +244,7 @@ public class JobListController extends BaseCloudController  {
         jobManager.createJobAuditTrail(oldJobStatus, job, "Job deleted.");
         // Failure here is NOT fatal - it will just result in some
         // residual files in staging directory and S3 cloud storage.
-        cleanupDeletedJob(job, user.getArnExecution(), user.getAwsSecret());
+        cleanupDeletedJob(job);
 
         return generateJSONResponseMAV (true, null, "");
     }
@@ -270,7 +269,7 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "Unable to lookup series.");
         }
 
-        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue());
+        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
         if (jobs == null) {
             logger.warn(String.format("Unable to lookup jobs for series id '%1$s'", seriesId));
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs of series.");
@@ -285,7 +284,7 @@ public class JobListController extends BaseCloudController  {
             jobManager.createJobAuditTrail(oldJobStatus, job, "Job deleted.");
             // Failure here is NOT fatal - it will just result in some
             // residual files in staging directory and S3 cloud storage.
-            cleanupDeletedJob(job, user.getArnExecution(), user.getAwsSecret());
+            cleanupDeletedJob(job);
         }
 
         logger.info("Deleting series "+seriesId);
@@ -300,7 +299,7 @@ public class JobListController extends BaseCloudController  {
      * back to the calling method.
      * @param job the job to be deleted.
      */
-    private void cleanupDeletedJob(VEGLJob job, String stsArn, String clientSecret) {
+    private void cleanupDeletedJob(VEGLJob job) {
         try {
             // Remove files from staging directory
             fileStagingService.deleteStageInDirectory(job);
@@ -311,7 +310,7 @@ public class JobListController extends BaseCloudController  {
                 if (cloudStorageService == null) {
                     logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud files (if any) will not be removed", job.getStorageServiceId(), job.getId()));
                 } else {
-                    cloudStorageService.deleteJobFiles(job, stsArn, clientSecret);
+                    cloudStorageService.deleteJobFiles(job);
                 }
             }
         } catch (Exception ex) {
@@ -414,7 +413,7 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "Unable to lookup series.");
         }
 
-        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue());
+        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
         if (jobs == null) {
             logger.warn(String.format("Unable to lookup jobs for series id '%1$s'", seriesId));
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs of series.");
@@ -519,7 +518,7 @@ public class JobListController extends BaseCloudController  {
                 logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
                 return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
             }
-            is = cloudStorageService.getJobFile(job, key, user.getArnExecution(), user.getAwsSecret());
+            is = cloudStorageService.getJobFile(job, key);
         } catch (Exception ex) {
             logger.warn(String.format("Unable to access '%1$s' from the cloud", key), ex);
             return generateJSONResponseMAV(false, null, "Unable to access file from the cloud");
@@ -606,7 +605,7 @@ public class JobListController extends BaseCloudController  {
             ZipOutputStream zout = new ZipOutputStream(
                     response.getOutputStream());
             for (String fileKey : fileKeys) {
-                InputStream is = cloudStorageService.getJobFile(job, fileKey, user.getArnExecution(), user.getAwsSecret());
+                InputStream is = cloudStorageService.getJobFile(job, fileKey);
 
                 byte[] buffer = new byte[16384];
                 int count = 0;
@@ -752,17 +751,17 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
         }
 
-        List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue());
+        List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
         if (seriesJobs == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs for the specified series.");
         }
 
-        for (VEGLJob veglJob : seriesJobs) {
-        	veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
-        	veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
-        	veglJob.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
-		}
-        
+//        for (VEGLJob veglJob : seriesJobs) {
+//        	veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+//        	veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+//        	veglJob.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
+//		}
+//        
         if (forceStatusRefresh) {
             try {
                 jobStatusMonitor.statusUpdate(seriesJobs);
@@ -848,7 +847,7 @@ public class JobListController extends BaseCloudController  {
             CloudFileInformation[] cloudFiles = cloudStorageService.listJobFiles(oldJob);
             for (CloudFileInformation cloudFile : cloudFiles) {
                 if (cloudFileIncluded(files, cloudFile)) {
-                    InputStream is = cloudStorageService.getJobFile(oldJob, cloudFile.getName(), user.getArnExecution(), user.getAwsSecret());
+                    InputStream is = cloudStorageService.getJobFile(oldJob, cloudFile.getName());
                     OutputStream os = null;
                     try {
                         os = fileStagingService.writeFile(newJob, cloudFile.getName());

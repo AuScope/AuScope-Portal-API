@@ -233,6 +233,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
         }
         newJob.setJobParameters(newParams);
 
+        for (String key : properties.keySet()) {
+            newJob.setProperty(key, getProperty(key));            
+        }
         return newJob;
     }
 

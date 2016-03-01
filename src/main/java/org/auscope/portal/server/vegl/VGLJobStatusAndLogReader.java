@@ -50,10 +50,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         String logContents = null;
         InputStream is = null;
         try {
-        	String arn = job.getProperty(CloudJob.PROPERTY_STS_ARN);
-        	String secret = job.getProperty(CloudJob.PROPERTY_CLIENT_SECRET);
-        	
-            is = cloudStorageService.getJobFile(job, JobListController.VGL_LOG_FILE, arn, secret);
+            is = cloudStorageService.getJobFile(job, JobListController.VGL_LOG_FILE);
             logContents = IOUtils.toString(is);
         } catch (Exception ex) {
             log.debug(String.format("The job %1$s hasn't uploaded any logs yet.", job.getId()));

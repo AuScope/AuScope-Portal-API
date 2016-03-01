@@ -707,7 +707,7 @@ public class JobBuilderController extends BaseCloudController {
                                 files[i] = stagedFiles[i].getFile();
                             }
 
-                            cloudStorageService.uploadJobFiles(curJob, files, user.getArnExecution(), user.getAwsSecret());
+                            cloudStorageService.uploadJobFiles(curJob, files);
 
                             // create our input user data string
                             String userDataString = null;

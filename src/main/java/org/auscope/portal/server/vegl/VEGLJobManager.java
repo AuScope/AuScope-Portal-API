@@ -27,8 +27,8 @@ public class VEGLJobManager {
         return veglSeriesDao.query(user, name, desc);
     }
 
-    public List<VEGLJob> getSeriesJobs(int seriesId) {
-        return veglJobDao.getJobsOfSeries(seriesId);
+    public List<VEGLJob> getSeriesJobs(int seriesId, ANVGLUser user) {
+        return veglJobDao.getJobsOfSeries(seriesId, user);
     }
 
     public List<VEGLJob> getPendingOrActiveJobs() {

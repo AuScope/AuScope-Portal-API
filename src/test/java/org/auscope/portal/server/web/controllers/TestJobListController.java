@@ -290,7 +290,7 @@ public class TestJobListController extends PortalTestClass {
 
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
             oneOf(mockJob).getRegisteredUrl();will(returnValue(null)); //the job isn't registered
-            oneOf(mockCloudStorageServices[0]).deleteJobFiles(mockJob, null, null); //this must occur if the job isnt registered
+            oneOf(mockCloudStorageServices[0]).deleteJobFiles(mockJob); //this must occur if the job isnt registered
         }});
 
         ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
@@ -354,7 +354,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
-            oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(mockJobs));
 
             //Make sure each job marked as deleted, its transition audit trial record
             //is created and all its files in staging directory are deleted.
@@ -433,7 +433,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
-            oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(null));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(null));
         }});
 
         ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
@@ -548,7 +548,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(mockJobs));
 
             //Each of our jobs is in a different status
             allowing(mockJobs.get(0)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
@@ -740,7 +740,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
 
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, key, null, null);will(returnValue(inputStream));
+            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, key);will(returnValue(inputStream));
 
             //Ensure our response stream gets written to
             oneOf(mockResponse).setContentType("application/octet-stream");
@@ -832,9 +832,9 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getSubmitDate();will(returnValue(submitDate));
 
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey1, null, null);will(returnValue(is1));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey2, null, null);will(returnValue(is2));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey3, null, null);will(returnValue(is3));
+            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey1);will(returnValue(is1));
+            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey2);will(returnValue(is2));
+            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey3);will(returnValue(is3));
 
             //Ensure our response stream gets written to
             oneOf(mockResponse).setContentType("application/zip");
@@ -1080,7 +1080,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(mockJobs));
         }});
 
         ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false, mockPortalUser);
@@ -1110,7 +1110,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesJobs(seriesId);will(returnValue(mockJobs));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(mockJobs));
 
             oneOf(mockJobStatusMonitor).statusUpdate(mockJobs);
         }});
@@ -1197,8 +1197,8 @@ public class TestJobListController extends PortalTestClass {
 
             oneOf(mockCloudStorageServices[0]).generateBaseKey(with(aNonMatchingVeglJob(jobId)));will(returnValue(baseKey));
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(aVeglJob(jobId)));will(returnValue(cloudFiles));
-            oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[0].getName()), null, null);will(returnValue(is1));
-            oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[1].getName()), null, null);will(returnValue(is2));
+            oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[0].getName()));will(returnValue(is1));
+            oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[1].getName()));will(returnValue(is2));
 
             //We should have 1 call to our job manager to create a job audit trail record
             oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)), with(any(String.class)));

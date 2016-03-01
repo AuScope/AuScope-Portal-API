@@ -71,11 +71,11 @@ public class TestVEGLJobManager extends PortalTestClass {
         final List<VEGLJob> jobList = Arrays.asList(mockJob);
         
         context.checking(new Expectations() {{
-            oneOf(mockJobDao).getJobsOfSeries(seriesId);
+            oneOf(mockJobDao).getJobsOfSeries(seriesId, new ANVGLUser());
             will(returnValue(jobList));
         }});
         
-        Assert.assertNotNull(jobManager.getSeriesJobs(seriesId));
+        Assert.assertNotNull(jobManager.getSeriesJobs(seriesId, new ANVGLUser()));
     }
     
     /**

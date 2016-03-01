@@ -650,7 +650,7 @@ public class TestJobBuilderController {
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
             //We should have 1 call to upload them
-            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(equal(new File[] {mockFile1, mockFile2})), null, null);
+            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(equal(new File[] {mockFile1, mockFile2})));
             inSequence(jobFileSequence);
 
             //And finally 1 call to execute the job
@@ -781,7 +781,7 @@ public class TestJobBuilderController {
             oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
 
             //And one call to upload them (which we will mock as failing)
-            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)), null, null);will(throwException(new PortalServiceException("")));
+            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));will(throwException(new PortalServiceException("")));
 
             //We should have 1 call to our job manager to create a job audit trail record
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "");
@@ -855,7 +855,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
 
             //We should have 1 call to upload them
-            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)), null, null);
+            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
 
             //We should have access control check to ensure user has permission to run the job
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
@@ -957,7 +957,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
 
             //We should have 1 call to upload them
-            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)), null, null);
+            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(jobObj)), with(any(File[].class)));
 
             //We should have access control check to ensure user has permission to run the job
             oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
