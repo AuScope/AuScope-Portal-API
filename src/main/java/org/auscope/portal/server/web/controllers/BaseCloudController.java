@@ -117,14 +117,15 @@ public abstract class BaseCloudController extends BasePortalController {
     public String createBootstrapForJob(VEGLJob job) throws IOException {
         String bootstrapTemplate = getBootstrapTemplate();
         CloudStorageService cloudStorageService = getStorageService(job);
-
+        boolean useSts = job.getProperty(CloudJob.PROPERTY_STS_ARN) !=null;
+        
         Object[] arguments;
 		try {
 			arguments = new Object[] {
 			    cloudStorageService.getBucket(job.getProperty(CloudJob.PROPERTY_STS_ARN)), //STORAGE_BUCKET
 			    job.getStorageBaseKey().replace("//", "/"), //STORAGE_BASE_KEY_PATH
-			    cloudStorageService.getAccessKey(), //STORAGE_ACCESS_KEY
-			    cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
+			    useSts ? "" : cloudStorageService.getAccessKey(), //STORAGE_ACCESS_KEY
+			    useSts ? "" : cloudStorageService.getSecretKey(), //STORAGE_SECRET_KEY
 			    hostConfigurer.resolvePlaceholder("vm.sh"), //WORKFLOW_URL
 			    cloudStorageService.getEndpoint(), //STORAGE_ENDPOINT
 			    cloudStorageService.getProvider(), //STORAGE_TYPE
