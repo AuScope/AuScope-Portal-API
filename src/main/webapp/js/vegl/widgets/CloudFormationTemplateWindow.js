@@ -20,7 +20,7 @@ Ext.define('vegl.widgets.CloudFormationTemplateWindow', {
             border: true,
             resizable: true,
             layout: 'fit',
-            closable: false,
+            closable: true,
             modal: true,
             width: 600,
             height: 400,
@@ -30,10 +30,22 @@ Ext.define('vegl.widgets.CloudFormationTemplateWindow', {
                 border: false,
                 padding: 5,
                 scrollable: true,
-                html: config.content,
+                html: '<iframe style="width:100%;height:100%;border:0px;"></iframe>',
                 bodyStyle: {
-                    'font-family': 'monospace',
-                    'white-space': 'pre'
+                    padding: '0px',
+                    border: '0px'
+                },
+                listeners: {
+                    afterrender: function(panel) {
+                        var iframe = panel.getEl().down('iframe');
+                        var doc = iframe.dom.contentWindow.document;
+                        doc.open();
+                        doc.write(config.content);
+
+                        doc.close();
+
+                        doc.body.setAttribute('style', 'white-space:pre;font-family:monospace;');
+                    }
                 }
             }]
         });
