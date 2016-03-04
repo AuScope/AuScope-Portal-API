@@ -1,8 +1,9 @@
 Ext.application({
     /** 
-     * @lends JobBuilder 
+     * @lends anvgl.JobBuilder 
+     * 
      */ 
-    name : 'anvgl',
+    name : 'jobbuilder',
     
     /**
      * Creates the wizard towards a job submission: <br/>

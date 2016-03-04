@@ -198,8 +198,6 @@ public class ScmEntryService {
         }
         else {
             solutions = rest.getForObject(url.toString(), Entries.class);
-            logger.info("scmentryservice.getSolutions called for - " + url.toString());
-            logger.info("total solutions.toString on ScmEntryService - " + solutions.toString());
         }
 
         return usefulSolutions(solutions.getSolutions());
@@ -224,8 +222,6 @@ public class ScmEntryService {
     private List<Solution> usefulSolutions(List<Solution> solutions) {
         ArrayList<Solution> useful = new ArrayList<Solution>();
 
-        logger.info("total solutions on usefulSolutions - " + solutions.size());
-        
         // Collect our set of available providers
         Set<String> providers = new HashSet<String>();
         for (CloudComputeService ccs: cloudComputeServices) {
@@ -234,7 +230,6 @@ public class ScmEntryService {
         
         for (Solution solution: solutions) {
         	useful.add(solution);
-        	/* put back with the production solutions url
         	// Solution with toolbox with at least one image at a
             // provider we can use is useful.
             for (Map<String, String> image:
@@ -244,11 +239,8 @@ public class ScmEntryService {
                     break;
                 }
             }
-            */
         }
         
-        logger.info("returning total useful - " + useful.size());
-
         return useful;
     }
 

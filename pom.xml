@@ -26,6 +26,33 @@
     <build>
         <finalName>ANVGL-Portal</finalName>
         <plugins>
+        
+         <!--- jsdoc -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.4.0</version>
+            <executions>
+                <execution>
+                    <id>jsdoc</id>
+                    <phase>install</phase>
+                    <configuration>
+                        <executable>java</executable>
+                        <workingDirectory>tools/jsdoc</workingDirectory>
+                        <arguments>
+                            <argument>-jar</argument>
+                            <argument>jsrun.jar</argument>
+                            <argument>app/run.js</argument>
+                            <argument>-c=anvgl.conf</argument>
+                        </arguments>
+                    </configuration>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                </execution>   
+            </executions>
+        </plugin> 
+              
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
@@ -134,6 +161,7 @@
                     <wtpversion>2.0</wtpversion>
                 </configuration>
             </plugin>
+            
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>yuicompressor-maven-plugin</artifactId>
@@ -152,6 +180,7 @@
                 </configuration>
                 <version>1.4.0</version>
             </plugin>
+             
             <!--
                 This is needed for Emma Coverage to work with unit tests
                 that use PowerMock's JMock library. The latest alpha

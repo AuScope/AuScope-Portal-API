@@ -2,7 +2,7 @@
  * @author  Josh Vote
  */
 Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
-    /** @lends JobBuilder.JobSubmitForm */
+    /** @lends anvgl.JobBuilder.JobSubmitForm */
     extend : 'vegl.jobwizard.forms.JobUploadForm',
 
     /**
@@ -22,7 +22,11 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
         this.callParent(arguments);
     },
 
-    //Validation means we go and submit the job
+    /**
+     * Submits the job
+     * @function
+     * @param {object} callback
+     */
     beginValidation : function(callback) {
         var jobSubmitFrm = this;                
         Ext.getBody().mask('Submitting Job...');
@@ -71,22 +75,41 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
         });
     },
 
+    /**
+     * Title for the interface
+     * @function
+     * @return {string} 
+     */
     getTitle : function() {
         return "Review job before submission...";
     },
 
+    /**
+     * 'Next' text
+     * @function
+     * @return {string} 
+     */
     getNextText : function() {
         return 'Submit Job';
     },
 
+    /**
+     * 'Next' icon
+     * @function
+     * @return {string} 
+     */
     getNextIconClass : function() {
         return 'submit-icon';
     },
 
+    /**
+     * This is a giant misdirection - the job was already saved way back in the Job Series form. This part is just
+     * making the user feel more involved in the process
+     * @function
+     */
     saveJob : function() {
-        //This is a giant misdirection - the job was already saved way back in the Job Object form. This part is just
-        //making the user feel more involved in the process
         this.noWindowUnloadWarning = true;
+        
         Ext.Msg.alert('Job Saved', 'Your job has been saved for later submission. You can attempt submission later from the <a href="joblist.html">Monitor Jobs</a> page. It is now safe to close this window.');
     }
 });
