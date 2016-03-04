@@ -23,6 +23,7 @@ public class ANVGLUser implements UserDetails, Serializable {
     private String arnExecution;
     private String arnStorage;
     private String awsSecret;
+    private String awsAccount;
     private Integer acceptedTermsConditions;
 
     public ANVGLUser() {
@@ -144,6 +145,14 @@ public class ANVGLUser implements UserDetails, Serializable {
         this.awsSecret = awsSecret;
     }
 
+    public String getAwsAccount() {
+        return awsAccount;
+    }
+
+    public void setAwsAccount(String awsAccount) {
+        this.awsAccount = awsAccount;
+    }
+
     /**
      * Returns true iff this ANVGLUser instance has all the relevant fields set that are required for
      * submitting an AWS job. Returning false would indicate that the user has more data to enter before
@@ -152,6 +161,7 @@ public class ANVGLUser implements UserDetails, Serializable {
     public boolean isFullyConfigured() {
         return StringUtils.isNotEmpty(arnStorage) &&
                 StringUtils.isNotEmpty(awsSecret) &&
+                StringUtils.isNotEmpty(awsAccount) &&
                 StringUtils.isNotEmpty(arnExecution) &&
                 acceptedTermsConditions != null &&
                 acceptedTermsConditions > 0;

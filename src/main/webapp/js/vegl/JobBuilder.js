@@ -23,8 +23,8 @@ Ext.application({
                 xtype: 'box',
                 region: 'north',
                 applyTo: 'body',
-                height: 100
-            }, {
+                height: 60
+            },{
                 region: 'center',
                 margin: '10 0 10 0',
                 border: false,

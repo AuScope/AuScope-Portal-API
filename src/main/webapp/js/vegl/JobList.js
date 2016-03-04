@@ -136,7 +136,7 @@ Ext.application({
                 xtype: 'box',
                 region: 'north',
                 applyTo: 'body',
-                height: 100
+                height: 60
             },{
                 border: false,
                 region: 'west',

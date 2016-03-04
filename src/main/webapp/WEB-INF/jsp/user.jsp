@@ -49,6 +49,7 @@
 
       <script src="js/vegl/models/ANVGLUser.js" type="text/javascript"></script>
       <script src="js/vegl/widgets/ANVGLUserPanel.js" type="text/javascript"></script>
+      <script src="js/vegl/widgets/CloudFormationTemplateWindow.js" type="text/javascript"></script>
       <script src="js/vegl/widgets/TermsConditionsWindow.js" type="text/javascript"></script>
       <script src="js/vegl/User-UI.js" type="text/javascript"></script>
    </head>

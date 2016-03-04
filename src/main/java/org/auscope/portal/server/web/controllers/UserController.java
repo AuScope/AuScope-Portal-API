@@ -1,11 +1,14 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.server.web.security.ANVGLUser;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,16 +28,20 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class UserController extends BasePortalController {
+    private static final String CLOUD_FORMATION_RESOURCE = "org/auscope/portal/server/web/controllers/vl-cloudformation.json.tpl";
+
     protected final Log logger = LogFactory.getLog(getClass());
 
     private ANVGLUserDao userDao;
     private PortalPropertyPlaceholderConfigurer properties;
+    private VelocityEngine velocityEngine;
 
     @Autowired
-    public UserController(ANVGLUserDao userDao, PortalPropertyPlaceholderConfigurer properties) {
+    public UserController(ANVGLUserDao userDao, PortalPropertyPlaceholderConfigurer properties, VelocityEngine velocityEngine) {
         super();
         this.userDao = userDao;
         this.properties = properties;
+        this.velocityEngine = velocityEngine;
     }
 
     /**
@@ -70,6 +78,7 @@ public class UserController extends BasePortalController {
     public ModelAndView setUser(@AuthenticationPrincipal ANVGLUser user,
             @RequestParam(required=false, value="arnExecution") String arnExecution,
             @RequestParam(required=false, value="arnStorage") String arnStorage,
+            @RequestParam(required=false, value="awsAccount") String awsAccount,
             @RequestParam(required=false, value="acceptedTermsConditions") Integer acceptedTermsConditions) {
 
         if (user == null) {
@@ -89,6 +98,11 @@ public class UserController extends BasePortalController {
 
         if (acceptedTermsConditions != null) {
             user.setAcceptedTermsConditions(acceptedTermsConditions);
+            modified = true;
+        }
+
+        if (awsAccount != null) {
+            user.setAwsAccount(awsAccount);
             modified = true;
         }
 
@@ -117,5 +131,21 @@ public class UserController extends BasePortalController {
             log.error("Unable to read terms and conditions resource", ex);
             return generateJSONResponseMAV(false);
         }
+    }
+
+    @RequestMapping("/secure/getCloudFormationScript.do")
+    public ModelAndView getCloudFormationScript(@AuthenticationPrincipal ANVGLUser user) {
+        if (user == null || !user.isFullyConfigured()) {
+            return generateJSONResponseMAV(false);
+        }
+
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("arnStorage", user.getArnStorage());
+        model.put("arnExecute", user.getArnExecution());
+        model.put("awsSecret", user.getAwsSecret());
+        model.put("awsAccount", user.getAwsAccount());
+
+        String cloudFormationScript = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, CLOUD_FORMATION_RESOURCE, "UTF-8", model);
+        return generateJSONResponseMAV(true, cloudFormationScript, "");
     }
 }
