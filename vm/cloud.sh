@@ -41,21 +41,22 @@ fi
 #wrapper for aws upload
 if [[ "$STORAGE_TYPE" == aws* ]]
 then
-        if [[ $STORAGE_ACCESS_KEY != "" ]]
-        then
+	if [[ $STORAGE_ACCESS_KEY != "" ]]
+	then
             export AWS_ACCESS_KEY_ID=$STORAGE_ACCESS_KEY
-            export AWS_SECRET_ACCESS_KEY=$STORAGE_SECRET_KEY
-        fi
+    	    export AWS_SECRET_ACCESS_KEY=$STORAGE_SECRET_KEY
+    	fi
+
         export AWS_DEFAULT_REGION=$OS_REGION_NAME
 
         if [[ "$1" == "list" ]]
         then
-            aws s3 ls "s3://$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/" | awk '{print $4}'
+                aws s3 ls "s3://$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/" | awk '{print $4}'
         fi
 
         if [[ "$1" == "download" ]]
         then
-            aws s3 cp "s3://$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/$2" "$3"
+                aws s3 cp "s3://$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH/$2" "$3"
         fi
 
         if [[ "$1" == "upload" ]]
