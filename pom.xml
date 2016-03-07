@@ -338,10 +338,6 @@
             <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.auscope.portal</groupId>
             <artifactId>portal-core</artifactId>
             <version>${portal.core.version}</version>
