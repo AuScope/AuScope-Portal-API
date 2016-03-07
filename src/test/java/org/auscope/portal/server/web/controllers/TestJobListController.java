@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
+import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
@@ -110,8 +111,6 @@ public class TestJobListController extends PortalTestClass {
 
     @Test
     public void testInitizeQueueNDelete() throws InterruptedException, PortalServiceException{
-
-
         final String storageBucket = "storage-bucket";
         final String storageAccess = "213-asd-54";
         final String storageSecret = "tops3cret";
@@ -142,7 +141,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(queueMockJobs.get(1)).getStorageBaseKey();will(returnValue(""));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket("foo");will(returnValue(storageBucket));
+            allowing(mockCloudStorageServices[0]).getBucket(null);will(returnValue(storageBucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
@@ -160,7 +159,15 @@ public class TestJobListController extends PortalTestClass {
             allowing(queueMockJobs.get(1)).getUser();will(returnValue(userEmail));
             //allowing(queueMockJobs.get(0)).getUser();will(returnValue(userEmail));
 
-            oneOf(queueMockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(queueMockJobs.get(1)));
+            oneOf(queueMockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(queueMockJobs.get(1)));
+            
+            allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
+            allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
+            allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+
+            allowing(queueMockJobs.get(1)).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
+            allowing(queueMockJobs.get(1)).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
+            allowing(queueMockJobs.get(1)).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
 
             allowing(queueMockJobs.get(1)).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(queueMockJobs.get(1)).getComputeServiceId();will(returnValue(computeServiceId));
@@ -245,7 +252,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
 
             //Make sure the job marked as deleted and its transition audit trial record is created
@@ -276,7 +283,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
@@ -311,7 +318,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
@@ -330,7 +337,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(null));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
@@ -354,7 +361,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
-            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(mockJobs));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(mockJobs));
 
             //Make sure each job marked as deleted, its transition audit trial record
             //is created and all its files in staging directory are deleted.
@@ -433,7 +440,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
-            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(null));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
@@ -453,7 +460,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockJob).getUser();will(returnValue(userEmail));
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
 
@@ -481,7 +488,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockJob).getUser();will(returnValue(userEmail));
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
         }});
 
@@ -504,7 +511,7 @@ public class TestJobListController extends PortalTestClass {
 
             allowing(mockJob).getUser();will(returnValue(jobEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
         }});
 
         ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
@@ -522,7 +529,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(null));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
@@ -548,7 +555,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(mockJobs));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(mockJobs));
 
             //Each of our jobs is in a different status
             allowing(mockJobs.get(0)).getStatus();will(returnValue(JobBuilderController.STATUS_DONE));
@@ -639,7 +646,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
@@ -665,7 +672,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(jobEmail));
 
         }});
@@ -685,7 +692,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(null));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(null));
 
         }});
 
@@ -706,7 +713,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
@@ -735,7 +742,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
@@ -770,7 +777,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
@@ -792,7 +799,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(null));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(null));
         }});
 
         //Returns null on success
@@ -825,7 +832,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getName();will(returnValue(jobName));
             allowing(mockJob).getUser();will(returnValue(userEmail));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
@@ -895,7 +902,7 @@ public class TestJobListController extends PortalTestClass {
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
@@ -916,7 +923,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(null));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(null));
         }});
 
         //Returns null on success
@@ -1080,7 +1087,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(mockJobs));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(mockJobs));
         }});
 
         ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false, mockPortalUser);
@@ -1110,7 +1117,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesJobs(seriesId, new ANVGLUser());will(returnValue(mockJobs));
+            oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(mockJobs));
 
             oneOf(mockJobStatusMonitor).statusUpdate(mockJobs);
         }});
@@ -1188,7 +1195,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, new ANVGLUser());will(returnValue(existingJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(existingJob));
             allowing(mockJobManager).saveJob(with(aNonMatchingVeglJob(jobId)));
 
             oneOf(mockFileStagingService).generateStageInDirectory(with(aNonMatchingVeglJob(jobId)));

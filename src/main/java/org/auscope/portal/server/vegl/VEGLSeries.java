@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @Author Josh Vote
  */
 public class VEGLSeries implements Serializable {
-	/** A unique identifier for this series */
+    /** A unique identifier for this series */
     private Integer id;
     /** The user owning this series */
     private String user;

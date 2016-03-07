@@ -218,6 +218,7 @@
         
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
+        <property name="keypair" value="AwsCarstenCsiro"/>
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">

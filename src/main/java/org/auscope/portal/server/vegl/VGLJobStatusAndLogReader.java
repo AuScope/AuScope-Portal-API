@@ -119,7 +119,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      */
     public String getSectionedLog(VEGLJob job, String sectionName) {
         try {
-        	ModelMap sectLogs = getSectionedLogs(job);
+            ModelMap sectLogs = getSectionedLogs(job);
             return (String)sectLogs.get(sectionName);
         } catch (PortalServiceException ex) {
             log.debug(ex.getMessage());

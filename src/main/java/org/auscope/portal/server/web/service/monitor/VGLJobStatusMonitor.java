@@ -43,7 +43,7 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
         this.jobUserDao = jobUserDao;
     }
 
-	/**
+    /**
      * Sets the job manager to be used for querying
      * pending or active jobs from VL DB.
      * @param jobManager

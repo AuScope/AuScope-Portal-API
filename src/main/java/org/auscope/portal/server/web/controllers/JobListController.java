@@ -757,10 +757,10 @@ public class JobListController extends BaseCloudController  {
         }
 
 //        for (VEGLJob veglJob : seriesJobs) {
-//        	veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
-//        	veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
-//        	veglJob.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
-//		}
+//          veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+//          veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+//          veglJob.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
+//        }
 //        
         if (forceStatusRefresh) {
             try {
