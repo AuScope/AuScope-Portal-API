@@ -6,6 +6,7 @@ CREATE TABLE `users` (
   `arnStorage` varchar(128) DEFAULT NULL,
   `awsSecret` varchar(128) DEFAULT NULL,
   `acceptedTermsConditions` int(11) DEFAULT NULL,
+  `awsAccount` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `EMAIL` (`email`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
