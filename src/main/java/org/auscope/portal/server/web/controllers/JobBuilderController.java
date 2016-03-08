@@ -921,29 +921,23 @@ public class JobBuilderController extends BaseCloudController {
         try {
             // Assume all images are usable by the current user
             List<MachineImage> images = new ArrayList<MachineImage>();
-            images = getImagesForJobAndUser(request, computeServiceId);
 
-            /*
             // Filter list to images suitable for job solution, if specified
             if (jobId != null) {
-                // Get images available to the current user
-                images = getImagesForJobAndUser(request, computeServiceId);
-
                 Set<String> vmIds = scmEntryService.getJobImages(jobId).get(computeServiceId);
-                // Set<String> vmIds = scmEntryService.getJobImages(jobId).get(computeServiceId);
                 if (vmIds != null) {
                     for (String vmId: vmIds) {
                         images.add(new MachineImage(vmId));
                     }
                 }
             }
-            else {
+
+            if (images.isEmpty()) {
                 // Fall back on old behaviour based on configured images for now
                 // Get images available to the current user
                 images = getImagesForJobAndUser(request, computeServiceId);
             }
-             */
-            
+
             if (images.isEmpty()) {
                 // There are no suitable images at the specified compute service.
                 log.warn("No suitable images at compute service (" + computeServiceId + ") for job (" + jobId + ")");

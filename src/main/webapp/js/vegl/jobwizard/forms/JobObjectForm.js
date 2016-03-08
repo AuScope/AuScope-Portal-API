@@ -77,22 +77,38 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                     var jobData = responseObj.data[0];
 
                                     if (!Ext.isEmpty(jobData.computeServiceId)) {
+                                        jobObjectFrm.imageStore.load({
+                                            params : {
+                                                computeServiceId : jobData.computeServiceId,
+                                                jobId: jobData.id
+                                            },
+                                            callback: function(records, operation, success) {
+                                                // Set form values from the jobData, but
+                                                // override {compute,storage}ServiceId since
+                                                // they are now constant values (see
+                                                // ANVGL-35)
+                                                frm.setValues(jobData);
+                                                frm.setValues({
+                                                    computeServiceId: 'aws-ec2-compute',
+                                                    storageServiceId: 'amazon-aws-storage-sydney'
+                                                });
+                                            }
+                                        });
+
+                                        jobObjectFrm.computeTypeStore.load({
+                                            params : {
+                                                computeServiceId : jobData.computeServiceId
+                                            },
+                                            callback: function(records, operation, success) {
+                                                jobObjectFrm.preselectVmType();
+                                            }
+                                        });
                                     }
 
                                     // Store the vm type if specified
                                     // in the job, and solutionId, for later use.
                                     jobObjectFrm.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
                                     jobObjectFrm.wizardState.solutionId = jobData.solutionId;
-
-                                    // Set form values from the jobData, but
-                                    // override {compute,storage}ServiceId since
-                                    // they are now constant values (see
-                                    // ANVGL-35)
-                                    frm.setValues(jobData);
-                                    frm.setValues({
-                                        computeServiceId: 'aws-ec2-compute',
-                                        storageServiceId: 'amazon-aws-storage-sydney'
-                                    });
 
                                     jobObjectFrm.wizardState.jobId = frm.getValues().id;
                                 }
@@ -200,7 +216,41 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         }]);
     },
 
-    
+    /**
+     * Select a VM type based on the number of threads specified in the template.
+     * @function
+     *
+     */
+    preselectVmType: function() {
+        var jobObjectFrm = this;
+        var wizardState = this.wizardState;
+        var computeTypeStore = this.computeTypeStore;
+        var computeTypeId = wizardState.jobComputeInstanceType;
+        var frm = jobObjectFrm.getForm();
+
+        // Select a vm type that has ncpus
+        // >= nthreads if one hasn't
+        // already been selected.
+        if (!Ext.isEmpty(computeTypeId)) {
+            frm.setValues({computeTypeId: computeTypeId});
+        }
+        else if (wizardState.nthreads) {
+            // Get vm types that are big enough
+            var vmtype, vcpus;
+            var ncpus = 99999;
+            computeTypeStore.each(function(r) {
+                vcpus = r.get('vcpus');
+                if (vcpus < ncpus && vcpus >= wizardState.nthreads) {
+                    vmtype = r;
+                    ncpus = vcpus;
+                }
+            });
+            if (vmtype) {
+                frm.setValues({computeTypeId: vmtype.get('id')});
+            }
+        }
+    },
+
     /**
      * loads images for computeServiceId 'aws-ec2-compute'
      * @function
