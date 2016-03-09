@@ -13,7 +13,7 @@
 
 # Use a local repo/branch until pulled into master
 baseUrl="https://github.com/squireg/ANVGL-Portal.git"
-branch="feature/ANVGL-47"
+branch="feature/sssc"
 
 # # baseUrl -- git repository url
 # baseUrl="https://github.com/AuScope/AVNGL-Portal.git"
