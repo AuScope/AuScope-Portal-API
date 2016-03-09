@@ -99,7 +99,7 @@ public class TestJobBuilderController {
         
         anvglProvenanceService = new ANVGLProvenanceService(mockFileStagingService, mockCloudStorageServices);
 
-        vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader);
+        vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader, anvglProvenanceService);
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
         //Object Under Test
         controller = new JobBuilderController(mockJobManager, mockFileStagingService,

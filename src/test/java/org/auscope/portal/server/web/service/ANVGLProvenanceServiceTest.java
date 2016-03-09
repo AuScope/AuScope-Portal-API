@@ -151,7 +151,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
 
     @Test
     public void testCreateActivity() throws Exception {
-        String graph = ANVGLProvenanceService.createActivity(preparedJob, mockPortalUser);
+        String graph = ANVGLProvenanceService.createActivity(preparedJob, null, mockPortalUser);
         Assert.assertTrue(graph.contains(initialTurtle));
         Assert.assertTrue(graph.contains(serviceTurtle));
         //Assert.assertTrue(graph.contains(intermediateTurtle));
@@ -176,7 +176,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
 
     @Test
     public void testCreateEntitiesForInputs() throws Exception {
-        Set<Entity> entities = ANVGLProvenanceService.createEntitiesForInputs(preparedJob, mockPortalUser);
+        Set<Entity> entities = ANVGLProvenanceService.createEntitiesForInputs(preparedJob, null, mockPortalUser);
         Assert.assertNotNull(entities);
         Assert.assertEquals(3, entities.size());
     }

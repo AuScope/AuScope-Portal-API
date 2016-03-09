@@ -718,7 +718,7 @@ public class JobBuilderController extends BaseCloudController {
                             
                             // Provenance
                             anvglProvenanceService.setServerURL(request.getRequestURL().toString());
-                            anvglProvenanceService.createActivity(curJob, user);
+                            anvglProvenanceService.createActivity(curJob, null, user);
 
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);

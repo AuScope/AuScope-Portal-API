@@ -11,6 +11,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
+import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 
 /**
  * A handler that provides the concrete implementation of
@@ -28,13 +29,16 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
     private VEGLJobManager jobManager;
     private JobMailSender jobMailSender;
     private VGLJobStatusAndLogReader jobStatusLogReader;
+    private ANVGLProvenanceService anvglProvenanceService;
 
 
     public VGLJobStatusChangeHandler(VEGLJobManager jobManager,
-            JobMailSender jobMailSender, VGLJobStatusAndLogReader jobStatusLogReader) {
+            JobMailSender jobMailSender, VGLJobStatusAndLogReader jobStatusLogReader,
+            ANVGLProvenanceService anvglProvenanceService) {
         this.jobManager = jobManager;
         this.jobMailSender = jobMailSender;
-        this.jobStatusLogReader=jobStatusLogReader;
+        this.jobStatusLogReader = jobStatusLogReader;
+        this.anvglProvenanceService = anvglProvenanceService;
     }
 
     @Override
@@ -52,6 +56,8 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
                 jobMailSender.sendMail(vglJob);
                 LOG.trace("Job completion email notification sent. Job id: " + vglJob.getId());
             }
+            // Provenance
+            anvglProvenanceService.createEntitiesForOutputs(vglJob);
         }
     }
 
