@@ -279,7 +279,7 @@ public class ANVGLProvenanceService {
      *            Completed virtual labs job, about which we will finish our
      *            provenance gathering.
      */
-    public final String createEntitiesForOutputs(final VEGLJob job) {
+    public String createEntitiesForOutputs(final VEGLJob job) {
         Set<Entity> outputs = new HashSet<>();
         Set<Entity> potentialOutputs = new HashSet<>();
         CloudStorageService cloudStorageService = getStorageService(job);
