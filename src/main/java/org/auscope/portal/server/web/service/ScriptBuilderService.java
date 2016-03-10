@@ -13,7 +13,9 @@ import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 /**
@@ -52,12 +54,12 @@ public class ScriptBuilderService {
      * @param scriptText
      * @throws PortalServiceException
      */
-    public void saveScript(String jobId, String scriptText) throws PortalServiceException {
+    public void saveScript(String jobId, String scriptText, ANVGLUser user) throws PortalServiceException {
 
         //Lookup our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId));
+            job = jobManager.getJobById(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.warn("Unable to lookup job with id " + jobId + ": " + ex.getMessage());
             logger.debug("exception:", ex);
@@ -86,11 +88,11 @@ public class ScriptBuilderService {
      * @return the file contents if the script file exists otherwise an empty string if the script file doesn't exist or is empty.
      * @throws PortalServiceException
      */
-    public String loadScript(String jobId) throws PortalServiceException {
+    public String loadScript(String jobId, ANVGLUser user) throws PortalServiceException {
         InputStream is = null;
         try {
             //Lookup our job
-            VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
+            VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
             //Load script from VL server's filesystem
             is = jobFileService.readFile(job, SCRIPT_FILE_NAME);
             String script = null;

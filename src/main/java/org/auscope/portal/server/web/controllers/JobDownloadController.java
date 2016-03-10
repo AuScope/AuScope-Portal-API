@@ -177,7 +177,7 @@ public class JobDownloadController extends BasePortalController {
     
     @RequestMapping("/makeNetcdfsubseserviceUrl.do")
     public ModelAndView makeNetcdfsubsetserviceUrl(@RequestParam("url") String url,
-    							@RequestParam("northBoundLatitude") final Double northBoundLatitude,
+                                @RequestParam("northBoundLatitude") final Double northBoundLatitude,
                                 @RequestParam("eastBoundLongitude") final Double eastBoundLongitude,
                                 @RequestParam("southBoundLatitude") final Double southBoundLatitude,
                                 @RequestParam("westBoundLongitude") final Double westBoundLongitude,
@@ -295,7 +295,7 @@ public class JobDownloadController extends BasePortalController {
     @RequestMapping("/getNumDownloadRequests.do")
     public ModelAndView getNumDownloadRequests(HttpServletRequest request) {
         int size = 0;
-        List downloadList = (List)request.getSession().getAttribute(SESSION_DOWNLOAD_LIST);
+        List<?> downloadList = (List<?>)request.getSession().getAttribute(SESSION_DOWNLOAD_LIST);
         if (downloadList != null && downloadList.size() > 0) {
             size = downloadList.size();
         }

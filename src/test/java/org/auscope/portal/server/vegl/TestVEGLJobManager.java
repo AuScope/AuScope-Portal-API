@@ -7,6 +7,7 @@ import org.junit.Assert;
 
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.junit.Before;
 import org.junit.Test;
 import org.jmock.Expectations;
@@ -68,13 +69,14 @@ public class TestVEGLJobManager extends PortalTestClass {
         final int seriesId = 1;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final List<VEGLJob> jobList = Arrays.asList(mockJob);
+        final ANVGLUser user = new ANVGLUser();
         
         context.checking(new Expectations() {{
-            oneOf(mockJobDao).getJobsOfSeries(seriesId);
+            oneOf(mockJobDao).getJobsOfSeries(seriesId, user);
             will(returnValue(jobList));
         }});
         
-        Assert.assertNotNull(jobManager.getSeriesJobs(seriesId));
+        Assert.assertNotNull(jobManager.getSeriesJobs(seriesId, user));
     }
     
     /**
@@ -86,14 +88,15 @@ public class TestVEGLJobManager extends PortalTestClass {
         final int jobId1 = 1;
         final int jobId2 = 2;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
-
+        final ANVGLUser user = new ANVGLUser();
+        
         context.checking(new Expectations() {{
-            oneOf(mockJobDao).get(jobId1);will(returnValue(mockJob));
-            oneOf(mockJobDao).get(jobId2);will(returnValue(null));
+            oneOf(mockJobDao).get(jobId1, user);will(returnValue(mockJob));
+            oneOf(mockJobDao).get(jobId2, user);will(returnValue(null));
         }});
         
-        Assert.assertNotNull(jobManager.getJobById(jobId1));
-        Assert.assertNull(jobManager.getJobById(jobId2));
+        Assert.assertNotNull(jobManager.getJobById(jobId1, user));
+        Assert.assertNull(jobManager.getJobById(jobId2, user));
     }
     
     /**

@@ -36,9 +36,9 @@ public class FileInformation implements Serializable {
         this.directoryFlag = file.isDirectory();
         this.parentPath = file.getParent();
     }
-    
+
     public FileInformation(String name, long size, boolean directoryFlag,
-            String parentPath) {
+                           String parentPath) {
         super();
         this.name = name;
         this.size = size;
@@ -81,7 +81,8 @@ public class FileInformation implements Serializable {
     }
 
     /**
-     * @param directoryFlag the directoryFlag to set
+     * @param directoryFlag
+     *            the directoryFlag to set
      */
     public void setDirectoryFlag(boolean directoryFlag) {
         this.directoryFlag = directoryFlag;
@@ -97,7 +98,7 @@ public class FileInformation implements Serializable {
     public void setParent(VEGLJob parent) {
         this.parent = parent;
     }
-    
+
     /**
      * @param parentPath the parentPath to set
      */

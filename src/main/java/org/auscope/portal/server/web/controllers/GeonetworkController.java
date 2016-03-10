@@ -210,8 +210,16 @@ public class GeonetworkController extends BaseCloudController {
      */
     @RequestMapping("/secure/insertRecord.do")
     public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request, @AuthenticationPrincipal ANVGLUser user) throws Exception {
+        //Get user email from session
+        if (user == null) {
+            logger.debug("Unable to get user email as user session has expired.");
+            return generateJSONResponseMAV(false, null,
+                    "Your session has timed out.",
+                    "Please refresh this page and login again to complete the job registration.");
+        }
+
         //Lookup our appropriate job
-        VEGLJob job = jobManager.getJobById(jobId);
+        VEGLJob job = jobManager.getJobById(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The specified job does not exist.");
         }
@@ -220,14 +228,6 @@ public class GeonetworkController extends BaseCloudController {
         VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
         if (jobSeries == null) {
             return generateJSONResponseMAV(false, null, "The specified job does not belong to a series.");
-        }
-
-        //Get user email from session
-        if (user == null) {
-            logger.debug("Unable to get user email as user session has expired.");
-            return generateJSONResponseMAV(false, null,
-                    "Your session has timed out.",
-                    "Please refresh this page and login again to complete the job registration.");
         }
 
         try {

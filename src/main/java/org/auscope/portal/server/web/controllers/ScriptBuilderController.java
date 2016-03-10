@@ -19,10 +19,12 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.web.service.ScmEntryService;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.auscope.portal.server.web.service.scm.Problem;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -71,14 +73,15 @@ public class ScriptBuilderController extends BasePortalController {
     @RequestMapping("/secure/saveScript.do")
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
                                    @RequestParam("sourceText") String sourceText,
-                                   @RequestParam("solutionId") String solutionId) {
+                                   @RequestParam("solutionId") String solutionId,
+                                   @AuthenticationPrincipal ANVGLUser user) {
 
         if (sourceText == null || sourceText.trim().isEmpty()) {
             return generateJSONResponseMAV(false, null, "No source text specified");
         }
 
         try {
-            sbService.saveScript(jobId, sourceText);
+            sbService.saveScript(jobId, sourceText, user);
         } catch (PortalServiceException ex) {
             logger.warn("Unable to save job script for job with id " + jobId + ": " + ex.getMessage());
             logger.debug("error:", ex);
@@ -105,12 +108,12 @@ public class ScriptBuilderController extends BasePortalController {
      * @return A JSON encoded response which contains the contents of a saved job's script file
      */
     @RequestMapping("/getSavedScript.do")
-    public ModelAndView getSavedScript(@RequestParam("jobId") String jobId) {
+    public ModelAndView getSavedScript(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
         logger.debug("getSavedScript with jobId: " + jobId);
         String script = null;
 
         try {
-            script = sbService.loadScript(jobId);
+            script = sbService.loadScript(jobId, user);
         } catch (PortalServiceException ex) {
             logger.error("Unable to load saved script for job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, ex.getMessage(), ex.getErrorCorrection());
