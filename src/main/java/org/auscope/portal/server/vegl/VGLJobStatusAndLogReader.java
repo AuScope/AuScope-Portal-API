@@ -119,7 +119,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      */
     public String getSectionedLog(VEGLJob job, String sectionName) {
         try {
-        	ModelMap sectLogs = getSectionedLogs(job);
+            ModelMap sectLogs = getSectionedLogs(job);
             return (String)sectLogs.get(sectionName);
         } catch (PortalServiceException ex) {
             log.debug(ex.getMessage());
@@ -132,9 +132,14 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      * will return the underlying job status
      */
     public String getJobStatus(CloudJob cloudJob) {
+
+        String stsArn = cloudJob.getProperty(CloudJob.PROPERTY_STS_ARN);
+        String clientSecret = cloudJob.getProperty(CloudJob.PROPERTY_CLIENT_SECRET);
+        String s3Role = cloudJob.getProperty(CloudJob.PROPERTY_S3_ROLE);
+
         //The service hangs onto the underlying job Object but the DB is the point of truth
         //Make sure we get an updated job object first!
-        VEGLJob job = jobManager.getJobById(cloudJob.getId());
+        VEGLJob job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role);
         if (job == null) {
             return null;
         }

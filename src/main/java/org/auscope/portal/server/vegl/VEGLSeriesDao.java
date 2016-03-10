@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.cloud.CloudJob;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -58,6 +60,7 @@ public class VEGLSeriesDao extends HibernateDaoSupport {
 
     /**
      * Retrieves the series with given ID.
+     * @param user 
      */
     public VEGLSeries get(final int id) {
         return (VEGLSeries) getHibernateTemplate().get(VEGLSeries.class, id);

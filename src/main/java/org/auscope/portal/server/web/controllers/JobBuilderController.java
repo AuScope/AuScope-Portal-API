@@ -114,9 +114,9 @@ public class JobBuilderController extends BaseCloudController {
      *         VEGLJob object and a success attribute.
      */
     @RequestMapping("/getJobObject.do")
-    public ModelAndView getJobObject(@RequestParam("jobId") String jobId) {
+    public ModelAndView getJobObject(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
         try {
-            VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
+            VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
 
             return generateJSONResponseMAV(true, Arrays.asList(job), "");
         } catch (Exception ex) {
@@ -147,12 +147,12 @@ public class JobBuilderController extends BaseCloudController {
      *         filenames.
      */
     @RequestMapping("/listJobFiles.do")
-    public ModelAndView listJobFiles(@RequestParam("jobId") String jobId) {
+    public ModelAndView listJobFiles(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
 
         //Lookup our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId));
+            job = jobManager.getJobById(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
@@ -189,10 +189,10 @@ public class JobBuilderController extends BaseCloudController {
     public ModelAndView downloadFile(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") String jobId,
-            @RequestParam("filename") String filename) throws Exception {
+            @RequestParam("filename") String filename, @AuthenticationPrincipal ANVGLUser user) throws Exception {
 
         //Lookup our job and download the specified files (any exceptions will return a HTTP 503)
-        VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId));
+        VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
         fileStagingService.handleFileDownload(job, filename, response);
         return null;
     }
@@ -210,12 +210,12 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/uploadFile.do")
     public ModelAndView uploadFile(HttpServletRequest request,
             HttpServletResponse response,
-            @RequestParam("jobId") String jobId) {
+            @RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
 
         //Lookup our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId));
+            job = jobManager.getJobById(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
@@ -248,11 +248,11 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/deleteFiles.do")
     public ModelAndView deleteFiles(@RequestParam("jobId") String jobId,
-            @RequestParam("fileName") String[] fileNames) {
+            @RequestParam("fileName") String[] fileNames, @AuthenticationPrincipal ANVGLUser user) {
 
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId));
+            job = jobManager.getJobById(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
@@ -277,11 +277,11 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/deleteDownloads.do")
     public ModelAndView deleteDownloads(@RequestParam("jobId") String jobId,
-            @RequestParam("downloadId") Integer[] downloadIds) {
+            @RequestParam("downloadId") Integer[] downloadIds, @AuthenticationPrincipal ANVGLUser user) {
 
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId));
+            job = jobManager.getJobById(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
@@ -319,12 +319,12 @@ public class JobBuilderController extends BaseCloudController {
      *
      */
     @RequestMapping("/getJobStatus.do")
-    public ModelAndView getJobStatus(@RequestParam("jobId") String jobId) {
+    public ModelAndView getJobStatus(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
 
         //Get our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId));
+            job = jobManager.getJobById(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
@@ -342,12 +342,12 @@ public class JobBuilderController extends BaseCloudController {
      * @return null
      */
     @RequestMapping("/cancelSubmission.do")
-    public ModelAndView cancelSubmission(@RequestParam("jobId") String jobId) {
+    public ModelAndView cancelSubmission(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
 
         //Get our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId));
+            job = jobManager.getJobById(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
@@ -402,7 +402,7 @@ public class JobBuilderController extends BaseCloudController {
                 //Job creation involves a fair bit of initialisation on the server
                 job = initialiseVEGLJob(request.getSession(), user);
             } else {
-                job = jobManager.getJobById(id);
+                job = jobManager.getJobById(id, user);
             }
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
@@ -483,7 +483,7 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         try {
-            job = jobManager.getJobById(id);
+            job = jobManager.getJobById(id, user);
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
@@ -522,7 +522,8 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam("name") String[] names,
             @RequestParam("description") String[] descriptions,
             @RequestParam("url") String[] urls,
-            @RequestParam("localPath") String[] localPaths) throws ParseException {
+            @RequestParam("localPath") String[] localPaths,
+            @AuthenticationPrincipal ANVGLUser user) throws ParseException {
 
         boolean append = Boolean.parseBoolean(appendString);
 
@@ -539,7 +540,7 @@ public class JobBuilderController extends BaseCloudController {
         //Lookup the job
         VEGLJob job;
         try {
-            job = jobManager.getJobById(id);
+            job = jobManager.getJobById(id, user);
         } catch (Exception ex) {
             logger.error("Error looking up job with id " + id + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
@@ -573,11 +574,11 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      */
     @RequestMapping("/getJobDownloads.do")
-    public ModelAndView getJobDownloads(@RequestParam("jobId") Integer jobId) {
+    public ModelAndView getJobDownloads(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
         //Lookup the job
         VEGLJob job;
         try {
-            job = jobManager.getJobById(jobId);
+            job = jobManager.getJobById(jobId, user);
         } catch (Exception ex) {
             logger.error("Error looking up job with id " + jobId + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
@@ -647,14 +648,15 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/secure/submitJob.do")
     public ModelAndView submitJob(HttpServletRequest request,
             HttpServletResponse response,
-            @RequestParam("jobId") String jobId) {
+            @RequestParam("jobId") String jobId,
+            @AuthenticationPrincipal ANVGLUser user) {
         boolean succeeded = false;
         String oldJobStatus = null, errorDescription = null, errorCorrection = null;
         VEGLJob curJob = null;
 
         try {
             // Get our job
-            curJob = jobManager.getJobById(Integer.parseInt(jobId));
+            curJob = jobManager.getJobById(Integer.parseInt(jobId), user);
             if (curJob == null) {
                 logger.error("Error fetching job with id " + jobId);
                 errorDescription = "There was a problem retrieving your job from the database.";
@@ -810,6 +812,10 @@ public class JobBuilderController extends BaseCloudController {
         jobManager.saveJob(job);
         log.debug(String.format("Created a new job row id=%1$s", job.getId()));
 
+        job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+        job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+        job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
+        
         //Iterate over all session variables - set them up as job parameters
         @SuppressWarnings("rawtypes")
         Enumeration sessionVariables = session.getAttributeNames();
@@ -997,10 +1003,10 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      */
     @RequestMapping("/getAllJobInputs.do")
-    public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId) {
+    public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(jobId);
+            job = jobManager.getJobById(jobId, user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);

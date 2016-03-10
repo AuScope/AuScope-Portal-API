@@ -176,7 +176,7 @@ public class TestGeonetworkController {
             allowing(mockSeries).getDescription();will(returnValue("seriesDescription"));
 
             //We should make a single call to the database for job objects
-            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
@@ -190,7 +190,7 @@ public class TestGeonetworkController {
 
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(outputFileInfo));
-            allowing(cloudStorageServices[0]).getBucket();will(returnValue("s3-output-bucket"));
+            allowing(cloudStorageServices[0]).getBucket("foo");will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
@@ -239,7 +239,7 @@ public class TestGeonetworkController {
 
         context.checking(new Expectations() {{
             //We should make a single call to the database for job objects
-            oneOf(mockJobManager).getJobById(jobId);will(returnValue(null));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
@@ -263,7 +263,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
 
             //We should make a single call to the database for job objects
-            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
         }});
 
@@ -312,7 +312,7 @@ public class TestGeonetworkController {
             allowing(mockRequest).getParameter("keywords");will(returnValue("keyword1, keyword2"));
 
             //We should make a single call to the database for job objects
-            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
@@ -379,7 +379,7 @@ public class TestGeonetworkController {
             allowing(mockSeries).getDescription();will(returnValue("seriesDescription"));
 
             //We should make a single call to the database for job objects
-            oneOf(mockJobManager).getJobById(jobId);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
@@ -393,7 +393,7 @@ public class TestGeonetworkController {
 
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(outputFileInfo));
-            allowing(cloudStorageServices[0]).getBucket();will(returnValue("s3-output-bucket"));
+            allowing(cloudStorageServices[0]).getBucket("foo");will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));

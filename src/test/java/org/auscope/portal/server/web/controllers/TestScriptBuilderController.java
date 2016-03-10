@@ -8,6 +8,7 @@ import java.util.Map;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -35,12 +36,13 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void testSaveScript() throws Exception {
         final String jobId = "1";
         final String sourceText = "print 'test'";
+        final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockSbService).saveScript(jobId, sourceText);
+            oneOf(mockSbService).saveScript(jobId, sourceText, user);
         }});
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -53,7 +55,7 @@ public class TestScriptBuilderController extends PortalTestClass {
         final String jobId = "1";
         final String sourceText = "";
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, new ANVGLUser());
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -66,13 +68,14 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void testSaveScript_Exception() throws Exception {
         final String jobId = "1";
         final String sourceText = "print 'test'";
+        final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockSbService).saveScript(jobId, sourceText);
+            oneOf(mockSbService).saveScript(jobId, sourceText, user);
             will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -84,13 +87,14 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void testGetSavedScript() throws Exception {
         final String jobId = "1";
         final String expectedScriptText = "print 'test'";
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockSbService).loadScript(jobId);
+            oneOf(mockSbService).loadScript(jobId, user);
             will(returnValue(expectedScriptText));
         }});
 
-        ModelAndView mav = controller.getSavedScript(jobId);
+        ModelAndView mav = controller.getSavedScript(jobId, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         String script = (String)mav.getModel().get("data");
         Assert.assertEquals(expectedScriptText, script);
@@ -104,13 +108,14 @@ public class TestScriptBuilderController extends PortalTestClass {
     @Test
     public void testGetSavedScript_Exception() throws Exception {
         final String jobId = "1";
+        final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockSbService).loadScript(jobId);
+            oneOf(mockSbService).loadScript(jobId, user);
             will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.getSavedScript(jobId);
+        ModelAndView mav = controller.getSavedScript(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 

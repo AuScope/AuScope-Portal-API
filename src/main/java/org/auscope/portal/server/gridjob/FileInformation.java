@@ -27,22 +27,21 @@ public class FileInformation implements Serializable {
     private String parentPath = "";
 
     public FileInformation(File file) {
-    	this.name = file.getName();
-    	this.size = file.length();
-    	this.directoryFlag = file.isDirectory();
-    	this.parentPath = file.getParent();
+        this.name = file.getName();
+        this.size = file.length();
+        this.directoryFlag = file.isDirectory();
+        this.parentPath = file.getParent();
     }
-    
-    public FileInformation(String name, long size, boolean directoryFlag,
-			String parentPath) {
-		super();
-		this.name = name;
-		this.size = size;
-		this.directoryFlag = directoryFlag;
-		this.parentPath = parentPath;
-	}
 
-	/**
+    public FileInformation(String name, long size, boolean directoryFlag, String parentPath) {
+        super();
+        this.name = name;
+        this.size = size;
+        this.directoryFlag = directoryFlag;
+        this.parentPath = parentPath;
+    }
+
+    /**
      * Returns the filename.
      *
      * @return The filename.
@@ -69,31 +68,33 @@ public class FileInformation implements Serializable {
         return size;
     }
 
-	/**
-	 * @return the directoryFlag
-	 */
-	public boolean getDirectoryFlag() {
-		return directoryFlag;
-	}
+    /**
+     * @return the directoryFlag
+     */
+    public boolean getDirectoryFlag() {
+        return directoryFlag;
+    }
 
-	/**
-	 * @param directoryFlag the directoryFlag to set
-	 */
-	public void setDirectoryFlag(boolean directoryFlag) {
-		this.directoryFlag = directoryFlag;
-	}
+    /**
+     * @param directoryFlag
+     *            the directoryFlag to set
+     */
+    public void setDirectoryFlag(boolean directoryFlag) {
+        this.directoryFlag = directoryFlag;
+    }
 
-	/**
-	 * @return the parentPath
-	 */
-	public String getParentPath() {
-		return parentPath;
-	}
+    /**
+     * @return the parentPath
+     */
+    public String getParentPath() {
+        return parentPath;
+    }
 
-	/**
-	 * @param parentPath the parentPath to set
-	 */
-	public void setParentPath(String parentPath) {
-		this.parentPath = parentPath;
-	}
+    /**
+     * @param parentPath
+     *            the parentPath to set
+     */
+    public void setParentPath(String parentPath) {
+        this.parentPath = parentPath;
+    }
 }

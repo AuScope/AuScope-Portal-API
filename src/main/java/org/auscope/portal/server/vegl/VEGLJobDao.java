@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -20,12 +22,19 @@ public class VEGLJobDao extends HibernateDaoSupport {
      * It excludes jobs that are deleted.
      *
      * @param seriesID the ID of the series
+     * @param user 
      */
     @SuppressWarnings("unchecked")
-    public List<VEGLJob> getJobsOfSeries(final int seriesID) {
-        return (List<VEGLJob>) getHibernateTemplate()
+    public List<VEGLJob> getJobsOfSeries(final int seriesID, ANVGLUser user) {
+        List<VEGLJob> res = (List<VEGLJob>) getHibernateTemplate()
             .findByNamedParam("from VEGLJob j where j.seriesId=:searchID and lower(j.status)!='deleted'",
                     "searchID", seriesID);
+        for (VEGLJob job : res) {
+            job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+            job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+            job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage()); 
+        }
+        return res;
     }
 
     /**
@@ -68,9 +77,14 @@ public class VEGLJobDao extends HibernateDaoSupport {
 
     /**
      * Retrieves the job with given ID.
+     * @param user 
      */
-    public VEGLJob get(final int id) {
-        return (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
+    public VEGLJob get(final int id, ANVGLUser user) {
+        VEGLJob job = (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
+        job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+        job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+        job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
+        return job;
     }
 
     /**
@@ -85,5 +99,13 @@ public class VEGLJobDao extends HibernateDaoSupport {
      */
     public void save(final VEGLJob job) {
         getHibernateTemplate().saveOrUpdate(job);
+    }
+
+    public VEGLJob get(int id, String stsArn, String clientSecret, String s3Role) {
+        VEGLJob job = (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
+        job.setProperty(CloudJob.PROPERTY_STS_ARN, stsArn);
+        job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, clientSecret);
+        job.setProperty(CloudJob.PROPERTY_S3_ROLE, s3Role);
+        return job;
     }
 }

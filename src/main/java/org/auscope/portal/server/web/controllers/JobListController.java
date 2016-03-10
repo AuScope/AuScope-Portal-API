@@ -130,7 +130,7 @@ public class JobListController extends BaseCloudController  {
         //Attempt to fetch our job
         if (jobId != null) {
             try {
-                job = jobManager.getJobById(jobId.intValue());
+                job = jobManager.getJobById(jobId.intValue(), user);
                 logger.debug("Job [" + job.hashCode() + "] retrieved by jobManager [" + jobManager.hashCode() + "]");
             } catch (Exception ex) {
                 logger.error(String.format("Exception when accessing jobManager for job id '%1$s'", jobId), ex);
@@ -269,7 +269,7 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "Unable to lookup series.");
         }
 
-        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue());
+        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
         if (jobs == null) {
             logger.warn(String.format("Unable to lookup jobs for series id '%1$s'", seriesId));
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs of series.");
@@ -413,7 +413,7 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "Unable to lookup series.");
         }
 
-        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue());
+        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
         if (jobs == null) {
             logger.warn(String.format("Unable to lookup jobs for series id '%1$s'", seriesId));
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs of series.");
@@ -751,11 +751,17 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
         }
 
-        List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue());
+        List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
         if (seriesJobs == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs for the specified series.");
         }
 
+//        for (VEGLJob veglJob : seriesJobs) {
+//          veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+//          veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+//          veglJob.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
+//        }
+//        
         if (forceStatusRefresh) {
             try {
                 jobStatusMonitor.statusUpdate(seriesJobs);
