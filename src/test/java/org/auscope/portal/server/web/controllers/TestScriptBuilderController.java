@@ -42,8 +42,8 @@ public class TestScriptBuilderController extends PortalTestClass {
         final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockSbService).saveScript(jobId, sourceText);
-            oneOf(mockScmEntryService).updateJobForSolution(jobId, solutionId);
+            oneOf(mockSbService).saveScript(jobId, sourceText, user);
+            oneOf(mockScmEntryService).updateJobForSolution(jobId, solutionId, user);
         }});
 
         ModelAndView mav = controller.saveScript(jobId, sourceText, solutionId, user);

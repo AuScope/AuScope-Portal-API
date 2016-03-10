@@ -17,6 +17,7 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VLScmSnapshot;
 import org.auscope.portal.server.vegl.VLScmSnapshotDao;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.scm.Entries;
 import org.auscope.portal.server.web.service.scm.Problem;
 import org.auscope.portal.server.web.service.scm.Solution;
@@ -87,14 +88,15 @@ public class ScmEntryService {
      *
      * @param jobId String job ID
      * @param solutionId String solution URL
+     * @param user Authenticated ANVGLUser 
      * @throws PortalServiceException
      */
-    public void updateJobForSolution(String jobId, String solutionId)
+    public void updateJobForSolution(String jobId, String solutionId, ANVGLUser user)
         throws PortalServiceException {
         //Lookup our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId));
+            job = jobManager.getJobById(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.warn("Unable to lookup job with id " + jobId + ": " + ex.getMessage());
             logger.debug("exception:", ex);
@@ -268,13 +270,13 @@ public class ScmEntryService {
      *
      * @return Map<String, Set<String>> with images for job, or null.
      */
-    public Map<String, Set<String>> getJobImages(Integer jobId) {
+    public Map<String, Set<String>> getJobImages(Integer jobId, ANVGLUser user) {
         if (jobId == null) {
             return null;
         }
 
         Map<String, Set<String>> images = new HashMap<String, Set<String>>();
-        VEGLJob job = jobManager.getJobById(jobId);
+        VEGLJob job = jobManager.getJobById(jobId, user);
         if (job != null) {
             Solution solution = getJobSolution(job);
             if (solution != null) {
@@ -299,8 +301,8 @@ public class ScmEntryService {
      *
      * @return Set<String> of compute service ids for job, or null if jobId == null.
      */
-    public Set<String> getJobProviders(Integer jobId) {
-        Map<String, Set<String>> images = getJobImages(jobId);
+    public Set<String> getJobProviders(Integer jobId, ANVGLUser user) {
+        Map<String, Set<String>> images = getJobImages(jobId, user);
         if (images != null) {
             return images.keySet();
         }

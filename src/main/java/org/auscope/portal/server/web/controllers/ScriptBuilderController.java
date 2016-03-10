@@ -90,7 +90,7 @@ public class ScriptBuilderController extends BasePortalController {
 
         // Update job with vmId for solution if we have one.
         try {
-            scmEntryService.updateJobForSolution(jobId, solutionId);
+            scmEntryService.updateJobForSolution(jobId, solutionId, user);
         }
         catch (PortalServiceException e) {
             logger.warn("Failed to update job (" + jobId + ") for solution (" +

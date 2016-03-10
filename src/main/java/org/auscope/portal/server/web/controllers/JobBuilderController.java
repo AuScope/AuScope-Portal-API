@@ -923,14 +923,15 @@ public class JobBuilderController extends BaseCloudController {
     public ModelAndView getImagesForComputeService(
         HttpServletRequest request,
         @RequestParam("computeServiceId") String computeServiceId,
-        @RequestParam(value="jobId", required=false) Integer jobId) {
+        @RequestParam(value="jobId", required=false) Integer jobId,
+        @AuthenticationPrincipal ANVGLUser user) {
         try {
             // Assume all images are usable by the current user
             List<MachineImage> images = new ArrayList<MachineImage>();
 
             // Filter list to images suitable for job solution, if specified
             if (jobId != null) {
-                Set<String> vmIds = scmEntryService.getJobImages(jobId).get(computeServiceId);
+                Set<String> vmIds = scmEntryService.getJobImages(jobId, user).get(computeServiceId);
                 if (vmIds != null) {
                     for (String vmId: vmIds) {
                         images.add(new MachineImage(vmId));
@@ -955,11 +956,6 @@ public class JobBuilderController extends BaseCloudController {
             log.error("Unable to access image list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
         }
-    }
-
-    public ModelAndView getImagesForComputeService(HttpServletRequest request,
-                                                   String computeServiceId) {
-        return getImagesForComputeService(request, computeServiceId, null);
     }
 
     /**
@@ -1027,9 +1023,10 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/getComputeServices.do")
     public ModelAndView getComputeServices(@RequestParam(value="jobId",
                                                          required=false)
-                                           Integer jobId) {
+                                           Integer jobId,
+                                           @AuthenticationPrincipal ANVGLUser user) {
         
-        Set<String> jobCCSIds = scmEntryService.getJobProviders(jobId);
+        Set<String> jobCCSIds = scmEntryService.getJobProviders(jobId, user);
 
         List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();
 
@@ -1044,13 +1041,6 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         return generateJSONResponseMAV(true, simpleComputeServices, "");
-    }
-
-    /**
-     * Convenience method for getComputeServices(null).
-     */
-    public ModelAndView getComputeServices() {
-        return getComputeServices(null);
     }
 
     /**

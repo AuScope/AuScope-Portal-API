@@ -1277,7 +1277,7 @@ public class TestJobBuilderController {
             allowing(mockRequest).isUserInRole("testRole2");will(returnValue(true));
         }});
 
-        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId);
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, new ANVGLUser());
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
@@ -1307,7 +1307,7 @@ public class TestJobBuilderController {
             oneOf(images[0]).getPermissions();will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId);
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, new ANVGLUser());
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
@@ -1812,14 +1812,15 @@ public class TestJobBuilderController {
     public void testGetComputeServices() throws Exception {
         final String name = "name";
         final String id = "id";
+        final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getName();will(returnValue(name));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(id));
-            allowing(mockScmEntryService).getJobProviders(null);will(returnValue(null));
+            allowing(mockScmEntryService).getJobProviders(null, user);will(returnValue(null));
         }});
-
-        ModelAndView mav = controller.getComputeServices();
+        
+		ModelAndView mav = controller.getComputeServices(null, user);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
