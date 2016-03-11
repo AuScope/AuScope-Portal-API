@@ -38,8 +38,6 @@ import org.springframework.web.client.RestTemplate;
 public class ScmEntryService {
     private final Log logger = LogFactory.getLog(getClass());
 
-    public static final String SCM_URL = "http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm";
-    
     /** Puppet module template resource */
     protected static final String PUPPET_TEMPLATE =
         "org/auscope/portal/server/web/service/template.pp";
@@ -48,6 +46,8 @@ public class ScmEntryService {
     private VelocityEngine velocityEngine;
     private VEGLJobManager jobManager;
     private CloudComputeService[] cloudComputeServices;
+
+    static String solutionsUrl;
 
     /**
      * Create a new instance.
@@ -191,7 +191,7 @@ public class ScmEntryService {
         RestTemplate rest = new RestTemplate();
         Entries solutions;
 
-        url.append(SCM_URL).append("/solutions");
+        url.append(solutionsUrl).append("/solutions");
         if (problem != null) {
             url.append("?problem={problem_id}");
             solutions = rest.getForObject(url.toString(),
@@ -398,5 +398,12 @@ public class ScmEntryService {
      */
     public void setVelocityEngine(VelocityEngine velocityEngine) {
         this.velocityEngine = velocityEngine;
+    }
+
+    /**
+     * Static setter used to inject the configured solution center URL.
+     */
+    public static void setSolutionsUrl(String solutionsUrl) {
+        ScmEntryService.solutionsUrl = solutionsUrl;
     }
 }
