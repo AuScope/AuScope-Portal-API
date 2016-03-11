@@ -1,11 +1,6 @@
-/**
- * A Ext.grid.Panel specialisation for rendering the Jobs
- * available to the current user.
- *
- * Adds the following events
- * selectjob : function(vegl.widgets.SeriesPanel panel, vegl.models.Job selection) - fires whenever a new Job is selected
- */
 Ext.define('vegl.widgets.JobInputFilesPanel', {
+    /** @lends anvgl.JobBuilder.JobInputFilesPanel */
+    
     extend : 'Ext.grid.Panel',
     alias : 'widget.jobinputfilespanel',
 
@@ -13,14 +8,22 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
     downloadAction : null,
     deleteAction : null,
 
+    /**
+     * A Ext.grid.Panel specialisation for rendering the Jobs available to the current user.
+     * Adds the following events:
+     * selectjob : function(vegl.widgets.SeriesPanel panel, vegl.models.Job selection) - fires whenever a new Job is selected
+     * @constructs
+     * @param {object} config
+     */
     constructor : function(config) {
         var jobFilesGrid = this;
-
+        
+        // while creating a job the jobId is not available at this stage
         this.currentJobId = config.currentJob ? config.currentJob.get("id") : config.currentJobId;
-
+        
         //Action for downloading a single file
         this.downloadAction = new Ext.Action({
-            text: 'Download to your machine.',
+            text: 'Download this input to your machine.',
             disabled: true,
             iconCls: 'disk-icon',
             scope : this,
@@ -42,7 +45,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
         //Action for deleting a single file
         this.deleteAction = new Ext.Action({
-            text: 'Delete.',
+            text: 'Delete this input.',
             disabled: true,
             iconCls: 'cross-icon',
             scope : this,
@@ -80,9 +83,15 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
                 groupHeaderTpl: '{name} ({[values.rows.length]} {[values.rows.length > 1 ? "Items" : "Item"]})'
             })],
             plugins : [{
-                ptype : 'inlinecontextmenu',
-                align : 'left',
-                actions: [this.downloadAction, this.deleteAction]
+                ptype: 'rowexpander',
+                rowBodyTpl : [
+                    '<p>{description}</p><br>'
+                ]
+            },{
+                ptype : 'rowcontextmenu',
+                contextMenu : Ext.create('Ext.menu.Menu', {
+                     items: [this.downloadAction, this.deleteAction]
+                })
             }],
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.widgets.JobInputFilesPanel.Item',
@@ -91,18 +100,23 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             }),
             columns: [{ header: 'Name', width: 200, sortable: true, dataIndex: 'name'},
                       { header: 'Location', width: 200, dataIndex: 'localPath'},
-                      { header: 'Details', flex : 1, dataIndex: 'details'}]
+                      { header: 'Details', flex : 1, dataIndex: 'details'}],
+              tbar: [{
+                  text: 'Actions',
+                  iconCls: 'folder-icon',
+                  menu: [ this.downloadAction, this.deleteAction]
+              }]
         });
 
         this.callParent(arguments);
-
+        
         this.on('selectionchange', this._onSelectionChange, this);
         this.on('celldblclick', this._onDblClick, this);
-
     },
 
     /**
      * Updates the store by making AJAX requests for the current job object
+     * @function
      */
     updateFileStore : function() {
         if (!this.currentJobId) {
@@ -174,6 +188,9 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
     /**
      * Sets the store data from a set of vegl.models.FileRecord and vegl.models.Download objects
+     * @function
+     * @param {object} fileRecords
+     * @param {object} downloads
      */
     _setStoreData : function(fileRecords, downloads) {
         var ds = this.getStore();
@@ -211,12 +228,28 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
         ds.loadData(dsData);
     },
 
+    /**
+     * @function
+     * @param view
+     * @param td
+     * @param cellIndex
+     * @param record
+     * @param tr
+     * @param rowIndex
+     * @param e
+     * @param eOpts
+     */
     _onDblClick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
         var sm = this.getSelectionModel();
 
         this.getSelectionModel().select([record], false);
     },
 
+    
+    /**
+     * @function
+     * @param sm
+     */
     _onSelectionChange : function(sm) {
         var totalSelections = this.getSelectionModel().getSelection().length;
         if (totalSelections == 0) {
@@ -230,6 +263,8 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
     /**
      * Reloads this store with all the files for the specified job
+     * @function
+     * @param {object} job
      */
     listFilesForJob : function(job) {
         this.currentJob = job;
@@ -246,7 +281,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel.Item', {
     fields: [
         { name: 'id', type: 'string' }, //Unique ID for this download/file
         { name: 'name', type: 'string' }, //short name of this download/file
-        { name: 'description', type: 'string' }, //longer descriptiion of this download
+        { name: 'description', type: 'string' }, //longer description of this download
         { name: 'details', type: 'string'}, //The remote URL or file size
         { name: 'localPath', type: 'string'}, //Where the file will be made available
         { name: 'source', type: 'auto'}, //Either a vegl.models.FileRecord or a vegl.models.Download object.

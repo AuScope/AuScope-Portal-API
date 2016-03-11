@@ -97,9 +97,13 @@ Ext.define('vegl.widgets.JobInputFileWindow', {
             return;
         }
 
+        var params = form.getValues();
+        params.jobId = this.jobId;
+        
         //Submit our form so our files get uploaded...
         form.submit({
             url: 'uploadFile.do',
+            params: params,
             scope : this,
             success: function(form, action) {
                 if (!action.result.success) {
@@ -110,9 +114,6 @@ Ext.define('vegl.widgets.JobInputFileWindow', {
             },
             failure: function() {
                 Ext.Msg.alert('Failure', 'File upload failed. Please try again in a few minutes.');
-            },
-            params: {
-                jobId : this.jobId
             },
             waitMsg: 'Uploading file, please wait...',
             waitTitle: 'Upload file'

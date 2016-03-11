@@ -26,6 +26,10 @@ source /etc/profile
 
 echo "------ VL Bootstrap Script ---------"
 echo "                                      "
+echo "------ Provisioning ----------"
+echo ""
+{9}
+echo ""
 echo "------ Printing Environment ----------"
 echo "VL_BOOTSTRAP_VERSION = $VL_BOOTSTRAP_VERSION"
 echo "WORKING_DIR = $WORKING_DIR"

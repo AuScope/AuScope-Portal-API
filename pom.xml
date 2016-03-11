@@ -26,6 +26,7 @@
     <build>
         <finalName>ANVGL-Portal</finalName>
         <plugins>
+        
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
@@ -110,21 +111,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                        <version>${log4j.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <webApp>${project.build.directory}/${project.build.finalName}</webApp>
-                    <scanIntervalSeconds>9999</scanIntervalSeconds>
-                    <contextPath>/</contextPath>
-                </configuration>
             </plugin>
             <!-- Powermock - Unit test work around... -->
             <plugin>
@@ -146,6 +135,7 @@
                     <wtpversion>2.0</wtpversion>
                 </configuration>
             </plugin>
+            
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>yuicompressor-maven-plugin</artifactId>
@@ -164,6 +154,7 @@
                 </configuration>
                 <version>1.4.0</version>
             </plugin>
+             
             <!--
                 This is needed for Emma Coverage to work with unit tests
                 that use PowerMock's JMock library. The latest alpha
@@ -264,7 +255,7 @@
 
     <!-- Project properties -->
     <properties>
-        <jetty.version>6.1.26</jetty.version>
+        <jetty.version>9.3.7.v20160115</jetty.version>
         <hibernate.version>3.6.7.Final</hibernate.version>
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>1.8</targetJdk>
@@ -272,6 +263,7 @@
         <powermock.version>1.6.3</powermock.version>
         <portal.core.version>1.5.0-SNAPSHOT</portal.core.version>
         <httpclient.version>4.3.5</httpclient.version>
+        <mysql.version>5.1.38</mysql.version>
     </properties>
 
     <repositories>
@@ -501,6 +493,11 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
         </dependency>
     </dependencies>
 </project>

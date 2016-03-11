@@ -316,12 +316,16 @@ Ext.define('vegl.widgets.JobsPanel', {
      */
     listJobsForSeries : function(series, forceStatusRefresh) {
         this.currentSeries = series;
+        
         var store = this.getStore();
+        
         var ajaxProxy = store.getProxy();
         ajaxProxy.extraParams.seriesId = series.get('id');
+        
         if (forceStatusRefresh) {
             ajaxProxy.extraParams.forceStatusRefresh = true;
         }
+
         store.load();
     },
 
@@ -363,7 +367,6 @@ Ext.define('vegl.widgets.JobsPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {     
-                    
                     Ext.getBody().mask('Cancelling Job...');
                     
                     Ext.Ajax.request({
@@ -451,10 +454,12 @@ Ext.define('vegl.widgets.JobsPanel', {
                     duplicateJobId : job.get('id'),
                     userAction : 'duplicate'
                 },
-                forms : ['vegl.jobwizard.forms.DuplicateJobForm',
-                         'vegl.jobwizard.forms.JobObjectForm',
+                forms : [
+                         'vegl.jobwizard.forms.DuplicateJobForm',
                          'vegl.jobwizard.forms.ScriptBuilderForm',
-                         'vegl.jobwizard.forms.JobSubmitForm']
+                         'vegl.jobwizard.forms.JobObjectForm',
+                         'vegl.jobwizard.forms.JobSubmitForm'
+                 ]
             }]
         });
 
@@ -490,10 +495,12 @@ Ext.define('vegl.widgets.JobsPanel', {
                     seriesId : job.get('seriesId'),
                     userAction : 'edit'
                 },
-                forms : ['vegl.jobwizard.forms.JobObjectForm',
+                forms : [
+                         'vegl.jobwizard.forms.JobObjectForm',
                          'vegl.jobwizard.forms.JobUploadForm',
                          'vegl.jobwizard.forms.ScriptBuilderForm',
-                         'vegl.jobwizard.forms.JobSubmitForm']
+                         'vegl.jobwizard.forms.JobSubmitForm'
+                 ]
             }]
         });
 
