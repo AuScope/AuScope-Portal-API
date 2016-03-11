@@ -66,6 +66,7 @@
     <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileWindow.js"></script>
+    <script src="js/ScriptBuilder/templates/DynamicTemplate.js" type="text/javascript"></script>
 
     <script type="text/javascript" src="js/vegl/JobBuilder.js"></script>
     <script type="text/javascript" src="js/vegl/HelpHandler.js"></script>

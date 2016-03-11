@@ -44,6 +44,7 @@ CREATE TABLE `jobs` (
   `processDate` datetime DEFAULT NULL,
   `emailNotification` char(1) DEFAULT 'N',
   `processTimeLog` varchar(255) DEFAULT '',
+  `solutionId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `SERIES` (`seriesId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;

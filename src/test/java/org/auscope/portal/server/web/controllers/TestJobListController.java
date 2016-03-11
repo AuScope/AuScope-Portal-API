@@ -992,19 +992,20 @@ public class TestJobListController extends PortalTestClass {
     @Test
     public void testCreateSeries() throws Exception {
         final String userEmail = "exampleuser@email.com";
-        final String qName = "default";
-        final String qDescription = "Everything will now come through to a single default series";
+        final String qName = "series name";
+        final String qDescription = "series description";
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).querySeries(userEmail,qName, null);will(returnValue(null));
+
             oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));
         }});
 
         //Returns MAV on failure
-        ModelAndView mav = controller.createSeries(mockRequest, mockPortalUser);
+        ModelAndView mav = controller.createSeries(mockRequest, qName, qDescription, mockPortalUser);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         VEGLSeries actualSeries = ((List<VEGLSeries>) mav.getModel().get("data")).get(0);
+
         Assert.assertNotNull(actualSeries);
         Assert.assertEquals(userEmail, actualSeries.getUser());
         Assert.assertEquals(qName, actualSeries.getName());
@@ -1051,17 +1052,17 @@ public class TestJobListController extends PortalTestClass {
     @Test
     public void testCreateSeriesFailure() throws Exception {
         final String userEmail = "exampleuser@email.com";
-        final String qName = "default";
-        final String qDescription = "Everything will now come through to a single default series";
+        final String qName = "series name";
+        final String qDescription = "series description";
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).querySeries(userEmail, qName, null);will(returnValue(null));
+
             oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));will(throwException(new MyDataAccessException()));
         }});
 
         //Returns MAV on failure
-        ModelAndView mav = controller.createSeries(mockRequest, mockPortalUser);
+        ModelAndView mav = controller.createSeries(mockRequest, qName, qDescription, mockPortalUser);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 

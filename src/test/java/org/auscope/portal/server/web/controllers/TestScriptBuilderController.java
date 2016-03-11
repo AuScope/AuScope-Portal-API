@@ -8,6 +8,7 @@ import java.util.Map;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.jmock.Expectations;
@@ -21,11 +22,12 @@ import org.springframework.web.servlet.ModelAndView;
 public class TestScriptBuilderController extends PortalTestClass {
     private ScriptBuilderController controller;
     private ScriptBuilderService mockSbService = context.mock(ScriptBuilderService.class);
-
+    private ScmEntryService mockScmEntryService = context.mock(ScmEntryService.class);
+    
     @Before
     public void setup() {
         // Object Under Test
-        controller = new ScriptBuilderController(mockSbService);
+        controller = new ScriptBuilderController(mockSbService, mockScmEntryService);
     }
 
     /**
@@ -36,13 +38,15 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void testSaveScript() throws Exception {
         final String jobId = "1";
         final String sourceText = "print 'test'";
+        final String solutionId = "http://vhirl-dev.csiro.au/scm/solutions/1";
         final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockSbService).saveScript(jobId, sourceText, user);
+            oneOf(mockScmEntryService).updateJobForSolution(jobId, solutionId, user);
         }});
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText, user);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutionId, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -54,8 +58,10 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void testSaveScript_EmptySourceText() throws Exception {
         final String jobId = "1";
         final String sourceText = "";
+        final String solutionId = "http://vhirl-dev.csiro.au/scm/solutions/1";
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText, new ANVGLUser());
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutionId,
+                                                 new ANVGLUser());
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -68,6 +74,7 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void testSaveScript_Exception() throws Exception {
         final String jobId = "1";
         final String sourceText = "print 'test'";
+        final String solutionId = "http://vhirl-dev.csiro.au/scm/solutions/1";
         final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
@@ -75,7 +82,7 @@ public class TestScriptBuilderController extends PortalTestClass {
             will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText, user);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutionId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
