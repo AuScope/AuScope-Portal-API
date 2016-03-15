@@ -1,12 +1,8 @@
 package org.auscope.portal.server.web.service.scm;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Problem from the Scientific Solution Centre.
