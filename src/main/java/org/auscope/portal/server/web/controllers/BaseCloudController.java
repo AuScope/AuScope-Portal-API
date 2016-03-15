@@ -11,6 +11,7 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 
 /**
@@ -126,8 +127,7 @@ public abstract class BaseCloudController extends BasePortalController {
     public String createBootstrapForJob(VEGLJob job) throws IOException {
         String bootstrapTemplate = getBootstrapTemplate();
         CloudStorageService cloudStorageService = getStorageService(job);
-
-        boolean useSts = job.getProperty(CloudJob.PROPERTY_STS_ARN) !=null;
+        boolean useSts = ! TextUtil.isNullOrEmpty(job.getProperty(CloudJob.PROPERTY_STS_ARN));
         
         Object[] arguments;
         try {
