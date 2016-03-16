@@ -50,6 +50,10 @@ public class TestJobDownloadController extends PortalTestClass {
         final String description = "desc";
         final String localPath = "localPath";
         final String serviceUrl = "http://example.org/service";
+        final String parentName = "parent data";
+        final String parentUrl = "http://example.org/service";
+        final String owner = "CoolCompany@cool.com";
+        
 
         final List<VglDownload> downloads = new ArrayList<VglDownload>();
 
@@ -62,7 +66,7 @@ public class TestJobDownloadController extends PortalTestClass {
             oneOf(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
         }});
 
-        ModelAndView mav = controller.makeErddapUrl(northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, format, layerName, name, description, localPath, true, mockRequest, mockResponse);
+        ModelAndView mav = controller.makeErddapUrl(northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, format, layerName, name, description, description, localPath, parentName, parentUrl, owner, true, mockRequest, mockResponse);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
 
@@ -103,14 +107,18 @@ public class TestJobDownloadController extends PortalTestClass {
         final String description = "desc";
         final String localPath = "localPath";
         final String serviceUrl = "http://example.org/service";
-
+        final String parentName = "parent data";
+        final String parentUrl = "http://example.org/service";
+        final String owner = "CoolCompany@cool.com";
+        
         context.checking(new Expectations() {{
             oneOf(mockHostConfigurer).resolvePlaceholder("HOST.erddapservice.url");will(returnValue(serviceUrl));
 
             allowing(mockRequest).getSession();will(returnValue(mockSession));
         }});
 
-        ModelAndView mav = controller.makeErddapUrl(northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, format, layerName, name, description, localPath, false, mockRequest, mockResponse);
+        ModelAndView mav = controller.makeErddapUrl(northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, format, layerName, name, description, description, localPath, parentName, parentUrl, owner, false, mockRequest, mockResponse);
+        
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
 
@@ -135,6 +143,9 @@ public class TestJobDownloadController extends PortalTestClass {
         final String description = "desc";
         final String localPath = "localPath";
         final String serviceUrl = "http://example.org/service";
+        final String parentName = "parent data";
+        final String parentUrl = "http://example.org/service";
+        final String owner = "CoolCompany@cool.com";
 
         final List<VglDownload> downloads = new ArrayList<VglDownload>();
 
@@ -145,7 +156,7 @@ public class TestJobDownloadController extends PortalTestClass {
             oneOf(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
         }});
 
-        ModelAndView mav = controller.makeDownloadUrl(serviceUrl, name, description, localPath, northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, true, mockRequest);
+        ModelAndView mav = controller.makeDownloadUrl(serviceUrl, name, description, description, localPath, northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, parentName, parentUrl, owner, true, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
 
@@ -182,12 +193,15 @@ public class TestJobDownloadController extends PortalTestClass {
         final String description = "desc";
         final String localPath = "localPath";
         final String serviceUrl = "http://example.org/service";
+        final String parentName = "parent data";
+        final String parentUrl = "http://example.org/service";
+        final String owner = "CoolCompany@cool.com";
 
         context.checking(new Expectations() {{
             allowing(mockRequest).getSession();will(returnValue(mockSession));
         }});
 
-        ModelAndView mav = controller.makeDownloadUrl(serviceUrl, name, description, localPath, northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, false, mockRequest);
+        ModelAndView mav = controller.makeDownloadUrl(serviceUrl, name, description, description, localPath, northBoundLatitude, eastBoundLongitude, southBoundLatitude, westBoundLongitude, parentName, parentUrl, owner, false, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
 
@@ -219,6 +233,11 @@ public class TestJobDownloadController extends PortalTestClass {
         final Integer maxFeatures = null;
         final List<VglDownload> downloads = new ArrayList<VglDownload>();
         final String wfsRequestString = serviceUrl + "?request=param";
+        final String parentName = "parent data";
+        final String parentUrl = "http://example.org/wfs";
+        final String owner = "CoolCompany@cool.com";
+        
+        
 
         final String[] expectedFormats = new String[] {"format1", "format2"};
         final WFSGetCapabilitiesResponse mockResponse = context.mock(WFSGetCapabilitiesResponse.class);
@@ -235,9 +254,9 @@ public class TestJobDownloadController extends PortalTestClass {
             oneOf(mockSession).setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, downloads);
         }});
 
-        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs,
-                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude,
-                outputFormat, maxFeatures, name, description, localPath, true, mockRequest);
+        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs, 
+                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, 
+                outputFormat, maxFeatures, name, description, description, localPath, parentName, parentUrl, owner, true, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
 
@@ -280,6 +299,10 @@ public class TestJobDownloadController extends PortalTestClass {
         final String outputFormat = "o-f";
         final Integer maxFeatures = null;
         final String wfsRequestString = serviceUrl + "?request=param";
+        final String parentName = "parent data";
+        final String parentUrl = "http://example.org/wfs";
+        final String owner = "CoolCompany@cool.com";
+        
 
         final String[] expectedFormats = new String[] {"format1", "format2"};
         final WFSGetCapabilitiesResponse mockResponse = context.mock(WFSGetCapabilitiesResponse.class);
@@ -293,9 +316,9 @@ public class TestJobDownloadController extends PortalTestClass {
             allowing(mockResponse).getGetFeatureOutputFormats();will(returnValue(expectedFormats));
         }});
 
-        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs,
-                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude,
-                outputFormat, maxFeatures, name, description, localPath, false, mockRequest);
+        ModelAndView mav = controller.makeWfsUrl(serviceUrl, featureType, srsName, bboxSrs, 
+                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, 
+                outputFormat, maxFeatures, name, description, description, localPath, parentName, parentUrl, owner, false, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
 

@@ -87,6 +87,7 @@
             <map>
                 <entry key="jobManager" value-ref="veglJobManager"/>
                 <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
+                <entry key="jobUserDao" value-ref="anvglUserDao"/>
             </map>
         </property>
     </bean>
@@ -200,30 +201,26 @@
     <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageService">
         <constructor-arg name="provider" value="aws-s3"/>
         <constructor-arg name="endpoint"><null/></constructor-arg>
-        <constructor-arg name="accessKey" value="${env.aws.s3.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.aws.s3.secretkey}"/>
+        <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.aws.secretkey}"/>
         <constructor-arg name="regionName" value="ap-southeast-2"/>
         <constructor-arg name="relaxHostName" value="false"/>
         <constructor-arg name="stripExpectHeader" value="true"/>
         <property name="name" value="Amazon Web Services - S3"/>
         <property name="id" value="amazon-aws-storage-sydney"/>
-        <property name="bucket" value="anvgl-csiro"/>
+        <property name="bucket" value="anvgl-csiro-"/>
     </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
 
-    <bean id="cloudComputeService-aws" class="org.auscope.portal.core.services.cloud.CloudComputeService">
-        <constructor-arg name="provider" value="AWSEc2"/>
-        <constructor-arg name="endpoint"><null/></constructor-arg>
+    <bean id="cloudComputeService-aws" class="org.auscope.portal.core.services.cloud.CloudComputeServiceAws">
+        <constructor-arg name="endpoint" value="ec2.ap-southeast-2.amazonaws.com"/>
         <constructor-arg name="apiVersion"><null/></constructor-arg>
-        <constructor-arg name="accessKey" value="${env.aws.ec2.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.aws.ec2.secretkey}"/>
-        <constructor-arg name="httpServiceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.aws.secretkey}"/>
         
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
-        <property name="keypair" value="developers-anvgl-aws"/>
-        <property name="zone" value="ap-southeast-2"/>
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
@@ -258,6 +255,17 @@
                 <constructor-arg name="stageInDirectory" value="${HOST.localStageInDir}"/>
             </bean>
         </constructor-arg>
+    </bean>
+
+    <!-- Inject the configured solutions centre URL -->
+    <bean class="org.springframework.beans.factory.config.MethodInvokingBean">
+      <property name="staticMethod"
+                value="org.auscope.portal.server.web.service.ScmEntryService.setSolutionsUrl"/>
+      <property name="arguments">
+        <list>
+          <value>${HOST.solutions.url}</value>
+        </list>
+      </property>
     </bean>
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
@@ -302,10 +310,16 @@
                 <value>vglsignature.hbm.xml</value>
                 <value>anvgluser.hbm.xml</value>
                 <value>anvglauthority.hbm.xml</value>
+                <value>scmentrysnapshot.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
             <value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>
         </property>
+    </bean>
+    
+    <!-- vegl.VLScmSnapshotDao -->
+     <bean id="vlScmSnapshotDao" class="org.auscope.portal.server.vegl.VLScmSnapshotDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
 </beans>

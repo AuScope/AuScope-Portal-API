@@ -1,23 +1,25 @@
 /**
- * Job wizard form for creating and editing a new Job Object
- *
- * Author - Josh Vote
+ * @author Josh Vote
  */
-
 Ext.define('vegl.jobwizard.forms.JobObjectForm', {
+    /** @lends anvgl.JobBuilder.JobObjectForm */
+
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
 
     imageStore : null,
     computeTypeStore : null,
 
     /**
+     * Extends 'vegl.jobwizard.forms.BaseJobWizardForm'
+     * Job wizard form for creating and editing a new Job Object. 
      * Creates a new JobObjectForm form configured to write/read to the specified global state
+     * @constructs
+     * @param {object} wizardState
      */
     constructor: function(wizardState) {
         var jobObjectFrm = this;
-
-        this.createSeries(wizardState);
-
+        
+        // create the store, get the machine image
         this.imageStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.MachineImage',
             proxy: {
@@ -33,7 +35,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             }
         });
         this.imageStore.load();
-
+        
+        // create the store and get the compute type
         this.computeTypeStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.ComputeType',
             proxy: {
@@ -45,7 +48,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             }
         });
-
+                
+        // call the parent class
         this.callParent([{
             wizardState : wizardState,
             bodyStyle: 'padding:10px;',
@@ -67,10 +71,45 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                             failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
                             success : function(frm, action) {
                                 var responseObj = Ext.JSON.decode(action.response.responseText);
-
                                 if (responseObj.success) {
-                                    //Loads the image store of user selected compute provider
-                                    frm.setValues(responseObj.data[0]);
+                                    //Loads the image store of user selected
+                                    //compute provider
+                                    var jobData = responseObj.data[0];
+
+                                    if (!Ext.isEmpty(jobData.computeServiceId)) {
+                                        jobObjectFrm.imageStore.load({
+                                            params : {
+                                                computeServiceId : jobData.computeServiceId,
+                                                jobId: jobData.id
+                                            },
+                                            callback: function(records, operation, success) {
+                                                // Set form values from the jobData, but
+                                                // override {compute,storage}ServiceId since
+                                                // they are now constant values (see
+                                                // ANVGL-35)
+                                                frm.setValues(jobData);
+                                                frm.setValues({
+                                                    computeServiceId: 'aws-ec2-compute',
+                                                    storageServiceId: 'amazon-aws-storage-sydney'
+                                                });
+                                            }
+                                        });
+
+                                        jobObjectFrm.computeTypeStore.load({
+                                            params : {
+                                                computeServiceId : jobData.computeServiceId
+                                            },
+                                            callback: function(records, operation, success) {
+                                                jobObjectFrm.preselectVmType();
+                                            }
+                                        });
+                                    }
+
+                                    // Store the vm type if specified
+                                    // in the job, and solutionId, for later use.
+                                    jobObjectFrm.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
+                                    jobObjectFrm.wizardState.solutionId = jobData.solutionId;
+
                                     jobObjectFrm.wizardState.jobId = frm.getValues().id;
                                 }
                             }
@@ -86,7 +125,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 name: 'name',
                 itemId : 'name',
                 fieldLabel: 'Job Name',
-                value : Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'Y-m-d g:i a')),
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'Enter a useful name for your job here.'
@@ -116,7 +154,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 value: 'amazon-aws-storage-sydney'
             },{
                 xtype : 'machineimagecombo',
-                fieldLabel : 'Toolbox',
+                fieldLabel : 'Toolbox<span>*</span>',
                 name: 'computeVmId',
                 itemId : 'image-combo',
                 allowBlank: false,
@@ -138,7 +176,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             },{
                 xtype : 'combo',
-                fieldLabel : 'Resources',
+                fieldLabel : 'Resources<span>*</span>',
                 name: 'computeTypeId',
                 itemId : 'resource-combo',
                 displayField : 'longDescription',
@@ -178,6 +216,45 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         }]);
     },
 
+    /**
+     * Select a VM type based on the number of threads specified in the template.
+     * @function
+     *
+     */
+    preselectVmType: function() {
+        var jobObjectFrm = this;
+        var wizardState = this.wizardState;
+        var computeTypeStore = this.computeTypeStore;
+        var computeTypeId = wizardState.jobComputeInstanceType;
+        var frm = jobObjectFrm.getForm();
+
+        // Select a vm type that has ncpus
+        // >= nthreads if one hasn't
+        // already been selected.
+        if (!Ext.isEmpty(computeTypeId)) {
+            frm.setValues({computeTypeId: computeTypeId});
+        }
+        else if (wizardState.nthreads) {
+            // Get vm types that are big enough
+            var vmtype, vcpus;
+            var ncpus = 99999;
+            computeTypeStore.each(function(r) {
+                vcpus = r.get('vcpus');
+                if (vcpus < ncpus && vcpus >= wizardState.nthreads) {
+                    vmtype = r;
+                    ncpus = vcpus;
+                }
+            });
+            if (vmtype) {
+                frm.setValues({computeTypeId: vmtype.get('id')});
+            }
+        }
+    },
+
+    /**
+     * loads images for computeServiceId 'aws-ec2-compute'
+     * @function
+     */
     loadImages : function() {
         this.getComponent('image-combo').clearValue();
         this.getComponent('resource-combo').clearValue();
@@ -187,7 +264,12 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             }
         });
     },
-
+    
+    
+    /**
+     * Handles the selection on 'Toolbox'
+     * @function
+     */
     onImageSelect : function(combo, records) {
         if (!records) {
             this.computeTypeStore.removeAll();
@@ -196,6 +278,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
         this.getComponent('resource-combo').clearValue();
         var selectedComputeService = this.getComponent('computeServiceId').getValue();
+        var selectedComputeService = "aws-ec2-compute";
+
         this.computeTypeStore.load({
             params : {
                 computeServiceId : selectedComputeService,
@@ -204,10 +288,21 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         });
     },
 
+    
+    /**
+     * Title for the interface
+     * @function
+     * @return {string} 
+     */
     getTitle : function() {
         return "Enter job details...";
     },
-
+    
+    /**
+     * getNumDownloadRequests
+     * @function
+     * @return {object} size 
+     */
     getNumDownloadRequests : function() {
         request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
         request.open("GET", "getNumDownloadRequests.do", false); //<-- false makes it a synchonous request!
@@ -216,24 +311,32 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         size = respObj.data;
         return size;
     },
-
+    
+    /**
+     * Updates the job with additional details on storage, computing provider etc.
+     * @function
+     * @param {object} callback
+     */
     beginValidation : function(callback) {
         var jobObjectFrm = this;
         var wizardState = this.wizardState;
 
         var numDownloadReqs = this.getNumDownloadRequests();
-
-
-
-        //Ensure we have entered all appropriate fields
+        
+        // ensure we have entered all appropriate fields
         if (!jobObjectFrm.getForm().isValid()) {
             callback(false);
             return;
         }
 
-        //Then save the job to the database before proceeding
+        // then save the job to the database before proceeding
         var values = jobObjectFrm.getForm().getValues();
         values.seriesId = jobObjectFrm.wizardState.seriesId;
+        values.jobId = jobObjectFrm.wizardState.jobId;
+        values.storageServiceId = "amazon-aws-storage-sydney";
+        values.computeServiceId = "aws-ec2-compute";
+        
+        // update the job here
         Ext.Ajax.request({
             url : 'updateOrCreateJob.do',
             params : values,
@@ -252,10 +355,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
 
                 jobObjectFrm.wizardState.jobId = responseObj.data[0].id;
-                // Store user selected toolbox into wizard state. That toolbox
-                // will be used to select relevant script templates or examples.
+                // Store user selected toolbox into wizard state.
+                // That toolbox will be used to select relevant script templates or examples.
                 wizardState.toolbox = jobObjectFrm.getForm().findField("computeVmId").getRawValue();
-
+                
                 // Store selected resource limits into wizard state. These values will be included
                 // in template generation (to ensure valid numbers of CPU's are chosen etc)
                 var computeTypeId = jobObjectFrm.getComponent('resource-combo').getValue();
@@ -279,39 +382,17 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 } else {
                     callback(true);
                     return;
-                }
-
+                }              
             }
         });
     },
 
-    createSeries : function(wizardState) {
-
-        Ext.Ajax.request({
-            url: 'secure/createSeries.do',
-            callback : function(options, success, response) {
-                if (success) {
-                    var responseObj = Ext.JSON.decode(response.responseText);
-                    if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
-                        wizardState.seriesId = responseObj.data[0].id;
-                        return;
-                    } else {
-                        errorMsg = responseObj.msg;
-                        errorInfo = responseObj.debugInfo;
-                    }
-                } else {
-                    errorMsg = "There was an internal error saving your series.";
-                    errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
-                }
-
-                portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
-
-                return;
-            }
-        });
-
-    },
-
+    
+    /**
+     * Gets the help instructions for the interface
+     * @function
+     * @return {object} instance of 'portal.util.help.Instruction'
+     */
     getHelpInstructions : function() {
         var name = this.getComponent('name');
         var description = this.getComponent('description');

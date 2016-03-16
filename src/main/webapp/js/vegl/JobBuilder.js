@@ -1,9 +1,19 @@
 Ext.application({
-    name : 'portal',
-
-    //Here we build our GUI from existing components - this function should only be assembling the GUI
-    //Any processing logic should be managed in dedicated classes - don't let this become a
-    //monolithic 'do everything' function
+    /** 
+     * @lends anvgl.JobBuilder 
+     * 
+     */ 
+    name : 'jobbuilder',
+    
+    /**
+     * Creates the wizard towards a job submission: <br/>
+     * - Allows for selecting (or creating a new) series to submit jobs under
+     * - Upload input files <br/>
+     * - Select solution <br/>
+     * - Select storage and resources <br/>
+     * - Review and submit (or save)
+     * @constructs
+     */
     launch : function() {
         Ext.create('Ext.container.Viewport', {
             layout: 'border',
@@ -34,10 +44,13 @@ Ext.application({
                     layout: 'fit',
                     items: [ Ext.create('vegl.jobwizard.JobWizard', {
                         id : 'job-wizard-panel',
-                        forms : ['vegl.jobwizard.forms.JobObjectForm',
+                        forms : [
+                                 'vegl.jobwizard.forms.JobSeriesForm',
                                  'vegl.jobwizard.forms.JobUploadForm',
                                  'vegl.jobwizard.forms.ScriptBuilderForm',
-                                 'vegl.jobwizard.forms.JobSubmitForm']
+                                 'vegl.jobwizard.forms.JobObjectForm',
+                                 'vegl.jobwizard.forms.JobSubmitForm'
+                             ]
                     }) ]
                 }]
             }]

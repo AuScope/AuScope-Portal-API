@@ -130,7 +130,7 @@ public class JobListController extends BaseCloudController  {
         //Attempt to fetch our job
         if (jobId != null) {
             try {
-                job = jobManager.getJobById(jobId.intValue());
+                job = jobManager.getJobById(jobId.intValue(), user);
                 logger.debug("Job [" + job.hashCode() + "] retrieved by jobManager [" + jobManager.hashCode() + "]");
             } catch (Exception ex) {
                 logger.error(String.format("Exception when accessing jobManager for job id '%1$s'", jobId), ex);
@@ -269,7 +269,7 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "Unable to lookup series.");
         }
 
-        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue());
+        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
         if (jobs == null) {
             logger.warn(String.format("Unable to lookup jobs for series id '%1$s'", seriesId));
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs of series.");
@@ -413,7 +413,7 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "Unable to lookup series.");
         }
 
-        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue());
+        List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
         if (jobs == null) {
             logger.warn(String.format("Unable to lookup jobs for series id '%1$s'", seriesId));
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs of series.");
@@ -680,15 +680,15 @@ public class JobListController extends BaseCloudController  {
      */
     @RequestMapping("/secure/createSeries.do")
     public ModelAndView createSeries(HttpServletRequest request,
+            @RequestParam("seriesName") String seriesName,
+            @RequestParam("seriesDescription") String seriesDescription,
             @AuthenticationPrincipal ANVGLUser user) {
-
-
-        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), "default", null);
-        if(series==null || series.isEmpty()){
+            
             VEGLSeries newSeries = new VEGLSeries();
+                  
             newSeries.setUser(user.getEmail());
-            newSeries.setName("default");
-            newSeries.setDescription("Everything will now come through to a single default series");
+            newSeries.setName(seriesName);
+            newSeries.setDescription(seriesDescription);
 
             try {
                 jobManager.saveSeries(newSeries);
@@ -696,11 +696,9 @@ public class JobListController extends BaseCloudController  {
                 logger.error("failure saving series", ex);
                 return generateJSONResponseMAV(false, null, "Failure saving series");
             }
+            
             return generateJSONResponseMAV(true, Arrays.asList(newSeries), "");
-        }else{
-            return generateJSONResponseMAV(true, Arrays.asList(series.get(0)), "");
-        }
-    }
+    };
 
     /**
      * Attempts to creates a new folder for the specified user.
@@ -751,11 +749,17 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
         }
 
-        List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue());
+        List<VEGLJob> seriesJobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
         if (seriesJobs == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup jobs for the specified series.");
         }
 
+//        for (VEGLJob veglJob : seriesJobs) {
+//          veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+//          veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+//          veglJob.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
+//        }
+//        
         if (forceStatusRefresh) {
             try {
                 jobStatusMonitor.statusUpdate(seriesJobs);

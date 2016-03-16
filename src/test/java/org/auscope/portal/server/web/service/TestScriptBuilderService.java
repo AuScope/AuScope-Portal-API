@@ -11,6 +11,7 @@ import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,18 +41,18 @@ public class TestScriptBuilderService extends PortalTestClass {
     public void testSaveScript() throws Exception {
         final String script = "#a pretend script\n";
         final Integer jobId = 123;
-
+        final ANVGLUser user = new ANVGLUser();
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId);
+            oneOf(mockJobManager).getJobById(jobId, user);
             will(returnValue(mockJob));
 
             oneOf(mockFileStagingService).writeFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
             will(returnValue(bos));
         }});
 
-        service.saveScript(jobId.toString(), script);
+        service.saveScript(jobId.toString(), script, user);
         String actual = new String(bos.toByteArray());
         Assert.assertEquals(script, actual);
     }
@@ -64,23 +65,25 @@ public class TestScriptBuilderService extends PortalTestClass {
     public void testSaveScript_JobNotFoundException() throws Exception {
         final Integer jobId = 123;
         final String script = "#a pretend script\n";
+        final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId);
+            oneOf(mockJobManager).getJobById(jobId, user);
             will(throwException(new ConnectException()));
         }});
 
-        service.saveScript(jobId.toString(), script);
+        service.saveScript(jobId.toString(), script, user);
     }
 
     @Test(expected=PortalServiceException.class)
     public void testSaveScript_Exception() throws Exception {
         final String script = "#a pretend script\n";
         final Integer jobId = 123;
+        final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {
             {
-                oneOf(mockJobManager).getJobById(jobId);
+                oneOf(mockJobManager).getJobById(jobId, user);
                 will(returnValue(mockJob));
 
                 oneOf(mockFileStagingService).writeFile(mockJob,
@@ -89,7 +92,7 @@ public class TestScriptBuilderService extends PortalTestClass {
             }
         });
 
-        service.saveScript(jobId.toString(), script);
+        service.saveScript(jobId.toString(), script, user);
     }
 
     /**
@@ -99,16 +102,17 @@ public class TestScriptBuilderService extends PortalTestClass {
     public void testLoadScript() throws Exception {
         final String script = "#a pretend script\n";
         final Integer jobId = 123;
+        final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId);
+            oneOf(mockJobManager).getJobById(jobId, user);
             will(returnValue(mockJob));
 
             oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
             will(returnValue(new ByteArrayInputStream(script.getBytes())));
         }});
 
-        String actualScript = service.loadScript(jobId.toString());
+        String actualScript = service.loadScript(jobId.toString(), user);
         Assert.assertEquals(script, actualScript);
     }
 
@@ -118,16 +122,17 @@ public class TestScriptBuilderService extends PortalTestClass {
     @Test
     public void testLoadEmptyScript() throws Exception {
         final Integer jobId = 123;
+        final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId);
+            oneOf(mockJobManager).getJobById(jobId, user);
             will(returnValue(mockJob));
 
             oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
             will(returnValue(null));
         }});
 
-        String actualScript = service.loadScript(jobId.toString());
+        String actualScript = service.loadScript(jobId.toString(), user);
         Assert.assertEquals("", actualScript);
     }
 
@@ -137,16 +142,17 @@ public class TestScriptBuilderService extends PortalTestClass {
     @Test(expected=PortalServiceException.class)
     public void testLoadScriptError() throws Exception {
         final Integer jobId = 123;
+        final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId);
+            oneOf(mockJobManager).getJobById(jobId, user);
             will(returnValue(mockJob));
 
             oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
             will(throwException(new PortalServiceException("Test load script exception")));
         }});
 
-        service.loadScript(jobId.toString());
+        service.loadScript(jobId.toString(), user);
     }
 
     /**

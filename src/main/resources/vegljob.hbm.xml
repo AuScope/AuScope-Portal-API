@@ -24,6 +24,7 @@
         <property name="seriesId"/>
         <property name="storageBaseKey"/>
         <property name="emailNotification" type="yes_no" />
+        <property name="solutionId"/>
 
         <map name="jobParameters" lazy="false" cascade="all" inverse="true">
             <key column="jobId"/>

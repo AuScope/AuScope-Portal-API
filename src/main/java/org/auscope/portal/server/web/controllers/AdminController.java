@@ -32,7 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class AdminController {
 
     @SuppressWarnings("unused")
-	private final Log log = LogFactory.getLog(getClass());
+    private final Log log = LogFactory.getLog(getClass());
 
     /** For accessing the various CSW's*/
     private List<CSWServiceItem> cswServiceList;

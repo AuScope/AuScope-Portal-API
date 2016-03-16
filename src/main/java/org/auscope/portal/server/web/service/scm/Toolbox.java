@@ -2,8 +2,7 @@ package org.auscope.portal.server.web.service.scm;
 
 import java.util.List;
 import java.util.Map;
-
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Toolbox extends Entry {

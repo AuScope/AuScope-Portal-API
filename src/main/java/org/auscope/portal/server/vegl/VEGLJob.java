@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
+import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 
 /**
@@ -19,17 +20,21 @@ import org.auscope.portal.server.vegl.VglParameter.ParameterType;
  */
 public class VEGLJob extends CloudJob implements Cloneable {
     private static final long serialVersionUID = -57851899164623641L;
+    @SuppressWarnings("unused")
     private final Log logger = LogFactory.getLog(this.getClass());
     private String registeredUrl;
     private Integer seriesId;
     private boolean emailNotification;
     private String processTimeLog;
-
+    private String solutionId;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
     /** A list of VglDownload objects associated with this job*/
     private List<VglDownload> jobDownloads = new ArrayList<VglDownload>();
+
+    /** A list of FileInformation objects associated with this job*/
+    private List<FileInformation> jobFiles = new ArrayList<FileInformation>();
 
     /**
      * Creates an unitialised VEGLJob
@@ -194,6 +199,26 @@ public class VEGLJob extends CloudJob implements Cloneable {
         }
     }
 
+
+    public List<FileInformation> getJobFiles() {
+        return jobFiles;
+    }
+
+    public void setJobFiles(List<FileInformation> jobFiles) {
+        this.jobFiles = jobFiles;
+        for (FileInformation fi : jobFiles) {
+            fi.setParent(this);
+        }
+    }
+
+    public String getSolutionId() {
+        return solutionId;
+    }
+
+    public void setSolutionId(String solutionId) {
+        this.solutionId = solutionId;
+    }
+
     /**
      * Similar to clone but ensures compatibility with hibernate. No IDs or references (except for immutable ones)
      * will be shared by the clone and this object.
@@ -216,6 +241,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setStorageBaseKey(this.getStorageBaseKey());
         newJob.setSubmitDate(this.getSubmitDate()); //this job isn't submitted yet
         newJob.setUser(this.getUser());
+        newJob.setSolutionId(this.getSolutionId());
 
         List<VglDownload> newDownloads = new ArrayList<VglDownload>();
         for (VglDownload dl : this.getJobDownloads()) {
@@ -233,6 +259,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
         }
         newJob.setJobParameters(newParams);
 
+        for (String key : properties.keySet()) {
+            newJob.setProperty(key, getProperty(key));            
+        }
         return newJob;
     }
 

@@ -62,7 +62,7 @@ Ext.define('ScriptBuilder.templates.BaseTemplate', {
 
                     if (panel.getForm().isValid()) {
                         var additionalParams = panel.getForm().getValues(false, false, includeEmptyText, false);
-
+                        
                         //We need to close our window when finished so we wrap callback
                         //with a function that ensures closing BEFORE the callback is executed
                         this._getTemplatedScript(function(status, script) {
@@ -95,53 +95,28 @@ Ext.define('ScriptBuilder.templates.BaseTemplate', {
      * additionalParams - a regular object containing key/value pairs to inject into the specified template
      * templateName - the name of the template to use
      */
-    _getTemplatedScript : function(callback, templateName, additionalParams) {
-        //Convert our keys/values into a form the controller can read
-        var keys = [];
-        var values = [];
-        //Utility function
-        var denormaliseKvp = function(keyList, valueList, kvpObj) {
-            if (kvpObj) {
-                for (key in kvpObj) {
-                    keyList.push(key);
-                    valueList.push(kvpObj[key]);
-                }
-            }
-        };
+    _getTemplatedScript : function(callback, template, additionalParams) {
+    	 var params = {};
+         for (var k in this.getParameters()) {
+             params[k] = this.getParameters()[k];
+         }
+         for (var k in additionalParams) {
+             params[k] = additionalParams[k];
+         }
 
-        denormaliseKvp(keys, values, this.getParameters());
-        denormaliseKvp(keys, values, additionalParams);
+         var f = function(match, p1, offset, string) {
+             return params[p1];
+         };
 
-       
-        
-        Ext.getBody().mask("Loading script...");
-        
-       
+         template = template.replace(/\$\{([a-zA-Z0-9_-]+)\}/g, f);
 
-        Ext.Ajax.request({
-            url : 'getTemplatedScript.do',
-            params : {
-                templateName : templateName,
-                key : keys,
-                value : values
-            },
-            callback : function(options, success, response) {
-                Ext.getBody().unmask();
+         // If the template config specified a value for 'n-threads',
+         // store for later use in selecting an appropriate vm type.
+         if (params['n-threads']) {
+             this.wizardState.nthreads = params['n-threads'];
+         }
 
-                if (!success) {
-                    callback(ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_ERROR, null);
-                    return;
-                }
-
-                var responseObj = Ext.JSON.decode(response.responseText);
-                if (!responseObj || !responseObj.success) {
-                    callback(ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_ERROR, null);
-                    return;
-                }
-
-                callback(ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_SUCCESS, responseObj.data);
-            }
-        });
+         callback(ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_SUCCESS, template);
     },
 
     /**
