@@ -8,6 +8,7 @@ import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
+import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -41,7 +42,7 @@ public class ANVGLProvenanceService {
     private static final String TURTLE_FORMAT = "TTL";
 
     /* Can be changed in application context */
-    private final String promsUrl = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
+    private String promsUrl = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
     private final String reportingSystemUrl = "http://anvgl.org.au/rs";
     private URI PROMSService = null;
 
@@ -73,9 +74,11 @@ public class ANVGLProvenanceService {
      */
     @Autowired
     public ANVGLProvenanceService(final ANVGLFileStagingService anvglFileStagingService,
-            final CloudStorageService[] cloudStorageServices) {
+            final CloudStorageService[] cloudStorageServices,
+            final PortalPropertyPlaceholderConfigurer propertyConfigurer) {
         this.anvglFileStagingService = anvglFileStagingService;
         this.cloudStorageServices = cloudStorageServices;
+        this.promsUrl = propertyConfigurer.resolvePlaceholder("proms.report.url");
         try {
             this.PROMSService = new URI(promsUrl);
         } catch (URISyntaxException e) {
@@ -93,7 +96,7 @@ public class ANVGLProvenanceService {
      *            should be just about to execute, but not yet have started.
      * @return The TURTLE text.
      */
-    public final String createActivity(final VEGLJob job, final Solution solution, ANVGLUser user) {
+    public String createActivity(final VEGLJob job, final Solution solution, ANVGLUser user) {
         String jobURL = jobURL(job, serverURL());
         Activity anvglJob = null;
         Set<Entity> inputs = createEntitiesForInputs(job, solution, user);

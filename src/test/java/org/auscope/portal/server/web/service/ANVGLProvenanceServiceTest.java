@@ -5,6 +5,7 @@ import junit.framework.Assert;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
+import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.gridjob.FileInformation;
@@ -34,6 +35,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     final String activityFileName = "activity.ttl";
     final String PROMSURI = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
     final String mockUser = "jo@me.com";
+    final PortalPropertyPlaceholderConfigurer mockPropertyConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
     URI mockProfileUrl;
     ANVGLUser mockPortalUser;
     
@@ -76,7 +78,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
         final File activityFile2 = new File(turtleURL.toURI());
         mockProfileUrl = new URI("https://plus.google.com/1");
 
-        ANVGLProvenanceService = new ANVGLProvenanceService(fileServer, storageServices);
+        ANVGLProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, mockPropertyConfigurer);
         ANVGLProvenanceService.setServerURL(serverURL);
         VglDownload download = new VglDownload(1);
         download.setUrl("http://portal-uploads.anvgl.org/file1?download=true");

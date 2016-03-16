@@ -65,6 +65,7 @@
     <bean name="ANVGLProvenanceService" class="org.auscope.portal.server.web.service.ANVGLProvenanceService" autowire="constructor">
         <constructor-arg name="anvglFileStagingService" ref="fileStagingService"/>
         <constructor-arg name="cloudStorageServices" ref="cloudStorageService-aws-sydney"/>
+        <constructor-arg name="propertyConfigurer" ref="propertyConfigurer"/>
     </bean>
     
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
