@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
@@ -32,10 +34,12 @@ public class MenuController {
    protected final Log logger = LogFactory.getLog(getClass());
 
    private PortalPropertyPlaceholderConfigurer hostConfigurer;
+   private String buildStamp;
 
    @Autowired
    public MenuController(PortalPropertyPlaceholderConfigurer hostConfigurer) {
        this.hostConfigurer = hostConfigurer;
+       this.buildStamp = null;
    }
 
    /**
@@ -49,6 +53,27 @@ public class MenuController {
        mav.addObject("googleKey", googleKey);
        if (analyticKey != null && !analyticKey.isEmpty()) {
            mav.addObject("analyticKey", analyticKey);
+       }
+   }
+
+   private String getOrGenerateBuildStamp(HttpServletRequest request) {
+       if (buildStamp != null) {
+           return buildStamp;
+       }
+
+       try {
+           String appServerHome = request.getSession().getServletContext().getRealPath("/");
+           File manifestFile = new File(appServerHome,"META-INF/MANIFEST.MF");
+           Manifest mf = new Manifest();
+           mf.read(new FileInputStream(manifestFile));
+           String buildDate = mf.getMainAttributes().getValue("buildDate");
+
+           buildStamp = new String(Hex.encodeHex(buildDate.getBytes(Charsets.UTF_8)));
+           return buildStamp;
+       } catch (Exception e) {
+           logger.info("Error accessing manifest: " + e.getMessage());
+           logger.debug("Exception:", e);
+           return "";
        }
    }
 
@@ -128,6 +153,7 @@ public class MenuController {
        if (resourceName.equals("about") || resourceName.equals("admin")) {
            addManifest(mav, request); //The manifest details aren't really required by much
        }
+       mav.addObject("buildTimestamp", getOrGenerateBuildStamp(request));
 
        return mav;
    }

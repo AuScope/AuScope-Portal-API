@@ -41,10 +41,10 @@
 	  </style>
       
       <%-- JS imports - relative paths back to the webapp directory --%>
-      <jsp:include page="../../portal-core/jsimports.htm"/>
+      <jsp:include page="../../portal-core/jsimports.jsp"/>
       
       <%-- CSS imports - relative paths back to the webapp directory--%>
-      <jsp:include page="../../portal-core/cssimports.htm"/>
+      <jsp:include page="../../portal-core/cssimports.jsp"/>
       <jsp:include page="../../cssimports.htm"/>
 
       <script src="js/vegl/models/ANVGLUser.js" type="text/javascript"></script>
