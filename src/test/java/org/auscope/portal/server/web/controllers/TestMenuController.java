@@ -1,5 +1,7 @@
 package org.auscope.portal.server.web.controllers;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -23,12 +25,16 @@ public class TestMenuController extends PortalTestClass {
     private PortalPropertyPlaceholderConfigurer hostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
     private HttpSession mockSession = context.mock(HttpSession.class);
 
-
     private MenuController mc = null;
 
     @Before
     public void setup() {
         mc = new MenuController(hostConfigurer);
+
+        //Global expectations for setting build stamp id
+        context.checking(new Expectations() {{
+            oneOf(mockSession).getServletContext();will(throwException(new IOException("manifest DNE for unit testing")));
+        }});
     }
 
     /**
@@ -137,7 +143,6 @@ public class TestMenuController extends PortalTestClass {
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
-
 
             //Every view should have the analytics key thrown into it
             oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
