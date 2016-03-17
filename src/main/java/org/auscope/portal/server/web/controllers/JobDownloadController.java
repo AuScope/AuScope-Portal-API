@@ -57,7 +57,7 @@ public class JobDownloadController extends BasePortalController {
         map.put("localPath", dl.getLocalPath());
         return map;
     }
-    
+
     /**
      * Utility for adding a single VglDownload object to the session based array of VglDownload objects.
      * @param request
@@ -87,21 +87,21 @@ public class JobDownloadController extends BasePortalController {
     public ModelAndView makeDownloadUrl(@RequestParam("url") String url,
             @RequestParam("name") String name,
             @RequestParam("description") String description,
-            @RequestParam("fullDescription") final String fullDescription,
+            @RequestParam(required = false, value = "fullDescription") final String fullDescription,
             @RequestParam("localPath") String localPath,
             @RequestParam("northBoundLatitude") final Double northBoundLatitude,
             @RequestParam("eastBoundLongitude") final Double eastBoundLongitude,
             @RequestParam("southBoundLatitude") final Double southBoundLatitude,
             @RequestParam("westBoundLongitude") final Double westBoundLongitude,
-            @RequestParam("parentName") String parentName,
-            @RequestParam("parentUrl") String parentUrl,
-            @RequestParam("owner") String owner,
+            @RequestParam(required = false, value = "parentName") String parentName,
+            @RequestParam(required = false, value = "parentUrl") String parentUrl,
+            @RequestParam(required = false, value = "owner") String owner,
             @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
             HttpServletRequest request) {
 
         VglDownload newDownload = new VglDownload();
         newDownload.setName(name);
-        newDownload.setDescription(fullDescription);
+        newDownload.setDescription(fullDescription == null ? description : fullDescription);
         newDownload.setLocalPath(localPath);
         newDownload.setUrl(url);
         newDownload.setNorthBoundLatitude(northBoundLatitude);
@@ -134,11 +134,11 @@ public class JobDownloadController extends BasePortalController {
                                 @RequestParam("layerName") final String layerName,
                                 @RequestParam("name") final String name,
                                 @RequestParam("description") final String description,
-                                @RequestParam("fullDescription") final String fullDescription,
+                                @RequestParam(required = false, value = "fullDescription") final String fullDescription,
                                 @RequestParam("localPath") final String localPath,
-                                @RequestParam("parentName") String parentName,
-                                @RequestParam("parentUrl") String parentUrl,
-                                @RequestParam("owner") String owner,
+                                @RequestParam(required = false, value = "parentName") String parentName,
+                                @RequestParam(required = false, value = "parentUrl") String parentUrl,
+                                @RequestParam(required = false, value = "owner") String owner,
                                 @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                 HttpServletRequest request,
                                 HttpServletResponse response) throws Exception {
@@ -150,7 +150,7 @@ public class JobDownloadController extends BasePortalController {
         // Append this download list to the existing list of download objects
         VglDownload newDownload = new VglDownload();
         newDownload.setName(name);
-        newDownload.setDescription(fullDescription);
+        newDownload.setDescription(fullDescription == null ? description : fullDescription);
         newDownload.setLocalPath(localPath);
         newDownload.setUrl(erddapUrl);
         newDownload.setNorthBoundLatitude(northBoundLatitude);
@@ -174,7 +174,7 @@ public class JobDownloadController extends BasePortalController {
      * @return
      * @throws Exception
      */
-    
+
     @RequestMapping("/makeNetcdfsubseserviceUrl.do")
     public ModelAndView makeNetcdfsubsetserviceUrl(@RequestParam("url") String url,
                                 @RequestParam("northBoundLatitude") final Double northBoundLatitude,
@@ -183,11 +183,11 @@ public class JobDownloadController extends BasePortalController {
                                 @RequestParam("westBoundLongitude") final Double westBoundLongitude,
                                 @RequestParam("name") final String name,
                                 @RequestParam("description") final String description,
-                                @RequestParam("fullDescription") final String fullDescription,
+                                @RequestParam(required = false, value = "fullDescription") final String fullDescription,
                                 @RequestParam("localPath") final String localPath,
-                                @RequestParam("parentName") String parentName,
-                                @RequestParam("parentUrl") String parentUrl,
-                                @RequestParam("owner") String owner,
+                                @RequestParam(required = false, value = "parentName") String parentName,
+                                @RequestParam(required = false, value = "parentUrl") String parentUrl,
+                                @RequestParam(required = false, value = "owner") String owner,
                                 @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                 HttpServletRequest request,
                                 HttpServletResponse response) throws Exception {
@@ -199,7 +199,7 @@ public class JobDownloadController extends BasePortalController {
         // Append this download list to the existing list of download objects
         VglDownload newDownload = new VglDownload();
         newDownload.setName(name);
-        newDownload.setDescription(fullDescription);
+        newDownload.setDescription(fullDescription == null ? description : fullDescription);
         newDownload.setLocalPath(localPath);
         newDownload.setUrl(netcdfsubsetserviceUrl);
         newDownload.setNorthBoundLatitude(northBoundLatitude);
@@ -217,11 +217,11 @@ public class JobDownloadController extends BasePortalController {
 
         return generateJSONResponseMAV(true, toView(newDownload), "");
     }
-    
-    
+
+
     /**
      * Creates a new VL Download object from some WFS parameters. The Download object is returned. If saveSession
-     * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list. 
+     * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list.
      *
      * @param serviceUrl The WFS endpoint
      * @param featureType The feature type name to query
@@ -240,11 +240,11 @@ public class JobDownloadController extends BasePortalController {
                                            @RequestParam(required = false, value = "maxFeatures") Integer maxFeatures,
                                            @RequestParam("name") final String name,
                                            @RequestParam("description") final String description,
-                                           @RequestParam("fullDescription") final String fullDescription,
+                                           @RequestParam(required = false, value = "fullDescription") final String fullDescription,
                                            @RequestParam("localPath") final String localPath,
-                                           @RequestParam("parentName") String parentName,
-                                           @RequestParam("parentUrl") String parentUrl,
-                                           @RequestParam("owner") String owner,
+                                           @RequestParam(required = false, value = "parentName") String parentName,
+                                           @RequestParam(required = false, value = "parentUrl") String parentUrl,
+                                           @RequestParam(required = false, value = "owner") String owner,
                                            @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                            HttpServletRequest request) throws Exception {
 
@@ -252,9 +252,9 @@ public class JobDownloadController extends BasePortalController {
         if (northBoundLatitude != null) {
             bbox = FilterBoundingBox.parseFromValues(bboxCrs, northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude);
         }
-        
+
         String response = null;
-        
+
         try {
             response = wfsService.getFeatureRequestAsString(serviceUrl, featureType, bbox, maxFeatures, srsName, outputFormat);
         } catch (Exception ex) {
@@ -262,10 +262,10 @@ public class JobDownloadController extends BasePortalController {
             log.debug("Exception: ", ex);
             return generateExceptionResponse(ex, serviceUrl);
         }
-        
+
         VglDownload newDownload = new VglDownload();
         newDownload.setName(name);
-        newDownload.setDescription(fullDescription);
+        newDownload.setDescription(fullDescription == null ? description : fullDescription);
         newDownload.setLocalPath(localPath);
         newDownload.setUrl(response);
         newDownload.setNorthBoundLatitude(northBoundLatitude);
@@ -276,19 +276,19 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setParentName(parentName);
         newDownload.setParentUrl(parentUrl);
 
-        
+
         if (saveSession) {
             addDownloadToSession(request, newDownload);
         }
 
         return generateJSONResponseMAV(true, toView(newDownload), "");
     }
-    
+
     /**
      * Get the number of download requests stored in user session. This method
      * will be used by VL frontend to check if any data set has been captured
      * before creating a new job.
-     * 
+     *
      * @param request The servlet request with query parameters
      * @return number of download requests in user session.
      */
@@ -301,7 +301,7 @@ public class JobDownloadController extends BasePortalController {
         }
         return generateJSONResponseMAV(true, size, "");
     }
-    
+
     /**
      * Takes the co-ordinates of a user drawn bounding box and constructs an ERDDAP
      * coverage subset request URL.
@@ -334,7 +334,7 @@ public class JobDownloadController extends BasePortalController {
      */
     private String getNetcdfSubsetUrl(CSWGeographicBoundingBox bbox, String serviceUrl, String name, String description, String format) {
         logger.debug(String.format("serviceUrl='%1$s' bbox='%2$s' layerName='%3$s'  layerDescription='%4$s'", serviceUrl, bbox, name, description));
-        
+
         // convert bbox co-ordinates to an netcdfsubsetservice dimension string
         String netcdfsubsetserviceDimensions = "&spatial=bb" +
         		"&north="+ bbox.getNorthBoundLatitude() +
