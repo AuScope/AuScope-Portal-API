@@ -78,7 +78,7 @@ public class ANVGLProvenanceService {
             final PortalPropertyPlaceholderConfigurer propertyConfigurer) {
         this.anvglFileStagingService = anvglFileStagingService;
         this.cloudStorageServices = cloudStorageServices;
-        this.promsUrl = propertyConfigurer.resolvePlaceholder("proms.report.url");
+        this.promsUrl = propertyConfigurer.resolvePlaceholder("HOST.proms.report.url");
         try {
             this.PROMSService = new URI(promsUrl);
         } catch (URISyntaxException e) {

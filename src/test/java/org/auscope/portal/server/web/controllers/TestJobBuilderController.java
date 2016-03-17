@@ -1532,7 +1532,7 @@ public class TestJobBuilderController {
             oneOf(mockSeries).getId();will(returnValue(newSeriesId));
             oneOf(mockJob).setSeriesId(newSeriesId);
             oneOf(mockJobManager).saveJob(mockJob);
-            oneOf(mockHostConfigurer).resolvePlaceholder("proms.report.url");will(returnValue(""));
+            oneOf(mockHostConfigurer).resolvePlaceholder("HOST.proms.report.url");will(returnValue(""));
         }});
 
         ModelAndView mav = controller.updateJobSeries(jobId,folderName,mockRequest,mockPortalUser);
