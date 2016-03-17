@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <title>AuScope VGL Workflow  - Monitor Jobs</title>
+    <title>ANVGL Portal - Monitor Jobs</title>
     
     <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     

@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <title>VGL Portal - Access Error</title>
+    <title>ANVGL Portal - Access Error</title>
 
     <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     <link rel="stylesheet" type="text/css" href="portal-core/css/styles.css">

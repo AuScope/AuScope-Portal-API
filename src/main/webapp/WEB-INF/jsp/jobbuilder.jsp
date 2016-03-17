@@ -4,7 +4,7 @@
 <html>
 
 <head>
-    <title>VGL Portal - Build Job</title>
+    <title>ANVGL Portal - Build Job</title>
     
     <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     
