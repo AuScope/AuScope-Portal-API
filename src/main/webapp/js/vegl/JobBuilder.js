@@ -1,10 +1,10 @@
 Ext.application({
-    /** 
-     * @lends anvgl.JobBuilder 
-     * 
-     */ 
+    /**
+     * @lends anvgl.JobBuilder
+     *
+     */
     name : 'jobbuilder',
-    
+
     /**
      * Creates the wizard towards a job submission: <br/>
      * - Allows for selecting (or creating a new) series to submit jobs under
@@ -45,10 +45,9 @@ Ext.application({
                     items: [ Ext.create('vegl.jobwizard.JobWizard', {
                         id : 'job-wizard-panel',
                         forms : [
-                                 'vegl.jobwizard.forms.JobSeriesForm',
+                                 'vegl.jobwizard.forms.JobObjectForm',
                                  'vegl.jobwizard.forms.JobUploadForm',
                                  'vegl.jobwizard.forms.ScriptBuilderForm',
-                                 'vegl.jobwizard.forms.JobObjectForm',
                                  'vegl.jobwizard.forms.JobSubmitForm'
                              ]
                     }) ]
