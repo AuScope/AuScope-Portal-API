@@ -15,10 +15,10 @@
         <script src="portal-core/js/OpenLayers-2.11/OpenLayers.js" type="text/javascript"></script>
 
         <%-- CSS imports - relative paths back to the webapp directory--%>
-        <jsp:include page="../../portal-core/cssimports.htm"/>
+        <jsp:include page="../../portal-core/cssimports.jsp"/>
 
         <%-- JS imports - relative paths back to the webapp directory --%>
-        <jsp:include page="../../portal-core/jsimports.htm"/>
+        <jsp:include page="../../portal-core/jsimports.jsp"/>
 
         <script type="text/javascript" src="portal-core/js/admin/tests/TestStatus.js"></script>
         <script type="text/javascript" src="portal-core/js/admin/tests/BaseTest.js"></script>
