@@ -64,7 +64,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             "      <http://www.w3.org/ns/prov#wasAttributedTo>" + System.lineSeparator() +
             "              <https://plus.google.com/1> .";
 
-    ANVGLProvenanceService ANVGLProvenanceService;
+    ANVGLProvenanceService anvglProvenanceService;
 
     @Before
     public void setUp() throws Exception {
@@ -78,8 +78,6 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
         final File activityFile2 = new File(turtleURL.toURI());
         mockProfileUrl = new URI("https://plus.google.com/1");
 
-        ANVGLProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, mockPropertyConfigurer);
-        ANVGLProvenanceService.setServerURL(serverURL);
         VglDownload download = new VglDownload(1);
         download.setUrl("http://portal-uploads.anvgl.org/file1?download=true");
         //download.setParentUrl("http://portal-uploads.vhirl.org/");
@@ -120,6 +118,8 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             will(returnValue(new Date()));
             allowing(preparedJob).getUser();
             will(returnValue("foo@test.com"));
+            
+            allowing(mockPropertyConfigurer).resolvePlaceholder(anvglProvenanceService.HOST_PROMS_REPORT_URL);will(returnValue("http://mockurl"));
             /*
             allowing(preparedJob).getJobFiles();
             will(returnValue(fileInfos));
@@ -144,6 +144,9 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             
             allowing(mockPortalUser).getId();will(returnValue(mockUser));
         }});
+        
+        anvglProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, mockPropertyConfigurer);
+        anvglProvenanceService.setServerURL(serverURL);
     }
 
     @After
@@ -153,7 +156,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
 
     @Test
     public void testCreateActivity() throws Exception {
-        String graph = ANVGLProvenanceService.createActivity(preparedJob, null, mockPortalUser);
+        String graph = anvglProvenanceService.createActivity(preparedJob, null, mockPortalUser);
         Assert.assertTrue(graph.contains(initialTurtle));
         Assert.assertTrue(graph.contains(serviceTurtle));
         //Assert.assertTrue(graph.contains(intermediateTurtle));
@@ -161,31 +164,31 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
 
     @Test
     public void testUploadModel() throws Exception {
-        ANVGLProvenanceService.uploadModel(plainModel, preparedJob);
+        anvglProvenanceService.uploadModel(plainModel, preparedJob);
     }
 
     @Test
     public void testJobURL() throws Exception {
-        String url = ANVGLProvenanceService.jobURL(preparedJob, serverURL);
+        String url = anvglProvenanceService.jobURL(preparedJob, serverURL);
         Assert.assertEquals(serverURL + "/secure/getJobObject.do?jobId=1", url);
     }
 
     @Test
     public void testOutputURL() throws Exception {
-        String url = ANVGLProvenanceService.outputURL(preparedJob, fileInformation, serverURL);
+        String url = anvglProvenanceService.outputURL(preparedJob, fileInformation, serverURL);
         Assert.assertEquals(serverURL + "/secure/jobFile.do?jobId=1&key=cloudKey", url);
     }
 
     @Test
     public void testCreateEntitiesForInputs() throws Exception {
-        Set<Entity> entities = ANVGLProvenanceService.createEntitiesForInputs(preparedJob, null, mockPortalUser);
+        Set<Entity> entities = anvglProvenanceService.createEntitiesForInputs(preparedJob, null, mockPortalUser);
         Assert.assertNotNull(entities);
         Assert.assertEquals(3, entities.size());
     }
 
     @Test
     public void testCreateEntitiesForOutputs() throws Exception {
-        String graph = ANVGLProvenanceService.createEntitiesForOutputs(preparedJob);
+        String graph = anvglProvenanceService.createEntitiesForOutputs(preparedJob);
         Assert.assertTrue(graph.contains(initialTurtle));
         Assert.assertTrue(graph.contains(endedTurtle));
     }
@@ -201,7 +204,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
                 serverURL,
                 "TURTLE");
         URI activityURI = new URI(
-                ANVGLProvenanceService.jobURL(turtleJob, serverURL));
+                anvglProvenanceService.jobURL(turtleJob, serverURL));
         activity = new Activity().setActivityUri(activityURI).setTitle(activityURI.toString()).setFromModel(model);
         if (activity != null) {
             activity.setEndedAtTime(new Date());
@@ -241,7 +244,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
                 serverURL,
                 "TURTLE");
         activity = new Activity().setActivityUri(new URI(
-                ANVGLProvenanceService.jobURL(turtleJob, serverURL))).setFromModel(model);
+                anvglProvenanceService.jobURL(turtleJob, serverURL))).setFromModel(model);
         if (activity != null) {
             activity.setEndedAtTime(new Date());
             String outputURL = serverURL + "/secure/jobFile.do?jobId=21&key=job-macgo-bt-everbloom_gmail_com-0000000021/1000_yrRP_hazard_map.png";

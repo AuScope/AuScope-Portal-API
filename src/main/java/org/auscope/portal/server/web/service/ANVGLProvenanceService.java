@@ -32,6 +32,7 @@ import java.util.*;
  */
 @Service
 public class ANVGLProvenanceService {
+    public static final String HOST_PROMS_REPORT_URL = "HOST.proms.report.url";
     /** Logger for this class. */
     private static final Log LOGGER = LogFactory.getLog(ANVGLProvenanceService.class);
     /** Default name for the half-baked provenance uploaded to the cloud. */
@@ -78,7 +79,7 @@ public class ANVGLProvenanceService {
             final PortalPropertyPlaceholderConfigurer propertyConfigurer) {
         this.anvglFileStagingService = anvglFileStagingService;
         this.cloudStorageServices = cloudStorageServices;
-        this.promsUrl = propertyConfigurer.resolvePlaceholder("HOST.proms.report.url");
+        this.promsUrl = propertyConfigurer.resolvePlaceholder(HOST_PROMS_REPORT_URL);
         try {
             this.PROMSService = new URI(promsUrl);
         } catch (URISyntaxException e) {

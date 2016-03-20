@@ -46,7 +46,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
         }});
 
-        jobStatLogReader = new VGLJobStatusAndLogReader(mockJobManager, mockFileStagingService,
+        jobStatLogReader = new VGLJobStatusAndLogReader(mockJobManager,
                 mockCloudStorageServices, mockCloudComputeServices);
     }
 

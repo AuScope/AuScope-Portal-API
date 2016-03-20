@@ -711,7 +711,9 @@ public class TestJobBuilderController {
             
             oneOf(mockPortalUser).getUsername();will(returnValue(mockUser));
             allowing(mockPortalUser).getId();will(returnValue(mockUser));            
-            oneOf(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);will(returnValue(""));
+            oneOf(mockAnvglProvenanceService).createActivity(jobObj, mockSolution, mockPortalUser);will(returnValue(""));
+            
+            allowing(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
@@ -956,6 +958,9 @@ public class TestJobBuilderController {
             allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
             allowing(mockPortalUser).getId();will(returnValue(mockUser));
             allowing(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);will(returnValue(""));
+            oneOf(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
+            oneOf(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);
+            oneOf(mockScmEntryService).getJobSolution(jobObj);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
@@ -1066,6 +1071,8 @@ public class TestJobBuilderController {
             oneOf(mockPortalUser).getUsername();will(returnValue(mockUser));
             allowing(mockPortalUser).getId();will(returnValue(mockUser));
             allowing(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);will(returnValue(""));
+            oneOf(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
+            oneOf(mockScmEntryService).getJobSolution(jobObj);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
