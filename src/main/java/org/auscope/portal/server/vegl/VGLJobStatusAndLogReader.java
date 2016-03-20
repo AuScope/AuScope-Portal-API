@@ -15,7 +15,6 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.web.controllers.BaseCloudController;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
-import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.springframework.ui.ModelMap;
 
 public class VGLJobStatusAndLogReader extends BaseCloudController implements JobStatusReader {
@@ -23,7 +22,6 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
     private VEGLJobManager jobManager;
 
     public VGLJobStatusAndLogReader(VEGLJobManager jobManager,
-    		ANVGLFileStagingService anvglFileStagingService,
             CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices) {
         super(cloudStorageServices, cloudComputeServices);
