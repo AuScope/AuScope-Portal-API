@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.test.PortalTestClass;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class TestMenuController extends PortalTestClass {
     private HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
     private HttpServletResponse mockResponse = context.mock(HttpServletResponse.class);
+    private ANVGLUser mockUser = context.mock(ANVGLUser.class);
     private PortalPropertyPlaceholderConfigurer hostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
     private HttpSession mockSession = context.mock(HttpSession.class);
 
@@ -33,7 +35,7 @@ public class TestMenuController extends PortalTestClass {
 
         //Global expectations for setting build stamp id
         context.checking(new Expectations() {{
-            oneOf(mockSession).getServletContext();will(throwException(new IOException("manifest DNE for unit testing")));
+            allowing(mockSession).getServletContext();will(throwException(new IOException("manifest DNE for unit testing")));
         }});
     }
 
@@ -54,12 +56,14 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
 
+            allowing(mockUser).isFullyConfigured();will(returnValue(true));
+
             //Every view should have the analytics key thrown into it
             oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
             oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
         }});
 
-        ModelAndView mav = mc.handleHtmlToView(mockRequest, mockResponse);
+        ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
 
         Assert.assertNotNull(mav);
         Assert.assertEquals("resource", mav.getViewName());
@@ -85,12 +89,14 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(null));
             oneOf(mockSession).setAttribute("existingSession", true);
 
+            allowing(mockUser).isFullyConfigured();will(returnValue(true));
+
             //Every view should have the analytics key thrown into it
             oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
             oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
         }});
 
-        ModelAndView mav = mc.handleHtmlToView(mockRequest, mockResponse);
+        ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
 
         Assert.assertNotNull(mav);
         Assert.assertEquals("resource", mav.getViewName());
@@ -115,13 +121,12 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(null));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-
             //Every view should have the analytics key thrown into it
             oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
             oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
         }});
 
-        ModelAndView mav = mc.handleHtmlToView(mockRequest, mockResponse);
+        ModelAndView mav = mc.handleHtmlToView(null, mockRequest, mockResponse);
 
         Assert.assertNotNull(mav);
         Assert.assertEquals(mav.getModel().get("isNewSession"), true);
@@ -144,14 +149,64 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
 
+            allowing(mockUser).isFullyConfigured();will(returnValue(true));
+
             //Every view should have the analytics key thrown into it
             oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
             oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
         }});
 
-        ModelAndView mav = mc.handleHtmlToView(mockRequest, mockResponse);
+        ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
 
         Assert.assertNotNull(mav);
         Assert.assertEquals(mav.getModel().get("isNewSession"), false);
+    }
+
+    @Test
+    public void testUnconfiguredRedirect() throws Exception {
+        final String uri = "http://example.org/context/path/resource.html";
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getRequestURI();will(returnValue(uri));
+
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
+            oneOf(mockSession).setAttribute("existingSession", true);
+
+            allowing(mockUser).isFullyConfigured();will(returnValue(false));
+
+        }});
+
+        ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
+
+        Assert.assertNotNull(mav);
+        Assert.assertEquals("redirect:/user.html?next=/context/path/resource.html", mav.getViewName());
+    }
+
+    @Test
+    public void testUnconfiguredRedirect_AbortOnUser() throws Exception {
+        final String uri = "http://example.org/context/path/user.html?a=b";
+        final String gMapKey = "13421asdasd";
+        final String gAnalyticsKey = "faf3113f1";
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getRequestURI();will(returnValue(uri));
+
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            allowing(mockSession).getAttribute("existingSession");will(returnValue(true));
+            allowing(mockSession).setAttribute("existingSession", true);
+
+            allowing(mockUser).isFullyConfigured();will(returnValue(false));
+
+            oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
+            oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
+
+        }});
+
+        ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
+
+        Assert.assertNotNull(mav);
+        Assert.assertEquals("user?a=b", mav.getViewName());
+
     }
 }

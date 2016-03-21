@@ -4,6 +4,8 @@ import java.awt.Menu;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -17,7 +19,9 @@ import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -122,9 +126,10 @@ public class MenuController {
     * @param response
     * @return
     * @throws IOException
+ * @throws URISyntaxException
     */
    @RequestMapping("/*.html")
-   public ModelAndView handleHtmlToView(HttpServletRequest request, HttpServletResponse response) throws IOException {
+   public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
        //Detect whether this is a new session or not...
        HttpSession session = request.getSession();
        boolean isNewSession = session.getAttribute("existingSession") == null;
@@ -142,6 +147,25 @@ public class MenuController {
        String resourceName = requestedResource.replace(".html", "");
 
        logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
+
+       //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
+       if (user != null && user instanceof ANVGLUser) {
+           if (!((ANVGLUser) user).isFullyConfigured()) {
+               String uri = request.getRequestURI();
+               if (!uri.contains("login.html") &&
+                   !uri.contains("gmap.html") &&
+                   !uri.contains("user.html") &&
+                   !uri.contains("admin.html")) {
+
+                   String params = "";
+                   if (!uri.contains("login.html")) {
+                       params = "?next=" + new URI(uri).getPath();
+                   }
+
+                   return new ModelAndView("redirect:/user.html" + params);
+               }
+           }
+       }
 
        //Give the user the view they are actually requesting
        ModelAndView mav = new ModelAndView(resourceName);

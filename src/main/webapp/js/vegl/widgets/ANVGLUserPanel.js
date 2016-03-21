@@ -158,6 +158,11 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                                 }
 
                                 statusLabel.setText('Saved!');
+
+                                var queryParams = Ext.Object.fromQueryString(window.location.search);
+                                if (queryParams.next) {
+                                    window.location.href = queryParams.next;
+                                }
                             }
                         });
                     }

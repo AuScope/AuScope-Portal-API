@@ -1,6 +1,7 @@
 package org.auscope.portal.server.web.security;
 
 import java.io.IOException;
+import java.net.URL;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,14 +26,22 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth)
             throws IOException, ServletException {
         Object principal = auth.getPrincipal();
+        DefaultSavedRequest savedRequest = (DefaultSavedRequest) request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST");
+
         if (principal instanceof ANVGLUser) {
             if (!((ANVGLUser) principal).isFullyConfigured()) {
-                response.sendRedirect("../user.html");
+                String params = "";
+                if (savedRequest != null) {
+                    URL requestUrl = new URL(savedRequest.getRequestURL());
+                    if (!requestUrl.getPath().contains("login.html")) {
+                        params = "?next=" + requestUrl.getPath();
+                    }
+                }
+                response.sendRedirect("../user.html" + params);
                 return;
             }
         }
 
-        DefaultSavedRequest savedRequest = (DefaultSavedRequest) request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST");
         if (savedRequest != null) {
             response.sendRedirect(savedRequest.getRequestURL());
             return;
