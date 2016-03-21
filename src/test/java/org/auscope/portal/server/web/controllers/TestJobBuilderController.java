@@ -36,9 +36,9 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
-import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.auscope.portal.server.web.service.scm.Solution;
@@ -98,8 +98,8 @@ public class TestJobBuilderController {
 
         mockJobMailSender = context.mock(JobMailSender.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
-        
-        mockAnvglProvenanceService = context.mock(ANVGLProvenanceService.class);        
+
+        mockAnvglProvenanceService = context.mock(ANVGLProvenanceService.class);
         mockScmEntryService = context.mock(ScmEntryService.class);
 
         vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader, mockAnvglProvenanceService);
@@ -619,6 +619,7 @@ public class TestJobBuilderController {
         final String computeVmId = "compute-vmi-id";
         final String computeServiceId = "compute-service-id";
         final String instanceId = "new-instance-id";
+        final String computeKeyName = "key-name";
         final Sequence jobFileSequence = context.sequence("jobFileSequence"); //this makes sure we aren't deleting directories before uploading (and other nonsense)
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
@@ -703,16 +704,17 @@ public class TestJobBuilderController {
             //We should have 1 call to our job manager to create a job audit trail record
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
             oneOf(mockJobManager).createJobAuditTrail("Provisioning", jobObj, "Set job to Pending");
-            
+
             oneOf(mockRequest).getRequestURL();will(returnValue(new StringBuffer("http://mock.fake/secure/something")));
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(jobObj)));will(returnValue(cloudList));
             allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
             allowing(mockCloudStorageServices[0]).uploadJobFiles(with(any(VEGLJob.class)), with(any(File[].class)));
-            
+
             oneOf(mockPortalUser).getUsername();will(returnValue(mockUser));
-            allowing(mockPortalUser).getId();will(returnValue(mockUser));            
+            oneOf(mockPortalUser).getAwsKeyName();will(returnValue(computeKeyName));
+            allowing(mockPortalUser).getId();will(returnValue(mockUser));
             oneOf(mockAnvglProvenanceService).createActivity(jobObj, mockSolution, mockPortalUser);will(returnValue(""));
-            
+
             allowing(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
         }});
 
@@ -877,6 +879,7 @@ public class TestJobBuilderController {
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final String computeKeyName = "key-name";
         final String storageBucket = "storage-bucket";
         final String storageAccess = "213-asd-54";
         final String storageSecret = "tops3cret";
@@ -952,11 +955,12 @@ public class TestJobBuilderController {
 
             oneOf(mockJobMailSender).sendMail(jobObj);
             oneOf(mockVGLJobStatusAndLogReader).getSectionedLog(jobObj, "Time");
-            
+
             oneOf(mockRequest).getRequestURL();will(returnValue(new StringBuffer("http://mock.fake/secure/something")));
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(jobObj)));will(returnValue(cloudList));
             allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
             allowing(mockPortalUser).getId();will(returnValue(mockUser));
+            allowing(mockPortalUser).getAwsKeyName();will(returnValue(computeKeyName));
             allowing(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);will(returnValue(""));
             oneOf(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
             oneOf(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);
@@ -993,6 +997,7 @@ public class TestJobBuilderController {
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
         final OutputStream mockOutputStream = context.mock(OutputStream.class);
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final String computeKeyName = "key-name";
         final String storageBucket = "storage-bucket";
         final String storageAccess = "213-asd-54";
         final String storageSecret = "tops3cret";
@@ -1062,7 +1067,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "Set job to provisioning");
 
             oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PROVISION, jobObj, "Job Placed in Queue");
-            
+
             oneOf(mockRequest).getRequestURL();will(returnValue(new StringBuffer("http://mock.fake/secure/something")));
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(jobObj)));will(returnValue(cloudList));
             allowing(mockFileStagingService).createLocalFile(activityFileName, jobObj);will(returnValue(activityFile));
@@ -1070,6 +1075,7 @@ public class TestJobBuilderController {
 
             oneOf(mockPortalUser).getUsername();will(returnValue(mockUser));
             allowing(mockPortalUser).getId();will(returnValue(mockUser));
+            allowing(mockPortalUser).getAwsKeyName();will(returnValue(computeKeyName));
             allowing(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);will(returnValue(""));
             oneOf(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
             oneOf(mockScmEntryService).getJobSolution(jobObj);will(returnValue(null));
@@ -1395,7 +1401,7 @@ public class TestJobBuilderController {
             allowing(mockPortalUser).getArnExecution(); will(returnValue(null));
             allowing(mockPortalUser).getArnStorage(); will(returnValue(null));
             allowing(mockPortalUser).getAwsSecret(); will(returnValue(null));
-            
+
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
             oneOf(mockCloudStorageServices[0]).generateBaseKey(with(any(VEGLJob.class)));will(returnValue(baseKey));
@@ -1862,7 +1868,7 @@ public class TestJobBuilderController {
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(id));
             allowing(mockScmEntryService).getJobProviders(null, user);will(returnValue(null));
         }});
-        
+
 		ModelAndView mav = controller.getComputeServices(null, user);
 
         Assert.assertNotNull(mav);
