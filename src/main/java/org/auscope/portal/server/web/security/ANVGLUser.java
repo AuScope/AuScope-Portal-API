@@ -24,6 +24,7 @@ public class ANVGLUser implements UserDetails, Serializable {
     private String arnStorage;
     private String awsSecret;
     private String awsAccount;
+    private String awsKeyName;
     private Integer acceptedTermsConditions;
 
     public ANVGLUser() {
@@ -86,6 +87,22 @@ public class ANVGLUser implements UserDetails, Serializable {
      */
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    /**
+     * The keyname to be used for VMs started by this user (can be null)
+     * @return
+     */
+    public String getAwsKeyName() {
+        return awsKeyName;
+    }
+
+    /**
+     * The keyname to be used for VMs started by this user (can be null)
+     * @param awsKeyName
+     */
+    public void setAwsKeyName(String awsKeyName) {
+        this.awsKeyName = awsKeyName;
     }
 
     /**

@@ -51,7 +51,7 @@ Ext.application({
                     border: false,
                     maxWidth: 800,
                     width: '100%',
-                    height: 300,
+                    height: 350,
                     bodyStyle: {
                         'background-color': 'white'
                     },

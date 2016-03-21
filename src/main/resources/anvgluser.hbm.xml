@@ -12,6 +12,7 @@
         <property name="arnStorage"/>
         <property name="awsSecret"/>
         <property name="awsAccount"/>
+        <property name="awsKeyName"/>
         <property name="acceptedTermsConditions"/>
         
         <bag name="authorities" lazy="false" cascade="all-delete-orphan" inverse="true">

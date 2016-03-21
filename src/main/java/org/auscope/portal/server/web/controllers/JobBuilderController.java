@@ -732,6 +732,7 @@ public class JobBuilderController extends BaseCloudController {
 
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);
+                            curJob.setComputeInstanceKey(user.getAwsKeyName());
                             jobManager.saveJob(curJob);
                             jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to provisioning");
 
@@ -832,7 +833,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
         job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
         job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
-        
+
         //Iterate over all session variables - set them up as job parameters
         @SuppressWarnings("rawtypes")
         Enumeration sessionVariables = session.getAttributeNames();
@@ -1034,7 +1035,7 @@ public class JobBuilderController extends BaseCloudController {
                                                          required=false)
                                            Integer jobId,
                                            @AuthenticationPrincipal ANVGLUser user) {
-        
+
         Set<String> jobCCSIds = scmEntryService.getJobProviders(jobId, user);
 
         List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();

@@ -80,6 +80,17 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                         ptype: 'fieldhelptext',
                         text: 'The Amazon resource name describing the storage S3 resource to be used for job artifacts'
                     }]
+                },{
+                    xtype: 'textfield',
+                    itemId: 'awsKeyName',
+                    name: 'awsKeyName',
+                    fieldLabel: 'AWS Key Name',
+                    anchor: '100%',
+                    allowBlank: true,
+                    plugins: [{
+                        ptype: 'fieldhelptext',
+                        text: 'The (optional) name of the key to be applied to every VM started by ANVGL'
+                    }]
                 }]
             }],
             dockedItems: [{

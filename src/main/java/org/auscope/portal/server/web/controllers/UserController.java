@@ -79,7 +79,8 @@ public class UserController extends BasePortalController {
             @RequestParam(required=false, value="arnExecution") String arnExecution,
             @RequestParam(required=false, value="arnStorage") String arnStorage,
             @RequestParam(required=false, value="awsAccount") String awsAccount,
-            @RequestParam(required=false, value="acceptedTermsConditions") Integer acceptedTermsConditions) {
+            @RequestParam(required=false, value="acceptedTermsConditions") Integer acceptedTermsConditions,
+            @RequestParam(required=false, value="awsKeyName") String awsKeyName) {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -103,6 +104,11 @@ public class UserController extends BasePortalController {
 
         if (awsAccount != null) {
             user.setAwsAccount(awsAccount);
+            modified = true;
+        }
+
+        if (!StringUtils.equals(user.getAwsKeyName(), awsKeyName)) {
+            user.setAwsKeyName(awsKeyName);
             modified = true;
         }
 
