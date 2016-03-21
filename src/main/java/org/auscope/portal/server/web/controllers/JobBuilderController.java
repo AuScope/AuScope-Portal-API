@@ -42,6 +42,7 @@ import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
+import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
@@ -76,6 +77,7 @@ public class JobBuilderController extends BaseCloudController {
     private FileStagingService fileStagingService;
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
     private ScmEntryService scmEntryService;
+    private ANVGLProvenanceService anvglProvenanceService;
 
     public static final String STATUS_PENDING = "Pending";//VT:Request accepted by compute service
     public static final String STATUS_ACTIVE = "Active";//VT:Running
@@ -96,7 +98,9 @@ public class JobBuilderController extends BaseCloudController {
     @Autowired
     public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
             PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService[] cloudStorageServices,
-                                CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,VGLPollingJobQueueManager vglPollingJobQueueManager, ScmEntryService scmEntryService) {
+            CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
+            VGLPollingJobQueueManager vglPollingJobQueueManager, ScmEntryService scmEntryService,
+            ANVGLProvenanceService anvglProvenanceService) {
         super(cloudStorageServices, cloudComputeServices,hostConfigurer);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
@@ -105,6 +109,7 @@ public class JobBuilderController extends BaseCloudController {
         this.vglJobStatusChangeHandler=vglJobStatusChangeHandler;
         this.vglPollingJobQueueManager = vglPollingJobQueueManager;
         this.scmEntryService = scmEntryService;
+        this.anvglProvenanceService = anvglProvenanceService;
     }
 
 
@@ -720,6 +725,10 @@ public class JobBuilderController extends BaseCloudController {
                             // create our input user data string
                             String userDataString = null;
                             userDataString = createBootstrapForJob(curJob);
+                            
+                            // Provenance
+                            anvglProvenanceService.setServerURL(request.getRequestURL().toString());
+                            anvglProvenanceService.createActivity(curJob, scmEntryService.getJobSolution(curJob), user);
 
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);
@@ -1107,6 +1116,5 @@ public class JobBuilderController extends BaseCloudController {
 
         return generateJSONResponseMAV(true, allInputs, "");
     }
-
 
 }

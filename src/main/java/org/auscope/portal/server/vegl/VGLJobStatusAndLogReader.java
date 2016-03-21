@@ -22,7 +22,8 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
     private VEGLJobManager jobManager;
 
     public VGLJobStatusAndLogReader(VEGLJobManager jobManager,
-            CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices) {
+            CloudStorageService[] cloudStorageServices,
+            CloudComputeService[] cloudComputeServices) {
         super(cloudStorageServices, cloudComputeServices);
         this.jobManager = jobManager;
     }

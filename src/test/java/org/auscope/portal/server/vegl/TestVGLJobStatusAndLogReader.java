@@ -1,6 +1,8 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.auscope.portal.core.cloud.CloudFileInformation;
@@ -12,6 +14,7 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
+import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -31,6 +34,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
     private CloudStorageService[] mockCloudStorageServices;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader jobStatLogReader;
+    private ANVGLFileStagingService mockFileStagingService;
 
     @Before
     public void init() {
@@ -127,6 +131,12 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
                 new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
                 new CloudFileInformation("key3/vl.sh.log", 102L, "http://public.url3/filename3"),
         };
+        
+        final List<VglDownload> downloads = new ArrayList<>();
+		VglDownload download = new VglDownload(1);
+		download.setUrl("http://portal-uploads.anvgl.org/file1");
+		download.setName("file1");
+		downloads.add(download);
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(mockJobId, null, null, null);will(returnValue(mockJob));
@@ -134,7 +144,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobDoneFiles));
+            allowing(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobDoneFiles));
+			allowing(mockJob).getUser();will(returnValue("JaneNg"));
+			allowing(mockJob).getJobDownloads();will(returnValue(downloads));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));

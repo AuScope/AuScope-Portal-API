@@ -1,0 +1,17 @@
+<http://portal-fake.vhirl.org/getJobObject.do?jobId=1>
+      <http://www.w3.org/2000/01/rdf-schema#type>
+              "http://www.w3.org/ns/prov#Activity" ;
+      <http://purl.org/dc/elements/1.1/description>
+              "Some job I made."^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://purl.org/dc/elements/1.1/title>
+              "Cool Job"^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://www.w3.org/ns/prov#startedAtTime>
+              "2008-10-31T15:07:38-05:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+      <http://www.w3.org/ns/prov#used>
+              "http://portal-uploads.vhirl.org/file1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://www.w3.org/ns/prov#wasAttributedTo>
+              "http://portal-fake.vhirl.org"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<http://portal-uploads.vhirl.org/file1>
+      <http://www.w3.org/2000/01/rdf-schema#type>
+              "http://www.w3.org/ns/prov#Entity" .

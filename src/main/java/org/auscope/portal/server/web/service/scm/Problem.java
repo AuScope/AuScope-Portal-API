@@ -1,7 +1,6 @@
 package org.auscope.portal.server.web.service.scm;
 
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**

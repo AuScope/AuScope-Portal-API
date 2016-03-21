@@ -52,9 +52,6 @@
         </property>
     </bean>
 
-
-
-
     <bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">
         <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
         <property name="dateFormat" value="EEE, d MMM yyyy HH:mm:ss" />
@@ -65,15 +62,22 @@
         <property name="emailSubject" value="VGL Job (%s/%s)" />
     </bean>
     
+    <bean name="ANVGLProvenanceService" class="org.auscope.portal.server.web.service.ANVGLProvenanceService" autowire="constructor">
+        <constructor-arg name="anvglFileStagingService" ref="fileStagingService"/>
+        <constructor-arg name="cloudStorageServices" ref="cloudStorageService-aws-sydney"/>
+        <constructor-arg name="propertyConfigurer" ref="propertyConfigurer"/>
+    </bean>
     
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
-    <bean name="VGLJobStatusChangeHandler" class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor"/>
+    <bean name="VGLJobStatusChangeHandler" class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor">
+        <constructor-arg name="anvglProvenanceService" ref="ANVGLProvenanceService"/>
+    </bean>
 
     <bean name="jobStatusMonitor" class="org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor">
         <constructor-arg name="jobStatusReader" ref="jobStatusLogReader"/>
         <constructor-arg name="jobStatusChangeListeners">
             <array>
-                <bean class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor"/>
+                <ref bean="VGLJobStatusChangeHandler"/>
             </array>
         </constructor-arg>
     </bean>
@@ -246,7 +250,7 @@
         </property>
     </bean>
 
-    <bean id="fileStagingService" class="org.auscope.portal.core.services.cloud.FileStagingService">
+    <bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">
         <constructor-arg name="stagingInformation">
             <bean class="org.auscope.portal.core.cloud.StagingInformation">
                 <constructor-arg name="stageInDirectory" value="${HOST.localStageInDir}"/>

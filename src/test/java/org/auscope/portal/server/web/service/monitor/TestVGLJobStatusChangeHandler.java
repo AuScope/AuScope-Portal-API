@@ -8,6 +8,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
+import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,8 @@ public class TestVGLJobStatusChangeHandler extends PortalTestClass {
     private JobMailSender mockJobMailSender;
     private VEGLJob mockJob;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
+    
+    private ANVGLProvenanceService mockANVGLProvenanceService;
 
     @Before
     public void init() {
@@ -31,10 +34,11 @@ public class TestVGLJobStatusChangeHandler extends PortalTestClass {
         mockJobMailSender = context.mock(JobMailSender.class);
         mockJob = context.mock(VEGLJob.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
+        mockANVGLProvenanceService = context.mock(ANVGLProvenanceService.class);
 
         //This is the component under test
         handler = new VGLJobStatusChangeHandler(mockJobManager,
-                mockJobMailSender,mockVGLJobStatusAndLogReader);
+                mockJobMailSender,mockVGLJobStatusAndLogReader, mockANVGLProvenanceService);
     }
 
     /**
@@ -68,6 +72,7 @@ public class TestVGLJobStatusChangeHandler extends PortalTestClass {
             oneOf(mockJob).setStatus(newStatus);
             oneOf(mockJobManager).saveJob(mockJob);
             oneOf(mockJobManager).createJobAuditTrail(oldStatus, mockJob, "Job status updated.");
+            oneOf(mockANVGLProvenanceService).createEntitiesForOutputs(mockJob);will(returnValue(""));
         }});
 
         handler.handleStatusChange(mockJob, newStatus, oldStatus);
@@ -94,6 +99,8 @@ public class TestVGLJobStatusChangeHandler extends PortalTestClass {
             oneOf(mockJobManager).saveJob(mockJob);
             oneOf(mockJobManager).createJobAuditTrail(oldStatus, mockJob, "Job status updated.");
             oneOf(mockJobMailSender).sendMail(mockJob);
+            
+            oneOf(mockANVGLProvenanceService).createEntitiesForOutputs(mockJob);will(returnValue(""));
         }});
 
         handler.handleStatusChange(mockJob, newStatus, oldStatus);
