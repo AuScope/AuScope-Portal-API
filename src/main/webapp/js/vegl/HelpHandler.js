@@ -23,6 +23,7 @@ Ext.define('vegl.HelpHandler', {
                     width : '32',
                     height : '32',
                     style : {
+                        'margin': '5px 3px 0 0',
                         'z-index' : 999999
                     }
                 });
