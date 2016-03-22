@@ -46,18 +46,6 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     }
                 },{
                     xtype: 'textfield',
-                    itemId: 'awsAccount',
-                    name: 'awsAccount',
-                    fieldLabel: 'AWS Account',
-                    anchor: '100%',
-                    allowBlank: false,
-                    allowOnlyWhitespace: false,
-                    plugins: [{
-                        ptype: 'fieldhelptext',
-                        text: 'The Amazon IAM account name which will be configured to run ANVGL virtual machines.'
-                    }]
-                },{
-                    xtype: 'textfield',
                     itemId: 'arnExecution',
                     name: 'arnExecution',
                     fieldLabel: 'Compute ARN',

@@ -44,6 +44,7 @@ public class UserController extends BasePortalController {
         this.velocityEngine = velocityEngine;
     }
 
+
     /**
      * Gets user metadata for the currently logged in user
      * @param user
@@ -78,7 +79,6 @@ public class UserController extends BasePortalController {
     public ModelAndView setUser(@AuthenticationPrincipal ANVGLUser user,
             @RequestParam(required=false, value="arnExecution") String arnExecution,
             @RequestParam(required=false, value="arnStorage") String arnStorage,
-            @RequestParam(required=false, value="awsAccount") String awsAccount,
             @RequestParam(required=false, value="acceptedTermsConditions") Integer acceptedTermsConditions,
             @RequestParam(required=false, value="awsKeyName") String awsKeyName) {
 
@@ -99,11 +99,6 @@ public class UserController extends BasePortalController {
 
         if (acceptedTermsConditions != null) {
             user.setAcceptedTermsConditions(acceptedTermsConditions);
-            modified = true;
-        }
-
-        if (awsAccount != null) {
-            user.setAwsAccount(awsAccount);
             modified = true;
         }
 
@@ -149,7 +144,7 @@ public class UserController extends BasePortalController {
         model.put("arnStorage", user.getArnStorage());
         model.put("arnExecute", user.getArnExecution());
         model.put("awsSecret", user.getAwsSecret());
-        model.put("awsAccount", user.getAwsAccount());
+        model.put("awsAccount", properties.resolvePlaceholder("env.aws.account"));
 
         String cloudFormationScript = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, CLOUD_FORMATION_RESOURCE, "UTF-8", model);
         return generateJSONResponseMAV(true, cloudFormationScript, "");
