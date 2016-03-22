@@ -680,15 +680,13 @@ public class JobListController extends BaseCloudController  {
      */
     @RequestMapping("/secure/createSeries.do")
     public ModelAndView createSeries(HttpServletRequest request,
-            @RequestParam("seriesName") String seriesName,
-            @RequestParam("seriesDescription") String seriesDescription,
             @AuthenticationPrincipal ANVGLUser user) {
-            
+
             VEGLSeries newSeries = new VEGLSeries();
-                  
+
             newSeries.setUser(user.getEmail());
-            newSeries.setName(seriesName);
-            newSeries.setDescription(seriesDescription);
+            newSeries.setName("default");
+            newSeries.setDescription("Everything will now come through to a single default series");
 
             try {
                 jobManager.saveSeries(newSeries);
@@ -696,7 +694,7 @@ public class JobListController extends BaseCloudController  {
                 logger.error("failure saving series", ex);
                 return generateJSONResponseMAV(false, null, "Failure saving series");
             }
-            
+
             return generateJSONResponseMAV(true, Arrays.asList(newSeries), "");
     };
 

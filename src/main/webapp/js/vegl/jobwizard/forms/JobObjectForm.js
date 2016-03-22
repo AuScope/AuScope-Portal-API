@@ -18,7 +18,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
      */
     constructor: function(wizardState) {
         var jobObjectFrm = this;
-        
+
         // create the store, get the machine image
         this.imageStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.MachineImage',
@@ -382,12 +382,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 } else {
                     callback(true);
                     return;
-                }              
+                }
             }
         });
     },
 
-    
     /**
      * Gets the help instructions for the interface
      * @function
