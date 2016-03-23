@@ -996,7 +996,7 @@ public class TestJobListController extends PortalTestClass {
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-
+            oneOf(mockJobManager).querySeries(userEmail, qName, null);will(returnValue(null));
             oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));
         }});
 
@@ -1054,7 +1054,7 @@ public class TestJobListController extends PortalTestClass {
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-
+            oneOf(mockJobManager).querySeries(userEmail, "default", null);will(returnValue(null));
             oneOf(mockJobManager).saveSeries(with(any(VEGLSeries.class)));will(throwException(new MyDataAccessException()));
         }});
 
