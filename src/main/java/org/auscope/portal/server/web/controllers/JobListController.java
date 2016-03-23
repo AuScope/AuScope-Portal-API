@@ -682,6 +682,10 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView createSeries(HttpServletRequest request,
             @AuthenticationPrincipal ANVGLUser user) {
 
+        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(),
+                                                         "default",
+                                                         null);
+        if(series==null || series.isEmpty()){
             VEGLSeries newSeries = new VEGLSeries();
 
             newSeries.setUser(user.getEmail());
@@ -696,6 +700,11 @@ public class JobListController extends BaseCloudController  {
             }
 
             return generateJSONResponseMAV(true, Arrays.asList(newSeries), "");
+        }
+        else{
+            return generateJSONResponseMAV(true, Arrays.asList(series.get(0)), "");
+        }
+
     };
 
     /**
