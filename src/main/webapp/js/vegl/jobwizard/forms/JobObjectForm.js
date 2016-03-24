@@ -321,8 +321,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         var jobObjectFrm = this;
         var wizardState = this.wizardState;
 
-        var numDownloadReqs = this.getNumDownloadRequests();
-        
         // ensure we have entered all appropriate fields
         if (!jobObjectFrm.getForm().isValid()) {
             callback(false);
@@ -354,7 +352,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     return;
                 }
 
-                jobObjectFrm.wizardState.jobId = responseObj.data[0].id;
+                var updatedJob = responseObj.data[0];
+                jobObjectFrm.wizardState.jobId = updatedJob.id;
                 // Store user selected toolbox into wizard state.
                 // That toolbox will be used to select relevant script templates or examples.
                 wizardState.toolbox = jobObjectFrm.getForm().findField("computeVmId").getRawValue();
@@ -366,6 +365,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 wizardState.ncpus = computeType.get('vcpus');
                 wizardState.nrammb = computeType.get('ramMB');
 
+                // Check with the user if no data set has been captured.
+                var numDownloadReqs = 0;
+                if (updatedJob.jobDownloads !== null) {
+                    numDownloadReqs = updatedJob.jobDownloads.length;
+                }
                 if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
                     Ext.Msg.confirm('Confirm',
                             'No data set has been captured. Do you want to continue?',

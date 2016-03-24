@@ -240,7 +240,32 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                         return;
                     }
 
-                    wizardState.jobId = responseObj.data[0].id;
+                    var updatedJob = responseObj.data[0];
+                    wizardState.jobId = updatedJob.id;
+
+                    // Check with the user if no data set has been captured.
+                    var numDownloadReqs = 0;
+                    if (updatedJob.jobDownloads !== null) {
+                        numDownloadReqs = updatedJob.jobDownloads.length;
+                    }
+                    if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
+                        Ext.Msg.confirm('Confirm',
+                                        'No data set has been captured. Do you want to continue?',
+                                        function(button) {
+                                            if (button === 'yes') {
+                                                wizardState.skipConfirmPopup = true;
+                                                callback(true);
+                                                return;
+                                            } else {
+                                                callback(false);
+                                                return;
+                                            }
+                                        });
+                    } else {
+                        callback(true);
+                        return;
+                    }
+
                     callback(true);
                     return;
                 }
