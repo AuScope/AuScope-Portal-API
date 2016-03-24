@@ -63,6 +63,7 @@ public class UserController extends BasePortalController {
         userObj.put("arnExecution", user.getArnExecution());
         userObj.put("arnStorage", user.getArnStorage());
         userObj.put("acceptedTermsConditions", user.getAcceptedTermsConditions());
+        userObj.put("awsKeyName", user.getAwsKeyName());
 
         return generateJSONResponseMAV(true, userObj, "");
     }
