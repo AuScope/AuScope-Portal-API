@@ -6,3 +6,4 @@ src/main/webapp/META-INF/
 src/main/resources/env.properties
 .pydevproject
 /build/
+/src/main/webapp/js/vegl/jobwizard/forms/.tern-port
