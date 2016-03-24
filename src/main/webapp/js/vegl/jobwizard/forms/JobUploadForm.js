@@ -104,33 +104,31 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
         // 'false' makes it a synchonous request!
         request.open("GET", "getNumDownloadRequests.do", false); 
         request.send(null);
-        
+
         respObj = Ext.JSON.decode(request.responseText);
         size = respObj.data;
-        
+
         return size;
     },
-    
-    
+
     /**
      * When the user wishes to proceed to the next step and clicks 'Next'
      * @function
      */
     beginValidation : function(callback) {
-        callback(true);
+        // Create the job and invoke the callback
+        this.createJob(callback);
     },
-    
-    
+
     /**
      * Title of the interface
      * @function
-     * @return {string} 
+     * @return {string}
      */
     getTitle : function() {
         return "Manage job input files...";
     },
 
-    
     /**
      * Gets the help instructions for the interface
      * @function
@@ -152,5 +150,126 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
             anchor : 'top',
             description : 'If you\'d like to add your own custom input files/web service downloads then press this button. You will be prompted to either upload a file from your local machine or to specify the public URL where the file can be accessed from.'
         })];
+    },
+
+    /**
+     * Create the default series if required, and hook the id into the workflow.
+     *
+     * @function
+     * @param {object} wizardState
+     *
+     */
+    createSeries : function(wizardState, callback) {
+        // Check whether we already have a series
+        if (wizardState.seriesId === undefined) {
+            Ext.Ajax.request({
+                url: 'secure/createSeries.do',
+                callback : function(options, success, response) {
+                    if (success) {
+                        var responseObj = Ext.JSON.decode(response.responseText);
+                        if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
+                            wizardState.seriesId = responseObj.data[0].id;
+                            callback();
+                        } else {
+                            errorMsg = responseObj.msg;
+                            errorInfo = responseObj.debugInfo;
+                        }
+                    } else {
+                        errorMsg = "There was an internal error saving your series.";
+                        errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
+                    }
+
+                    portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
+
+                    return;
+                }
+            });
+        }
+        else {
+            // Already have a series, so just call the callback
+            callback();
+        }
+    },
+
+    /**
+     * Creates a new job and hooks the generated JobId to the work-flow
+     * @function
+     * @param {function} callback
+     */
+    createJob : function(callback) {
+        var wizardState = this.wizardState;
+
+        // Make sure we have the default series
+        this.createSeries(wizardState, function() {
+            var params = {};
+
+            // If we already created the job, pass the id so it's updated instead.
+            if (wizardState.jobId !== undefined) {
+                params.id = wizardState.jobId;
+            }
+
+            if (typeof wizardState.name === "undefined") {
+                params.name = Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'd M Y g:i a'));
+            }
+
+            // see ANVGL 35
+            params.computeServiceId = "aws-ec2-compute";
+            params.storageServiceId = "amazon-aws-storage-sydney";
+
+            Ext.Ajax.request({
+                url : 'updateOrCreateJob.do',
+                params : params,
+                callback : function(options, success, response) {
+                    if (!success) {
+                        portal.widgets.window.ErrorWindow.showText(
+                            'Error creating job',
+                            'There was an unexpected error when attempting to save the details on this form. Please try again in a few minutes.'
+                        );
+                        callback(false);
+                        return;
+                    }
+
+                    var responseObj = Ext.JSON.decode(response.responseText);
+                    if (!responseObj.success) {
+                        portal.widgets.window.ErrorWindow.showText(
+                            'Error saving details',
+                            'There was an unexpected error when attempting to save the details on this form.',
+                            responseObj.msg
+                        );
+                        callback(false);
+                        return;
+                    }
+
+                    var updatedJob = responseObj.data[0];
+                    wizardState.jobId = updatedJob.id;
+
+                    // Check with the user if no data set has been captured.
+                    var numDownloadReqs = 0;
+                    if (updatedJob.jobDownloads !== null) {
+                        numDownloadReqs = updatedJob.jobDownloads.length;
+                    }
+                    if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
+                        Ext.Msg.confirm('Confirm',
+                                        'No data set has been captured. Do you want to continue?',
+                                        function(button) {
+                                            if (button === 'yes') {
+                                                wizardState.skipConfirmPopup = true;
+                                                callback(true);
+                                                return;
+                                            } else {
+                                                callback(false);
+                                                return;
+                                            }
+                                        });
+                    } else {
+                        callback(true);
+                        return;
+                    }
+
+                    callback(true);
+                    return;
+                }
+            });
+        });
     }
 });
