@@ -137,13 +137,12 @@ public class UserController extends BasePortalController {
 
     @RequestMapping("/secure/getCloudFormationScript.do")
     public ModelAndView getCloudFormationScript(@AuthenticationPrincipal ANVGLUser user) {
-        if (user == null || !user.isFullyConfigured()) {
+        if (user == null) {
             return generateJSONResponseMAV(false);
         }
 
         Map<String, Object> model = new HashMap<String, Object>();
-        model.put("arnStorage", user.getArnStorage());
-        model.put("arnExecute", user.getArnExecution());
+        model.put("s3Bucket", user.getS3Bucket());
         model.put("awsSecret", user.getAwsSecret());
         model.put("awsAccount", properties.resolvePlaceholder("env.aws.account"));
 

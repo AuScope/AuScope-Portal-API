@@ -125,7 +125,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
             try {
                 MessageDigest md = MessageDigest.getInstance("SHA-1");
                 String hashedSeed = Base64.encodeBase64String(md.digest(storageBucketSeed.getBytes("UTF-8")));
-                String bucketName = ("ANVGL-" + hashedSeed).replace('=', '_').replace('/', '-');
+                String bucketName = ("ANVGL-" + hashedSeed).replace('=', '_').replace('/', '-').replace('+', '-');
 
                 if (bucketName.length() > 63) {
                     bucketName = bucketName.substring(0, 63);
