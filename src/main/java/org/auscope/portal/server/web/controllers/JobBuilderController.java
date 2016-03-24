@@ -451,7 +451,6 @@ public class JobBuilderController extends BaseCloudController {
             }
 
             job.setComputeServiceId(computeServiceId);
-            job.setComputeInstanceKey(ccs.getKeypair());
         } else {
             job.setComputeServiceId(null);
         }

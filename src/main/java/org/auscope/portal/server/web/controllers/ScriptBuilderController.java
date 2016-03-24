@@ -13,13 +13,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.util.FileIOUtil;
-import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.auscope.portal.server.web.service.scm.Problem;
 import org.auscope.portal.server.web.service.scm.Solution;
@@ -78,6 +79,10 @@ public class ScriptBuilderController extends BasePortalController {
 
         if (sourceText == null || sourceText.trim().isEmpty()) {
             return generateJSONResponseMAV(false, null, "No source text specified");
+        }
+
+        if (StringUtils.isEmpty(solutionId)) {
+            solutionId = null;
         }
 
         try {
@@ -175,11 +180,11 @@ public class ScriptBuilderController extends BasePortalController {
 
         // Group solutions by the problem that they solve.
         HashMap<String, Problem> problems = new HashMap<String, Problem>();
-        
+
         for (Solution solution: solutions) {
             String problemId = solution.getProblem().getId();
             Problem problem = problems.get(problemId);
-            
+
             if (problem == null) {
                 problem = solution.getProblem();
                 problem.setSolutions(new ArrayList<Solution>());
