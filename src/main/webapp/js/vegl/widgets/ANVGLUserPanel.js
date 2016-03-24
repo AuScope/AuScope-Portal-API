@@ -23,28 +23,6 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                 padding: '10 20 20 5',
                 layout: 'anchor',
                 items: [{
-                    xtype: 'label',
-                    itemId: 'fullName',
-                    text: 'Loading...',
-                    style: {
-                        'font-size': '24px',
-                    }
-                },{
-                    xtype: 'textfield',
-                    itemId: 'email',
-                    readOnly: true,
-                    fieldLabel: 'Email',
-                    margin: '20 0 0 0',
-                    anchor: '100%',
-                    plugins: [{
-                        ptype: 'fieldhelptext',
-                        text: 'The email used that will be used to contact you (Modify this at accounts.google.com)'
-                    }],
-                    fieldStyle: {
-                        color: '#888888',
-                        'background-color': '#eeeeee'
-                    }
-                },{
                     xtype: 'textfield',
                     itemId: 'arnExecution',
                     name: 'arnExecution',
@@ -91,29 +69,6 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     itemId: 'status',
                     style: {
                         'color': 'gray'
-                    }
-                },{
-                    xtype: 'button',
-                    scale: 'large',
-                    text: 'Download AWS Policy',
-                    handler: function() {
-                        Ext.Ajax.request({
-                            url: 'secure/getCloudFormationScript.do',
-                            callback: function(options, success, response) {
-                                if (!success) {
-                                    Ext.MessageBox.alert('Error', 'There was an error accessing template. Please try refreshing the page');
-                                    return;
-                                }
-
-                                var responseObj = Ext.JSON.decode(response.responseText);
-                                if (!responseObj.success) {
-                                    Ext.MessageBox.alert('Error', 'There was an error generating template. Please try refreshing the page.');
-                                    return;
-                                }
-
-                                Ext.create('vegl.widgets.CloudFormationTemplateWindow', {content: responseObj.data}).show();
-                            }
-                        });
                     }
                 },{
                     xtype: 'button',
@@ -169,11 +124,8 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
     },
 
     setUser: function(user) {
-        this.down('#email').setValue(user.get('email'));
         this.down('#awsKeyName').setValue(user.get('awsKeyName'));
         this.down('#arnExecution').setValue(user.get('arnExecution'));
         this.down('#arnStorage').setValue(user.get('arnStorage'));
-        this.down('#fullName').setText('Hello ' + user.get('fullName'));
-
     }
 });

@@ -48,18 +48,74 @@ Ext.application({
                     'background-color': 'white'
                 },
                 items: [{
+                    xtype: 'panel',
                     border: false,
-                    maxWidth: 800,
+                    maxWidth: 1200,
                     width: '100%',
-                    height: 300,
-                    bodyStyle: {
-                        'background-color': 'white'
+                    height: 500,
+                    layout: {
+                        type: 'hbox',
+                        pack: 'center'
                     },
-                    layout: 'fit',
                     items: [{
-                        xtype: 'userpanel'
+                        xtype: 'panel',
+                        title: 'Step 1: Initialising your AWS',
+                        flex: 1,
+                        height: '100%',
+                        margin: '0 10 0 0',
+                        bodyStyle: {
+                            'background-color': 'white',
+                            padding: '5px',
+                        },
+                        html: '<h1>Tutorial Video</h1><img src="http://placehold.it/450x250"><p>You can also follow instructions at our wiki</p>',
+                        dockedItems: [{
+                            xtype: 'toolbar',
+                            dock: 'bottom',
+                            items: [{
+                                xtype: 'tbfill'
+                            },{
+                                xtype: 'button',
+                                scale: 'large',
+                                cls: 'important-button',
+                                text: 'Download Cloud Formation Policy',
+                                handler: function() {
+                                    Ext.Ajax.request({
+                                        url: 'secure/getCloudFormationScript.do',
+                                        callback: function(options, success, response) {
+                                            if (!success) {
+                                                Ext.MessageBox.alert('Error', 'There was an error accessing template. Please try refreshing the page');
+                                                return;
+                                            }
+
+                                            var responseObj = Ext.JSON.decode(response.responseText);
+                                            if (!responseObj.success) {
+                                                Ext.MessageBox.alert('Error', 'There was an error generating template. Please try refreshing the page.');
+                                                return;
+                                            }
+
+                                            Ext.create('vegl.widgets.CloudFormationTemplateWindow', {content: responseObj.data}).show();
+                                        }
+                                    });
+                                }
+                            }]
+                        }]
+                    },{
+                        xtype: 'panel',
+                        title: 'Step 2: Configuring ANVGL',
+                        flex: 1,
+                        height: '100%',
+                        margin: '0 0 0 10',
+                        bodyStyle: {
+                            'background-color': 'white'
+                        },
+                        layout: 'fit',
+                        items: [{
+                            border: false,
+                            xtype: 'userpanel'
+                        }]
                     }]
                 }]
+
             }],
             listeners: {
                 afterrender: function(vp) {
