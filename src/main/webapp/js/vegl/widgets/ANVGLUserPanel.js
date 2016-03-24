@@ -170,6 +170,7 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
 
     setUser: function(user) {
         this.down('#email').setValue(user.get('email'));
+        this.down('#awsKeyName').setValue(user.get('awsKeyName'));
         this.down('#arnExecution').setValue(user.get('arnExecution'));
         this.down('#arnStorage').setValue(user.get('arnStorage'));
         this.down('#fullName').setText('Hello ' + user.get('fullName'));
