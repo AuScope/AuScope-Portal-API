@@ -170,6 +170,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
 
             //Our series configuration
             allowing(mockSeries).getName();will(returnValue("seriesName"));
@@ -190,7 +191,6 @@ public class TestGeonetworkController {
 
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(outputFileInfo));
-            allowing(cloudStorageServices[0]).getBucket("foo");will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
@@ -292,6 +292,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
@@ -373,6 +374,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
 
             //Our series configuration
             allowing(mockSeries).getName();will(returnValue("seriesName"));
@@ -393,7 +395,6 @@ public class TestGeonetworkController {
 
             //Only 1 call to the job storage service for files
             oneOf(cloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(outputFileInfo));
-            allowing(cloudStorageServices[0]).getBucket("foo");will(returnValue("s3-output-bucket"));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));

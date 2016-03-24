@@ -27,6 +27,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private boolean emailNotification;
     private String processTimeLog;
     private String solutionId;
+    private String storageBucket;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -242,6 +243,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setSubmitDate(this.getSubmitDate()); //this job isn't submitted yet
         newJob.setUser(this.getUser());
         newJob.setSolutionId(this.getSolutionId());
+        newJob.setStorageBucket(this.getStorageBucket());
 
         List<VglDownload> newDownloads = new ArrayList<VglDownload>();
         for (VglDownload dl : this.getJobDownloads()) {
@@ -260,10 +262,27 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setJobParameters(newParams);
 
         for (String key : properties.keySet()) {
-            newJob.setProperty(key, getProperty(key));            
+            newJob.setProperty(key, getProperty(key));
         }
         return newJob;
     }
+
+    /**
+     * The storage bucket name that will receive job artifacts (usually unique to user)
+     */
+    @Override
+    public String getStorageBucket() {
+        return storageBucket;
+    }
+
+    /**
+     * The storage bucket name that will receive job artifacts (usually unique to user)
+     * @param storageBucket
+     */
+    public void setStorageBucket(String storageBucket) {
+        this.storageBucket = storageBucket;
+    }
+
 
     @Override
     public String toString() {

@@ -648,6 +648,7 @@ public class TestJobBuilderController {
         jobObj.setStorageBaseKey("base/key");
         jobObj.setComputeServiceId(computeServiceId);
         jobObj.setStorageServiceId(storageServiceId);
+        jobObj.setStorageBucket(storageBucket);
 
         context.checking(new Expectations() {{
             oneOf(mockScmEntryService).getJobSolution(jobObj);will(returnValue(mockSolution));
@@ -679,7 +680,6 @@ public class TestJobBuilderController {
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket(null);will(returnValue(storageBucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
@@ -904,6 +904,7 @@ public class TestJobBuilderController {
         jobObj.setStatus(jobInSavedState);
         jobObj.setComputeServiceId(computeServiceId);
         jobObj.setStorageServiceId(storageServiceId);
+        jobObj.setStorageBucket(storageBucket);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -921,7 +922,6 @@ public class TestJobBuilderController {
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket(null);will(returnValue(storageBucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
@@ -1021,6 +1021,7 @@ public class TestJobBuilderController {
         jobObj.setStatus(jobInSavedState);
         jobObj.setComputeServiceId(computeServiceId);
         jobObj.setStorageServiceId(storageServiceId);
+        jobObj.setStorageBucket(storageBucket);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1038,7 +1039,6 @@ public class TestJobBuilderController {
             allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket(null);will(returnValue(storageBucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
@@ -1230,12 +1230,12 @@ public class TestJobBuilderController {
 
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);
+        job.setStorageBucket(bucket);
 
         context.checking(new Expectations() {{
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
             atLeast(1).of(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            atLeast(1).of(mockCloudStorageServices[0]).getBucket(null);will(returnValue(bucket));
             atLeast(1).of(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
             atLeast(1).of(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
             atLeast(1).of(mockCloudStorageServices[0]).getProvider();will(returnValue(provider));
@@ -1284,12 +1284,12 @@ public class TestJobBuilderController {
 
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);
+        job.setStorageBucket(bucket);
 
         context.checking(new Expectations() {{
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket(null);will(returnValue(bucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(provider));
@@ -1401,6 +1401,8 @@ public class TestJobBuilderController {
             allowing(mockPortalUser).getArnExecution(); will(returnValue(null));
             allowing(mockPortalUser).getArnStorage(); will(returnValue(null));
             allowing(mockPortalUser).getAwsSecret(); will(returnValue(null));
+            allowing(mockPortalUser).getAwsKeyName(); will(returnValue(null));
+            allowing(mockPortalUser).getS3Bucket(); will(returnValue(null));
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 

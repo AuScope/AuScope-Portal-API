@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.security;
 
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -112,8 +114,28 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
         userDao.save(newUser); //create our new user
 
         synchronized(this.random) {
+            //Create an AWS secret for this user
             String randomSecret = RandomStringUtils.random(SECRET_LENGTH, 0, 0, true, true, null, this.random);
             newUser.setAwsSecret(randomSecret);
+
+            //Create a random bucket name for this user
+            String storageBucketSalt = RandomStringUtils.random(8, 0, 0, true, true, null, this.random);
+            String storageBucketSeed = "anvgl-" + id + storageBucketSalt;
+
+            try {
+                MessageDigest md = MessageDigest.getInstance("SHA-1");
+                String hashedSeed = Base64.encodeBase64String(md.digest(storageBucketSeed.getBytes("UTF-8")));
+                String bucketName = ("ANVGL-" + hashedSeed).replace('=', '_').replace('/', '-');
+
+                if (bucketName.length() > 63) {
+                    bucketName = bucketName.substring(0, 63);
+                }
+
+                newUser.setS3Bucket(bucketName);
+            } catch (Exception ex) {
+                //How can we handle this other than fail hard?
+                throw new RuntimeException("Unable to encode bucket name", ex);
+            }
         }
         newUser.setAuthorities(authorities);
         userDao.save(newUser); //apply authorities (so they inherit the ID)

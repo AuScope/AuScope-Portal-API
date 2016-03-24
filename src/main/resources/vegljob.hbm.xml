@@ -25,6 +25,7 @@
         <property name="storageBaseKey"/>
         <property name="emailNotification" type="yes_no" />
         <property name="solutionId"/>
+        <property name="storageBucket"/>
 
         <map name="jobParameters" lazy="false" cascade="all" inverse="true">
             <key column="jobId"/>
