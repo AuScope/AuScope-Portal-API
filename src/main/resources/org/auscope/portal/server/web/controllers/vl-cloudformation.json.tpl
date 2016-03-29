@@ -229,6 +229,7 @@
               "Action": [
                 "ec2:CreateTags",
                 "ec2:DeleteTags",
+                "ec2:GetConsoleOutput",
                 "ec2:ModifyInstanceAttribute"
               ],
               "Resource": [
@@ -244,27 +245,11 @@
                 "ec2:TerminateInstances"
               ],
               "Resource": [
-                "arn:aws:ec2:*:*:image/ami-0487de67",
+                "arn:aws:ec2:*:*:image/*",
                 "arn:aws:ec2:*:*:instance/*",
                 "arn:aws:ec2:*:*:network-interface/*",
                 "arn:aws:ec2:*:*:security-group/*",
-                "arn:aws:ec2:*:*:subnet/*",
-                "arn:aws:ec2:*:*:volume/*"
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "ec2:RunInstances",
-                "ec2:StartInstances",
-                "ec2:StopInstances",
-                "ec2:TerminateInstances"
-              ],
-              "Resource": [
-                "arn:aws:ec2:*:*:image/ami-736b3010",
-                "arn:aws:ec2:*:*:instance/*",
-                "arn:aws:ec2:*:*:network-interface/*",
-                "arn:aws:ec2:*:*:security-group/*",
+                "arn:aws:ec2:*:*:key-pair/*",
                 "arn:aws:ec2:*:*:subnet/*",
                 "arn:aws:ec2:*:*:volume/*"
               ]
