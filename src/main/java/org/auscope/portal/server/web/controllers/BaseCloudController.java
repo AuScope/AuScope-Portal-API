@@ -114,7 +114,8 @@ public abstract class BaseCloudController extends BasePortalController {
      */
     private String getProvisioningTemplate() throws IOException {
         InputStream is = getClass().getResourceAsStream("vl-provisioning.sh");
-        return IOUtils.toString(is);
+        String template = IOUtils.toString(is);
+        return template.replaceAll("\r", ""); //Windows style file endings have a tendency to sneak in via StringWriter and the like
     }
 
     /**
