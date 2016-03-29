@@ -22,7 +22,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     public static final int SECRET_LENGTH = 32;
 
 
-    private static char[] BUCKET_NAME_WHITELIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_0123456789".toCharArray();
+    private static char[] BUCKET_NAME_WHITELIST = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
     protected SecureRandom random;
     protected String defaultRole;
@@ -86,7 +86,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     }
 
     protected String generateRandomBucketName() {
-        return "ANVGL-" + RandomStringUtils.random(32, 0, 0, false, false, BUCKET_NAME_WHITELIST, this.random);
+        return "anvgl-" + RandomStringUtils.random(32, 0, 0, false, false, BUCKET_NAME_WHITELIST, this.random);
     }
 
     @Override

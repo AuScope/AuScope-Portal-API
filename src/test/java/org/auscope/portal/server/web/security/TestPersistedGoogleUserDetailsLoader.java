@@ -26,7 +26,7 @@ public class TestPersistedGoogleUserDetailsLoader extends PortalTestClass {
             Assert.assertTrue("Bucket name too long", bucketName.length() < 64);
             Assert.assertTrue("Bucket name too short", bucketName.length() >= 6);
             Assert.assertFalse(previousNames.contains(bucketName));
-            Assert.assertTrue(bucketName.matches("[A-Za-z0-9\\-_]*"));
+            Assert.assertTrue(bucketName.matches("[a-z0-9\\-]*"));
 
             previousNames.add(bucketName);
         }
