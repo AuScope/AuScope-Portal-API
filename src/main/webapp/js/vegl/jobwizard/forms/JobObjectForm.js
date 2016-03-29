@@ -101,6 +101,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                     jobObjectFrm.wizardState.solutionId = jobData.solutionId;
 
                                     jobObjectFrm.wizardState.jobId = frm.getValues().id;
+
+
                                 }
                             }
                         });
@@ -261,6 +263,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
      * @function
      */
     onImageSelect : function(combo, records) {
+        var me = this;
+
         if (!records) {
             this.computeTypeStore.removeAll();
             return;
@@ -274,6 +278,9 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             params : {
                 computeServiceId : selectedComputeService,
                 machineImageId : records.get('imageId')
+            },
+            callback: function() {
+                me.preselectVmType();
             }
         });
     },
@@ -319,6 +326,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
         // then save the job to the database before proceeding
         var values = jobObjectFrm.getForm().getValues();
+        values.seriesId = jobObjectFrm.wizardState.seriesId;
         values.jobId = jobObjectFrm.wizardState.jobId;
         values.storageServiceId = "amazon-aws-storage-sydney";
         values.computeServiceId = "aws-ec2-compute";
