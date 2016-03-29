@@ -1,6 +1,5 @@
 package org.auscope.portal.server.web.security;
 
-import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -23,6 +21,8 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
 
     public static final int SECRET_LENGTH = 32;
 
+
+    private static char[] BUCKET_NAME_WHITELIST = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
     protected SecureRandom random;
     protected String defaultRole;
@@ -85,6 +85,10 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
         user.setId(userInfo.get("id").toString());
     }
 
+    protected String generateRandomBucketName() {
+        return "anvgl-" + RandomStringUtils.random(32, 0, 0, false, false, BUCKET_NAME_WHITELIST, this.random);
+    }
+
     @Override
     public ANVGLUser getUserByUserId(String id) {
         return userDao.getById(id);
@@ -119,23 +123,8 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
             newUser.setAwsSecret(randomSecret);
 
             //Create a random bucket name for this user
-            String storageBucketSalt = RandomStringUtils.random(8, 0, 0, true, true, null, this.random);
-            String storageBucketSeed = "anvgl-" + id + storageBucketSalt;
-
-            try {
-                MessageDigest md = MessageDigest.getInstance("SHA-1");
-                String hashedSeed = Base64.encodeBase64String(md.digest(storageBucketSeed.getBytes("UTF-8")));
-                String bucketName = ("ANVGL-" + hashedSeed).replace('=', '_').replace('/', '-').replace('+', '-');
-
-                if (bucketName.length() > 63) {
-                    bucketName = bucketName.substring(0, 63);
-                }
-
-                newUser.setS3Bucket(bucketName);
-            } catch (Exception ex) {
-                //How can we handle this other than fail hard?
-                throw new RuntimeException("Unable to encode bucket name", ex);
-            }
+            String bucketName = generateRandomBucketName();
+            newUser.setS3Bucket(bucketName);
         }
         newUser.setAuthorities(authorities);
         userDao.save(newUser); //apply authorities (so they inherit the ID)
