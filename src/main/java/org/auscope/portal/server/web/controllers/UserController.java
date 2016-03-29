@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -14,6 +17,7 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUserDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -136,9 +140,10 @@ public class UserController extends BasePortalController {
     }
 
     @RequestMapping("/secure/getCloudFormationScript.do")
-    public ModelAndView getCloudFormationScript(@AuthenticationPrincipal ANVGLUser user) {
+    public void getCloudFormationScript(@AuthenticationPrincipal ANVGLUser user, HttpServletResponse response) throws IOException {
         if (user == null) {
-            return generateJSONResponseMAV(false);
+            response.sendError(HttpStatus.UNAUTHORIZED.value());
+            return;
         }
 
         Map<String, Object> model = new HashMap<String, Object>();
@@ -147,6 +152,14 @@ public class UserController extends BasePortalController {
         model.put("awsAccount", properties.resolvePlaceholder("env.aws.account"));
 
         String cloudFormationScript = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, CLOUD_FORMATION_RESOURCE, "UTF-8", model);
-        return generateJSONResponseMAV(true, cloudFormationScript, "");
+
+        response.setContentType("application/octet");
+        response.setHeader("Content-Disposition", "inline; filename=anvgl-cloudformation.json;");
+
+        try {
+            response.getOutputStream().write(cloudFormationScript.getBytes(Charsets.UTF_8));
+        } catch (IOException e) {
+            response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
     }
 }

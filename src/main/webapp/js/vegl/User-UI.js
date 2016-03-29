@@ -79,23 +79,7 @@ Ext.application({
                                 cls: 'important-button',
                                 text: 'Download Cloud Formation Policy',
                                 handler: function() {
-                                    Ext.Ajax.request({
-                                        url: 'secure/getCloudFormationScript.do',
-                                        callback: function(options, success, response) {
-                                            if (!success) {
-                                                Ext.MessageBox.alert('Error', 'There was an error accessing template. Please try refreshing the page');
-                                                return;
-                                            }
-
-                                            var responseObj = Ext.JSON.decode(response.responseText);
-                                            if (!responseObj.success) {
-                                                Ext.MessageBox.alert('Error', 'There was an error generating template. Please try refreshing the page.');
-                                                return;
-                                            }
-
-                                            Ext.create('vegl.widgets.CloudFormationTemplateWindow', {content: responseObj.data}).show();
-                                        }
-                                    });
+                                    portal.util.FileDownloader.downloadFile('secure/getCloudFormationScript.do');
                                 }
                             }]
                         }]
