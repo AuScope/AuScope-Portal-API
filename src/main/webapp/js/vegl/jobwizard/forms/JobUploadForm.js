@@ -2,14 +2,14 @@
   * @author Josh Vote
   */
 Ext.define('vegl.jobwizard.forms.JobUploadForm', {
-   /** 
-     * @lends anvgl.JobSubmitForm.JobUploadForm 
-     */ 
+   /**
+     * @lends anvgl.JobSubmitForm.JobUploadForm
+     */
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
-    
+
     fileGrid : null,
     uploadedFilesStore : null,
-    
+
     /**
      * Job wizard form for handling uploads of custom user input files. First interface of the 4-step job submission work-flow.
      * Creates a new JobUploadForm form configured to write/read to the specified global state
@@ -19,7 +19,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
      */
     constructor: function(wizardState) {
         var jobUploadFrm = this;
-        
+
         // execute the parent class
         this.callParent([{
             wizardState : wizardState,
@@ -29,7 +29,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
             buttons: [],
             listeners : {
                     jobWizardActive : function() {
-                        
+
                         if (this.wizardState.userAction == 'edit') {
                             jobUploadFrm.getForm().load({
                                 url : 'getJobObject.do',
@@ -67,24 +67,32 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                     itemId : 'add-button',
                     align : 'right',
                     handler : function() {
-                        Ext.create('vegl.widgets.JobInputFileWindow', {
-                            jobId : jobUploadFrm.wizardState.jobId,
-                            width : 500,
-                            height : 300,
-                            modal : true,
-                            listeners : {
-                                close : function() {
-                                    jobUploadFrm.updateFileList();
+                        var showPopup = function() {
+                            Ext.create('vegl.widgets.JobInputFileWindow', {
+                                jobId : jobUploadFrm.wizardState.jobId,
+                                width : 500,
+                                height : 300,
+                                modal : true,
+                                listeners : {
+                                    close : function() {
+                                        jobUploadFrm.updateFileList();
+                                    }
                                 }
-                            }
-                        }).show();
+                            }).show();
+                        };
+
+                        if (jobUploadFrm.wizardState.jobId === undefined) {
+                            jobUploadFrm.createJob(showPopup);
+                        } else {
+                            showPopup();
+                        }
                     }
                 }]
             }]
         }]);
     },
 
-    
+
     /**
      * Refresh the server side file list, and fetch all input-files associated with the job.
      * @function
@@ -96,13 +104,13 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
     },
 
     /**
-     * 
+     *
      * @function
      */
     getNumDownloadRequests : function() {
         request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
         // 'false' makes it a synchonous request!
-        request.open("GET", "getNumDownloadRequests.do", false); 
+        request.open("GET", "getNumDownloadRequests.do", false);
         request.send(null);
 
         respObj = Ext.JSON.decode(request.responseText);
@@ -137,7 +145,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
     getHelpInstructions : function() {
         var filesPanel = this.getComponent('files-panel');
         var addButton = filesPanel.queryById('add-button');
-        
+
         // return the help instructions for the interface
         return [Ext.create('portal.util.help.Instruction', {
             highlightEl : filesPanel.getEl(),
@@ -152,24 +160,20 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
         })];
     },
 
-    /**
-     * Create the default series if required, and hook the id into the workflow.
-     *
-     * @function
-     * @param {object} wizardState
-     *
-     */
     createSeries : function(wizardState, callback) {
         // Check whether we already have a series
         if (wizardState.seriesId === undefined) {
             Ext.Ajax.request({
                 url: 'secure/createSeries.do',
                 callback : function(options, success, response) {
+                    var errorMsg = '';
+                    var errorInfo = '';
                     if (success) {
                         var responseObj = Ext.JSON.decode(response.responseText);
                         if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
                             wizardState.seriesId = responseObj.data[0].id;
                             callback();
+                            return;
                         } else {
                             errorMsg = responseObj.msg;
                             errorInfo = responseObj.debugInfo;
@@ -180,12 +184,10 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                     }
 
                     portal.widgets.window.ErrorWindow.showText('Create new series', errorMsg, errorInfo);
-
                     return;
                 }
             });
-        }
-        else {
+        } else {
             // Already have a series, so just call the callback
             callback();
         }
@@ -199,7 +201,6 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
     createJob : function(callback) {
         var wizardState = this.wizardState;
 
-        // Make sure we have the default series
         this.createSeries(wizardState, function() {
             var params = {};
 

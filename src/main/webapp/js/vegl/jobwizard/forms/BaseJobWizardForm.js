@@ -17,7 +17,7 @@ Ext.define('vegl.jobwizard.forms.BaseJobWizardForm', {
      * work state between steps (although ideally a job's dependency on this object
      * should be kept to a bare minimum)
      */
-    wizardState : {},
+    wizardState : null,
 
     /**
      * Set this to true in a child class to skip the warning when the user attempts to navigate

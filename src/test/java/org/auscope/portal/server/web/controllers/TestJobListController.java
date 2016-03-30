@@ -135,12 +135,13 @@ public class TestJobListController extends PortalTestClass {
             allowing(queueMockJobs.get(0)).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(queueMockJobs.get(0)).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(queueMockJobs.get(0)).getStorageBaseKey();will(returnValue(""));
+            allowing(queueMockJobs.get(0)).getStorageBucket();will(returnValue(storageBucket));
             allowing(queueMockJobs.get(1)).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(queueMockJobs.get(1)).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(queueMockJobs.get(1)).getStorageBaseKey();will(returnValue(""));
+            allowing(queueMockJobs.get(1)).getStorageBucket();will(returnValue(storageBucket));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getBucket(null);will(returnValue(storageBucket));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
@@ -159,7 +160,7 @@ public class TestJobListController extends PortalTestClass {
             //allowing(queueMockJobs.get(0)).getUser();will(returnValue(userEmail));
 
             oneOf(queueMockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(queueMockJobs.get(1)));
-            
+
             allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));

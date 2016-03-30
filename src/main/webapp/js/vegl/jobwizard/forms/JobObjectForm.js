@@ -11,7 +11,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
     /**
      * Extends 'vegl.jobwizard.forms.BaseJobWizardForm'
-     * Job wizard form for creating and editing a new Job Object. 
+     * Job wizard form for creating and editing a new Job Object.
      * Creates a new JobObjectForm form configured to write/read to the specified global state
      * @constructs
      * @param {object} wizardState
@@ -35,7 +35,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             }
         });
         this.imageStore.load();
-        
+
         // create the store and get the compute type
         this.computeTypeStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.ComputeType',
@@ -48,7 +48,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             }
         });
-                
+
         // call the parent class
         this.callParent([{
             wizardState : wizardState,
@@ -75,7 +75,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                     //Loads the image store of user selected
                                     //compute provider
                                     var jobData = responseObj.data[0];
-
+                                    frm.setValues(jobData);
                                     if (!Ext.isEmpty(jobData.computeServiceId)) {
                                         jobObjectFrm.imageStore.load({
                                             params : {
@@ -87,20 +87,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                                 // override {compute,storage}ServiceId since
                                                 // they are now constant values (see
                                                 // ANVGL-35)
-                                                frm.setValues(jobData);
                                                 frm.setValues({
                                                     computeServiceId: 'aws-ec2-compute',
                                                     storageServiceId: 'amazon-aws-storage-sydney'
                                                 });
-                                            }
-                                        });
-
-                                        jobObjectFrm.computeTypeStore.load({
-                                            params : {
-                                                computeServiceId : jobData.computeServiceId
-                                            },
-                                            callback: function(records, operation, success) {
-                                                jobObjectFrm.preselectVmType();
                                             }
                                         });
                                     }
@@ -111,6 +101,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                     jobObjectFrm.wizardState.solutionId = jobData.solutionId;
 
                                     jobObjectFrm.wizardState.jobId = frm.getValues().id;
+
+
                                 }
                             }
                         });
@@ -264,13 +256,15 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             }
         });
     },
-    
-    
+
+
     /**
      * Handles the selection on 'Toolbox'
      * @function
      */
     onImageSelect : function(combo, records) {
+        var me = this;
+
         if (!records) {
             this.computeTypeStore.removeAll();
             return;
@@ -284,24 +278,27 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             params : {
                 computeServiceId : selectedComputeService,
                 machineImageId : records.get('imageId')
+            },
+            callback: function() {
+                me.preselectVmType();
             }
         });
     },
 
-    
+
     /**
      * Title for the interface
      * @function
-     * @return {string} 
+     * @return {string}
      */
     getTitle : function() {
         return "Enter job details...";
     },
-    
+
     /**
      * getNumDownloadRequests
      * @function
-     * @return {object} size 
+     * @return {object} size
      */
     getNumDownloadRequests : function() {
         request = ((window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
@@ -311,7 +308,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         size = respObj.data;
         return size;
     },
-    
+
     /**
      * Updates the job with additional details on storage, computing provider etc.
      * @function
@@ -333,7 +330,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         values.jobId = jobObjectFrm.wizardState.jobId;
         values.storageServiceId = "amazon-aws-storage-sydney";
         values.computeServiceId = "aws-ec2-compute";
-        
+
         // update the job here
         Ext.Ajax.request({
             url : 'updateOrCreateJob.do',
@@ -357,7 +354,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 // Store user selected toolbox into wizard state.
                 // That toolbox will be used to select relevant script templates or examples.
                 wizardState.toolbox = jobObjectFrm.getForm().findField("computeVmId").getRawValue();
-                
+
                 // Store selected resource limits into wizard state. These values will be included
                 // in template generation (to ensure valid numbers of CPU's are chosen etc)
                 var computeTypeId = jobObjectFrm.getComponent('resource-combo').getValue();

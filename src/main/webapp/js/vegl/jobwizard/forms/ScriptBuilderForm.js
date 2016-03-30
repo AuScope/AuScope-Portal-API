@@ -5,7 +5,7 @@
  */
 Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
     /** @lends anvgl.JobBuilder.ScriptBuilderForm */
-   
+
     extend : 'vegl.jobwizard.forms.BaseJobWizardForm',
     scriptBuilderFrm : null,
 
@@ -25,19 +25,19 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         // finally, build the main layout once all the pieces are ready.
         this.callParent([{
             wizardState : wizardState,
-            
+
             header : false,
             layout : 'fit',
-            
+
             listeners : {
                 jobWizardActive : function() {
                     // builds scriptbuilder component tree with user selected toolbox
                     this.scriptBuilderFrm.buildComponentsPanel();
-                    
+
                     // part of editing the workflow, when the user wishes to 'edit' or 'duplicate' the job
                     if (this.wizardState.userAction == 'edit' || this.wizardState.userAction == 'duplicate') {
                         this.loadSavedScript(this.wizardState.jobId);
-                        
+
                         // once the script is loaded into the memory, we don't want it to be loaded again to prevent unsaved changes.
                         this.wizardState.userAction = null;
                     }
@@ -47,7 +47,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         }]);
     },
 
-    
+
     /**
      * load script source from VL server filesystem
      * @function
@@ -56,7 +56,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
     loadSavedScript : function(jobId) {
         // mask body
         Ext.getBody().mask('Loading saved script...');
-        
+
         // fetch the script associated
         try {
             Ext.Ajax.request({
@@ -103,7 +103,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         }
     },
 
-    
+
     /**
      * stores the script along with the solutionId (string) for the job
      * @function
@@ -113,12 +113,12 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         // read the script from the interface
         var sourceText = this.scriptBuilderFrm.getScript();
         var solutionId = this.scriptBuilderFrm.getSolutionId();
-        
+
         // replace tab with 4 spaces whenever it occurs in the sourceText
         sourceText = sourceText.replace(/\t/g,"\u0020\u0020\u0020\u0020");
-        
+
         try {
-            
+
             Ext.Ajax.request({
                 url: 'secure/saveScript.do',
                 params: {
@@ -144,24 +144,24 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
                     // do not proceed to the next interface on the work-flow
                     callback(false);
                 }
-            });    
+            });
         } catch (exception) {
             console.log("Exception: ScriptBuilderForm.beginValidation(), details below - ");
             console.log(exception);
         }
     },
 
-    
+
     /**
      * Title for the interface
      * @function
-     * @return {string} 
+     * @return {string}
      */
     getTitle : function() {
         return "Define your job script.";
     },
 
-    
+
     /**
      * Gets the help instructions for the interface
      * @function

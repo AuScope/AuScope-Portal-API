@@ -22,6 +22,7 @@ public class ANVGLUser implements UserDetails, Serializable {
     private List<ANVGLAuthority> authorities;
     private String arnExecution;
     private String arnStorage;
+    private String s3Bucket;
     private String awsSecret;
     private String awsKeyName;
     private Integer acceptedTermsConditions;
@@ -52,6 +53,22 @@ public class ANVGLUser implements UserDetails, Serializable {
      */
     public void setId(String id) {
         this.id = id;
+    }
+
+    /**
+     * The name of the AWS S3 bucket where this user's job data will be written
+     * @return
+     */
+    public String getS3Bucket() {
+        return s3Bucket;
+    }
+
+    /**
+     * The name of the AWS S3 bucket where this user's job data will be written
+     * @param s3Bucket
+     */
+    public void setS3Bucket(String s3Bucket) {
+        this.s3Bucket = s3Bucket;
     }
 
     /**

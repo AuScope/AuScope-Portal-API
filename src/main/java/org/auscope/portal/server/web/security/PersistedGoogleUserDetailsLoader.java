@@ -22,6 +22,8 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     public static final int SECRET_LENGTH = 32;
 
 
+    private static char[] BUCKET_NAME_WHITELIST = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+
     protected SecureRandom random;
     protected String defaultRole;
     protected Map<String, List<String>> rolesByUser;
@@ -83,6 +85,10 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
         user.setId(userInfo.get("id").toString());
     }
 
+    protected String generateRandomBucketName() {
+        return "anvgl-" + RandomStringUtils.random(32, 0, 0, false, false, BUCKET_NAME_WHITELIST, this.random);
+    }
+
     @Override
     public ANVGLUser getUserByUserId(String id) {
         return userDao.getById(id);
@@ -112,8 +118,13 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
         userDao.save(newUser); //create our new user
 
         synchronized(this.random) {
+            //Create an AWS secret for this user
             String randomSecret = RandomStringUtils.random(SECRET_LENGTH, 0, 0, true, true, null, this.random);
             newUser.setAwsSecret(randomSecret);
+
+            //Create a random bucket name for this user
+            String bucketName = generateRandomBucketName();
+            newUser.setS3Bucket(bucketName);
         }
         newUser.setAuthorities(authorities);
         userDao.save(newUser); //apply authorities (so they inherit the ID)

@@ -42,8 +42,8 @@ import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
-import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -451,7 +451,6 @@ public class JobBuilderController extends BaseCloudController {
             }
 
             job.setComputeServiceId(computeServiceId);
-            job.setComputeInstanceKey(ccs.getKeypair());
         } else {
             job.setComputeServiceId(null);
         }
@@ -725,14 +724,13 @@ public class JobBuilderController extends BaseCloudController {
                             // create our input user data string
                             String userDataString = null;
                             userDataString = createBootstrapForJob(curJob);
-                            
+
                             // Provenance
                             anvglProvenanceService.setServerURL(request.getRequestURL().toString());
                             anvglProvenanceService.createActivity(curJob, scmEntryService.getJobSolution(curJob), user);
 
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);
-                            curJob.setComputeInstanceKey(user.getAwsKeyName());
                             jobManager.saveJob(curJob);
                             jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to provisioning");
 
@@ -833,6 +831,8 @@ public class JobBuilderController extends BaseCloudController {
         job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
         job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
         job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
+        job.setComputeInstanceKey(user.getAwsKeyName());
+        job.setStorageBucket(user.getS3Bucket());
 
         //Iterate over all session variables - set them up as job parameters
         @SuppressWarnings("rawtypes")
