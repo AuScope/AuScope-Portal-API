@@ -169,13 +169,33 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         boolean jobStarted = containsFile(results, "workflow-version.txt");
         boolean jobFinished = containsFile(results, JobListController.VGL_LOG_FILE);
 
+        String expectedStatus = JobBuilderController.STATUS_PENDING;
         if (jobFinished) {
-            return JobBuilderController.STATUS_DONE;
+            expectedStatus = JobBuilderController.STATUS_DONE;
         } else if (jobStarted) {
-            return JobBuilderController.STATUS_ACTIVE;
-        } else {
-            return JobBuilderController.STATUS_PENDING;
+            expectedStatus = JobBuilderController.STATUS_ACTIVE;
         }
+
+        //There is also a possibility that the cloud has had issues booting the VM... lets see what we can dig up
+        CloudComputeService cloudComputeService = getComputeService(job);
+        try {
+            switch (cloudComputeService.getJobStatus(job)) {
+            case Missing:
+                if (jobFinished) {
+                    return JobBuilderController.STATUS_DONE;
+                } else {
+                    return JobBuilderController.STATUS_ERROR;
+                }
+            case Pending:
+            case Running:
+                return expectedStatus;
+            }
+        } catch (Exception ex) {
+            log.warn("Exception looking up job VM status:" + job.toString(), ex);
+            return job.getStatus();
+        }
+
+        return expectedStatus;
     }
 
     private boolean containsFile(CloudFileInformation[] files, String fileName) {

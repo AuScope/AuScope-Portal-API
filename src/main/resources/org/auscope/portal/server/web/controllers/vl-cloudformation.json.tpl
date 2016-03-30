@@ -230,6 +230,7 @@
                 "ec2:CreateTags",
                 "ec2:DeleteTags",
                 "ec2:GetConsoleOutput",
+                "ec2:DescribeInstanceStatus",
                 "ec2:ModifyInstanceAttribute"
               ],
               "Resource": [
