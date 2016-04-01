@@ -182,7 +182,7 @@
                 "s3:*"
               ],
               "Resource": [
-                "arn:aws:s3:::${s3Bucket}"
+                "arn:aws:s3:::${s3Bucket}*"
               ]
             }
           ]
