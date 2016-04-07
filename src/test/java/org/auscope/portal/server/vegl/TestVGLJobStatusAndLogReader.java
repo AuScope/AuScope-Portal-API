@@ -9,13 +9,13 @@ import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.core.services.cloud.CloudComputeService.InstanceStatus;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
-import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,6 +44,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
 
         context.checking(new Expectations() {{
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
+            allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
         }});
 
         jobStatLogReader = new VGLJobStatusAndLogReader(mockJobManager,
@@ -76,10 +77,80 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Pending));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
         Assert.assertEquals(JobBuilderController.STATUS_PENDING, status);
+    }
+
+    /**
+     * Tests that the get job status method returns a pending
+     * status when the status is still pending (even if it's started running)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetJobStatus_PendingToPending_RunningVM() throws Exception {
+        final int mockJobId = 123;
+        final String mockJobStatus = JobBuilderController.STATUS_PENDING;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final CloudFileInformation[] jobPendingFiles = new CloudFileInformation[] {
+                new CloudFileInformation("key3/filename", 100L, "http://public.url3/filename"),
+                new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
+        };
+
+        context.checking(new Expectations() {{
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null);will(returnValue(mockJob));
+            allowing(mockJob).getId();will(returnValue(mockJobId));
+            allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobPendingFiles));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Running));
+        }});
+
+        String status = jobStatLogReader.getJobStatus(mockJob);
+        Assert.assertEquals(JobBuilderController.STATUS_PENDING, status);
+    }
+
+    /**
+     * Tests that the get job status method returns a error
+     * status when its underlying VM goes missing
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetJobStatus_PendingToError() throws Exception {
+        final int mockJobId = 123;
+        final String mockJobStatus = JobBuilderController.STATUS_PENDING;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final CloudFileInformation[] jobPendingFiles = new CloudFileInformation[] {
+                new CloudFileInformation("key3/filename", 100L, "http://public.url3/filename"),
+                new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
+        };
+
+        context.checking(new Expectations() {{
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null);will(returnValue(mockJob));
+            allowing(mockJob).getId();will(returnValue(mockJobId));
+            allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobPendingFiles));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Missing));
+        }});
+
+        String status = jobStatLogReader.getJobStatus(mockJob);
+        Assert.assertEquals(JobBuilderController.STATUS_ERROR, status);
     }
 
     /**
@@ -104,11 +175,13 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobActiveFiles));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Running));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -131,7 +204,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
                 new CloudFileInformation("key3/filename2", 101L, "http://public.url3/filename2"),
                 new CloudFileInformation("key3/vl.sh.log", 102L, "http://public.url3/filename3"),
         };
-        
+
         final List<VglDownload> downloads = new ArrayList<>();
 		VglDownload download = new VglDownload(1);
 		download.setUrl("http://portal-uploads.anvgl.org/file1");
@@ -143,6 +216,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobDoneFiles));
 			allowing(mockJob).getUser();will(returnValue("JaneNg"));
@@ -150,6 +224,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Missing));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);

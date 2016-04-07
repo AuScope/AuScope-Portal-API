@@ -747,6 +747,12 @@ public class JobBuilderController extends BaseCloudController {
         } catch (PortalServiceException e) {
             errorDescription = e.getMessage();
             errorCorrection = e.getErrorCorrection();
+
+            //These are our "STS specific" overrides to some error messages (not an ideal solution but I don't want to have to overhaul everything just to tweak a string).
+            if (errorDescription.equals("Storage credentials are not valid.")) {
+                errorDescription = "Unable to upload job script and/or input files";
+                errorCorrection = "The most likely cause is that your user profile ARN's have been misconfigured.";
+            }
         } catch (IOException e) {
             logger.error("Job bootstrap creation failed.", e);
             errorDescription = "There was a problem creating startup script.";

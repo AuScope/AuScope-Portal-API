@@ -46,7 +46,11 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
         if (!newStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
             VEGLJob vglJob = (VEGLJob)job;
             vglJob.setProcessDate(new Date());
-            this.setProcessDuration(vglJob,newStatus);
+            try {
+                this.setProcessDuration(vglJob,newStatus);
+            } catch (Throwable ex) {
+                LOG.debug("Unable to set process duration for" + job, ex);
+            }
             vglJob.setStatus(newStatus);
             jobManager.saveJob(vglJob);
             jobManager.createJobAuditTrail(oldStatus, vglJob, "Job status updated.");
