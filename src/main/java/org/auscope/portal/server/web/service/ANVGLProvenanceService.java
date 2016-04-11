@@ -1,8 +1,19 @@
 package org.auscope.portal.server.web.service;
 
-import au.csiro.promsclient.*;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.logging.Log;
@@ -18,10 +29,15 @@ import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
+import au.csiro.promsclient.Activity;
+import au.csiro.promsclient.Entity;
+import au.csiro.promsclient.ExternalReport;
+import au.csiro.promsclient.ProvenanceReporter;
+import au.csiro.promsclient.Report;
+import au.csiro.promsclient.ServiceEntity;
 
 /**
  * Created by Catherine Wise (wis056) on 3/10/2014. Modified by Stuart Woodman
@@ -228,7 +244,7 @@ public class ANVGLProvenanceService {
 
             for (CloudFileInformation information : fileInformationSet) {
                 URI inputURI = new URI(outputURL(job, information, serverURL()));
-                LOGGER.debug("New Input: " + inputURI.toString());
+                LOGGER.trace("New Input: " + inputURI.toString());
                 inputs.add(new Entity().setDataUri(inputURI).setWasAttributedTo(new URI(user.getId())));
             }
         } catch (PortalServiceException e) {
@@ -323,7 +339,7 @@ public class ANVGLProvenanceService {
             for (Entity potentialOutput : potentialOutputs) {
                 if (activity.usedEntities != null && !activity.usedEntities.contains(potentialOutput)) {
                     outputs.add(potentialOutput);
-                    LOGGER.debug("Added input from potentials list: " + potentialOutput);
+                    LOGGER.trace("Added input from potentials list: " + potentialOutput);
                 }
             }
             activity.setGeneratedEntities(outputs);
