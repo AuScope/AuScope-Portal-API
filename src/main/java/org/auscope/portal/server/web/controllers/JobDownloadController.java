@@ -341,7 +341,7 @@ public class JobDownloadController extends BasePortalController {
         		"&south=" + bbox.getSouthBoundLatitude() +
         		"&west=" + bbox.getWestBoundLongitude() +
         		"&east="+ bbox.getEastBoundLongitude();
-        String otherParams = "&temporal=all&time_start=&time_end=&horizStride=";
+        String otherParams = "";//"&temporal=all&time_start=&time_end=&horizStride=";
 
         String url = serviceUrl + "?var=" + description + netcdfsubsetserviceDimensions + otherParams;
 
