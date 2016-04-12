@@ -47,6 +47,14 @@ Ext.application({
             stripeRows: true,
             itemId : 'vgl-jobs-panel',
             listeners : {
+                afterrender: function(jp) {
+                    //Setup a periodic update of this panel. See ANVGL-97
+                    var runner = new Ext.util.TaskRunner();
+                    runner.start({
+                        run: Ext.bind(jp.triggerRefresh, jp),
+                        interval: 60 * 1000 //60 Seconds
+                    });
+                },
                 selectjob : function(panel, job) {
                     jobDetailsPanel.showDetailsForJob(job);
                     jobFilesPanel.listFilesForJob(job);
