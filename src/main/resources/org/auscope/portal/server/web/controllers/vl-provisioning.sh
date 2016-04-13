@@ -85,7 +85,7 @@ if [ ! -d "$moduleDir/vl_common" ]; then
     else
         sudo yum install -y wget git
     fi
-    tmpModulesDir="/tmp/modules/"
+    tmpModulesDir="/root/anvglmodules/"
     rm -rf "$tmpModulesDir"
     if [ "$1" !=  "" ]
     then
