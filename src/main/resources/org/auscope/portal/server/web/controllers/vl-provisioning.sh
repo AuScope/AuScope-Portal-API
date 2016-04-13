@@ -11,15 +11,11 @@
 #
 # /////////////////////////////
 
-# Use a local repo/branch until pulled into master
-baseUrl="https://github.com/squireg/ANVGL-Portal.git"
-branch="feature/sssc"
+# baseUrl -- git repository url
+baseUrl="https://github.com/AuScope/AVNGL-Portal.git"
 
-# # baseUrl -- git repository url
-# baseUrl="https://github.com/AuScope/AVNGL-Portal.git"
-
-# # branch -- branch in the git repo
-# branch="master"
+# branch -- branch in the git repo
+branch="master"
 
 # pathSuffix -- path to puppet modules in the repo
 pathSuffix="/vm/puppet/modules/"
