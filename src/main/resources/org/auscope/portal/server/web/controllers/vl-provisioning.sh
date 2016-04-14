@@ -81,8 +81,9 @@ if [ ! -d "$moduleDir/vl_common" ]; then
     else
         sudo yum install -y wget git
     fi
-    tmpModulesDir="/root/anvglmodules/"
-    rm -rf "$tmpModulesDir"
+
+    # Assumes our temp dir does not already have content!
+    tmpModulesDir="/opt/anvgl/modules/"
     if [ "$1" !=  "" ]
     then
         baseUrl="$1"
@@ -113,8 +114,9 @@ if [ ! -d "$moduleDir/vl_common" ]; then
         exit 2
     fi
 
-    #Tidy up
-    rm -rf "$tmpModulesDir"
+    # Don't tidy up until we're sure this approach works with cloud-init
+    # # Tidy up
+    # rm -rf "$tmpModulesDir"
 else
     echo "Common vl modules found in $moduleDir/vl_common"
 fi
