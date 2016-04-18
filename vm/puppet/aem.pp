@@ -25,7 +25,7 @@ file { 'clean_and_remove_gaaem_dir':
   recurse => true,
   purge => true,
   force => true,
-  require => [Class["aem_packages"], Class["vgl_common"]],
+  require => [Class["aem_packages"], Class["vl_common"]],
 }
 
 
