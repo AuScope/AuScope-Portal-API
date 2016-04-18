@@ -4,7 +4,7 @@ import "python_pip"
 import "puppi"
 import "autofsck"
 
-class {["epel", "python_pip", "vgl_common"]:}
+class {["epel", "python_pip", "vl_common"]:}
 
 # Disable fsck on boot
 class { autofsck:
@@ -17,13 +17,13 @@ class escript_packages {
     #Install easy packages
     case $::osfamily {
         'redhat': {
-            package { ["blas-devel", "netcdf-devel", "suitesparse-devel", "boost-devel"]: 
+            package { ["atlas", "atlas-devel", "blas-devel", "netcdf-devel", "suitesparse-devel", "boost-devel", "libpng-devel", "freetype-devel"]: 
                 ensure => installed,
                 require => Class["epel"],
             }    
         }
         default: {
-            package { ["python-liblas", "liblas-dev", "libnetcdf-dev", "libsuitesparse-dev", "libboost-all-dev", "libboost-python-dev", "libboost-dev"]: 
+            package { ["libatlas-dev", "libatlas-base-dev", "python-liblas", "liblas-dev", "libnetcdf-dev", "libsuitesparse-dev", "libboost-all-dev", "libboost-python-dev", "libboost-dev", "libpng-dev", "libfreetype6-dev",]: 
                 ensure => installed,
                 require => Class["epel"],
             }

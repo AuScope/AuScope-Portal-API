@@ -1,4 +1,4 @@
-class {["epel", "python_pip", "vgl_common"]:}
+class {["epel", "python_pip", "vl_common"]:}
 
 # Disable fsck on boot
 class { autofsck:
