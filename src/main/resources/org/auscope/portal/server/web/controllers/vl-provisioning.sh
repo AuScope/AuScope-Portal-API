@@ -12,7 +12,7 @@
 # /////////////////////////////
 
 # baseUrl -- git repository url
-baseUrl="https://github.com/AuScope/AVNGL-Portal.git"
+baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
 
 # branch -- branch in the git repo
 branch="master"
@@ -83,7 +83,7 @@ if [ ! -d "$moduleDir/vl_common" ]; then
     fi
 
     # Assumes our temp dir does not already have content!
-    tmpModulesDir="/opt/anvgl"
+    tmpModulesDir="/opt/anvgl/modules"
     if [ "$1" !=  "" ]
     then
         baseUrl="$1"
