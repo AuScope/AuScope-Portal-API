@@ -7,10 +7,13 @@ include python_pip
 
 class vl_common {
 
+  ensure_packages('curl')
+  ensure_packages('wget')
+
     # Install default packages (curl/wget declared in puppi)
   package { ["subversion", "mercurial", "ftp", "bzip2", "bzip2-devel",
              "elfutils", "ntp", "ntpdate", "gcc", "make", "swig", "mlocate",
-             "expect-dev", "gfortran", "build-essential", "curl", "wget"]:
+             "expect-dev", "gfortran", "build-essential"]:
     ensure => installed,
     require => Class["epel"],
   }
@@ -28,5 +31,17 @@ class vl_common {
         require => Class["epel"],
       }
     }
+  }
+
+  package {  ["numpy", "boto", "pyproj"]:
+    ensure => installed,
+    provider => "pip",
+    require => Class["python_pip"],
+  }
+
+  package {["scipy"]:
+    ensure => installed,
+    provider => "pip",
+    require => [Class["python_pip"], Package["numpy"]],
   }
 }
