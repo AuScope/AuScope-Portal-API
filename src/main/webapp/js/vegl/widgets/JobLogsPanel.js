@@ -8,6 +8,7 @@ Ext.define('vegl.widgets.JobLogsPanel', {
     alias : 'widget.joblogspanel',
 
     currentJob : null,
+    currentRequest : null,
 
     constructor : function(config) {
 
@@ -42,6 +43,11 @@ Ext.define('vegl.widgets.JobLogsPanel', {
      * Reloads this store with all the jobs for the specified series
      */
     listLogsForJob : function(job) {
+        if (this.currentRequest != null) {
+            Ext.Ajax.abort(this.currentRequest);
+            this.currentRequest = null;
+        }
+
         if (job.get('status') === vegl.models.Job.STATUS_UNSUBMITTED) {
             this.clearLogs(true, 'This job hasn\'t been submitted yet.');
             this.currentJob = job;
@@ -57,7 +63,7 @@ Ext.define('vegl.widgets.JobLogsPanel', {
         this.clearLogs();
         this.currentJob = job;
 
-        Ext.Ajax.request({
+        this.currentRequest = Ext.Ajax.request({
             url : 'secure/getSectionedLogs.do',
             params : {
                 jobId : job.get('id')

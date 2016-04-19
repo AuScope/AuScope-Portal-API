@@ -78,9 +78,11 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                     listeners : {
                         exception : function(proxy, response, operation) {
                             responseObj = Ext.JSON.decode(response.responseText);
-                            errorMsg = responseObj.msg;
-                            errorInfo = responseObj.debugInfo;
-                            portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                            if (response.responseObj) {
+                                errorMsg = responseObj.msg;
+                                errorInfo = responseObj.debugInfo;
+                                portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                            }
                         }
                     }
                 }
@@ -130,6 +132,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         var store = this.getStore();
         var ajaxProxy = store.getProxy();
         ajaxProxy.extraParams.jobId = job.get('id');
+        ajaxProxy.abort(); //Stop loading any previous job files
         this.currentJob = job;
         store.removeAll(false);
         store.load();
