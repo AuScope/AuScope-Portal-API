@@ -20,6 +20,41 @@ Ext.define('vegl.widgets.JobsPanel', {
     duplicateJobAction : null,
     editJobAction : null,
 
+    statics : {
+        /**
+         * Given a vegl.models.Job STATUS, return an object with color, tip and text fields set
+         * specific to the status provided
+         */
+        styleFromStatus : function(status) {
+            var style = {
+                color: 'black',
+                tip: '',
+                text: status
+            };
+
+            if (status === vegl.models.Job.STATUS_FAILED) {
+                style.color = 'red';
+            } else if (status === vegl.models.Job.STATUS_ACTIVE) {
+                style.color = 'green';
+                style.tip = 'Currently running';
+            } else if (status === vegl.models.Job.STATUS_DONE) {
+                style.color = 'blue';
+                style.tip = 'Job is done';
+            } else if (status === vegl.models.Job.STATUS_PENDING || status === vegl.models.Job.STATUS_PROVISIONING) {
+                style.color = '#e59900';
+                style.tip = 'Waiting for resource';
+            } else if (status === vegl.models.Job.STATUS_INQUEUE) {
+                style.color = 'green';
+                style.tip = 'Quota exceeded, placed in queue for resource';
+            } else if (status === vegl.models.Job.STATUS_ERROR) {
+                style.color = 'red';
+                style.tip = 'Error: check your email for error log';
+            }
+
+            return style;
+        }
+    },
+
     /**
      * Accepts the config for a Ext.grid.Panel along with the following additions:
      *
@@ -164,7 +199,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                 }
             }),
             columns: columns,
-            enableDragDrop:true,          
+            enableDragDrop:true,
             viewConfig: {
                 plugins: {
                     ddGroup: 'grid2tree',
@@ -293,20 +328,8 @@ Ext.define('vegl.widgets.JobsPanel', {
     },
 
     _jobStatusRenderer : function(value, cell, record) {
-        if (value === vegl.models.Job.STATUS_FAILED) {
-            return '<span style="color:red;">' + value + '</span>';
-        } else if (value === vegl.models.Job.STATUS_ACTIVE) {
-            return '<span title="Currently running" style="color:green;">' + value + '</span>';
-        } else if (value === vegl.models.Job.STATUS_DONE) {
-            return '<span title="Job is done" style="color:blue;">' + value + '</span>';
-        } else if (value === vegl.models.Job.STATUS_PENDING || value === vegl.models.Job.STATUS_PROVISIONING) {
-            return '<span title="Waiting for resource" style="color:#e59900;">' + value + '</span>';
-        } else if (value === vegl.models.Job.STATUS_INQUEUE) {
-            return '<span title="Quota exceeded, placed in queue for resource" style="color:green;">' + value + '</span>';
-        } else if (value === vegl.models.Job.STATUS_ERROR) {
-            return '<span title="Error: check your email for error log" style="color:red;">' + value + '</span>';
-        }
-        return value;
+        var style = vegl.widgets.JobsPanel.styleFromStatus(value);
+        return Ext.util.Format.format('<span title="{0}" style="color:{1};">{2}</span>', style.tip, style.color, style.text);
     },
 
     /**
@@ -316,12 +339,12 @@ Ext.define('vegl.widgets.JobsPanel', {
      */
     listJobsForSeries : function(series, forceStatusRefresh) {
         this.currentSeries = series;
-        
+
         var store = this.getStore();
-        
+
         var ajaxProxy = store.getProxy();
         ajaxProxy.extraParams.seriesId = series.get('id');
-        
+
         if (forceStatusRefresh) {
             ajaxProxy.extraParams.forceStatusRefresh = true;
         }
@@ -366,14 +389,14 @@ Ext.define('vegl.widgets.JobsPanel', {
             closable: false,
             scope : this,
             fn: function(btn) {
-                if (btn == 'yes') {     
+                if (btn == 'yes') {
                     Ext.getBody().mask('Cancelling Job...');
-                    
+
                     Ext.Ajax.request({
                         url: 'secure/killJob.do',
                         params: { 'jobId': job.get('id')},
                         scope : this,
-                        callback : function(options, success, response) {                            
+                        callback : function(options, success, response) {
                             Ext.getBody().unmask();
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
@@ -406,9 +429,9 @@ Ext.define('vegl.widgets.JobsPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {
-                    
+
                     Ext.getBody().mask('Deleting Job...');
-                    
+
                     Ext.Ajax.request({
                         url: 'secure/deleteJob.do',
                         params: { 'jobId': job.get('id')},
@@ -527,7 +550,7 @@ Ext.define('vegl.widgets.JobsPanel', {
     submitJob : function(job) {
 
         Ext.getBody().mask('Submitting Job...');
-        
+
         Ext.Ajax.request({
             url : 'secure/submitJob.do',
             params : {

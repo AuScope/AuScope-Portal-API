@@ -8,9 +8,23 @@
     <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     
     <style type="text/css">
-      #sitenav-01 a {
-        background: url( "img/navigation.gif" ) 0px -38px no-repeat;
-      }
+        #sitenav-01 a {
+            background: url( "img/navigation.gif" ) 0px -38px no-repeat;
+        }
+      
+        .vl-job-details .x-form-value-field {
+	       margin: 0 0 0 0;
+	       padding: 0 0 0 0;
+	       font: bold 28px tahoma,arial,verdana,sans-serif;
+	   }
+	
+	   .vl-job-details .x-form-value-field-label {
+	       margin: 0 0 0 0;
+	       padding: 0 0 0 0;
+	       font: normal 16px tahoma,arial,verdana,sans-serif;
+	       text-align: center;
+	       color: black;
+	   }
     </style>
 
     <%-- Code Mirror inclusions --%>

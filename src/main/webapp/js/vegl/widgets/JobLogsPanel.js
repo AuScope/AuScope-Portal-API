@@ -42,12 +42,17 @@ Ext.define('vegl.widgets.JobLogsPanel', {
      * Reloads this store with all the jobs for the specified series
      */
     listLogsForJob : function(job) {
+        if (job.get('status') === vegl.models.Job.STATUS_UNSUBMITTED) {
+            this.clearLogs(true, 'This job hasn\'t been submitted yet.');
+            this.currentJob = job;
+            return;
+        }
+
         var loadMaskElement = null;
         if (this.rendered) {
             loadMaskElement = this.getEl();
             loadMaskElement.mask('Loading logs...');
         }
-
 
         this.clearLogs();
         this.currentJob = job;
@@ -64,7 +69,7 @@ Ext.define('vegl.widgets.JobLogsPanel', {
                 }
 
                 if (!success) {
-                    this.addEmptyTab('Error communicating with the server.');
+                    this.clearLogs(true, 'Error communicating with the server.');
                     return;
                 }
 
@@ -82,21 +87,28 @@ Ext.define('vegl.widgets.JobLogsPanel', {
                         title : sectionName,
                         itemId : sectionName,
                         autoDestroy : true,
-                        scrollable  : true,
                         layout : 'fit',
-                        items : [Ext.create('vegl.widgets.CodeEditorField', {
-                            title : 'Script Source',
-                            mode : 'text/plain',
-                            showAutoIndent : false,
-                            showLineNumbers : true,
-                            readOnly : true,
-                            listModes : [{text: "Plain text", mime: "text/plain"}],
-                            value : sections[sectionName],
-                            modes: [{
-                                mime:           ['text/plain'],
-                                dependencies:   []
-                            }]
-                        })]
+                        items: [{
+                            xtype: 'panel',
+                            border: false,
+                            padding: 5,
+                            scrollable: true,
+                            html: '<iframe sectionName="' + sectionName + '" style="width:100%;height:100%;border:0px;"></iframe>',
+                            bodyStyle: {
+                                padding: '0px',
+                                border: '0px'
+                            },
+                            listeners: {
+                                afterrender: function(panel) {
+                                    var iframe = panel.getEl().down('iframe');
+                                    var doc = iframe.dom.contentWindow.document;
+                                    doc.open();
+                                    doc.write(sections[iframe.getAttribute('sectionName')]);
+                                    doc.close();
+                                    doc.body.setAttribute('style', 'white-space:pre;font-family:monospace;');
+                                }
+                            }
+                        }]
                     });
                 }
 
@@ -117,11 +129,11 @@ Ext.define('vegl.widgets.JobLogsPanel', {
     /**
      * Removes logs from this panel. Optionally adds a replacement tab indicating this panel is empty
      */
-    clearLogs : function(addEmptyTab) {
+    clearLogs : function(addEmptyTab, emptyTabMsg) {
         this.currentJob = null;
         this.removeAll(true);
         if (addEmptyTab) {
-            this.addEmptyTab('No job selected.');
+            this.addEmptyTab(emptyTabMsg ? emptyTabMsg : 'No job selected.');
         }
         this.doLayout();
     },

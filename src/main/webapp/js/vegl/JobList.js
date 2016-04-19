@@ -19,23 +19,8 @@ Ext.application({
 
         var jobDetailsPanel = Ext.create('vegl.widgets.DetailsPanel', {
             title: 'Description',
-            bodyStyle: 'padding:10px',
-            listeners : {
-                error : onError
-            }
-        });
-
-        var jobLogsPanel = Ext.create('vegl.widgets.JobLogsPanel', {
-            title: 'Logs',
-            bodyStyle: 'padding:10px',
-            listeners : {
-                error : onError
-            }
-        });
-
-        var jobFilesPanel = Ext.create('vegl.widgets.JobFilesPanel', {
-            title: 'Files',
-            stripeRows: true,
+            region: 'center',
+            split: true,
             listeners : {
                 error : onError
             }
@@ -49,13 +34,9 @@ Ext.application({
             listeners : {
                 selectjob : function(panel, job) {
                     jobDetailsPanel.showDetailsForJob(job);
-                    jobFilesPanel.listFilesForJob(job);
-                    jobLogsPanel.listLogsForJob(job);
                 },
                 refreshDetailsPanel : function(panel, series) {
-                    jobDetailsPanel.showDetailsForSeries(series);
-                    jobFilesPanel.cleanupDataStore();
-                    jobLogsPanel.clearLogs(true);
+
                 },
                 refreshJobDescription : function(job) {
                     jobDetailsPanel.showDetailsForJob(job);
@@ -87,15 +68,11 @@ Ext.application({
             listeners : {
                 selectseries : function(panel, series) {
                     jobsPanel.listJobsForSeries(series);
-                    jobDetailsPanel.showDetailsForSeries(series);
-                    jobFilesPanel.cleanupDataStore();
-                    jobLogsPanel.clearLogs(true);
+                    jobDetailsPanel.cleanupDetails();
                 },
                 refreshDetailsPanel : function() {
                     jobsPanel.cleanupDataStore();
                     jobDetailsPanel.cleanupDetails();
-                    jobLogsPanel.clearLogs(true);
-                    jobFilesPanel.cleanupDataStore();
                 },
                 error : onError
             }
@@ -148,16 +125,7 @@ Ext.application({
                     'background-color': 'white'
                 },
                 items: [folderPanel, jobsPanel]
-            },{
-                xtype : 'tabpanel',
-                title: 'Details',
-                itemId : 'vgl-details-panel',
-                region: 'center',
-                margins: '2 2 2 0',
-                activeTab: 0,
-                split: true,
-                items: [jobDetailsPanel, jobLogsPanel, jobFilesPanel]
-            }]
+            },jobDetailsPanel]
         });
     },
 
