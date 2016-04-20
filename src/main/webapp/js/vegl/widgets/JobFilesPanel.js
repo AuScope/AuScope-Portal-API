@@ -19,10 +19,13 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         //Action for downloading a single file
         this.downloadAction = new Ext.Action({
             text: 'Download',
-            disabled: true,
             iconCls: 'disk-icon',
             handler: function() {
-                var fileRecord = jobFilesGrid.getSelectionModel().getSelection()[0];
+                var files = jobFilesGrid.getSelectionModel().getSelection();
+                if (files.length === 0) {
+                    return;
+                }
+                var fileRecord = files[0];
 
                 var params = {
                     jobId : jobFilesGrid.currentJob.get('id'),
@@ -37,10 +40,12 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         //Action for downloading one or more files in a zip
         this.downloadZipAction = new Ext.Action({
             text: 'Download as Zip',
-            disabled: true,
             iconCls: 'disk-icon',
             handler: function() {
                 var files = jobFilesGrid.getSelectionModel().getSelection();
+                if (files.length === 0) {
+                    return;
+                }
 
                 var fParam = files[0].get('name');
                 for (var i = 1; i < files.length; i++) {
@@ -58,12 +63,9 @@ Ext.define('vegl.widgets.JobFilesPanel', {
             plugins : [{
                 ptype : 'inlinecontextmenu',
                 align : 'left',
+                recordIdProperty: 'name',
+                allowMultipleOpen: false,
                 actions : [this.downloadAction]
-            },{
-                ptype : 'rowcontextmenu',
-                contextMenu : Ext.create('Ext.menu.Menu', {
-                    items: [this.downloadAction, this.downloadZipAction]
-                })
             }],
             multiSelect : true,
             store : Ext.create('Ext.data.Store', {
@@ -97,8 +99,6 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         });
 
         this.callParent(arguments);
-
-        this.on('selectionchange', this._onSelectionChange, this);
         this.on('celldblclick', this._onDblClick, this);
 
     },
@@ -108,21 +108,6 @@ Ext.define('vegl.widgets.JobFilesPanel', {
 
         this.getSelectionModel().select([record], false);
         this.downloadAction.execute();
-    },
-
-    _onSelectionChange : function(sm) {
-        var totalSelections = this.getSelectionModel().getSelection().length;
-        if (totalSelections === 0) {
-            this.downloadAction.setDisabled(true);
-            this.downloadZipAction.setDisabled(true);
-        } else {
-            if (totalSelections != 1) {
-                this.downloadAction.setDisabled(true);
-            } else {
-                this.downloadAction.setDisabled(false);
-            }
-            this.downloadZipAction.setDisabled(false);
-        }
     },
 
     /**

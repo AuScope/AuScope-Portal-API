@@ -1,6 +1,6 @@
 Ext.define('vegl.widgets.JobInputFilesPanel', {
     /** @lends anvgl.JobBuilder.JobInputFilesPanel */
-    
+
     extend : 'Ext.grid.Panel',
     alias : 'widget.jobinputfilespanel',
 
@@ -17,10 +17,10 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
      */
     constructor : function(config) {
         var jobFilesGrid = this;
-        
+
         // while creating a job the jobId is not available at this stage
         this.currentJobId = config.currentJob ? config.currentJob.get("id") : config.currentJobId;
-        
+
         //Action for downloading a single file
         this.downloadAction = new Ext.Action({
             text: 'Download this input to your machine.',
@@ -109,7 +109,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
         });
 
         this.callParent(arguments);
-        
+
         this.on('selectionchange', this._onSelectionChange, this);
         this.on('celldblclick', this._onDblClick, this);
     },
@@ -124,11 +124,11 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             return;
         }
 
-        //Fire off the first request for already uploaded input files 
+        //Fire off the first request for already uploaded input files
         var loadMask = new Ext.LoadMask({
             msg : 'Requesting input files...',
             target : this,
-            removeMask : true            
+            removeMask : true
         });
         loadMask.show();
 
@@ -245,7 +245,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
         this.getSelectionModel().select([record], false);
     },
 
-    
+
     /**
      * @function
      * @param sm
