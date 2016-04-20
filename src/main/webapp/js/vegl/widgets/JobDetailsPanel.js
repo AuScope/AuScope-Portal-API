@@ -62,18 +62,18 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     pack: 'center'
                 },
                 items: [{
+                    xtype: 'jobfilespanel',
+                    itemId: 'files',
+                    margin: '0 5 0 0',
+                    flex: 1,
+                    title: 'Files'
+                },{
                     xtype: 'joblogspanel',
                     itemId: 'logs',
-                    margin: '0 5 0 0',
+                    margin: '0 0 0 5',
                     flex: 1,
                     plain: true,
                     title: 'Logs'
-                },{
-                    xtype: 'jobfilespanel',
-                    itemId: 'files',
-                    margin: '0 0 0 5',
-                    flex: 1,
-                    title: 'Files'
                 }]
             }]
         });
