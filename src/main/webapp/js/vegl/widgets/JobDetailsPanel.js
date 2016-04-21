@@ -4,7 +4,7 @@
  */
 Ext.define('vegl.widgets.DetailsPanel', {
     extend : 'Ext.panel.Panel',
-    alias : 'widgets.detailspanel',
+    alias : 'widget.detailspanel',
 
     taskRunner: null,
 
@@ -12,68 +12,132 @@ Ext.define('vegl.widgets.DetailsPanel', {
         Ext.apply(config, {
             width: '100%',
             layout: {
-                type: 'vbox',
-                pack: 'center',
-                align: 'stretch'
+                type: 'auto',
+            },
+            plugins: 'responsive',
+            responsiveConfig: {
+                small: {
+                    scrollable: 'vertical'
+                },
+                normal: {
+                    scrollable: false
+                }
             },
             items: [{
                 xtype: 'container',
                 itemId: 'top-container',
-                height: 80,
-                layout: {
-                    type: 'hbox',
-                    align: 'middle',
-                    pack: 'center'
+                plugins: 'responsive',
+                responsiveConfig: {
+                    small: {
+                        layout: {
+                            type: 'hbox',
+                            align: 'middle',
+                            pack: 'center',
+                            vertical: true
+                        }
+                    },
+                    normal: {
+                        layout: {
+                            type: 'hbox',
+                            align: 'middle',
+                            pack: 'center',
+                            vertical: false
+                        }
+                    }
                 },
                 items: [{
                     xtype: 'datadisplayfield',
                     itemId: 'status',
                     fieldLabel: 'Status',
                     cls: 'vl-job-details',
-                    margin: '0 20 0 20'
+                    margin: '0 10 0 10'
+                },{
+                    xtype: 'datadisplayfield',
+                    itemId: 'jobid',
+                    fieldLabel: 'Job ID',
+                    cls: 'vl-job-details',
+                    margin: '0 10 0 10'
                 },{
                     xtype: 'datadisplayfield',
                     itemId: 'ami',
                     fieldLabel: 'Instance ID',
                     cls: 'vl-job-details',
-                    margin: '0 20 0 20'
+                    margin: '0 10 0 10'
                 },{
                     xtype: 'datadisplayfield',
                     itemId: 'type',
                     fieldLabel: 'Instance Type',
                     cls: 'vl-job-details',
-                    margin: '0 20 0 20'
+                    margin: '0 10 0 10'
                 },{
                     xtype: 'datadisplayfield',
                     itemId: 'submitted',
                     fieldLabel: 'Submitted',
                     cls: 'vl-job-details',
-                    margin: '0 20 0 20'
+                    margin: '0 10 0 10'
                 }]
             },{
                 xtype: 'container',
                 itemId: 'bottom-container',
-                flex: 1,
                 margin: '10 0 0 0',
-                padding: '10',
+                padding: '5',
+                flex: 1,
+                height: '100%',
+                style: 'text-align:center;',
                 layout: {
-                    type: 'hbox',
-                    align: 'stretch',
-                    pack: 'center'
+                    type: 'column'
                 },
                 items: [{
-                    xtype: 'jobfilespanel',
-                    itemId: 'files',
-                    margin: '0 5 0 0',
-                    flex: 1,
-                    title: 'Files'
-                },{
                     xtype: 'joblogspanel',
                     itemId: 'logs',
-                    margin: '0 0 0 5',
-                    flex: 1,
-                    plain: true,
-                    title: 'Logs'
+                    columnWidth: 0.5,
+                    minWidth: 300,
+                    maxHeight: 400,
+                    height: 200,
+                    plugins: 'responsive',
+                    responsiveConfig: {
+                        small: {
+                            maxWidth: 700,
+                            style: 'float:none;margin: 5px auto;display:block;',
+                        },
+                        normal: {
+                            maxWidth: 370,
+                            style: 'float:none;margin: 5px;display:inline-block;',
+                        }
+                    },
+                    setStyle: function(style) {
+                        if (this.rendered) {
+                            Ext.dom.Helper.applyStyles(this.getEl().dom, style);
+                        } else {
+                            this.on('afterrender', this.setStyle, this, {single: true, args: [style]});
+                        }
+                    }
+
+                },{
+                    xtype: 'jobfilespanel',
+                    itemId: 'files',
+                    columnWidth: 0.5,
+                    minWidth: 300,
+                    maxHeight: 400,
+                    height: 200,
+                    plugins: 'responsive',
+                    responsiveConfig: {
+                        small: {
+                            maxWidth: 700,
+                            style: 'float:none;margin: 5px auto;display:block;',
+                        },
+                        normal: {
+                            maxWidth: 370,
+                            style: 'float:none;margin: 5px;display:inline-block;',
+                        }
+                    },
+                    setStyle: function(style) {
+                        if (this.rendered) {
+                            Ext.dom.Helper.applyStyles(this.getEl().dom, style);
+                        } else {
+                            this.on('afterrender', this.setStyle, this, {single: true, args: [style]});
+                        }
+                    }
                 }]
             }]
         });
@@ -99,6 +163,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
         this.down('#status').setValue(Ext.util.Format.format('<span title="{0}" style="color:{1};">{2}</span>', style.tip, style.color, style.text));
         this.down('#ami').setValue(job.get('computeInstanceId') ? job.get('computeInstanceId') : 'N/A');
         this.down('#type').setValue(job.get('computeInstanceType') ? job.get('computeInstanceType') : 'N/A');
+        this.down('#jobid').setValue(job.get('id'));
 
         this.down('#logs').listLogsForJob(job);
         this.down('#files').listFilesForJob(job);
@@ -140,7 +205,10 @@ Ext.define('vegl.widgets.DetailsPanel', {
             timeString = Ext.util.Format.format('{0} day(s) ago', Math.floor(diffSeconds / (60 * 60 * 24)));
         }
 
-        this.down('#submitted').setValue(timeString);
+        var field = this.down('#submitted');
+        if (field.getValue() !== timeString) {
+            field.setValue(timeString);
+        }
     },
 
     cleanupDetails: function() {

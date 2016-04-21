@@ -59,14 +59,17 @@ Ext.define('vegl.widgets.JobFilesPanel', {
             }
         });
 
+        var plugins = config.plugins ? config.plugins : [];
+        plugins.concat({
+            ptype : 'inlinecontextmenu',
+            align : 'left',
+            recordIdProperty: 'name',
+            allowMultipleOpen: false,
+            actions : [this.downloadAction]
+        });
+
         Ext.apply(config, {
-            plugins : [{
-                ptype : 'inlinecontextmenu',
-                align : 'left',
-                recordIdProperty: 'name',
-                allowMultipleOpen: false,
-                actions : [this.downloadAction]
-            }],
+            plugins : plugins,
             multiSelect : true,
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.models.FileRecord',
