@@ -8,6 +8,9 @@ Ext.define('vegl.widgets.DetailsPanel', {
 
     taskRunner: null,
 
+    /**
+     *
+     */
     constructor : function(config) {
         Ext.apply(config, {
             width: '100%',
@@ -90,19 +93,20 @@ Ext.define('vegl.widgets.DetailsPanel', {
                 items: [{
                     xtype: 'joblogspanel',
                     itemId: 'logs',
-                    columnWidth: 0.5,
                     minWidth: 300,
-                    maxHeight: 400,
-                    height: 200,
                     plugins: 'responsive',
                     responsiveConfig: {
                         small: {
                             maxWidth: 700,
                             style: 'float:none;margin: 5px auto;display:block;',
+                            columnWidth: 1,
+                            height: 400
                         },
                         normal: {
-                            maxWidth: 370,
+                            maxWidth: 600,
                             style: 'float:none;margin: 5px;display:inline-block;',
+                            columnWidth: 0.5,
+                            height: '100%'
                         }
                     },
                     setStyle: function(style) {
@@ -111,24 +115,43 @@ Ext.define('vegl.widgets.DetailsPanel', {
                         } else {
                             this.on('afterrender', this.setStyle, this, {single: true, args: [style]});
                         }
+                    },
+                    setColumnWidth: function(cw) {
+                        this.columnWidth = cw;
+                        if (this.rendered) {
+                            this.ownerCt.doLayout();
+                        } else {
+                            this.on('afterrender', this.setColumnWidth, this, {single: true, args: [cw]});
+                        }
+                    },
+                    setHeight: function(height) {
+                        if (this.rendered) {
+                            if (height === '100%') {
+                                height = window.screen.height - 200;
+                                console.log('oVerridding to ', height);
+                            }
+                            this.setSize(undefined, height);
+                        } else {
+                            this.on('afterrender', this.setHeight, this, {single: true, args: [height]});
+                        }
                     }
-
                 },{
                     xtype: 'jobfilespanel',
                     itemId: 'files',
-                    columnWidth: 0.5,
                     minWidth: 300,
-                    maxHeight: 400,
-                    height: 200,
                     plugins: 'responsive',
                     responsiveConfig: {
                         small: {
                             maxWidth: 700,
                             style: 'float:none;margin: 5px auto;display:block;',
+                            columnWidth: 1,
+                            height: 400
                         },
                         normal: {
-                            maxWidth: 370,
+                            maxWidth: 600,
                             style: 'float:none;margin: 5px;display:inline-block;',
+                            columnWidth: 0.5,
+                            height: '100%'
                         }
                     },
                     setStyle: function(style) {
@@ -136,6 +159,25 @@ Ext.define('vegl.widgets.DetailsPanel', {
                             Ext.dom.Helper.applyStyles(this.getEl().dom, style);
                         } else {
                             this.on('afterrender', this.setStyle, this, {single: true, args: [style]});
+                        }
+                    },
+                    setColumnWidth: function(cw) {
+                        this.columnWidth = cw;
+                        if (this.rendered) {
+                            this.ownerCt.doLayout();
+                        } else {
+                            this.on('afterrender', this.setColumnWidth, this, {single: true, args: [cw]});
+                        }
+                    },
+                    setHeight: function(height) {
+                        if (this.rendered) {
+                            if (height === '100%') {
+                                height = window.screen.height - 200;
+                                console.log('oVerridding to ', height);
+                            }
+                            this.setSize(undefined, height);
+                        } else {
+                            this.on('afterrender', this.setHeight, this, {single: true, args: [height]});
                         }
                     }
                 }]
