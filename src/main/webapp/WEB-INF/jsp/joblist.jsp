@@ -25,6 +25,20 @@
 	       text-align: center;
 	       color: black;
 	   }
+	   
+	   .vl-job-details-small .x-form-value-field {
+           margin: 0 0 0 0;
+           padding: 0 0 0 0;
+           font: bold 18px tahoma,arial,verdana,sans-serif;
+       }
+    
+       .vl-job-details-small .x-form-value-field-label {
+           margin: 0 0 0 0;
+           padding: 0 0 0 0;
+           font: normal 12px tahoma,arial,verdana,sans-serif;
+           text-align: center;
+           color: black;
+       }
     </style>
 
     <%-- Code Mirror inclusions --%>

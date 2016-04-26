@@ -12,6 +12,51 @@ Ext.define('vegl.widgets.DetailsPanel', {
      * See ANVGl-117 for a breakdown on why we've included so much custom code
      */
     constructor : function(config) {
+
+        var ddfResponsiveCfg = {
+            small: {
+                cls: 'vl-job-details-small'
+            },
+            normal: {
+                cls: 'vl-job-details'
+            }
+        };
+        var ddfSetCls = function(cls) {
+            if (this.rendered) {
+                var el = this.getEl();
+                var currentCls = el.getAttribute('class').replace(/vl-job-details[^ ]*/g, '');
+                el.dom.className = currentCls + ' ' + cls;
+            } else {
+                this.on('afterrender', this.setCls, this, {single: true, args: [cls]});
+            }
+        };
+
+        var panelSetStyle = function(style) {
+            if (this.rendered) {
+                Ext.dom.Helper.applyStyles(this.getEl().dom, style);
+            } else {
+                this.on('afterrender', this.setStyle, this, {single: true, args: [style]});
+            }
+        };
+        var panelSetColumnWidth = function(cw) {
+            this.columnWidth = cw;
+            if (this.rendered) {
+                this.ownerCt.doLayout();
+            } else {
+                this.on('afterrender', this.setColumnWidth, this, {single: true, args: [cw]});
+            }
+        };
+        var panelSetHeight = function(height) {
+            if (this.rendered) {
+                if (height === '100%') {
+                    height = window.screen.height - 200;
+                }
+                this.setSize(undefined, height);
+            } else {
+                this.on('afterrender', this.setHeight, this, {single: true, args: [height]});
+            }
+        };
+
         Ext.apply(config, {
             width: '100%',
             layout: {
@@ -52,32 +97,46 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     xtype: 'datadisplayfield',
                     itemId: 'status',
                     fieldLabel: 'Status',
-                    cls: 'vl-job-details',
-                    margin: '0 10 0 10'
+                    margin: '0 10 0 10',
+                    plugins: 'responsive',
+                    responsiveConfig: ddfResponsiveCfg,
+                    setCls: ddfSetCls
                 },{
                     xtype: 'datadisplayfield',
                     itemId: 'jobid',
                     fieldLabel: 'Job ID',
                     cls: 'vl-job-details',
-                    margin: '0 10 0 10'
+                    margin: '0 10 0 10',
+                    plugins: 'responsive',
+                    responsiveConfig: ddfResponsiveCfg,
+                    setCls: ddfSetCls
                 },{
                     xtype: 'datadisplayfield',
                     itemId: 'ami',
                     fieldLabel: 'Instance ID',
                     cls: 'vl-job-details',
-                    margin: '0 10 0 10'
+                    margin: '0 10 0 10',
+                    plugins: 'responsive',
+                    responsiveConfig: ddfResponsiveCfg,
+                    setCls: ddfSetCls
                 },{
                     xtype: 'datadisplayfield',
                     itemId: 'type',
                     fieldLabel: 'Instance Type',
                     cls: 'vl-job-details',
-                    margin: '0 10 0 10'
+                    margin: '0 10 0 10',
+                    plugins: 'responsive',
+                    responsiveConfig: ddfResponsiveCfg,
+                    setCls: ddfSetCls
                 },{
                     xtype: 'datadisplayfield',
                     itemId: 'submitted',
                     fieldLabel: 'Submitted',
                     cls: 'vl-job-details',
-                    margin: '0 10 0 10'
+                    margin: '0 10 0 10',
+                    plugins: 'responsive',
+                    responsiveConfig: ddfResponsiveCfg,
+                    setCls: ddfSetCls
                 }]
             },{
                 xtype: 'container',
@@ -109,32 +168,9 @@ Ext.define('vegl.widgets.DetailsPanel', {
                             height: '100%'
                         }
                     },
-                    setStyle: function(style) {
-                        if (this.rendered) {
-                            Ext.dom.Helper.applyStyles(this.getEl().dom, style);
-                        } else {
-                            this.on('afterrender', this.setStyle, this, {single: true, args: [style]});
-                        }
-                    },
-                    setColumnWidth: function(cw) {
-                        this.columnWidth = cw;
-                        if (this.rendered) {
-                            this.ownerCt.doLayout();
-                        } else {
-                            this.on('afterrender', this.setColumnWidth, this, {single: true, args: [cw]});
-                        }
-                    },
-                    setHeight: function(height) {
-                        if (this.rendered) {
-                            if (height === '100%') {
-                                height = window.screen.height - 200;
-                                console.log('oVerridding to ', height);
-                            }
-                            this.setSize(undefined, height);
-                        } else {
-                            this.on('afterrender', this.setHeight, this, {single: true, args: [height]});
-                        }
-                    }
+                    setStyle: panelSetStyle,
+                    setColumnWidth: panelSetColumnWidth,
+                    setHeight: panelSetHeight
                 },{
                     xtype: 'jobfilespanel',
                     itemId: 'files',
@@ -154,32 +190,9 @@ Ext.define('vegl.widgets.DetailsPanel', {
                             height: '100%'
                         }
                     },
-                    setStyle: function(style) {
-                        if (this.rendered) {
-                            Ext.dom.Helper.applyStyles(this.getEl().dom, style);
-                        } else {
-                            this.on('afterrender', this.setStyle, this, {single: true, args: [style]});
-                        }
-                    },
-                    setColumnWidth: function(cw) {
-                        this.columnWidth = cw;
-                        if (this.rendered) {
-                            this.ownerCt.doLayout();
-                        } else {
-                            this.on('afterrender', this.setColumnWidth, this, {single: true, args: [cw]});
-                        }
-                    },
-                    setHeight: function(height) {
-                        if (this.rendered) {
-                            if (height === '100%') {
-                                height = window.screen.height - 200;
-                                console.log('oVerridding to ', height);
-                            }
-                            this.setSize(undefined, height);
-                        } else {
-                            this.on('afterrender', this.setHeight, this, {single: true, args: [height]});
-                        }
-                    }
+                    setStyle: panelSetStyle,
+                    setColumnWidth: panelSetColumnWidth,
+                    setHeight: panelSetHeight
                 }]
             }]
         });
