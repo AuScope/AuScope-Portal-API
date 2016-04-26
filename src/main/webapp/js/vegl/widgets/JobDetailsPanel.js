@@ -9,7 +9,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
     taskRunner: null,
 
     /**
-     *
+     * See ANVGl-117 for a breakdown on why we've included so much custom code
      */
     constructor : function(config) {
         Ext.apply(config, {
