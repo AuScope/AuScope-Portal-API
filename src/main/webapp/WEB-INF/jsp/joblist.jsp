@@ -39,6 +39,11 @@
            text-align: center;
            color: black;
        }
+       
+       .x-tree-icon.x-tree-icon-leaf {
+           background-image: none;
+           width: 0px;
+       }
     </style>
 
     <%-- Code Mirror inclusions --%>
@@ -72,6 +77,7 @@
     <script type="text/javascript" src="js/vegl/widgets/JobInputFilesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobsTree.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/SeriesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/FolderPanel.js"></script>

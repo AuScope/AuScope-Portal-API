@@ -62,6 +62,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
             layout: {
                 type: 'auto',
             },
+            title: 'Select a job on the left to view more details',
             plugins: 'responsive',
             responsiveConfig: {
                 small: {
@@ -74,6 +75,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
             items: [{
                 xtype: 'container',
                 itemId: 'top-container',
+                hidden: true,
                 plugins: 'responsive',
                 responsiveConfig: {
                     small: {
@@ -141,6 +143,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
             },{
                 xtype: 'container',
                 itemId: 'bottom-container',
+                hidden: true,
                 margin: '10 0 0 0',
                 padding: '5',
                 flex: 1,
@@ -198,10 +201,6 @@ Ext.define('vegl.widgets.DetailsPanel', {
         });
 
         this.callParent(arguments);
-
-        this.on('afterender', function(jdp) {
-            jdp.cleanupDetails();
-        });
     },
 
     /**
