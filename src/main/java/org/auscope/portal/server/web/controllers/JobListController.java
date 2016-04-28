@@ -786,6 +786,17 @@ public class JobListController extends BaseCloudController  {
         return generateJSONResponseMAV(true, seriesJobs, "");
     }
 
+    /**
+     * Sets a user's job series ID to a new ID (which can be null indicating default job)
+     *
+     * This will fail if user is not the owner of the job or the new series.
+     *
+     * @param request
+     * @param jobId
+     * @param seriesId
+     * @param user
+     * @return
+     */
     @RequestMapping("/secure/setJobFolder.do")
     public ModelAndView setJobFolder(HttpServletRequest request,
             @RequestParam("jobId") Integer jobId,
@@ -796,17 +807,16 @@ public class JobListController extends BaseCloudController  {
         }
 
         VEGLJob job = jobManager.getJobById(jobId, user);
-        VEGLSeries series = jobManager.getSeriesById(seriesId);
-        if (job == null || series == null) {
+        if (job == null || !job.getEmailAddress().equals(user.getEmail())) {
             return generateJSONResponseMAV(false);
         }
 
-        if (!job.getEmailAddress().equals(user.getEmail())) {
-            return generateJSONResponseMAV(false);
-        }
-
-        if (!series.getUser().equals(user.getEmail())) {
-            return generateJSONResponseMAV(false);
+        //We allow a null series ID
+        if (seriesId != null) {
+            VEGLSeries series = jobManager.getSeriesById(seriesId);
+            if (!series.getUser().equals(user.getEmail())) {
+                return generateJSONResponseMAV(false);
+            }
         }
 
         job.setSeriesId(seriesId);
