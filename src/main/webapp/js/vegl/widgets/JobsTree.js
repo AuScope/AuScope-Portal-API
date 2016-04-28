@@ -43,7 +43,7 @@ Ext.define('vegl.widgets.JobsTree', {
 
         this.deleteJobAction = new Ext.Action({
             text: 'Delete',
-            iconCls: 'cross-icon',
+            iconCls: 'trash-icon',
             scope : this,
             disabled : true,
             handler: function() {
@@ -108,11 +108,6 @@ Ext.define('vegl.widgets.JobsTree', {
         });
 
         Ext.apply(config, {
-            plugins : [{
-                ptype : 'inlinecontextmenu',
-                align : 'center',
-                actions: [this.cancelJobAction, this.deleteJobAction, this.duplicateJobAction, this.editJobAction, this.submitJobAction]
-            }],
             rootVisible: false,
             store : Ext.create('Ext.data.TreeStore', {
                 root: config.rootNode,
@@ -174,6 +169,35 @@ Ext.define('vegl.widgets.JobsTree', {
                  dataIndex: 'status',
                  width : 100,
                  renderer: this._jobStatusRenderer
+            },{
+                xtype: 'actioncolumn',
+                width: 50,
+                items: [{
+                    iconCls: 'setting-icon',
+                    tooltip: 'Actions for this job / folder.',
+                    scope: this,
+                    handler: function(grid, rowIndex, colIndex, item, e, node, row) {
+                        grid.getSelectionModel().select(node);
+
+                        var items = [this.deleteJobAction];
+                        if (!this.submitJobAction.isDisabled()) {
+                            items.push(this.submitJobAction);
+                        }
+
+                        if (!this.editJobAction.isDisabled()) {
+                            items.push(this.editJobAction);
+                        }
+
+                        if (!this.duplicateJobAction.isDisabled()) {
+                            items.push(this.duplicateJobAction);
+                        }
+
+                        Ext.create('Ext.menu.Menu', {
+                            width: 100,
+                            items: items
+                        }).showAt(e.getXY());
+                    }
+                }]
             }]
         });
 
@@ -192,15 +216,6 @@ Ext.define('vegl.widgets.JobsTree', {
             }
         });
     },
-
-
-    _timeDiffinMinutes: function(d1, d2) {
-        var t2 = d2.getTime();
-        var t1 = d1.getTime();
-
-        return parseInt((t2-t1)/(3600*1000));
-    },
-
 
     _onSelectionChange : function(sm) {
         var selections = this.getSelectionModel().getSelection();

@@ -155,7 +155,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
                 items: [{
                     xtype: 'joblogspanel',
                     itemId: 'logs',
-                    minWidth: 300,
+                    minWidth: 250,
                     plugins: 'responsive',
                     responsiveConfig: {
                         small: {
@@ -177,7 +177,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
                 },{
                     xtype: 'jobfilespanel',
                     itemId: 'files',
-                    minWidth: 300,
+                    minWidth: 250,
                     plugins: 'responsive',
                     responsiveConfig: {
                         small: {

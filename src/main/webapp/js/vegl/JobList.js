@@ -7,8 +7,8 @@ Ext.application({
     mixins: ['Ext.mixin.Responsive'],
 
     responsiveFormulas: {
-        small: 'width < 1150',
-        normal: 'width >= 1150'
+        small: 'width < 1250',
+        normal: 'width >= 1250'
     },
 
     init : function() {
@@ -254,7 +254,7 @@ Ext.application({
                         split: true,
                         margins: '2 2 2 0',
                         layout: 'border',
-                        width: 400,
+                        width: 500,
                         bodyStyle: {
                             'background-color': 'white'
                         },

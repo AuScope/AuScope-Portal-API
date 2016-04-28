@@ -53,6 +53,14 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
     background-image: url("../portal-core/img/refresh.png") !important
 }
 
+.trash-icon {
+    background-image: url("../img/trash.png") !important
+}
+
+.setting-icon {
+    background-image: url("../img/setting.png") !important
+}
+
 .settings-icon {
     background-image: url("../img/settings.png") !important
 }
