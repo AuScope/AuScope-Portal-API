@@ -144,8 +144,8 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     type: 'column'
                 },
                 items: [{
-                    xtype: 'joblogspanel',
-                    itemId: 'logs',
+                    xtype: 'jobfilespanel',
+                    itemId: 'files',
                     minWidth: 250,
                     plugins: 'responsive',
                     responsiveConfig: {
@@ -166,8 +166,8 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     setColumnWidth: panelSetColumnWidth,
                     setHeight: panelSetHeight
                 },{
-                    xtype: 'jobfilespanel',
-                    itemId: 'files',
+                    xtype: 'joblogspanel',
+                    itemId: 'logs',
                     minWidth: 250,
                     plugins: 'responsive',
                     responsiveConfig: {
