@@ -12,7 +12,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
      * See ANVGl-117 for a breakdown on why we've included so much custom code
      */
     constructor : function(config) {
-
+        var ddfStyle = 'float:none;margin: 5px;display:inline-block;';
         var ddfResponsiveCfg = {
             small: {
                 cls: 'vl-job-details-small'
@@ -77,24 +77,10 @@ Ext.define('vegl.widgets.DetailsPanel', {
                 itemId: 'top-container',
                 hidden: true,
                 plugins: 'responsive',
-                responsiveConfig: {
-                    small: {
-                        layout: {
-                            type: 'hbox',
-                            align: 'middle',
-                            pack: 'center',
-                            vertical: true
-                        }
-                    },
-                    normal: {
-                        layout: {
-                            type: 'hbox',
-                            align: 'middle',
-                            pack: 'center',
-                            vertical: false
-                        }
-                    }
+                layout: {
+                    type: 'column'
                 },
+                style: 'text-align:center;',
                 items: [{
                     xtype: 'datadisplayfield',
                     itemId: 'status',
@@ -102,6 +88,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     margin: '0 10 0 10',
                     plugins: 'responsive',
                     responsiveConfig: ddfResponsiveCfg,
+                    style: ddfStyle,
                     setCls: ddfSetCls
                 },{
                     xtype: 'datadisplayfield',
@@ -111,6 +98,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     margin: '0 10 0 10',
                     plugins: 'responsive',
                     responsiveConfig: ddfResponsiveCfg,
+                    style: ddfStyle,
                     setCls: ddfSetCls
                 },{
                     xtype: 'datadisplayfield',
@@ -120,6 +108,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     margin: '0 10 0 10',
                     plugins: 'responsive',
                     responsiveConfig: ddfResponsiveCfg,
+                    style: ddfStyle,
                     setCls: ddfSetCls
                 },{
                     xtype: 'datadisplayfield',
@@ -129,6 +118,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     margin: '0 10 0 10',
                     plugins: 'responsive',
                     responsiveConfig: ddfResponsiveCfg,
+                    style: ddfStyle,
                     setCls: ddfSetCls
                 },{
                     xtype: 'datadisplayfield',
@@ -138,6 +128,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     margin: '0 10 0 10',
                     plugins: 'responsive',
                     responsiveConfig: ddfResponsiveCfg,
+                    style: ddfStyle,
                     setCls: ddfSetCls
                 }]
             },{
