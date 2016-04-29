@@ -19,6 +19,7 @@ Ext.define('vegl.widgets.JobsPanel', {
     deleteJobAction : null,
     duplicateJobAction : null,
     editJobAction : null,
+    updateRunning : false,
 
     /**
      * Accepts the config for a Ext.grid.Panel along with the following additions:
@@ -164,7 +165,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                 }
             }),
             columns: columns,
-            enableDragDrop:true,          
+            enableDragDrop:true,
             viewConfig: {
                 plugins: {
                     ddGroup: 'grid2tree',
@@ -184,7 +185,7 @@ Ext.define('vegl.widgets.JobsPanel', {
                 itemId : 'btnRefresh',
                 tooltip : 'Refresh the list of jobs for the selected series',
                 iconCls: 'refresh-icon',
-                handler: Ext.bind(this._onRefresh, this)
+                handler: Ext.bind(this.triggerRefresh, this)
             }]
         });
 
@@ -278,7 +279,11 @@ Ext.define('vegl.widgets.JobsPanel', {
         popup.show();
     },
 
-    _onRefresh : function(btn) {
+
+    /**
+     * Triggers a refresh of the current selected series (if a refresh is already running this will have no effect)
+     */
+    triggerRefresh : function() {
         if (this.currentSeries) {
             this.listJobsForSeries(this.currentSeries, true);
             this.queryById('btnRegister').setDisabled(true);
@@ -315,18 +320,28 @@ Ext.define('vegl.widgets.JobsPanel', {
      * series - either a vegl.models.Series object
      */
     listJobsForSeries : function(series, forceStatusRefresh) {
+        if (this.updateRunning) {
+            return;
+        }
+
+        this.updateRunning = true;
         this.currentSeries = series;
-        
+
         var store = this.getStore();
-        
+
         var ajaxProxy = store.getProxy();
         ajaxProxy.extraParams.seriesId = series.get('id');
-        
+
         if (forceStatusRefresh) {
             ajaxProxy.extraParams.forceStatusRefresh = true;
         }
 
-        store.load();
+        store.load({
+            scope: this,
+            callback: function() {
+                this.updateRunning = false;
+            }
+        });
     },
 
     /**
@@ -366,14 +381,14 @@ Ext.define('vegl.widgets.JobsPanel', {
             closable: false,
             scope : this,
             fn: function(btn) {
-                if (btn == 'yes') {     
+                if (btn == 'yes') {
                     Ext.getBody().mask('Cancelling Job...');
-                    
+
                     Ext.Ajax.request({
                         url: 'secure/killJob.do',
                         params: { 'jobId': job.get('id')},
                         scope : this,
-                        callback : function(options, success, response) {                            
+                        callback : function(options, success, response) {
                             Ext.getBody().unmask();
                             if (!success) {
                                 this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
@@ -406,9 +421,9 @@ Ext.define('vegl.widgets.JobsPanel', {
             scope : this,
             fn: function(btn) {
                 if (btn == 'yes') {
-                    
+
                     Ext.getBody().mask('Deleting Job...');
-                    
+
                     Ext.Ajax.request({
                         url: 'secure/deleteJob.do',
                         params: { 'jobId': job.get('id')},
@@ -527,7 +542,7 @@ Ext.define('vegl.widgets.JobsPanel', {
     submitJob : function(job) {
 
         Ext.getBody().mask('Submitting Job...');
-        
+
         Ext.Ajax.request({
             url : 'secure/submitJob.do',
             params : {
