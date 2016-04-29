@@ -14,6 +14,7 @@ Ext.define('vegl.models.Job', {
         STATUS_UNSUBMITTED : "Saved",
         STATUS_INQUEUE : "In Queue",
         STATUS_ERROR : "ERROR",
+        STATUS_DELETED : "DELETED",
         STATUS_PROVISIONING : "Provisioning"
     },
 
