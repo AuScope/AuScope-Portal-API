@@ -10,9 +10,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -266,7 +269,11 @@ public class JobListController extends BaseCloudController  {
 
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
-            return generateJSONResponseMAV(false, null, "Unable to lookup series.");
+            return generateJSONResponseMAV(false);
+        }
+
+        if (!series.getUser().equals(user.getEmail())) {
+            return generateJSONResponseMAV(false);
         }
 
         List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
@@ -766,7 +773,7 @@ public class JobListController extends BaseCloudController  {
 //          veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
 //          veglJob.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
 //        }
-//        
+//
         if (forceStatusRefresh) {
             try {
                 jobStatusMonitor.statusUpdate(seriesJobs);
@@ -777,6 +784,127 @@ public class JobListController extends BaseCloudController  {
         }
 
         return generateJSONResponseMAV(true, seriesJobs, "");
+    }
+
+    /**
+     * Sets a user's job series ID to a new ID (which can be null indicating default job)
+     *
+     * This will fail if user is not the owner of the job or the new series.
+     *
+     * @param request
+     * @param jobId
+     * @param seriesId
+     * @param user
+     * @return
+     */
+    @RequestMapping("/secure/setJobFolder.do")
+    public ModelAndView setJobFolder(HttpServletRequest request,
+            @RequestParam("jobId") Integer jobId,
+            @RequestParam(required=false, value="seriesId") Integer seriesId,
+            @AuthenticationPrincipal ANVGLUser user) {
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+
+        VEGLJob job = jobManager.getJobById(jobId, user);
+        if (job == null || !job.getEmailAddress().equals(user.getEmail())) {
+            return generateJSONResponseMAV(false);
+        }
+
+        //We allow a null series ID
+        if (seriesId != null) {
+            VEGLSeries series = jobManager.getSeriesById(seriesId);
+            if (!series.getUser().equals(user.getEmail())) {
+                return generateJSONResponseMAV(false);
+            }
+        }
+
+        job.setSeriesId(seriesId);
+        jobManager.saveJob(job);
+        return generateJSONResponseMAV(true);
+    }
+
+    /**
+     * Returns a JSON object containing an tree of all jobs, grouped by series.
+     * Also returns an array of job objects
+     *
+     * @param request The servlet request including a seriesId parameter
+     * @param response The servlet response
+     *
+     * @return A JSON object with a jobs attribute which is an array of
+     *         <code>VEGLJob</code> objects.
+     */
+    @RequestMapping("/secure/treeJobs.do")
+    public ModelAndView treeJobs(HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
+            @AuthenticationPrincipal ANVGLUser user) {
+
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+
+        List<VEGLSeries> userSeries = jobManager.querySeries(user.getEmail(), null, null);
+        List<VEGLJob> userJobs = jobManager.getUserJobs(user);
+        if (userSeries == null || userJobs == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup jobs.");
+        }
+
+        if (forceStatusRefresh) {
+            try {
+                jobStatusMonitor.statusUpdate(userJobs);
+            } catch (JobStatusException e) {
+                log.info("There was an error updating one or more jobs: " + e.getMessage());
+                log.debug("Exception(s): ", e);
+            }
+        }
+
+        //Now we organise into a tree structure
+        ModelMap rootNode = new ModelMap();
+        rootNode.put("name", user.getEmail());
+        rootNode.put("expanded", true);
+        rootNode.put("expandable", true);
+        rootNode.put("leaf", false);
+        rootNode.put("root", true);
+        rootNode.put("seriesId", null);
+        rootNode.put("children", new ArrayList<ModelMap>());
+
+        Map<Integer, ModelMap> nodeMap = new HashMap<Integer, ModelMap>();
+        for (VEGLSeries series : userSeries) {
+            ModelMap node = new ModelMap();
+            node.put("leaf", false);
+            node.put("expanded", false);
+            node.put("expandable", true);
+            node.put("name", series.getName());
+            node.put("seriesId", series.getId());
+            node.put("children", new ArrayList<ModelMap>());
+
+            nodeMap.put(series.getId(), node);
+            ((ArrayList<ModelMap>) rootNode.get("children")).add(node);
+        }
+
+        for (VEGLJob job : userJobs) {
+            ModelMap nodeParent = nodeMap.get(job.getSeriesId());
+            if (nodeParent == null) {
+                nodeParent = rootNode;
+            }
+
+            ModelMap node = new ModelMap();
+            node.put("leaf", true);
+            node.put("name", job.getName());
+            node.put("id", job.getId());
+            node.put("submitDate", job.getSubmitDate());
+            node.put("status", job.getStatus());
+            node.put("seriesId", job.getSeriesId());
+
+            ((ArrayList<ModelMap>) nodeParent.get("children")).add(node);
+        }
+
+        ModelMap resultObj = new ModelMap();
+        resultObj.put("nodes", rootNode);
+        resultObj.put("jobs", userJobs);
+
+        return generateJSONResponseMAV(true, resultObj, "");
     }
 
     /**

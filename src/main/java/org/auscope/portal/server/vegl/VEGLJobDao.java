@@ -22,7 +22,7 @@ public class VEGLJobDao extends HibernateDaoSupport {
      * It excludes jobs that are deleted.
      *
      * @param seriesID the ID of the series
-     * @param user 
+     * @param user
      */
     @SuppressWarnings("unchecked")
     public List<VEGLJob> getJobsOfSeries(final int seriesID, ANVGLUser user) {
@@ -32,10 +32,33 @@ public class VEGLJobDao extends HibernateDaoSupport {
         for (VEGLJob job : res) {
             job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
             job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
-            job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage()); 
+            job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
         }
         return res;
     }
+
+    /**
+     * Retrieves jobs that are grouped under a given user.
+     * It excludes jobs that are deleted.
+     *
+     * @param user
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public List<VEGLJob> getJobsOfUser(ANVGLUser user) {
+        List<VEGLJob> res = (List<VEGLJob>) getHibernateTemplate()
+            .findByNamedParam("from VEGLJob j where j.emailAddress=:email and lower(j.status)!='deleted'",
+                    "email", user.getEmail());
+
+        for (VEGLJob job : res) {
+            job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+            job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+            job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
+        }
+
+        return res;
+    }
+
 
     /**
      * Retrieves jobs that belong to a specific email
@@ -77,7 +100,7 @@ public class VEGLJobDao extends HibernateDaoSupport {
 
     /**
      * Retrieves the job with given ID.
-     * @param user 
+     * @param user
      */
     public VEGLJob get(final int id, ANVGLUser user) {
         VEGLJob job = (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
