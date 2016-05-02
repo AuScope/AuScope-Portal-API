@@ -31,6 +31,10 @@ public class VEGLJobManager {
         return veglJobDao.getJobsOfSeries(seriesId, user);
     }
 
+    public List<VEGLJob> getUserJobs(ANVGLUser user) {
+        return veglJobDao.getJobsOfUser(user);
+    }
+
     public List<VEGLJob> getPendingOrActiveJobs() {
         return veglJobDao.getPendingOrActiveJobs();
     }

@@ -1,10 +1,10 @@
-import "vgl_common"
+import "vl_common"
 import "epel"
 import "python_pip"
 import "puppi"
 import "autofsck"
 
-class {["epel", "python_pip", "vgl_common"]:}
+class {["epel", "python_pip", "vl_common"]:}
 
 # Disable fsck on boot
 class { autofsck:
@@ -17,13 +17,13 @@ class escript_packages {
     #Install easy packages
     case $::osfamily {
         'redhat': {
-            package { ["blas-devel", "netcdf-devel", "suitesparse-devel", "boost-devel"]: 
+            package { ["atlas", "atlas-devel", "blas-devel", "netcdf-devel", "suitesparse-devel", "boost-devel", "libpng-devel", "freetype-devel"]: 
                 ensure => installed,
                 require => Class["epel"],
             }    
         }
         default: {
-            package { ["python-liblas", "liblas-dev", "libnetcdf-dev", "libsuitesparse-dev", "libboost-all-dev", "libboost-python-dev", "libboost-dev"]: 
+            package { ["libatlas-dev", "libatlas-base-dev", "python-liblas", "liblas-dev", "libnetcdf-dev", "libsuitesparse-dev", "libboost-all-dev", "libboost-python-dev", "libboost-dev", "libpng-dev", "libfreetype6-dev",]: 
                 ensure => installed,
                 require => Class["epel"],
             }
@@ -54,7 +54,7 @@ class escript_packages {
                 extracted_dir => 'openmpi-1.6.3',
                 destination_dir => '/tmp',
                 postextract_command => '/tmp/openmpi-1.6.3/configure --prefix=/usr/local && make install',
-                require => [Class["escript_packages"], Class["vgl_common"]],
+                require => [Class["escript_packages"], Class["vl_common"]],
             }
             $mpiShContent= '# Environment for MPI
             export PATH=/usr/local/bin:$PATH
@@ -72,7 +72,7 @@ class escript_packages {
                 extracted_dir => 'proj-4.8.0',
                 destination_dir => '/tmp',
                 postextract_command => '/tmp/proj-4.8.0/configure && make install',
-                require => [Class["escript_packages"], Class["vgl_common"]],
+                require => [Class["escript_packages"], Class["vl_common"]],
             }
             
             # Install GDAL
@@ -81,7 +81,7 @@ class escript_packages {
                 extracted_dir => 'gdal-1.9.2',
                 destination_dir => '/tmp',
                 postextract_command => '/tmp/gdal-1.9.2/configure && make install',
-                require => [Class["escript_packages"], Class["vgl_common"]],
+                require => [Class["escript_packages"], Class["vl_common"]],
             }
             
             # Install SILO
@@ -90,7 +90,7 @@ class escript_packages {
                 extracted_dir => 'silo-4.8-bsd',
                 destination_dir => '/tmp',
                 postextract_command => '/tmp/silo-4.8-bsd/configure --prefix=/usr/local && make install',
-                require => [Class["escript_packages"], Class["vgl_common"]],
+                require => [Class["escript_packages"], Class["vl_common"]],
             }
             
             # Install SymPy
@@ -99,7 +99,7 @@ class escript_packages {
                 extracted_dir => 'sympy-0.7.2',
                 destination_dir => '/tmp',
                 postextract_command => '/tmp/sympy-0.7.2/setup.py install',
-                require => [Class["escript_packages"], Class["vgl_common"]],
+                require => [Class["escript_packages"], Class["vl_common"]],
             }    
         }
         default: {
@@ -174,5 +174,5 @@ file {"escript-profile-env":
 
 # Install VisIt
 class {"visit":
-    require => [Class["vgl_common"], Exec['escript-install']],
+    require => [Class["vl_common"], Exec['escript-install']],
 }
