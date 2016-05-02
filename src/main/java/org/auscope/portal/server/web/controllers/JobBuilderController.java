@@ -400,6 +400,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="storageServiceId", required=false) String storageServiceId,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
+            @RequestParam(value="walltime", required=false) Integer walltime,
             HttpServletRequest request,
             @AuthenticationPrincipal ANVGLUser user) throws ParseException {
 
@@ -425,6 +426,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setComputeVmId(computeVmId);
         job.setComputeInstanceType(computeTypeId);
         job.setEmailNotification(emailNotification);
+        job.setWalltime(walltime);
 
         //Updating the storage service means changing the base key
         if (storageServiceId != null) {

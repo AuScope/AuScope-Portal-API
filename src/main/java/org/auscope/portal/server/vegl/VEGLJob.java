@@ -28,6 +28,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private String processTimeLog;
     private String solutionId;
     private String storageBucket;
+    private Integer walltime;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -244,6 +245,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setUser(this.getUser());
         newJob.setSolutionId(this.getSolutionId());
         newJob.setStorageBucket(this.getStorageBucket());
+        newJob.setWalltime(this.getWalltime());
 
         List<VglDownload> newDownloads = new ArrayList<VglDownload>();
         for (VglDownload dl : this.getJobDownloads()) {
@@ -283,6 +285,21 @@ public class VEGLJob extends CloudJob implements Cloneable {
         this.storageBucket = storageBucket;
     }
 
+    /**
+     * 
+     * @return
+     */
+    public Integer getWalltime() {
+        return walltime;
+    }
+
+    /**
+     * 
+     * @param walltime
+     */
+    public void setWalltime(Integer walltime) {
+        this.walltime = walltime;
+    }
 
     @Override
     public String toString() {

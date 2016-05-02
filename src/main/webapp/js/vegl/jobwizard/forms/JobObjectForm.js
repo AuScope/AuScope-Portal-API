@@ -198,6 +198,18 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     text: 'Tick to receive email notification upon job processing.'
                 }]
             },
+            {
+            	xtype: 'textfield',
+                name: 'walltime',
+                itemId : 'walltime',
+                fieldLabel: 'Walltime',
+                maskRe:/[\d]/,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Enter an optional walltime (milliseconds) for your job here.'
+                }],
+                allowBlank: true 
+            },
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'storageProvider' },
             { xtype: 'hidden', name: 'storageEndpoint' },
@@ -398,6 +410,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         var description = this.getComponent('description');
         var toolbox = this.getComponent('image-combo');
         var emailNotification = this.getComponent('emailNotification');
+        var walltime = this.getComponent('walltime');
 
         return [Ext.create('portal.util.help.Instruction', {
             highlightEl : name.getEl(),
@@ -419,6 +432,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             title : 'Job completion email notification',
             anchor : 'bottom',
             description : 'The VL will send out email notification to your email address upon job completion. Untick the checkbox if you don\'t want to receive the notification.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : walltime.getEl(),
+            title : 'Walltime',
+            anchor : 'bottom',
+            description : 'If you would like your job to terminate after a specific length of time, enter the walltime (milliseconds) here.'
         })];
     }
 });

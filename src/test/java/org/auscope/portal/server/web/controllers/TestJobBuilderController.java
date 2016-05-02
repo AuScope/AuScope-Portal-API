@@ -1434,6 +1434,7 @@ public class TestJobBuilderController {
                 storageServiceId,
                 null,
                 emailNotification,
+                null,
                 mockRequest,
                 mockPortalUser);
 
@@ -1518,6 +1519,7 @@ public class TestJobBuilderController {
                 "storageServiceId",
                 "registeredUrl",
                 emailNotification,
+                null,
                 mockRequest,
                 mockPortalUser);
         Assert.assertNotNull(mav);
@@ -1620,6 +1622,7 @@ public class TestJobBuilderController {
                 "storageServiceId",
                 "registeredUrl",
                 emailNotification,
+                null,
                 mockRequest,
                 mockPortalUser);
         Assert.assertNotNull(mav);
@@ -1669,6 +1672,7 @@ public class TestJobBuilderController {
                 "storageServiceId",
                 "registeredUrl",
                 emailNotification,
+                null,
                 mockRequest,
                 mockPortalUser);
         Assert.assertNotNull(mav);
@@ -1718,6 +1722,7 @@ public class TestJobBuilderController {
                 "storageServiceId",
                 "registeredUrl",
                 emailNotification,
+                null,
                 mockRequest,
                 mockPortalUser);
         Assert.assertNotNull(mav);
