@@ -46,6 +46,7 @@ CREATE TABLE `jobs` (
   `processTimeLog` varchar(255) DEFAULT '',
   `solutionId` varchar(255) DEFAULT NULL,
   `storageBucket` varchar(64) DEFAULT NULL,
+  `walltime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `SERIES` (`seriesId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;

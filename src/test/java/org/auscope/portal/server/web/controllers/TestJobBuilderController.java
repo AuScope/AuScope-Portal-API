@@ -1482,6 +1482,7 @@ public class TestJobBuilderController {
         final String newBaseKey = "base/key";
         final boolean emailNotification = true;
         final String keypair = "vl-developers";
+        final Integer walltime = Integer.valueOf(0);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1497,6 +1498,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setStorageBaseKey(newBaseKey);
             oneOf(mockJob).setEmailNotification(emailNotification);
             oneOf(mockJob).setComputeInstanceType(computeVmType);
+            oneOf(mockJob).setWalltime(walltime);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("storageServiceId"));
@@ -1519,7 +1521,7 @@ public class TestJobBuilderController {
                 "storageServiceId",
                 "registeredUrl",
                 emailNotification,
-                null,
+                Integer.valueOf(walltime),
                 mockRequest,
                 mockPortalUser);
         Assert.assertNotNull(mav);
@@ -1590,6 +1592,7 @@ public class TestJobBuilderController {
         final int jobId = 1234;
         final boolean emailNotification = true;
         final String computeVmType = "compute-vm-type";
+        final Integer walltime = Integer.valueOf(0);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1604,6 +1607,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setStorageServiceId("storageServiceId");
             oneOf(mockJob).setEmailNotification(emailNotification);
             oneOf(mockJob).setComputeInstanceType(computeVmType);
+            oneOf(mockJob).setWalltime(walltime);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId"));
@@ -1622,7 +1626,7 @@ public class TestJobBuilderController {
                 "storageServiceId",
                 "registeredUrl",
                 emailNotification,
-                null,
+                walltime,
                 mockRequest,
                 mockPortalUser);
         Assert.assertNotNull(mav);
@@ -1640,6 +1644,7 @@ public class TestJobBuilderController {
         final int jobId = 1234;
         final boolean emailNotification = true;
         final String computeVmType = "compute-vm-type";
+        final Integer walltime = Integer.valueOf(0);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1654,6 +1659,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setStorageServiceId("storageServiceId");
             oneOf(mockJob).setEmailNotification(emailNotification);
             oneOf(mockJob).setComputeInstanceType(computeVmType);
+            oneOf(mockJob).setWalltime(walltime);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId-thatDNE"));
@@ -1672,7 +1678,7 @@ public class TestJobBuilderController {
                 "storageServiceId",
                 "registeredUrl",
                 emailNotification,
-                null,
+                walltime,
                 mockRequest,
                 mockPortalUser);
         Assert.assertNotNull(mav);
@@ -1690,6 +1696,7 @@ public class TestJobBuilderController {
         final int jobId = 1234;
         final boolean emailNotification = true;
         final String computeVmType = "compute-vm-type";
+        final Integer walltime = Integer.valueOf(0);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1704,6 +1711,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setStorageServiceId("storageServiceId");
             oneOf(mockJob).setEmailNotification(emailNotification);
             oneOf(mockJob).setComputeInstanceType(computeVmType);
+            oneOf(mockJob).setWalltime(walltime);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId-thatDNE"));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId"));
@@ -1722,7 +1730,7 @@ public class TestJobBuilderController {
                 "storageServiceId",
                 "registeredUrl",
                 emailNotification,
-                null,
+                walltime,
                 mockRequest,
                 mockPortalUser);
         Assert.assertNotNull(mav);
