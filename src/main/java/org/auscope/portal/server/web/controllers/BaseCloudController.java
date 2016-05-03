@@ -139,7 +139,8 @@ public abstract class BaseCloudController extends BasePortalController {
                 cloudStorageService.getProvider(), // STORAGE_TYPE
                 cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion(), // STORAGE_AUTH_VERSION
                 cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName(), // OS_REGION_NAME
-                getProvisioningTemplate() // PROVISIONING_TEMPLATE
+                getProvisioningTemplate(), // PROVISIONING_TEMPLATE
+                job.getWalltime() // WALLTIME
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);

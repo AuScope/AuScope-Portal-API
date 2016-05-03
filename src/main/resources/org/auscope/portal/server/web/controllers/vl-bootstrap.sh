@@ -18,6 +18,7 @@ export STORAGE_ENDPOINT="{5}"
 export STORAGE_TYPE="{6}"
 export STORAGE_AUTH_VERSION="{7}"
 export OS_REGION_NAME="{8}"
+export WALLTIME="{10}"
 export VL_LOG_FILE_NAME="vl.sh.log"
 export VL_LOG_FILE="$WORKING_DIR/$VL_LOG_FILE_NAME"
 
@@ -40,8 +41,14 @@ echo "LD_LIBRARY_PATH = $LD_LIBRARY_PATH"
 echo "STORAGE_ENDPOINT = $STORAGE_ENDPOINT"
 echo "STORAGE_TYPE = $STORAGE_TYPE"
 echo "VL_LOG_FILE = $VL_LOG_FILE"
+if [ $WALLTIME > 0 ]; then
+    echo "WALLTIME = $WALLTIME"
+fi
 echo "--------------------------------------"
 
+if [ $WALLTIME > 0 ]; then
+    shutdown +$WALLTIME
+fi
 
 #Download our workflow and make it executable
 echo "Downloading workflow script from $WORKFLOW_URL and storing it at $WORKFLOW_SCRIPT"

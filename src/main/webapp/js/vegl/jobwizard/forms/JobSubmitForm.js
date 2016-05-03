@@ -28,9 +28,9 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
      * @param {object} callback
      */
     beginValidation : function(callback) {
-        var jobSubmitFrm = this;                
-        Ext.getBody().mask('Submitting Job...');
-        
+        var jobSubmitFrm = this;
+        Ext.getBody().mask('Submitting Job...').setStyle('z-index', '99999'); //ANVGL-107 Ensure this mask doesn't end up behind any modal window masks
+
         Ext.Ajax.request({
             url : 'secure/submitJob.do',
             params : {
@@ -78,7 +78,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
     /**
      * Title for the interface
      * @function
-     * @return {string} 
+     * @return {string}
      */
     getTitle : function() {
         return "Review job before submission...";
@@ -87,7 +87,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
     /**
      * 'Next' text
      * @function
-     * @return {string} 
+     * @return {string}
      */
     getNextText : function() {
         return 'Submit Job';
@@ -96,7 +96,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
     /**
      * 'Next' icon
      * @function
-     * @return {string} 
+     * @return {string}
      */
     getNextIconClass : function() {
         return 'submit-icon';
@@ -109,7 +109,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
      */
     saveJob : function() {
         this.noWindowUnloadWarning = true;
-        
+
         Ext.Msg.alert('Job Saved', 'Your job has been saved for later submission. You can attempt submission later from the <a href="joblist.html">Monitor Jobs</a> page. It is now safe to close this window.');
     }
 });

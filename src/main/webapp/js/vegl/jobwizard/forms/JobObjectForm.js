@@ -206,7 +206,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 maskRe:/[\d]/,
                 plugins: [{
                     ptype: 'fieldhelptext',
-                    text: 'Enter an optional walltime (milliseconds) for your job here.'
+                    text: 'Enter an optional walltime (minutes) for your job here.'
                 }],
                 allowBlank: true 
             },
@@ -436,7 +436,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             highlightEl : walltime.getEl(),
             title : 'Walltime',
             anchor : 'bottom',
-            description : 'If you would like your job to terminate after a specific length of time, enter the walltime (milliseconds) here.'
+            description : 'If you would like your job to terminate after a specific length of time, enter the walltime (minutes) here.'
         })];
     }
 });

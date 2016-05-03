@@ -17,11 +17,6 @@
                 <ref bean="knownTypeMagMap" />
                 <ref bean="knownTypeGocadModels" />
                 <ref bean="KnownTypeGeophysicsDatasets" />
-                <ref bean="knownTypeGswaMagMerge" />
-                <ref bean="knownTypeGswaUMerge" />
-                <ref bean="knownTypeGswaThMerge" />
-                <ref bean="knownTypeGswaTcMerge" />
-                <ref bean="knownTypeGswaKMerge" />
                 <ref bean="knownTypeGAAemSurvey" />
                 <ref bean="knownTypeGARumJungleAEM" />
                 <ref bean="knownTypeGAWoolnerAEM" />
@@ -29,6 +24,17 @@
                 <ref bean="knownTypeMusgraveAem" />
                 <ref bean="knownTypeWesternAreaAem" />
                 <ref bean="knownTypeAshburtonAem" />
+                <ref bean="knownTypeGswaGravMerge" />
+                <ref bean="knownTypeGswa20mMagMerge"/>
+                <ref bean="knownTypeGswa40mMagMerge1VD"/>
+                <ref bean="knownTypeGswa40mMagMerge"/>
+                <ref bean="knownTypeGswa80mMagMerge1VD"/>
+                <ref bean="knownTypeGswa80mMagMergertp"/>
+                <ref bean="knownTypeGswa80mMagMerge"/>
+                <ref bean="knownTypeGswa80mKmerge"/>
+                <ref bean="knownTypeGswa80mTCmerge"/>
+                <ref bean="knownTypeGswa80mThmerge"/>
+                <ref bean="knownTypeGswa80mUmerge"/>
                 <!-- <ref bean="knownTypeCunyuAem" />  -->
             </list>
         </constructor-arg>

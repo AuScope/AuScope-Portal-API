@@ -1,4 +1,4 @@
-class {["epel", "python_pip", "vgl_common"]:}
+class {["epel", "python_pip", "vl_common"]:}
 
 # Disable fsck on boot
 class { autofsck:
@@ -25,7 +25,7 @@ file { 'clean_and_remove_gaaem_dir':
   recurse => true,
   purge => true,
   force => true,
-  require => [Class["aem_packages"], Class["vgl_common"]],
+  require => [Class["aem_packages"], Class["vl_common"]],
 }
 
 
