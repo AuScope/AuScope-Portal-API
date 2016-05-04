@@ -31,47 +31,13 @@ Ext.define('vegl.widgets.DetailsPanel', {
             }
         };
 
-        var panelSetStyle = function(style) {
-            if (this.rendered) {
-                Ext.dom.Helper.applyStyles(this.getEl().dom, style);
-            } else {
-                this.on('afterrender', this.setStyle, this, {single: true, args: [style]});
-            }
-        };
-        var panelSetColumnWidth = function(cw) {
-            this.columnWidth = cw;
-            if (this.rendered) {
-                this.ownerCt.doLayout();
-            } else {
-                this.on('afterrender', this.setColumnWidth, this, {single: true, args: [cw]});
-            }
-        };
-        var panelSetHeight = function(height) {
-            if (this.rendered) {
-                if (height === '100%') {
-                    height = window.screen.height - 200;
-                }
-                this.setSize(undefined, height);
-            } else {
-                this.on('afterrender', this.setHeight, this, {single: true, args: [height]});
-            }
-        };
-
         Ext.apply(config, {
             width: '100%',
             layout: {
-                type: 'auto',
+                type: 'vbox',
+                align: 'stretch'
             },
             title: 'Select a job on the left to view more details',
-            plugins: 'responsive',
-            responsiveConfig: {
-                small: {
-                    scrollable: 'vertical'
-                },
-                normal: {
-                    scrollable: false
-                }
-            },
             items: [{
                 xtype: 'container',
                 itemId: 'top-container',
@@ -138,55 +104,22 @@ Ext.define('vegl.widgets.DetailsPanel', {
                 margin: '10 0 0 0',
                 padding: '5',
                 flex: 1,
-                height: '100%',
                 style: 'text-align:center;',
                 layout: {
-                    type: 'column'
+                    type: 'hbox',
+                    pack: 'center',
+                    align: 'stretch'
                 },
                 items: [{
                     xtype: 'jobfilespanel',
                     itemId: 'files',
-                    minWidth: 250,
-                    plugins: 'responsive',
-                    responsiveConfig: {
-                        small: {
-                            maxWidth: 700,
-                            style: 'float:none;margin: 5px auto;display:block;',
-                            columnWidth: 1,
-                            height: 400
-                        },
-                        normal: {
-                            maxWidth: 600,
-                            style: 'float:none;margin: 5px;display:inline-block;',
-                            columnWidth: 0.5,
-                            height: '100%'
-                        }
-                    },
-                    setStyle: panelSetStyle,
-                    setColumnWidth: panelSetColumnWidth,
-                    setHeight: panelSetHeight
+                    flex: 1
+                },{
+                    xtype: 'splitter'
                 },{
                     xtype: 'joblogspanel',
                     itemId: 'logs',
-                    minWidth: 250,
-                    plugins: 'responsive',
-                    responsiveConfig: {
-                        small: {
-                            maxWidth: 700,
-                            style: 'float:none;margin: 5px auto;display:block;',
-                            columnWidth: 1,
-                            height: 400
-                        },
-                        normal: {
-                            maxWidth: 600,
-                            style: 'float:none;margin: 5px;display:inline-block;',
-                            columnWidth: 0.5,
-                            height: '100%'
-                        }
-                    },
-                    setStyle: panelSetStyle,
-                    setColumnWidth: panelSetColumnWidth,
-                    setHeight: panelSetHeight
+                    flex: 1
                 }]
             }]
         });
