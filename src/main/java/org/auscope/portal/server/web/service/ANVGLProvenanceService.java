@@ -281,8 +281,8 @@ public class ANVGLProvenanceService {
             StringWriter stringWriter = new StringWriter();
             report.getGraph().write(new PrintWriter(stringWriter), "TURTLE");
             String reportString = stringWriter.toString();
-            LOGGER.info(reportString);
-            LOGGER.info(resp);
+            LOGGER.trace(reportString);
+            LOGGER.trace(resp);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
