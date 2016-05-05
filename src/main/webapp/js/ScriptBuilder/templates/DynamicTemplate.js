@@ -35,7 +35,7 @@ Ext.define('ScriptBuilder.templates.DynamicTemplate', {
         if (this.entry) {
 
             if (this.entry.variables) {
-        		
+
 	            this.entry.variables.forEach(function(variable, index) {
 	                item = {
 	                    id: variable.name,
@@ -44,7 +44,7 @@ Ext.define('ScriptBuilder.templates.DynamicTemplate', {
 	                    anchor: '-20',
 	                    allowBlank: variable.optional
 	                };
-	
+
 	                // Add help text if available
 	                _setItemField(variable, 'description', item, 'plugins',
 	                                   function(value) {
@@ -53,7 +53,7 @@ Ext.define('ScriptBuilder.templates.DynamicTemplate', {
 	                                           text: value
 	                                       }];
 	                                   });
-	
+
 	                // Map var type to item type
 	                if (variable.values) {
 	                    item.xtype = 'combo';
@@ -116,14 +116,14 @@ Ext.define('ScriptBuilder.templates.DynamicTemplate', {
 	                        item.xtype = 'textfield';
 	                    };
 	                }
-	
+
 	                _setItemField(variable, 'default', item, 'value');
-	
+
 	                // Set constraints if applicable
 	                _setItemField(variable, 'min', item, 'minValue');
 	                _setItemField(variable, 'max', item, 'maxValue');
 	                _setItemField(variable, 'step', item, 'step');
-	
+
 	                // If this is a numeric field with a minimum value and
 	                // no default, default to the min value.
 	                if (item.xtype == 'numberfield' && item.value === undefined) {
@@ -134,7 +134,7 @@ Ext.define('ScriptBuilder.templates.DynamicTemplate', {
 	                        item.value = 1;
 	                    }
 	                }
-	
+
 	                items.push(item);
 	            });
         	}
@@ -144,6 +144,7 @@ Ext.define('ScriptBuilder.templates.DynamicTemplate', {
             xtype : 'form',
             width : 500,
             height : 520,
+            autoScroll: true,
             items : [{
                 xtype : 'tabpanel',
                 anchor : '100%',

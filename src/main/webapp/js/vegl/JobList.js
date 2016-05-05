@@ -192,6 +192,19 @@ Ext.application({
                             containerScroll: true
                         },
                         listeners: {
+                            resize: function(treeView, width) {
+                                var tree = treeView.grid;
+                                if (width < 260) {
+                                    tree.columns[1].setVisible(false);
+                                    tree.columns[2].setVisible(false);
+                                } else if (width < 420) {
+                                    tree.columns[1].setVisible(false);
+                                    tree.columns[2].setVisible(true);
+                                } else {
+                                    tree.columns[1].setVisible(true);
+                                    tree.columns[2].setVisible(true);
+                                }
+                            },
                             drop: function(node, data, overModel, dropPosition) {
                                 if (!overModel) {
                                     return;
@@ -213,7 +226,8 @@ Ext.application({
                                     }
                                 });
                             }
-                        }
+                        },
+
                     },
                     buttons: [{
                         text: 'Add Folder',
@@ -236,7 +250,12 @@ Ext.application({
 
                 var me = this;
 
-
+                var treeWidth = 500;
+                if (window.screen.width < 900) {
+                    treeWidth = 250;
+                } else if (window.screen.width < 1000) {
+                    treeWidth = 400;
+                }
                 Ext.create('Ext.container.Viewport', {
                     layout: 'border',
                     id : 'vgl-joblist-viewport',
@@ -254,7 +273,7 @@ Ext.application({
                         split: true,
                         margins: '2 2 2 0',
                         layout: 'border',
-                        width: 500,
+                        width: treeWidth,
                         bodyStyle: {
                             'background-color': 'white'
                         },
