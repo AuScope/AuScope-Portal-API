@@ -7,6 +7,7 @@
 export VGL_BOOTSTRAP_VERSION="2"
 export WORKING_DIR="/root"
 export WORKFLOW_SCRIPT="$WORKING_DIR/vl.sh"
+export SHUTDOWN_SCRIPT="$WORKING_DIR/vl-shutdown.sh"
 
 # These will be replaced with hardcoded values by the VL Portal (varying for each job)
 export STORAGE_BUCKET="{0}"
@@ -18,7 +19,8 @@ export STORAGE_ENDPOINT="{5}"
 export STORAGE_TYPE="{6}"
 export STORAGE_AUTH_VERSION="{7}"
 export OS_REGION_NAME="{8}"
-export WALLTIME="{10}"
+export SHUTDOWN_URL="{10}"
+export WALLTIME="{11}"
 export VL_LOG_FILE_NAME="vl.sh.log"
 export VL_LOG_FILE="$WORKING_DIR/$VL_LOG_FILE_NAME"
 
@@ -42,12 +44,22 @@ echo "STORAGE_ENDPOINT = $STORAGE_ENDPOINT"
 echo "STORAGE_TYPE = $STORAGE_TYPE"
 echo "VL_LOG_FILE = $VL_LOG_FILE"
 if [ $WALLTIME > 0 ]; then
+    echo "SHUTDOWN_SCRIPT = $SHUTDOWN_SCRIPT"
     echo "WALLTIME = $WALLTIME"
 fi
 echo "--------------------------------------"
 
+# If a walltime is present, set walltime shutdown parameters
 if [ $WALLTIME > 0 ]; then
-    shutdown +$WALLTIME
+    #Download shutdown script and make it executable
+    echo "Downloading shutdown script from $SHUTDOWN_URL and storing it at $SHUTDOWN_SCRIPT"
+    curl -f -L "$SHUTDOWN_URL" -o "$SHUTDOWN_SCRIPT"
+    echo "curl result $?"
+    echo "Making $SHUTDOWN_SCRIPT executable"
+    chmod +x "$SHUTDOWN_SCRIPT"
+    echo "chmod result $?"
+    # Execute shutdown script (schedule shutdown at walltime)
+    $SHUTDOWN_SCRIPT 2>&1 | tee -a "$VL_LOG_FILE" 
 fi
 
 #Download our workflow and make it executable

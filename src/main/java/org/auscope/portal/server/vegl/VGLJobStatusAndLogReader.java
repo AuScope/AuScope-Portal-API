@@ -168,6 +168,15 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
 
         boolean jobStarted = containsFile(results, "workflow-version.txt");
         boolean jobFinished = containsFile(results, JobListController.VGL_LOG_FILE);
+        boolean jobWalltimeExceeded = containsFile(results, "walltime-exceeded.txt");
+        
+        
+        
+        // XXX TEST
+        if(jobWalltimeExceeded)
+            System.out.println("JOB WALLTIME EXCEEDED");
+        
+        
 
         String expectedStatus = JobBuilderController.STATUS_PENDING;
         if (jobFinished) {

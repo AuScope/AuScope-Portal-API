@@ -140,6 +140,7 @@ public abstract class BaseCloudController extends BasePortalController {
                 cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion(), // STORAGE_AUTH_VERSION
                 cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName(), // OS_REGION_NAME
                 getProvisioningTemplate(), // PROVISIONING_TEMPLATE
+                hostConfigurer.resolvePlaceholder("vm-shutdown.sh"), // WORKFLOW_URL
                 job.getWalltime() // WALLTIME
         };
 
