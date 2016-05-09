@@ -71,7 +71,12 @@ Ext.application({
             });
         };
 
+        var refreshRunning = false;
         var refreshJobStatus = function(jobStore, treePanel, forceStatusRefresh) {
+            if (refreshRunning) {
+                return;
+            }
+            refreshRunning = true;
             treePanel.getEl().mask('Loading...');
             Ext.Ajax.request({
                 url: 'secure/treeJobs.do',
@@ -80,6 +85,7 @@ Ext.application({
                 },
                 callback: function(options, success, response) {
                     treePanel.getEl().unmask();
+                    refreshRunning = false;
                     if (!success) {
                         onError(treePanel, "Unable to update your jobs due to a connection error. Please try refreshing the page.")
                         return;
@@ -224,6 +230,15 @@ Ext.application({
                                             onError(jobsTree, "There was an error reassigning job folders. Please refresh the page.");
                                         }
                                     }
+                                });
+                            },
+                            afterrender: function(tree) {
+                                tree.refreshRunner = new Ext.util.TaskRunner();
+                                tree.refreshRunner.start({
+                                    run: function() {
+                                        refreshJobStatus(jobStore, jobsTree, true);
+                                    },
+                                    interval: 60 * 1000 //60 Seconds
                                 });
                             }
                         },
