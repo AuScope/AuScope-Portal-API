@@ -226,7 +226,7 @@ Ext.define('vegl.widgets.JobsTree', {
             this.duplicateJobAction.setDisabled(true);
             this.submitJobAction.setDisabled(true);
             this.editJobAction.setDisabled(true);
-        } else if (!Ext.isNumber(selections[0].get('id'))) {
+        } else if (!Ext.isNumber(Number(selections[0].get('id')))) {
             this.cancelJobAction.setDisabled(true);
             this.deleteJobAction.setDisabled(false);
             this.duplicateJobAction.setDisabled(true);
