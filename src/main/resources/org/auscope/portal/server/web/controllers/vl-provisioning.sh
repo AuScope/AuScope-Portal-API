@@ -74,7 +74,7 @@ fi
 # Directory where vl modules will be installed
 moduleDir="/etc/puppet/modules"
 
-if [ ! -d "$moduleDir/vl_common" ]; then
+# if [ ! -d "$moduleDir/vl_common" ]; then
     echo "Installing vl common modules into $moduleDir/vl_common"
     if [ -f /etc/debian_version ]; then
         sudo apt-get install -y wget git
@@ -82,8 +82,9 @@ if [ ! -d "$moduleDir/vl_common" ]; then
         sudo yum install -y wget git
     fi
 
-    # Assumes our temp dir does not already have content!
+    # Remove any existing content in the tmpModulesDir
     tmpModulesDir="/opt/anvgl/modules"
+    rm -rf "$tmpModulesDir"
     if [ "$1" !=  "" ]
     then
         baseUrl="$1"
@@ -117,9 +118,9 @@ if [ ! -d "$moduleDir/vl_common" ]; then
     # Don't tidy up until we're sure this approach works with cloud-init
     # # Tidy up
     # rm -rf "$tmpModulesDir"
-else
-    echo "Common vl modules found in $moduleDir/vl_common"
-fi
+# else
+#     echo "Common vl modules found in $moduleDir/vl_common"
+# fi
 
 # /////////////////////////////
 # Make sure we are provisioned
