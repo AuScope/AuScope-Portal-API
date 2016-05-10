@@ -59,7 +59,10 @@ if [ $WALLTIME > 0 ]; then
     chmod +x "$SHUTDOWN_SCRIPT"
     echo "chmod result $?"
     # Execute shutdown script (schedule shutdown at walltime)
-    $SHUTDOWN_SCRIPT 2>&1 | tee -a "$VL_LOG_FILE" 
+    if command -v unbuffer > /dev/null 2>&1 ; then
+        unbuffer $SHUTDOWN_SCRIPT 2>&1 | tee -a "$VL_LOG_FILE"
+    else
+        $SHUTDOWN_SCRIPT 2>&1 | tee -a "$VL_LOG_FILE"
 fi
 
 #Download our workflow and make it executable

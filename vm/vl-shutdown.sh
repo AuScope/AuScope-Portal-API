@@ -7,9 +7,11 @@
 #
 ###############################################################################
 
+export ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
+
 # If ABORT_SHUTDOWN has not been set, commence shutdown
 if [ -f $ABORT_SHUTDOWN_PATH ]; then
-    echo 'Instance shutdown has been aborted'
+    echo 'Instance shutdown due to walltime being exceeded has been aborted'
 else
     # Upload a file indicating walltime has been exceeded
     echo "Walltime exceeded" > walltime-exceeded.txt
