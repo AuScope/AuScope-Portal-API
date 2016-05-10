@@ -111,7 +111,8 @@ Ext.define('vegl.widgets.JobsTree', {
             rootVisible: false,
             store : Ext.create('Ext.data.TreeStore', {
                 root: config.rootNode,
-                fields: [{ name: 'name', type: 'string'},
+                fields: [{ name: 'id', type: 'string'},
+                         { name: 'name', type: 'string'},
                          { name: 'status', type: 'string'},
                          { name: 'submitDate', type: 'date', convert: function(value, record) {
                             if (!value) {

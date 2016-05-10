@@ -136,12 +136,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
         this.down('#top-container').setVisible(true);
         this.down('#bottom-container').setVisible(true);
 
-        this.setTitle(job.get('name'));
-        var style = vegl.widgets.JobsPanel.styleFromStatus(job.get('status'));
-        this.down('#status').setValue(Ext.util.Format.format('<span title="{0}" style="color:{1};">{2}</span>', style.tip, style.color, style.text));
-        this.down('#ami').setValue(job.get('computeInstanceId') ? job.get('computeInstanceId') : 'N/A');
-        this.down('#type').setValue(job.get('computeInstanceType') ? job.get('computeInstanceType') : 'N/A');
-        this.down('#jobid').setValue(job.get('id'));
+        this.updateJobDetails();
 
         this.down('#logs').listLogsForJob(job);
         this.down('#files').listFilesForJob(job);
@@ -155,6 +150,23 @@ Ext.define('vegl.widgets.DetailsPanel', {
                 interval: 1000 //1 Second
             });
         }
+
+        this.on
+    },
+
+    updateJobDetails: function() {
+        if (!this.job) {
+            return;
+        }
+
+        this.setTitle(this.job.get('name'));
+        var style = vegl.widgets.JobsPanel.styleFromStatus(this.job.get('status'));
+        this.down('#status').setValue(Ext.util.Format.format('<span title="{0}" style="color:{1};">{2}</span>', style.tip, style.color, style.text));
+        this.down('#ami').setValue(this.job.get('computeInstanceId') ? this.job.get('computeInstanceId') : 'N/A');
+        this.down('#type').setValue(this.job.get('computeInstanceType') ? this.job.get('computeInstanceType') : 'N/A');
+        this.down('#jobid').setValue(this.job.get('id'));
+
+        this.updateSubmitTime();
     },
 
     updateSubmitTime: function() {
