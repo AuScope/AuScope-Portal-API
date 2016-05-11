@@ -8,6 +8,7 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,9 +20,12 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -1016,7 +1020,10 @@ public class JobListController extends BaseCloudController  {
      * @return
      */
     @RequestMapping("/secure/getSectionedLogs.do")
-    public ModelAndView getSectionedLogs(HttpServletRequest request, @RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getSectionedLogs(HttpServletRequest request,
+            @RequestParam("jobId") Integer jobId,
+            @RequestParam(value="file", required=false) String file,
+            @AuthenticationPrincipal ANVGLUser user) {
         //Lookup the job whose logs we are accessing
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -1025,11 +1032,86 @@ public class JobListController extends BaseCloudController  {
 
         ModelMap namedSections = null;
         try {
-            namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job);
+            namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job, file == null ? VGL_LOG_FILE : file);
         } catch (PortalServiceException ex) {
             return generateJSONResponseMAV(false, null, ex.getMessage());
         }
 
         return generateJSONResponseMAV(true, Arrays.asList(namedSections), "");
+    }
+
+    @RequestMapping("/secure/getPlaintextPreview.do")
+    public ModelAndView getPlaintextPreview(
+            @RequestParam("jobId") Integer jobId,
+            @RequestParam("file") String file,
+            @RequestParam("maxSize") Integer maxSize,
+            @AuthenticationPrincipal ANVGLUser user) {
+
+        if (maxSize > 512 * 1024) {
+            maxSize = 512 * 1024; //Don't allow us to burn GB's on previews
+        }
+
+        //Lookup the job whose logs we are accessing
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The specified job does not exist.");
+        }
+
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
+            return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+        }
+
+        InputStream is = null;
+        try {
+            is = cloudStorageService.getJobFile(job, file);
+            InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8);
+            char[] buffer = new char[maxSize];
+            int charsRead = reader.read(buffer);
+            if (charsRead < 0) {
+                return generateJSONResponseMAV(false, null, "Error reading file from cloud storage.");
+            }
+            return generateJSONResponseMAV(true, new String(buffer, 0, charsRead), "");
+        } catch (Exception ex) {
+            logger.error("Error accessing file:" + file, ex);
+            return generateJSONResponseMAV(false);
+        } finally {
+            IOUtils.closeQuietly(is);
+        }
+    }
+
+    @RequestMapping("/secure/getImagePreview.do")
+    public void getImagePreview(
+            HttpServletResponse response,
+            @RequestParam("jobId") Integer jobId,
+            @RequestParam("file") String file,
+            @AuthenticationPrincipal ANVGLUser user) throws Exception {
+
+        //Lookup the job whose logs we are accessing
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            response.sendError(HttpStatus.SC_NOT_FOUND);
+            return;
+        }
+
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
+            response.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        InputStream is = null;
+        ServletOutputStream os = null;
+        try {
+            is = cloudStorageService.getJobFile(job, file);
+            response.setContentType("image");
+            os = response.getOutputStream();
+            IOUtils.copy(is, os);
+        } finally {
+            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(os);
+        }
     }
 }
