@@ -1235,6 +1235,7 @@ public class TestJobBuilderController {
         context.checking(new Expectations() {{
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
+            allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm-shutdown.sh")));will(returnValue(vmSh));
             atLeast(1).of(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             atLeast(1).of(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
             atLeast(1).of(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
@@ -1289,6 +1290,7 @@ public class TestJobBuilderController {
         context.checking(new Expectations() {{
             //We allow calls to the Configurer which simply extract values from our property file
             allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
+            allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm-shutdown.sh")));will(returnValue(vmSh));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
