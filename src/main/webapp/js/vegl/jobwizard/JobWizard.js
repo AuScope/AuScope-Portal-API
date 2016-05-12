@@ -52,11 +52,20 @@ Ext.define('vegl.jobwizard.JobWizard', {
             if (requireValidation) {
                 var currentCard = layout.activeItem;
                 var currentForm = currentCard.items.get(0);
+                var toolbar = currentCard.getDockedItems('toolbar')[0];
+
+                toolbar.items.each(function(btn) {
+                    btn.setDisabled(true);
+                });
 
                 currentForm.beginValidation(function(success) {
                     if (success) {
                         setNewStep(layout, newStep);
                     }
+
+                    toolbar.items.each(function(btn) {
+                        btn.setDisabled(false);
+                    });
                 });
             } else {
                 setNewStep(layout, newStep);
