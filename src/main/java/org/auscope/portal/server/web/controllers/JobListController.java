@@ -825,6 +825,45 @@ public class JobListController extends BaseCloudController  {
     }
 
     /**
+     * Returns a JSON array of jobStatus and jobId tuples
+     *
+     */
+    @RequestMapping("/secure/jobsStatuses.do")
+    public ModelAndView jobStatuses(HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
+            @AuthenticationPrincipal ANVGLUser user) {
+
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+
+        List<VEGLJob> userJobs = jobManager.getUserJobs(user);
+        if (userJobs == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup jobs.");
+        }
+
+        if (forceStatusRefresh) {
+            try {
+                jobStatusMonitor.statusUpdate(userJobs);
+            } catch (JobStatusException e) {
+                log.info("There was an error updating one or more jobs: " + e.getMessage());
+                log.debug("Exception(s): ", e);
+            }
+        }
+
+        List<ModelMap> tuples = new ArrayList<ModelMap>(userJobs.size());
+        for (VEGLJob job : userJobs) {
+            ModelMap tuple = new ModelMap();
+            tuple.put("jobId", job.getId());
+            tuple.put("status", job.getStatus());
+            tuples.add(tuple);
+        }
+
+        return generateJSONResponseMAV(true, tuples, "");
+    }
+
+    /**
      * Returns a JSON object containing an tree of all jobs, grouped by series.
      * Also returns an array of job objects
      *

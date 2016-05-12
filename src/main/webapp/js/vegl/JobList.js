@@ -71,7 +71,51 @@ Ext.application({
             });
         };
 
-        var refreshJobStatus = function(jobStore, treePanel, forceStatusRefresh) {
+        //This is used for updating statuses of existing jobs that have been loaded
+        var refreshJobStatus = function(jobStore, treePanel) {
+            Ext.Ajax.request({
+                url: 'secure/jobsStatuses.do',
+                params: {
+                    forceStatusRefresh: true
+                },
+                callback: function(options, success, response) {
+                    if (!success) {
+                        onError(treePanel, "Unable to update your jobs due to a connection error. Please try refreshing the page.")
+                        return;
+                    }
+
+                    var responseObj = Ext.JSON.decode(response.responseText);
+                    if (!responseObj || !responseObj.success) {
+                        onError(treePanel, "Unable to update your jobs due to a server error. Please try refreshing the page.")
+                        return;
+                    }
+
+                    var treeStore = treePanel.getStore();
+                    for (var i = 0; i < responseObj.data.length; i++) {
+                        var tuple  = responseObj.data[i];
+                        var record = jobStore.getById(tuple.jobId);
+                        if (record) {
+                            record.set('status', tuple.status);
+                        }
+
+                        var node = treeStore.getNodeById(tuple.jobId.toString());
+                        if (node) {
+                            node.set('status', tuple.status);
+                        }
+                    }
+
+                    Ext.getCmp('job-details-panel').updateJobDetails();
+                }
+            });
+        };
+
+        //This is used for refreshing the entire structure of a job tree (with an optional status refresh)
+        var refreshRunning = false;
+        var refreshJobNodes = function(jobStore, treePanel, forceStatusRefresh) {
+            if (refreshRunning) {
+                return;
+            }
+            refreshRunning = true;
             treePanel.getEl().mask('Loading...');
             Ext.Ajax.request({
                 url: 'secure/treeJobs.do',
@@ -80,6 +124,7 @@ Ext.application({
                 },
                 callback: function(options, success, response) {
                     treePanel.getEl().unmask();
+                    refreshRunning = false;
                     if (!success) {
                         onError(treePanel, "Unable to update your jobs due to a connection error. Please try refreshing the page.")
                         return;
@@ -117,7 +162,7 @@ Ext.application({
                                 seriesDescription: ''
                             },
                             callback: function(options, success, response) {
-                                refreshJobStatus(jobStore, treePanel);
+                                refreshJobNodes(jobStore, treePanel);
                             }
                         });
                     }
@@ -153,6 +198,7 @@ Ext.application({
                 var jobDetailsPanel = Ext.create('vegl.widgets.DetailsPanel', {
                     title: 'Description',
                     region: 'center',
+                    id: 'job-details-panel',
                     split: true,
                     listeners : {
                         error : onError
@@ -175,7 +221,7 @@ Ext.application({
                             }
                         },
                         refreshJobs: function(panel) {
-                            refreshJobStatus(jobStore, panel);
+                            refreshJobNodes(jobStore, panel);
                         },
                         refreshDetailsPanel: function(tree, job) {
                             if (job == null || job.get('status') === vegl.models.Job.STATUS_DELETED) {
@@ -224,6 +270,19 @@ Ext.application({
                                             onError(jobsTree, "There was an error reassigning job folders. Please refresh the page.");
                                         }
                                     }
+                                });
+                            },
+                            afterrender: function(tree) {
+                                var taskExecutionCount = 0; //We dont want this firing immediately
+                                tree.refreshRunner = new Ext.util.TaskRunner();
+                                tree.refreshRunner.start({
+                                    run: function() {
+                                        if (taskExecutionCount > 0) {
+                                            refreshJobStatus(jobStore, jobsTree);
+                                        }
+                                        taskExecutionCount++;
+                                    },
+                                    interval: 60 * 1000 //60 Seconds
                                 });
                             }
                         },
