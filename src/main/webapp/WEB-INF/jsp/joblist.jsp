@@ -71,9 +71,14 @@
     <script type="text/javascript" src="js/vegl/models/ComputeType.js"></script>
     <script type="text/javascript" src="js/vegl/models/SimpleFeatureProperty.js"></script>
 
+    <script type="text/javascript" src="js/vegl/preview/FilePreviewMixin.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/LogPreview.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/PlainTextPreview.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/ImagePreview.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/FilePreviewPanel.js"></script>
+
     <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
-    <script type="text/javascript" src="js/vegl/widgets/JobLogsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFilesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>

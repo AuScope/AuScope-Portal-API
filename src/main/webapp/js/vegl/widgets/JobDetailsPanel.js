@@ -113,11 +113,14 @@ Ext.define('vegl.widgets.DetailsPanel', {
                 items: [{
                     xtype: 'jobfilespanel',
                     itemId: 'files',
-                    flex: 1
+                    width: 310,
+                    listeners: {
+                        select: Ext.bind(this._onFileSelect, this)
+                    }
                 },{
                     xtype: 'splitter'
                 },{
-                    xtype: 'joblogspanel',
+                    xtype: 'filepreviewpanel',
                     itemId: 'logs',
                     flex: 1
                 }]
@@ -125,6 +128,31 @@ Ext.define('vegl.widgets.DetailsPanel', {
         });
 
         this.callParent(arguments);
+    },
+
+    _onFileSelect: function(grid, record, index) {
+        var fileName = record.get('name');
+        var parts = fileName.split('.');
+        var extension = parts[parts.length - 1];
+
+        switch(extension) {
+        case 'png':
+        case 'jpeg':
+        case 'jpg':
+            this.down('#logs').preview(this.job, fileName, record.get('size'), 'image');
+            break;
+        case 'txt':
+        case 'py':
+        case 'sh':
+            this.down('#logs').preview(this.job, fileName, record.get('size'), 'plaintext');
+            break;
+        case 'log':
+            this.down('#logs').preview(this.job, fileName, record.get('size'), 'log');
+            break;
+        default:
+            this.down('#logs').clearPreview();
+            break;
+        }
     },
 
     /**
@@ -138,7 +166,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
 
         this.updateJobDetails();
 
-        this.down('#logs').listLogsForJob(job);
+        this.down('#logs').clearPreview();
         this.down('#files').listFilesForJob(job);
 
         this.updateSubmitTime();
