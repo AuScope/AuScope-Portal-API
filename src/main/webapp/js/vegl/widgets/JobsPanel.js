@@ -50,6 +50,9 @@ Ext.define('vegl.widgets.JobsPanel', {
             } else if (status === vegl.models.Job.STATUS_ERROR) {
                 style.color = 'red';
                 style.tip = 'Error: check your email for error log';
+            }  else if (status === vegl.models.Job.STATUS_WALLTIME_EXCEEDED) {
+                style.color = 'red';
+                style.tip = 'Walltime exceeded: the job could not complete in the time requested';
             }
 
             return style;
