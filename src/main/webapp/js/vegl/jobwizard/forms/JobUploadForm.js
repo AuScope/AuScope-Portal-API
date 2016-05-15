@@ -50,7 +50,11 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                         }
                         else {
                             // Ext.bind(jobUploadFrm.updateFileList, jobUploadFrm);
-                            jobUploadFrm.updateFileList();
+                        	 if (jobUploadFrm.wizardState.jobId === undefined) {
+                                 jobUploadFrm.createJob(function() { jobUploadFrm.updateFileList(); });
+                             } else {
+                                 jobUploadFrm.updateFileList();                            	 
+                             }
                         }
                     }
             },
