@@ -195,6 +195,8 @@ Ext.define('vegl.widgets.DetailsPanel', {
         this.down('#jobid').setValue(this.job.get('id'));
 
         this.updateSubmitTime();
+
+        this.down('#files').listFilesForJob(this.job);
     },
 
     updateSubmitTime: function() {
