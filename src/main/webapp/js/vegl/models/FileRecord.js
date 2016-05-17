@@ -10,5 +10,20 @@ Ext.define('vegl.models.FileRecord', {
         { name: 'parentPath', type: 'string' } //Parent path for where the input file is located
     ],
 
-    idProperty: 'name'
+    idProperty: 'name',
+
+    /**
+     * Returns true if this file matches a known pattern for a "utility" file that the end user
+     * will not find of any use
+     */
+    isVlUtilityFile: function() {
+        switch(this.get('name')) {
+        case 'activity.ttl':
+        case 'vl.end':
+        case 'workflow-version.txt':
+            return true;
+        default:
+            return false;
+        }
+    }
 });
