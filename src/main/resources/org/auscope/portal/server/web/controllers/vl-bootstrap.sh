@@ -20,6 +20,8 @@ export STORAGE_AUTH_VERSION="{7}"
 export OS_REGION_NAME="{8}"
 export VL_LOG_FILE_NAME="vl.sh.log"
 export VL_LOG_FILE="$WORKING_DIR/$VL_LOG_FILE_NAME"
+export VL_TERMINATION_FILE_NAME="vl.end"
+export VL_TERMINATION_FILE="$WORKING_DIR/$VL_TERMINATION_FILE_NAME"
 
 # Load our profile so this run is the same as a regular user login (to make debugging easier)
 source /etc/profile
@@ -40,6 +42,7 @@ echo "LD_LIBRARY_PATH = $LD_LIBRARY_PATH"
 echo "STORAGE_ENDPOINT = $STORAGE_ENDPOINT"
 echo "STORAGE_TYPE = $STORAGE_TYPE"
 echo "VL_LOG_FILE = $VL_LOG_FILE"
+echo "VL_TERMINATION_FILE = $VL_TERMINATION_FILE"
 echo "--------------------------------------"
 
 

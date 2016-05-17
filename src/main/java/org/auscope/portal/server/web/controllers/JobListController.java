@@ -67,7 +67,10 @@ import org.springframework.web.servlet.ModelAndView;
 public class JobListController extends BaseCloudController  {
 
     /** The name of the log file that the job will use*/
-    public static final String VGL_LOG_FILE = "vl.sh.log";
+    public static final String VL_LOG_FILE = "vl.sh.log";
+
+    /** The name of the termination file that the job will use*/
+    public static final String VL_TERMINATION_FILE = "vl.end";
 
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
@@ -1071,7 +1074,7 @@ public class JobListController extends BaseCloudController  {
 
         ModelMap namedSections = null;
         try {
-            namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job, file == null ? VGL_LOG_FILE : file);
+            namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job, file == null ? VL_LOG_FILE : file);
         } catch (PortalServiceException ex) {
             return generateJSONResponseMAV(false, null, ex.getMessage());
         }

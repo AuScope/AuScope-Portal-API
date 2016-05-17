@@ -40,7 +40,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      * @return
      */
     public ModelMap getSectionedLogs(VEGLJob job) throws PortalServiceException {
-        return getSectionedLogs(job, JobListController.VGL_LOG_FILE);
+        return getSectionedLogs(job, JobListController.VL_LOG_FILE);
     }
 
     /**
@@ -182,7 +182,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         }
 
         boolean jobStarted = containsFile(results, "workflow-version.txt");
-        boolean jobFinished = containsFile(results, JobListController.VGL_LOG_FILE);
+        boolean jobFinished = containsFile(results, JobListController.VL_TERMINATION_FILE);
 
         String expectedStatus = JobBuilderController.STATUS_PENDING;
         if (jobFinished) {
