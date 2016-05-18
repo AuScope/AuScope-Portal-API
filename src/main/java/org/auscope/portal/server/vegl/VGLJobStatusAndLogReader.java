@@ -202,6 +202,8 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
             case Missing:
                 if (jobFinished) {
                     return JobBuilderController.STATUS_DONE;
+                } else if (jobWalltimeExceeded) {
+                    return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
                 } else {
                     return JobBuilderController.STATUS_ERROR;
                 }

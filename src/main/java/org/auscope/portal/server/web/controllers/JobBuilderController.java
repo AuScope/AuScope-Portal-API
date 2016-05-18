@@ -87,7 +87,7 @@ public class JobBuilderController extends BaseCloudController {
     public static final String STATUS_UNSUBMITTED = "Saved";//VT:Job saved, fail to submit for whatever reason.
     public static final String STATUS_INQUEUE = "In Queue";//VT: quota exceeded, placed in queue.
     public static final String STATUS_ERROR = "ERROR";//VT:Exception in job processing.
-    public static final String STATUS_WALLTIME_EXCEEDED = "Walltime Exceeded";//VT:Walltime exceeded.
+    public static final String STATUS_WALLTIME_EXCEEDED = "WALLTIME EXCEEDED";//VT:Walltime exceeded.
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
@@ -807,7 +807,6 @@ public class JobBuilderController extends BaseCloudController {
                     curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
                     jobManager.saveJob(curJob);
                     jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
-
                 }else{
                     String oldJobStatus = curJob.getStatus();
                     curJob.setStatus(JobBuilderController.STATUS_ERROR);
@@ -816,10 +815,7 @@ public class JobBuilderController extends BaseCloudController {
                     vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
                 }
             }
-
         }
-
-
     }
 
     /**
