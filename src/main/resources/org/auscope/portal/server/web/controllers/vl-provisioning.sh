@@ -26,6 +26,9 @@ if hash puppet 2>/dev/null; then
     if [ -f /etc/debian_version ]; then
         sudo apt-get update
         sudo apt-get install -y at
+    else
+        sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
+        sudo yum install -y at
     fi
 else
     # Determine what OS we're using so we install appropriately
