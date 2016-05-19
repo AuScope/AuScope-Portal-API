@@ -33,8 +33,25 @@ Ext.define('vegl.preview.FilePreviewPanel', {
 
         Ext.apply(config, {
             layout: 'card',
-            items: previewers
-
+            items: previewers,
+            dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                items: [{
+                    xtype: 'tbfill'
+                },{
+                    xtype: 'button',
+                    text: 'Refresh',
+                    iconCls: 'refresh-icon',
+                    scope: this,
+                    handler: function() {
+                        var preview = this.getLayout().getActiveItem();
+                        if (preview.handleRefresh) {
+                            preview.handleRefresh();
+                        }
+                    }
+                }]
+            }]
         });
 
         this.callParent(arguments);

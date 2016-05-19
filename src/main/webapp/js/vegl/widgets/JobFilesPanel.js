@@ -125,7 +125,6 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         ajaxProxy.extraParams.jobId = job.get('id');
         ajaxProxy.abort(); //Stop loading any previous job files
         this.currentJob = job;
-        store.removeAll(false);
         store.load();
     },
 
