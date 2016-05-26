@@ -300,5 +300,33 @@
         }
       }
     }
+  },
+  "Outputs": {
+    "ComputeARN": {
+      "Description": "ARN for the STS role used to run jobs in the client account.",
+      "Value": { "Fn::Join": [
+                   "",
+                   [
+                     "arn:aws:iam::",
+                     { "Ref": "AWS::AccountId" },
+                     ":role/",
+                     { "Ref": "AnvglStsRole" }
+                   ]
+                 ]
+               }
+    },
+    "StorageARN": {
+      "Description": "ARN for the role used to access S3 storage in the client account.",
+      "Value": { "Fn::Join": [
+                   "",
+                   [
+                     "arn:aws:iam::",
+                     { "Ref": "AWS::AccountId" },
+                     ":instance-profile/",
+                     { "Ref": "AnvglS3InstanceProfile" }
+                   ]
+                 ]
+               }
+    }
   }
 }

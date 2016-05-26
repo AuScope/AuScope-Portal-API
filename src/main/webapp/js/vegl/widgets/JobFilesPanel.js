@@ -90,7 +90,10 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                             }
                         }
                     }
-                }
+                },
+                filters: [function(item) {
+                    return !item.isVlUtilityFile(); //Don't display the utility files
+                }]
             }),
             columns: [{ header: 'Filename', width: 200, sortable: true, dataIndex: 'name'},
                       { header: 'Size', width: 100, sortable: true, dataIndex: 'size', renderer: Ext.util.Format.fileSize, align: 'right'}],
@@ -122,7 +125,6 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         ajaxProxy.extraParams.jobId = job.get('id');
         ajaxProxy.abort(); //Stop loading any previous job files
         this.currentJob = job;
-        store.removeAll(false);
         store.load();
     },
 

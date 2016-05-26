@@ -40,6 +40,21 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      * @return
      */
     public ModelMap getSectionedLogs(VEGLJob job) throws PortalServiceException {
+        return getSectionedLogs(job, JobListController.VL_LOG_FILE);
+    }
+
+    /**
+     * Gets a pre parsed version of the specified log file. The resulting object will
+     * contain the logs sectioned into 'named sections' e.g.: Section for python code,
+     * section for environment etc.
+     *
+     * Will always contain a single section called "Full" containing the un-sectioned
+     * original log.
+     *
+     * @param job
+     * @return
+     */
+    public ModelMap getSectionedLogs(VEGLJob job, String logFile) throws PortalServiceException {
         CloudStorageService cloudStorageService = getStorageService(job);
         if (cloudStorageService == null) {
             throw new PortalServiceException(
@@ -51,10 +66,10 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         String logContents = null;
         InputStream is = null;
         try {
-            is = cloudStorageService.getJobFile(job, JobListController.VGL_LOG_FILE);
+            is = cloudStorageService.getJobFile(job, logFile);
             logContents = IOUtils.toString(is);
         } catch (Exception ex) {
-            log.debug(String.format("The job %1$s hasn't uploaded any logs yet.", job.getId()));
+            log.debug(String.format("The job %1$s hasn't uploaded %2$s yet", job.getId(), logFile));
         } finally {
             FileIOUtil.closeQuietly(is);
         }
@@ -167,7 +182,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         }
 
         boolean jobStarted = containsFile(results, "workflow-version.txt");
-        boolean jobFinished = containsFile(results, JobListController.VGL_LOG_FILE);
+        boolean jobFinished = containsFile(results, JobListController.VL_TERMINATION_FILE);
 
         String expectedStatus = JobBuilderController.STATUS_PENDING;
         if (jobFinished) {

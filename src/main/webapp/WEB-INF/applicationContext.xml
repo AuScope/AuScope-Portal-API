@@ -210,6 +210,7 @@
         <property name="name" value="Amazon Web Services - S3"/>
         <property name="id" value="amazon-aws-storage-sydney"/>
         <property name="bucket" value="anvgl-csiro-"/>
+        <property name="requireSts" value="${HOST.aws.stsonly}"/>        
     </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
@@ -222,6 +223,8 @@
         
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
+        <property name="requireSts" value="${HOST.aws.stsonly}"/>
+        
         <property name="availableImages">
             <list>
                 <bean class="org.auscope.portal.server.vegl.VglMachineImage">
