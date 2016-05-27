@@ -32,7 +32,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
 
                         if (this.wizardState.userAction == 'edit') {
                             jobUploadFrm.getForm().load({
-                                url : 'getJobObject.do',
+                                url : 'secure/getJobObject.do',
                                 waitMsg : 'Loading Job Object...',
                                 params : {
                                     jobId : jobUploadFrm.wizardState.jobId
@@ -222,7 +222,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
             params.storageServiceId = "amazon-aws-storage-sydney";
 
             Ext.Ajax.request({
-                url : 'updateOrCreateJob.do',
+                url : 'secure/updateOrCreateJob.do',
                 params : params,
                 callback : function(options, success, response) {
                     if (!success) {

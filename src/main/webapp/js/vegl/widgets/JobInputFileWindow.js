@@ -102,7 +102,7 @@ Ext.define('vegl.widgets.JobInputFileWindow', {
         
         //Submit our form so our files get uploaded...
         form.submit({
-            url: 'uploadFile.do',
+            url: 'secure/uploadFile.do',
             params: params,
             scope : this,
             success: function(form, action) {
@@ -137,7 +137,7 @@ Ext.define('vegl.widgets.JobInputFileWindow', {
         params.append = true;
 
         Ext.Ajax.request({
-            url: 'updateJobDownloads.do',
+            url: 'secure/updateJobDownloads.do',
             scope : this,
             callback: function(options, success, response) {
                 if (!success) {

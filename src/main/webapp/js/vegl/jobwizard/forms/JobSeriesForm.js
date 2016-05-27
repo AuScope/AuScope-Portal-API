@@ -177,7 +177,7 @@ Ext.define('vegl.jobwizard.forms.JobSeriesForm', {
         params.storageServiceId = "amazon-aws-storage-sydney";
         
         Ext.Ajax.request({
-            url : 'updateOrCreateJob.do',
+            url : 'secure/updateOrCreateJob.do',
             params : params,
             callback : function(options, success, response) {
                 if (!success) {

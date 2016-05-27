@@ -36,7 +36,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
                         filename : source.get('name')
                     };
 
-                    portal.util.FileDownloader.downloadFile("downloadInputFile.do", params);
+                    portal.util.FileDownloader.downloadFile("secure/downloadInputFile.do", params);
                 } else if (source instanceof vegl.models.Download) {
                     portal.util.FileDownloader.downloadFile(source.get('url'));
                 }
@@ -55,7 +55,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
                 if (source instanceof vegl.models.FileRecord) {
                     Ext.Ajax.request({
-                        url: 'deleteFiles.do',
+                        url: 'secure/deleteFiles.do',
                         callback: Ext.bind(this.updateFileStore, this),
                         params: {
                             'fileName': source.get('name'),
@@ -64,7 +64,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
                     });
                 } else if (source instanceof vegl.models.Download) {
                     Ext.Ajax.request({
-                        url: 'deleteDownloads.do',
+                        url: 'secure/deleteDownloads.do',
                         callback: Ext.bind(this.updateFileStore, this),
                         params: {
                             'downloadId': source.get('id'),
@@ -133,7 +133,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
         loadMask.show();
 
         Ext.Ajax.request({
-            url : 'listJobFiles.do',
+            url : 'secure/listJobFiles.do',
             params : {
                 jobId : this.currentJobId
             },
@@ -157,7 +157,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
                 //Fire off a second request for the downloads
                 Ext.Ajax.request({
-                    url : 'getJobDownloads.do',
+                    url : 'secure/getJobDownloads.do',
                     params : {
                         jobId : this.currentJobId
                     },
