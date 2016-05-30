@@ -177,7 +177,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
     handleLoadingJobObject: function() {
         this.getForm().load({
-            url : 'getJobObject.do',
+            url : 'secure/getJobObject.do',
             waitMsg : 'Loading Job Object...',
             params : {
                 jobId : this.wizardState.jobId
