@@ -14,5 +14,14 @@ Ext.define('vegl.preview.FilePreviewMixin', {
      *
      * returns nothing
      */
-    preview : portal.util.UnimplementedFunction
+    preview : portal.util.UnimplementedFunction,
+
+    /**
+     * Can be overridden
+     *
+     * Forces a complete refresh of the current preview.
+     */
+    handleRefresh : function() {
+        this.preview(this.job, this.fileName, this.size);
+    }
 });

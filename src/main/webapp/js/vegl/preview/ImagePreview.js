@@ -24,7 +24,25 @@ Ext.define('vegl.preview.ImagePreview', {
      */
     preview : function(job, fileName, size) {
         var img = this.getEl().down('img');
-        img.dom.setAttribute('src', 'secure/getImagePreview.do?jobId=' + job.get('id') + '&file=' + fileName);
+        var mask = new Ext.LoadMask({
+            msg: 'Loading Image...',
+            target: this.ownerCt
+        });
+        mask.show();
+
+        var hideMask = function() {
+            mask.hide();
+            img.un('load', hideMask);
+            img.un('error', hideMask);
+        };
+        img.on('load', hideMask);
+        img.on('error', hideMask);
+
+        img.dom.setAttribute('src', 'secure/getImagePreview.do?jobId=' + job.get('id') + '&file=' + fileName + '&_dc=' + Math.random());
+
+        this.job = job;
+        this.fileName = fileName;
+        this.size = size;
     },
 
     /**

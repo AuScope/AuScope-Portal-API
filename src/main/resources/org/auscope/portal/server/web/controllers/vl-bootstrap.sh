@@ -23,6 +23,8 @@ export SHUTDOWN_URL="{10}"
 export WALLTIME="{11}"
 export VL_LOG_FILE_NAME="vl.sh.log"
 export VL_LOG_FILE="$WORKING_DIR/$VL_LOG_FILE_NAME"
+export VL_TERMINATION_FILE_NAME="vl.end"
+export VL_TERMINATION_FILE="$WORKING_DIR/$VL_TERMINATION_FILE_NAME"
 
 # Load our profile so this run is the same as a regular user login (to make debugging easier)
 source /etc/profile
@@ -47,6 +49,7 @@ if [ $WALLTIME > 0 ]; then
     echo "SHUTDOWN_SCRIPT = $SHUTDOWN_SCRIPT"
     echo "WALLTIME = $WALLTIME"
 fi
+echo "VL_TERMINATION_FILE = $VL_TERMINATION_FILE"
 echo "--------------------------------------"
 
 # If a walltime is present, set walltime shutdown parameters

@@ -34,14 +34,15 @@ Ext.define('vegl.preview.PlainTextPreview', {
         }
 
         this.clearPreview();
-        this.currentJob = job;
-        this.currentFile = fileName;
+        this.job = job;
+        this.fileName = fileName;
+        this.size = size;
 
         this.currentRequest = Ext.Ajax.request({
             url : 'secure/getPlaintextPreview.do',
             params : {
                 jobId : job.get('id'),
-                file: this.currentFile,
+                file: this.fileName,
                 maxSize: 20 * 1024 //20 KB
             },
             scope : this,
@@ -80,8 +81,9 @@ Ext.define('vegl.preview.PlainTextPreview', {
      * Removes logs from this panel. Optionally adds a replacement tab indicating this panel is empty
      */
     clearPreview : function(addEmptyTab, emptyTabMsg) {
-        this.currentJob = null;
-        this.currentFile = null;
+        this.job = null;
+        this.fileName = null;
+        this.size = null;
         this.writeText('');
     }
 });

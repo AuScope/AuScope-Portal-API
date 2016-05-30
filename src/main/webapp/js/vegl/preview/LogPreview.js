@@ -11,32 +11,15 @@ Ext.define('vegl.preview.LogPreview', {
         preview: 'vegl.preview.FilePreviewMixin'
     },
 
-    currentJob : null,
-    currentFile : null,
+    job : null,
+    fileName : null,
     currentRequest : null,
 
     constructor : function(config) {
 
         Ext.apply(config, {
             autoScroll : true,
-            items : [],
-            dockedItems: [{
-                xtype: 'toolbar',
-                dock: 'bottom',
-                items: [{
-                    xtype: 'tbfill'
-                },{
-                    xtype: 'button',
-                    text: 'Refresh',
-                    iconCls: 'refresh-icon',
-                    scope: this,
-                    handler: function() {
-                        if (this.currentJob) {
-                            this.preview(this.currentJob, this.currentFile);
-                        }
-                    }
-                }]
-            }]
+            items : []
         });
 
         this.callParent(arguments);
@@ -55,8 +38,9 @@ Ext.define('vegl.preview.LogPreview', {
 
         if (job.get('status') === vegl.models.Job.STATUS_UNSUBMITTED) {
             this.clearLogs(true, 'This job hasn\'t been submitted yet.');
-            this.currentJob = job;
-            this.currentFile = fileName;
+            this.job = job;
+            this.fileName = fileName;
+            this.size = size;
             return;
         }
 
@@ -67,14 +51,15 @@ Ext.define('vegl.preview.LogPreview', {
         }
 
         this.clearLogs();
-        this.currentJob = job;
-        this.currentFile = fileName;
+        this.job = job;
+        this.fileName = fileName;
+        this.size = size;
 
         this.currentRequest = Ext.Ajax.request({
             url : 'secure/getSectionedLogs.do',
             params : {
                 jobId : job.get('id'),
-                file: this.currentFile
+                file: this.fileName
             },
             scope : this,
             callback : function(options, success, response) {
@@ -120,6 +105,8 @@ Ext.define('vegl.preview.LogPreview', {
                                     doc.write(sections[iframe.getAttribute('sectionName')]);
                                     doc.close();
                                     doc.body.setAttribute('style', 'white-space:pre;font-family:monospace;');
+
+                                    doc.body.scrollTo(0, 999999);
                                 }
                             }
                         }]
@@ -144,8 +131,10 @@ Ext.define('vegl.preview.LogPreview', {
      * Removes logs from this panel. Optionally adds a replacement tab indicating this panel is empty
      */
     clearLogs : function(addEmptyTab, emptyTabMsg) {
-        this.currentJob = null;
-        this.currentFile = null;
+        this.job = null;
+        this.fileName = null;
+        this.size = null;
+
         this.removeAll(true);
         if (addEmptyTab) {
             this.addEmptyTab(emptyTabMsg ? emptyTabMsg : 'No job selected.');
