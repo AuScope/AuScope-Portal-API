@@ -34,7 +34,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             }
         });
-        this.imageStore.load();
 
         // create the store and get the compute type
         this.computeTypeStore = Ext.create('Ext.data.Store', {
@@ -63,6 +62,17 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     //If we have a jobId, load that, OTHERWISE the job will be created later
                     if (jobObjectFrm.wizardState.jobId) {
                         jobObjectFrm.handleLoadingJobObject();
+                    } else if (jobObjectFrm.wizardState.solutionId) {
+                        this.imageStore.load({
+                            callback: Ext.bind(function() {
+                                if (this.imageStore.getCount()) {
+                                    var firstImg = this.imageStore.getAt(0);
+                                    this.down('#image-combo').select(firstImg);
+                                }
+                            }, this)
+                        });
+                    } else {
+                        this.imageStore.load();
                     }
                 }
             },
@@ -110,7 +120,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 queryMode: 'local',
                 triggerAction: 'all',
                 typeAhead: true,
-                forceSelection: true,
+                forceSelection: false,
                 store : this.imageStore,
                 listConfig : {
                     loadingText: 'Getting tools...',
@@ -188,40 +198,72 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     this.wizardState.solutionId = jobData.solutionId;
                     this.wizardState.jobId = frm.getValues().id;
 
-                    //We need to handle setting our VM ID's and instance types
-                    //but those will need to wait on stores to be loaded (frustrating!)
-                    //Hence the fun and games below.
-                    if (!Ext.isEmpty(jobData.computeVmId)) {
-                        var jobObjectFrm = this;
-                        var whenImagesReady = function() {
-                            if (jobObjectFrm.imageStore.getCount() === 0) {
-                                return;
-                            }
+                    //If we have a solution ID but no selected image, preload the image combo
+                    //with the first image sent from the backend
+                    if (Ext.isEmpty(jobData.computeVmId) && !Ext.isEmpty(jobData.solutionId)) {
+                        this.imageStore.getProxy().setExtraParam('jobId', jobData.id);
+                        this.imageStore.load({
+                            callback: Ext.bind(function() {
+                                if (this.imageStore.getCount()) {
+                                    var firstImg = this.imageStore.getAt(0);
+                                    this.down('#image-combo').select(firstImg);
 
-                            jobObjectFrm.computeTypeStore.load({
-                                params : {
-                                    computeServiceId : jobData.computeServiceId,
-                                    machineImageId : jobData.computeVmId
-                                },
-                                callback: function() {
-                                    jobObjectFrm.preselectVmType();
+                                    this.handleAutoSelectingImage(jobData.computeServiceId, firstImg.get('imageId'), true);
                                 }
-                            });
-                        };
+                            }, this)
+                        });
+                    }
 
-                        if (this.imageStore.updating) {
-                            this.imageStore.on('load', whenImagesReady, this, {single: true});
-                        } else if (this.imageStore.getCount() === 0) {
-                            this.imageStore.load({
-                                callback: Ext.bind(whenImagesReady, this)
-                            });
-                        } else {
-                            whenImagesReady();
-                        }
+                    if (!Ext.isEmpty(jobData.computeVmId)) {
+                        this.handleAutoSelectingImage(jobData.computeServiceId, jobData.computeVmId);
                     }
                 }
             }
         });
+    },
+
+    /**
+     * We need to handle setting our VM ID's and instance types
+     * but those will need to wait on stores to be loaded (frustrating!)
+     *
+     * forceFinishedUpdating:
+     *      Set to true to ignore the imageStore.updating property and assume it's not updating
+     *
+     *      ANVGL-119 The "load" event in imageStore won't fire if we listen at this point
+     *      even though the "updating" property is set on the store (frustrating!)
+     *      This override allows us to workaround this when calling from an update callback
+     */
+    handleAutoSelectingImage: function(computeServiceId, computeVmId, forceFinishedUpdating) {
+        if (!Ext.isEmpty(computeVmId)) {
+            var jobObjectFrm = this;
+            var whenImagesReady = function() {
+                if (jobObjectFrm.imageStore.getCount() === 0) {
+                    return;
+                }
+
+                jobObjectFrm.computeTypeStore.load({
+                    params : {
+                        computeServiceId : computeServiceId,
+                        machineImageId : computeVmId
+                    },
+                    callback: function() {
+                        jobObjectFrm.preselectVmType();
+                    }
+                });
+            };
+
+
+            if (!forceFinishedUpdating && this.imageStore.updating) {
+                this.imageStore.on('load', whenImagesReady, this, {single: true});
+            } else if (this.imageStore.getCount() === 0) {
+                this.imageStore.getProxy().setExtraParam('jobId', this.wizardState.jobId);
+                this.imageStore.load({
+                    callback: Ext.bind(whenImagesReady, this)
+                });
+            } else {
+                whenImagesReady();
+            }
+        }
     },
 
     /**
