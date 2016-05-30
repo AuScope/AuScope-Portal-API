@@ -154,6 +154,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
                     if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
                         this.wizardState.jobId = responseObj.data[0].id;
                         this.wizardState.seriesId = responseObj.data[0].seriesId;
+                        this.wizardState.solutionId = responseObj.data[0].solutionId;
                         callback(true);
                         return;
                     }
