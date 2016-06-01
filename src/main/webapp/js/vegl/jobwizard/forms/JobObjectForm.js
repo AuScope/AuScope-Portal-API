@@ -68,13 +68,13 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                                 if (this.imageStore.getCount()) {
                                     var firstImg = this.imageStore.getAt(0);
                                     this.down('#image-combo').select(firstImg);
-                                            }
+                                }
                             }, this)
-                                        });
+                        });
                     } else {
                         this.imageStore.load();
-                                    }
-                                }
+                    }
+                }
             },
             fieldDefaults: {
                 labelWidth: 120
