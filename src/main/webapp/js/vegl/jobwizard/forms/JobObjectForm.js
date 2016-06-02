@@ -24,7 +24,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             model: 'vegl.models.MachineImage',
             proxy: {
                 type: 'ajax',
-                url: 'getVmImagesForComputeService.do',
+                url: 'secure/getVmImagesForComputeService.do',
                 reader: {
                    type: 'json',
                    rootProperty : 'data'
@@ -40,7 +40,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             model: 'vegl.models.ComputeType',
             proxy: {
                 type: 'ajax',
-                url: 'getVmTypesForComputeService.do',
+                url: 'secure/getVmTypesForComputeService.do',
                 reader: {
                    type: 'json',
                    rootProperty : 'data'
@@ -177,7 +177,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
     handleLoadingJobObject: function() {
         this.getForm().load({
-            url : 'getJobObject.do',
+            url : 'secure/getJobObject.do',
             waitMsg : 'Loading Job Object...',
             params : {
                 jobId : this.wizardState.jobId
@@ -391,7 +391,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
         // update the job here
         Ext.Ajax.request({
-            url : 'updateOrCreateJob.do',
+            url : 'secure/updateOrCreateJob.do',
             params : values,
             callback : function(options, success, response) {
                 if (!success) {
