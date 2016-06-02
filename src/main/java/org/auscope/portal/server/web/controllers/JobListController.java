@@ -684,44 +684,6 @@ public class JobListController extends BaseCloudController  {
     }
 
     /**
-     * Attempts to creates a new series for the specified user.
-     *
-     * The series object will be returned in a JSON response on success.
-     *
-     * @param seriesName
-     * @param seriesDescription
-     * @return
-     */
-    @RequestMapping("/secure/createSeries.do")
-    public ModelAndView createSeries(HttpServletRequest request,
-            @AuthenticationPrincipal ANVGLUser user) {
-
-        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(),
-                                                         "default",
-                                                         null);
-        if(series==null || series.isEmpty()){
-            VEGLSeries newSeries = new VEGLSeries();
-
-            newSeries.setUser(user.getEmail());
-            newSeries.setName("default");
-            newSeries.setDescription("Everything will now come through to a single default series");
-
-            try {
-                jobManager.saveSeries(newSeries);
-            } catch (Exception ex) {
-                logger.error("failure saving series", ex);
-                return generateJSONResponseMAV(false, null, "Failure saving series");
-            }
-
-            return generateJSONResponseMAV(true, Arrays.asList(newSeries), "");
-        }
-        else{
-            return generateJSONResponseMAV(true, Arrays.asList(series.get(0)), "");
-        }
-
-    };
-
-    /**
      * Attempts to creates a new folder for the specified user.
      * We are resusing existing code for series in place as folder
      * The series object will be returned in a JSON response on success.
