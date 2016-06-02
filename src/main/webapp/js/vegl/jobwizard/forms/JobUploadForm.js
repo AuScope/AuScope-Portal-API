@@ -66,36 +66,57 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                 stripeRows: true,
                 anchor: '100% -20',
                 buttons : [{
-                    text : 'Add Input',
+                    text: 'Copy from Job',
+                    iconCls: 'download-cloud-icon',
+                    align : 'right',
+                    scope: this,
+                    handler: function() {
+                        this._doPopup('vegl.widgets.JobInputFileCopyWindow', 800, 400);
+                    }
+                },{
+                    text: 'Remote Download',
+                    iconCls: 'world-add-icon',
+                    align : 'right',
+                    scope: this,
+                    handler: function() {
+                        this._doPopup('vegl.widgets.JobInputFileRemoteWindow');
+                    }
+                },{
+                    text : 'Upload File',
                     iconCls : 'add',
                     itemId : 'add-button',
                     align : 'right',
+                    scope: this,
                     handler : function() {
-                        var showPopup = function() {
-                            Ext.create('vegl.widgets.JobInputFileWindow', {
-                                jobId : jobUploadFrm.wizardState.jobId,
-                                width : 500,
-                                height : 300,
-                                modal : true,
-                                listeners : {
-                                    close : function() {
-                                        jobUploadFrm.updateFileList();
-                                    }
-                                }
-                            }).show();
-                        };
-
-                        if (jobUploadFrm.wizardState.jobId === undefined) {
-                            jobUploadFrm.createJob(showPopup);
-                        } else {
-                            showPopup();
-                        }
+                        this._doPopup('vegl.widgets.JobInputFileUploadWindow');
                     }
                 }]
             }]
         }]);
     },
 
+    _doPopup: function(cls, width, height) {
+        var jobUploadFrm = this;
+        var showPopup = function() {
+            Ext.create(cls, {
+                jobId : jobUploadFrm.wizardState.jobId,
+                width : width ? width : 500,
+                height : height ? height : 300,
+                modal : true,
+                listeners : {
+                    close : function() {
+                        jobUploadFrm.updateFileList();
+                    }
+                }
+            }).show();
+        };
+
+        if (jobUploadFrm.wizardState.jobId === undefined) {
+            jobUploadFrm.createJob(showPopup);
+        } else {
+            showPopup();
+        }
+    },
 
     /**
      * Refresh the server side file list, and fetch all input-files associated with the job.
