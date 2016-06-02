@@ -22,7 +22,7 @@ Ext.define('ScriptBuilder.templates.UnderworldGocadTemplate', {
             model : 'vegl.models.Download',
             proxy : {
                 type : 'ajax',
-                url : 'getAllJobInputs.do',
+                url : 'secure/getAllJobInputs.do',
                 extraParams : {
                     jobId : jobId
                 },

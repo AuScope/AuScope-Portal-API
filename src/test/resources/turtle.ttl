@@ -1,4 +1,4 @@
-<http://portal-fake.vhirl.org/getJobObject.do?jobId=1>
+<http://portal-fake.vhirl.org/secure/getJobObject.do?jobId=1>
       <http://www.w3.org/2000/01/rdf-schema#type>
               "http://www.w3.org/ns/prov#Activity" ;
       <http://purl.org/dc/elements/1.1/description>
