@@ -62,9 +62,13 @@
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobSubmitForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/DuplicateJobForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/JobWizard.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobsTree.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>
-    <script type="text/javascript" src="js/vegl/widgets/JobInputFileWindow.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobInputFileCopyWindow.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobInputFileRemoteWindow.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobInputFileUploadWindow.js"></script>
     <script src="js/ScriptBuilder/templates/DynamicTemplate.js" type="text/javascript"></script>
 
     <script type="text/javascript" src="js/vegl/JobBuilder.js"></script>

@@ -938,6 +938,55 @@ public class JobListController extends BaseCloudController  {
     }
 
     /**
+     * Copies job files from sourceJobId to targetJobId
+     *
+     * Job files will be duplicated in LOCAL staging only. The files duplicated can be
+     * controlled by a list of file names
+     */
+    @RequestMapping("/secure/copyJobFiles.do")
+    public ModelAndView copyJobFiles(HttpServletRequest request,
+            @AuthenticationPrincipal ANVGLUser user,
+            @RequestParam("targetJobId") Integer targetJobId,
+            @RequestParam("sourceJobId") Integer sourceJobId,
+            @RequestParam("key") String[] keys) {
+
+        VEGLJob sourceJob = attemptGetJob(sourceJobId, user);
+        VEGLJob targetJob = attemptGetJob(targetJobId, user);
+
+        if (sourceJob == null || targetJob == null) {
+            logger.error(String.format("sourceJob %1$s or targetJob %2$s inaccessible to user %3$s", sourceJobId, targetJobId, user));
+            return generateJSONResponseMAV(false, null, "Unable to copy files");
+        }
+
+        CloudStorageService cloudStorageService = getStorageService(sourceJob);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cannot copy files", sourceJob.getStorageServiceId(), sourceJob.getId()));
+            return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+        }
+
+        try {
+            InputStream is = null;
+            OutputStream os = null;
+
+            for (String key : keys) {
+                try {
+                    is = cloudStorageService.getJobFile(sourceJob, key);
+                    os = fileStagingService.writeFile(targetJob, key);
+                    IOUtils.copy(is, os);
+                } finally {
+                    IOUtils.closeQuietly(is);
+                    IOUtils.closeQuietly(os);
+                }
+            }
+
+            return generateJSONResponseMAV(true);
+        } catch (Exception ex) {
+            logger.error("Error copying files for job.", ex);
+            return generateJSONResponseMAV(false);
+        }
+    }
+
+    /**
      * Duplicates the job given by its reference, the new job object is returned.
      *
      * Job files will be duplicated in LOCAL staging only. The files duplicated can be
