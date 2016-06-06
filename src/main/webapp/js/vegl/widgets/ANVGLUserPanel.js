@@ -15,6 +15,9 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
      * user: Instance of ANVGLUser to render
      */
     constructor : function(config) {
+        tm = new Ext.util.TextMetrics(),
+        n = tm.getWidth("ANVGL Access ARN:");
+      
         Ext.apply(config, {
             layout: 'fit',
             items: [{
@@ -26,31 +29,34 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     xtype: 'textfield',
                     itemId: 'arnExecution',
                     name: 'arnExecution',
-                    fieldLabel: 'Compute ARN',
+                    fieldLabel: 'ANVGL Access ARN',
+                    labelWidth: n,
                     anchor: '100%',
                     allowBlank: false,
                     allowOnlyWhitespace: false,
                     plugins: [{
                         ptype: 'fieldhelptext',
-                        text: 'The Amazon resource name describing the compute EC2 resource to be used for job execution'
+                        text: 'Amazon resource name for the role which is used to access the client AWS account.'
                     }]
                 },{
                     xtype: 'textfield',
                     itemId: 'arnStorage',
                     name: 'arnStorage',
-                    fieldLabel: 'Storage ARN',
+                    fieldLabel: 'Job Instance ARN',
+                    labelWidth: n,
                     anchor: '100%',
                     allowBlank: false,
                     allowOnlyWhitespace: false,
                     plugins: [{
                         ptype: 'fieldhelptext',
-                        text: 'The Amazon resource name describing the storage S3 resource to be used for job artifacts'
+                        text: 'The Amazon resource name for the instance profile which is used when processing user jobs.'
                     }]
                 },{
                     xtype: 'textfield',
                     itemId: 'awsKeyName',
                     name: 'awsKeyName',
                     fieldLabel: 'AWS Key Name',
+                    labelWidth: n,
                     anchor: '100%',
                     allowBlank: true,
                     plugins: [{
