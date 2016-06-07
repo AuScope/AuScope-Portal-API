@@ -985,35 +985,6 @@ public class TestJobListController extends PortalTestClass {
     }
 
     /**
-     * Tests that creating a series succeeds
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testCreateSeries() throws Exception {
-        final String userEmail = "exampleuser@email.com";
-        final String qName = "default";
-        final String qDescription = "Everything will now come through to a single default series";
-
-        context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).querySeries(userEmail, qName, null);will(returnValue(null));
-            oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));
-        }});
-
-        //Returns MAV on failure
-        ModelAndView mav = controller.createSeries(mockRequest, mockPortalUser);
-        Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        VEGLSeries actualSeries = ((List<VEGLSeries>) mav.getModel().get("data")).get(0);
-
-        Assert.assertNotNull(actualSeries);
-        Assert.assertEquals(userEmail, actualSeries.getUser());
-        Assert.assertEquals(qName, actualSeries.getName());
-        Assert.assertEquals(qDescription, actualSeries.getDescription());
-    }
-
-
-    /**
      * Tests that creating a folder succeeds
      * @throws Exception
      */
@@ -1043,25 +1014,6 @@ public class TestJobListController extends PortalTestClass {
         public MyDataAccessException() {
             super("");
         }
-    }
-
-    /**
-     * Tests that creating a series will fail if the underlying database fails
-     * @throws Exception
-     */
-    @Test
-    public void testCreateSeriesFailure() throws Exception {
-        final String userEmail = "exampleuser@email.com";
-
-        context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).querySeries(userEmail, "default", null);will(returnValue(null));
-            oneOf(mockJobManager).saveSeries(with(any(VEGLSeries.class)));will(throwException(new MyDataAccessException()));
-        }});
-
-        //Returns MAV on failure
-        ModelAndView mav = controller.createSeries(mockRequest, mockPortalUser);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
     /**

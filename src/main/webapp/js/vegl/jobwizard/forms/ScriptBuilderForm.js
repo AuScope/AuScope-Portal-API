@@ -41,6 +41,10 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
                         // once the script is loaded into the memory, we don't want it to be loaded again to prevent unsaved changes.
                         this.wizardState.userAction = null;
                     }
+
+                    if (!Ext.isEmpty(this.wizardState.solutionId)) {
+                        this.scriptBuilderFrm.setSolutionId(this.wizardState.solutionId);
+                    }
                 }
             },
             items: [this.scriptBuilderFrm]

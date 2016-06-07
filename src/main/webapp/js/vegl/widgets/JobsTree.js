@@ -24,6 +24,7 @@ Ext.define('vegl.widgets.JobsTree', {
      *
      * rootNode : Root node for the folder/job organisation
      * jobStore : store containing all jobs
+     * hideSettings: if true, the settings column will be hidden
      */
     constructor : function(config) {
         this.jobStore = config.jobStore;
@@ -173,6 +174,7 @@ Ext.define('vegl.widgets.JobsTree', {
             },{
                 xtype: 'actioncolumn',
                 width: 50,
+                hidden: config.hideSettings ? true : false,
                 items: [{
                     iconCls: 'setting-icon',
                     tooltip: 'Actions for this job / folder.',
