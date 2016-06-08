@@ -104,13 +104,15 @@ public class JobListController extends BaseCloudController  {
             FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
             VGLJobStatusAndLogReader jobStatusLogReader,
             JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
-            @Value("${vm.sh}") String vmSh,VGLPollingJobQueueManager vglPollingJobQueueManager) {
+            @Value("${vm.sh}") String vmSh,VGLPollingJobQueueManager vglPollingJobQueueManager,
+            @Value("${HOST.portalAdminEmail}") String adminEmail) {
         super(cloudStorageServices, cloudComputeServices,vmSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.jobStatusLogReader = jobStatusLogReader;
         this.jobStatusMonitor = jobStatusMonitor;
         this.vglPollingJobQueueManager =  vglPollingJobQueueManager;
+        this.adminEmail=adminEmail;
         this.initializeQueue();
     }
 
@@ -472,7 +474,7 @@ public class JobListController extends BaseCloudController  {
             } catch (Exception e) {
                 logger.error("Failed to cancel one of the jobs in a given series.", e);
                 return generateJSONResponseMAV(false, null, "There was a problem cancelling one of your jobs in selected series.",
-                        "Please try again in a few minutes or report it to cg-admin@csiro.au.");
+                        "Please try again in a few minutes or report it to "+getAdminEmail()+".");
             }
         }
 
