@@ -239,7 +239,7 @@ Ext.define('vegl.widgets.JobsTree', {
             switch(selections[0].get('status')) {
                 case vegl.models.Job.STATUS_ACTIVE:
                     this.cancelJobAction.setDisabled(false);
-                    this.deleteJobAction.setDisabled(true);
+                    this.deleteJobAction.setDisabled(false);
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
@@ -262,7 +262,7 @@ Ext.define('vegl.widgets.JobsTree', {
                 default:
                     // Job status is STATUS_PENDING
                     this.cancelJobAction.setDisabled(false);
-                    this.deleteJobAction.setDisabled(true);
+                    this.deleteJobAction.setDisabled(false);
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
