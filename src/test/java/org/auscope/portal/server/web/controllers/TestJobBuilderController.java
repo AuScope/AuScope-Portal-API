@@ -80,6 +80,7 @@ public class TestJobBuilderController {
     private ScmEntryService mockScmEntryService;
 
     private JobBuilderController controller;
+    private final String vmSh = "http://example2.org";
 
     @Before
     public void init() {
@@ -103,7 +104,7 @@ public class TestJobBuilderController {
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
         //Object Under Test
         controller = new JobBuilderController("dummy@dummy.com", mockJobManager, mockFileStagingService,
-        		null, mockCloudStorageServices, mockCloudComputeServices,
+        		vmSh, mockCloudStorageServices, mockCloudComputeServices,
         		vglJobStatusChangeHandler, vglPollingJobQueueManager, mockScmEntryService, mockAnvglProvenanceService);
     }
 
@@ -1213,7 +1214,6 @@ public class TestJobBuilderController {
         final String computeServiceId = "ccs";
         final String storageServiceId = "css";
         final String endpoint = "http://example.org";
-        final String vmSh = "http://example2.org";
         final String regionName = "region-name";
 
         job.setComputeServiceId(computeServiceId);
@@ -1267,7 +1267,6 @@ public class TestJobBuilderController {
         final String computeServiceId = "ccs";
         final String storageServiceId = "css";
         final String endpoint = "http://example.org";
-        final String vmSh = "http://example2.org";
 
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);

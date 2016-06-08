@@ -73,8 +73,6 @@ public class TestMenuController extends PortalTestClass {
     @Test
     public void testHandleHtmlToView_Relative() throws Exception {
         final String uri = "/context/path/resource.html";
-        final String gMapKey = "131asdasd";
-        final String gAnalyticsKey = "fahh113f1";
 
         context.checking(new Expectations() {{
             oneOf(mockRequest).getRequestURI();will(returnValue(uri));
