@@ -1,11 +1,19 @@
 package org.auscope.portal.server.web.service;
 
-import au.csiro.promsclient.*;
-import junit.framework.Assert;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.gridjob.FileInformation;
@@ -17,10 +25,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
-import java.net.URI;
-import java.net.URL;
-import java.util.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
+import au.csiro.promsclient.Activity;
+import au.csiro.promsclient.Entity;
+import au.csiro.promsclient.ExternalReport;
+import au.csiro.promsclient.ProvenanceReporter;
+import junit.framework.Assert;
 
 public class ANVGLProvenanceServiceTest extends PortalTestClass {
     VEGLJob preparedJob;
