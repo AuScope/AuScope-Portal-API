@@ -32,8 +32,7 @@ public class CSWCacheController extends BaseCSWController {
     @Autowired
     public CSWCacheController(CSWCacheService cswService,
                          ViewCSWRecordFactory viewCSWRecordFactory,
-                         ViewKnownLayerFactory viewKnownLayerFactory,
-                         PortalPropertyPlaceholderConfigurer propertyResolver) {
+                         ViewKnownLayerFactory viewKnownLayerFactory) {
 
         super(viewCSWRecordFactory, viewKnownLayerFactory);
         this.cswService = cswService;

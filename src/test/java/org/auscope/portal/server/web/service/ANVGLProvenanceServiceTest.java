@@ -35,7 +35,6 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     final String activityFileName = "activity.ttl";
     final String PROMSURI = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
     final String mockUser = "jo@me.com";
-    final PortalPropertyPlaceholderConfigurer mockPropertyConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
     URI mockProfileUrl;
     ANVGLUser mockPortalUser;
     
@@ -119,7 +118,6 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             allowing(preparedJob).getUser();
             will(returnValue("foo@test.com"));
             
-            allowing(mockPropertyConfigurer).resolvePlaceholder(anvglProvenanceService.HOST_PROMS_REPORT_URL);will(returnValue("http://mockurl"));
             /*
             allowing(preparedJob).getJobFiles();
             will(returnValue(fileInfos));
@@ -145,7 +143,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             allowing(mockPortalUser).getId();will(returnValue(mockUser));
         }});
         
-        anvglProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, mockPropertyConfigurer);
+        anvglProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, "http://mockurl");
         anvglProvenanceService.setServerURL(serverURL);
     }
 

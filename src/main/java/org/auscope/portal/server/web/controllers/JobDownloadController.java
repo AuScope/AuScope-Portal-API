@@ -8,13 +8,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,13 +36,15 @@ public class JobDownloadController extends BasePortalController {
 
 
     protected final Log logger = LogFactory.getLog(getClass());
-    private PortalPropertyPlaceholderConfigurer hostConfigurer;
     private SimpleWfsService wfsService;
 
+
+    private String erddapServiceUrl;
+
     @Autowired
-    public JobDownloadController(PortalPropertyPlaceholderConfigurer hostConfigurer, SimpleWfsService wfsService) {
-        this.hostConfigurer = hostConfigurer;
+    public JobDownloadController(SimpleWfsService wfsService, @Value("${HOST.erddapservice.url}") String erddapServiceUrl) {
         this.wfsService = wfsService;
+        this.erddapServiceUrl=erddapServiceUrl;
     }
 
     private ModelMap toView(VglDownload dl) {
@@ -143,7 +145,7 @@ public class JobDownloadController extends BasePortalController {
                                 HttpServletRequest request,
                                 HttpServletResponse response) throws Exception {
 
-        String serviceUrl = hostConfigurer.resolvePlaceholder("HOST.erddapservice.url");
+        String serviceUrl = erddapServiceUrl;
         CSWGeographicBoundingBox bbox = new CSWGeographicBoundingBox(westBoundLongitude, eastBoundLongitude, southBoundLatitude, northBoundLatitude);
         String erddapUrl = getCoverageSubsetUrl(bbox, serviceUrl, layerName, format);
 

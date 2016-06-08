@@ -43,9 +43,6 @@ public class TestCSWCacheController extends PortalTestClass {
     /** The mock csw service. */
     private CSWCacheService mockCSWService = context.mock(CSWCacheService.class);
 
-    /** The mock property configurer. */
-    private PortalPropertyPlaceholderConfigurer mockPropertyConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
-
     /** The mock http request. */
     private HttpServletRequest mockHttpRequest = context.mock(HttpServletRequest.class);
 
@@ -74,13 +71,11 @@ public class TestCSWCacheController extends PortalTestClass {
      */
     @Before
     public void setUp() throws Exception {
-        final String serviceUrl = "somejunk";
-
         context.checking(new Expectations() {{
             oneOf(mockCSWService).updateCache();
         }});
 
-        cswController = new CSWCacheController(mockCSWService, mockViewCSWRecordFactory, mockViewKnownLayerFactory, mockPropertyConfigurer);
+        cswController = new CSWCacheController(mockCSWService, mockViewCSWRecordFactory, mockViewKnownLayerFactory);
     }
 
     /**

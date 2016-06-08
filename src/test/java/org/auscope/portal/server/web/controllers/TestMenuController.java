@@ -24,14 +24,15 @@ public class TestMenuController extends PortalTestClass {
     private HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
     private HttpServletResponse mockResponse = context.mock(HttpServletResponse.class);
     private ANVGLUser mockUser = context.mock(ANVGLUser.class);
-    private PortalPropertyPlaceholderConfigurer hostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
     private HttpSession mockSession = context.mock(HttpSession.class);
+    final String gMapKey = "13421asdasd";
+    final String gAnalyticsKey = "faf3113f1";
 
     private MenuController mc = null;
 
     @Before
     public void setup() {
-        mc = new MenuController(hostConfigurer);
+        mc = new MenuController(gMapKey, gAnalyticsKey);
 
         //Global expectations for setting build stamp id
         context.checking(new Expectations() {{
@@ -46,8 +47,6 @@ public class TestMenuController extends PortalTestClass {
     @Test
     public void testHandleHtmlToView_FullyQualified() throws Exception {
         final String uri = "http://example.org/context/path/resource.html";
-        final String gMapKey = "13421asdasd";
-        final String gAnalyticsKey = "faf3113f1";
 
         context.checking(new Expectations() {{
             oneOf(mockRequest).getRequestURI();will(returnValue(uri));
@@ -57,10 +56,6 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).setAttribute("existingSession", true);
 
             allowing(mockUser).isFullyConfigured();will(returnValue(true));
-
-            //Every view should have the analytics key thrown into it
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
@@ -90,10 +85,6 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).setAttribute("existingSession", true);
 
             allowing(mockUser).isFullyConfigured();will(returnValue(true));
-
-            //Every view should have the analytics key thrown into it
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
@@ -111,8 +102,6 @@ public class TestMenuController extends PortalTestClass {
     @Test
     public void testHandleHtmlToView_NewSession() throws Exception {
         final String uri = "http://example.org/context/path/resource.html";
-        final String gMapKey = "13421asdasd";
-        final String gAnalyticsKey = "faf3113f1";
 
         context.checking(new Expectations() {{
             oneOf(mockRequest).getRequestURI();will(returnValue(uri));
@@ -120,10 +109,6 @@ public class TestMenuController extends PortalTestClass {
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(null));
             oneOf(mockSession).setAttribute("existingSession", true);
-
-            //Every view should have the analytics key thrown into it
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(null, mockRequest, mockResponse);
@@ -139,9 +124,6 @@ public class TestMenuController extends PortalTestClass {
     @Test
     public void testHandleHtmlToView_ExistingSession() throws Exception {
         final String uri = "http://example.org/context/path/resource.html";
-        final String gMapKey = "13421asdasd";
-        final String gAnalyticsKey = "faf3113f1";
-
         context.checking(new Expectations() {{
             oneOf(mockRequest).getRequestURI();will(returnValue(uri));
 
@@ -150,10 +132,6 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).setAttribute("existingSession", true);
 
             allowing(mockUser).isFullyConfigured();will(returnValue(true));
-
-            //Every view should have the analytics key thrown into it
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
@@ -186,8 +164,6 @@ public class TestMenuController extends PortalTestClass {
     @Test
     public void testUnconfiguredRedirect_AbortOnUser() throws Exception {
         final String uri = "http://example.org/context/path/user.html?a=b";
-        final String gMapKey = "13421asdasd";
-        final String gAnalyticsKey = "faf3113f1";
 
         context.checking(new Expectations() {{
             allowing(mockRequest).getRequestURI();will(returnValue(uri));
@@ -197,10 +173,6 @@ public class TestMenuController extends PortalTestClass {
             allowing(mockSession).setAttribute("existingSession", true);
 
             allowing(mockUser).isFullyConfigured();will(returnValue(false));
-
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.googlemap.key");will(returnValue(gMapKey));
-            oneOf(hostConfigurer).resolvePlaceholder("HOST.google.analytics.key");will(returnValue(gAnalyticsKey));
-
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);

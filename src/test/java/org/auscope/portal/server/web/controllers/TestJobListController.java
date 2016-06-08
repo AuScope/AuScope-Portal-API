@@ -17,7 +17,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.cloud.CloudJob;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -54,7 +53,6 @@ public class TestJobListController extends PortalTestClass {
     private FileStagingService mockFileStagingService;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
-    private PortalPropertyPlaceholderConfigurer mockHostConfigurer;
     private ANVGLUser mockPortalUser;
     private JobStatusMonitor mockJobStatusMonitor;
     private HttpServletRequest mockRequest;
@@ -72,7 +70,6 @@ public class TestJobListController extends PortalTestClass {
         mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
         mockFileStagingService = context.mock(FileStagingService.class);
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
-        mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
         mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
         mockResponse = context.mock(HttpServletResponse.class);
@@ -90,7 +87,7 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer,vglPollingJobQueueManager);
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager);
     }
 
     @After
@@ -151,7 +148,6 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
-            allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             //Here on start is the delete mock
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
@@ -181,18 +177,13 @@ public class TestJobListController extends PortalTestClass {
 
         JobListController myController = new JobListController(queueMockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer,vglPollingJobQueueManager);
-
-
-
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager);
 
         Assert.assertEquals(2, vglPollingJobQueueManager.getQueue().size());
 
         myController.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
 
         Assert.assertEquals(1, vglPollingJobQueueManager.getQueue().size());
-
-
     }
 
     /**

@@ -17,6 +17,7 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUserDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -37,15 +38,21 @@ public class UserController extends BasePortalController {
     protected final Log logger = LogFactory.getLog(getClass());
 
     private ANVGLUserDao userDao;
-    private PortalPropertyPlaceholderConfigurer properties;
     private VelocityEngine velocityEngine;
 
+    private String awsAccount;
+
+    private String tacVersion;
+
     @Autowired
-    public UserController(ANVGLUserDao userDao, PortalPropertyPlaceholderConfigurer properties, VelocityEngine velocityEngine) {
+    public UserController(ANVGLUserDao userDao, VelocityEngine velocityEngine, 
+            @Value("${env.aws.account}") String awsAccount,
+            @Value("${termsconditions.version}") String tacVersion) {
         super();
         this.userDao = userDao;
-        this.properties = properties;
         this.velocityEngine = velocityEngine;
+        this.awsAccount=awsAccount;
+        this.tacVersion=tacVersion;
     }
 
 
@@ -127,7 +134,7 @@ public class UserController extends BasePortalController {
 
             ModelMap response = new ModelMap();
             response.put("html", tcs);
-            response.put("currentVersion", Integer.parseInt(properties.resolvePlaceholder("termsconditions.version")));
+            response.put("currentVersion", Integer.parseInt(tacVersion));
             if (user != null) {
                 response.put("acceptedVersion", user.getAcceptedTermsConditions());
             }
@@ -149,7 +156,7 @@ public class UserController extends BasePortalController {
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("s3Bucket", user.getS3Bucket());
         model.put("awsSecret", user.getAwsSecret());
-        model.put("awsAccount", properties.resolvePlaceholder("env.aws.account"));
+        model.put("awsAccount", awsAccount);
 
         String cloudFormationScript = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, CLOUD_FORMATION_RESOURCE, "UTF-8", model);
 
