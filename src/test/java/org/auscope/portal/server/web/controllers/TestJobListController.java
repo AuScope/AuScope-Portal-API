@@ -87,7 +87,7 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager);
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
     }
 
     @After
@@ -177,7 +177,7 @@ public class TestJobListController extends PortalTestClass {
 
         JobListController myController = new JobListController(queueMockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager);
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
 
         Assert.assertEquals(2, vglPollingJobQueueManager.getQueue().size());
 
