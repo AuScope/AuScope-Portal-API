@@ -457,6 +457,38 @@ public class JobListController extends BaseCloudController  {
     }
 
     /**
+     * Returns a JSON object containing the latest copy of metadata for a given job's file
+     *
+     * @param jobId
+     * @return
+     */
+    @RequestMapping("/secure/getCloudFileMetadata.do")
+    public ModelAndView getCloudFileMetadata(@RequestParam("jobId") Integer jobId,
+            @RequestParam("fileName") String fileName,
+            @AuthenticationPrincipal ANVGLUser user) {
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The requested job was not found.");
+        }
+
+        CloudFileInformation fileDetails = null;
+        try {
+            CloudStorageService cloudStorageService = getStorageService(job);
+            if (cloudStorageService == null) {
+                logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud files cannot be requested", job.getStorageServiceId(), job.getId()));
+                return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+            } else {
+                fileDetails = cloudStorageService.getJobFileMetadata(job, fileName);
+            }
+        } catch (Exception e) {
+            logger.warn("Error fetching job file metadata.", e);
+            return generateJSONResponseMAV(false, null, "Error fetching file metadata");
+        }
+
+        return generateJSONResponseMAV(true, Arrays.asList(fileDetails), "");
+    }
+
+    /**
      * Returns a JSON object containing an array of files belonging to a
      * given job.
      *

@@ -139,15 +139,15 @@ Ext.define('vegl.widgets.DetailsPanel', {
         case 'png':
         case 'jpeg':
         case 'jpg':
-            this.down('#logs').preview(this.job, fileName, record.get('size'), 'image');
+            this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'image');
             break;
         case 'txt':
         case 'py':
         case 'sh':
-            this.down('#logs').preview(this.job, fileName, record.get('size'), 'plaintext');
+            this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'plaintext');
             break;
         case 'log':
-            this.down('#logs').preview(this.job, fileName, record.get('size'), 'log');
+            this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'log');
             break;
         default:
             this.down('#logs').clearPreview();
@@ -197,6 +197,14 @@ Ext.define('vegl.widgets.DetailsPanel', {
         this.updateSubmitTime();
 
         this.down('#files').listFilesForJob(this.job);
+
+        var previewPanel = this.down('#logs');
+
+        previewPanel.isRefreshRequired(function(refreshRequired, newHash) {
+            if (refreshRequired) {
+                previewPanel.refresh(newHash);
+            }
+        });
     },
 
     updateSubmitTime: function() {

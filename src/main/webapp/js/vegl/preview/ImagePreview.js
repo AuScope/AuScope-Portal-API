@@ -22,7 +22,7 @@ Ext.define('vegl.preview.ImagePreview', {
     /**
      * Reloads this store with all the jobs for the specified series
      */
-    preview : function(job, fileName, size) {
+    preview : function(job, fileName, size, hash) {
         var img = this.getEl().down('img');
         var mask = new Ext.LoadMask({
             msg: 'Loading Image...',
@@ -43,14 +43,17 @@ Ext.define('vegl.preview.ImagePreview', {
         this.job = job;
         this.fileName = fileName;
         this.size = size;
+        this.hash = hash;
     },
 
     /**
      * Removes logs from this panel. Optionally adds a replacement tab indicating this panel is empty
      */
     clearPreview : function(addEmptyTab, emptyTabMsg) {
-        this.currentJob = null;
-        this.currentFile = null;
+        this.job = null;
+        this.fileName = null;
+        this.size = null;
+        this.hash = null;
         this.doLayout();
     }
 });
