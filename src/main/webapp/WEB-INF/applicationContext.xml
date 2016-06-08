@@ -58,8 +58,9 @@
         <property name="maxLengthForSeriesNameInSubject" value="15" />
         <property name="maxLengthForJobNameInSubject" value="15" />
         <property name="maxLinesForTail" value="5" />
-        <property name="emailSender"><value><![CDATA[VGL Admin <noreply-cg-admin@csiro.au>]]></value></property>
-        <property name="emailSubject" value="VGL Job (%s/%s)" />
+        <property name="emailSender" value="${HOST.portalAdminEmail}"/>
+        <property name="emailSubject" value="ANVGL Job (%s)" />
+        <property name="portalUrl" value="${HOST.portalUrl}"/>
     </bean>
     
     <bean name="ANVGLProvenanceService" class="org.auscope.portal.server.web.service.ANVGLProvenanceService" autowire="constructor">

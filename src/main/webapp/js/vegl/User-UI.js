@@ -60,7 +60,7 @@ Ext.application({
                     items: [{
                         xtype: 'panel',
                         title: 'Step 1: Initialising your AWS',
-                        flex: 1,
+                        flex: 0.4,
                         height: '100%',
                         margin: '0 10 0 0',
                         bodyStyle: {
@@ -86,7 +86,7 @@ Ext.application({
                     },{
                         xtype: 'panel',
                         title: 'Step 2: Configuring ANVGL',
-                        flex: 1,
+                        flex: 0.6,
                         height: '100%',
                         margin: '0 0 0 10',
                         bodyStyle: {

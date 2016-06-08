@@ -302,8 +302,8 @@
     }
   },
   "Outputs": {
-    "ComputeARN": {
-      "Description": "ARN for the STS role used to run jobs in the client account.",
+    "AnvglAccessARN": {
+      "Description": "ARN for the role which is used to access the client AWS account.",
       "Value": { "Fn::Join": [
                    "",
                    [
@@ -315,8 +315,8 @@
                  ]
                }
     },
-    "StorageARN": {
-      "Description": "ARN for the role used to access S3 storage in the client account.",
+    "JobInstanceARN": {
+      "Description": "ARN for the instance profile which is used when processing user jobs.",
       "Value": { "Fn::Join": [
                    "",
                    [
