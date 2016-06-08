@@ -339,8 +339,8 @@ Ext.define('vegl.widgets.JobsTree', {
 
     deleteSeries : function(series) {
         var seriesName = series.get('name');
-        var childrenNames = series.get('children').map(function(childNode) {
-            return childNode.name;
+        var childrenNames = series.childNodes.map(function(childNode) {
+            return childNode.get('name');
         });
 
         var message = Ext.util.Format.format('Are you sure you want to delete the folder <b>{0}</b> and its jobs?<br><ul>', seriesName);
@@ -379,6 +379,11 @@ Ext.define('vegl.widgets.JobsTree', {
                                 this.fireEvent('error', this, Ext.util.Format.format('There was an error deleting this series. {0}', responseObj.msg));
                                 return;
                             }
+
+                            Ext.each(series.childNodes, function(jobNode) {
+                                this.jobStore.remove(this.jobStore.getById(jobNode.get('id')));
+                                this.getStore().remove(jobNode);
+                            }, this);
 
                             this.getStore().remove(series);
                             this.fireEvent('refreshDetailsPanel', this, null);
