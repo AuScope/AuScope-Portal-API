@@ -282,7 +282,7 @@ Ext.application({
                                         }
                                         taskExecutionCount++;
                                     },
-                                    interval: 10 * 1000 //60 Seconds
+                                    interval: 60 * 1000 //60 Seconds
                                 });
                             }
                         },
