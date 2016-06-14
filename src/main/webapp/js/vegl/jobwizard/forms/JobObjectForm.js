@@ -24,7 +24,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             model: 'vegl.models.MachineImage',
             proxy: {
                 type: 'ajax',
-                url: 'getVmImagesForComputeService.do',
+                url: 'secure/getVmImagesForComputeService.do',
                 reader: {
                    type: 'json',
                    rootProperty : 'data'
@@ -34,14 +34,13 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             }
         });
-        this.imageStore.load();
 
         // create the store and get the compute type
         this.computeTypeStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.ComputeType',
             proxy: {
                 type: 'ajax',
-                url: 'getVmTypesForComputeService.do',
+                url: 'secure/getVmTypesForComputeService.do',
                 reader: {
                    type: 'json',
                    rootProperty : 'data'
@@ -62,50 +61,18 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 jobWizardActive : function() {
                     //If we have a jobId, load that, OTHERWISE the job will be created later
                     if (jobObjectFrm.wizardState.jobId) {
-                        jobObjectFrm.getForm().load({
-                            url : 'getJobObject.do',
-                            waitMsg : 'Loading Job Object...',
-                            params : {
-                                jobId : jobObjectFrm.wizardState.jobId
-                            },
-                            failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
-                            success : function(frm, action) {
-                                var responseObj = Ext.JSON.decode(action.response.responseText);
-                                if (responseObj.success) {
-                                    //Loads the image store of user selected
-                                    //compute provider
-                                    var jobData = responseObj.data[0];
-                                    frm.setValues(jobData);
-                                    if (!Ext.isEmpty(jobData.computeServiceId)) {
-                                        jobObjectFrm.imageStore.load({
-                                            params : {
-                                                computeServiceId : jobData.computeServiceId,
-                                                jobId: jobData.id
-                                            },
-                                            callback: function(records, operation, success) {
-                                                // Set form values from the jobData, but
-                                                // override {compute,storage}ServiceId since
-                                                // they are now constant values (see
-                                                // ANVGL-35)
-                                                frm.setValues({
-                                                    computeServiceId: 'aws-ec2-compute',
-                                                    storageServiceId: 'amazon-aws-storage-sydney'
-                                                });
-                                            }
-                                        });
-                                    }
-
-                                    // Store the vm type if specified
-                                    // in the job, and solutionId, for later use.
-                                    jobObjectFrm.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
-                                    jobObjectFrm.wizardState.solutionId = jobData.solutionId;
-
-                                    jobObjectFrm.wizardState.jobId = frm.getValues().id;
-
-
+                        jobObjectFrm.handleLoadingJobObject();
+                    } else if (jobObjectFrm.wizardState.solutionId) {
+                        this.imageStore.load({
+                            callback: Ext.bind(function() {
+                                if (this.imageStore.getCount()) {
+                                    var firstImg = this.imageStore.getAt(0);
+                                    this.down('#image-combo').select(firstImg);
                                 }
-                            }
+                            }, this)
                         });
+                    } else {
+                        this.imageStore.load();
                     }
                 }
             },
@@ -153,7 +120,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 queryMode: 'local',
                 triggerAction: 'all',
                 typeAhead: true,
-                forceSelection: true,
+                forceSelection: false,
                 store : this.imageStore,
                 listConfig : {
                     loadingText: 'Getting tools...',
@@ -218,6 +185,97 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             { xtype: 'hidden', name: 'vmSubsetUrl' }
             ]
         }]);
+    },
+
+    handleLoadingJobObject: function() {
+        this.getForm().load({
+            url : 'secure/getJobObject.do',
+            waitMsg : 'Loading Job Object...',
+            params : {
+                jobId : this.wizardState.jobId
+            },
+            scope: this,
+            failure : Ext.bind(this.fireEvent, this, ['jobWizardLoadException']),
+            success : function(frm, action) {
+                var responseObj = Ext.JSON.decode(action.response.responseText);
+                if (responseObj.success) {
+                    //Loads the image store of user selected
+                    //compute provider
+                    var jobData = responseObj.data[0];
+                    frm.setValues(jobData);
+
+                    // Store the vm type if specified
+                    // in the job, and solutionId, for later use.
+                    this.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
+                    this.wizardState.solutionId = jobData.solutionId;
+                    this.wizardState.jobId = frm.getValues().id;
+
+                    //If we have a solution ID but no selected image, preload the image combo
+                    //with the first image sent from the backend
+                    if (Ext.isEmpty(jobData.computeVmId) && !Ext.isEmpty(jobData.solutionId)) {
+                        this.imageStore.getProxy().setExtraParam('jobId', jobData.id);
+                        this.imageStore.load({
+                            callback: Ext.bind(function() {
+                                if (this.imageStore.getCount()) {
+                                    var firstImg = this.imageStore.getAt(0);
+                                    this.down('#image-combo').select(firstImg);
+
+                                    this.handleAutoSelectingImage(jobData.computeServiceId, firstImg.get('imageId'), true);
+                                }
+                            }, this)
+                        });
+                    }
+
+                    if (!Ext.isEmpty(jobData.computeVmId)) {
+                        this.handleAutoSelectingImage(jobData.computeServiceId, jobData.computeVmId);
+                    }
+                }
+            }
+        });
+    },
+
+    /**
+     * We need to handle setting our VM ID's and instance types
+     * but those will need to wait on stores to be loaded (frustrating!)
+     *
+     * forceFinishedUpdating:
+     *      Set to true to ignore the imageStore.updating property and assume it's not updating
+     *
+     *      ANVGL-119 The "load" event in imageStore won't fire if we listen at this point
+     *      even though the "updating" property is set on the store (frustrating!)
+     *      This override allows us to workaround this when calling from an update callback
+     */
+    handleAutoSelectingImage: function(computeServiceId, computeVmId, forceFinishedUpdating) {
+        if (!Ext.isEmpty(computeVmId)) {
+            var jobObjectFrm = this;
+            var whenImagesReady = function() {
+                if (jobObjectFrm.imageStore.getCount() === 0) {
+                    return;
+                }
+
+                jobObjectFrm.computeTypeStore.load({
+                    params : {
+                        computeServiceId : computeServiceId,
+                        machineImageId : computeVmId
+                    },
+                    callback: function() {
+                        jobObjectFrm.preselectVmType();
+                    }
+                });
+            };
+
+
+            if (!forceFinishedUpdating && this.imageStore.updating) {
+                this.imageStore.on('load', whenImagesReady, this, {single: true});
+            } else if (this.imageStore.getCount() === 0) {
+                this.imageStore.getProxy().setExtraParam('jobId', this.wizardState.jobId);
+                this.imageStore.load({
+                    callback: Ext.bind(whenImagesReady, this)
+                });
+            } else {
+                whenImagesReady();
+            }
+        }
     },
 
     /**
@@ -345,7 +403,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
         // update the job here
         Ext.Ajax.request({
-            url : 'updateOrCreateJob.do',
+            url : 'secure/updateOrCreateJob.do',
             params : values,
             callback : function(options, success, response) {
                 if (!success) {
