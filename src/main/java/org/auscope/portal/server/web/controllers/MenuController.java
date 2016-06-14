@@ -52,7 +52,7 @@ public class MenuController {
     */
    private void addGoogleKeys(ModelAndView mav) {
        String googleKey = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
-       String analyticKey = hostConfigurer.resolvePlaceholder("HOST.google.analytics.key");
+        String analyticKey = hostConfigurer.resolvePlaceholder("HOST.google.analytics.key");
 
        mav.addObject("googleKey", googleKey);
        if (analyticKey != null && !analyticKey.isEmpty()) {

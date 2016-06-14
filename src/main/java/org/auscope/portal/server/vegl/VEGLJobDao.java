@@ -8,6 +8,7 @@ import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * A data access object for VEGLJob
@@ -26,9 +27,11 @@ public class VEGLJobDao extends HibernateDaoSupport {
      */
     @SuppressWarnings("unchecked")
     public List<VEGLJob> getJobsOfSeries(final int seriesID, ANVGLUser user) {
+        String[] paramKeys = new String[] {"searchID", "email"};
+        Object[] paramVals = new Object[] {seriesID, user.getEmail()};
         List<VEGLJob> res = (List<VEGLJob>) getHibernateTemplate()
-            .findByNamedParam("from VEGLJob j where j.seriesId=:searchID and lower(j.status)!='deleted'",
-                    "searchID", seriesID);
+            .findByNamedParam("from VEGLJob j where j.seriesId=:searchID and j.emailAddress=:email and lower(j.status)!='deleted'",
+                    paramKeys, paramVals);
         for (VEGLJob job : res) {
             job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
             job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
@@ -60,17 +63,17 @@ public class VEGLJobDao extends HibernateDaoSupport {
     }
 
 
-    /**
-     * Retrieves jobs that belong to a specific email
-     *
-     * @param emailAddress the email whose jobs are to be retrieved
-     */
-    @SuppressWarnings("unchecked")
-    public List<VEGLJob> getJobsByEmail(final String emailAddress) {
-        return (List<VEGLJob>) getHibernateTemplate()
-            .findByNamedParam("from VEGLJob j where j.emailAddress=:email",
-                    "email", emailAddress);
-    }
+//    /**
+//     * Retrieves jobs that belong to a specific email
+//     *
+//     * @param emailAddress the email whose jobs are to be retrieved
+//     */
+//    @SuppressWarnings("unchecked")
+//    public List<VEGLJob> getJobsByEmail(final String emailAddress) {
+//        return (List<VEGLJob>) getHibernateTemplate()
+//            .findByNamedParam("from VEGLJob j where j.emailAddress=:email",
+//                    "email", emailAddress);
+//    }
 
     /**
      * Retrieves jobs that are either pending or active.
@@ -103,10 +106,14 @@ public class VEGLJobDao extends HibernateDaoSupport {
      * @param user
      */
     public VEGLJob get(final int id, ANVGLUser user) {
+        user.setEmail("dummy@dummy.org");
         VEGLJob job = (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
         job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
         job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
         job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
+        if( job.getEmailAddress() == null || user.getEmail()==null || (!job.getEmailAddress().trim().equalsIgnoreCase(user.getEmail().trim()) ))
+            throw new AccessDeniedException("User does not have access to the requested job");
+        
         return job;
     }
 

@@ -58,7 +58,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-
 /**
  * Controller for the job submission view.
  *
@@ -599,15 +598,15 @@ public class JobBuilderController extends BaseCloudController {
     }
 
 
-    /**
-     * Gets the list of authorised images for the specified job owned by user
-     * @param request The request (from a user) making the query
-     * @param job The job for which the images will be tested
-     * @return
-     */
-    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, VEGLJob job) {
-        return getImagesForJobAndUser(request, job.getComputeServiceId());
-    }
+//    /**
+//     * Gets the list of authorised images for the specified job owned by user
+//     * @param request The request (from a user) making the query
+//     * @param job The job for which the images will be tested
+//     * @return
+//     */
+//    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, VEGLJob job) {
+//        return getImagesForJobAndUser(request, job.getComputeServiceId());
+//    }
 
     /**
      * Gets the list of authorised images for the specified job owned by user
