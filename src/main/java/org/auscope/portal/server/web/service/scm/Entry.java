@@ -49,4 +49,18 @@ public class Entry {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public int hashCode() {
+        return uri.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (this == that) return true;
+
+        if (that == null || this.getClass() != that.getClass()) return false;
+
+        return this.uri.equals(((Entry)that).getUri());
+    }
 }

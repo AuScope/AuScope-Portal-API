@@ -752,7 +752,7 @@ public class JobBuilderController extends BaseCloudController {
 
                             // Provenance
                             anvglProvenanceService.setServerURL(request.getRequestURL().toString());
-                            anvglProvenanceService.createActivity(curJob, scmEntryService.getJobSolution(curJob), user);
+                            anvglProvenanceService.createActivity(curJob, scmEntryService.getJobSolutions(curJob), user);
 
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);
@@ -972,16 +972,14 @@ public class JobBuilderController extends BaseCloudController {
         @AuthenticationPrincipal ANVGLUser user) {
         try {
             // Assume all images are usable by the current user
-            List<MachineImage> images = new ArrayList<MachineImage>();
+            List<MachineImage> images;
 
             // Filter list to images suitable for job solution, if specified
             if (jobId != null) {
-                Set<String> vmIds = scmEntryService.getJobImages(jobId, user).get(computeServiceId);
-                if (vmIds != null) {
-                    for (String vmId: vmIds) {
-                        images.add(new MachineImage(vmId));
-                    }
-                }
+                images = new ArrayList<MachineImage>(scmEntryService.getJobImages(jobId, user).get(computeServiceId));
+            }
+            else {
+                images = new ArrayList<MachineImage>();
             }
 
             if (images.isEmpty()) {

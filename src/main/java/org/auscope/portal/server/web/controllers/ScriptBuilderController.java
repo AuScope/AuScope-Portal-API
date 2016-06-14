@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -74,15 +75,11 @@ public class ScriptBuilderController extends BasePortalController {
     @RequestMapping("/secure/saveScript.do")
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
                                    @RequestParam("sourceText") String sourceText,
-                                   @RequestParam("solutionId") String solutionId,
+                                   @RequestParam("solutions") Set<String> solutions,
                                    @AuthenticationPrincipal ANVGLUser user) {
 
         if (sourceText == null || sourceText.trim().isEmpty()) {
             return generateJSONResponseMAV(false, null, "No source text specified");
-        }
-
-        if (StringUtils.isEmpty(solutionId)) {
-            solutionId = null;
         }
 
         try {
@@ -95,11 +92,11 @@ public class ScriptBuilderController extends BasePortalController {
 
         // Update job with vmId for solution if we have one.
         try {
-            scmEntryService.updateJobForSolution(jobId, solutionId, user);
+            scmEntryService.updateJobForSolution(jobId, solutions, user);
         }
         catch (PortalServiceException e) {
-            logger.warn("Failed to update job (" + jobId + ") for solution (" +
-                        solutionId + "): " + e.getMessage());
+            logger.warn("Failed to update job (" + jobId + ") for solutions (" +
+                        solutions + "): " + e.getMessage());
             logger.debug("error: ", e);
             return generateJSONResponseMAV(false, null, "Unable to write script file");
         }

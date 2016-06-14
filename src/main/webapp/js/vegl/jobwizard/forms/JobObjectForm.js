@@ -62,7 +62,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     //If we have a jobId, load that, OTHERWISE the job will be created later
                     if (jobObjectFrm.wizardState.jobId) {
                         jobObjectFrm.handleLoadingJobObject();
-                    } else if (jobObjectFrm.wizardState.solutionId) {
+                    } else if (jobObjectFrm.wizardState.solutions) {
                         this.imageStore.load({
                             callback: Ext.bind(function() {
                                 if (this.imageStore.getCount()) {
@@ -195,12 +195,12 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     // Store the vm type if specified
                     // in the job, and solutionId, for later use.
                     this.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
-                    this.wizardState.solutionId = jobData.solutionId;
+                    this.wizardState.solutions = jobData.jobSolutions;
                     this.wizardState.jobId = frm.getValues().id;
 
                     //If we have a solution ID but no selected image, preload the image combo
                     //with the first image sent from the backend
-                    if (Ext.isEmpty(jobData.computeVmId) && !Ext.isEmpty(jobData.solutionId)) {
+                    if (Ext.isEmpty(jobData.computeVmId) && !Ext.isEmpty(jobData.jobSolutions)) {
                         this.imageStore.getProxy().setExtraParam('jobId', jobData.id);
                         this.imageStore.load({
                             callback: Ext.bind(function() {

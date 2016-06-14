@@ -99,11 +99,9 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         	
             //Once we have the script text - ask the user what they want to do with it
             if (status === ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_SUCCESS) {
-                // Store the selected solution
-                me.setSolution(entry);
-                
                 //If there's nothing in the window - just put text in there
                 if (me.getScript().length === 0) {
+                    me.setSolutions([entry.uri]);
                     me.replaceScript(script);
                 } else {
                     Ext.create('ScriptBuilder.InsertionPromptWindow', {
@@ -112,9 +110,11 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
                             select : function(popup, selection) {
                                 switch(selection) {
                                 case ScriptBuilder.InsertionPromptWindow.OPTION_REPLACE:
+                                    me.setSolutions([entry.uri]);
                                     me.replaceScript(script);
                                     break;
                                 case ScriptBuilder.InsertionPromptWindow.OPTION_INSERT:
+                                    me.addSolution(entry.uri);
                                     me.insertScript(script);
                                     break;
                                 }
@@ -180,48 +180,53 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
     getScript : function() {
         return this.editor.getValue();
     },
-    
-    
+
+
     /**
-     * Get the solutionId (URI)
+     * Return the solution ids.
      * @function
      */
-    getSolutionId: function() {
-        return this.wizardState.solutionId;
+    getSolutions: function() {
+        return this.wizardState.solutions;
     },
 
-    
     /**
-     * Set the solution
+     * Set the solution ids, replacing any existing set of solutions.
      * @function
      */
-    setSolution: function(solution) {
-    	// Store the solution information and select corresponding node
-        this.solution = solution;
-        this.setSolutionId(solution.uri);
+    setSolutions: function(solutions) {
+        this.wizardState.solutions = solutions;
     },
 
-    
     /**
-     * Set the solutionId
+     * Add a solution to the current set in the wizardState.
+     *
+     * Initialises wizardState.solutions as an empty array if it is not already
+     * defined.
+     *
      * @function
      */
-    setSolutionId: function(solutionId) {
-        this.wizardState.solutionId = solutionId;
-        this.selectSolution();
+    addSolution: function(solution) {
+        var solutions = this.wizardState.solutions;
+        if (!Ext.isArray(solutions)) {
+            solutions = [];
+        }
+        this.wizardState.solutions = Ext.Array.merge(solutions, [solution]);
     },
 
-    
+
     /**
      * Select the node corresponding to the current solution
      * @function
      */
     selectSolution: function() {
-        if (!Ext.isEmpty(this.wizardState.solutionId)) {
+        if (!Ext.isEmpty(this.wizardState.solutions)) {
             var solutionChild = this
-                    .componentsPanel
-                    .getRootNode()
-                    .findChild('id', this.wizardState.solutionId, true);
+                .componentsPanel
+                .getRootNode()
+                .findChild('id',
+                           this.wizardState.solutions[this.wizardState.solutions.length - 1],
+                           true);
             if (solutionChild) {
                 this.componentsPanel.selectPath(solutionChild.getPath());
             }

@@ -91,7 +91,7 @@ public class ScmEntryService {
      * @param user Authenticated ANVGLUser 
      * @throws PortalServiceException
      */
-    public void updateJobForSolution(String jobId, String solutionId, ANVGLUser user)
+    public void updateJobForSolution(String jobId, Set<String> solutions, ANVGLUser user)
         throws PortalServiceException {
         //Lookup our job
         VEGLJob job = null;
@@ -104,7 +104,9 @@ public class ScmEntryService {
         }
 
         // Store the solutionId in the job
-        job.setSolutionId(solutionId);
+        for (String solutionId: solutions) {
+            job.addJobSolution(solutionId);
+        }
         try {
             jobManager.saveJob(job);
         } catch (Exception ex) {
@@ -247,22 +249,25 @@ public class ScmEntryService {
     }
 
     /**
-     * Return the Solution object for job (if known).
+     * Return the Solution object(s) for job (if known).
      *
      * @param job VEGLJob object
      * @returns Solution object if job has a solutionId
      */
-    public Solution getJobSolution(VEGLJob job) {
+    public Set<Solution> getJobSolutions(VEGLJob job) {
         Solution solution = null;
+        HashSet<Solution> solutions = new HashSet<Solution>();
 
         if (job != null) {
-            String solutionId = job.getSolutionId();
-            if (solutionId != null) {
-                solution = getScmSolution(solutionId);
+            for (String uri: job.getJobSolutions()) {
+                solution = getScmSolution(uri);
+                if (solution != null) {
+                    solutions.add(solution);
+                }
             }
         }
 
-        return solution;
+        return solutions;
     }
 
     /**
@@ -270,25 +275,27 @@ public class ScmEntryService {
      *
      * @return Map<String, Set<String>> with images for job, or null.
      */
-    public Map<String, Set<String>> getJobImages(Integer jobId, ANVGLUser user) {
+    public Map<String, Set<MachineImage>> getJobImages(Integer jobId, ANVGLUser user) {
         if (jobId == null) {
             return null;
         }
 
-        Map<String, Set<String>> images = new HashMap<String, Set<String>>();
+        Map<String, Set<MachineImage>> images = new HashMap<String, Set<MachineImage>>();
         VEGLJob job = jobManager.getJobById(jobId, user);
         if (job != null) {
-            Solution solution = getJobSolution(job);
-            if (solution != null) {
-                for (Map<String, String> img:
-                         solution.getToolbox(true).getImages()) {
+            for (Solution solution: getJobSolutions(job)) {
+                Toolbox toolbox = solution.getToolbox(true);
+                for (Map<String, String> img: toolbox.getImages()) {
                     String providerId = img.get("provider");
-                    Set<String> vms = images.get(providerId);
+                    Set<MachineImage> vms = images.get(providerId);
                     if (vms == null) {
-                        vms = new HashSet<String>();
+                        vms = new HashSet<MachineImage>();
                         images.put(providerId, vms);
                     }
-                    vms.add(img.get("image_id"));
+                    MachineImage mi = new MachineImage(img.get("image_id"));
+                    mi.setName(toolbox.getName());
+                    mi.setDescription(toolbox.getDescription());
+                    vms.add(mi);
                 }
             }
         }
@@ -302,7 +309,7 @@ public class ScmEntryService {
      * @return Set<String> of compute service ids for job, or null if jobId == null.
      */
     public Set<String> getJobProviders(Integer jobId, ANVGLUser user) {
-        Map<String, Set<String>> images = getJobImages(jobId, user);
+        Map<String, Set<MachineImage>> images = getJobImages(jobId, user);
         if (images != null) {
             return images.keySet();
         }
