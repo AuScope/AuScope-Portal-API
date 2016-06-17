@@ -1,6 +1,7 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -184,6 +185,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
 
         boolean jobStarted = containsFile(results, "workflow-version.txt");
         boolean jobFinished = containsFile(results, JobListController.VL_TERMINATION_FILE);
+        // VM side walltime exceeded
         boolean jobWalltimeExceeded = containsFile(results, "walltime-exceeded.txt");
 
         String expectedStatus = JobBuilderController.STATUS_PENDING;
@@ -193,6 +195,20 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
             expectedStatus = JobBuilderController.STATUS_ACTIVE;
         } else if(jobWalltimeExceeded) {
             expectedStatus = JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+        }
+        
+        // If the walltime has exceeded and the VM side walltime check has
+        // failed to shut the instance down, shut it down
+        if(jobStarted && !jobFinished && !jobWalltimeExceeded 
+                && job.getSubmitDate().getTime() + (job.getWalltime()*60*1000) < new Date().getTime()) {
+            try {
+                CloudComputeService cloudComputeService = getComputeService(job);
+                cloudComputeService.terminateJob(job);
+                return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+            } catch(Exception e) {
+                log.warn("Exception shutting down terminal: " + job.toString(), e);
+                return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+            }
         }
 
         //There is also a possibility that the cloud has had issues booting the VM... lets see what we can dig up

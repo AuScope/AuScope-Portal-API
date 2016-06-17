@@ -67,6 +67,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param fileStorageId The ID of this job that is used for storing input/output files
      * @param vmSubsetFilePath The File path (on the VM) where the job should look for its input subset file
      * @param vmSubsetUrl The URL of the actual input subset file
+     * @param walltime The walltime (in minutes) for the job
      */
     public VEGLJob(Integer id) {
         super(id);
@@ -286,7 +287,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     }
 
     /**
-     * 
+     * The walltime in minutes
      * @return
      */
     public Integer getWalltime() {
@@ -294,7 +295,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     }
 
     /**
-     * 
+     * Set the walltime in minutes
      * @param walltime
      */
     public void setWalltime(Integer walltime) {
@@ -307,8 +308,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
                 + seriesId + ", id=" + id + ", name=" + name + ", description="
                 + description + "]";
     }
-
-
 
 
 }
