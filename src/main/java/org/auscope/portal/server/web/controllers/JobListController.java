@@ -31,7 +31,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -39,6 +38,7 @@ import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusException;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
@@ -48,6 +48,7 @@ import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -82,18 +83,36 @@ public class JobListController extends BaseCloudController  {
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
+    private String adminEmail=null;
+    
+    /**
+     * @return the adminEmail
+     */
+    public String getAdminEmail() {
+        return adminEmail;
+    }
+
+    /**
+     * @param adminEmail the adminEmail to set
+     */
+    public void setAdminEmail(String adminEmail) {
+        this.adminEmail = adminEmail;
+    }
+
     @Autowired
     public JobListController(VEGLJobManager jobManager, CloudStorageService[] cloudStorageServices,
             FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
             VGLJobStatusAndLogReader jobStatusLogReader,
             JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
-            PortalPropertyPlaceholderConfigurer hostConfigurer,VGLPollingJobQueueManager vglPollingJobQueueManager) {
-        super(cloudStorageServices, cloudComputeServices,hostConfigurer);
+            @Value("${vm.sh}") String vmSh,VGLPollingJobQueueManager vglPollingJobQueueManager,
+            @Value("${HOST.portalAdminEmail}") String adminEmail) {
+        super(cloudStorageServices, cloudComputeServices,vmSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.jobStatusLogReader = jobStatusLogReader;
         this.jobStatusMonitor = jobStatusMonitor;
         this.vglPollingJobQueueManager =  vglPollingJobQueueManager;
+        this.adminEmail=adminEmail;
         this.initializeQueue();
     }
 
@@ -364,8 +383,14 @@ public class JobListController extends BaseCloudController  {
             terminateInstance(job);
         } catch (Exception e) {
             logger.error("Failed to cancel the job.", e);
+            String admin = getAdminEmail();
+            if(TextUtil.isNullOrEmpty(admin)) {
+                admin = "the portal admin";
+            }
+            String errorCorrection = "Please try again in a few minutes or report it to "+admin+".";
+
             return generateJSONResponseMAV(false, null, "There was a problem cancelling your job.",
-                    "Please try again in a few minutes or report it to cg-admin@csiro.au.");
+                    errorCorrection);
         }
 
         return generateJSONResponseMAV(true, null, "");
@@ -449,7 +474,7 @@ public class JobListController extends BaseCloudController  {
             } catch (Exception e) {
                 logger.error("Failed to cancel one of the jobs in a given series.", e);
                 return generateJSONResponseMAV(false, null, "There was a problem cancelling one of your jobs in selected series.",
-                        "Please try again in a few minutes or report it to cg-admin@csiro.au.");
+                        "Please try again in a few minutes or report it to "+getAdminEmail()+".");
             }
         }
 

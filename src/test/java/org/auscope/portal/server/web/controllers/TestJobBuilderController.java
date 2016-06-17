@@ -22,7 +22,6 @@ import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -66,7 +65,6 @@ public class TestJobBuilderController {
 
     private VEGLJobManager mockJobManager;
     private CloudStorageService[] mockCloudStorageServices;
-    private PortalPropertyPlaceholderConfigurer mockHostConfigurer;
     private CloudComputeService[] mockCloudComputeServices;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
@@ -82,13 +80,13 @@ public class TestJobBuilderController {
     private ScmEntryService mockScmEntryService;
 
     private JobBuilderController controller;
+    private final String vmSh = "http://example2.org";
 
     @Before
     public void init() {
         //Mock objects required for Object Under Test
         mockJobManager = context.mock(VEGLJobManager.class);
         mockFileStagingService = context.mock(ANVGLFileStagingService.class);
-        mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
         mockPortalUser = context.mock(ANVGLUser.class);
         mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
@@ -105,8 +103,8 @@ public class TestJobBuilderController {
         vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader, mockAnvglProvenanceService);
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
         //Object Under Test
-        controller = new JobBuilderController(mockJobManager, mockFileStagingService,
-        		mockHostConfigurer, mockCloudStorageServices, mockCloudComputeServices,
+        controller = new JobBuilderController("dummy@dummy.com", mockJobManager, mockFileStagingService,
+        		vmSh, mockCloudStorageServices, mockCloudComputeServices,
         		vglJobStatusChangeHandler, vglPollingJobQueueManager, mockScmEntryService, mockAnvglProvenanceService);
     }
 
@@ -676,9 +674,6 @@ public class TestJobBuilderController {
             oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
             inSequence(jobFileSequence);
 
-            //We allow calls to the Configurer which simply extract values from our property file
-            allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
-
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
@@ -918,9 +913,6 @@ public class TestJobBuilderController {
             //We should have 1 call to get our stage in files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
 
-            //We allow calls to the Configurer which simply extract values from our property file
-            allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
-
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
@@ -1034,9 +1026,6 @@ public class TestJobBuilderController {
 
             //We should have 1 call to get our stage in files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(jobObj);will(returnValue(stageInFiles));
-
-            //We allow calls to the Configurer which simply extract values from our property file
-            allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
@@ -1225,7 +1214,6 @@ public class TestJobBuilderController {
         final String computeServiceId = "ccs";
         final String storageServiceId = "css";
         final String endpoint = "http://example.org";
-        final String vmSh = "http://example2.org";
         final String regionName = "region-name";
 
         job.setComputeServiceId(computeServiceId);
@@ -1234,7 +1222,6 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We allow calls to the Configurer which simply extract values from our property file
-            allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
             atLeast(1).of(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             atLeast(1).of(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
             atLeast(1).of(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
@@ -1280,7 +1267,6 @@ public class TestJobBuilderController {
         final String computeServiceId = "ccs";
         final String storageServiceId = "css";
         final String endpoint = "http://example.org";
-        final String vmSh = "http://example2.org";
 
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);
@@ -1288,7 +1274,6 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We allow calls to the Configurer which simply extract values from our property file
-            allowing(mockHostConfigurer).resolvePlaceholder(with(equal("vm.sh")));will(returnValue(vmSh));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(access));
             allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(secret));
@@ -1408,9 +1393,6 @@ public class TestJobBuilderController {
 
             oneOf(mockCloudStorageServices[0]).generateBaseKey(with(any(VEGLJob.class)));will(returnValue(baseKey));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-
-            oneOf(mockHostConfigurer).resolvePlaceholder("storage.provider");will(returnValue(storageProvider));
-            oneOf(mockHostConfigurer).resolvePlaceholder("storage.endpoint");will(returnValue(storageEndpoint));
 
             oneOf(mockFileStagingService).generateStageInDirectory(with(any(VEGLJob.class)));
 
@@ -1547,7 +1529,6 @@ public class TestJobBuilderController {
             oneOf(mockSeries).getId();will(returnValue(newSeriesId));
             oneOf(mockJob).setSeriesId(newSeriesId);
             oneOf(mockJobManager).saveJob(mockJob);
-            oneOf(mockHostConfigurer).resolvePlaceholder("HOST.proms.report.url");will(returnValue(""));
         }});
 
         ModelAndView mav = controller.updateJobSeries(jobId,folderName,mockRequest,mockPortalUser);
