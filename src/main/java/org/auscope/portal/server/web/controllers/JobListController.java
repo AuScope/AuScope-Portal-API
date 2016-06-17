@@ -268,9 +268,14 @@ public class JobListController extends BaseCloudController  {
         }
 
         String oldJobStatus = job.getStatus();
+
+        //Always cleanup our compute resources (if there are any)
+        terminateInstance(job, false);
+
         job.setStatus(JobBuilderController.STATUS_DELETED);
         jobManager.saveJob(job);
         jobManager.createJobAuditTrail(oldJobStatus, job, "Job deleted.");
+
         // Failure here is NOT fatal - it will just result in some
         // residual files in staging directory and S3 cloud storage.
         cleanupDeletedJob(job);
@@ -380,7 +385,7 @@ public class JobListController extends BaseCloudController  {
             }
 
             // terminate the EMI instance
-            terminateInstance(job);
+            terminateInstance(job, true);
         } catch (Exception e) {
             logger.error("Failed to cancel the job.", e);
             String admin = getAdminEmail();
@@ -402,7 +407,7 @@ public class JobListController extends BaseCloudController  {
      * @param request The HttpServletRequest
      * @param job The job linked the to instance that is to be terminated
      */
-    private void terminateInstance(VEGLJob job) {
+    private void terminateInstance(VEGLJob job, boolean includeAuditTrail) {
         String oldJobStatus = job.getStatus();
         if (oldJobStatus.equals(JobBuilderController.STATUS_DONE) ||
                 oldJobStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
@@ -410,16 +415,21 @@ public class JobListController extends BaseCloudController  {
         }else if(oldJobStatus.equals(JobBuilderController.STATUS_INQUEUE)){
             VGLQueueJob dummyQueueJobForRemoval = new VGLQueueJob(null,null,job,"",null);
             vglPollingJobQueueManager.getQueue().remove(dummyQueueJobForRemoval);
-            job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-            jobManager.saveJob(job);
-            jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+
+            if (includeAuditTrail) {
+                job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+                jobManager.saveJob(job);
+                jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+            }
         }else {
             try {
                 // We allow the job to be cancelled and re-submitted regardless
                 // of its termination status.
-                job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-                jobManager.saveJob(job);
-                jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+                if (includeAuditTrail) {
+                    job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+                    jobManager.saveJob(job);
+                    jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+                }
                 CloudComputeService cloudComputeService = getComputeService(job);
                 if (cloudComputeService == null) {
                     logger.error(String.format("No cloud compute service with id '%1$s' for job '%2$s'. Cloud VM cannot be terminated", job.getComputeServiceId(), job.getId()));
@@ -470,7 +480,7 @@ public class JobListController extends BaseCloudController  {
                 }
 
                 // terminate the EMI instance
-                terminateInstance(job);
+                terminateInstance(job, true);
             } catch (Exception e) {
                 logger.error("Failed to cancel one of the jobs in a given series.", e);
                 return generateJSONResponseMAV(false, null, "There was a problem cancelling one of your jobs in selected series.",
