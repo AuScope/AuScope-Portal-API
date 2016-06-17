@@ -199,15 +199,16 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         
         // If the walltime has exceeded and the VM side walltime check has
         // failed to shut the instance down, shut it down
-        if(jobStarted && !jobFinished && !jobWalltimeExceeded 
-                && job.getSubmitDate().getTime() + (job.getWalltime()*60*1000) < new Date().getTime()) {
-            try {
-                CloudComputeService cloudComputeService = getComputeService(job);
-                cloudComputeService.terminateJob(job);
-                return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
-            } catch(Exception e) {
-                log.warn("Exception shutting down terminal: " + job.toString(), e);
-                return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+        if(jobStarted && !jobFinished && job.getWalltime() != 0) {
+            if(job.getSubmitDate().getTime() + (job.getWalltime()*60*1000) < new Date().getTime()) {
+                try {
+                    CloudComputeService cloudComputeService = getComputeService(job);
+                    cloudComputeService.terminateJob(job);
+                    return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+                } catch(Exception e) {
+                    log.warn("Exception shutting down terminal: " + job.toString(), e);
+                    return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+                }
             }
         }
 

@@ -18,7 +18,7 @@
 
     <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
     <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->
-    <bean id="propertyConfigurer" class="org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer">
+    <bean id="propertyConfigurer" class="org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:config.properties</value>
@@ -66,7 +66,7 @@
     <bean name="ANVGLProvenanceService" class="org.auscope.portal.server.web.service.ANVGLProvenanceService" autowire="constructor">
         <constructor-arg name="anvglFileStagingService" ref="fileStagingService"/>
         <constructor-arg name="cloudStorageServices" ref="cloudStorageService-aws-sydney"/>
-        <constructor-arg name="propertyConfigurer" ref="propertyConfigurer"/>
+        <constructor-arg name="promsUrl" value="${HOST.proms.report.url}"/>
     </bean>
     
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
@@ -211,6 +211,7 @@
         <property name="name" value="Amazon Web Services - S3"/>
         <property name="id" value="amazon-aws-storage-sydney"/>
         <property name="bucket" value="anvgl-csiro-"/>
+        <property name="adminEmail" value="${HOST.portalAdminEmail}"/>
         <property name="requireSts" value="${HOST.aws.stsonly}"/>
     </bean>
 

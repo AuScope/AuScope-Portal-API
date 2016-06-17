@@ -18,9 +18,9 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,13 +37,17 @@ public class MenuController {
 
    protected final Log logger = LogFactory.getLog(getClass());
 
-   private PortalPropertyPlaceholderConfigurer hostConfigurer;
    private String buildStamp;
 
+   private String googleMapKey;
+
+   private String googleAnalyticsKey;
+
    @Autowired
-   public MenuController(PortalPropertyPlaceholderConfigurer hostConfigurer) {
-       this.hostConfigurer = hostConfigurer;
+   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey, @Value("${HOST.google.analytics.key:''}") String googleAnalyticsKey) {
        this.buildStamp = null;
+       this.googleMapKey = googleMapKey;
+       this.googleAnalyticsKey = googleAnalyticsKey;
    }
 
    /**
@@ -51,12 +55,9 @@ public class MenuController {
     * @param mav
     */
    private void addGoogleKeys(ModelAndView mav) {
-       String googleKey = hostConfigurer.resolvePlaceholder("HOST.googlemap.key");
-       String analyticKey = hostConfigurer.resolvePlaceholder("HOST.google.analytics.key");
-
-       mav.addObject("googleKey", googleKey);
-       if (analyticKey != null && !analyticKey.isEmpty()) {
-           mav.addObject("analyticKey", analyticKey);
+       mav.addObject("googleKey", googleMapKey);
+       if (googleAnalyticsKey != null && !googleAnalyticsKey.isEmpty()) {
+           mav.addObject("analyticKey", googleAnalyticsKey);
        }
    }
 

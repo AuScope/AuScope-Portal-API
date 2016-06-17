@@ -27,12 +27,12 @@ import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -47,6 +47,7 @@ import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -78,6 +79,22 @@ public class JobBuilderController extends BaseCloudController {
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
     private ScmEntryService scmEntryService;
     private ANVGLProvenanceService anvglProvenanceService;
+    private String adminEmail = null;
+    
+    /**
+     * @return the adminEmail
+     */
+    public String getAdminEmail() {
+        return adminEmail;
+    }
+
+
+    /**
+     * @param adminEmail the adminEmail to set
+     */
+    public void setAdminEmail(String adminEmail) {
+        this.adminEmail = adminEmail;
+    }
 
     public static final String STATUS_PENDING = "Pending";//VT:Request accepted by compute service
     public static final String STATUS_ACTIVE = "Active";//VT:Running
@@ -94,15 +111,15 @@ public class JobBuilderController extends BaseCloudController {
     public static final String DOWNLOAD_SCRIPT = "vl-download.sh";
     VGLJobStatusChangeHandler vglJobStatusChangeHandler;
 
-
-
     @Autowired
-    public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
-            PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService[] cloudStorageServices,
+    public JobBuilderController(@Value("${HOST.portalAdminEmail}") String adminEmail,
+            VEGLJobManager jobManager, FileStagingService fileStagingService,
+            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
+            CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             VGLPollingJobQueueManager vglPollingJobQueueManager, ScmEntryService scmEntryService,
             ANVGLProvenanceService anvglProvenanceService) {
-        super(cloudStorageServices, cloudComputeServices,hostConfigurer);
+        super(cloudStorageServices, cloudComputeServices,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
@@ -111,6 +128,7 @@ public class JobBuilderController extends BaseCloudController {
         this.vglPollingJobQueueManager = vglPollingJobQueueManager;
         this.scmEntryService = scmEntryService;
         this.anvglProvenanceService = anvglProvenanceService;
+        this.adminEmail=adminEmail;
     }
 
 
@@ -673,7 +691,11 @@ public class JobBuilderController extends BaseCloudController {
             if (curJob == null) {
                 logger.error("Error fetching job with id " + jobId);
                 errorDescription = "There was a problem retrieving your job from the database.";
-                errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
+                String admin = getAdminEmail();
+                if(TextUtil.isNullOrEmpty(admin)) {
+                    admin = "the portal admin";
+                }
+                errorCorrection = "Please try again in a few minutes or report it to "+admin+".";
                 return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
             } else {
 
@@ -707,7 +729,11 @@ public class JobBuilderController extends BaseCloudController {
                     if (!createDownloadScriptFile(curJob, DOWNLOAD_SCRIPT)) {
                         logger.error(String.format("Error creating download script '%1$s' for job with id %2$s", DOWNLOAD_SCRIPT, jobId));
                         errorDescription = "There was a problem configuring the data download script.";
-                        errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
+                        String admin = getAdminEmail();
+                        if(TextUtil.isNullOrEmpty(admin)) {
+                            admin = "the portal admin";
+                        }
+                        errorCorrection = "Please try again in a few minutes or report it to "+admin+".";
                     } else {
                         // copy files to S3 storage for processing
                         // get job files from local directory
@@ -744,7 +770,11 @@ public class JobBuilderController extends BaseCloudController {
                     }
                 } else {
                     errorDescription = "You do not have the permission to submit this job for processing.";
-                    errorCorrection = "If you think this is wrong, please report it to cg-admin@csiro.au.";
+                    String admin = getAdminEmail();
+                    if(TextUtil.isNullOrEmpty(admin)) {
+                        admin = "the portal admin";
+                    }
+                    errorCorrection = "If you think this is wrong, please report it to "+admin+".";
                 }
             }
         } catch (PortalServiceException e) {
