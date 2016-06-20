@@ -50,7 +50,7 @@ Ext.define('vegl.widgets.JobsTree', {
             handler: function() {
                 var selection = this.getSelectionModel().getSelection();
                 if (selection.length > 0) {
-                    if (Ext.isNumber(selection[0].get('id'))) {
+                    if (selection[0].get('leaf')) {
                         this.deleteJob(selection[0]);
                     } else {
                         this.deleteSeries(selection[0]);
@@ -239,7 +239,7 @@ Ext.define('vegl.widgets.JobsTree', {
             switch(selections[0].get('status')) {
                 case vegl.models.Job.STATUS_ACTIVE:
                     this.cancelJobAction.setDisabled(false);
-                    this.deleteJobAction.setDisabled(true);
+                    this.deleteJobAction.setDisabled(false);
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
@@ -262,7 +262,7 @@ Ext.define('vegl.widgets.JobsTree', {
                 default:
                     // Job status is STATUS_PENDING
                     this.cancelJobAction.setDisabled(false);
-                    this.deleteJobAction.setDisabled(true);
+                    this.deleteJobAction.setDisabled(false);
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
@@ -338,9 +338,20 @@ Ext.define('vegl.widgets.JobsTree', {
     },
 
     deleteSeries : function(series) {
+        var seriesName = series.get('name');
+        var childrenNames = series.childNodes.map(function(childNode) {
+            return childNode.get('name');
+        });
+
+        var message = Ext.util.Format.format('Are you sure you want to delete the folder <b>{0}</b> and its jobs?<br><ul>', seriesName);
+        Ext.each(childrenNames, function(name) {
+            message += Ext.util.Format.format('<li><i>{0}</i></li>', name);
+        });
+        message += '</ul>';
+
         Ext.Msg.show({
-            title: 'Delete Job',
-            msg: 'Are you sure you want to delete the selected folder and ALL of it\'s jobs?',
+            title: 'Delete Folder',
+            msg: message,
             buttons: Ext.Msg.YESNO,
             icon: Ext.Msg.WARNING,
             modal: true,
@@ -369,6 +380,11 @@ Ext.define('vegl.widgets.JobsTree', {
                                 return;
                             }
 
+                            Ext.each(series.childNodes, function(jobNode) {
+                                this.jobStore.remove(this.jobStore.getById(jobNode.get('id')));
+                                this.getStore().remove(jobNode);
+                            }, this);
+
                             this.getStore().remove(series);
                             this.fireEvent('refreshDetailsPanel', this, null);
                         }
@@ -381,7 +397,7 @@ Ext.define('vegl.widgets.JobsTree', {
     deleteJob : function(job) {
         Ext.Msg.show({
             title: 'Delete Job',
-            msg: 'Are you sure you want to delete the selected job?',
+            msg: Ext.util.Format.format('Are you sure you want to delete the job <b>{0}</b>?', job.get('name')),
             buttons: Ext.Msg.YESNO,
             icon: Ext.Msg.WARNING,
             modal: true,

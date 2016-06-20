@@ -1,6 +1,5 @@
 package org.auscope.portal.server.web.service;
 
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.admin.AdminService;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
@@ -18,13 +17,11 @@ public class VglAdminService extends AdminService {
     /** The compute service for running images*/
     private CloudComputeService[] cloudComputeServices;
     /** Used for looking up some config (this service is dependent on some configuration options */
-    private PortalPropertyPlaceholderConfigurer hostConfigurer;
 
     @Autowired
-    public VglAdminService(HttpServiceCaller serviceCaller, CloudComputeService[] cloudComputeServices, PortalPropertyPlaceholderConfigurer hostConfigurer) {
+    public VglAdminService(HttpServiceCaller serviceCaller, CloudComputeService[] cloudComputeServices) {
         super(serviceCaller);
         this.cloudComputeServices = cloudComputeServices;
-        this.hostConfigurer = hostConfigurer;
     }
 
     /**

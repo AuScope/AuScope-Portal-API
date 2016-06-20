@@ -19,7 +19,6 @@ import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -27,6 +26,7 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -48,7 +48,6 @@ import au.csiro.promsclient.ServiceEntity;
  */
 @Service
 public class ANVGLProvenanceService {
-    public static final String HOST_PROMS_REPORT_URL = "HOST.proms.report.url";
     /** Logger for this class. */
     private static final Log LOGGER = LogFactory.getLog(ANVGLProvenanceService.class);
     /** Default name for the half-baked provenance uploaded to the cloud. */
@@ -92,10 +91,10 @@ public class ANVGLProvenanceService {
     @Autowired
     public ANVGLProvenanceService(final ANVGLFileStagingService anvglFileStagingService,
             final CloudStorageService[] cloudStorageServices,
-            final PortalPropertyPlaceholderConfigurer propertyConfigurer) {
+            @Value("${HOST.proms.report.url}") String promsUrl) {
         this.anvglFileStagingService = anvglFileStagingService;
         this.cloudStorageServices = cloudStorageServices;
-        this.promsUrl = propertyConfigurer.resolvePlaceholder(HOST_PROMS_REPORT_URL);
+        this.promsUrl = promsUrl;
         try {
             this.PROMSService = new URI(promsUrl);
         } catch (URISyntaxException e) {

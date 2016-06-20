@@ -12,10 +12,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -28,6 +24,9 @@ import org.junit.Test;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.AbstractView;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 /**
  * User: Mathew Wyatt
@@ -42,9 +41,6 @@ public class TestCSWCacheController extends PortalTestClass {
 
     /** The mock csw service. */
     private CSWCacheService mockCSWService = context.mock(CSWCacheService.class);
-
-    /** The mock property configurer. */
-    private PortalPropertyPlaceholderConfigurer mockPropertyConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
 
     /** The mock http request. */
     private HttpServletRequest mockHttpRequest = context.mock(HttpServletRequest.class);
@@ -74,13 +70,11 @@ public class TestCSWCacheController extends PortalTestClass {
      */
     @Before
     public void setUp() throws Exception {
-        final String serviceUrl = "somejunk";
-
         context.checking(new Expectations() {{
             oneOf(mockCSWService).updateCache();
         }});
 
-        cswController = new CSWCacheController(mockCSWService, mockViewCSWRecordFactory, mockViewKnownLayerFactory, mockPropertyConfigurer);
+        cswController = new CSWCacheController(mockCSWService, mockViewCSWRecordFactory, mockViewKnownLayerFactory);
     }
 
     /**

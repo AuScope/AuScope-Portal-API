@@ -18,6 +18,19 @@
     <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"/>
+    
+    <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
+    <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->
+    <bean id="propertyConfigurer" class="org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:config.properties</value>
+                <!--  Spring SpEL magic - use context parameter or the default war env.properties -->
+                <value>#{contextParameters['envPropertiesLocation'] ?: 'classpath:env.properties'}</value>
+            </list>
+        </property>
+<!--         <property name="ignoreUnresolvablePlaceholders" value="true" />
+ -->    </bean>
 
 	 <mvc:annotation-driven>
     	<mvc:argument-resolvers>
