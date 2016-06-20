@@ -166,15 +166,30 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }]
             },
             {
+                xtype: 'checkbox',
+                fieldLabel: 'Set Job Walltime',
+                name: 'setJobWalltime',
+                checked: false,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select to add an optional walltime (minutes) for your job.'
+                }],
+                listeners: {
+	                change: function(cb, checked) {
+	                	Ext.getCmp('walltime').setDisabled(!checked);
+	                	if(!checked)
+	                		Ext.getCmp('walltime').setValue('0');
+	                }
+                }
+            },
+            {
             	xtype: 'textfield',
                 name: 'walltime',
                 itemId : 'walltime',
+                id: 'walltime',
+                disabled: true,
                 fieldLabel: 'Walltime',
                 maskRe:/[\d]/,
-                plugins: [{
-                    ptype: 'fieldhelptext',
-                    text: 'Enter an optional walltime (minutes) for your job here.'
-                }],
                 allowBlank: true 
             },
             { xtype: 'hidden', name: 'id' },
@@ -468,6 +483,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         var description = this.getComponent('description');
         var toolbox = this.getComponent('image-combo');
         var emailNotification = this.getComponent('emailNotification');
+        var setJobWalltime = this.getComponent('setJobWalltime');
         var walltime = this.getComponent('walltime');
 
         return [Ext.create('portal.util.help.Instruction', {
@@ -491,10 +507,15 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             anchor : 'bottom',
             description : 'The VL will send out email notification to your email address upon job completion. Untick the checkbox if you don\'t want to receive the notification.'
         }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : setJobWalltime.getEl(),
+            title : 'Set job walltime',
+            anchor : 'bottom',
+            description : 'If you would like the job to terminate after a set period, check this box and enter a value in the textfield below.'
+        }), Ext.create('portal.util.help.Instruction', {
             highlightEl : walltime.getEl(),
             title : 'Walltime',
             anchor : 'bottom',
-            description : 'If you would like your job to terminate after a specific length of time, enter the walltime (minutes) here.'
+            description : 'If you would like your job to terminate after a set period, enter the walltime (in minutes) here.'
         })];
     }
 });
