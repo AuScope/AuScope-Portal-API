@@ -48,8 +48,11 @@ import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+<<<<<<< HEAD
 import org.springframework.security.access.AccessDeniedException;
+=======
 import org.springframework.beans.factory.annotation.Value;
+>>>>>>> upstream/master
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -207,7 +210,7 @@ public class JobListController extends BaseCloudController  {
         //Attempt to fetch our job
         if (seriesId != null) {
             try {
-                series = jobManager.getSeriesById(seriesId.intValue(), user.getEmail());
+                series = jobManager.getSeriesById(seriesId.intValue());
             } catch (Exception ex) {
                 logger.error(String.format("Exception when accessing jobManager for series id '%1$s'", seriesId), ex);
                 return null;
@@ -228,29 +231,29 @@ public class JobListController extends BaseCloudController  {
         return series;
     }
 
-//    /**
-//     * Returns a JSON object containing a list of the current user's series.
-//     *
-//     * @param request The servlet request
-//     * @param response The servlet response
-//     *
-//     * @return A JSON object with a series attribute which is an array of
-//     *         VEGLSeries objects.
-//     */
-//    @RequestMapping("/secure/mySeries.do")
-//    public ModelAndView mySeries(HttpServletRequest request,
-//            HttpServletResponse response,
-//            @AuthenticationPrincipal ANVGLUser user) {
-//
-//        if (user == null || user.getEmail() == null) {
-//            logger.warn("No email attached to session");
-//            return generateJSONResponseMAV(false, null, "No email attached to session");
-//        }
-//        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), null, null);
-//
-//        logger.debug("Returning " + series);
-//        return generateJSONResponseMAV(true, series, "");
-//    }
+    /**
+     * Returns a JSON object containing a list of the current user's series.
+     *
+     * @param request The servlet request
+     * @param response The servlet response
+     *
+     * @return A JSON object with a series attribute which is an array of
+     *         VEGLSeries objects.
+     */
+    @RequestMapping("/secure/mySeries.do")
+    public ModelAndView mySeries(HttpServletRequest request,
+            HttpServletResponse response,
+            @AuthenticationPrincipal ANVGLUser user) {
+
+        if (user == null || user.getEmail() == null) {
+            logger.warn("No email attached to session");
+            return generateJSONResponseMAV(false, null, "No email attached to session");
+        }
+        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), null, null);
+
+        logger.debug("Returning " + series);
+        return generateJSONResponseMAV(true, series, "");
+    }
 
     /**
      * Delete the job given by its reference.
@@ -423,18 +426,18 @@ public class JobListController extends BaseCloudController  {
             vglPollingJobQueueManager.getQueue().remove(dummyQueueJobForRemoval);
 
             if (includeAuditTrail) {
-            job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-            jobManager.saveJob(job);
-            jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+                job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+                jobManager.saveJob(job);
+                jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
             }
         }else {
             try {
                 // We allow the job to be cancelled and re-submitted regardless
                 // of its termination status.
                 if (includeAuditTrail) {
-                job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-                jobManager.saveJob(job);
-                jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+                    job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+                    jobManager.saveJob(job);
+                    jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
                 }
                 CloudComputeService cloudComputeService = getComputeService(job);
                 if (cloudComputeService == null) {
@@ -830,7 +833,7 @@ public class JobListController extends BaseCloudController  {
 
         //We allow a null series ID
         if (seriesId != null) {
-            VEGLSeries series = jobManager.getSeriesById(seriesId, user.getEmail());
+            VEGLSeries series = jobManager.getSeriesById(seriesId);
             if (!series.getUser().equals(user.getEmail())) {
                 return generateJSONResponseMAV(false);
             }

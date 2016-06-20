@@ -71,7 +71,7 @@ public class TestGeonetworkController {
     @Test
     public void testGetUserSignature() {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
-        final HttpSession mockSession = context.mock(HttpSession.class);
+//        final HttpSession mockSession = context.mock(HttpSession.class);
         final String userEmail = "user@test.au";
         final VGLSignature userSignature = new VGLSignature(1, userEmail);
 
@@ -93,7 +93,7 @@ public class TestGeonetworkController {
     @Test
     public void testGetUserSignatureDNE() {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
-        final HttpSession mockSession = context.mock(HttpSession.class);
+//        final HttpSession mockSession = context.mock(HttpSession.class);
         final String userEmail = "user@test.org";
 
         context.checking(new Expectations() {{
@@ -114,7 +114,7 @@ public class TestGeonetworkController {
     @Test
     public void testGetUserSignatureSessionExpired() {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
-        final HttpSession mockSession = context.mock(HttpSession.class);
+//        final HttpSession mockSession = context.mock(HttpSession.class);
 
         context.checking(new Expectations() {{
 
@@ -178,7 +178,7 @@ public class TestGeonetworkController {
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, "email@address");will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
@@ -264,7 +264,7 @@ public class TestGeonetworkController {
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
+            oneOf(mockJobManager).getSeriesById(seriesId, "email@address");will(returnValue(null));
         }});
 
         ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
@@ -283,7 +283,7 @@ public class TestGeonetworkController {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
-        final HttpSession mockSession = context.mock(HttpSession.class);
+//        final HttpSession mockSession = context.mock(HttpSession.class);
         final String userEmail = "user@test.au";
         final VGLSignature userSignature = new VGLSignature(1, userEmail);
 
@@ -314,7 +314,7 @@ public class TestGeonetworkController {
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, "user@test.au");will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
@@ -382,7 +382,7 @@ public class TestGeonetworkController {
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, "email@address");will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));

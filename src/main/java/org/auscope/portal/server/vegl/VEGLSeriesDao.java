@@ -1,13 +1,13 @@
 package org.auscope.portal.server.vegl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.core.cloud.CloudJob;
-import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * A Hibernate-backed VEGLSeries data object
@@ -24,46 +24,42 @@ public class VEGLSeriesDao extends HibernateDaoSupport {
      */
     public List<VEGLSeries> query(final String user, final String name,
                                  final String desc) {
-        String queryString = "from VEGLSeries s where";
-        boolean first = true;
-
-        if (StringUtils.isNotEmpty(user)) {
-            queryString += " s.user = '" + user + "'";
-            first = false;
-        }
-
+        String queryString = "from VEGLSeries s where s.emailAddress=:email";
+        ArrayList<String> paramKeys = new ArrayList<>();
+        ArrayList<Object> paramVals = new ArrayList<>();
+        
+        paramKeys.add("email");
+        paramVals.add(user);
+        
         if (StringUtils.isNotEmpty(name)) {
-            if (!first) {
-                queryString += " and";
-            }
-
-            queryString += " s.name like '%"+name+"%'";
-            first = false;
-        }
+            queryString += " and s.name like '%:name%'";
+            paramKeys.add("name");
+            paramVals.add(name);
+        }   
 
         if (StringUtils.isNotEmpty(desc)) {
-            if (!first) {
-                queryString += " and";
-            }
-
-            queryString += " s.description like '%"+desc+"%'";
-            first = false;
+            queryString += " and s.description like '%:desc%'";
+            paramKeys.add("desc");
+            paramVals.add(name);
         }
 
-        if (first) {
-            logger.warn("All parameters were null!");
-            return null;
-        }
-
-        return (List<VEGLSeries>) getHibernateTemplate().find(queryString);
+        @SuppressWarnings("unchecked")
+        List<VEGLSeries> res = (List<VEGLSeries>) getHibernateTemplate()
+                .findByNamedParam(queryString,
+                        paramKeys.toArray(new String[0]), paramVals.toArray());
+        return res;
     }
 
     /**
      * Retrieves the series with given ID.
      * @param user 
      */
-    public VEGLSeries get(final int id) {
-        return (VEGLSeries) getHibernateTemplate().get(VEGLSeries.class, id);
+    public VEGLSeries get(final int id, String userEmail) {
+        VEGLSeries res = (VEGLSeries) getHibernateTemplate().get(VEGLSeries.class, id);
+        if( (res!=null) && (! res.getUser().equalsIgnoreCase(userEmail))) {
+            throw new AccessDeniedException("User not authorized to access series: "+id);
+        }
+        return res;
     }
 
     /**

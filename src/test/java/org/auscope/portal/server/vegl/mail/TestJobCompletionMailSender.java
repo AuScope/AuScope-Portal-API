@@ -136,7 +136,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         final String jobStatus="Done";
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, user);will(returnValue(mockSeries));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
 
             oneOf(mockSeries).getName();will(returnValue(seriesName));
@@ -179,7 +179,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         final String jobStatus="Done";
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, user);will(returnValue(mockSeries));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
 
             oneOf(mockSeries).getName();will(returnValue(seriesName));

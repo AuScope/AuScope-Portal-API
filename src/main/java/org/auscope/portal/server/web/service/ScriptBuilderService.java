@@ -15,8 +15,12 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * A service class for providing functionality for saving 'scripts' against a particular job.
@@ -60,6 +64,8 @@ public class ScriptBuilderService {
         VEGLJob job = null;
         try {
             job = jobManager.getJobById(Integer.parseInt(jobId), user);
+        } catch (AccessDeniedException e) {
+            throw e;
         } catch (Exception ex) {
             logger.warn("Unable to lookup job with id " + jobId + ": " + ex.getMessage());
             logger.debug("exception:", ex);
@@ -103,6 +109,8 @@ public class ScriptBuilderService {
                 script = FileIOUtil.convertStreamtoString(is);
             }
             return script;
+        } catch (AccessDeniedException e) {
+            throw e;
         } catch (Exception ex) {
             logger.error("Error loading script.", ex);
             throw new PortalServiceException("There was a problem loading your script.", "Please report this error to cg_admin@csiro.au");
@@ -121,4 +129,11 @@ public class ScriptBuilderService {
     public String populateTemplate(String templateText, Map<String, Object> values) {
         return StrSubstitutor.replace(templateText, values);
     }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
+    public @ResponseBody String handleException(AccessDeniedException e) {
+        return e.getMessage();
+    }
+
 }

@@ -794,11 +794,15 @@ public class JobBuilderController extends BaseCloudController {
         } catch (IOException e) {
             logger.error("Job bootstrap creation failed.", e);
             errorDescription = "There was a problem creating startup script.";
-            errorCorrection = "Please report this error to cg_admin@csiro.au";
+            errorCorrection = "Please report this error to "+getAdminEmail();
+        } catch (AccessDeniedException e) {
+            logger.error("Job submission failed.", e);
+            errorDescription = "You are not authorized to access the specified job with id: "+ curJob.getId();
+            errorCorrection = "Please report this error to "+getAdminEmail();
         } catch (Exception e) {
             logger.error("Job submission failed.", e);
             errorDescription = "An unexpected error has occurred while submitting your job for processing.";
-            errorCorrection = "Please report this error to cg_admin@csiro.au";
+            errorCorrection = "Please report this error to "+getAdminEmail();
         }
 
         if (succeeded) {
@@ -1079,9 +1083,13 @@ public class JobBuilderController extends BaseCloudController {
                                                          required=false)
                                            Integer jobId,
                                            @AuthenticationPrincipal ANVGLUser user) {
-
-        Set<String> jobCCSIds = scmEntryService.getJobProviders(jobId, user);
-
+        Set<String> jobCCSIds;
+        try {
+            jobCCSIds = scmEntryService.getJobProviders(jobId, user);
+        } catch (AccessDeniedException e) {
+            throw e;
+        }   
+        
         List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();
 
         for (CloudComputeService ccs : cloudComputeServices) {

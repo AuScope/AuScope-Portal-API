@@ -252,7 +252,7 @@ public class JobCompletionMailSender implements JobMailSender {
         String seriesName = "";
         
         if (job.getSeriesId() != 0) { 
-            VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
+            VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId(), job.getEmailAddress());
             if (jobSeries != null) {
                 seriesName = jobSeries.getName();
 
