@@ -48,13 +48,17 @@ import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -412,6 +416,8 @@ public class JobBuilderController extends BaseCloudController {
             } else {
                 job = jobManager.getJobById(id, user);
             }
+        } catch (AccessDeniedException e) {
+            throw e;  
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
@@ -493,6 +499,8 @@ public class JobBuilderController extends BaseCloudController {
 
         try {
             job = jobManager.getJobById(id, user);
+        } catch (AccessDeniedException e) {
+            throw e;  
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
@@ -550,6 +558,8 @@ public class JobBuilderController extends BaseCloudController {
         VEGLJob job;
         try {
             job = jobManager.getJobById(id, user);
+        } catch (AccessDeniedException e) {
+          throw e;  
         } catch (Exception ex) {
             logger.error("Error looking up job with id " + id + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
@@ -775,7 +785,7 @@ public class JobBuilderController extends BaseCloudController {
         VEGLJob curJob;
         String userDataString;
 
-        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString ){
+        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString){
             this.cloudComputeService = cloudComputeService;
             this.curJob = curJob;
             this.userDataString = userDataString;
@@ -1121,6 +1131,12 @@ public class JobBuilderController extends BaseCloudController {
         allInputs.addAll(job.getJobDownloads());
 
         return generateJSONResponseMAV(true, allInputs, "");
+    }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
+    public @ResponseBody String handleException(AccessDeniedException e) {
+        return e.getMessage();
     }
 
 }

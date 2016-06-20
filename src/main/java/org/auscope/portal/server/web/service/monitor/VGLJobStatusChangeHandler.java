@@ -31,7 +31,6 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
     private VGLJobStatusAndLogReader jobStatusLogReader;
     private ANVGLProvenanceService anvglProvenanceService;
 
-
     public VGLJobStatusChangeHandler(VEGLJobManager jobManager,
             JobMailSender jobMailSender, VGLJobStatusAndLogReader jobStatusLogReader,
             ANVGLProvenanceService anvglProvenanceService) {

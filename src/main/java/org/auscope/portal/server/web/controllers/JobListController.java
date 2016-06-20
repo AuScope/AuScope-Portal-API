@@ -780,8 +780,15 @@ public class JobListController extends BaseCloudController  {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-
-        VEGLJob job = jobManager.getJobById(jobId, user);
+        VEGLJob job;
+        try {
+            job = jobManager.getJobById(jobId, user);
+        } catch (AccessDeniedException e) {
+            throw e;
+        } catch (Exception e) {
+            return generateJSONResponseMAV(false);
+        }
+        
         if (job == null || !job.getEmailAddress().equals(user.getEmail())) {
             return generateJSONResponseMAV(false);
         }
@@ -1007,7 +1014,13 @@ public class JobListController extends BaseCloudController  {
         logger.info("Duplicate a new job from job ID "+ jobId);
 
         //Lookup the job we are cloning
-        VEGLJob oldJob = attemptGetJob(jobId, user);
+        VEGLJob oldJob;
+        try {
+             oldJob = attemptGetJob(jobId, user);
+        } catch (AccessDeniedException e) {
+            throw e;
+        }
+        
         if (oldJob == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job to duplicate.");
         }
