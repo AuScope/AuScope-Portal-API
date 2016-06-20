@@ -24,7 +24,7 @@ public class VEGLSeriesDao extends HibernateDaoSupport {
      */
     public List<VEGLSeries> query(final String user, final String name,
                                  final String desc) {
-        String queryString = "from VEGLSeries s where s.emailAddress=:email";
+        String queryString = "from VEGLSeries s where s.user=:email";
         ArrayList<String> paramKeys = new ArrayList<>();
         ArrayList<Object> paramVals = new ArrayList<>();
         
