@@ -423,18 +423,18 @@ public class JobListController extends BaseCloudController  {
             vglPollingJobQueueManager.getQueue().remove(dummyQueueJobForRemoval);
 
             if (includeAuditTrail) {
-            job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-            jobManager.saveJob(job);
-            jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+                job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+                jobManager.saveJob(job);
+                jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
             }
         }else {
             try {
                 // We allow the job to be cancelled and re-submitted regardless
                 // of its termination status.
                 if (includeAuditTrail) {
-                job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-                jobManager.saveJob(job);
-                jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+                    job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+                    jobManager.saveJob(job);
+                    jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
                 }
                 CloudComputeService cloudComputeService = getComputeService(job);
                 if (cloudComputeService == null) {
