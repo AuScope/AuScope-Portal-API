@@ -177,8 +177,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 listeners: {
 	                change: function(cb, checked) {
 	                	Ext.getCmp('walltime').setDisabled(!checked);
-	                	if(!checked)
-	                		Ext.getCmp('walltime').setValue('0');
+	                	//if(!checked)
+	                	//	Ext.getCmp('walltime').setValue('0');
 	                }
                 }
             },
@@ -415,7 +415,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         values.jobId = jobObjectFrm.wizardState.jobId;
         values.storageServiceId = "amazon-aws-storage-sydney";
         values.computeServiceId = "aws-ec2-compute";
-
+        
         // update the job here
         Ext.Ajax.request({
             url : 'secure/updateOrCreateJob.do',
