@@ -6,12 +6,12 @@ import java.text.MessageFormat;
 
 import org.apache.commons.io.IOUtils;
 import org.auscope.portal.core.cloud.CloudJob;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Methods and variables common to any controller wishing to access
@@ -25,8 +25,8 @@ public abstract class BaseCloudController extends BasePortalController {
     protected CloudStorageService[] cloudStorageServices;
     /** All cloud compute services that are available to this controller */
     protected CloudComputeService[] cloudComputeServices;
+    private String vmSh;
 
-    protected PortalPropertyPlaceholderConfigurer hostConfigurer;
 
     /**
      * @param cloudStorageServices All cloud storage services that are available to this controller
@@ -36,13 +36,14 @@ public abstract class BaseCloudController extends BasePortalController {
         this(cloudStorageServices,cloudComputeServices,null);
     }
 
-
-    public BaseCloudController(CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices,PortalPropertyPlaceholderConfigurer hostConfigurer) {
+    public BaseCloudController(CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices,
+            @Value("${vm.sh}") String vmSh) {
         super();
         this.cloudComputeServices = cloudComputeServices;
         this.cloudStorageServices = cloudStorageServices;
-        this.hostConfigurer=hostConfigurer;
+        this.vmSh=vmSh;
     }
+
 
     /**
      * Lookup a cloud storage service by ID. Returns null if the service DNE
@@ -134,7 +135,7 @@ public abstract class BaseCloudController extends BasePortalController {
                 job.getStorageBaseKey().replace("//", "/"), // STORAGE_BASE_KEY_PATH
                 useSts ? "" : cloudStorageService.getAccessKey(), // STORAGE_ACCESS_KEY
                 useSts ? "" : cloudStorageService.getSecretKey(), // STORAGE_SECRET_KEY
-                hostConfigurer.resolvePlaceholder("vm.sh"), // WORKFLOW_URL
+                vmSh, // WORKFLOW_URL
                 cloudStorageService.getEndpoint(), // STORAGE_ENDPOINT
                 cloudStorageService.getProvider(), // STORAGE_TYPE
                 cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion(), // STORAGE_AUTH_VERSION

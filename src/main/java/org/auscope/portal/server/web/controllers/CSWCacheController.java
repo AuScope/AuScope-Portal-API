@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.server.controllers.BaseCSWController;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
@@ -32,8 +31,7 @@ public class CSWCacheController extends BaseCSWController {
     @Autowired
     public CSWCacheController(CSWCacheService cswService,
                          ViewCSWRecordFactory viewCSWRecordFactory,
-                         ViewKnownLayerFactory viewKnownLayerFactory,
-                         PortalPropertyPlaceholderConfigurer propertyResolver) {
+                         ViewKnownLayerFactory viewKnownLayerFactory) {
 
         super(viewCSWRecordFactory, viewKnownLayerFactory);
         this.cswService = cswService;

@@ -17,7 +17,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.cloud.CloudJob;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -54,7 +53,6 @@ public class TestJobListController extends PortalTestClass {
     private FileStagingService mockFileStagingService;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
-    private PortalPropertyPlaceholderConfigurer mockHostConfigurer;
     private ANVGLUser mockPortalUser;
     private JobStatusMonitor mockJobStatusMonitor;
     private HttpServletRequest mockRequest;
@@ -72,7 +70,6 @@ public class TestJobListController extends PortalTestClass {
         mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
         mockFileStagingService = context.mock(FileStagingService.class);
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
-        mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
         mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
         mockResponse = context.mock(HttpServletResponse.class);
@@ -90,7 +87,7 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer,vglPollingJobQueueManager);
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
     }
 
     @After
@@ -151,7 +148,6 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
-            allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             //Here on start is the delete mock
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
@@ -181,18 +177,13 @@ public class TestJobListController extends PortalTestClass {
 
         JobListController myController = new JobListController(queueMockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer,vglPollingJobQueueManager);
-
-
-
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
 
         Assert.assertEquals(2, vglPollingJobQueueManager.getQueue().size());
 
         myController.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
 
         Assert.assertEquals(1, vglPollingJobQueueManager.getQueue().size());
-
-
     }
 
     /**
@@ -248,6 +239,7 @@ public class TestJobListController extends PortalTestClass {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String initialStatus = JobBuilderController.STATUS_DONE;
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
@@ -258,10 +250,12 @@ public class TestJobListController extends PortalTestClass {
             //Make sure the job marked as deleted and its transition audit trial record is created
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
-            oneOf(mockJob).getStatus();will(returnValue("old mock job status"));
+            allowing(mockJob).getId();will(returnValue(jobId));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
             oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
             oneOf(mockJobManager).saveJob(mockJob);
-            oneOf(mockJobManager).createJobAuditTrail("old mock job status", mockJob, "Job deleted.");
+            oneOf(mockJobManager).createJobAuditTrail(initialStatus, mockJob, "Job deleted.");
 
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
             oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
@@ -279,25 +273,65 @@ public class TestJobListController extends PortalTestClass {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String initialStatus = JobBuilderController.STATUS_DONE;
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
 
 
             //Make sure the job marked as deleted and its transition audit trial record is created
-            oneOf(mockJob).getStatus();will(returnValue("old mock job status"));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
             oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
             oneOf(mockJobManager).saveJob(mockJob);
-            oneOf(mockJobManager).createJobAuditTrail("old mock job status", mockJob, "Job deleted.");
+            oneOf(mockJobManager).createJobAuditTrail(initialStatus, mockJob, "Job deleted.");
 
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
             oneOf(mockJob).getRegisteredUrl();will(returnValue(null)); //the job isn't registered
             oneOf(mockCloudStorageServices[0]).deleteJobFiles(mockJob); //this must occur if the job isnt registered
+        }});
+
+        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+    }
+
+
+    /**
+     * Tests deleting a running job successfully
+     */
+    @Test
+    public void testDeleteJob_Running() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String initialStatus = JobBuilderController.STATUS_ACTIVE;
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+
+            //Make sure the job marked as deleted and its transition audit trial record is created
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
+            oneOf(mockJobManager).saveJob(mockJob);
+            oneOf(mockJobManager).createJobAuditTrail(initialStatus, mockJob, "Job deleted.");
+
+            oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
+            oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
+
+            oneOf(mockCloudComputeServices[0]).terminateJob(mockJob);
         }});
 
         ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
