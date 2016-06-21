@@ -30,7 +30,7 @@ Ext.define('vegl.preview.LogPreview', {
     /**
      * Reloads this store with all the jobs for the specified series
      */
-    preview : function(job, fileName, size) {
+    preview : function(job, fileName, size, hash) {
         if (this.currentRequest != null) {
             Ext.Ajax.abort(this.currentRequest);
             this.currentRequest = null;
@@ -54,6 +54,7 @@ Ext.define('vegl.preview.LogPreview', {
         this.job = job;
         this.fileName = fileName;
         this.size = size;
+        this.hash = hash;
 
         this.currentRequest = Ext.Ajax.request({
             url : 'secure/getSectionedLogs.do',
@@ -134,6 +135,7 @@ Ext.define('vegl.preview.LogPreview', {
         this.job = null;
         this.fileName = null;
         this.size = null;
+        this.hash = null;
 
         this.removeAll(true);
         if (addEmptyTab) {
