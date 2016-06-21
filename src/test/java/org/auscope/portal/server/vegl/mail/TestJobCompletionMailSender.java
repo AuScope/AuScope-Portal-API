@@ -142,7 +142,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
             oneOf(mockSeries).getName();will(returnValue(seriesName));
 
             oneOf(mockJob).getName();will(returnValue(jobName));
-            oneOf(mockJob).getEmailAddress();will(returnValue(user));
+            allowing(mockJob).getEmailAddress();will(returnValue(user));
 
             //The following expectations are for invoking constructMailContent method.
             allowing(mockJob).getSubmitDate();will(returnValue(dateSubmitted));
@@ -193,6 +193,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
             allowing(mockJob).getUser();will(returnValue(user));
             allowing(mockJob).getStatus();will(returnValue(jobStatus));
             allowing(mockJob).getId();will(returnValue(jobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(user));
             oneOf(mockJob).getName();will(returnValue(jobName));
             oneOf(mockJob).getDescription();will(returnValue(jobDescription));
             //Ensure we've one call to getSectionedLog to get Python execution log

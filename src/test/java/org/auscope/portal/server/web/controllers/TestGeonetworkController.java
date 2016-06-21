@@ -34,6 +34,8 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Richard Goh
  */
 public class TestGeonetworkController {
+    private static final String USER_EMAIL_ADDRESS = "email@address";
+
     private Mockery context = new Mockery() {{
         setImposteriser(ClassImposteriser.INSTANCE);
     }};
@@ -139,8 +141,7 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
         final HttpSession mockSession = context.mock(HttpSession.class);
         final ServletContext mockContext = context.mock(ServletContext.class);
-        final String userEmail = "user@test.au";
-        final VGLSignature userSignature = new VGLSignature(1, userEmail);
+        final VGLSignature userSignature = new VGLSignature(1, USER_EMAIL_ADDRESS);
         final CloudFileInformation[] outputFileInfo = new CloudFileInformation[] {
                 new CloudFileInformation("my/key1", 100L, "http://public.url1"),
                 new CloudFileInformation("my/key2", 200L, "http://public.url2"),
@@ -166,7 +167,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getName();will(returnValue("name"));
             allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
-            allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL_ADDRESS));
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
@@ -178,13 +179,13 @@ public class TestGeonetworkController {
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            oneOf(mockJobManager).getSeriesById(seriesId, "email@address");will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, USER_EMAIL_ADDRESS);will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(USER_EMAIL_ADDRESS));
 
             //We should have a single call to the database for user signature object
-            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
+            oneOf(mockJobManager).getSignatureByUser(USER_EMAIL_ADDRESS);will(returnValue(userSignature));
 
             //We should have a call to the job manager to store user signature object
             oneOf(mockJobManager).saveSignature(userSignature);
@@ -264,7 +265,8 @@ public class TestGeonetworkController {
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            oneOf(mockJobManager).getSeriesById(seriesId, "email@address");will(returnValue(null));
+            allowing(mockPortalUser).getEmail();will(returnValue(USER_EMAIL_ADDRESS));
+            oneOf(mockJobManager).getSeriesById(seriesId, USER_EMAIL_ADDRESS);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
@@ -347,8 +349,7 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
         final HttpSession mockSession = context.mock(HttpSession.class);
         final ServletContext mockContext = context.mock(ServletContext.class);
-        final String userEmail = "user@test.au";
-        final VGLSignature userSignature = new VGLSignature(1, userEmail);
+        final VGLSignature userSignature = new VGLSignature(1, USER_EMAIL_ADDRESS);
         final CloudFileInformation[] outputFileInfo = new CloudFileInformation[] {
                 new CloudFileInformation("my/key1", 100L, "http://public.url1"),
                 new CloudFileInformation("my/key2", 200L, "http://public.url2"),
@@ -370,7 +371,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getName();will(returnValue("name"));
             allowing(mockJob).getUser();will(returnValue("user"));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
-            allowing(mockJob).getEmailAddress();will(returnValue("email@address"));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL_ADDRESS));
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
@@ -382,13 +383,13 @@ public class TestGeonetworkController {
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            oneOf(mockJobManager).getSeriesById(seriesId, "email@address");will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, USER_EMAIL_ADDRESS);will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(USER_EMAIL_ADDRESS));
 
             //We should have a single call to the database for user signature object
-            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
+            oneOf(mockJobManager).getSignatureByUser(USER_EMAIL_ADDRESS);will(returnValue(userSignature));
 
             //We should have a call to the job manager to store user signature object
             oneOf(mockJobManager).saveSignature(userSignature);
