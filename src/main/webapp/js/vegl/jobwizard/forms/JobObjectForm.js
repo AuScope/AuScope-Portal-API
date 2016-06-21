@@ -169,6 +169,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 xtype: 'checkbox',
                 fieldLabel: 'Set Job Walltime',
                 name: 'setJobWalltime',
+                itemId: 'setJobWalltime',
                 checked: false,
                 plugins: [{
                     ptype: 'fieldhelptext',
