@@ -46,8 +46,10 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
                     msg = responseObj.msg;
                     if (responseObj.success) {
                         if (responseObj.data && responseObj.data.containsPersistentVolumes) {
-                            Ext.window.MessageBox.alert({
+                            Ext.Msg.show({
                                 title: 'Warning',
+                                buttons: Ext.Msg.OK,
+                                icon: Ext.Msg.WARNING,
                                 message: 'This job will create an instance with persistent EBS volumes. These will need to be manually removed from AWS as the portal cannot remove them without potentially causing you to lose data.',
                                 fn: function() {
                                     jobSubmitFrm.noWindowUnloadWarning = true;

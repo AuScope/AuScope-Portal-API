@@ -231,7 +231,8 @@
                 "ec2:DeleteTags",
                 "ec2:GetConsoleOutput",
                 "ec2:DescribeInstanceStatus",
-                "ec2:ModifyInstanceAttribute"
+                "ec2:ModifyInstanceAttribute",
+                "ec2:DescribeImages"
               ],
               "Resource": [
                 "*"
