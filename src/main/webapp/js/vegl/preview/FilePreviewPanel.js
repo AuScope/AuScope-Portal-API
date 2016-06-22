@@ -63,13 +63,46 @@ Ext.define('vegl.preview.FilePreviewPanel', {
      * @param fileName The name of the file to preview
      * @param type String Which file previewer should be used?
      */
-    preview : function(job, fileName, size, type) {
+    preview : function(job, fileName, size, hash, type) {
         var l = this.getLayout();
 
         if (l.getActiveItem().getItemId() === type || l.setActiveItem(type)) {
             var previewer = l.getActiveItem();
-            previewer.preview(job, fileName, size);
+            previewer.preview(job, fileName, size, hash);
         }
+    },
+
+    /**
+     * Determines whether the current preview's underlying data has changed and a refresh is required
+     *
+     * @param callback function(refreshRequired, newHash) - will be passed true if the underlying data has changed. False otherwise
+     */
+    isRefreshRequired : function(callback) {
+        var l = this.getLayout();
+
+        if (l.getActiveItem().getItemId() === 'empty') {
+            callback(false);
+            return;
+        }
+
+        var previewer = l.getActiveItem();
+        previewer.isRefreshRequired(callback);
+    },
+
+    /**
+     * Refreshes the current preview panel. Has no effect if nothing is showing
+     *
+     * @param newHash The new hash value returned from the call to isRefreshRequired
+     */
+    refresh: function(newHash) {
+        var l = this.getLayout();
+        if (l.getActiveItem().getItemId() === 'empty') {
+            return;
+        }
+
+        var previewer = l.getActiveItem();
+        previewer.hash = newHash;
+        previewer.handleRefresh();
     },
 
 
