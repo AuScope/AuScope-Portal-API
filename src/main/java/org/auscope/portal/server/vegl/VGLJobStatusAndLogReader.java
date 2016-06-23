@@ -1,6 +1,7 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -160,11 +161,12 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
             return null;
         }
 
-        //If the job is currently in the done/saved IN_QUEUE or ERROR state - do absolutely nothing.
+        //If the job is currently in the done/saved IN_QUEUE, ERROR or WALLTIME_EXCEEDED state - do absolutely nothing.
         if (job.getStatus().equals(JobBuilderController.STATUS_DONE) ||
                 job.getStatus().equals(JobBuilderController.STATUS_UNSUBMITTED) ||
                         job.getStatus().equals(JobBuilderController.STATUS_INQUEUE) ||
-                                job.getStatus().equals(JobBuilderController.STATUS_ERROR)) {
+                                job.getStatus().equals(JobBuilderController.STATUS_ERROR)|| 
+                                    job.getStatus().equals(JobBuilderController.STATUS_WALLTIME_EXCEEDED)) {
             return job.getStatus();
         }
 
@@ -183,12 +185,31 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
 
         boolean jobStarted = containsFile(results, "workflow-version.txt");
         boolean jobFinished = containsFile(results, JobListController.VL_TERMINATION_FILE);
+        // VM side walltime exceeded
+        boolean jobWalltimeExceeded = containsFile(results, "walltime-exceeded.txt");
 
         String expectedStatus = JobBuilderController.STATUS_PENDING;
         if (jobFinished) {
             expectedStatus = JobBuilderController.STATUS_DONE;
         } else if (jobStarted) {
             expectedStatus = JobBuilderController.STATUS_ACTIVE;
+        } else if(jobWalltimeExceeded) {
+            expectedStatus = JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+        }
+        
+        // If the walltime has exceeded and the VM side walltime check has
+        // failed to shut the instance down, shut it down
+        if(jobStarted && !jobFinished && job.getWalltime() != 0) {
+            if(job.getSubmitDate().getTime() + (job.getWalltime()*60*1000) < new Date().getTime()) {
+                try {
+                    CloudComputeService cloudComputeService = getComputeService(job);
+                    cloudComputeService.terminateJob(job);
+                    return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+                } catch(Exception e) {
+                    log.warn("Exception shutting down terminal: " + job.toString(), e);
+                    return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+                }
+            }
         }
 
         //There is also a possibility that the cloud has had issues booting the VM... lets see what we can dig up
@@ -198,6 +219,8 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
             case Missing:
                 if (jobFinished) {
                     return JobBuilderController.STATUS_DONE;
+                } else if (jobWalltimeExceeded) {
+                    return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
                 } else {
                     return JobBuilderController.STATUS_ERROR;
                 }

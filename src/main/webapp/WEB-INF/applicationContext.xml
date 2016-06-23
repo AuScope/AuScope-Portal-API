@@ -212,7 +212,7 @@
         <property name="id" value="amazon-aws-storage-sydney"/>
         <property name="bucket" value="anvgl-csiro-"/>
         <property name="adminEmail" value="${HOST.portalAdminEmail}"/>
-        <property name="requireSts" value="${HOST.aws.stsonly}"/>        
+        <property name="requireSts" value="${HOST.aws.stsonly}"/>
     </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
