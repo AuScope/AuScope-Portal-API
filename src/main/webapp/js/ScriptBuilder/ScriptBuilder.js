@@ -1,8 +1,8 @@
 Ext.define('ScriptBuilder.ScriptBuilder', {
-    
-    /** 
-     * @lends ScriptBuilder 
-     */ 
+
+    /**
+     * @lends ScriptBuilder
+     */
     extend : 'Ext.panel.Panel',
 
     textEditMode : false,
@@ -12,7 +12,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
     editor  : null,
     componentsPanel : null,
 
-    
+
     /**
      * A component for tying all of the script builder components together
      * @constructs
@@ -30,7 +30,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         var editorPanel =  Ext.create('Ext.form.FormPanel', {
             region : 'center',
             layout    : 'fit',
-            scrollable  : true,
+            scrollable  : 'y',
             items: [this.editor]
         });
 
@@ -43,7 +43,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
                 addcomponent : Ext.bind(this.onAddComponent, this)
             }
         });
-        
+
         Ext.apply(config, {
             layout : 'border',
             border : false,
@@ -64,7 +64,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
                             'background-color': 'white'
                         },
                         items : [editorPanel]
-                    }, 
+                    },
                     this.componentsPanel
             ]
         });
@@ -73,7 +73,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         this.callParent(arguments);
     },
 
-    
+
     /**
      * Add the script to the component
      * @function
@@ -81,7 +81,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
      * @param {object} entry
      * @param {string} name
      * @param {string} description
-     * 
+     *
      */
     onAddComponent : function(panel, entry, name, description) {
     	var me = this;
@@ -94,14 +94,14 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
             wizardState : me.wizardState,
             parameters : Ext.apply({}, me.templateVariables)
         });
-        
+
         template.requestScript(function(status, script) {
-        	
+
             //Once we have the script text - ask the user what they want to do with it
             if (status === ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_SUCCESS) {
                 // Store the selected solution
                 me.setSolution(entry);
-                
+
                 //If there's nothing in the window - just put text in there
                 if (me.getScript().length === 0) {
                     me.replaceScript(script);
@@ -128,7 +128,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         });
     },
 
-    
+
     /**
      * Builds components panel with selected toolbox
      * @function
@@ -144,7 +144,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
             });
     },
 
-    
+
     /**
      * Inserts the specified script at the current caret location
      * @function
@@ -163,7 +163,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         this.editor.replaceRange(script, from, to);
     },
 
-    
+
     /**
      * Replaces the current tab with the specified script
      * @function
@@ -172,7 +172,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         this.editor.setValue(script);
     },
 
-    
+
     /**
      * Get script from the editor
      * @function
@@ -180,8 +180,8 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
     getScript : function() {
         return this.editor.getValue();
     },
-    
-    
+
+
     /**
      * Get the solutionId (URI)
      * @function
@@ -190,7 +190,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         return this.wizardState.solutionId;
     },
 
-    
+
     /**
      * Set the solution
      * @function
@@ -201,7 +201,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         this.setSolutionId(solution.uri);
     },
 
-    
+
     /**
      * Set the solutionId
      * @function
@@ -211,7 +211,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         this.selectSolution();
     },
 
-    
+
     /**
      * Select the node corresponding to the current solution
      * @function

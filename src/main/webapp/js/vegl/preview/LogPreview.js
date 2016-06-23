@@ -18,7 +18,6 @@ Ext.define('vegl.preview.LogPreview', {
     constructor : function(config) {
 
         Ext.apply(config, {
-            autoScroll : true,
             items : []
         });
 
