@@ -44,7 +44,7 @@ public class MenuController {
    private String googleAnalyticsKey;
 
    @Autowired
-   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey, @Value("${HOST.google.analytics.key:''}") String googleAnalyticsKey) {
+   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey, @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey) {
        this.buildStamp = null;
        this.googleMapKey = googleMapKey;
        this.googleAnalyticsKey = googleAnalyticsKey;
