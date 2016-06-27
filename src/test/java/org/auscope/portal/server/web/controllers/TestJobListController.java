@@ -83,7 +83,7 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
     }
 
     @After
@@ -166,6 +166,10 @@ public class TestJobListController extends PortalTestClass {
             allowing(queueMockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_INQUEUE));
             allowing(queueMockJobs.get(0)).getId();will(returnValue(5555));
             allowing(queueMockJobs.get(1)).getId();will(returnValue(jobId));
+            
+            allowing(queueMockJobs.get(0)).getWalltime();will(returnValue(0));
+            allowing(queueMockJobs.get(1)).getWalltime();will(returnValue(0));
+            
             oneOf(queueMockJobs.get(1)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
             oneOf(queueMockJobManager).saveJob(queueMockJobs.get(1));
             oneOf(queueMockJobManager).createJobAuditTrail(JobBuilderController.STATUS_INQUEUE, queueMockJobs.get(1), "Job cancelled by user.");
@@ -173,7 +177,7 @@ public class TestJobListController extends PortalTestClass {
 
         JobListController myController = new JobListController(queueMockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
 
         Assert.assertEquals(2, vglPollingJobQueueManager.getQueue().size());
 

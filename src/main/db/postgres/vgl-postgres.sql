@@ -75,7 +75,8 @@ CREATE TABLE "jobs" (
 "cellX" int4,
 "cellY" int4,
 "cellZ" int4,
-"inversionDepth" int4
+"inversionDepth" int4,
+"walltime" int4,
 )
 WITH (OIDS=FALSE)
 

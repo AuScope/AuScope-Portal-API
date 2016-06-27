@@ -13,7 +13,7 @@ class vl_common {
     # Install default packages (curl/wget declared in puppi)
   package { ["subversion", "mercurial", "ftp", "bzip2", "bzip2-devel",
              "elfutils", "ntp", "ntpdate", "gcc", "make", "swig", "mlocate",
-             "expect-dev", "gfortran", "build-essential"]:
+             "expect-dev", "gfortran", "build-essential", "at"]:
     ensure => installed,
     require => Class["epel"],
   }

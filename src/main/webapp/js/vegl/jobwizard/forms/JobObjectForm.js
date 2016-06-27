@@ -62,7 +62,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     //If we have a jobId, load that, OTHERWISE the job will be created later
                     if (jobObjectFrm.wizardState.jobId) {
                         jobObjectFrm.handleLoadingJobObject();
-                    } else if (jobObjectFrm.wizardState.solutionId) {
+                    } else if (jobObjectFrm.wizardState.solutions) {
                         this.imageStore.load({
                             callback: Ext.bind(function() {
                                 if (this.imageStore.getCount()) {
@@ -165,6 +165,34 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     text: 'Tick to receive email notification upon job processing.'
                 }]
             },
+            {
+                xtype: 'checkbox',
+                fieldLabel: 'Set Job Walltime',
+                name: 'setJobWalltime',
+                itemId: 'setJobWalltime',
+                checked: false,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select to add an optional walltime (minutes) for your job.'
+                }],
+                listeners: {
+	                change: function(cb, checked) {
+	                	Ext.getCmp('walltime').setDisabled(!checked);
+	                	//if(!checked)
+	                	//	Ext.getCmp('walltime').setValue('0');
+	                }
+                }
+            },
+            {
+            	xtype: 'textfield',
+                name: 'walltime',
+                itemId : 'walltime',
+                id: 'walltime',
+                disabled: true,
+                fieldLabel: 'Walltime',
+                maskRe:/[\d]/,
+                allowBlank: true 
+            },
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'storageProvider' },
             { xtype: 'hidden', name: 'storageEndpoint' },
@@ -195,12 +223,29 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     // Store the vm type if specified
                     // in the job, and solutionId, for later use.
                     this.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
-                    this.wizardState.solutionId = jobData.solutionId;
                     this.wizardState.jobId = frm.getValues().id;
+
+                    // Load the solution info for the job into the wizardState
+        	          Ext.Ajax.request({
+                        url: 'getSolutions.do',
+                        scope: this,
+                        headers: { Accept: 'application/json' },
+                        params: { uris: jobData.jobSolutions },
+                        success: function(response) {
+                            results = Ext.JSON.decode(response.responseText);
+                            if (results && results.data) {
+                                this.wizardState.solutions = results.data;
+                            }
+                        },
+
+                        failure: function(response) {
+                            console.log("Load job solutions failed! " + response);
+                        }
+                    });
 
                     //If we have a solution ID but no selected image, preload the image combo
                     //with the first image sent from the backend
-                    if (Ext.isEmpty(jobData.computeVmId) && !Ext.isEmpty(jobData.solutionId)) {
+                    if (Ext.isEmpty(jobData.computeVmId) && !Ext.isEmpty(jobData.jobSolutions)) {
                         this.imageStore.getProxy().setExtraParam('jobId', jobData.id);
                         this.imageStore.load({
                             callback: Ext.bind(function() {
@@ -388,7 +433,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         values.jobId = jobObjectFrm.wizardState.jobId;
         values.storageServiceId = "amazon-aws-storage-sydney";
         values.computeServiceId = "aws-ec2-compute";
-
+        
         // update the job here
         Ext.Ajax.request({
             url : 'secure/updateOrCreateJob.do',
@@ -456,6 +501,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         var description = this.getComponent('description');
         var toolbox = this.getComponent('image-combo');
         var emailNotification = this.getComponent('emailNotification');
+        var setJobWalltime = this.getComponent('setJobWalltime');
+        var walltime = this.getComponent('walltime');
 
         return [Ext.create('portal.util.help.Instruction', {
             highlightEl : name.getEl(),
@@ -477,6 +524,16 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             title : 'Job completion email notification',
             anchor : 'bottom',
             description : 'The VL will send out email notification to your email address upon job completion. Untick the checkbox if you don\'t want to receive the notification.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : setJobWalltime.getEl(),
+            title : 'Set job walltime',
+            anchor : 'bottom',
+            description : 'If you would like the job to terminate after a set period, check this box and enter a value in the textfield below.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : walltime.getEl(),
+            title : 'Walltime',
+            anchor : 'bottom',
+            description : 'If you would like your job to terminate after a set period, enter the walltime (in minutes) here.'
         })];
     }
 });

@@ -25,7 +25,7 @@ public abstract class BaseCloudController extends BasePortalController {
     protected CloudStorageService[] cloudStorageServices;
     /** All cloud compute services that are available to this controller */
     protected CloudComputeService[] cloudComputeServices;
-    private String vmSh;
+    private String vmSh, vmShutdownSh;
 
 
     /**
@@ -33,15 +33,16 @@ public abstract class BaseCloudController extends BasePortalController {
      * @param cloudComputeServices All cloud compute services that are available to this controller
      */
     public BaseCloudController(CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices) {
-        this(cloudStorageServices,cloudComputeServices,null);
+        this(cloudStorageServices,cloudComputeServices,null,null);
     }
 
     public BaseCloudController(CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices,
-            @Value("${vm.sh}") String vmSh) {
+            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh) {
         super();
         this.cloudComputeServices = cloudComputeServices;
         this.cloudStorageServices = cloudStorageServices;
         this.vmSh=vmSh;
+        this.vmShutdownSh=vmShutdownSh;
     }
 
 
@@ -140,7 +141,9 @@ public abstract class BaseCloudController extends BasePortalController {
                 cloudStorageService.getProvider(), // STORAGE_TYPE
                 cloudStorageService.getAuthVersion() == null ? "" : cloudStorageService.getAuthVersion(), // STORAGE_AUTH_VERSION
                 cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName(), // OS_REGION_NAME
-                getProvisioningTemplate() // PROVISIONING_TEMPLATE
+                getProvisioningTemplate(), // PROVISIONING_TEMPLATE
+                vmShutdownSh, // WORKFLOW_URL
+                job.getWalltime() // WALLTIME
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);

@@ -2,6 +2,7 @@ package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -186,6 +187,8 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getSubmitDate(); will(returnValue(new Date()));
+            allowing(mockJob).getWalltime(); will(returnValue(0));
             oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Running));
         }});
 

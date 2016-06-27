@@ -108,9 +108,10 @@ public class JobListController extends BaseCloudController  {
             FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
             VGLJobStatusAndLogReader jobStatusLogReader,
             JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
-            @Value("${vm.sh}") String vmSh,VGLPollingJobQueueManager vglPollingJobQueueManager,
+            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
+            VGLPollingJobQueueManager vglPollingJobQueueManager,
             @Value("${HOST.portalAdminEmail}") String adminEmail) {
-        super(cloudStorageServices, cloudComputeServices,vmSh);
+        super(cloudStorageServices, cloudComputeServices,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.jobStatusLogReader = jobStatusLogReader;

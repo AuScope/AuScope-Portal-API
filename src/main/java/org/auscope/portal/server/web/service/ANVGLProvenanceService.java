@@ -112,10 +112,10 @@ public class ANVGLProvenanceService {
      *            should be just about to execute, but not yet have started.
      * @return The TURTLE text.
      */
-    public String createActivity(final VEGLJob job, final Solution solution, ANVGLUser user) {
+    public String createActivity(final VEGLJob job, final Set<Solution> solutions, ANVGLUser user) {
         String jobURL = jobURL(job, serverURL());
         Activity anvglJob = null;
-        Set<Entity> inputs = createEntitiesForInputs(job, solution, user);
+        Set<Entity> inputs = createEntitiesForInputs(job, solutions, user);
         try {
             anvglJob = new Activity().setActivityUri(new URI(jobURL)).setTitle(job.getName())
                     .setDescription(job.getDescription()).setStartedAtTime(new Date())
@@ -218,7 +218,7 @@ public class ANVGLProvenanceService {
      *            The virtual labs job we want to examine the inputs of.
      * @return An array of PROV-O entities. May be empty, but won't be null.
      */
-    public Set<Entity> createEntitiesForInputs(final VEGLJob job, final Solution solution, ANVGLUser user) {
+    public Set<Entity> createEntitiesForInputs(final VEGLJob job, final Set<Solution> solutions, ANVGLUser user) {
         Set<Entity> inputs = new HashSet<>();
         // Downloads first
         try {
@@ -254,14 +254,16 @@ public class ANVGLProvenanceService {
                     ex);
         }
 
-        if (solution != null) {
-            try {
-                URI dataURI = new URI(solution.getUri());
-                inputs.add(new Entity().setWasAttributedTo(new URI(user.getId())).setEntityUri(dataURI)
-                        .setDescription(solution.getDescription()).setCreated(solution.getCreatedAt())
-                        .setTitle(solution.getName()).setMetadataUri(dataURI));
-            } catch (URISyntaxException ex) {
-                LOGGER.error(String.format("Error parsing data source urls %s into URIs.", solution.getUri()), ex);
+        if (solutions != null) {
+            for (Solution solution: solutions) {
+                try {
+                    URI dataURI = new URI(solution.getUri());
+                    inputs.add(new Entity().setWasAttributedTo(new URI(user.getId())).setEntityUri(dataURI)
+                               .setDescription(solution.getDescription()).setCreated(solution.getCreatedAt())
+                               .setTitle(solution.getName()).setMetadataUri(dataURI));
+                } catch (URISyntaxException ex) {
+                    LOGGER.error(String.format("Error parsing data source urls %s into URIs.", solution.getUri()), ex);
+                }
             }
         }
         return inputs;

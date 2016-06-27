@@ -24,12 +24,16 @@ Ext.define('vegl.widgets.CodeEditorField', {
                     var element = document.getElementById(obj.getInputId());
                     this.editor = CodeMirror.fromTextArea(element,{
                         lineNumbers: true,
+                        scrollbarStyle: 'null',
                         mode: config.mode
                     });
 
                     if (config.value) {
                         obj.setValue(config.value);
                     }
+                },
+                resize: function() {
+                    this.editor.refresh();
                 }
             }
         });
