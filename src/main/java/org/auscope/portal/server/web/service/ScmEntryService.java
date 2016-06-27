@@ -1,11 +1,16 @@
 package org.auscope.portal.server.web.service;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
+import javax.swing.plaf.ToolBarUI;
+import javax.xml.ws.spi.Provider;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -91,7 +96,7 @@ public class ScmEntryService {
      * @param user Authenticated ANVGLUser 
      * @throws PortalServiceException
      */
-    public void updateJobForSolution(String jobId, String solutionId, ANVGLUser user)
+    public void updateJobForSolution(String jobId, Set<String> solutions, ANVGLUser user)
         throws PortalServiceException {
         //Lookup our job
         VEGLJob job = null;
@@ -104,7 +109,9 @@ public class ScmEntryService {
         }
 
         // Store the solutionId in the job
-        job.setSolutionId(solutionId);
+        job.setJobSolutions(solutions);
+
+        // Save the job
         try {
             jobManager.saveJob(job);
         } catch (Exception ex) {
@@ -247,22 +254,71 @@ public class ScmEntryService {
     }
 
     /**
-     * Return the Solution object for job (if known).
+     * Return the Solution object(s) for job (if known).
      *
      * @param job VEGLJob object
      * @returns Solution object if job has a solutionId
      */
-    public Solution getJobSolution(VEGLJob job) {
+    public Set<Solution> getJobSolutions(VEGLJob job) {
         Solution solution = null;
+        HashSet<Solution> solutions = new HashSet<Solution>();
 
         if (job != null) {
-            String solutionId = job.getSolutionId();
-            if (solutionId != null) {
-                solution = getScmSolution(solutionId);
+            for (String uri: job.getJobSolutions()) {
+                solution = getScmSolution(uri);
+                if (solution != null) {
+                    solutions.add(solution);
+                }
             }
         }
 
-        return solution;
+        return solutions;
+    }
+
+    /**
+     * Return a Set of the Toolbox object(s) for job.
+     *
+     * @param job VEGLJob object
+     * @returns Set of Solution Objects.
+     */
+    public Set<Toolbox> getJobToolboxes(VEGLJob job) {
+        HashSet<Toolbox> toolboxes = new HashSet<Toolbox>();
+
+        for (Solution solution: getJobSolutions(job)) {
+            toolboxes.add(solution.getToolbox(true));
+        }
+
+        return toolboxes;
+    }
+
+    /**
+     * Return image info for toolbox at the specified cloud provider, or null.
+     *
+     * Uses the toolbox name and description as metadata for the machine image.
+     *
+     * TODO: Extract image metadata from compute provider, as well as toolbox
+     * info.
+     *
+     * @param toolbox Toolbox of interest
+     * @param provider ID of cloud Provider
+     * @returns MachineImage with id and metadata of cloud Image
+     */
+    public MachineImage getToolboxImage(Toolbox toolbox, String provider) {
+        if (toolbox != null && provider != null) {
+            // Toolbox model allows multiple images for a given provider, but we
+            // assume only one in practice, so take the first one that matches
+            // the requested provider.
+            for (Map<String, String> img: toolbox.getImages()) {
+                if (provider.equals(img.get("provider"))) {
+                    MachineImage image = new MachineImage(img.get("image_id"));
+                    image.setName(toolbox.getName());
+                    image.setDescription(toolbox.getDescription());
+                    return image;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -270,26 +326,26 @@ public class ScmEntryService {
      *
      * @return Map<String, Set<String>> with images for job, or null.
      */
-    public Map<String, Set<String>> getJobImages(Integer jobId, ANVGLUser user) {
+    public Map<String, Set<MachineImage>> getJobImages(Integer jobId, ANVGLUser user) {
         if (jobId == null) {
             return null;
         }
 
-        Map<String, Set<String>> images = new HashMap<String, Set<String>>();
+        Map<String, Set<MachineImage>> images = new HashMap<String, Set<MachineImage>>();
         VEGLJob job = jobManager.getJobById(jobId, user);
-        if (job != null) {
-            Solution solution = getJobSolution(job);
-            if (solution != null) {
-                for (Map<String, String> img:
-                         solution.getToolbox(true).getImages()) {
-                    String providerId = img.get("provider");
-                    Set<String> vms = images.get(providerId);
-                    if (vms == null) {
-                        vms = new HashSet<String>();
-                        images.put(providerId, vms);
-                    }
-                    vms.add(img.get("image_id"));
+
+        for (Toolbox toolbox: getJobToolboxes(job)) {
+            for (Map<String, String> img: toolbox.getImages()) {
+                String providerId = img.get("provider");
+                Set<MachineImage> vms = images.get(providerId);
+                if (vms == null) {
+                    vms = new HashSet<MachineImage>();
+                    images.put(providerId, vms);
                 }
+                MachineImage mi = new MachineImage(img.get("image_id"));
+                mi.setName(toolbox.getName());
+                mi.setDescription(toolbox.getDescription());
+                vms.add(mi);
             }
         }
 
@@ -302,7 +358,7 @@ public class ScmEntryService {
      * @return Set<String> of compute service ids for job, or null if jobId == null.
      */
     public Set<String> getJobProviders(Integer jobId, ANVGLUser user) {
-        Map<String, Set<String>> images = getJobImages(jobId, user);
+        Map<String, Set<MachineImage>> images = getJobImages(jobId, user);
         if (images != null) {
             return images.keySet();
         }

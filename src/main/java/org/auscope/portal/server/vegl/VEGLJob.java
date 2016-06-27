@@ -2,8 +2,10 @@ package org.auscope.portal.server.vegl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +28,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private Integer seriesId;
     private boolean emailNotification;
     private String processTimeLog;
-    private String solutionId;
     private String storageBucket;
     private Integer walltime;
 
@@ -37,6 +38,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
 
     /** A list of FileInformation objects associated with this job*/
     private List<FileInformation> jobFiles = new ArrayList<FileInformation>();
+
+    /** A set of Solutions associated with this job */
+    private Set<String> jobSolutions = new HashSet<String>();
 
     /**
      * Creates an unitialised VEGLJob
@@ -214,12 +218,16 @@ public class VEGLJob extends CloudJob implements Cloneable {
         }
     }
 
-    public String getSolutionId() {
-        return solutionId;
+    public Set<String> getJobSolutions() {
+        return this.jobSolutions;
     }
 
-    public void setSolutionId(String solutionId) {
-        this.solutionId = solutionId;
+    public void addJobSolution(String solutionId) {
+        this.jobSolutions.add(solutionId);
+    }
+
+    public void setJobSolutions(Set<String> solutions) {
+        this.jobSolutions = solutions;
     }
 
     /**
@@ -244,7 +252,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setStorageBaseKey(this.getStorageBaseKey());
         newJob.setSubmitDate(this.getSubmitDate()); //this job isn't submitted yet
         newJob.setUser(this.getUser());
-        newJob.setSolutionId(this.getSolutionId());
         newJob.setStorageBucket(this.getStorageBucket());
         newJob.setWalltime(this.getWalltime());
 
@@ -267,6 +274,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
         for (String key : properties.keySet()) {
             newJob.setProperty(key, getProperty(key));
         }
+
+        newJob.setJobSolutions(new HashSet<String>(this.getJobSolutions()));
+
         return newJob;
     }
 
