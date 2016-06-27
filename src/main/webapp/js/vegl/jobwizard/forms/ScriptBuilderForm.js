@@ -123,7 +123,10 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
                 params: {
                     'sourceText': sourceText,
                     'jobId': this.wizardState.jobId,
-                    'solutions': this.wizardState.solutions
+                    'solutions': Ext.Array.map(
+                        this.wizardState.solutions,
+                        function(solution) { return solution.uri; }
+                    )
                 },
                 success: function(response, opts) {
                     responseObj = Ext.JSON.decode(response.responseText);

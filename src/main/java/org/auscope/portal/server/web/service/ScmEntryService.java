@@ -1,11 +1,16 @@
 package org.auscope.portal.server.web.service;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
+import javax.swing.plaf.ToolBarUI;
+import javax.xml.ws.spi.Provider;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,9 +109,9 @@ public class ScmEntryService {
         }
 
         // Store the solutionId in the job
-        for (String solutionId: solutions) {
-            job.addJobSolution(solutionId);
-        }
+        job.setJobSolutions(solutions);
+
+        // Save the job
         try {
             jobManager.saveJob(job);
         } catch (Exception ex) {
@@ -271,6 +276,52 @@ public class ScmEntryService {
     }
 
     /**
+     * Return a Set of the Toolbox object(s) for job.
+     *
+     * @param job VEGLJob object
+     * @returns Set of Solution Objects.
+     */
+    public Set<Toolbox> getJobToolboxes(VEGLJob job) {
+        HashSet<Toolbox> toolboxes = new HashSet<Toolbox>();
+
+        for (Solution solution: getJobSolutions(job)) {
+            toolboxes.add(solution.getToolbox(true));
+        }
+
+        return toolboxes;
+    }
+
+    /**
+     * Return image info for toolbox at the specified cloud provider, or null.
+     *
+     * Uses the toolbox name and description as metadata for the machine image.
+     *
+     * TODO: Extract image metadata from compute provider, as well as toolbox
+     * info.
+     *
+     * @param toolbox Toolbox of interest
+     * @param provider ID of cloud Provider
+     * @returns MachineImage with id and metadata of cloud Image
+     */
+    public MachineImage getToolboxImage(Toolbox toolbox, String provider) {
+        if (toolbox != null && provider != null) {
+            // Toolbox model allows multiple images for a given provider, but we
+            // assume only one in practice, so take the first one that matches
+            // the requested provider.
+            for (Map<String, String> img: toolbox.getImages()) {
+                if (provider.equals(img.get("provider"))) {
+                    MachineImage image = new MachineImage(img.get("image_id"));
+                    image.setName(toolbox.getName());
+                    image.setDescription(toolbox.getDescription());
+                    return image;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Return a map of computeServiceId to imageIds valid for job.
      *
      * @return Map<String, Set<String>> with images for job, or null.
@@ -282,21 +333,19 @@ public class ScmEntryService {
 
         Map<String, Set<MachineImage>> images = new HashMap<String, Set<MachineImage>>();
         VEGLJob job = jobManager.getJobById(jobId, user);
-        if (job != null) {
-            for (Solution solution: getJobSolutions(job)) {
-                Toolbox toolbox = solution.getToolbox(true);
-                for (Map<String, String> img: toolbox.getImages()) {
-                    String providerId = img.get("provider");
-                    Set<MachineImage> vms = images.get(providerId);
-                    if (vms == null) {
-                        vms = new HashSet<MachineImage>();
-                        images.put(providerId, vms);
-                    }
-                    MachineImage mi = new MachineImage(img.get("image_id"));
-                    mi.setName(toolbox.getName());
-                    mi.setDescription(toolbox.getDescription());
-                    vms.add(mi);
+
+        for (Toolbox toolbox: getJobToolboxes(job)) {
+            for (Map<String, String> img: toolbox.getImages()) {
+                String providerId = img.get("provider");
+                Set<MachineImage> vms = images.get(providerId);
+                if (vms == null) {
+                    vms = new HashSet<MachineImage>();
+                    images.put(providerId, vms);
                 }
+                MachineImage mi = new MachineImage(img.get("image_id"));
+                mi.setName(toolbox.getName());
+                mi.setDescription(toolbox.getDescription());
+                vms.add(mi);
             }
         }
 

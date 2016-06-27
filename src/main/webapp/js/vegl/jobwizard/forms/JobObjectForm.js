@@ -195,8 +195,25 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     // Store the vm type if specified
                     // in the job, and solutionId, for later use.
                     this.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
-                    this.wizardState.solutions = jobData.jobSolutions;
                     this.wizardState.jobId = frm.getValues().id;
+
+                    // Load the solution info for the job into the wizardState
+        	          Ext.Ajax.request({
+                        url: 'getSolutions.do',
+                        scope: this,
+                        headers: { Accept: 'application/json' },
+                        params: { uris: jobData.jobSolutions },
+                        success: function(response) {
+                            results = Ext.JSON.decode(response.responseText);
+                            if (results && results.data) {
+                                this.wizardState.solutions = results.data;
+                            }
+                        },
+
+                        failure: function(response) {
+                            console.log("Load job solutions failed! " + response);
+                        }
+                    });
 
                     //If we have a solution ID but no selected image, preload the image combo
                     //with the first image sent from the backend

@@ -9,6 +9,7 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,8 +171,8 @@ public class ScriptBuilderController extends BasePortalController {
     /**
      * Return a JSON list of problems and their solutions.
      */
-    @RequestMapping("/getSolutions.do")
-    public ModelAndView getSolutions() {
+    @RequestMapping("/getProblems.do")
+    public ModelAndView getProblems() {
         // Get the Solutions from the SSC
         List<Solution> solutions = scmEntryService.getSolutions();
 
@@ -207,5 +208,30 @@ public class ScriptBuilderController extends BasePortalController {
         // Wrap the data in an array or list until the JSON response
         // code is fixed.
         return generateJSONResponseMAV(true, new Solution[] {solution}, "");
+    }
+
+    /**
+     * Return a list of solution objects for the corresponding uris.
+     *
+     * @param uris Collection<String> of uris to look up
+     * @return List<Solution> solution objects
+     */
+    @RequestMapping("/getSolutions.do")
+    public ModelAndView doGetSolutions(@RequestParam("uris") Set<String> uris) {
+        ArrayList<Solution> solutions = new ArrayList<Solution>();
+        StringBuilder msg = new StringBuilder();
+
+        for (String uri: uris) {
+            Solution solution = scmEntryService.getScmSolution(uri);
+            if (solution != null) {
+                solutions.add(solution);
+            }
+            else {
+                msg.append(String.format("No solution found (%s)", uri))
+                    .append("; \n");
+            }
+        }
+
+        return generateJSONResponseMAV(true, solutions, msg.toString());
     }
 }

@@ -105,7 +105,7 @@ public class TestJobBuilderController {
         vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader, mockAnvglProvenanceService);
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
         //Object Under Test
-        controller = new JobBuilderController("dummy@dummy.com", mockJobManager, mockFileStagingService,
+        controller = new JobBuilderController("dummy@dummy.com", "http://example.org/scm/toolbox/42", mockJobManager, mockFileStagingService,
         		vmSh, mockCloudStorageServices, mockCloudComputeServices,
         		vglJobStatusChangeHandler, vglPollingJobQueueManager, mockScmEntryService, mockAnvglProvenanceService);
     }

@@ -44,6 +44,7 @@ Ext.define('ScriptBuilder.InsertionPromptWindow', {
             }],
             items : [{
                 xtype : 'label',
+                itemId: 'promptLabel',
                 anchor : '100%',
                 style : 'font-size: 12px;',
                 text : Ext.util.Format.format('What would you like to do with this code snippet? It\'s {0} characters in length.', config.script.length)
@@ -57,11 +58,13 @@ Ext.define('ScriptBuilder.InsertionPromptWindow', {
                     xtype : 'radiogroup',
                     columns : [0.999],
                     items : [{
+                        itemId: 'replaceRadio',
                         boxLabel : 'Replace the entire script window with this snippet.',
                         name : 'insertion-radio',
                         inputValue : ScriptBuilder.InsertionPromptWindow.OPTION_REPLACE,
                         checked : true
                     },{
+                        itemId: 'insertRadio',
                         boxLabel : 'Insert the snippet at the current cursor location.',
                         name : 'insertion-radio',
                         inputValue : ScriptBuilder.InsertionPromptWindow.OPTION_INSERT
@@ -77,5 +80,10 @@ Ext.define('ScriptBuilder.InsertionPromptWindow', {
 
     onClose : function() {
         this.fireEvent('select', this, ScriptBuilder.InsertionPromptWindow.OPTION_CANCEL);
+    },
+
+    disableInsertOption: function(msg) {
+        this.queryById('promptLabel').setText(msg);
+        this.queryById('insertRadio').setDisabled(true);
     }
 });
