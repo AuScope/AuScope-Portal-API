@@ -106,6 +106,7 @@ public class JobBuilderController extends BaseCloudController {
     public static final String STATUS_UNSUBMITTED = "Saved";//VT:Job saved, fail to submit for whatever reason.
     public static final String STATUS_INQUEUE = "In Queue";//VT: quota exceeded, placed in queue.
     public static final String STATUS_ERROR = "ERROR";//VT:Exception in job processing.
+    public static final String STATUS_WALLTIME_EXCEEDED = "WALLTIME EXCEEDED";//VT:Walltime exceeded.
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
@@ -116,11 +117,12 @@ public class JobBuilderController extends BaseCloudController {
     public JobBuilderController(@Value("${HOST.portalAdminEmail}") String adminEmail,
                                 @Value("${HOST.defaultToolbox}") String defaultToolbox,
             VEGLJobManager jobManager, FileStagingService fileStagingService,
-            @Value("${vm.sh}") String vmSh, CloudStorageService[] cloudStorageServices,
+            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
+            CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             VGLPollingJobQueueManager vglPollingJobQueueManager, ScmEntryService scmEntryService,
             ANVGLProvenanceService anvglProvenanceService) {
-        super(cloudStorageServices, cloudComputeServices,vmSh);
+        super(cloudStorageServices, cloudComputeServices,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
@@ -421,6 +423,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="storageServiceId", required=false) String storageServiceId,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
+            @RequestParam(value="walltime", required=false) Integer walltime,
             HttpServletRequest request,
             @AuthenticationPrincipal ANVGLUser user) throws ParseException {
 
@@ -446,6 +449,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setComputeVmId(computeVmId);
         job.setComputeInstanceType(computeTypeId);
         job.setEmailNotification(emailNotification);
+        job.setWalltime(walltime);
 
         //Updating the storage service means changing the base key
         if (storageServiceId != null) {
@@ -837,7 +841,6 @@ public class JobBuilderController extends BaseCloudController {
                     curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
                     jobManager.saveJob(curJob);
                     jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
-
                 }else{
                     String oldJobStatus = curJob.getStatus();
                     curJob.setStatus(JobBuilderController.STATUS_ERROR);
@@ -846,10 +849,7 @@ public class JobBuilderController extends BaseCloudController {
                     vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
                 }
             }
-
         }
-
-
     }
 
     /**

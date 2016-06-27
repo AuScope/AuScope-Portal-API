@@ -252,6 +252,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     this.editJobAction.setDisabled(false);
                     break;
                 case vegl.models.Job.STATUS_ERROR:
+                case vegl.models.Job.STATUS_WALLTIME_EXCEEDED:
                 case vegl.models.Job.STATUS_DONE:
                     this.cancelJobAction.setDisabled(true);
                     this.deleteJobAction.setDisabled(false);

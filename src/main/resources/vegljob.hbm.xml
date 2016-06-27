@@ -24,6 +24,7 @@
         <property name="seriesId"/>
         <property name="storageBaseKey"/>
         <property name="emailNotification" type="yes_no" />
+        <property name="walltime"/>
         <property name="storageBucket"/>
 
         <map name="jobParameters" lazy="false" cascade="all" inverse="true">

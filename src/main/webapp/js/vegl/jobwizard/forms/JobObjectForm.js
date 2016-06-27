@@ -165,6 +165,34 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     text: 'Tick to receive email notification upon job processing.'
                 }]
             },
+            {
+                xtype: 'checkbox',
+                fieldLabel: 'Set Job Walltime',
+                name: 'setJobWalltime',
+                itemId: 'setJobWalltime',
+                checked: false,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select to add an optional walltime (minutes) for your job.'
+                }],
+                listeners: {
+	                change: function(cb, checked) {
+	                	Ext.getCmp('walltime').setDisabled(!checked);
+	                	//if(!checked)
+	                	//	Ext.getCmp('walltime').setValue('0');
+	                }
+                }
+            },
+            {
+            	xtype: 'textfield',
+                name: 'walltime',
+                itemId : 'walltime',
+                id: 'walltime',
+                disabled: true,
+                fieldLabel: 'Walltime',
+                maskRe:/[\d]/,
+                allowBlank: true 
+            },
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'storageProvider' },
             { xtype: 'hidden', name: 'storageEndpoint' },
@@ -405,7 +433,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         values.jobId = jobObjectFrm.wizardState.jobId;
         values.storageServiceId = "amazon-aws-storage-sydney";
         values.computeServiceId = "aws-ec2-compute";
-
+        
         // update the job here
         Ext.Ajax.request({
             url : 'secure/updateOrCreateJob.do',
@@ -473,6 +501,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         var description = this.getComponent('description');
         var toolbox = this.getComponent('image-combo');
         var emailNotification = this.getComponent('emailNotification');
+        var setJobWalltime = this.getComponent('setJobWalltime');
+        var walltime = this.getComponent('walltime');
 
         return [Ext.create('portal.util.help.Instruction', {
             highlightEl : name.getEl(),
@@ -494,6 +524,16 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             title : 'Job completion email notification',
             anchor : 'bottom',
             description : 'The VL will send out email notification to your email address upon job completion. Untick the checkbox if you don\'t want to receive the notification.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : setJobWalltime.getEl(),
+            title : 'Set job walltime',
+            anchor : 'bottom',
+            description : 'If you would like the job to terminate after a set period, check this box and enter a value in the textfield below.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : walltime.getEl(),
+            title : 'Walltime',
+            anchor : 'bottom',
+            description : 'If you would like your job to terminate after a set period, enter the walltime (in minutes) here.'
         })];
     }
 });

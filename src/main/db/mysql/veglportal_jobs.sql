@@ -45,6 +45,7 @@ CREATE TABLE `jobs` (
   `emailNotification` char(1) DEFAULT 'N',
   `processTimeLog` varchar(255) DEFAULT '',
   `storageBucket` varchar(64) DEFAULT NULL,
+  `walltime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `SERIES` (`seriesId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;

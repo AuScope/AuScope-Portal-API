@@ -29,6 +29,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private boolean emailNotification;
     private String processTimeLog;
     private String storageBucket;
+    private Integer walltime;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -70,6 +71,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param fileStorageId The ID of this job that is used for storing input/output files
      * @param vmSubsetFilePath The File path (on the VM) where the job should look for its input subset file
      * @param vmSubsetUrl The URL of the actual input subset file
+     * @param walltime The walltime (in minutes) for the job
      */
     public VEGLJob(Integer id) {
         super(id);
@@ -251,6 +253,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setSubmitDate(this.getSubmitDate()); //this job isn't submitted yet
         newJob.setUser(this.getUser());
         newJob.setStorageBucket(this.getStorageBucket());
+        newJob.setWalltime(this.getWalltime());
 
         List<VglDownload> newDownloads = new ArrayList<VglDownload>();
         for (VglDownload dl : this.getJobDownloads()) {
@@ -293,6 +296,21 @@ public class VEGLJob extends CloudJob implements Cloneable {
         this.storageBucket = storageBucket;
     }
 
+    /**
+     * The walltime in minutes
+     * @return
+     */
+    public Integer getWalltime() {
+        return walltime;
+    }
+
+    /**
+     * Set the walltime in minutes
+     * @param walltime
+     */
+    public void setWalltime(Integer walltime) {
+        this.walltime = walltime;
+    }
 
     @Override
     public String toString() {
@@ -300,8 +318,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
                 + seriesId + ", id=" + id + ", name=" + name + ", description="
                 + description + "]";
     }
-
-
 
 
 }
