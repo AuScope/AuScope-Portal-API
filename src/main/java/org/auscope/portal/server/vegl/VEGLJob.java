@@ -30,6 +30,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private String processTimeLog;
     private String storageBucket;
     private Integer walltime;
+    private boolean containsPersistentVolumes;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -41,6 +42,15 @@ public class VEGLJob extends CloudJob implements Cloneable {
 
     /** A set of Solutions associated with this job */
     private Set<String> jobSolutions = new HashSet<String>();
+
+    public boolean isContainsPersistentVolumes() {
+        return containsPersistentVolumes;
+    }
+
+
+    public void setContainsPersistentVolumes(boolean containsPersistentVolumes) {
+        this.containsPersistentVolumes = containsPersistentVolumes;
+    }
 
     /**
      * Creates an unitialised VEGLJob
@@ -254,6 +264,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setUser(this.getUser());
         newJob.setStorageBucket(this.getStorageBucket());
         newJob.setWalltime(this.getWalltime());
+        newJob.setContainsPersistentVolumes(this.isContainsPersistentVolumes());
 
         List<VglDownload> newDownloads = new ArrayList<VglDownload>();
         for (VglDownload dl : this.getJobDownloads()) {

@@ -26,6 +26,7 @@
         <property name="emailNotification" type="yes_no" />
         <property name="walltime"/>
         <property name="storageBucket"/>
+        <property name="containsPersistentVolumes" type="yes_no"/>
 
         <map name="jobParameters" lazy="false" cascade="all" inverse="true">
             <key column="jobId"/>
