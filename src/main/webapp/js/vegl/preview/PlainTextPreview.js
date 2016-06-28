@@ -37,6 +37,7 @@ Ext.define('vegl.preview.PlainTextPreview', {
         this.job = job;
         this.fileName = fileName;
         this.size = size;
+        this.hash = hash;
 
         this.currentRequest = Ext.Ajax.request({
             url : 'secure/getPlaintextPreview.do',
@@ -84,6 +85,7 @@ Ext.define('vegl.preview.PlainTextPreview', {
         this.job = null;
         this.fileName = null;
         this.size = null;
+        this.hash = null;
         this.writeText('');
     }
 });

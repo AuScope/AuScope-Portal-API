@@ -7,6 +7,7 @@ Ext.define('vegl.models.FileRecord', {
     fields: [
         { name: 'name', type: 'string' }, //name of the input file
         { name: 'size', type: 'int' }, //Size of the input file in bytes
+        { name: 'fileHash', type: 'string' }, //Hash of the file as returned by the cloud
         { name: 'parentPath', type: 'string' } //Parent path for where the input file is located
     ],
 
