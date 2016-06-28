@@ -45,15 +45,18 @@ echo "LD_LIBRARY_PATH = $LD_LIBRARY_PATH"
 echo "STORAGE_ENDPOINT = $STORAGE_ENDPOINT"
 echo "STORAGE_TYPE = $STORAGE_TYPE"
 echo "VL_LOG_FILE = $VL_LOG_FILE"
-if [ $WALLTIME > 0 ]; then
+if [ "$WALLTIME" -gt 0 ]; then
     echo "SHUTDOWN_SCRIPT = $SHUTDOWN_SCRIPT"
     echo "WALLTIME = $WALLTIME"
+else
+    echo "Walltime not set or set to 0"
 fi
+
 echo "VL_TERMINATION_FILE = $VL_TERMINATION_FILE"
 echo "--------------------------------------"
 
 # If a walltime is present, set walltime shutdown parameters
-if [ $WALLTIME > 0 ]; then
+if [ "$WALLTIME" -gt 0 ]; then
     #Download shutdown script and make it executable
     echo "Downloading shutdown script from $SHUTDOWN_URL and storing it at $SHUTDOWN_SCRIPT"
     curl -f -L "$SHUTDOWN_URL" -o "$SHUTDOWN_SCRIPT"
@@ -62,6 +65,9 @@ if [ $WALLTIME > 0 ]; then
     chmod +x "$SHUTDOWN_SCRIPT"
     echo "chmod result $?"
     at -f $SHUTDOWN_SCRIPT now + $WALLTIME min | tee -a "$VL_LOG_FILE"
+else
+    echo "Skipping download of walltime shutdown script"
+    echo "Job will execute without walltime limit"
 fi
 
 #Download our workflow and make it executable

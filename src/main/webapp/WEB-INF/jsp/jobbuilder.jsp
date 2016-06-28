@@ -15,12 +15,10 @@
     </style>
 
     <%-- Code Mirror inclusions --%>
-    <link href="CodeMirror-5.0/lib/codemirror.css" type="text/css" rel="stylesheet" />
-    <link href="CodeMirror-5.0/addon/scroll/simplescrollbars.css" type="text/css" rel="stylesheet" />    
-    <script type="text/javascript" src="CodeMirror-5.0/lib/codemirror.js"></script>
-    <script type="text/javascript" src="CodeMirror-5.0/mode/python/python.js"></script>
-    <script type="text/javascript" src="CodeMirror-5.0/mode/javascript/javascript.js"></script>
-    <script type="text/javascript" src="CodeMirror-5.0/addon/scroll/simplescrollbars.js"></script>
+    <link href="CodeMirror-5.16/lib/codemirror.css" type="text/css" rel="stylesheet" />    
+    <script type="text/javascript" src="CodeMirror-5.16/lib/codemirror.js"></script>
+    <script type="text/javascript" src="CodeMirror-5.16/mode/python/python.js"></script>
+    <script type="text/javascript" src="CodeMirror-5.16/mode/javascript/javascript.js"></script>
 
 
     <!-- Portal Core Includes -->    

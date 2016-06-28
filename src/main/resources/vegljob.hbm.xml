@@ -25,8 +25,8 @@
         <property name="storageBaseKey"/>
         <property name="emailNotification" type="yes_no" />
         <property name="walltime"/>
-        <property name="solutionId"/>
         <property name="storageBucket"/>
+        <property name="containsPersistentVolumes" type="yes_no"/>
 
         <map name="jobParameters" lazy="false" cascade="all" inverse="true">
             <key column="jobId"/>
@@ -38,5 +38,14 @@
             <key column="jobId" />
             <one-to-many class="org.auscope.portal.server.vegl.VglDownload" />
         </bag>
+
+        <set name="jobSolutions"
+             table="job_solutions"
+             lazy="false"
+             cascade="delete" >
+            <key column="job_id"/>
+            <element column="solution_id" type="string"/>
+        </set>
+
     </class>
 </hibernate-mapping>

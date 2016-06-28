@@ -29,6 +29,7 @@ import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.util.FileIOUtil;
@@ -46,6 +47,7 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
+import org.auscope.portal.server.web.service.scm.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -80,7 +82,8 @@ public class JobBuilderController extends BaseCloudController {
     private ScmEntryService scmEntryService;
     private ANVGLProvenanceService anvglProvenanceService;
     private String adminEmail = null;
-    
+    private String defaultToolbox = null;
+
     /**
      * @return the adminEmail
      */
@@ -113,6 +116,7 @@ public class JobBuilderController extends BaseCloudController {
 
     @Autowired
     public JobBuilderController(@Value("${HOST.portalAdminEmail}") String adminEmail,
+                                @Value("${HOST.defaultToolbox}") String defaultToolbox,
             VEGLJobManager jobManager, FileStagingService fileStagingService,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
             CloudStorageService[] cloudStorageServices,
@@ -129,6 +133,7 @@ public class JobBuilderController extends BaseCloudController {
         this.scmEntryService = scmEntryService;
         this.anvglProvenanceService = anvglProvenanceService;
         this.adminEmail=adminEmail;
+        this.defaultToolbox = defaultToolbox;
     }
 
 
@@ -684,6 +689,7 @@ public class JobBuilderController extends BaseCloudController {
         boolean succeeded = false;
         String oldJobStatus = null, errorDescription = null, errorCorrection = null;
         VEGLJob curJob = null;
+        boolean containsPersistentVolumes = false;
 
         try {
             // Get our job
@@ -756,7 +762,13 @@ public class JobBuilderController extends BaseCloudController {
 
                             // Provenance
                             anvglProvenanceService.setServerURL(request.getRequestURL().toString());
-                            anvglProvenanceService.createActivity(curJob, scmEntryService.getJobSolution(curJob), user);
+                            anvglProvenanceService.createActivity(curJob, scmEntryService.getJobSolutions(curJob), user);
+
+                            //ANVGL-120 Check for persistent volumes
+                            if (cloudComputeService instanceof CloudComputeServiceAws) {
+                                containsPersistentVolumes = ((CloudComputeServiceAws) cloudComputeService).containsPersistentVolumes(curJob);
+                                curJob.setContainsPersistentVolumes(containsPersistentVolumes);
+                            }
 
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);
@@ -797,7 +809,9 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         if (succeeded) {
-            return generateJSONResponseMAV(true, null, "");
+            ModelMap responseModel = new ModelMap();
+            responseModel.put("containsPersistentVolumes", containsPersistentVolumes);
+            return generateJSONResponseMAV(true, responseModel, "");
         } else {
             jobManager.createJobAuditTrail(oldJobStatus, curJob, errorDescription);
             return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
@@ -954,6 +968,15 @@ public class JobBuilderController extends BaseCloudController {
     }
 
     /**
+     * Request wrapper to get the default toolbox uri.
+     *
+     */
+    @RequestMapping("/getDefaultToolbox.do")
+    public ModelAndView doGetDefaultToolbox() {
+        return generateJSONResponseMAV(true, new String[] {getDefaultToolbox()}, "");
+    }
+
+    /**
      * Gets the set of cloud images available for use by a particular user.
      *
      * If jobId is specified, limit the set to images that are
@@ -974,12 +997,23 @@ public class JobBuilderController extends BaseCloudController {
             // Assume all images are usable by the current user
             List<MachineImage> images = new ArrayList<MachineImage>();
 
-            // Filter list to images suitable for job solution, if specified
             if (jobId != null) {
-                Set<String> vmIds = scmEntryService.getJobImages(jobId, user).get(computeServiceId);
-                if (vmIds != null) {
-                    for (String vmId: vmIds) {
-                        images.add(new MachineImage(vmId));
+                VEGLJob job = jobManager.getJobById(jobId, user);
+
+                // Filter list to images suitable for job solutions, if specified.
+                Set<Toolbox> toolboxes = scmEntryService.getJobToolboxes(job);
+
+                // With multiple solutions and multiple toolboxes, do
+                // not give the user the option of selecting the default
+                // portal toolbox for utility functions unless it's the
+                // only toolbox available.
+                int numToolboxes = toolboxes.size();
+                for (Toolbox toolbox: toolboxes) {
+                    if ((numToolboxes == 1) ||
+                        !toolbox.getUri().equals(this.defaultToolbox)) {
+                        images.add(scmEntryService
+                                   .getToolboxImage(toolbox,
+                                                    computeServiceId));
                     }
                 }
             }
@@ -1153,4 +1187,21 @@ public class JobBuilderController extends BaseCloudController {
         return generateJSONResponseMAV(true, allInputs, "");
     }
 
+    /**
+     * Return the default toolbox URI.
+     *
+     * @returns String with the URI for the default toolbox.
+     */
+    public String getDefaultToolbox() {
+        return this.defaultToolbox;
+    }
+
+    /**
+     * Set the default toolbox URI.
+     *
+     * @param defaultToolbox String containing the URI of the default toolbox to set
+     */
+    public void setDefaultToolbox(String defaultToolbox) {
+        this.defaultToolbox = defaultToolbox;
+    }
 }

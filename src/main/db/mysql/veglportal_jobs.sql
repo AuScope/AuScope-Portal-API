@@ -44,12 +44,15 @@ CREATE TABLE `jobs` (
   `processDate` datetime DEFAULT NULL,
   `emailNotification` char(1) DEFAULT 'N',
   `processTimeLog` varchar(255) DEFAULT '',
-  `solutionId` varchar(255) DEFAULT NULL,
   `storageBucket` varchar(64) DEFAULT NULL,
   `walltime` int(11) DEFAULT NULL,
+  `folderId` int(11) DEFAULT NULL,
+  `containsPersistentVolumes` char(1) DEFAULT 'N',
   PRIMARY KEY (`id`),
-  KEY `SERIES` (`seriesId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  KEY `SERIES` (`seriesId`),
+  KEY `JOB_LIST` (`emailAddress`,`status`,`folderId`)
+) ENGINE=MyISAM AUTO_INCREMENT=1761 DEFAULT CHARSET=latin1;
+
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

@@ -1,9 +1,9 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-
-
+import java.util.Set;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -38,15 +38,16 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void testSaveScript() throws Exception {
         final String jobId = "1";
         final String sourceText = "print 'test'";
-        final String solutionId = "http://vhirl-dev.csiro.au/scm/solutions/1";
+        final Set<String> solutions = new HashSet<String>();
+        solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
         final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockSbService).saveScript(jobId, sourceText, user);
-            oneOf(mockScmEntryService).updateJobForSolution(jobId, solutionId, user);
+            oneOf(mockScmEntryService).updateJobForSolution(jobId, solutions, user);
         }});
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText, solutionId, user);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -58,9 +59,10 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void testSaveScript_EmptySourceText() throws Exception {
         final String jobId = "1";
         final String sourceText = "";
-        final String solutionId = "http://vhirl-dev.csiro.au/scm/solutions/1";
+        final Set<String> solutions = new HashSet<String>();
+        solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText, solutionId,
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions,
                                                  new ANVGLUser());
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
@@ -74,7 +76,8 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void testSaveScript_Exception() throws Exception {
         final String jobId = "1";
         final String sourceText = "print 'test'";
-        final String solutionId = "http://vhirl-dev.csiro.au/scm/solutions/1";
+        final Set<String> solutions = new HashSet<String>();
+        solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
         final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
@@ -82,7 +85,7 @@ public class TestScriptBuilderController extends PortalTestClass {
             will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText, solutionId, user);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 

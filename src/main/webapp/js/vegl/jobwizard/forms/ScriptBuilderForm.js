@@ -41,10 +41,6 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
                         // once the script is loaded into the memory, we don't want it to be loaded again to prevent unsaved changes.
                         this.wizardState.userAction = null;
                     }
-
-                    if (!Ext.isEmpty(this.wizardState.solutionId)) {
-                        this.scriptBuilderFrm.setSolutionId(this.wizardState.solutionId);
-                    }
                 }
             },
             items: [this.scriptBuilderFrm]
@@ -116,7 +112,6 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
     beginValidation : function(callback) {
         // read the script from the interface
         var sourceText = this.scriptBuilderFrm.getScript();
-        var solutionId = this.scriptBuilderFrm.getSolutionId();
 
         // replace tab with 4 spaces whenever it occurs in the sourceText
         sourceText = sourceText.replace(/\t/g,"\u0020\u0020\u0020\u0020");
@@ -128,7 +123,10 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
                 params: {
                     'sourceText': sourceText,
                     'jobId': this.wizardState.jobId,
-                    'solutionId': solutionId
+                    'solutions': Ext.Array.map(
+                        this.wizardState.solutions,
+                        function(solution) { return solution.uri; }
+                    )
                 },
                 success: function(response, opts) {
                     responseObj = Ext.JSON.decode(response.responseText);

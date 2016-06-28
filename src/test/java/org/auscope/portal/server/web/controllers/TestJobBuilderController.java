@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,9 +107,20 @@ public class TestJobBuilderController {
         vglJobStatusChangeHandler = new VGLJobStatusChangeHandler(mockJobManager,mockJobMailSender,mockVGLJobStatusAndLogReader, mockAnvglProvenanceService);
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
         //Object Under Test
-        controller = new JobBuilderController("dummy@dummy.com", mockJobManager, mockFileStagingService,
-        		vmSh, vmShutdownSh, mockCloudStorageServices, mockCloudComputeServices,
-        		vglJobStatusChangeHandler, vglPollingJobQueueManager, mockScmEntryService, mockAnvglProvenanceService);
+
+        controller =
+            new JobBuilderController("dummy@dummy.com",
+                                     "http://example.org/scm/toolbox/42",
+                                     mockJobManager,
+                                     mockFileStagingService,
+                                     vmSh,
+                                     vmShutdownSh,
+                                     mockCloudStorageServices,
+                                     mockCloudComputeServices,
+                                     vglJobStatusChangeHandler,
+                                     vglPollingJobQueueManager,
+                                     mockScmEntryService,
+                                     mockAnvglProvenanceService);
     }
 
     @After
@@ -642,6 +655,8 @@ public class TestJobBuilderController {
         final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
 
         final Solution mockSolution = context.mock(Solution.class);
+        final Set<Solution> solutions = new HashSet<Solution>();
+        solutions.add(mockSolution);
 
         jobObj.setComputeVmId(computeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
@@ -651,7 +666,7 @@ public class TestJobBuilderController {
         jobObj.setStorageBucket(storageBucket);
 
         context.checking(new Expectations() {{
-            oneOf(mockScmEntryService).getJobSolution(jobObj);will(returnValue(mockSolution));
+            oneOf(mockScmEntryService).getJobSolutions(jobObj);will(returnValue(solutions));
             oneOf(mockSolution).getUri();will(returnValue("http://sssc.vhirl.org/solution1"));
             oneOf(mockSolution).getDescription();will(returnValue("A Fake Solution"));
             oneOf(mockSolution).getName();will(returnValue("FakeSol"));
@@ -710,7 +725,7 @@ public class TestJobBuilderController {
             oneOf(mockPortalUser).getUsername();will(returnValue(mockUser));
             oneOf(mockPortalUser).getAwsKeyName();will(returnValue(computeKeyName));
             allowing(mockPortalUser).getId();will(returnValue(mockUser));
-            oneOf(mockAnvglProvenanceService).createActivity(jobObj, mockSolution, mockPortalUser);will(returnValue(""));
+            oneOf(mockAnvglProvenanceService).createActivity(jobObj, solutions, mockPortalUser);will(returnValue(""));
 
             allowing(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
         }});
@@ -958,7 +973,7 @@ public class TestJobBuilderController {
             allowing(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);will(returnValue(""));
             oneOf(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
             oneOf(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);
-            oneOf(mockScmEntryService).getJobSolution(jobObj);will(returnValue(null));
+            oneOf(mockScmEntryService).getJobSolutions(jobObj);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
@@ -1069,7 +1084,7 @@ public class TestJobBuilderController {
             allowing(mockPortalUser).getAwsKeyName();will(returnValue(computeKeyName));
             allowing(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);will(returnValue(""));
             oneOf(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
-            oneOf(mockScmEntryService).getJobSolution(jobObj);will(returnValue(null));
+            oneOf(mockScmEntryService).getJobSolutions(jobObj);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);

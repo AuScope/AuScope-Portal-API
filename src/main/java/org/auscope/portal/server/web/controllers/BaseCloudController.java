@@ -143,7 +143,7 @@ public abstract class BaseCloudController extends BasePortalController {
                 cloudStorageService.getRegionName() == null ? "" : cloudStorageService.getRegionName(), // OS_REGION_NAME
                 getProvisioningTemplate(), // PROVISIONING_TEMPLATE
                 vmShutdownSh, // WORKFLOW_URL
-                job.getWalltime() // WALLTIME
+                job.isWalltimeSet() ? job.getWalltime() : 0 // WALLTIME
         };
 
         String result = MessageFormat.format(bootstrapTemplate, arguments);
