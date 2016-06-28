@@ -29,6 +29,10 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private boolean emailNotification;
     private String processTimeLog;
     private String storageBucket;
+    
+    /**
+     * max walltime for the job. 0 or null indicate that no walltime applies to the job
+     */
     private Integer walltime;
     private boolean containsPersistentVolumes;
 
@@ -308,13 +312,17 @@ public class VEGLJob extends CloudJob implements Cloneable {
     }
 
     /**
-     * The walltime in minutes
-     * @return
+     * The walltime in minutes.
+     * @return Walltime in minutes or null if no walltime is set.
      */
     public Integer getWalltime() {
         return walltime;
     }
 
+    public boolean isWalltimeSet() {
+        return getWalltime()!=null && getWalltime()>0;
+    }
+    
     /**
      * Set the walltime in minutes
      * @param walltime
