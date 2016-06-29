@@ -50,8 +50,8 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                         }
                         else {
                         	  if (jobUploadFrm.wizardState.jobId === undefined) {
-                                jobUploadFrm.confirmContinue(function(cont) {
-                                    if (cont) {
+                                jobUploadFrm.confirmContinue(function(doContinue) {
+                                    if (doContinue) {
                                         jobUploadFrm.createJob(function() {
                                             jobUploadFrm.updateFileList();
                                         });
@@ -211,12 +211,13 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
 
         // If no data set has been captured in the session and we have no job
         // then check with the user whether or not to continue.
-        if (this.wizardState.jobId === undefined && this.getNumDownloadRequests() === 0) {
+        if (this.wizardState.jobId === undefined && this.getNumDownloadRequests() == 0) {
+            var self = this;
             Ext.Msg.confirm('Confirm',
                             'No data set has been captured. Do you want to continue?',
                             function(button) {
                                 if (button === 'yes') {
-                                    this.wizardState.skipConfirmPopup = true;
+                                    self.wizardState.skipConfirmPopup = true;
                                     callback(true);
                                     return;
                                 } else {
@@ -225,9 +226,10 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                                 }
                             });
         }
-
-        // Continue by default
-        callback(true);
+        else {
+            // Continue by default
+            callback(true);
+        }
     },
 
     /**
@@ -277,6 +279,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                 }
 
                 // continue with the wizard
+                wizardState.jobId = responseObj.data[0].id;
                 callback(true);
                 return;
             }
