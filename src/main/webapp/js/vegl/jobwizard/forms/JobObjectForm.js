@@ -465,28 +465,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 wizardState.ncpus = computeType.get('vcpus');
                 wizardState.nrammb = computeType.get('ramMB');
 
-                // Check with the user if no data set has been captured.
-                var numDownloadReqs = 0;
-                if (updatedJob.jobDownloads !== null) {
-                    numDownloadReqs = updatedJob.jobDownloads.length;
-                }
-                if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
-                    Ext.Msg.confirm('Confirm',
-                            'No data set has been captured. Do you want to continue?',
-                            function(button) {
-                                if (button === 'yes') {
-                                    wizardState.skipConfirmPopup = true;
-                                    callback(true);
-                                    return;
-                                } else {
-                                    callback(false);
-                                    return;
-                                }
-                        });
-                } else {
-                    callback(true);
-                    return;
-                }
+                // Don't need to check for data sets at this point since that
+                // was done at the start. Continue with the wizard.
+                callback(true);
+                return;
             }
         });
     },
