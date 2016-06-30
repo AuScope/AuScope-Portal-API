@@ -29,7 +29,12 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private boolean emailNotification;
     private String processTimeLog;
     private String storageBucket;
+    
+    /**
+     * max walltime for the job. 0 or null indicate that no walltime applies to the job
+     */
     private Integer walltime;
+    private boolean containsPersistentVolumes;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -41,6 +46,15 @@ public class VEGLJob extends CloudJob implements Cloneable {
 
     /** A set of Solutions associated with this job */
     private Set<String> jobSolutions = new HashSet<String>();
+
+    public boolean isContainsPersistentVolumes() {
+        return containsPersistentVolumes;
+    }
+
+
+    public void setContainsPersistentVolumes(boolean containsPersistentVolumes) {
+        this.containsPersistentVolumes = containsPersistentVolumes;
+    }
 
     /**
      * Creates an unitialised VEGLJob
@@ -254,6 +268,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setUser(this.getUser());
         newJob.setStorageBucket(this.getStorageBucket());
         newJob.setWalltime(this.getWalltime());
+        newJob.setContainsPersistentVolumes(this.isContainsPersistentVolumes());
 
         List<VglDownload> newDownloads = new ArrayList<VglDownload>();
         for (VglDownload dl : this.getJobDownloads()) {
@@ -297,13 +312,17 @@ public class VEGLJob extends CloudJob implements Cloneable {
     }
 
     /**
-     * The walltime in minutes
-     * @return
+     * The walltime in minutes.
+     * @return Walltime in minutes or null if no walltime is set.
      */
     public Integer getWalltime() {
         return walltime;
     }
 
+    public boolean isWalltimeSet() {
+        return getWalltime()!=null && getWalltime()>0;
+    }
+    
     /**
      * Set the walltime in minutes
      * @param walltime

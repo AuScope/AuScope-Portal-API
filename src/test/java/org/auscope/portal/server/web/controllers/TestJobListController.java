@@ -167,8 +167,11 @@ public class TestJobListController extends PortalTestClass {
             allowing(queueMockJobs.get(0)).getId();will(returnValue(5555));
             allowing(queueMockJobs.get(1)).getId();will(returnValue(jobId));
             
-            allowing(queueMockJobs.get(0)).getWalltime();will(returnValue(0));
-            allowing(queueMockJobs.get(1)).getWalltime();will(returnValue(0));
+            allowing(queueMockJobs.get(0)).isWalltimeSet(); will(returnValue(false));
+            allowing(queueMockJobs.get(1)).isWalltimeSet(); will(returnValue(false));
+
+            allowing(queueMockJobs.get(0)).getWalltime();will(returnValue(null));
+            allowing(queueMockJobs.get(1)).getWalltime();will(returnValue(null));
             
             oneOf(queueMockJobs.get(1)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
             oneOf(queueMockJobManager).saveJob(queueMockJobs.get(1));

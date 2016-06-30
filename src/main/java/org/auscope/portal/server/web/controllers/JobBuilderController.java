@@ -29,6 +29,7 @@ import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.util.FileIOUtil;
@@ -85,7 +86,7 @@ public class JobBuilderController extends BaseCloudController {
     private ANVGLProvenanceService anvglProvenanceService;
     private String adminEmail = null;
     private String defaultToolbox = null;
-    
+
     /**
      * @return the adminEmail
      */
@@ -697,6 +698,7 @@ public class JobBuilderController extends BaseCloudController {
         boolean succeeded = false;
         String oldJobStatus = null, errorDescription = null, errorCorrection = null;
         VEGLJob curJob = null;
+        boolean containsPersistentVolumes = false;
 
         try {
             // Get our job
@@ -771,6 +773,12 @@ public class JobBuilderController extends BaseCloudController {
                             anvglProvenanceService.setServerURL(request.getRequestURL().toString());
                             anvglProvenanceService.createActivity(curJob, scmEntryService.getJobSolutions(curJob), user);
 
+                            //ANVGL-120 Check for persistent volumes
+                            if (cloudComputeService instanceof CloudComputeServiceAws) {
+                                containsPersistentVolumes = ((CloudComputeServiceAws) cloudComputeService).containsPersistentVolumes(curJob);
+                                curJob.setContainsPersistentVolumes(containsPersistentVolumes);
+                            }
+
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);
                             jobManager.saveJob(curJob);
@@ -814,7 +822,9 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         if (succeeded) {
-            return generateJSONResponseMAV(true, null, "");
+            ModelMap responseModel = new ModelMap();
+            responseModel.put("containsPersistentVolumes", containsPersistentVolumes);
+            return generateJSONResponseMAV(true, responseModel, "");
         } else {
             jobManager.createJobAuditTrail(oldJobStatus, curJob, errorDescription);
             return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);

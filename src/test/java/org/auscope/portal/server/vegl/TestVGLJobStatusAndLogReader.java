@@ -188,7 +188,8 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
             allowing(mockJob).getSubmitDate(); will(returnValue(new Date()));
-            allowing(mockJob).getWalltime(); will(returnValue(0));
+            allowing(mockJob).isWalltimeSet(); will(returnValue(false));
+            allowing(mockJob).getWalltime(); will(returnValue(null));
             oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Running));
         }});
 
