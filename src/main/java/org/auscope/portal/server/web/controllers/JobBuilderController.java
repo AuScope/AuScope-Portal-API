@@ -51,16 +51,19 @@ import org.auscope.portal.server.web.service.scm.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-
 
 /**
  * Controller for the job submission view.
@@ -438,6 +441,8 @@ public class JobBuilderController extends BaseCloudController {
             } else {
                 job = jobManager.getJobById(id, user);
             }
+        } catch (AccessDeniedException e) {
+            throw e;  
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
@@ -520,6 +525,8 @@ public class JobBuilderController extends BaseCloudController {
 
         try {
             job = jobManager.getJobById(id, user);
+        } catch (AccessDeniedException e) {
+            throw e;  
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
@@ -577,6 +584,8 @@ public class JobBuilderController extends BaseCloudController {
         VEGLJob job;
         try {
             job = jobManager.getJobById(id, user);
+        } catch (AccessDeniedException e) {
+          throw e;  
         } catch (Exception ex) {
             logger.error("Error looking up job with id " + id + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
@@ -625,15 +634,15 @@ public class JobBuilderController extends BaseCloudController {
     }
 
 
-    /**
-     * Gets the list of authorised images for the specified job owned by user
-     * @param request The request (from a user) making the query
-     * @param job The job for which the images will be tested
-     * @return
-     */
-    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, VEGLJob job) {
-        return getImagesForJobAndUser(request, job.getComputeServiceId());
-    }
+//    /**
+//     * Gets the list of authorised images for the specified job owned by user
+//     * @param request The request (from a user) making the query
+//     * @param job The job for which the images will be tested
+//     * @return
+//     */
+//    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, VEGLJob job) {
+//        return getImagesForJobAndUser(request, job.getComputeServiceId());
+//    }
 
     /**
      * Gets the list of authorised images for the specified job owned by user
@@ -801,11 +810,15 @@ public class JobBuilderController extends BaseCloudController {
         } catch (IOException e) {
             logger.error("Job bootstrap creation failed.", e);
             errorDescription = "There was a problem creating startup script.";
-            errorCorrection = "Please report this error to cg_admin@csiro.au";
+            errorCorrection = "Please report this error to "+getAdminEmail();
+        } catch (AccessDeniedException e) {
+            logger.error("Job submission failed.", e);
+            errorDescription = "You are not authorized to access the specified job with id: "+ curJob.getId();
+            errorCorrection = "Please report this error to "+getAdminEmail();
         } catch (Exception e) {
             logger.error("Job submission failed.", e);
             errorDescription = "An unexpected error has occurred while submitting your job for processing.";
-            errorCorrection = "Please report this error to cg_admin@csiro.au";
+            errorCorrection = "Please report this error to "+getAdminEmail();
         }
 
         if (succeeded) {
@@ -823,7 +836,7 @@ public class JobBuilderController extends BaseCloudController {
         VEGLJob curJob;
         String userDataString;
 
-        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString ){
+        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString){
             this.cloudComputeService = cloudComputeService;
             this.curJob = curJob;
             this.userDataString = userDataString;
@@ -1104,9 +1117,13 @@ public class JobBuilderController extends BaseCloudController {
                                                          required=false)
                                            Integer jobId,
                                            @AuthenticationPrincipal ANVGLUser user) {
-
-        Set<String> jobCCSIds = scmEntryService.getJobProviders(jobId, user);
-
+        Set<String> jobCCSIds;
+        try {
+            jobCCSIds = scmEntryService.getJobProviders(jobId, user);
+        } catch (AccessDeniedException e) {
+            throw e;
+        }   
+        
         List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();
 
         for (CloudComputeService ccs : cloudComputeServices) {
@@ -1185,6 +1202,12 @@ public class JobBuilderController extends BaseCloudController {
         allInputs.addAll(job.getJobDownloads());
 
         return generateJSONResponseMAV(true, allInputs, "");
+    }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
+    public @ResponseBody String handleException(AccessDeniedException e) {
+        return e.getMessage();
     }
 
     /**

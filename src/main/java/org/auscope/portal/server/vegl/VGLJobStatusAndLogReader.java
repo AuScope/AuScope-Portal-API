@@ -156,7 +156,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
 
         //The service hangs onto the underlying job Object but the DB is the point of truth
         //Make sure we get an updated job object first!
-        VEGLJob job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role);
+        VEGLJob job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role, cloudJob.getEmailAddress());
         if (job == null) {
             return null;
         }

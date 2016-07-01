@@ -119,21 +119,22 @@ public class TestVEGLJobManager extends PortalTestClass {
      */
     @Test
     public void testGetSeriesById() {
+        final String userEmail= "dummy@dummy.comn";
         final int series1 = 1;
         final int series2 = 2;
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockSeriesDao).get(series1);
+            oneOf(mockSeriesDao).get(series1, userEmail);
             will(returnValue(mockSeries));
-            oneOf(mockSeriesDao).get(series2);
+            oneOf(mockSeriesDao).get(series2, userEmail);
             will(returnValue(null));
         }});
         
-        Assert.assertNotNull(jobManager.getSeriesById(series1));
+        Assert.assertNotNull(jobManager.getSeriesById(series1, userEmail));
         // Test to ensure null is returned when user's signature 
         // cannot be found.
-        Assert.assertNull(jobManager.getSeriesById(series2));
+        Assert.assertNull(jobManager.getSeriesById(series2, userEmail));
     }
     
     /**
