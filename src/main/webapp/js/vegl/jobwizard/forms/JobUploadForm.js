@@ -43,18 +43,27 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
 
                                     if (responseObj.success) {
                                         jobUploadFrm.wizardState.jobId = responseObj.data[0].id;
+                                        jobUploadFrm.updateFileList();
                                     }
                                 }
                             });
-                            jobUploadFrm.updateFileList();
                         }
                         else {
-                            // Ext.bind(jobUploadFrm.updateFileList, jobUploadFrm);
-                        	 if (jobUploadFrm.wizardState.jobId === undefined) {
-                                 jobUploadFrm.createJob(function() { jobUploadFrm.updateFileList(); });
-                             } else {
-                                 jobUploadFrm.updateFileList();
-                             }
+                        	  if (jobUploadFrm.wizardState.jobId === undefined) {
+                                jobUploadFrm.confirmContinue(function(doContinue) {
+                                    if (doContinue) {
+                                        jobUploadFrm.createJob(function() {
+                                            jobUploadFrm.updateFileList();
+                                        });
+                                    }
+                                    else {
+                                        Ext.util.History.back();
+                                    }
+                                });
+                            }
+                            else {
+                                jobUploadFrm.updateFileList();
+                            }
                         }
                     }
             },
@@ -186,6 +195,44 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
     },
 
     /**
+     * Confirm with the user whether to continue if no dataset has been captured.
+     *
+     * Calls callback passing true/false to indicate whether to continue.
+     *
+     * @function
+     * @param {function} callback
+     */
+    confirmContinue: function(callback) {
+        // Did the user already confirm to continue earlier?
+        if (this.wizardState.skipConfirmPopup) {
+            callback(true);
+            return;
+        }
+
+        // If no data set has been captured in the session and we have no job
+        // then check with the user whether or not to continue.
+        if (this.wizardState.jobId === undefined && this.getNumDownloadRequests() == 0) {
+            var self = this;
+            Ext.Msg.confirm('Confirm',
+                            'No data set has been captured. Do you want to continue?',
+                            function(button) {
+                                if (button === 'yes') {
+                                    self.wizardState.skipConfirmPopup = true;
+                                    callback(true);
+                                    return;
+                                } else {
+                                    callback(false);
+                                    return;
+                                }
+                            });
+        }
+        else {
+            // Continue by default
+            callback(true);
+        }
+    },
+
+    /**
      * Creates a new job and hooks the generated JobId to the work-flow
      * @function
      * @param {function} callback
@@ -231,32 +278,8 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                     return;
                 }
 
-                var updatedJob = responseObj.data[0];
-                wizardState.jobId = updatedJob.id;
-
-                // Check with the user if no data set has been captured.
-                var numDownloadReqs = 0;
-                if (updatedJob.jobDownloads !== null) {
-                    numDownloadReqs = updatedJob.jobDownloads.length;
-                }
-                if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
-                    Ext.Msg.confirm('Confirm',
-                                    'No data set has been captured. Do you want to continue?',
-                                    function(button) {
-                                        if (button === 'yes') {
-                                            wizardState.skipConfirmPopup = true;
-                                            callback(true);
-                                            return;
-                                        } else {
-                                            callback(false);
-                                            return;
-                                        }
-                                    });
-                } else {
-                    callback(true);
-                    return;
-                }
-
+                // continue with the wizard
+                wizardState.jobId = responseObj.data[0].id;
                 callback(true);
                 return;
             }

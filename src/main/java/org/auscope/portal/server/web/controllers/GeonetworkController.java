@@ -33,10 +33,14 @@ import org.auscope.portal.server.vegl.VGLSignature;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -219,13 +223,19 @@ public class GeonetworkController extends BaseCloudController {
         }
 
         //Lookup our appropriate job
-        VEGLJob job = jobManager.getJobById(jobId, user);
+        VEGLJob job;
+        try {
+            job = jobManager.getJobById(jobId, user);
+        } catch (AccessDeniedException e) {
+            throw e;
+        }
+        
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The specified job does not exist.");
         }
 
         //Lookup our series
-        VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
+        VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId(), user.getEmail());
         if (jobSeries == null) {
             return generateJSONResponseMAV(false, null, "The specified job does not belong to a series.");
         }
@@ -270,4 +280,11 @@ public class GeonetworkController extends BaseCloudController {
             return generateJSONResponseMAV(false, null, "Internal error");
         }
     }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
+    public @ResponseBody String handleException(AccessDeniedException e) {
+        return e.getMessage();
+    }
+
 }

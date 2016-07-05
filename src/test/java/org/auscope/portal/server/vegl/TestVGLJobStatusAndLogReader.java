@@ -29,6 +29,7 @@ import org.springframework.ui.ModelMap;
  * @author Richard Goh
  */
 public class TestVGLJobStatusAndLogReader extends PortalTestClass {
+    private static final String USER_EMAIL = "dummy@dummy.com";
     private final String storageServiceId = "storage-service-id";
     private final String computeServiceId = "compute-service-id";
     private VEGLJobManager mockJobManager;
@@ -69,8 +70,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
@@ -103,8 +105,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
@@ -137,8 +140,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
@@ -172,8 +176,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
@@ -216,8 +221,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
 		downloads.add(download);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
@@ -246,8 +252,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
             oneOf(mockJob).getId();will(returnValue(jobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
@@ -268,8 +275,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null);will(returnValue(null));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(null));
             oneOf(mockJob).getId();will(returnValue(jobId));
+            oneOf(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
@@ -290,8 +298,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(jobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
             allowing(mockJob).getStorageServiceId();will(returnValue("does-not-exist"));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
@@ -315,8 +324,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(jobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockCloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("error")));
