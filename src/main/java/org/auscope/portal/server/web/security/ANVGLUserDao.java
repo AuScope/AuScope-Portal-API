@@ -2,8 +2,6 @@ package org.auscope.portal.server.web.security;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -12,15 +10,13 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  *
  */
 public class ANVGLUserDao extends HibernateDaoSupport {
-    protected final Log logger = LogFactory.getLog(getClass());
-
     /**
      * Retrieves ANVGLUser that has the specified UD
      *
      * @param id the ID of the user
      */
     public ANVGLUser getById(final String id) {
-        return (ANVGLUser) getHibernateTemplate().get(ANVGLUser.class, id);
+        return getHibernateTemplate().get(ANVGLUser.class, id);
     }
 
     /**

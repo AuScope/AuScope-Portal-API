@@ -118,9 +118,7 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 //        final HttpSession mockSession = context.mock(HttpSession.class);
 
-        context.checking(new Expectations() {{
-
-        }});
+        context.checking(new Expectations());
 
         ModelAndView mav = controller.getUserSignature(mockRequest, null);
         Assert.assertNotNull(mav);

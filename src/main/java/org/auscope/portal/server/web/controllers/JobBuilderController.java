@@ -32,7 +32,6 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
-import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -98,7 +97,7 @@ public class JobBuilderController extends BaseCloudController {
     /**
      * @param adminEmail the adminEmail to set
      */
-    public void setAdminEmail(String adminEmail) {
+    public void setAdminEmail(final String adminEmail) {
         this.adminEmail = adminEmail;
     }
 
@@ -118,14 +117,14 @@ public class JobBuilderController extends BaseCloudController {
     VGLJobStatusChangeHandler vglJobStatusChangeHandler;
 
     @Autowired
-    public JobBuilderController(@Value("${HOST.portalAdminEmail}") String adminEmail,
-                                @Value("${HOST.defaultToolbox}") String defaultToolbox,
-            VEGLJobManager jobManager, FileStagingService fileStagingService,
-            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
-            CloudStorageService[] cloudStorageServices,
-            CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
-            VGLPollingJobQueueManager vglPollingJobQueueManager, ScmEntryService scmEntryService,
-            ANVGLProvenanceService anvglProvenanceService) {
+    public JobBuilderController(@Value("${HOST.portalAdminEmail}") final String adminEmail,
+            @Value("${HOST.defaultToolbox}") final String defaultToolbox,
+            final VEGLJobManager jobManager, final FileStagingService fileStagingService,
+            @Value("${vm.sh}") final String vmSh, @Value("${vm-shutdown.sh}") final String vmShutdownSh,
+            final CloudStorageService[] cloudStorageServices,
+            final CloudComputeService[] cloudComputeServices,final VGLJobStatusChangeHandler vglJobStatusChangeHandler,
+            final VGLPollingJobQueueManager vglPollingJobQueueManager, final ScmEntryService scmEntryService,
+            final ANVGLProvenanceService anvglProvenanceService) {
         super(cloudStorageServices, cloudComputeServices,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
@@ -150,12 +149,12 @@ public class JobBuilderController extends BaseCloudController {
      *         VEGLJob object and a success attribute.
      */
     @RequestMapping("/secure/getJobObject.do")
-    public ModelAndView getJobObject(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getJobObject(@RequestParam("jobId") final String jobId, @AuthenticationPrincipal final ANVGLUser user) {
         try {
-            VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
+            final VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
 
             return generateJSONResponseMAV(true, Arrays.asList(job), "");
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
@@ -166,9 +165,9 @@ public class JobBuilderController extends BaseCloudController {
      * @param file
      * @return
      */
-    private FileInformation stagedFileToFileInformation(StagedFile file) {
-        File internalFile = file.getFile();
-        long length = internalFile == null ? 0 : internalFile.length();
+    private static FileInformation stagedFileToFileInformation(final StagedFile file) {
+        final File internalFile = file.getFile();
+        final long length = internalFile == null ? 0 : internalFile.length();
         return new FileInformation(file.getName(), length, false, "");
     }
 
@@ -183,13 +182,13 @@ public class JobBuilderController extends BaseCloudController {
      *         filenames.
      */
     @RequestMapping("/secure/listJobFiles.do")
-    public ModelAndView listJobFiles(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView listJobFiles(@RequestParam("jobId") final String jobId, @AuthenticationPrincipal final ANVGLUser user) {
 
         //Lookup our job
         VEGLJob job = null;
         try {
             job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
@@ -198,12 +197,12 @@ public class JobBuilderController extends BaseCloudController {
         StagedFile[] files = null;
         try {
             files = fileStagingService.listStageInDirectoryFiles(job);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error listing job stage in directory", ex);
             return generateJSONResponseMAV(false, null, "Error reading job stage in directory");
         }
-        List<FileInformation> fileInfos = new ArrayList<FileInformation>();
-        for (StagedFile file : files) {
+        final List<FileInformation> fileInfos = new ArrayList<>();
+        for (final StagedFile file : files) {
             fileInfos.add(stagedFileToFileInformation(file));
         }
 
@@ -222,13 +221,13 @@ public class JobBuilderController extends BaseCloudController {
      * @throws IOException
      */
     @RequestMapping("/secure/downloadInputFile.do")
-    public ModelAndView downloadFile(HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestParam("jobId") String jobId,
-            @RequestParam("filename") String filename, @AuthenticationPrincipal ANVGLUser user) throws Exception {
+    public ModelAndView downloadFile(final HttpServletRequest request,
+            final HttpServletResponse response,
+            @RequestParam("jobId") final String jobId,
+            @RequestParam("filename") final String filename, @AuthenticationPrincipal final ANVGLUser user) throws Exception {
 
         //Lookup our job and download the specified files (any exceptions will return a HTTP 503)
-        VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
+        final VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
         fileStagingService.handleFileDownload(job, filename, response);
         return null;
     }
@@ -244,15 +243,15 @@ public class JobBuilderController extends BaseCloudController {
      * @return null
      */
     @RequestMapping("/secure/uploadFile.do")
-    public ModelAndView uploadFile(HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView uploadFile(final HttpServletRequest request,
+            final HttpServletResponse response,
+            @RequestParam("jobId") final String jobId, @AuthenticationPrincipal final ANVGLUser user) {
 
         //Lookup our job
         VEGLJob job = null;
         try {
             job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
@@ -261,11 +260,11 @@ public class JobBuilderController extends BaseCloudController {
         StagedFile file = null;
         try {
             file = fileStagingService.handleFileUpload(job, (MultipartHttpServletRequest) request);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error uploading file", ex);
             return generateJSONResponseMAV(false, null, "Error uploading file");
         }
-        FileInformation fileInfo = stagedFileToFileInformation(file);
+        final FileInformation fileInfo = stagedFileToFileInformation(file);
 
         //We have to use a HTML response due to ExtJS's use of a hidden iframe for file uploads
         //Failure to do this will result in the upload working BUT the user will also get prompted
@@ -283,19 +282,19 @@ public class JobBuilderController extends BaseCloudController {
      *         the files were successfully deleted.
      */
     @RequestMapping("/secure/deleteFiles.do")
-    public ModelAndView deleteFiles(@RequestParam("jobId") String jobId,
-            @RequestParam("fileName") String[] fileNames, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView deleteFiles(@RequestParam("jobId") final String jobId,
+            @RequestParam("fileName") final String[] fileNames, @AuthenticationPrincipal final ANVGLUser user) {
 
         VEGLJob job = null;
         try {
             job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
 
-        for (String fileName : fileNames) {
-            boolean success = fileStagingService.deleteStageInFile(job, fileName);
+        for (final String fileName : fileNames) {
+            final boolean success = fileStagingService.deleteStageInFile(job, fileName);
             logger.debug("Deleting " + fileName + " success=" + success);
         }
 
@@ -312,22 +311,22 @@ public class JobBuilderController extends BaseCloudController {
      *         the downloads were successfully deleted.
      */
     @RequestMapping("/secure/deleteDownloads.do")
-    public ModelAndView deleteDownloads(@RequestParam("jobId") String jobId,
-            @RequestParam("downloadId") Integer[] downloadIds, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView deleteDownloads(@RequestParam("jobId") final String jobId,
+            @RequestParam("downloadId") final Integer[] downloadIds, @AuthenticationPrincipal final ANVGLUser user) {
 
         VEGLJob job = null;
         try {
             job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
 
         //Delete the specified ID's
-        Iterator<VglDownload> dlIterator = job.getJobDownloads().iterator();
+        final Iterator<VglDownload> dlIterator = job.getJobDownloads().iterator();
         while (dlIterator.hasNext()) {
-            VglDownload dl = dlIterator.next();
-            for (Integer id : downloadIds) {
+            final VglDownload dl = dlIterator.next();
+            for (final Integer id : downloadIds) {
                 if (id.equals(dl.getId())) {
                     dlIterator.remove();
                     break;
@@ -337,7 +336,7 @@ public class JobBuilderController extends BaseCloudController {
 
         try {
             jobManager.saveJob(job);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error saving job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error saving job with id " + jobId);
         }
@@ -355,13 +354,13 @@ public class JobBuilderController extends BaseCloudController {
      *
      */
     @RequestMapping("/secure/getJobStatus.do")
-    public ModelAndView getJobStatus(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getJobStatus(@RequestParam("jobId") final String jobId, @AuthenticationPrincipal final ANVGLUser user) {
 
         //Get our job
         VEGLJob job = null;
         try {
             job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
@@ -378,18 +377,18 @@ public class JobBuilderController extends BaseCloudController {
      * @return null
      */
     @RequestMapping("/secure/cancelSubmission.do")
-    public ModelAndView cancelSubmission(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView cancelSubmission(@RequestParam("jobId") final String jobId, @AuthenticationPrincipal final ANVGLUser user) {
 
         //Get our job
         VEGLJob job = null;
         try {
             job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
 
-        boolean success = fileStagingService.deleteStageInDirectory(job);
+        final boolean success = fileStagingService.deleteStageInDirectory(job);
         return generateJSONResponseMAV(success, null, "");
     }
 
@@ -400,8 +399,8 @@ public class JobBuilderController extends BaseCloudController {
      * @param binder
      */
     @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        CustomDateEditor editor = new CustomDateEditor(new SimpleDateFormat(CloudJob.DATE_FORMAT), true);
+    public void initBinder(final WebDataBinder binder) {
+        final CustomDateEditor editor = new CustomDateEditor(new SimpleDateFormat(CloudJob.DATE_FORMAT), true);
         binder.registerCustomEditor(Date.class, editor);
     }
 
@@ -417,19 +416,19 @@ public class JobBuilderController extends BaseCloudController {
      * @throws ParseException
      */
     @RequestMapping("/secure/updateOrCreateJob.do")
-    public ModelAndView updateOrCreateJob(@RequestParam(value="id", required=false) Integer id,  //The integer ID if not specified will trigger job creation
-            @RequestParam(value="name", required=false) String name,
-            @RequestParam(value="description", required=false) String description,
-            @RequestParam(value="seriesId", required=false) Integer seriesId,
-            @RequestParam(value="computeServiceId", required=false) String computeServiceId,
-            @RequestParam(value="computeVmId", required=false) String computeVmId,
-            @RequestParam(value="computeTypeId", required=false) String computeTypeId,
-            @RequestParam(value="storageServiceId", required=false) String storageServiceId,
-            @RequestParam(value="registeredUrl", required=false) String registeredUrl,
-            @RequestParam(value="emailNotification", required=false) boolean emailNotification,
-            @RequestParam(value="walltime", required=false) Integer walltime,
-            HttpServletRequest request,
-            @AuthenticationPrincipal ANVGLUser user) throws ParseException {
+    public ModelAndView updateOrCreateJob(@RequestParam(value="id", required=false) final Integer id,  //The integer ID if not specified will trigger job creation
+            @RequestParam(value="name", required=false) final String name,
+            @RequestParam(value="description", required=false) final String description,
+            @RequestParam(value="seriesId", required=false) final Integer seriesId,
+            @RequestParam(value="computeServiceId", required=false) final String computeServiceId,
+            @RequestParam(value="computeVmId", required=false) final String computeVmId,
+            @RequestParam(value="computeTypeId", required=false) final String computeTypeId,
+            @RequestParam(value="storageServiceId", required=false) final String storageServiceId,
+            @RequestParam(value="registeredUrl", required=false) final String registeredUrl,
+            @RequestParam(value="emailNotification", required=false) final boolean emailNotification,
+            @RequestParam(value="walltime", required=false) final Integer walltime,
+            final HttpServletRequest request,
+            @AuthenticationPrincipal final ANVGLUser user) {
 
         //Get our job
         VEGLJob job = null;
@@ -441,9 +440,9 @@ public class JobBuilderController extends BaseCloudController {
             } else {
                 job = jobManager.getJobById(id, user);
             }
-        } catch (AccessDeniedException e) {
-            throw e;  
-        } catch (Exception ex) {
+        } catch (final AccessDeniedException e) {
+            throw e;
+        } catch (final Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
         }
@@ -459,7 +458,7 @@ public class JobBuilderController extends BaseCloudController {
 
         //Updating the storage service means changing the base key
         if (storageServiceId != null) {
-            CloudStorageService css = getStorageService(storageServiceId);
+            final CloudStorageService css = getStorageService(storageServiceId);
             if (css == null) {
                 logger.error(String.format("Error fetching storage service with id %1$s", storageServiceId));
                 return generateJSONResponseMAV(false, null, "Storage service does not exist");
@@ -475,7 +474,7 @@ public class JobBuilderController extends BaseCloudController {
         //Dont allow the user to specify a cloud compute service that DNE
         // Updating the compute service means updating the dev keypair
         if (computeServiceId != null) {
-            CloudComputeService ccs = getComputeService(computeServiceId);
+            final CloudComputeService ccs = getComputeService(computeServiceId);
             if (ccs == null) {
                 logger.error(String.format("Error fetching compute service with id %1$s", computeServiceId));
                 return generateJSONResponseMAV(false, null, "No compute/storage service with those ID's");
@@ -489,7 +488,7 @@ public class JobBuilderController extends BaseCloudController {
         //Save the VEGL job
         try {
             jobManager.saveJob(job);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error updating job " + job, ex);
             return generateJSONResponseMAV(false, null, "Error saving job");
         }
@@ -508,15 +507,15 @@ public class JobBuilderController extends BaseCloudController {
      * @throws ParseException
      */
     @RequestMapping("/secure/updateJobSeries.do")
-    public ModelAndView updateJobSeries(@RequestParam(value="id", required=true) Integer id,  //The integer ID if not specified will trigger job creation
-            @RequestParam(value="folderName", required=true) String folderName, //Name of the folder to move to
-            HttpServletRequest request,
-            @AuthenticationPrincipal ANVGLUser user) throws ParseException {
+    public ModelAndView updateJobSeries(@RequestParam(value="id", required=true) final Integer id,  //The integer ID if not specified will trigger job creation
+            @RequestParam(value="folderName", required=true) final String folderName, //Name of the folder to move to
+            final HttpServletRequest request,
+            @AuthenticationPrincipal final ANVGLUser user) {
 
         //Get our job
         VEGLJob job = null;
         Integer seriesId=null;
-        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), folderName, null);
+        final List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), folderName, null);
         if(series.isEmpty()){
             return generateJSONResponseMAV(false, null,"Series not found");
         }else{
@@ -525,9 +524,9 @@ public class JobBuilderController extends BaseCloudController {
 
         try {
             job = jobManager.getJobById(id, user);
-        } catch (AccessDeniedException e) {
-            throw e;  
-        } catch (Exception ex) {
+        } catch (final AccessDeniedException e) {
+            throw e;
+        } catch (final Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
         }
@@ -538,7 +537,7 @@ public class JobBuilderController extends BaseCloudController {
         //Save the VEGL job
         try {
             jobManager.saveJob(job);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error updating series for job " + job, ex);
             return generateJSONResponseMAV(false, null, "Error updating series");
         }
@@ -560,19 +559,19 @@ public class JobBuilderController extends BaseCloudController {
      * @throws ParseException
      */
     @RequestMapping("/secure/updateJobDownloads.do")
-    public ModelAndView updateJobDownloads(@RequestParam("id") Integer id,  //The integer ID is the only required value
-            @RequestParam(required=false, value="append", defaultValue="false") String appendString,
-            @RequestParam("name") String[] names,
-            @RequestParam("description") String[] descriptions,
-            @RequestParam("url") String[] urls,
-            @RequestParam("localPath") String[] localPaths,
-            @AuthenticationPrincipal ANVGLUser user) throws ParseException {
+    public ModelAndView updateJobDownloads(@RequestParam("id") final Integer id,  //The integer ID is the only required value
+            @RequestParam(required=false, value="append", defaultValue="false") final String appendString,
+            @RequestParam("name") final String[] names,
+            @RequestParam("description") final String[] descriptions,
+            @RequestParam("url") final String[] urls,
+            @RequestParam("localPath") final String[] localPaths,
+            @AuthenticationPrincipal final ANVGLUser user) {
 
-        boolean append = Boolean.parseBoolean(appendString);
+        final boolean append = Boolean.parseBoolean(appendString);
 
-        List<VglDownload> parsedDownloads = new ArrayList<VglDownload>();
+        final List<VglDownload> parsedDownloads = new ArrayList<>();
         for (int i = 0; i < urls.length && i < names.length && i < descriptions.length && i < localPaths.length; i++) {
-            VglDownload newDl = new VglDownload();
+            final VglDownload newDl = new VglDownload();
             newDl.setName(names[i]);
             newDl.setDescription(descriptions[i]);
             newDl.setUrl(urls[i]);
@@ -584,15 +583,15 @@ public class JobBuilderController extends BaseCloudController {
         VEGLJob job;
         try {
             job = jobManager.getJobById(id, user);
-        } catch (AccessDeniedException e) {
-          throw e;  
-        } catch (Exception ex) {
+        } catch (final AccessDeniedException e) {
+            throw e;
+        } catch (final Exception ex) {
             logger.error("Error looking up job with id " + id + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
             return generateJSONResponseMAV(false, null, "Unable to access job");
         }
 
-        List<VglDownload> existingDownloads = job.getJobDownloads();
+        final List<VglDownload> existingDownloads = job.getJobDownloads();
         if (append) {
             existingDownloads.addAll(parsedDownloads);
             job.setJobDownloads(existingDownloads);
@@ -603,7 +602,7 @@ public class JobBuilderController extends BaseCloudController {
         //Save the VEGL job
         try {
             jobManager.saveJob(job);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error updating job downloads" + job, ex);
             return generateJSONResponseMAV(false, null, "Error saving job");
         }
@@ -619,12 +618,12 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      */
     @RequestMapping("/secure/getJobDownloads.do")
-    public ModelAndView getJobDownloads(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getJobDownloads(@RequestParam("jobId") final Integer jobId, @AuthenticationPrincipal final ANVGLUser user) {
         //Lookup the job
         VEGLJob job;
         try {
             job = jobManager.getJobById(jobId, user);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error looking up job with id " + jobId + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
             return generateJSONResponseMAV(false, null, "Unable to access job");
@@ -634,15 +633,15 @@ public class JobBuilderController extends BaseCloudController {
     }
 
 
-//    /**
-//     * Gets the list of authorised images for the specified job owned by user
-//     * @param request The request (from a user) making the query
-//     * @param job The job for which the images will be tested
-//     * @return
-//     */
-//    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, VEGLJob job) {
-//        return getImagesForJobAndUser(request, job.getComputeServiceId());
-//    }
+    //    /**
+    //     * Gets the list of authorised images for the specified job owned by user
+    //     * @param request The request (from a user) making the query
+    //     * @param job The job for which the images will be tested
+    //     * @return
+    //     */
+    //    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, VEGLJob job) {
+    //        return getImagesForJobAndUser(request, job.getComputeServiceId());
+    //    }
 
     /**
      * Gets the list of authorised images for the specified job owned by user
@@ -650,23 +649,23 @@ public class JobBuilderController extends BaseCloudController {
      * @param computeServiceId The compute service ID to search for images
      * @return
      */
-    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, String computeServiceId) {
-        CloudComputeService ccs = getComputeService(computeServiceId);
+    private List<MachineImage> getImagesForJobAndUser(final HttpServletRequest request, final String computeServiceId) {
+        final CloudComputeService ccs = getComputeService(computeServiceId);
         if (ccs == null) {
-            return new ArrayList<MachineImage>();
+            return new ArrayList<>();
         }
 
-        List<MachineImage> authorisedImages = new ArrayList<MachineImage>();
+        final List<MachineImage> authorisedImages = new ArrayList<>();
 
-        for (MachineImage img : ccs.getAvailableImages()) {
+        for (final MachineImage img : ccs.getAvailableImages()) {
             if (img instanceof VglMachineImage) {
                 //If the image has no permission restrictions, add it. Otherwise
                 //ensure that the user has a role matching something in the image permission list
-                String[] permissions = ((VglMachineImage) img).getPermissions();
+                final String[] permissions = ((VglMachineImage) img).getPermissions();
                 if (permissions == null) {
                     authorisedImages.add(img);
                 } else {
-                    for (String validRole : permissions) {
+                    for (final String validRole : permissions) {
                         if (request.isUserInRole(validRole)) {
                             authorisedImages.add(img);
                             break;
@@ -691,10 +690,10 @@ public class JobBuilderController extends BaseCloudController {
      *         the job was successfully submitted.
      */
     @RequestMapping("/secure/submitJob.do")
-    public ModelAndView submitJob(HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestParam("jobId") String jobId,
-            @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView submitJob(final HttpServletRequest request,
+            final HttpServletResponse response,
+            @RequestParam("jobId") final String jobId,
+            @AuthenticationPrincipal final ANVGLUser user) {
         boolean succeeded = false;
         String oldJobStatus = null, errorDescription = null, errorCorrection = null;
         VEGLJob curJob = null;
@@ -714,8 +713,8 @@ public class JobBuilderController extends BaseCloudController {
                 return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
             } else {
 
-                CloudStorageService cloudStorageService = getStorageService(curJob);
-                CloudComputeService cloudComputeService = getComputeService(curJob);
+                final CloudStorageService cloudStorageService = getStorageService(curJob);
+                final CloudComputeService cloudComputeService = getComputeService(curJob);
                 if (cloudStorageService == null || cloudComputeService == null) {
                     errorDescription = "One of the specified storage/compute services cannot be found.";
                     errorCorrection = "Consider changing the selected compute or storage service.";
@@ -725,7 +724,7 @@ public class JobBuilderController extends BaseCloudController {
                 // we need to keep track of old job for audit trail purposes
                 oldJobStatus = curJob.getStatus();
                 // Assume user has permission since we're using images from the SSC
-                boolean permissionGranted = true;
+                final boolean permissionGranted = true;
 
                 // // final check to ensure user has permission to run the job
                 // // boolean permissionGranted = false;
@@ -752,13 +751,13 @@ public class JobBuilderController extends BaseCloudController {
                     } else {
                         // copy files to S3 storage for processing
                         // get job files from local directory
-                        StagedFile[] stagedFiles = fileStagingService.listStageInDirectoryFiles(curJob);
+                        final StagedFile[] stagedFiles = fileStagingService.listStageInDirectoryFiles(curJob);
                         if (stagedFiles.length == 0) {
                             errorDescription = "There wasn't any input files found for submitting your job for processing.";
                             errorCorrection = "Please upload your input files and try again.";
                         } else {
                             // Upload them to storage
-                            File[] files = new File[stagedFiles.length];
+                            final File[] files = new File[stagedFiles.length];
                             for (int i = 0; i < stagedFiles.length; i++) {
                                 files[i] = stagedFiles[i].getFile();
                             }
@@ -784,7 +783,7 @@ public class JobBuilderController extends BaseCloudController {
                             jobManager.saveJob(curJob);
                             jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to provisioning");
 
-                            ExecutorService es = Executors.newSingleThreadExecutor();
+                            final ExecutorService es = Executors.newSingleThreadExecutor();
                             es.execute(new CloudThreadedExecuteService(cloudComputeService,curJob,userDataString));
                             succeeded = true;
                         }
@@ -798,7 +797,7 @@ public class JobBuilderController extends BaseCloudController {
                     errorCorrection = "If you think this is wrong, please report it to "+admin+".";
                 }
             }
-        } catch (PortalServiceException e) {
+        } catch (final PortalServiceException e) {
             errorDescription = e.getMessage();
             errorCorrection = e.getErrorCorrection();
 
@@ -807,22 +806,26 @@ public class JobBuilderController extends BaseCloudController {
                 errorDescription = "Unable to upload job script and/or input files";
                 errorCorrection = "The most likely cause is that your user profile ARN's have been misconfigured.";
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             logger.error("Job bootstrap creation failed.", e);
             errorDescription = "There was a problem creating startup script.";
             errorCorrection = "Please report this error to "+getAdminEmail();
-        } catch (AccessDeniedException e) {
+        } catch (final AccessDeniedException e) {
             logger.error("Job submission failed.", e);
-            errorDescription = "You are not authorized to access the specified job with id: "+ curJob.getId();
+            if (curJob == null) {
+                errorDescription = "You are not authorized to access the specified job";
+            } else {
+                errorDescription = "You are not authorized to access the specified job with id: "+ curJob.getId();
+            }
             errorCorrection = "Please report this error to "+getAdminEmail();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("Job submission failed.", e);
             errorDescription = "An unexpected error has occurred while submitting your job for processing.";
             errorCorrection = "Please report this error to "+getAdminEmail();
         }
 
         if (succeeded) {
-            ModelMap responseModel = new ModelMap();
+            final ModelMap responseModel = new ModelMap();
             responseModel.put("containsPersistentVolumes", containsPersistentVolumes);
             return generateJSONResponseMAV(true, responseModel, "");
         } else {
@@ -836,7 +839,7 @@ public class JobBuilderController extends BaseCloudController {
         VEGLJob curJob;
         String userDataString;
 
-        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString){
+        public CloudThreadedExecuteService(final CloudComputeService cloudComputeService,final VEGLJob curJob,final String userDataString){
             this.cloudComputeService = cloudComputeService;
             this.curJob = curJob;
             this.userDataString = userDataString;
@@ -850,22 +853,22 @@ public class JobBuilderController extends BaseCloudController {
                 logger.info("Launched instance: " + instanceId);
                 // set reference as instanceId for use when killing a job
                 curJob.setComputeInstanceId(instanceId);
-                String oldJobStatus = curJob.getStatus();
+                final String oldJobStatus = curJob.getStatus();
                 curJob.setStatus(STATUS_PENDING);
                 jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to Pending");
                 curJob.setSubmitDate(new Date());
                 jobManager.saveJob(curJob);
 
-            }catch(PortalServiceException e){
+            }catch(final PortalServiceException e){
                 //only for this specific error we wanna queue the job
                 if(e.getErrorCorrection()!= null && e.getErrorCorrection().contains("Quota exceeded")){
                     vglPollingJobQueueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
-                    String oldJobStatus = curJob.getStatus();
+                    final String oldJobStatus = curJob.getStatus();
                     curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
                     jobManager.saveJob(curJob);
                     jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
                 }else{
-                    String oldJobStatus = curJob.getStatus();
+                    final String oldJobStatus = curJob.getStatus();
                     curJob.setStatus(JobBuilderController.STATUS_ERROR);
                     jobManager.saveJob(curJob);
                     jobManager.createJobAuditTrail(oldJobStatus, curJob, e);
@@ -883,8 +886,8 @@ public class JobBuilderController extends BaseCloudController {
      * @param email
      * @return
      */
-    private VEGLJob initialiseVEGLJob(HttpSession session, ANVGLUser user) throws PortalServiceException {
-        VEGLJob job = new VEGLJob();
+    private VEGLJob initialiseVEGLJob(final HttpSession session, final ANVGLUser user) throws PortalServiceException {
+        final VEGLJob job = new VEGLJob();
 
         //Start by saving our job to set its ID
         jobManager.saveJob(job);
@@ -898,10 +901,11 @@ public class JobBuilderController extends BaseCloudController {
 
         //Iterate over all session variables - set them up as job parameters
         @SuppressWarnings("rawtypes")
+        final
         Enumeration sessionVariables = session.getAttributeNames();
         while (sessionVariables.hasMoreElements()) {
-            String variableName = sessionVariables.nextElement().toString();
-            Object variableValue = session.getAttribute(variableName);
+            final String variableName = sessionVariables.nextElement().toString();
+            final Object variableValue = session.getAttribute(variableName);
             String variableStringValue = null;
             ParameterType variableType = null;
 
@@ -930,10 +934,11 @@ public class JobBuilderController extends BaseCloudController {
 
         //Transfer the 'session downloads' into actual download objects associated with a job
         @SuppressWarnings("unchecked")
+        final
         List<VglDownload> erddapDownloads = (List<VglDownload>) session.getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);
         session.setAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST, null); //ensure we clear the list out in case the user makes more jobs
         if (erddapDownloads != null) {
-            job.setJobDownloads(new ArrayList<VglDownload>(erddapDownloads));
+            job.setJobDownloads(new ArrayList<>(erddapDownloads));
         } else {
             logger.warn("No downloads configured for user session!");
         }
@@ -957,27 +962,21 @@ public class JobBuilderController extends BaseCloudController {
      * @param fileName the file name of the generated script
      * @return
      */
-    private boolean createDownloadScriptFile(VEGLJob job, String fileName) {
-        OutputStream os = null;
-        OutputStreamWriter out = null;
-        try {
-            os = fileStagingService.writeFile(job,  fileName);
-            out = new OutputStreamWriter(os);
+    private boolean createDownloadScriptFile(final VEGLJob job, final String fileName) {
+        try (OutputStream os = fileStagingService.writeFile(job,  fileName);
+             OutputStreamWriter out = new OutputStreamWriter(os)) {
 
-            for (VglDownload dl : job.getJobDownloads()) {
+            for (final VglDownload dl : job.getJobDownloads()) {
                 out.write(String.format("#Downloading %1$s\n", dl.getName()));
                 out.write(String.format("curl -f -L '%1$s' -o \"%2$s\"\n", dl.getUrl(), dl.getLocalPath()));
             }
 
             return true;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("Error creating download script" +  e.getMessage());
             logger.debug("Error:", e);
             return false;
-        } finally {
-            FileIOUtil.closeQuietly(out);
-            FileIOUtil.closeQuietly(os);
-        }
+        } 
     }
 
     /**
@@ -1002,31 +1001,31 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/getVmImagesForComputeService.do")
     public ModelAndView getImagesForComputeService(
-        HttpServletRequest request,
-        @RequestParam("computeServiceId") String computeServiceId,
-        @RequestParam(value="jobId", required=false) Integer jobId,
-        @AuthenticationPrincipal ANVGLUser user) {
+            final HttpServletRequest request,
+            @RequestParam("computeServiceId") final String computeServiceId,
+            @RequestParam(value="jobId", required=false) final Integer jobId,
+            @AuthenticationPrincipal final ANVGLUser user) {
         try {
             // Assume all images are usable by the current user
-            List<MachineImage> images = new ArrayList<MachineImage>();
+            List<MachineImage> images = new ArrayList<>();
 
             if (jobId != null) {
-                VEGLJob job = jobManager.getJobById(jobId, user);
+                final VEGLJob job = jobManager.getJobById(jobId, user);
 
                 // Filter list to images suitable for job solutions, if specified.
-                Set<Toolbox> toolboxes = scmEntryService.getJobToolboxes(job);
+                final Set<Toolbox> toolboxes = scmEntryService.getJobToolboxes(job);
 
                 // With multiple solutions and multiple toolboxes, do
                 // not give the user the option of selecting the default
                 // portal toolbox for utility functions unless it's the
                 // only toolbox available.
-                int numToolboxes = toolboxes.size();
-                for (Toolbox toolbox: toolboxes) {
+                final int numToolboxes = toolboxes.size();
+                for (final Toolbox toolbox: toolboxes) {
                     if ((numToolboxes == 1) ||
-                        !toolbox.getUri().equals(this.defaultToolbox)) {
+                            !toolbox.getUri().equals(this.defaultToolbox)) {
                         images.add(scmEntryService
-                                   .getToolboxImage(toolbox,
-                                                    computeServiceId));
+                                .getToolboxImage(toolbox,
+                                        computeServiceId));
                     }
                 }
             }
@@ -1044,7 +1043,7 @@ public class JobBuilderController extends BaseCloudController {
 
             // return result
             return generateJSONResponseMAV(true, images, "");
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             log.error("Unable to access image list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
         }
@@ -1056,18 +1055,18 @@ public class JobBuilderController extends BaseCloudController {
      * @param computeServiceId
      */
     @RequestMapping("/secure/getVmTypesForComputeService.do")
-    public ModelAndView getTypesForComputeService(HttpServletRequest request,
-            @RequestParam("computeServiceId") String computeServiceId,
-            @RequestParam("machineImageId") String machineImageId) {
+    public ModelAndView getTypesForComputeService(final HttpServletRequest request,
+            @RequestParam("computeServiceId") final String computeServiceId,
+            @RequestParam("machineImageId") final String machineImageId) {
         try {
-            CloudComputeService ccs = getComputeService(computeServiceId);
+            final CloudComputeService ccs = getComputeService(computeServiceId);
             if (ccs == null) {
                 return generateJSONResponseMAV(false, null, "Unknown compute service");
             }
 
-            List<MachineImage> images = getImagesForJobAndUser(request, computeServiceId);
+            final List<MachineImage> images = getImagesForJobAndUser(request, computeServiceId);
             MachineImage selectedImage = null;
-            for (MachineImage image : images) {
+            for (final MachineImage image : images) {
                 if (image.getImageId().equals(machineImageId)) {
                     selectedImage = image;
                     break;
@@ -1088,15 +1087,15 @@ public class JobBuilderController extends BaseCloudController {
             }
 
             //Filter further due to AWS HVM/PVM compatiblity. See ANVGL-16
-            Object[] filteredTypes = Arrays.stream(allTypes).filter(new Predicate<ComputeType>() {
+            final Object[] filteredTypes = Arrays.stream(allTypes).filter(new Predicate<ComputeType>() {
                 @Override
-                public boolean test(ComputeType t) {
+                public boolean test(final ComputeType t) {
                     return t.getId().startsWith("c3") || t.getId().startsWith("m3");
                 }
             }).toArray();
 
             return generateJSONResponseMAV(true, filteredTypes, "");
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             log.error("Unable to access compute type list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
         }
@@ -1114,22 +1113,22 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/getComputeServices.do")
     public ModelAndView getComputeServices(@RequestParam(value="jobId",
-                                                         required=false)
-                                           Integer jobId,
-                                           @AuthenticationPrincipal ANVGLUser user) {
+    required=false) final
+            Integer jobId,
+            @AuthenticationPrincipal final ANVGLUser user) {
         Set<String> jobCCSIds;
         try {
             jobCCSIds = scmEntryService.getJobProviders(jobId, user);
-        } catch (AccessDeniedException e) {
+        } catch (final AccessDeniedException e) {
             throw e;
-        }   
-        
-        List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();
+        }
 
-        for (CloudComputeService ccs : cloudComputeServices) {
+        final List<ModelMap> simpleComputeServices = new ArrayList<>();
+
+        for (final CloudComputeService ccs : cloudComputeServices) {
             // Add the ccs to the list if it's valid for job or we have no job
             if (jobCCSIds == null || jobCCSIds.contains(ccs.getId())) {
-                ModelMap map = new ModelMap();
+                final ModelMap map = new ModelMap();
                 map.put("id", ccs.getId());
                 map.put("name", ccs.getName());
                 simpleComputeServices.add(map);
@@ -1145,10 +1144,10 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/getStorageServices.do")
     public ModelAndView getStorageServices() {
-        List<ModelMap> simpleStorageServices = new ArrayList<ModelMap>();
+        final List<ModelMap> simpleStorageServices = new ArrayList<>();
 
-        for (CloudStorageService ccs : cloudStorageServices) {
-            ModelMap map = new ModelMap();
+        for (final CloudStorageService ccs : cloudStorageServices) {
+            final ModelMap map = new ModelMap();
             map.put("id", ccs.getId());
             map.put("name", ccs.getName());
             simpleStorageServices.add(map);
@@ -1167,11 +1166,11 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      */
     @RequestMapping("/secure/getAllJobInputs.do")
-    public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getAllJobInputs(@RequestParam("jobId") final Integer jobId, @AuthenticationPrincipal final ANVGLUser user) {
         VEGLJob job = null;
         try {
             job = jobManager.getJobById(jobId, user);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
         }
@@ -1180,18 +1179,18 @@ public class JobBuilderController extends BaseCloudController {
         StagedFile[] files = null;
         try {
             files = fileStagingService.listStageInDirectoryFiles(job);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             logger.error("Error listing job stage in directory", ex);
             return generateJSONResponseMAV(false, null, "Error reading job stage in directory");
         }
 
         //Load the staged files
-        List<VglDownload> allInputs = new ArrayList<VglDownload>();
+        final List<VglDownload> allInputs = new ArrayList<>();
         int idCounter = Integer.MIN_VALUE;
-        for (StagedFile file : files) {
+        for (final StagedFile file : files) {
             //we need unique ids - this is our simple way of generating them (low likelyhood of collision)
             //if we have a collision the GUI might not show one entry - it's not the end of the world
-            VglDownload dl = new VglDownload(idCounter++);
+            final VglDownload dl = new VglDownload(idCounter++);
             dl.setName(file.getName());
             dl.setLocalPath(file.getName());
 
@@ -1203,10 +1202,10 @@ public class JobBuilderController extends BaseCloudController {
 
         return generateJSONResponseMAV(true, allInputs, "");
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
-    public @ResponseBody String handleException(AccessDeniedException e) {
+    public @ResponseBody String handleException(final AccessDeniedException e) {
         return e.getMessage();
     }
 
@@ -1224,7 +1223,7 @@ public class JobBuilderController extends BaseCloudController {
      *
      * @param defaultToolbox String containing the URI of the default toolbox to set
      */
-    public void setDefaultToolbox(String defaultToolbox) {
+    public void setDefaultToolbox(final String defaultToolbox) {
         this.defaultToolbox = defaultToolbox;
     }
 }

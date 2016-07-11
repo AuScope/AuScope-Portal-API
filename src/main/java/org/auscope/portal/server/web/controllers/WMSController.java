@@ -12,8 +12,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BaseCSWController;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
@@ -47,7 +45,6 @@ public class WMSController extends BaseCSWController {
     // ----------------------------------------------------- Instance variables
 
     private WMSService wmsService;
-    private final Log log = LogFactory.getLog(getClass());
 
     // ----------------------------------------------------------- Constructors
 

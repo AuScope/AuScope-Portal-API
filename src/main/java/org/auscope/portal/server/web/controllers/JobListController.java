@@ -48,8 +48,8 @@ import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -598,47 +598,33 @@ public class JobListController extends BaseCloudController  {
 
         logger.debug("Download " + key);
 
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
+            return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+        }
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=\""+fileName+"\"");
+
         //Get our Input Stream
-        InputStream is = null;
-        try {
-            CloudStorageService cloudStorageService = getStorageService(job);
-            if (cloudStorageService == null) {
-                logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
-                return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+        try (InputStream is = cloudStorageService.getJobFile(job, key)) {
+            try (OutputStream out = response.getOutputStream()) {
+                int n;
+                byte[] buffer = new byte[1024];
+                while ((n = is.read(buffer)) != -1) {
+                    out.write(buffer, 0, n);
+                }
+                out.flush();
+            } catch (Exception e) {
+                logger.warn("Error whilst writing to output stream", e);
             }
-            is = cloudStorageService.getJobFile(job, key);
+            // The output is raw data down the output stream, just return null
+            return null;
         } catch (Exception ex) {
             logger.warn(String.format("Unable to access '%1$s' from the cloud", key), ex);
             return generateJSONResponseMAV(false, null, "Unable to access file from the cloud");
         }
-
-        //start writing our output stream
-        try {
-            response.setContentType("application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment; filename=\""+fileName+"\"");
-
-            //Ensure that our streams get closed
-            OutputStream out = response.getOutputStream();
-            try {
-
-                int n;
-                byte[] buffer = new byte[1024];
-
-                while ((n = is.read(buffer)) != -1) {
-                    out.write(buffer, 0, n);
-                }
-
-                out.flush();
-            } finally {
-                IOUtils.closeQuietly(is);
-                IOUtils.closeQuietly(out);
-            }
-        } catch (Exception ex) {
-            logger.warn("Error whilst writing to output stream", ex);
-        }
-
-        //The output is raw data down the output stream, just return null
-        return null;
     }
 
     /**
@@ -693,16 +679,16 @@ public class JobListController extends BaseCloudController  {
             ZipOutputStream zout = new ZipOutputStream(
                     response.getOutputStream());
             for (String fileKey : fileKeys) {
-                InputStream is = cloudStorageService.getJobFile(job, fileKey);
-
-                byte[] buffer = new byte[16384];
-                int count = 0;
-                zout.putNextEntry(new ZipEntry(fileKey));
-                while ((count = is.read(buffer)) != -1) {
-                    zout.write(buffer, 0, count);
+                try (InputStream is = cloudStorageService.getJobFile(job, fileKey)) {
+                    byte[] buffer = new byte[16384];
+                    int count = 0;
+                    zout.putNextEntry(new ZipEntry(fileKey));
+                    while ((count = is.read(buffer)) != -1) {
+                        zout.write(buffer, 0, count);
+                    }
+                    zout.closeEntry();
+                    readOneOrMoreFiles = true;
                 }
-                zout.closeEntry();
-                readOneOrMoreFiles = true;
             }
 
             if (readOneOrMoreFiles) {
@@ -902,7 +888,7 @@ public class JobListController extends BaseCloudController  {
             }
         }
 
-        List<ModelMap> tuples = new ArrayList<ModelMap>(userJobs.size());
+        List<ModelMap> tuples = new ArrayList<>(userJobs.size());
         for (VEGLJob job : userJobs) {
             ModelMap tuple = new ModelMap();
             tuple.put("jobId", job.getId());
@@ -923,6 +909,7 @@ public class JobListController extends BaseCloudController  {
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VEGLJob</code> objects.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/secure/treeJobs.do")
     public ModelAndView treeJobs(HttpServletRequest request,
             HttpServletResponse response,
@@ -958,7 +945,7 @@ public class JobListController extends BaseCloudController  {
         rootNode.put("seriesId", null);
         rootNode.put("children", new ArrayList<ModelMap>());
 
-        Map<Integer, ModelMap> nodeMap = new HashMap<Integer, ModelMap>();
+        Map<Integer, ModelMap> nodeMap = new HashMap<>();
         for (VEGLSeries series : userSeries) {
             ModelMap node = new ModelMap();
             node.put("leaf", false);
@@ -1004,7 +991,7 @@ public class JobListController extends BaseCloudController  {
      * @param fileName
      * @return
      */
-    private boolean cloudFileIncluded(String[] fileNames, CloudFileInformation cloudFile) {
+    private static boolean cloudFileIncluded(String[] fileNames, CloudFileInformation cloudFile) {
         if (fileNames == null) {
             return false;
         }
@@ -1124,16 +1111,11 @@ public class JobListController extends BaseCloudController  {
             CloudFileInformation[] cloudFiles = cloudStorageService.listJobFiles(oldJob);
             for (CloudFileInformation cloudFile : cloudFiles) {
                 if (cloudFileIncluded(files, cloudFile)) {
-                    InputStream is = cloudStorageService.getJobFile(oldJob, cloudFile.getName());
-                    OutputStream os = null;
-                    try {
-                        os = fileStagingService.writeFile(newJob, cloudFile.getName());
+                    try (InputStream is = cloudStorageService.getJobFile(oldJob, cloudFile.getName());
+                         OutputStream os = fileStagingService.writeFile(newJob, cloudFile.getName())) {
 
                         FileIOUtil.writeInputToOutputStream(is, os, 1024 * 1024, false);
-                    } finally {
-                        FileIOUtil.closeQuietly(os);
-                        FileIOUtil.closeQuietly(is);
-                    }
+                    } 
                 }
             }
         } catch (Exception ex) {
@@ -1172,7 +1154,7 @@ public class JobListController extends BaseCloudController  {
 
         ModelMap namedSections = null;
         try {
-            namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job, file == null ? VL_LOG_FILE : file);
+            namedSections = jobStatusLogReader.getSectionedLogs(job, file == null ? VL_LOG_FILE : file);
         } catch (PortalServiceException ex) {
             return generateJSONResponseMAV(false, null, ex.getMessage());
         }

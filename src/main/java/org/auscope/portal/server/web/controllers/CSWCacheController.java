@@ -21,7 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class CSWCacheController extends BaseCSWController {
-
     private CSWCacheService cswService;
 
     /**
