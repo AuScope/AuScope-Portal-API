@@ -115,7 +115,7 @@ public class TestBaseCloudController extends PortalTestClass {
      * @throws Exception
      */
     @Test
-    public void testGetComputeService_Job() throws Exception {
+    public void testGetComputeService_Job() {
         TestableBaseCloudController controller = new TestableBaseCloudController(mockStorageServices, mockComputeServices);
 
         String existingId = "anotherId-c";

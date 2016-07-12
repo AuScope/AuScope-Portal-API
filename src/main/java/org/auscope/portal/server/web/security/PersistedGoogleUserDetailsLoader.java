@@ -99,7 +99,6 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
         return userInfo.containsKey("id");
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UserDetails createUser(String id, Map<String, Object> userInfo) {
         List<ANVGLAuthority> authorities = new ArrayList<ANVGLAuthority>();

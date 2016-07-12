@@ -30,7 +30,7 @@ public class VEGLSeriesMatcher extends TypeSafeMatcher<VEGLSeries> {
     }
 
     @SuppressWarnings("null")
-    private boolean nullStringComparison(String s1, String s2) {
+    private static boolean nullStringComparison(String s1, String s2) {
         if ((s1 == null && s2 != null) || 
             (s1 != null && s2 == null)) {
             return false;
@@ -65,8 +65,8 @@ public class VEGLSeriesMatcher extends TypeSafeMatcher<VEGLSeries> {
     }
 
     @Override
-    public void describeTo(Description description) {
-        description.appendText(String.format("a VEGLSeries with user='%1$s' name='%2$s' description='%3$s'", user, name, description));
+    public void describeTo(Description desc) {
+        desc.appendText(String.format("a VEGLSeries with user='%1$s' name='%2$s' description='%3$s'", user, name, description));
     }
 
 }

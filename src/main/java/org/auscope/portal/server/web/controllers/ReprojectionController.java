@@ -71,13 +71,12 @@ public class ReprojectionController extends BasePortalController {
      * Calculates the likely MGA zone that the user should use. This zone is determined by finding what zone
      * the center of the selected region is in.
      * @return
-     * @throws Exception
      */
     @RequestMapping("/calculateMgaZoneForBBox.do")
     public ModelAndView calculateMgaZoneForBBox(@RequestParam("northBoundLatitude") final double northBoundLatitude,
                                          @RequestParam("southBoundLatitude") final double southBoundLatitude,
                                          @RequestParam("eastBoundLongitude") final double eastBoundLongitude,
-                                         @RequestParam("westBoundLongitude") final double westBoundLongitude) throws Exception {
+                                         @RequestParam("westBoundLongitude") final double westBoundLongitude) {
 
         // calculate likely MGA zone
         int mgaZone = calculateIdealMgaZone(northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude);
@@ -100,7 +99,7 @@ public class ReprojectionController extends BasePortalController {
                                 @RequestParam("southBoundLatitude") double southBoundLatitude,
                                 @RequestParam("eastBoundLongitude") double eastBoundLongitude,
                                 @RequestParam("westBoundLongitude") double westBoundLongitude,
-                                @RequestParam(required=false, value="mgaZone") Integer mgaZone) throws Exception {
+                                @RequestParam(required=false, value="mgaZone") Integer mgaZone) {
 
         if (mgaZone == null) {
             mgaZone = calculateIdealMgaZone(northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude);

@@ -194,6 +194,7 @@ public class TestCSWCacheController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get(SUCCESSJSON));
 
+        @SuppressWarnings("unchecked")
         List<ModelMap> data = (List<ModelMap>) mav.getModel().get("data");
         Assert.assertEquals(expectedKeywords.size(), data.size());
         for (ModelMap kwResponse : data) {
