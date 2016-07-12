@@ -1058,6 +1058,7 @@ public class TestJobBuilderController {
                     will(returnValue(""));
                     oneOf(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
                     oneOf(mockAnvglProvenanceService).createActivity(jobObj, null, mockPortalUser);
+                    allowing(mockAnvglProvenanceService).createEntitiesForOutputs(jobObj);
                     oneOf(mockScmEntryService).getJobSolutions(jobObj);
                     will(returnValue(null));
                 }

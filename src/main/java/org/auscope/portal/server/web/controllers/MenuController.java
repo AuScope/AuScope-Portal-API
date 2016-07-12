@@ -39,7 +39,17 @@ public class MenuController {
 
    private String buildStamp;
 
-   private String googleMapKey;
+    /**
+     * !!! For Unit Testing Only !!!
+     * 
+     * @param buildStamp
+     *            the buildStamp to set
+     */
+    public void setBuildStamp(String buildStamp) {
+        this.buildStamp = buildStamp;
+    }
+
+private String googleMapKey;
 
    private String googleAnalyticsKey;
 
