@@ -69,7 +69,7 @@ public class JobDownloadController extends BasePortalController {
         @SuppressWarnings("unchecked")
         List<VglDownload> erddapUrlList = (List<VglDownload>) request.getSession().getAttribute(SESSION_DOWNLOAD_LIST);
         if (erddapUrlList == null) {
-            erddapUrlList = new ArrayList<VglDownload>();
+            erddapUrlList = new ArrayList<>();
         }
 
         logger.trace("Adding download: " + download.getUrl());

@@ -69,11 +69,10 @@ public class OPeNDAPController extends BasePortalController {
      * @param opendapUrl The remote service URL to query
      * @param variableName the variable name
      * @return the variables
-     * @throws Exception the exception
      */
     @RequestMapping("/opendapGetVariables.do")
     public ModelAndView getVariables(@RequestParam("opendapUrl") final String opendapUrl,
-                                     @RequestParam(required=false, value="variableName") final String variableName) throws Exception {
+                                     @RequestParam(required=false, value="variableName") final String variableName) {
 
         //Attempt to parse our response
         try {

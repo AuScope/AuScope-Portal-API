@@ -62,18 +62,16 @@ public class WMSController extends BaseCSWController {
      * creates JSON response for the WMS layers list in the portal
      *
      * @return a JSON representation of the CSWRecord equivalent records
-     *
-     * @throws Exception
      */
     @RequestMapping("/getCustomLayers.do")
-    public ModelAndView getCustomLayers(@RequestParam("service_URL") String serviceUrl) throws Exception {
+    public ModelAndView getCustomLayers(@RequestParam("service_URL") String serviceUrl) {
 
         CSWRecord[] records;
         int invalidLayerCount = 0;
         try {
             GetCapabilitiesRecord capabilitiesRec = wmsService.getWmsCapabilities(serviceUrl,null);
 
-            List<CSWRecord> cswRecords = new ArrayList<CSWRecord>();
+            List<CSWRecord> cswRecords = new ArrayList<>();
 
             if (capabilitiesRec != null) {
                 //Make a best effort of parsing a WMS into a CSWRecord
@@ -160,11 +158,11 @@ public class WMSController extends BaseCSWController {
      * @param serviceUrl The WMS URL to query
      */
     @RequestMapping("/getLayerFormats.do")
-    public ModelAndView getLayerFormats(@RequestParam("serviceUrl") String serviceUrl) throws Exception {
+    public ModelAndView getLayerFormats(@RequestParam("serviceUrl") String serviceUrl) {
         try {
             GetCapabilitiesRecord capabilitiesRec = wmsService.getWmsCapabilities(serviceUrl,null);
 
-            List<ModelMap> data = new ArrayList<ModelMap>();
+            List<ModelMap> data = new ArrayList<>();
             for (String format : capabilitiesRec.getGetMapFormats()) {
                 ModelMap formatItem = new ModelMap();
                 formatItem.put("format", format);

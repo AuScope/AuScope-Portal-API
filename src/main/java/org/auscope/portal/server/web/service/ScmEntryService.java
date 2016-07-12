@@ -419,7 +419,7 @@ public class ScmEntryService {
      * by the java regex spec.
      *
      */
-    private String safeScName(final Toolbox toolbox) {
+    private static String safeScName(final Toolbox toolbox) {
         return toolbox.getName().replaceAll("\\W", "");
     }
 

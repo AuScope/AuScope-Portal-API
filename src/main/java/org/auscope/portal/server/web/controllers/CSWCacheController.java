@@ -79,7 +79,7 @@ public class CSWCacheController extends BaseCSWController {
     public ModelAndView getCSWKeywords() {
         Map<String, Set<CSWRecord>> keywords = this.cswService.getKeywordCache();
 
-        List<ModelMap> response = new ArrayList<ModelMap>();
+        List<ModelMap> response = new ArrayList<>();
         for (String keyword : keywords.keySet()) {
             ModelMap modelMap = new ModelMap();
             modelMap.put("keyword", keyword);

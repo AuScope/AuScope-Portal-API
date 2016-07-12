@@ -53,7 +53,7 @@ public class TestScriptBuilderService extends PortalTestClass {
         }});
 
         service.saveScript(jobId.toString(), script, user);
-        String actual = new String(bos.toByteArray());
+        final String actual = new String(bos.toByteArray());
         Assert.assertEquals(script, actual);
     }
 
@@ -112,7 +112,7 @@ public class TestScriptBuilderService extends PortalTestClass {
             will(returnValue(new ByteArrayInputStream(script.getBytes())));
         }});
 
-        String actualScript = service.loadScript(jobId.toString(), user);
+        final String actualScript = service.loadScript(jobId.toString(), user);
         Assert.assertEquals(script, actualScript);
     }
 
@@ -132,7 +132,7 @@ public class TestScriptBuilderService extends PortalTestClass {
             will(returnValue(null));
         }});
 
-        String actualScript = service.loadScript(jobId.toString(), user);
+        final String actualScript = service.loadScript(jobId.toString(), user);
         Assert.assertEquals("", actualScript);
     }
 
@@ -157,33 +157,31 @@ public class TestScriptBuilderService extends PortalTestClass {
 
     /**
      * Tests templating on a valid template string
-     * @throws Exception
      */
     @Test
-    public void testTemplating() throws Exception {
+    public void testTemplating() {
         final String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
-        final Map<String, Object> values = new HashMap<String, Object>();
+        final Map<String, Object> values = new HashMap<>();
         values.put("dog-amount", 2);
         values.put("cat-amount", "3");
         values.put("bird-amount", 4);
 
-        String result = service.populateTemplate(template, values);
+        final String result = service.populateTemplate(template, values);
 
         Assert.assertEquals("I have 2 dogs and 3 cats", result);
     }
 
     /**
      * Tests templating on an invalid template string
-     * @throws Exception
      */
     @Test
-    public void testTemplating_BadTemplate() throws Exception {
+    public void testTemplating_BadTemplate() {
         final String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
-        final Map<String, Object> values = new HashMap<String, Object>();
+        final Map<String, Object> values = new HashMap<>();
         values.put("dog-amount", 2);
         values.put("bird-amount", 4);
 
-        String result = service.populateTemplate(template, values);
+        final String result = service.populateTemplate(template, values);
         Assert.assertEquals("I have 2 dogs and ${cat-amount} cats", result);
     }
 }

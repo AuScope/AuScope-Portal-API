@@ -79,4 +79,9 @@ public class VGLQueueJob implements Job {
         }
     }
 
+    @Override
+    public int hashCode() {
+        return curJob.getId();
+    }
+
 }

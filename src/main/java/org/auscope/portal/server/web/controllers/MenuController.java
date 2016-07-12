@@ -148,7 +148,7 @@ public class MenuController {
        logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
 
        //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
-       if (user != null && user instanceof ANVGLUser) {
+       if (user != null) {
            if (!user.isFullyConfigured()) {
                String uri = request.getRequestURI();
                if (!uri.contains("login.html") &&

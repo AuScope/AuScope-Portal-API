@@ -1,6 +1,5 @@
 package org.auscope.portal.server.web.security;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author Josh Vote (CSIRO)
  *
  */
-public class ANVGLUser implements UserDetails, Serializable {
+public class ANVGLUser implements UserDetails {
 
     private String id;
     private String fullName;
@@ -28,10 +27,10 @@ public class ANVGLUser implements UserDetails, Serializable {
     private Integer acceptedTermsConditions;
 
     public ANVGLUser() {
-        this.authorities = new ArrayList<ANVGLAuthority>();
+        this.authorities = new ArrayList<>();
     }
 
-    public ANVGLUser(String id, String fullName, String email, List<ANVGLAuthority> authorities) {
+    public ANVGLUser(final String id, final String fullName, final String email, final List<ANVGLAuthority> authorities) {
         super();
         this.id = id;
         this.fullName = fullName;
@@ -51,7 +50,7 @@ public class ANVGLUser implements UserDetails, Serializable {
      * Sets the ID as reported by the remote authentication service (Probably google)
      * @return
      */
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -67,7 +66,7 @@ public class ANVGLUser implements UserDetails, Serializable {
      * The name of the AWS S3 bucket where this user's job data will be written
      * @param s3Bucket
      */
-    public void setS3Bucket(String s3Bucket) {
+    public void setS3Bucket(final String s3Bucket) {
         this.s3Bucket = s3Bucket;
     }
 
@@ -85,7 +84,7 @@ public class ANVGLUser implements UserDetails, Serializable {
      *
      * @param fullName
      */
-    public void setFullName(String fullName) {
+    public void setFullName(final String fullName) {
         this.fullName = fullName;
     }
 
@@ -101,7 +100,7 @@ public class ANVGLUser implements UserDetails, Serializable {
      *
      * @param email
      */
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -117,7 +116,7 @@ public class ANVGLUser implements UserDetails, Serializable {
      * The keyname to be used for VMs started by this user (can be null)
      * @param awsKeyName
      */
-    public void setAwsKeyName(String awsKeyName) {
+    public void setAwsKeyName(final String awsKeyName) {
         this.awsKeyName = awsKeyName;
     }
 
@@ -133,7 +132,7 @@ public class ANVGLUser implements UserDetails, Serializable {
      * The version of the T&Cs that the user has last accepted (or null if none)
      * @return
      */
-    public void setAcceptedTermsConditions(Integer acceptedTermsConditions) {
+    public void setAcceptedTermsConditions(final Integer acceptedTermsConditions) {
         this.acceptedTermsConditions = acceptedTermsConditions;
     }
 
@@ -147,9 +146,9 @@ public class ANVGLUser implements UserDetails, Serializable {
         return authorities;
     }
 
-    public void setAuthorities(List<ANVGLAuthority> authorities) {
+    public void setAuthorities(final List<ANVGLAuthority> authorities) {
         this.authorities = authorities;
-        for (ANVGLAuthority auth : authorities) {
+        for (final ANVGLAuthority auth : authorities) {
             auth.setParent(this);
         }
     }
@@ -158,7 +157,7 @@ public class ANVGLUser implements UserDetails, Serializable {
         return arnExecution;
     }
 
-    public void setArnExecution(String arnExecution) {
+    public void setArnExecution(final String arnExecution) {
         this.arnExecution = arnExecution;
     }
 
@@ -166,7 +165,7 @@ public class ANVGLUser implements UserDetails, Serializable {
         return arnStorage;
     }
 
-    public void setArnStorage(String arnStorage) {
+    public void setArnStorage(final String arnStorage) {
         this.arnStorage = arnStorage;
     }
 
@@ -174,7 +173,7 @@ public class ANVGLUser implements UserDetails, Serializable {
         return awsSecret;
     }
 
-    public void setAwsSecret(String awsSecret) {
+    public void setAwsSecret(final String awsSecret) {
         this.awsSecret = awsSecret;
     }
 

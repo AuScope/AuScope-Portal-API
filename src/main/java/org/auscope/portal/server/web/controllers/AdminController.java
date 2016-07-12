@@ -45,10 +45,10 @@ public class AdminController {
      * Creates a new instance of this class
      */
     @Autowired
-    public AdminController(@Qualifier(value = "cswServiceList") ArrayList<CSWServiceItem> cswServiceList,
-            VglAdminService adminService) {
+    public AdminController(@Qualifier(value = "cswServiceList") final ArrayList<CSWServiceItem> cswServiceList,
+            final VglAdminService adminService) {
         this.adminService = adminService;
-        this.cswServiceList = new ArrayList<CSWServiceItem>();
+        this.cswServiceList = new ArrayList<>();
         for (int i = 0; i < cswServiceList.size(); i++) {
             this.cswServiceList.add(cswServiceList.get(i));
         }
@@ -59,9 +59,9 @@ public class AdminController {
      * @param response a response from the AdminService
      * @return
      */
-    private ModelAndView generateTestResponse(AdminDiagnosticResponse response) {
-        JSONView view = new JSONView();
-        ModelMap model = new ModelMap();
+    private static ModelAndView generateTestResponse(final AdminDiagnosticResponse response) {
+        final JSONView view = new JSONView();
+        final ModelMap model = new ModelMap();
 
         model.put("success", response.isSuccess());
         model.put("warnings", response.getWarnings());
@@ -79,12 +79,12 @@ public class AdminController {
      */
     @RequestMapping("/testExternalConnectivity.diag")
     public ModelAndView testExternalConnectivity() throws MalformedURLException {
-        URL[] urlsToTest = new URL[] {
-            new URL("http://www.google.com"),
-            new URL("https://www.google.com")
+        final URL[] urlsToTest = new URL[] {
+                new URL("http://www.google.com"),
+                new URL("https://www.google.com")
         };
 
-        AdminDiagnosticResponse response = adminService.externalConnectivity(urlsToTest);
+        final AdminDiagnosticResponse response = adminService.externalConnectivity(urlsToTest);
         return generateTestResponse(response);
     }
 
@@ -94,7 +94,7 @@ public class AdminController {
      */
     @RequestMapping("/testCSWConnectivity.diag")
     public ModelAndView testCSWConnectivity() {
-        AdminDiagnosticResponse response = adminService.cswConnectivity(cswServiceList);
+        final AdminDiagnosticResponse response = adminService.cswConnectivity(cswServiceList);
         return generateTestResponse(response);
     }
 
@@ -107,16 +107,16 @@ public class AdminController {
      * @param selectors The selector (WFS type name, WMS layer name etc). Must be the same length as endpoints
      * @return
      */
-    private List<EndpointAndSelector> parseEndpointAndSelectors(String[] endpoints, String[] selectors) {
+    private static List<EndpointAndSelector> parseEndpointAndSelectors(final String[] endpoints, final String[] selectors) {
         //Make sure the view is calling this method correctly
         if (endpoints == null || selectors == null || endpoints.length != selectors.length) {
             throw new IllegalArgumentException("serviceUrls.length != typeNames.length");
         }
 
         //Build our list of endpoints (skip duplicates)
-        List<EndpointAndSelector> result = new ArrayList<EndpointAndSelector>();
+        final List<EndpointAndSelector> result = new ArrayList<>();
         for (int i = 0; i < endpoints.length; i++) {
-            EndpointAndSelector eas = new EndpointAndSelector(endpoints[i], selectors[i]);
+            final EndpointAndSelector eas = new EndpointAndSelector(endpoints[i], selectors[i]);
             if (!result.contains(eas)) {
                 result.add(eas);
             }
@@ -135,23 +135,23 @@ public class AdminController {
      * @throws URISyntaxException
      */
     @RequestMapping("/testWFS.diag")
-    public ModelAndView testWFS(@RequestParam("serviceUrls") String[] serviceUrls,
-                                @RequestParam("typeNames") String[] typeNames,
-                                @RequestParam("bbox") String bboxJson) throws URISyntaxException {
+    public ModelAndView testWFS(@RequestParam("serviceUrls") final String[] serviceUrls,
+            @RequestParam("typeNames") final String[] typeNames,
+            @RequestParam("bbox") final String bboxJson) throws URISyntaxException {
 
         //No point in proceeding with test without a valid bbox
-        FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
+        final FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
         if (bbox == null) {
-            AdminDiagnosticResponse error = new AdminDiagnosticResponse();
+            final AdminDiagnosticResponse error = new AdminDiagnosticResponse();
             error.addError(String.format("The backend cannot parse the provided bbox string into a FilterBoundingBox - %1$s", bboxJson));
             return generateTestResponse(error);
         }
 
         //Build our list of endpoints (skip duplicates)
-        List<EndpointAndSelector> endpoints = parseEndpointAndSelectors(serviceUrls, typeNames);
+        final List<EndpointAndSelector> endpoints = parseEndpointAndSelectors(serviceUrls, typeNames);
 
         //Do the diagnostics
-        AdminDiagnosticResponse response = adminService.wfsConnectivity(endpoints, bbox);
+        final AdminDiagnosticResponse response = adminService.wfsConnectivity(endpoints, bbox);
         return generateTestResponse(response);
     }
 
@@ -163,23 +163,23 @@ public class AdminController {
      * @throws URISyntaxException
      */
     @RequestMapping("/testWMS.diag")
-    public ModelAndView testWMS(@RequestParam("serviceUrls") String[] serviceUrls,
-                                @RequestParam("layerNames") String[] layerNames,
-                                @RequestParam("bbox") String bboxJson) throws URISyntaxException {
+    public ModelAndView testWMS(@RequestParam("serviceUrls") final String[] serviceUrls,
+            @RequestParam("layerNames") final String[] layerNames,
+            @RequestParam("bbox") final String bboxJson) throws URISyntaxException {
 
         //No point in proceeding with test without a valid bbox
-        FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
+        final FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
         if (bbox == null) {
-            AdminDiagnosticResponse error = new AdminDiagnosticResponse();
+            final AdminDiagnosticResponse error = new AdminDiagnosticResponse();
             error.addError(String.format("The backend cannot parse the provided bbox string into a FilterBoundingBox - %1$s", bboxJson));
             return generateTestResponse(error);
         }
 
         //Build our list of endpoints (skip duplicates)
-        List<EndpointAndSelector> endpoints = parseEndpointAndSelectors(serviceUrls, layerNames);
+        final List<EndpointAndSelector> endpoints = parseEndpointAndSelectors(serviceUrls, layerNames);
 
         //Do the diagnostics
-        AdminDiagnosticResponse response = adminService.wmsConnectivity(endpoints, bbox);
+        final AdminDiagnosticResponse response = adminService.wmsConnectivity(endpoints, bbox);
         return generateTestResponse(response);
     }
 }
