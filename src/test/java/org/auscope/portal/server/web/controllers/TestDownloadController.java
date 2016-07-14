@@ -11,6 +11,7 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.client.methods.HttpRequestBase;
+import org.auscope.portal.core.server.http.HttpClientInputStream;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.test.ByteBufferedServletOutputStream;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -80,7 +81,7 @@ public class TestDownloadController extends PortalTestClass {
         final String dummyJSONResponse = "{\"data\":{\"kml\":\"<someKmlHere/>\", \"gml\":\""
                 + dummyGml + "\"},\"success\":true}";
         try (final MyServletOutputStream servletOutputStream = new MyServletOutputStream(dummyJSONResponse.length());
-                final InputStream dummyJSONResponseIS = new ByteArrayInputStream(dummyJSONResponse.getBytes())) {
+                final HttpClientInputStream dummyJSONResponseIS = new HttpClientInputStream(new ByteArrayInputStream(dummyJSONResponse.getBytes()), null)) {
 
             context.checking(new Expectations() {
                 {
@@ -137,8 +138,8 @@ public class TestDownloadController extends PortalTestClass {
                 + "',\"success\":false}";
         final String dummyJSONResponseNoMsg = "{\"success\":false}";
         try (final MyServletOutputStream servletOutputStream = new MyServletOutputStream(dummyJSONResponseNoMsg.length());
-                final InputStream dummyJSONResponseNoMsgIS=new ByteArrayInputStream(dummyJSONResponseNoMsg.getBytes());
-                final InputStream dummyJSONResponseIS = new ByteArrayInputStream(dummyJSONResponse.getBytes())) {
+                final HttpClientInputStream dummyJSONResponseNoMsgIS= new HttpClientInputStream(new ByteArrayInputStream(dummyJSONResponseNoMsg.getBytes()), null);
+                final HttpClientInputStream dummyJSONResponseIS = new HttpClientInputStream(new ByteArrayInputStream(dummyJSONResponse.getBytes()), null)) {
 
             context.checking(new Expectations() {
                 {
@@ -199,7 +200,7 @@ public class TestDownloadController extends PortalTestClass {
         final String dummyJSONResponse = "{\"data\":{\"kml\":\"<someKmlHere/>\", \"gml\":\""
                 + dummyGml + "\"},\"success\":true}";
         try (final MyServletOutputStream servletOutputStream = new MyServletOutputStream(dummyJSONResponse.length());
-                final InputStream dummyJSONResponseIS2 = new ByteArrayInputStream(dummyJSONResponse.getBytes())) {
+                final HttpClientInputStream dummyJSONResponseIS2 = new HttpClientInputStream(new ByteArrayInputStream(dummyJSONResponse.getBytes()), null)) {
 
             context.checking(new Expectations() {
                 {
