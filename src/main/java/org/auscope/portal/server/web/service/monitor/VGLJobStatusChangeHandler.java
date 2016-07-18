@@ -42,7 +42,6 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
 
     @Override
     public void handleStatusChange(CloudJob job, String newStatus, String oldStatus) {
-        System.out.println("Status change, FROM: " + oldStatus + ", TO: " + newStatus);
         if (!newStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
             VEGLJob vglJob = (VEGLJob)job;
             vglJob.setProcessDate(new Date());
