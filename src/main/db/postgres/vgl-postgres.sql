@@ -77,6 +77,8 @@ CREATE TABLE "jobs" (
 "cellZ" int4,
 "inversionDepth" int4,
 "walltime" int4,
+"executeDate" timestamp(6),
+"executeDate" timestamp(6),
 )
 WITH (OIDS=FALSE)
 

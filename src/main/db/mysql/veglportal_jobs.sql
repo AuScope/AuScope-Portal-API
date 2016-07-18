@@ -46,6 +46,7 @@ CREATE TABLE `jobs` (
   `processTimeLog` varchar(255) DEFAULT '',
   `storageBucket` varchar(64) DEFAULT NULL,
   `walltime` int(11) DEFAULT NULL,
+  `executeDate` datetime DEFAULT NULL,
   `folderId` int(11) DEFAULT NULL,
   `containsPersistentVolumes` char(1) DEFAULT 'N',
   PRIMARY KEY (`id`),

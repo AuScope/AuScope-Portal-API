@@ -208,7 +208,7 @@ public class JobCompletionMailSender implements JobMailSender {
     @Override
     public String constructMailContent(String seriesName, VEGLJob job) {
 
-        Date submitDate, processDate;
+        Date submitDate, processDate, executeDate;
         if(job.getSubmitDate()!=null){
             submitDate=job.getSubmitDate();
         }else{
@@ -220,8 +220,14 @@ public class JobCompletionMailSender implements JobMailSender {
         }else{
             processDate=new Date();
         }
+        
+        if(job.getExecuteDate()!=null){
+            executeDate=job.getExecuteDate();
+        }else{
+            executeDate=new Date();
+        }
 
-        long[] diff = DateUtil.getTimeDifference(submitDate, processDate);
+        long[] diff = DateUtil.getTimeDifference(executeDate, processDate);
         String timeElapsed = diff[0] + " day(s) " + diff[1] + " hour(s) "
                 + diff[2] + " minute(s) " + diff[3] + " second(s)";
 
@@ -233,6 +239,7 @@ public class JobCompletionMailSender implements JobMailSender {
         model.put("jobName", job.getName());
         model.put("jobDescription", job.getDescription());
         model.put("dateSubmitted", DateUtil.formatDate(submitDate, dateFormat));
+        model.put("dateExecuted", DateUtil.formatDate(executeDate, dateFormat));
         model.put("dateProcessed", DateUtil.formatDate(processDate, dateFormat));
         model.put("timeElapsed", timeElapsed);
         model.put("jobExecLogSnippet", TextUtil.tail(jobStatLogReader.getSectionedLog(job, "Python"), maxLinesForTail));

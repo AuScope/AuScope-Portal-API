@@ -40,9 +40,49 @@ Ext.define('vegl.layer.filterer.VeglFormFactory', {
 
         //otherwise let's see if we can guess an appropriate filter based on layer renderer
         if (layer.get('renderer') instanceof portal.layer.renderer.wms.LayerRenderer) {
-            baseFilterForm = Ext.create('portal.layer.filterer.forms.WMSLayerFilterForm', baseFilterFormCfg);
+        	//baseFilterForm = layer.get('filterForm');
+        	
+        	baseFilterForm = Ext.create('portal.layer.filterer.forms.WMSLayerFilterForm', baseFilterFormCfg);
+        	
+        	var slider = baseFilterForm.down('slider');
+        	
+        	var layerExists = ActiveLayerManager.doesLayerExist(layer);
+        	if(layerExists) {
+                slider.setDisabled(false);
+                
+                
+                //var filterer = layer.get('filterer');//.setParameter('opacity',1,true);
+                //var sliderHandler = function(caller, newValue) {
+            	//	filterer.setParameter('opacity',newValue);
+        		//};
+        		//slider.addListener('changecomplete', sliderHandler);
+                
+                
+                //baseFilterForm.doLayout();
+                //var renderer = layer.get('renderer');
+                //renderer.setVisibility(true);
+                
+                //var map = baseFilterFormCfg.map;
+                //var isRendered = map
+                //var extent = map.getExtent();
+                //window.alert("hello");
+                
+                //layer.setLayerVisibility(true);
+                //layer.set('renderOnAdd', true);
+        	}
+        	else
+        		slider.setDisabled(true);
+        	
+        	//if (baseFilterForm == null) {
+        	//	baseFilterForm = Ext.create('portal.layer.filterer.forms.WMSLayerFilterForm', baseFilterFormCfg);
+        	//	var slider = baseFilterForm.down('slider');
+            //    slider.setDisabled(true);
+        	//}
+			
+        	
             //VT: Filtering is support but for WMS, we want the image to be displayed immediately after it has been added and
             //the opacity can be adjusted from there on
+        	
             return this._generateResult(baseFilterForm, false);
         }
 
