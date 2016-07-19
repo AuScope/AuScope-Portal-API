@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS `users`;
+
 CREATE TABLE `users` (
   `id` varchar(128) NOT NULL,
   `fullName` varchar(256) DEFAULT NULL,
@@ -9,6 +11,6 @@ CREATE TABLE `users` (
   `awsAccount` varchar(128) DEFAULT NULL,
   `awsKeyName` varchar(45) DEFAULT NULL,
   `s3Bucket` varchar(64) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `EMAIL` (`email`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `EMAIL` (`email`) USING BTREE
+);
