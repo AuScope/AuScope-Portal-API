@@ -132,17 +132,17 @@ public class TestJobBuilderController {
      */
     @Test
     public void testGetJobObject() {
-        final String jobId = "1";
-        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
+        String jobId = "1";
+        VEGLJob jobObj = new VEGLJob(new Integer(jobId));
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
             will(returnValue(jobObj));
         }});
 
-        final ModelAndView mav = controller.getJobObject(jobId, user);
+        ModelAndView mav = controller.getJobObject(jobId, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -153,16 +153,16 @@ public class TestJobBuilderController {
      */
     @Test
     public void testGetJobObject_Exception() {
-        final String jobId = "1";
+        String jobId = "1";
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
             will(throwException(new Exception()));
         }});
 
-        final ModelAndView mav = controller.getJobObject(jobId, user);
+        ModelAndView mav = controller.getJobObject(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -173,16 +173,16 @@ public class TestJobBuilderController {
      */
     @Test
     public void testListJobFiles() throws Exception {
-        final String jobId = "1";
-        final VEGLJob mockJob = new VEGLJob(new Integer(jobId));
+        String jobId = "1";
+        VEGLJob mockJob = new VEGLJob(new Integer(jobId));
 
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
-        final StagedFile[] mockStageFiles = new StagedFile[] {
+        File mockFile1 = context.mock(File.class, "MockFile1");
+        File mockFile2 = context.mock(File.class, "MockFile2");
+        StagedFile[] mockStageFiles = new StagedFile[] {
                 new StagedFile(mockJob, "mockFile1", mockFile1),
                 new StagedFile(mockJob, "mockFile2", mockFile2) };
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -195,7 +195,7 @@ public class TestJobBuilderController {
             oneOf(mockFile2).length();will(returnValue(512L));
         }});
 
-        final ModelAndView mav = controller.listJobFiles(jobId, user);
+        ModelAndView mav = controller.listJobFiles(jobId, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -206,16 +206,16 @@ public class TestJobBuilderController {
      */
     @Test
     public void testListJobFiles_JobNotFound() {
-        final String jobId = "1";
+        String jobId = "1";
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
             will(throwException(new Exception()));
         }});
 
-        final ModelAndView mav = controller.listJobFiles(jobId, user);
+        ModelAndView mav = controller.listJobFiles(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -227,10 +227,10 @@ public class TestJobBuilderController {
      */
     @Test
     public void testListJobFiles_Exception() throws Exception {
-        final String jobId = "1";
-        final VEGLJob mockJob = new VEGLJob(new Integer(jobId));
+        String jobId = "1";
+        VEGLJob mockJob = new VEGLJob(new Integer(jobId));
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -240,7 +240,7 @@ public class TestJobBuilderController {
             will(throwException(new PortalServiceException("test exception","test exception")));
         }});
 
-        final ModelAndView mav = controller.listJobFiles(jobId, user);
+        ModelAndView mav = controller.listJobFiles(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -252,11 +252,11 @@ public class TestJobBuilderController {
      */
     @Test
     public void testDownloadFile() throws Exception {
-        final String jobId = "1";
-        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
-        final String filename = "test.py";
+        String jobId = "1";
+        VEGLJob jobObj = new VEGLJob(new Integer(jobId));
+        String filename = "test.py";
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId(), user);
@@ -265,7 +265,7 @@ public class TestJobBuilderController {
             oneOf(mockFileStagingService).handleFileDownload(jobObj, filename, mockResponse);
         }});
 
-        final ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, filename, user);
+        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, filename, user);
         Assert.assertNull(mav);
     }
 
@@ -274,13 +274,13 @@ public class TestJobBuilderController {
      */
     @Test
     public void testDeleteFiles() {
-        final String jobId = "1";
-        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
-        final String file1 = "file1.txt";
-        final String file2 = "file2.txt";
-        final String[] filenames = new String[] { file1, file2 };
+        String jobId = "1";
+        VEGLJob jobObj = new VEGLJob(new Integer(jobId));
+        String file1 = "file1.txt";
+        String file2 = "file2.txt";
+        String[] filenames = new String[] { file1, file2 };
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId(), user);
@@ -292,7 +292,7 @@ public class TestJobBuilderController {
             will(returnValue(true));
         }});
 
-        final ModelAndView mav = controller.deleteFiles(jobId, filenames, user);
+        ModelAndView mav = controller.deleteFiles(jobId, filenames, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -303,19 +303,19 @@ public class TestJobBuilderController {
      */
     @Test
     public void testDeleteFiles_JobNotFoundException() {
-        final String jobId = "1";
-        final String file1 = "file1.txt";
-        final String file2 = "file2.txt";
-        final String[] filenames = new String[] { file1, file2 };
+        String jobId = "1";
+        String file1 = "file1.txt";
+        String file2 = "file2.txt";
+        String[] filenames = new String[] { file1, file2 };
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
             will(throwException(new Exception()));
         }});
 
-        final ModelAndView mav = controller.deleteFiles(jobId, filenames, user);
+        ModelAndView mav = controller.deleteFiles(jobId, filenames, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -325,18 +325,18 @@ public class TestJobBuilderController {
      */
     @Test
     public void testDeleteDownloads() {
-        final String jobId = "1";
-        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
-        final int downloadId1 = 13579;
-        final int downloadId2 = 23480;
-        final Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
-        final VglDownload vglDownload1 = new VglDownload(downloadId1);
-        final VglDownload vglDownload2 = new VglDownload(downloadId2);
-        final VglDownload[] vglDownloads = new VglDownload[] { vglDownload1, vglDownload2 };
-        final List<VglDownload> downloadList = new ArrayList<>(Arrays.asList(vglDownloads));
+        String jobId = "1";
+        VEGLJob jobObj = new VEGLJob(new Integer(jobId));
+        int downloadId1 = 13579;
+        int downloadId2 = 23480;
+        Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
+        VglDownload vglDownload1 = new VglDownload(downloadId1);
+        VglDownload vglDownload2 = new VglDownload(downloadId2);
+        VglDownload[] vglDownloads = new VglDownload[] { vglDownload1, vglDownload2 };
+        List<VglDownload> downloadList = new ArrayList<>(Arrays.asList(vglDownloads));
         jobObj.setJobDownloads(downloadList);
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId(), user);
@@ -345,7 +345,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(jobObj);
         }});
 
-        final ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -356,18 +356,18 @@ public class TestJobBuilderController {
      */
     @Test
     public void testDeleteDownloads_SaveJobException() {
-        final String jobId = "1";
-        final VEGLJob jobObj = new VEGLJob(new Integer(jobId));
-        final int downloadId1 = 13579;
-        final int downloadId2 = 23480;
-        final Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
-        final VglDownload vglDownload1 = new VglDownload(downloadId1);
-        final VglDownload vglDownload2 = new VglDownload(downloadId2);
-        final VglDownload[] vglDownloads = new VglDownload[] { vglDownload1, vglDownload2 };
-        final List<VglDownload> downloadList = new ArrayList<>(Arrays.asList(vglDownloads));
+        String jobId = "1";
+        VEGLJob jobObj = new VEGLJob(new Integer(jobId));
+        int downloadId1 = 13579;
+        int downloadId2 = 23480;
+        Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
+        VglDownload vglDownload1 = new VglDownload(downloadId1);
+        VglDownload vglDownload2 = new VglDownload(downloadId2);
+        VglDownload[] vglDownloads = new VglDownload[] { vglDownload1, vglDownload2 };
+        List<VglDownload> downloadList = new ArrayList<>(Arrays.asList(vglDownloads));
         jobObj.setJobDownloads(downloadList);
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId(), user);
@@ -377,7 +377,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        final ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -388,19 +388,19 @@ public class TestJobBuilderController {
      */
     @Test
     public void testDeleteDownloads_JobNotFoundException() {
-        final String jobId = "1";
-        final int downloadId1 = 13579;
-        final int downloadId2 = 23480;
-        final Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
+        String jobId = "1";
+        int downloadId1 = 13579;
+        int downloadId2 = 23480;
+        Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
             will(throwException(new Exception()));
         }});
 
-        final ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -411,12 +411,12 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUploadFile() throws Exception {
-        final VEGLJob jobObj = new VEGLJob(new Integer(13));
-        final MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
-        final File mockFile = context.mock(File.class);
-        final StagedFile mockStagedFile = new StagedFile(jobObj, "mockFile", mockFile);
+        VEGLJob jobObj = new VEGLJob(new Integer(13));
+        MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
+        File mockFile = context.mock(File.class);
+        StagedFile mockStagedFile = new StagedFile(jobObj, "mockFile", mockFile);
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId(), user);
@@ -430,7 +430,7 @@ public class TestJobBuilderController {
             will(returnValue(1024L));
         }});
 
-        final ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString(), user);
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString(), user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -441,10 +441,10 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUploadFile_FileUploadException() throws Exception {
-        final VEGLJob jobObj = new VEGLJob(new Integer(13));
-        final MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
+        VEGLJob jobObj = new VEGLJob(new Integer(13));
+        MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId(), user);
@@ -455,7 +455,7 @@ public class TestJobBuilderController {
             will(throwException(new PortalServiceException("Test Exception","Test Exception")));
         }});
 
-        final ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString(), user);
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString(), user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -466,17 +466,17 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUploadFile_JobNotFoundException() {
-        final VEGLJob jobObj = new VEGLJob(new Integer(13));
-        final MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
+        VEGLJob jobObj = new VEGLJob(new Integer(13));
+        MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobObj.getId(), user);
             will(throwException(new Exception()));
         }});
 
-        final ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString(), user);
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, jobObj.getId().toString(), user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -486,12 +486,12 @@ public class TestJobBuilderController {
      */
     @Test
     public void testGetJobDownloads() {
-        final int jobId = 1;
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final VglDownload[] existingDownloads = new VglDownload[] { new VglDownload(12356) };
-        final List<VglDownload> downloadList = new ArrayList<>(Arrays.asList(existingDownloads));
+        int jobId = 1;
+        VEGLJob mockJob = context.mock(VEGLJob.class);
+        VglDownload[] existingDownloads = new VglDownload[] { new VglDownload(12356) };
+        List<VglDownload> downloadList = new ArrayList<>(Arrays.asList(existingDownloads));
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobId, user);
@@ -501,7 +501,7 @@ public class TestJobBuilderController {
             will(returnValue(downloadList));
         }});
 
-        final ModelAndView mav = controller.getJobDownloads(jobId, user);
+        ModelAndView mav = controller.getJobDownloads(jobId, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -512,16 +512,16 @@ public class TestJobBuilderController {
      */
     @Test
     public void testGetJobDownloads_Exception() {
-        final int jobId = 1;
+        int jobId = 1;
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(jobId, user);
             will(throwException(new Exception()));
         }});
 
-        final ModelAndView mav = controller.getJobDownloads(jobId, user);
+        ModelAndView mav = controller.getJobDownloads(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -531,11 +531,11 @@ public class TestJobBuilderController {
      */
     @Test
     public void testGetJobStatus() {
-        final String jobId = "1";
-        final String expectedStatus = "Pending";
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        String jobId = "1";
+        String expectedStatus = "Pending";
+        VEGLJob mockJob = context.mock(VEGLJob.class);
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -545,9 +545,9 @@ public class TestJobBuilderController {
             will(returnValue(expectedStatus));
         }});
 
-        final ModelAndView mav = controller.getJobStatus(jobId, user);
+        ModelAndView mav = controller.getJobStatus(jobId, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
-        final String jobStatus = (String)mav.getModel().get("data");
+        String jobStatus = (String)mav.getModel().get("data");
         Assert.assertEquals(expectedStatus, jobStatus);
     }
 
@@ -557,16 +557,16 @@ public class TestJobBuilderController {
      */
     @Test
     public void testGetJobStatus_JobNotFound() {
-        final String jobId = "1";
+        String jobId = "1";
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
             will(throwException(new Exception()));
         }});
 
-        final ModelAndView mav = controller.getJobStatus(jobId, user);
+        ModelAndView mav = controller.getJobStatus(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -577,10 +577,10 @@ public class TestJobBuilderController {
      */
     @Test
     public void testCancelSubmission() throws Exception {
-        final String jobId = "1";
-        final VEGLJob mockJob = new VEGLJob(new Integer(jobId));
+        String jobId = "1";
+        VEGLJob mockJob = new VEGLJob(new Integer(jobId));
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -590,7 +590,7 @@ public class TestJobBuilderController {
             will(returnValue(true));
         }});
 
-        final ModelAndView mav = controller.cancelSubmission(jobId, user);
+        ModelAndView mav = controller.cancelSubmission(jobId, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -602,16 +602,16 @@ public class TestJobBuilderController {
      */
     @Test
     public void testCancelSubmission_Exception() {
-        final String jobId = "1";
+        String jobId = "1";
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
             will(throwException(new Exception()));
         }});
 
-        final ModelAndView mav = controller.cancelSubmission(jobId, user);
+        ModelAndView mav = controller.cancelSubmission(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -623,35 +623,35 @@ public class TestJobBuilderController {
     @Test
     public void testJobSubmission() throws Exception {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(new Integer(13));
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
-        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
-        final String computeVmId = "compute-vmi-id";
-        final String computeServiceId = "compute-service-id";
-        final String instanceId = "new-instance-id";
-        final String computeKeyName = "key-name";
-        final Sequence jobFileSequence = context.sequence("jobFileSequence"); //this makes sure we aren't deleting directories before uploading (and other nonsense)
-        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
-        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final String storageBucket = "storage-bucket";
-        final String storageAccess = "213-asd-54";
-        final String storageSecret = "tops3cret";
-        final String storageServiceId = "storageid";
-        final String storageEndpoint = "http://example.org";
-        final String storageProvider = "provider";
-        final String storageAuthVersion = "1.2.3";
-        final String regionName = null;
+        VEGLJob jobObj = new VEGLJob(new Integer(13));
+        File mockFile1 = context.mock(File.class, "MockFile1");
+        File mockFile2 = context.mock(File.class, "MockFile2");
+        StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
+        String computeVmId = "compute-vmi-id";
+        String computeServiceId = "compute-service-id";
+        String instanceId = "new-instance-id";
+        String computeKeyName = "key-name";
+        Sequence jobFileSequence = context.sequence("jobFileSequence"); //this makes sure we aren't deleting directories before uploading (and other nonsense)
+        String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        String storageBucket = "storage-bucket";
+        String storageAccess = "213-asd-54";
+        String storageSecret = "tops3cret";
+        String storageServiceId = "storageid";
+        String storageEndpoint = "http://example.org";
+        String storageProvider = "provider";
+        String storageAuthVersion = "1.2.3";
+        String regionName = null;
 
-        final String mockUser = "jo@me.com";
-        final File activityFile = File.createTempFile("activity", ".ttl");
-        final String activityFileName = "activity.ttl";
-        final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
-        final CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
-        final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
+        String mockUser = "jo@me.com";
+        File activityFile = File.createTempFile("activity", ".ttl");
+        String activityFileName = "activity.ttl";
+        CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
+        CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
+        CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
 
-        final Solution mockSolution = context.mock(Solution.class);
-        final Set<Solution> solutions = new HashSet<>();
+        Solution mockSolution = context.mock(Solution.class);
+        Set<Solution> solutions = new HashSet<>();
         solutions.add(mockSolution);
 
         jobObj.setComputeVmId(computeVmId);
@@ -661,7 +661,7 @@ public class TestJobBuilderController {
         jobObj.setStorageServiceId(storageServiceId);
         jobObj.setStorageBucket(storageBucket);
 
-        try (final OutputStream mockOutputStream = context.mock(OutputStream.class)) {
+        try (OutputStream mockOutputStream = context.mock(OutputStream.class)) {
             context.checking(new Expectations() {
                 {
                     oneOf(mockScmEntryService).getJobSolutions(jobObj);
@@ -765,7 +765,7 @@ public class TestJobBuilderController {
                 }
             });
 
-            final ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(),
+            ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(),
                     mockPortalUser);
 
             Assert.assertTrue((Boolean) mav.getModel().get("success"));
@@ -783,22 +783,22 @@ public class TestJobBuilderController {
     @Test
     public void testJobSubmission_PermissionDenied() throws Exception {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(new Integer(13));
-        final String computeServiceId = "ccsid";
-        final String injectedComputeVmId = "injected-compute-vmi-id";
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
-        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
-        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
-        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final String storageServiceId = "cssid";
+        VEGLJob jobObj = new VEGLJob(new Integer(13));
+        String computeServiceId = "ccsid";
+        String injectedComputeVmId = "injected-compute-vmi-id";
+        File mockFile1 = context.mock(File.class, "MockFile1");
+        File mockFile2 = context.mock(File.class, "MockFile2");
+        StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
+        String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        String storageServiceId = "cssid";
 
         jobObj.setComputeVmId(injectedComputeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
         jobObj.setComputeServiceId(computeServiceId);
         jobObj.setStorageServiceId(storageServiceId);
 
-        try (final OutputStream mockOutputStream = context.mock(OutputStream.class)) {
+        try (OutputStream mockOutputStream = context.mock(OutputStream.class)) {
             context.checking(new Expectations() {
                 {
                     // We should have 1 call to our job manager to get our job
@@ -848,7 +848,7 @@ public class TestJobBuilderController {
                 }
             });
 
-            final ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(),
+            ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(),
                     mockPortalUser);
 
             Assert.assertFalse((Boolean) mav.getModel().get("success"));
@@ -862,13 +862,13 @@ public class TestJobBuilderController {
      */
     @Test
     public void testJobSubmission_JobDNE() {
-        final String jobId = "24";
+        String jobId = "24";
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(null));
         }});
 
-        final ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobId, mockPortalUser);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
@@ -880,16 +880,16 @@ public class TestJobBuilderController {
     @Test
     public void testJobSubmission_S3Failure() throws Exception {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(13);
-        final String computeVmId = "compute-vmi-id";
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
-        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
-        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
-        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final String computeServiceId = "id-1";
-        final String storageServiceId = "id-2";
+        VEGLJob jobObj = new VEGLJob(13);
+        String computeVmId = "compute-vmi-id";
+        File mockFile1 = context.mock(File.class, "MockFile1");
+        File mockFile2 = context.mock(File.class, "MockFile2");
+        StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
+        String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
+        VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        String computeServiceId = "id-1";
+        String storageServiceId = "id-2";
         jobObj.setComputeVmId(computeVmId);
         jobObj.setStatus(jobInSavedState); // by default, the job is in SAVED state
         jobObj.setComputeServiceId(computeServiceId);
@@ -923,7 +923,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, jobObj, "");
         }});
 
-        final ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
@@ -936,32 +936,32 @@ public class TestJobBuilderController {
     @Test
     public void testJobSubmission_ExecuteFailure() throws Exception {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(13);
-        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        VEGLJob jobObj = new VEGLJob(13);
+        String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
 
-        final String computeVmId = "compute-vmi-id";
-        final String computeServiceId = "compute-service-id";
+        String computeVmId = "compute-vmi-id";
+        String computeServiceId = "compute-service-id";
 
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
-        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
-        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final String computeKeyName = "key-name";
-        final String storageBucket = "storage-bucket";
-        final String storageAccess = "213-asd-54";
-        final String storageSecret = "tops3cret";
-        final String storageProvider = "provider";
-        final String storageAuthVersion = "1.2.3";
-        final String storageEndpoint = "http://example.org";
-        final String storageServiceId = "storage-service-id";
-        final String regionName = "region-name";
-        final PortalServiceException exception = new PortalServiceException("Some random error","Some error correction");
-        final File activityFile = File.createTempFile("activity", ".ttl");
-        final String activityFileName = "activity.ttl";
-        final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
-        final CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
-        final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
-        final String mockUser = "jo@me.com";
+        File mockFile1 = context.mock(File.class, "MockFile1");
+        File mockFile2 = context.mock(File.class, "MockFile2");
+        StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
+        VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        String computeKeyName = "key-name";
+        String storageBucket = "storage-bucket";
+        String storageAccess = "213-asd-54";
+        String storageSecret = "tops3cret";
+        String storageProvider = "provider";
+        String storageAuthVersion = "1.2.3";
+        String storageEndpoint = "http://example.org";
+        String storageServiceId = "storage-service-id";
+        String regionName = "region-name";
+        PortalServiceException exception = new PortalServiceException("Some random error","Some error correction");
+        File activityFile = File.createTempFile("activity", ".ttl");
+        String activityFileName = "activity.ttl";
+        CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
+        CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
+        CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
+        String mockUser = "jo@me.com";
 
         jobObj.setComputeVmId(computeVmId);
         //As submitJob method no longer explicitly checks for empty storage credentials,
@@ -972,7 +972,7 @@ public class TestJobBuilderController {
         jobObj.setComputeServiceId(computeServiceId);
         jobObj.setStorageServiceId(storageServiceId);
         jobObj.setStorageBucket(storageBucket);
-        try (final OutputStream mockOutputStream = context.mock(OutputStream.class)) {
+        try (OutputStream mockOutputStream = context.mock(OutputStream.class)) {
 
             context.checking(new Expectations() {
                 {
@@ -1064,7 +1064,7 @@ public class TestJobBuilderController {
                 }
             });
 
-            final ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(),
+            ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(),
                     mockPortalUser);
 
             Assert.assertTrue((Boolean) mav.getModel().get("success"));
@@ -1085,31 +1085,31 @@ public class TestJobBuilderController {
     @Test
     public void testJobSubmissionWithQueue_ExecuteFailure() throws Exception {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(13);
-        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        VEGLJob jobObj = new VEGLJob(13);
+        String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
 
-        final String computeVmId = "compute-vmi-id";
-        final String computeServiceId = "compute-service-id";
+        String computeVmId = "compute-vmi-id";
+        String computeServiceId = "compute-service-id";
 
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
-        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
-        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final String computeKeyName = "key-name";
-        final String storageBucket = "storage-bucket";
-        final String storageAccess = "213-asd-54";
-        final String storageSecret = "tops3cret";
-        final String storageProvider = "provider";
-        final String storageAuthVersion = "1.2.3";
-        final String storageEndpoint = "http://example.org";
-        final String storageServiceId = "storage-service-id";
-        final String regionName = "region-name";
-        final File activityFile = File.createTempFile("activity", ".ttl");
-        final String activityFileName = "activity.ttl";
-        final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
-        final CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
-        final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
-        final String mockUser = "jo@me.com";
+        File mockFile1 = context.mock(File.class, "MockFile1");
+        File mockFile2 = context.mock(File.class, "MockFile2");
+        StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(jobObj, "mockFile1", mockFile1), new StagedFile(jobObj, "mockFile2", mockFile2)};
+        VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        String computeKeyName = "key-name";
+        String storageBucket = "storage-bucket";
+        String storageAccess = "213-asd-54";
+        String storageSecret = "tops3cret";
+        String storageProvider = "provider";
+        String storageAuthVersion = "1.2.3";
+        String storageEndpoint = "http://example.org";
+        String storageServiceId = "storage-service-id";
+        String regionName = "region-name";
+        File activityFile = File.createTempFile("activity", ".ttl");
+        String activityFileName = "activity.ttl";
+        CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
+        CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
+        CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
+        String mockUser = "jo@me.com";
 
         jobObj.setComputeVmId(computeVmId);
         //As submitJob method no longer explicitly checks for empty storage credentials,
@@ -1121,7 +1121,7 @@ public class TestJobBuilderController {
         jobObj.setStorageServiceId(storageServiceId);
         jobObj.setStorageBucket(storageBucket);
         
-        try (final OutputStream mockOutputStream = context.mock(OutputStream.class)) {
+        try (OutputStream mockOutputStream = context.mock(OutputStream.class)) {
             context.checking(new Expectations() {
                 {
                     // We should have 1 call to our job manager to get our job
@@ -1211,7 +1211,7 @@ public class TestJobBuilderController {
                 }
             });
 
-            final ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(),
+            ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(),
                     mockPortalUser);
             Thread.sleep(2000);
             Assert.assertTrue(vglPollingJobQueueManager.getQueue().hasJob());
@@ -1227,13 +1227,13 @@ public class TestJobBuilderController {
     @Test
     public void testJobSubmission_StorageServiceDNE() {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(new Integer(13));
-        final String computeServiceId = "ccsid";
-        final String injectedComputeVmId = "injected-compute-vmi-id";
-        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
-        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final HashMap<String, Object> sessionVariables = new HashMap<>();
-        final String storageServiceId = "cssid";
+        VEGLJob jobObj = new VEGLJob(new Integer(13));
+        String computeServiceId = "ccsid";
+        String injectedComputeVmId = "injected-compute-vmi-id";
+        String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        HashMap<String, Object> sessionVariables = new HashMap<>();
+        String storageServiceId = "cssid";
 
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
         jobObj.setComputeVmId(injectedComputeVmId);
@@ -1257,7 +1257,7 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
         }});
 
-        final ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
@@ -1269,13 +1269,13 @@ public class TestJobBuilderController {
     @Test
     public void testJobSubmission_ComputeServiceDNE() {
         //Instantiate our job object
-        final VEGLJob jobObj = new VEGLJob(new Integer(13));
-        final String computeServiceId = "ccsid";
-        final String injectedComputeVmId = "injected-compute-vmi-id";
-        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
-        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final HashMap<String, Object> sessionVariables = new HashMap<>();
-        final String storageServiceId = "cssid";
+        VEGLJob jobObj = new VEGLJob(new Integer(13));
+        String computeServiceId = "ccsid";
+        String injectedComputeVmId = "injected-compute-vmi-id";
+        String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
+        VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        HashMap<String, Object> sessionVariables = new HashMap<>();
+        String storageServiceId = "cssid";
 
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
         jobObj.setComputeVmId(injectedComputeVmId);
@@ -1299,7 +1299,7 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
         }});
 
-        final ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobObj.getId().toString(), mockPortalUser);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, jobObj.getStatus());
@@ -1313,10 +1313,10 @@ public class TestJobBuilderController {
     @Test
     public void testBootstrapResource() throws Exception {
         //see - http://docs.amazonwebservices.com/AutoScaling/latest/APIReference/API_CreateLaunchConfiguration.html
-        final int maxFileSize = 21847;
-        final int safeFileSize = maxFileSize - 1024; //arbitrary number to account for long strings being injected into bootstrap
+        int maxFileSize = 21847;
+        int safeFileSize = maxFileSize - 1024; //arbitrary number to account for long strings being injected into bootstrap
 
-        final String contents = ResourceUtil.loadResourceAsString("org/auscope/portal/server/web/controllers/vl-bootstrap.sh");
+        String contents = ResourceUtil.loadResourceAsString("org/auscope/portal/server/web/controllers/vl-bootstrap.sh");
 
         Assert.assertNotNull(contents);
         Assert.assertTrue("Bootstrap is empty!", contents.length() > 0);
@@ -1325,18 +1325,18 @@ public class TestJobBuilderController {
         Assert.assertEquals("Boostrap must start with '#'", '#', contents.charAt(0));
 
         //We can't use variables in the form ${name} as the {} conflict with java MessageFormat
-        final Pattern pattern = Pattern.compile("\\{(.*?)\\}");
-        final Matcher matcher = pattern.matcher(contents);
+        Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+        Matcher matcher = pattern.matcher(contents);
         while (matcher.find()) {
 
             if (matcher.groupCount() != 1) {
                 continue;
             }
-            final String name = matcher.group(1);
+            String name = matcher.group(1);
 
             try {
                 Integer.parseInt(name);
-            } catch (final NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 Assert.fail(String.format("The variable ${%1$s} conflicts with java MessageFormat variables. Get rid of curly braces", name));
             }
         }
@@ -1348,16 +1348,16 @@ public class TestJobBuilderController {
      */
     @Test
     public void testCreateBootstrapForJob() throws Exception {
-        final VEGLJob job = new VEGLJob(1234);
-        final String bucket = "stora124e-Bucket";
-        final String access = "213-asd-54";
-        final String secret = "tops3cret";
-        final String provider = "provider";
-        final String storageAuthVersion = "1.2.3";
-        final String computeServiceId = "ccs";
-        final String storageServiceId = "css";
-        final String endpoint = "http://example.org";
-        final String regionName = "region-name";
+        VEGLJob job = new VEGLJob(1234);
+        String bucket = "stora124e-Bucket";
+        String access = "213-asd-54";
+        String secret = "tops3cret";
+        String provider = "provider";
+        String storageAuthVersion = "1.2.3";
+        String computeServiceId = "ccs";
+        String storageServiceId = "css";
+        String endpoint = "http://example.org";
+        String regionName = "region-name";
 
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);
@@ -1377,7 +1377,7 @@ public class TestJobBuilderController {
 
         job.setStorageBaseKey("test/key");
 
-        final String contents = controller.createBootstrapForJob(job);
+        String contents = controller.createBootstrapForJob(job);
         Assert.assertNotNull(contents);
         Assert.assertTrue("Bootstrap is empty!", contents.length() > 0);
         Assert.assertFalse("Boostrap needs Unix style line endings!", contents.contains("\r"));
@@ -1400,16 +1400,16 @@ public class TestJobBuilderController {
      */
     @Test
     public void testCreateBootstrapForJob_NoOptionalValues() throws Exception {
-        final VEGLJob job = new VEGLJob(1234);
-        final String bucket = "stora124e-Bucket";
-        final String access = "213-asd-54";
-        final String secret = "tops3cret";
-        final String provider = "provider";
-        final String storageAuthVersion = null;
-        final String regionName = null;
-        final String computeServiceId = "ccs";
-        final String storageServiceId = "css";
-        final String endpoint = "http://example.org";
+        VEGLJob job = new VEGLJob(1234);
+        String bucket = "stora124e-Bucket";
+        String access = "213-asd-54";
+        String secret = "tops3cret";
+        String provider = "provider";
+        String storageAuthVersion = null;
+        String regionName = null;
+        String computeServiceId = "ccs";
+        String storageServiceId = "css";
+        String endpoint = "http://example.org";
 
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);
@@ -1429,7 +1429,7 @@ public class TestJobBuilderController {
 
         job.setStorageBaseKey("test/key");
 
-        final String contents = controller.createBootstrapForJob(job);
+        String contents = controller.createBootstrapForJob(job);
         Assert.assertNotNull(contents);
         Assert.assertTrue(contents.contains("STORAGE_AUTH_VERSION=\"\""));
         Assert.assertTrue(contents.contains("OS_REGION_NAME=\"\""));
@@ -1442,8 +1442,8 @@ public class TestJobBuilderController {
     @SuppressWarnings("rawtypes")
     @Test
     public void testListImages() {
-        final String computeServiceId = "compute-service-id";
-        final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        String computeServiceId = "compute-service-id";
+        VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
 
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
@@ -1453,7 +1453,7 @@ public class TestJobBuilderController {
             allowing(mockRequest).isUserInRole("testRole2");will(returnValue(true));
         }});
 
-        final ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, new ANVGLUser());
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, new ANVGLUser());
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
@@ -1467,9 +1467,9 @@ public class TestJobBuilderController {
     @SuppressWarnings("rawtypes")
     @Test
     public void testListImages_NoRestrictions() {
-        final HashMap<String, Object> sessionVariables = new HashMap<>();
-        final String computeServiceId = "compute-service-id";
-        final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        HashMap<String, Object> sessionVariables = new HashMap<>();
+        String computeServiceId = "compute-service-id";
+        VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
 
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
@@ -1483,7 +1483,7 @@ public class TestJobBuilderController {
             oneOf(images[0]).getPermissions();will(returnValue(null));
         }});
 
-        final ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, new ANVGLUser());
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, new ANVGLUser());
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
@@ -1497,16 +1497,16 @@ public class TestJobBuilderController {
     @SuppressWarnings("unchecked")
     @Test
     public void testUpdateOrCreateJob_CreateJobObject() throws Exception {
-        final HashMap<String, Object> sessionVariables = new HashMap<>();
-        final String baseKey = "base/key";
-        final String storageServiceId = "storage-service";
-        final String computeServiceId = "compute-service";
-        final String computeVmType = "compute-vm-type";
-        final String computeVmId = "compute-vm";
-        final String name = "name";
-        final String description = "desc";
-        final Integer seriesId = 5431;
-        final boolean emailNotification = true;
+        HashMap<String, Object> sessionVariables = new HashMap<>();
+        String baseKey = "base/key";
+        String storageServiceId = "storage-service";
+        String computeServiceId = "compute-service";
+        String computeVmType = "compute-vm-type";
+        String computeVmId = "compute-vm";
+        String name = "name";
+        String description = "desc";
+        Integer seriesId = 5431;
+        boolean emailNotification = true;
 
         sessionVariables.put("doubleValue", 123.45);
         sessionVariables.put("intValue", 123);
@@ -1547,7 +1547,7 @@ public class TestJobBuilderController {
             oneOf(mockCloudComputeServices[0]).getKeypair();
         }});
 
-        final ModelAndView mav = controller.updateOrCreateJob(null,  //The integer ID if not specified will trigger job creation
+        ModelAndView mav = controller.updateOrCreateJob(null,  //The integer ID if not specified will trigger job creation
                 name,
                 description,
                 seriesId,
@@ -1564,18 +1564,18 @@ public class TestJobBuilderController {
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
-        final List<VEGLJob> data = (List<VEGLJob>)mav.getModel().get("data");
+        List<VEGLJob> data = (List<VEGLJob>)mav.getModel().get("data");
         Assert.assertNotNull(data);
         Assert.assertEquals(1, data.size());
 
-        final VEGLJob newJob = data.get(0);
+        VEGLJob newJob = data.get(0);
         Assert.assertNotNull(newJob);
         Assert.assertEquals(storageServiceId, newJob.getStorageServiceId());
         Assert.assertEquals(computeServiceId, newJob.getComputeServiceId());
         Assert.assertEquals(baseKey, newJob.getStorageBaseKey());
         Assert.assertEquals(computeVmType, newJob.getComputeInstanceType());
 
-        final Map<String, VglParameter> params = newJob.getJobParameters();
+        Map<String, VglParameter> params = newJob.getJobParameters();
         Assert.assertNotNull(params);
         Assert.assertEquals(2, params.size());
 
@@ -1598,14 +1598,14 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUpdateOrCreateJob_UpdateJob() {
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final int seriesId = 12;
-        final int jobId = 1234;
-        final String computeVmType = "compute-vm-type";
-        final String newBaseKey = "base/key";
-        final boolean emailNotification = true;
-        final String keypair = "vl-developers";
-        final Integer walltime = Integer.valueOf(0);
+        VEGLJob mockJob = context.mock(VEGLJob.class);
+        int seriesId = 12;
+        int jobId = 1234;
+        String computeVmType = "compute-vm-type";
+        String newBaseKey = "base/key";
+        boolean emailNotification = true;
+        String keypair = "vl-developers";
+        Integer walltime = Integer.valueOf(0);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1634,7 +1634,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setComputeInstanceKey(keypair);
         }});
 
-        final ModelAndView mav = controller.updateOrCreateJob(jobId,
+        ModelAndView mav = controller.updateOrCreateJob(jobId,
                 "name",
                 "description",
                 seriesId,
@@ -1657,13 +1657,13 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUpdateJobSeries() {
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
-        final String folderName = "Name";
-        final int jobId = 1234;
-        final int newSeriesId=1111;
-        final String userEmail = "exampleuser@email.com";
-        final ArrayList<VEGLSeries> series=new ArrayList<>();
+        VEGLJob mockJob = context.mock(VEGLJob.class);
+        VEGLSeries mockSeries = context.mock(VEGLSeries.class);
+        String folderName = "Name";
+        int jobId = 1234;
+        int newSeriesId=1111;
+        String userEmail = "exampleuser@email.com";
+        ArrayList<VEGLSeries> series=new ArrayList<>();
         series.add(mockSeries);
 
         context.checking(new Expectations() {{
@@ -1675,7 +1675,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(mockJob);
         }});
 
-        final ModelAndView mav = controller.updateJobSeries(jobId,folderName,mockRequest,mockPortalUser);
+        ModelAndView mav = controller.updateJobSeries(jobId,folderName,mockRequest,mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1686,11 +1686,11 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUpdateJobSeriesError() {
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final String folderName = "Name";
-        final int jobId = 1234;
-        final String userEmail = "exampleuser@email.com";
-        final ArrayList<VEGLSeries> series=new ArrayList<>();
+        VEGLJob mockJob = context.mock(VEGLJob.class);
+        String folderName = "Name";
+        int jobId = 1234;
+        String userEmail = "exampleuser@email.com";
+        ArrayList<VEGLSeries> series=new ArrayList<>();
 
 
         context.checking(new Expectations() {{
@@ -1700,19 +1700,19 @@ public class TestJobBuilderController {
 
         }});
 
-        final ModelAndView mav = controller.updateJobSeries(jobId,folderName,mockRequest,mockPortalUser);
+        ModelAndView mav = controller.updateJobSeries(jobId,folderName,mockRequest,mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
     @Test
     public void testUpdateOrCreateJob_SaveFailure() {
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final int seriesId = 12;
-        final int jobId = 1234;
-        final boolean emailNotification = true;
-        final String computeVmType = "compute-vm-type";
-        final Integer walltime = Integer.valueOf(0);
+        VEGLJob mockJob = context.mock(VEGLJob.class);
+        int seriesId = 12;
+        int jobId = 1234;
+        boolean emailNotification = true;
+        String computeVmType = "compute-vm-type";
+        Integer walltime = Integer.valueOf(0);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1736,7 +1736,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(mockJob);will(throwException(new Exception("")));
         }});
 
-        final ModelAndView mav = controller.updateOrCreateJob(jobId,
+        ModelAndView mav = controller.updateOrCreateJob(jobId,
                 "name",
                 "description",
                 seriesId,
@@ -1759,12 +1759,12 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUpdateOrCreateJob_UpdateJobWithBadStorageId() {
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final int seriesId = 12;
-        final int jobId = 1234;
-        final boolean emailNotification = true;
-        final String computeVmType = "compute-vm-type";
-        final Integer walltime = Integer.valueOf(0);
+        VEGLJob mockJob = context.mock(VEGLJob.class);
+        int seriesId = 12;
+        int jobId = 1234;
+        boolean emailNotification = true;
+        String computeVmType = "compute-vm-type";
+        Integer walltime = Integer.valueOf(0);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1788,7 +1788,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(mockJob);
         }});
 
-        final ModelAndView mav = controller.updateOrCreateJob(jobId,
+        ModelAndView mav = controller.updateOrCreateJob(jobId,
                 "name",
                 "description",
                 seriesId,
@@ -1811,12 +1811,12 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUpdateOrCreateJob_UpdateJobWithBadComputeId() {
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final int seriesId = 12;
-        final int jobId = 1234;
-        final boolean emailNotification = true;
-        final String computeVmType = "compute-vm-type";
-        final Integer walltime = Integer.valueOf(0);
+        VEGLJob mockJob = context.mock(VEGLJob.class);
+        int seriesId = 12;
+        int jobId = 1234;
+        boolean emailNotification = true;
+        String computeVmType = "compute-vm-type";
+        Integer walltime = Integer.valueOf(0);
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object and 1 call to save it
@@ -1840,7 +1840,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(mockJob);
         }});
 
-        final ModelAndView mav = controller.updateOrCreateJob(jobId,
+        ModelAndView mav = controller.updateOrCreateJob(jobId,
                 "name",
                 "description",
                 seriesId,
@@ -1863,36 +1863,36 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUpdateJobDownloads_Append() {
-        final Integer jobId = 124;
-        final String append = "true";
-        final String[] names = new String[] {"n1", "n2"};
-        final String[] descriptions = new String[] {"d1", "d2"};
-        final String[] urls = new String[] {"http://example.org/1", "http://example.org/2"};
-        final String[] localPaths = new String[] {"p1", "p2"};
+        Integer jobId = 124;
+        String append = "true";
+        String[] names = new String[] {"n1", "n2"};
+        String[] descriptions = new String[] {"d1", "d2"};
+        String[] urls = new String[] {"http://example.org/1", "http://example.org/2"};
+        String[] localPaths = new String[] {"p1", "p2"};
 
-        final VEGLJob myJob = new VEGLJob(jobId);
-        final VglDownload[] existingDownloads = new VglDownload[] {new VglDownload(12356)};
+        VEGLJob myJob = new VEGLJob(jobId);
+        VglDownload[] existingDownloads = new VglDownload[] {new VglDownload(12356)};
 
 
         myJob.setJobDownloads(new ArrayList<>(Arrays.asList(existingDownloads)));
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId, user);will(returnValue(myJob));
 
             oneOf(mockJobManager).saveJob(myJob);
         }});
 
-        final ModelAndView mav = controller.updateJobDownloads(jobId, append, names, descriptions, urls, localPaths, user);
+        ModelAndView mav = controller.updateJobDownloads(jobId, append, names, descriptions, urls, localPaths, user);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
         //The resulting job should have 3 elements in its list (due to appending)
-        final List<VglDownload> dls = myJob.getJobDownloads();
+        List<VglDownload> dls = myJob.getJobDownloads();
         Assert.assertEquals(existingDownloads.length + names.length, dls.size());
         Assert.assertSame(existingDownloads[0], dls.get(0));
         for (int i = 0; i < names.length; i++) {
-            final VglDownload dlToTest = dls.get(existingDownloads.length + i);
+            VglDownload dlToTest = dls.get(existingDownloads.length + i);
             Assert.assertEquals(names[i], dlToTest.getName());
             Assert.assertEquals(descriptions[i], dlToTest.getDescription());
             Assert.assertEquals(urls[i], dlToTest.getUrl());
@@ -1906,35 +1906,35 @@ public class TestJobBuilderController {
      */
     @Test
     public void testUpdateJobDownloads_Replace() {
-        final Integer jobId = 124;
-        final String append = "false";
-        final String[] names = new String[] {"n1", "n2"};
-        final String[] descriptions = new String[] {"d1", "d2"};
-        final String[] urls = new String[] {"http://example.org/1", "http://example.org/2"};
-        final String[] localPaths = new String[] {"p1", "p2"};
+        Integer jobId = 124;
+        String append = "false";
+        String[] names = new String[] {"n1", "n2"};
+        String[] descriptions = new String[] {"d1", "d2"};
+        String[] urls = new String[] {"http://example.org/1", "http://example.org/2"};
+        String[] localPaths = new String[] {"p1", "p2"};
 
-        final VEGLJob myJob = new VEGLJob(jobId);
-        final VglDownload[] existingDownloads = new VglDownload[] {new VglDownload(12356)};
+        VEGLJob myJob = new VEGLJob(jobId);
+        VglDownload[] existingDownloads = new VglDownload[] {new VglDownload(12356)};
 
 
         myJob.setJobDownloads(new ArrayList<>(Arrays.asList(existingDownloads)));
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId, user);will(returnValue(myJob));
 
             oneOf(mockJobManager).saveJob(myJob);
         }});
 
-        final ModelAndView mav = controller.updateJobDownloads(jobId, append, names, descriptions, urls, localPaths, user);
+        ModelAndView mav = controller.updateJobDownloads(jobId, append, names, descriptions, urls, localPaths, user);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
         //The resulting job should have 3 elements in its list (due to appending)
-        final List<VglDownload> dls = myJob.getJobDownloads();
+        List<VglDownload> dls = myJob.getJobDownloads();
         Assert.assertEquals(names.length, dls.size());
         for (int i = 0; i < names.length; i++) {
-            final VglDownload dlToTest = dls.get(i);
+            VglDownload dlToTest = dls.get(i);
             Assert.assertEquals(names[i], dlToTest.getName());
             Assert.assertEquals(descriptions[i], dlToTest.getDescription());
             Assert.assertEquals(urls[i], dlToTest.getUrl());
@@ -1948,12 +1948,12 @@ public class TestJobBuilderController {
      */
     @Test
     public void testGetAllJobInputs() throws Exception {
-        final Integer jobId = 543231;
-        final VEGLJob job = new VEGLJob(jobId);
-        final VglDownload dl = new VglDownload(413);
-        final File mockFile = context.mock(File.class);
-        final long mockFileLength = 21314L;
-        final StagedFile[] stagedFiles = new StagedFile[]{new StagedFile(job, "another/file.ext", mockFile)};
+        Integer jobId = 543231;
+        VEGLJob job = new VEGLJob(jobId);
+        VglDownload dl = new VglDownload(413);
+        File mockFile = context.mock(File.class);
+        long mockFileLength = 21314L;
+        StagedFile[] stagedFiles = new StagedFile[]{new StagedFile(job, "another/file.ext", mockFile)};
 
         dl.setDescription("desc");
         dl.setEastBoundLongitude(1.0);
@@ -1966,14 +1966,14 @@ public class TestJobBuilderController {
 
         job.setJobDownloads(Arrays.asList(dl));
 
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId, user);will(returnValue(job));
             oneOf(mockFile).length();will(returnValue(mockFileLength));
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stagedFiles));
         }});
 
-        final ModelAndView mav = controller.getAllJobInputs(jobId, user);
+        ModelAndView mav = controller.getAllJobInputs(jobId, user);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
@@ -1995,9 +1995,9 @@ public class TestJobBuilderController {
     @SuppressWarnings("unchecked")
     @Test
     public void testGetComputeServices() {
-        final String name = "name";
-        final String id = "id";
-        final ANVGLUser user = new ANVGLUser();
+        String name = "name";
+        String id = "id";
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getName();will(returnValue(name));
@@ -2005,12 +2005,12 @@ public class TestJobBuilderController {
             allowing(mockScmEntryService).getJobProviders(null, user);will(returnValue(null));
         }});
 
-        final ModelAndView mav = controller.getComputeServices(null, user);
+        ModelAndView mav = controller.getComputeServices(null, user);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
-        final ModelMap test = ((List<ModelMap>)mav.getModel().get("data")).get(0);
+        ModelMap test = ((List<ModelMap>)mav.getModel().get("data")).get(0);
 
         Assert.assertEquals(name, test.get("name"));
         Assert.assertEquals(id, test.get("id"));
@@ -2023,20 +2023,20 @@ public class TestJobBuilderController {
     @SuppressWarnings("unchecked")
     @Test
     public void testGetStorageServices() {
-        final String name = "name";
-        final String id = "id";
+        String name = "name";
+        String id = "id";
 
         context.checking(new Expectations() {{
             allowing(mockCloudStorageServices[0]).getName();will(returnValue(name));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(id));
         }});
 
-        final ModelAndView mav = controller.getStorageServices();
+        ModelAndView mav = controller.getStorageServices();
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
-        final ModelMap test = ((List<ModelMap>)mav.getModel().get("data")).get(0);
+        ModelMap test = ((List<ModelMap>)mav.getModel().get("data")).get(0);
 
         Assert.assertEquals(name, test.get("name"));
         Assert.assertEquals(id, test.get("id"));
@@ -2048,10 +2048,10 @@ public class TestJobBuilderController {
      */
     @Test
     public void testGetComputeTypes() {
-        final String computeId = "compute-id";
-        final String imageId = "image-id";
-        final ComputeType[] result = new ComputeType[] {new ComputeType("m3.test-compute-type")};
-        final MachineImage[] machineImages = new MachineImage[] {new MachineImage("another-image"), new MachineImage(imageId)};
+        String computeId = "compute-id";
+        String imageId = "image-id";
+        ComputeType[] result = new ComputeType[] {new ComputeType("m3.test-compute-type")};
+        MachineImage[] machineImages = new MachineImage[] {new MachineImage("another-image"), new MachineImage(imageId)};
 
         machineImages[0].setMinimumDiskGB(200);
         machineImages[1].setMinimumDiskGB(1000);
@@ -2062,12 +2062,12 @@ public class TestJobBuilderController {
             allowing(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(machineImages));
         }});
 
-        final ModelAndView mav = controller.getTypesForComputeService(mockRequest, computeId, imageId);
+        ModelAndView mav = controller.getTypesForComputeService(mockRequest, computeId, imageId);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
-        final Object[] actual = (Object[])mav.getModel().get("data");
+        Object[] actual = (Object[])mav.getModel().get("data");
         Assert.assertEquals(result.length, actual.length);
         Assert.assertSame(result[0], actual[0]);
     }
@@ -2078,13 +2078,13 @@ public class TestJobBuilderController {
      */
     @Test
     public void testGetComputeTypes_NoComputeService() {
-        final String computeId = "compute-id";
+        String computeId = "compute-id";
 
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeId));
         }});
 
-        final ModelAndView mav = controller.getTypesForComputeService(mockRequest, "non-matching-compute-id", "image-id");
+        ModelAndView mav = controller.getTypesForComputeService(mockRequest, "non-matching-compute-id", "image-id");
 
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));

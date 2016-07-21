@@ -82,9 +82,9 @@ public class TestCSWCacheController extends PortalTestClass {
      */
     @Test
     public void testGetRecordResponse_Success() throws Exception {
-        final StringWriter actualJSONResponse = new StringWriter();
-        final ModelMap viewCSWRecord1 = new ModelMap();
-        final ModelMap viewCSWRecord2 = new ModelMap();
+        StringWriter actualJSONResponse = new StringWriter();
+        ModelMap viewCSWRecord1 = new ModelMap();
+        ModelMap viewCSWRecord2 = new ModelMap();
 
         viewCSWRecord1.put("rec1", "val1");
         viewCSWRecord2.put("rec2", "val2");
@@ -105,19 +105,19 @@ public class TestCSWCacheController extends PortalTestClass {
         }});
 
         //Run the method, get our response rendered as a JSONObject
-        final ModelAndView mav = cswController.getCSWRecords();
+        ModelAndView mav = cswController.getCSWRecords();
         ((AbstractView) mav.getView()).setExposePathVariables(false);
         mav.getView().render(mav.getModel(), mockHttpRequest, mockHttpResponse);
-        final JSONObject jsonObj = JSONObject.fromObject(actualJSONResponse.toString());
+        JSONObject jsonObj = JSONObject.fromObject(actualJSONResponse.toString());
 
         //Check our response contains useful info...
         Assert.assertEquals(true, jsonObj.getBoolean(SUCCESSJSON));
-        final JSONArray records = jsonObj.getJSONArray("data");
+        JSONArray records = jsonObj.getJSONArray("data");
         Assert.assertNotNull(records);
         Assert.assertEquals(2, records.size());
 
-        final JSONObject jsonRec1 = records.getJSONObject(0);
-        final JSONObject jsonRec2 = records.getJSONObject(1);
+        JSONObject jsonRec1 = records.getJSONObject(0);
+        JSONObject jsonRec2 = records.getJSONObject(1);
 
         Assert.assertEquals("val1", jsonRec1.get("rec1"));
         Assert.assertEquals("val2", jsonRec2.get("rec2"));
@@ -131,9 +131,9 @@ public class TestCSWCacheController extends PortalTestClass {
      */
     @Test
     public void testGetRecordResponse_TransformError() throws Exception {
-        final StringWriter actualJSONResponse = new StringWriter();
-        final ModelMap viewCSWRecord1 = new ModelMap();
-        final ModelMap viewCSWRecord2 = new ModelMap();
+        StringWriter actualJSONResponse = new StringWriter();
+        ModelMap viewCSWRecord1 = new ModelMap();
+        ModelMap viewCSWRecord2 = new ModelMap();
 
         viewCSWRecord1.put("rec1", "val1");
         viewCSWRecord2.put("rec2", "val2");
@@ -154,14 +154,14 @@ public class TestCSWCacheController extends PortalTestClass {
         }});
 
         //Run the method, get our response rendered as a JSONObject
-        final ModelAndView mav = cswController.getCSWRecords();
+        ModelAndView mav = cswController.getCSWRecords();
         ((AbstractView) mav.getView()).setExposePathVariables(false);
         mav.getView().render(mav.getModel(), mockHttpRequest, mockHttpResponse);
-        final JSONObject jsonObj = JSONObject.fromObject(actualJSONResponse.toString());
+        JSONObject jsonObj = JSONObject.fromObject(actualJSONResponse.toString());
 
         //Check our response contains useful info...
         Assert.assertEquals(false, jsonObj.getBoolean(SUCCESSJSON));
-        final JSONArray records = (JSONArray)jsonObj.get("data");
+        JSONArray records = (JSONArray)jsonObj.get("data");
         Assert.assertNotNull(records);
         Assert.assertEquals(0, records.size());
     }
@@ -172,14 +172,14 @@ public class TestCSWCacheController extends PortalTestClass {
      */
     @Test
     public void testGetKeywords() {
-        final Map<String, Set<CSWRecord>> expectedKeywords = new HashMap<>();
+        Map<String, Set<CSWRecord>> expectedKeywords = new HashMap<>();
         expectedKeywords.put("keyword1", new HashSet<>(Arrays.asList(new CSWRecord("a"), new CSWRecord("b"))));
         expectedKeywords.put("keyword1", new HashSet<>(Arrays.asList(new CSWRecord("c"), new CSWRecord("b"), new CSWRecord("a"))));
 
-        final ModelMap kw1 = new ModelMap();
+        ModelMap kw1 = new ModelMap();
         kw1.put("keyword", "keyword1");
         kw1.put("count", 2);
-        final ModelMap kw2 = new ModelMap();
+        ModelMap kw2 = new ModelMap();
         kw2.put("keyword", "keyword2");
         kw2.put("count", 3);
 
@@ -188,7 +188,7 @@ public class TestCSWCacheController extends PortalTestClass {
             will(returnValue(expectedKeywords));
         }});
 
-        final ModelAndView mav = cswController.getCSWKeywords();
+        ModelAndView mav = cswController.getCSWKeywords();
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get(SUCCESSJSON));
 
@@ -196,10 +196,10 @@ public class TestCSWCacheController extends PortalTestClass {
         final
         List<ModelMap> data = (List<ModelMap>) mav.getModel().get("data");
         Assert.assertEquals(expectedKeywords.size(), data.size());
-        for (final ModelMap kwResponse : data) {
+        for (ModelMap kwResponse : data) {
 
-            final String keyword = (String) kwResponse.get("keyword");
-            final Integer count = (Integer)kwResponse.get("count");
+            String keyword = (String) kwResponse.get("keyword");
+            Integer count = (Integer)kwResponse.get("count");
 
             Assert.assertEquals(expectedKeywords.get(keyword).size(), count.intValue());
         }

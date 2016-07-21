@@ -36,18 +36,18 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testSaveScript() throws Exception {
-        final String jobId = "1";
-        final String sourceText = "print 'test'";
-        final Set<String> solutions = new HashSet<>();
+        String jobId = "1";
+        String sourceText = "print 'test'";
+        Set<String> solutions = new HashSet<>();
         solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockSbService).saveScript(jobId, sourceText, user);
             oneOf(mockScmEntryService).updateJobForSolution(jobId, solutions, user);
         }});
 
-        final ModelAndView mav = controller.saveScript(jobId, sourceText, solutions, user);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -56,12 +56,12 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testSaveScript_EmptySourceText() {
-        final String jobId = "1";
-        final String sourceText = "";
-        final Set<String> solutions = new HashSet<>();
+        String jobId = "1";
+        String sourceText = "";
+        Set<String> solutions = new HashSet<>();
         solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
 
-        final ModelAndView mav = controller.saveScript(jobId, sourceText, solutions,
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions,
                 new ANVGLUser());
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
@@ -73,18 +73,18 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testSaveScript_Exception() throws Exception {
-        final String jobId = "1";
-        final String sourceText = "print 'test'";
-        final Set<String> solutions = new HashSet<>();
+        String jobId = "1";
+        String sourceText = "print 'test'";
+        Set<String> solutions = new HashSet<>();
         solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockSbService).saveScript(jobId, sourceText, user);
             will(throwException(new PortalServiceException("")));
         }});
 
-        final ModelAndView mav = controller.saveScript(jobId, sourceText, solutions, user);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -94,18 +94,18 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testGetSavedScript() throws Exception {
-        final String jobId = "1";
-        final String expectedScriptText = "print 'test'";
-        final ANVGLUser user = new ANVGLUser();
+        String jobId = "1";
+        String expectedScriptText = "print 'test'";
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockSbService).loadScript(jobId, user);
             will(returnValue(expectedScriptText));
         }});
 
-        final ModelAndView mav = controller.getSavedScript(jobId, user);
+        ModelAndView mav = controller.getSavedScript(jobId, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
-        final String script = (String)mav.getModel().get("data");
+        String script = (String)mav.getModel().get("data");
         Assert.assertEquals(expectedScriptText, script);
     }
 
@@ -116,15 +116,15 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testGetSavedScript_Exception() throws Exception {
-        final String jobId = "1";
-        final ANVGLUser user = new ANVGLUser();
+        String jobId = "1";
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockSbService).loadScript(jobId, user);
             will(throwException(new PortalServiceException("")));
         }});
 
-        final ModelAndView mav = controller.getSavedScript(jobId, user);
+        ModelAndView mav = controller.getSavedScript(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -133,12 +133,12 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testTemplateParameterParsing() {
-        final String[] keys = new String[] {"apple", "pear", "banana"};
-        final String[] values = new String[] {"2", "4", "6"};
-        final String templateName = "example.txt";
+        String[] keys = new String[] {"apple", "pear", "banana"};
+        String[] values = new String[] {"2", "4", "6"};
+        String templateName = "example.txt";
 
         //The test is that the above keys/values make their way into a valid map
-        final Map<String, Object> expectedMapping = new HashMap<>();
+        Map<String, Object> expectedMapping = new HashMap<>();
         expectedMapping.put(keys[0], values[0]);
         expectedMapping.put(keys[1], values[1]);
         expectedMapping.put(keys[2], values[2]);

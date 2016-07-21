@@ -52,7 +52,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     }
 
 
-    public void setContainsPersistentVolumes(final boolean containsPersistentVolumes) {
+    public void setContainsPersistentVolumes(boolean containsPersistentVolumes) {
         this.containsPersistentVolumes = containsPersistentVolumes;
     }
 
@@ -87,7 +87,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param vmSubsetUrl The URL of the actual input subset file
      * @param walltime The walltime (in minutes) for the job
      */
-    public VEGLJob(final Integer id) {
+    public VEGLJob(Integer id) {
         super(id);
     }
 
@@ -95,7 +95,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * Sets the processTimeLog
      * @param String time
      */
-    public void setProcessTimeLog(final String processTimeLog) {
+    public void setProcessTimeLog(String processTimeLog) {
         this.processTimeLog=processTimeLog;
 
     }
@@ -119,7 +119,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * Sets where this job has been registered
      * @param registeredUrl
      */
-    public void setRegisteredUrl(final String registeredUrl) {
+    public void setRegisteredUrl(String registeredUrl) {
         this.registeredUrl = registeredUrl;
     }
 
@@ -135,7 +135,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * Sets the ID of the series this job belongs to
      * @param seriesId
      */
-    public void setSeriesId(final Integer seriesId) {
+    public void setSeriesId(Integer seriesId) {
         this.seriesId = seriesId;
     }
 
@@ -151,7 +151,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * Sets the email notification flag for this job
      * @param seriesId
      */
-    public void setEmailNotification(final boolean emailNotification) {
+    public void setEmailNotification(boolean emailNotification) {
         this.emailNotification = emailNotification;
     }
 
@@ -164,9 +164,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
     }
 
     /** A set of VglJobParameter objects*/
-    public void setJobParameters(final Map<String, VglParameter> jobParameters) {
+    public void setJobParameters(Map<String, VglParameter> jobParameters) {
         this.jobParameters = jobParameters;
-        for (final VglParameter params : jobParameters.values()) {
+        for (VglParameter params : jobParameters.values()) {
             params.setParent(this);
         }
     }
@@ -177,7 +177,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param value The value of the parameter
      * @param type The type of the parameter ('number' or 'string')
      */
-    public void setJobParameter(final String name, final String value, final ParameterType type) {
+    public void setJobParameter(String name, String value, ParameterType type) {
         VglParameter param = jobParameters.get(name);
         if (param == null) {
             param = new VglParameter();
@@ -196,7 +196,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param key
      * @return
      */
-    public VglParameter getJobParameter(final String key) {
+    public VglParameter getJobParameter(String key) {
         return this.jobParameters.get(key);
     }
 
@@ -213,9 +213,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * A list of VglDownload objects associated with this job
      * @param jobDownloads
      */
-    public void setJobDownloads(final List<VglDownload> jobDownloads) {
+    public void setJobDownloads(List<VglDownload> jobDownloads) {
         this.jobDownloads = jobDownloads;
-        for (final VglDownload dl : jobDownloads) {
+        for (VglDownload dl : jobDownloads) {
             dl.setParent(this);
         }
     }
@@ -236,11 +236,11 @@ public class VEGLJob extends CloudJob implements Cloneable {
         return this.jobSolutions;
     }
 
-    public void addJobSolution(final String solutionId) {
+    public void addJobSolution(String solutionId) {
         this.jobSolutions.add(solutionId);
     }
 
-    public void setJobSolutions(final Set<String> solutions) {
+    public void setJobSolutions(Set<String> solutions) {
         this.jobSolutions = solutions;
     }
 
@@ -250,7 +250,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @return
      */
     public VEGLJob safeClone() {
-        final VEGLJob newJob = new VEGLJob(null);
+        VEGLJob newJob = new VEGLJob(null);
         newJob.setComputeInstanceId(this.getComputeInstanceId());
         newJob.setComputeInstanceKey(this.getComputeInstanceKey());
         newJob.setComputeInstanceType(this.getComputeInstanceType());
@@ -270,23 +270,23 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setWalltime(this.getWalltime());
         newJob.setContainsPersistentVolumes(this.isContainsPersistentVolumes());
 
-        final List<VglDownload> newDownloads = new ArrayList<>();
-        for (final VglDownload dl : this.getJobDownloads()) {
-            final VglDownload dlClone = (VglDownload) dl.clone();
+        List<VglDownload> newDownloads = new ArrayList<>();
+        for (VglDownload dl : this.getJobDownloads()) {
+            VglDownload dlClone = (VglDownload) dl.clone();
             dlClone.setId(null);
             newDownloads.add(dlClone);
         }
         newJob.setJobDownloads(newDownloads);
 
-        final Map<String, VglParameter> newParams = new HashMap<>();
-        for (final String key : this.jobParameters.keySet()) {
-            final VglParameter paramClone = (VglParameter)this.jobParameters.get(key).clone();
+        Map<String, VglParameter> newParams = new HashMap<>();
+        for (String key : this.jobParameters.keySet()) {
+            VglParameter paramClone = (VglParameter)this.jobParameters.get(key).clone();
             paramClone.setId(null);
             newParams.put(key, paramClone);
         }
         newJob.setJobParameters(newParams);
 
-        for (final String key : properties.keySet()) {
+        for (String key : properties.keySet()) {
             newJob.setProperty(key, getProperty(key));
         }
 
@@ -307,7 +307,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * The storage bucket name that will receive job artifacts (usually unique to user)
      * @param storageBucket
      */
-    public void setStorageBucket(final String storageBucket) {
+    public void setStorageBucket(String storageBucket) {
         this.storageBucket = storageBucket;
     }
 
@@ -327,7 +327,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * Set the walltime in minutes
      * @param walltime
      */
-    public void setWalltime(final Integer walltime) {
+    public void setWalltime(Integer walltime) {
         this.walltime = walltime;
     }
 

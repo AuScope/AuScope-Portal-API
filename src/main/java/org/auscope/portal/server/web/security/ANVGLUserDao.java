@@ -15,7 +15,7 @@ public class ANVGLUserDao extends HibernateDaoSupport {
      *
      * @param id the ID of the user
      */
-    public ANVGLUser getById(final String id) {
+    public ANVGLUser getById(String id) {
         return getHibernateTemplate().get(ANVGLUser.class, id);
     }
 
@@ -24,7 +24,7 @@ public class ANVGLUserDao extends HibernateDaoSupport {
      *
      * @param id the ID of the user
      */
-    public ANVGLUser getByEmail(final String email) {
+    public ANVGLUser getByEmail(String email) {
         List<?> resList = getHibernateTemplate().findByNamedParam("from ANVGLUser u where u.email =:p", "p", email);
         if(resList.isEmpty()) return null;
         return (ANVGLUser) resList.get(0);
@@ -33,14 +33,14 @@ public class ANVGLUserDao extends HibernateDaoSupport {
     /**
      * Deletes the given user.
      */
-    public void deleteUser(final ANVGLUser user) {
+    public void deleteUser(ANVGLUser user) {
         getHibernateTemplate().delete(user);
     }
 
     /**
      * Saves or updates the given user.
      */
-    public void save(final ANVGLUser user) {
+    public void save(ANVGLUser user) {
         getHibernateTemplate().saveOrUpdate(user);
     }
 }

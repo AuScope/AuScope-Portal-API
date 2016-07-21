@@ -51,7 +51,7 @@ public class VglDownload implements Serializable, Cloneable {
      *
      * @param id The primary key for this download
      */
-    public VglDownload(final Integer id) {
+    public VglDownload(Integer id) {
         super();
         this.id = id;
     }
@@ -68,7 +68,7 @@ public class VglDownload implements Serializable, Cloneable {
      * The primary key for this download
      * @param id
      */
-    public void setId(final Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -84,7 +84,7 @@ public class VglDownload implements Serializable, Cloneable {
      * The descriptive name of this download
      * @param name
      */
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -100,7 +100,7 @@ public class VglDownload implements Serializable, Cloneable {
      *  The long description for this download
      * @param description
      */
-    public void setDescription(final String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -116,7 +116,7 @@ public class VglDownload implements Serializable, Cloneable {
      * The actual URL that when accessed with a GET request will download data
      * @param url
      */
-    public void setUrl(final String url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 
@@ -132,7 +132,7 @@ public class VglDownload implements Serializable, Cloneable {
      * Where the downloaded data (on the job VM) will be downloaded to
      * @param localPath
      */
-    public void setLocalPath(final String localPath) {
+    public void setLocalPath(String localPath) {
         this.localPath = localPath;
     }
 
@@ -148,7 +148,7 @@ public class VglDownload implements Serializable, Cloneable {
      * If this download is for a spatial region this will represent the most northern bounds of the region in WGS:84
      * @param northBoundLatitude
      */
-    public void setNorthBoundLatitude(final Double northBoundLatitude) {
+    public void setNorthBoundLatitude(Double northBoundLatitude) {
         this.northBoundLatitude = northBoundLatitude;
     }
 
@@ -164,7 +164,7 @@ public class VglDownload implements Serializable, Cloneable {
      * If this download is for a spatial region this will represent the most southern bounds of the region in WGS:84
      * @param southBoundLatitude
      */
-    public void setSouthBoundLatitude(final Double southBoundLatitude) {
+    public void setSouthBoundLatitude(Double southBoundLatitude) {
         this.southBoundLatitude = southBoundLatitude;
     }
 
@@ -180,7 +180,7 @@ public class VglDownload implements Serializable, Cloneable {
      * If this download is for a spatial region this will represent the most eastern bounds of the region in WGS:84
      * @param eastBoundLongitude
      */
-    public void setEastBoundLongitude(final Double eastBoundLongitude) {
+    public void setEastBoundLongitude(Double eastBoundLongitude) {
         this.eastBoundLongitude = eastBoundLongitude;
     }
 
@@ -196,7 +196,7 @@ public class VglDownload implements Serializable, Cloneable {
      * If this download is for a spatial region this will represent the most western bounds of the region in WGS:84
      * @param westBoundLongitude
      */
-    public void setWestBoundLongitude(final Double westBoundLongitude) {
+    public void setWestBoundLongitude(Double westBoundLongitude) {
         this.westBoundLongitude = westBoundLongitude;
     }
 
@@ -204,7 +204,7 @@ public class VglDownload implements Serializable, Cloneable {
         return owner;
     }
 
-    public void setOwner(final String owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 
@@ -212,7 +212,7 @@ public class VglDownload implements Serializable, Cloneable {
         return parentUrl;
     }
 
-    public void setParentUrl(final String parentUrl) {
+    public void setParentUrl(String parentUrl) {
         this.parentUrl = parentUrl;
     }
 
@@ -220,7 +220,7 @@ public class VglDownload implements Serializable, Cloneable {
         return parentName;
     }
 
-    public void setParentName(final String parentName) {
+    public void setParentName(String parentName) {
         this.parentName = parentName;
     }
 
@@ -236,7 +236,7 @@ public class VglDownload implements Serializable, Cloneable {
      * The job that owns this download
      * @param parent
      */
-    public void setParent(final VEGLJob parent) {
+    public void setParent(VEGLJob parent) {
         this.parent = parent;
     }
 
@@ -244,13 +244,13 @@ public class VglDownload implements Serializable, Cloneable {
     public Object clone() {
         try {
             return super.clone();
-        } catch (final CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             return null;
         }
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }

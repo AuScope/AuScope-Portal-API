@@ -14,15 +14,15 @@ public class TestReprojectionController extends PortalTestClass {
      */
     @Test
     public void testCalculateMgaZoneForBBox_MGAZone_49() {
-        final double north = -30;
-        final double south = -32;
-        final double east = 125;
-        final double west = 100;
+        double north = -30;
+        double south = -32;
+        double east = 125;
+        double west = 100;
 
-        final ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
+        ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        final int result = (Integer)mav.getModel().get("data");
+        int result = (Integer)mav.getModel().get("data");
         Assert.assertEquals(49, result);
     }
 
@@ -31,15 +31,15 @@ public class TestReprojectionController extends PortalTestClass {
      */
     @Test
     public void testCalculateMgaZoneForBBox_MGAZone_50() {
-        final double north = -30;
-        final double south = -32;
-        final double east = 125;
-        final double west = 110;
+        double north = -30;
+        double south = -32;
+        double east = 125;
+        double west = 110;
 
-        final ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
+        ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        final int result = (Integer)mav.getModel().get("data");
+        int result = (Integer)mav.getModel().get("data");
         Assert.assertEquals(50, result);
     }
 
@@ -48,15 +48,15 @@ public class TestReprojectionController extends PortalTestClass {
      */
     @Test
     public void testCalculateMgaZoneForBBox_MGAZone_51() {
-        final double north = -30;
-        final double south = -32;
-        final double east = 150;
-        final double west = 100;
+        double north = -30;
+        double south = -32;
+        double east = 150;
+        double west = 100;
 
-        final ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
+        ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        final int result = (Integer)mav.getModel().get("data");
+        int result = (Integer)mav.getModel().get("data");
         Assert.assertEquals(51, result);
     }
 
@@ -65,15 +65,15 @@ public class TestReprojectionController extends PortalTestClass {
      */
     @Test
     public void testCalculateMgaZoneForBBox_MGAZone_52() {
-        final double north = -30;
-        final double south = -32;
-        final double east = 150;
-        final double west = 110;
+        double north = -30;
+        double south = -32;
+        double east = 150;
+        double west = 110;
 
-        final ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
+        ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        final int result = (Integer)mav.getModel().get("data");
+        int result = (Integer)mav.getModel().get("data");
         Assert.assertEquals(52, result);
     }
 
@@ -82,15 +82,15 @@ public class TestReprojectionController extends PortalTestClass {
      */
     @Test
     public void testCalculateMgaZoneForBBox_MGAZone_53() {
-        final double north = -30;
-        final double south = -32;
-        final double east = 170;
-        final double west = 100;
+        double north = -30;
+        double south = -32;
+        double east = 170;
+        double west = 100;
 
-        final ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
+        ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        final int result = (Integer)mav.getModel().get("data");
+        int result = (Integer)mav.getModel().get("data");
         Assert.assertEquals(53, result);
     }
 
@@ -99,15 +99,15 @@ public class TestReprojectionController extends PortalTestClass {
      */
     @Test
     public void testCalculateMgaZoneForBBox_MGAZone_54() {
-        final double north = -30;
-        final double south = -32;
-        final double east = 180;
-        final double west = 100;
+        double north = -30;
+        double south = -32;
+        double east = 180;
+        double west = 100;
 
-        final ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
+        ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        final int result = (Integer)mav.getModel().get("data");
+        int result = (Integer)mav.getModel().get("data");
         Assert.assertEquals(54, result);
     }
 
@@ -116,15 +116,15 @@ public class TestReprojectionController extends PortalTestClass {
      */
     @Test
     public void testCalculateMgaZoneForBBox_MGAZone_55() {
-        final double north = -30;
-        final double south = -32;
-        final double east = 190;
-        final double west = 100;
+        double north = -30;
+        double south = -32;
+        double east = 190;
+        double west = 100;
 
-        final ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
+        ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        final int result = (Integer)mav.getModel().get("data");
+        int result = (Integer)mav.getModel().get("data");
         Assert.assertEquals(55, result);
     }
 
@@ -133,15 +133,15 @@ public class TestReprojectionController extends PortalTestClass {
      */
     @Test
     public void testCalculateMgaZoneForBBox_MGAZone_56() {
-        final double north = -30;
-        final double south = -32;
-        final double east = 200;
-        final double west = 100;
+        double north = -30;
+        double south = -32;
+        double east = 200;
+        double west = 100;
 
-        final ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
+        ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        final int result = (Integer)mav.getModel().get("data");
+        int result = (Integer)mav.getModel().get("data");
         Assert.assertEquals(56, result);
     }
 
@@ -151,12 +151,12 @@ public class TestReprojectionController extends PortalTestClass {
     @Test
     public void testCalculateMgaZoneForBBox_MGAZoneSmallerThanZero() {
         // The following dataset will yield -1 MGA zone
-        final double north = -30;
-        final double south = -32;
-        final double east = 100;
-        final double west = 50;
+        double north = -30;
+        double south = -32;
+        double east = 100;
+        double west = 50;
 
-        final ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
+        ModelAndView mav = cont.calculateMgaZoneForBBox(north, south, east, west);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
@@ -167,17 +167,17 @@ public class TestReprojectionController extends PortalTestClass {
      */
     @Test
     public void testBBoxReproject() {
-        final double north = -30;
-        final double south = -32;
-        final double east = 125;
-        final double west = 110;
+        double north = -30;
+        double south = -32;
+        double east = 125;
+        double west = 110;
 
-        final ModelAndView mav = cont.projectBBoxToUtm(north, south, east, west, null);
+        ModelAndView mav = cont.projectBBoxToUtm(north, south, east, west, null);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
 
-        final ModelMap data = (ModelMap) mav.getModel().get("data");
+        ModelMap data = (ModelMap) mav.getModel().get("data");
         data.containsKey("mgaZone");
         data.containsKey("minNorthing");
         data.containsKey("maxNorthing");
@@ -191,12 +191,12 @@ public class TestReprojectionController extends PortalTestClass {
     @Test
     public void testBBoxReproject_MGAZoneSmallerThanZero() {
         // The following dataset will yield -1 MGA zone
-        final double north = -30;
-        final double south = -32;
-        final double east = 100;
-        final double west = 50;
+        double north = -30;
+        double south = -32;
+        double east = 100;
+        double west = 50;
 
-        final ModelAndView mav = cont.projectBBoxToUtm(north, south, east, west, null);
+        ModelAndView mav = cont.projectBBoxToUtm(north, south, east, west, null);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));

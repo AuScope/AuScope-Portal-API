@@ -30,7 +30,7 @@ public class ANVGLUser implements UserDetails {
         this.authorities = new ArrayList<>();
     }
 
-    public ANVGLUser(final String id, final String fullName, final String email, final List<ANVGLAuthority> authorities) {
+    public ANVGLUser(String id, String fullName, String email, List<ANVGLAuthority> authorities) {
         super();
         this.id = id;
         this.fullName = fullName;
@@ -50,7 +50,7 @@ public class ANVGLUser implements UserDetails {
      * Sets the ID as reported by the remote authentication service (Probably google)
      * @return
      */
-    public void setId(final String id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -66,7 +66,7 @@ public class ANVGLUser implements UserDetails {
      * The name of the AWS S3 bucket where this user's job data will be written
      * @param s3Bucket
      */
-    public void setS3Bucket(final String s3Bucket) {
+    public void setS3Bucket(String s3Bucket) {
         this.s3Bucket = s3Bucket;
     }
 
@@ -84,7 +84,7 @@ public class ANVGLUser implements UserDetails {
      *
      * @param fullName
      */
-    public void setFullName(final String fullName) {
+    public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
@@ -100,7 +100,7 @@ public class ANVGLUser implements UserDetails {
      *
      * @param email
      */
-    public void setEmail(final String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -116,7 +116,7 @@ public class ANVGLUser implements UserDetails {
      * The keyname to be used for VMs started by this user (can be null)
      * @param awsKeyName
      */
-    public void setAwsKeyName(final String awsKeyName) {
+    public void setAwsKeyName(String awsKeyName) {
         this.awsKeyName = awsKeyName;
     }
 
@@ -132,7 +132,7 @@ public class ANVGLUser implements UserDetails {
      * The version of the T&Cs that the user has last accepted (or null if none)
      * @return
      */
-    public void setAcceptedTermsConditions(final Integer acceptedTermsConditions) {
+    public void setAcceptedTermsConditions(Integer acceptedTermsConditions) {
         this.acceptedTermsConditions = acceptedTermsConditions;
     }
 
@@ -146,9 +146,9 @@ public class ANVGLUser implements UserDetails {
         return authorities;
     }
 
-    public void setAuthorities(final List<ANVGLAuthority> authorities) {
+    public void setAuthorities(List<ANVGLAuthority> authorities) {
         this.authorities = authorities;
-        for (final ANVGLAuthority auth : authorities) {
+        for (ANVGLAuthority auth : authorities) {
             auth.setParent(this);
         }
     }
@@ -157,7 +157,7 @@ public class ANVGLUser implements UserDetails {
         return arnExecution;
     }
 
-    public void setArnExecution(final String arnExecution) {
+    public void setArnExecution(String arnExecution) {
         this.arnExecution = arnExecution;
     }
 
@@ -165,7 +165,7 @@ public class ANVGLUser implements UserDetails {
         return arnStorage;
     }
 
-    public void setArnStorage(final String arnStorage) {
+    public void setArnStorage(String arnStorage) {
         this.arnStorage = arnStorage;
     }
 
@@ -173,7 +173,7 @@ public class ANVGLUser implements UserDetails {
         return awsSecret;
     }
 
-    public void setAwsSecret(final String awsSecret) {
+    public void setAwsSecret(String awsSecret) {
         this.awsSecret = awsSecret;
     }
 

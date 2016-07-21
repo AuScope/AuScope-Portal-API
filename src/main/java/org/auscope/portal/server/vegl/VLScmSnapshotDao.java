@@ -12,15 +12,15 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class VLScmSnapshotDao extends HibernateDaoSupport {
     @SuppressWarnings("unchecked")
-    public List<VLScmSnapshot> getSnapshotsForEntry(final String scmEntryId) {
-        final String query = "from VLScmSnapshot s where s.entryId=:scmEntryId";
+    public List<VLScmSnapshot> getSnapshotsForEntry(String scmEntryId) {
+        String query = "from VLScmSnapshot s where s.entryId=:scmEntryId";
         return (List<VLScmSnapshot>)getHibernateTemplate()
                 .findByNamedParam(query, "scmEntryId", scmEntryId);
     }
 
-    public VLScmSnapshot getSnapshotForEntryAndProvider(final String scmEntryId,
-            final String computeServiceId) {
-        final String query = "from VLScmSnapshot s where s.entryId=:scmEntryId and s.computeServiceId=:computeServiceId";
+    public VLScmSnapshot getSnapshotForEntryAndProvider(String scmEntryId,
+            String computeServiceId) {
+        String query = "from VLScmSnapshot s where s.entryId=:scmEntryId and s.computeServiceId=:computeServiceId";
         return (VLScmSnapshot)getHibernateTemplate()
                 .findByNamedParam(query,
                         new String[] {"scmEntryId", "computeServiceId"},

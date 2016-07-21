@@ -34,7 +34,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
      *
      * @param defaultRole
      */
-    public PersistedGoogleUserDetailsLoader(final String defaultRole) {
+    public PersistedGoogleUserDetailsLoader(String defaultRole) {
         this(defaultRole, null);
     }
 
@@ -45,13 +45,13 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
      * @param defaultRole
      * @param rolesByUser
      */
-    public PersistedGoogleUserDetailsLoader(final String defaultRole, final Map<String, List<String>> rolesByUser) {
+    public PersistedGoogleUserDetailsLoader(String defaultRole, Map<String, List<String>> rolesByUser) {
         this.defaultRole = defaultRole;
         this.rolesByUser = new HashMap<>();
         this.random = new SecureRandom();
         if (rolesByUser != null) {
-            for (final Entry<String, List<String>> entry : rolesByUser.entrySet()) {
-                final List<String> authorityStrings = entry.getValue();
+            for (Entry<String, List<String>> entry : rolesByUser.entrySet()) {
+                List<String> authorityStrings = entry.getValue();
                 this.rolesByUser.put(entry.getKey(), authorityStrings);
             }
         }
@@ -69,7 +69,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
      * The DAO that will be used to fetch/set users
      * @param userDao
      */
-    public void setUserDao(final ANVGLUserDao userDao) {
+    public void setUserDao(ANVGLUserDao userDao) {
         this.userDao = userDao;
     }
 
@@ -79,7 +79,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
      * @param user
      * @param userInfo
      */
-    protected void applyInfoToUser(final ANVGLUser user, final Map<String, Object> userInfo) {
+    protected void applyInfoToUser(ANVGLUser user, Map<String, Object> userInfo) {
         user.setEmail(userInfo.get("email").toString());
         user.setFullName(userInfo.get("name").toString());
         user.setId(userInfo.get("id").toString());
@@ -90,39 +90,39 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     }
 
     @Override
-    public ANVGLUser getUserByUserId(final String id) {
+    public ANVGLUser getUserByUserId(String id) {
         return userDao.getById(id);
     }
 
     @Override
-    public boolean isCreatable(final Map<String, Object> userInfo) {
+    public boolean isCreatable(Map<String, Object> userInfo) {
         return userInfo.containsKey("id");
     }
 
     @Override
-    public UserDetails createUser(final String id, final Map<String, Object> userInfo) {
-        final List<ANVGLAuthority> authorities = new ArrayList<>();
+    public UserDetails createUser(String id, Map<String, Object> userInfo) {
+        List<ANVGLAuthority> authorities = new ArrayList<>();
         authorities.add(new ANVGLAuthority(defaultRole));
         if (rolesByUser != null) {
-            final List<String> additionalAuthorities = rolesByUser.get(id);
+            List<String> additionalAuthorities = rolesByUser.get(id);
             if (additionalAuthorities != null) {
-                for (final String authority : additionalAuthorities) {
+                for (String authority : additionalAuthorities) {
                     authorities.add(new ANVGLAuthority(authority));
                 }
             }
         }
 
-        final ANVGLUser newUser = new ANVGLUser();
+        ANVGLUser newUser = new ANVGLUser();
         applyInfoToUser(newUser, userInfo);
         userDao.save(newUser); //create our new user
 
         synchronized(this.random) {
             //Create an AWS secret for this user
-            final String randomSecret = RandomStringUtils.random(SECRET_LENGTH, 0, 0, true, true, null, this.random);
+            String randomSecret = RandomStringUtils.random(SECRET_LENGTH, 0, 0, true, true, null, this.random);
             newUser.setAwsSecret(randomSecret);
 
             //Create a random bucket name for this user
-            final String bucketName = generateRandomBucketName();
+            String bucketName = generateRandomBucketName();
             newUser.setS3Bucket(bucketName);
         }
         newUser.setAuthorities(authorities);
@@ -132,8 +132,8 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     }
 
     @Override
-    public UserDetails updateUser(final UserDetails userDetails,
-            final Map<String, Object> userInfo) {
+    public UserDetails updateUser(UserDetails userDetails,
+            Map<String, Object> userInfo) {
 
         if (userDetails instanceof ANVGLUser) {
             applyInfoToUser((ANVGLUser) userDetails, userInfo);
