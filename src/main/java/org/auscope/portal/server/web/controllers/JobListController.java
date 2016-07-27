@@ -48,8 +48,8 @@ import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -80,7 +80,6 @@ public class JobListController extends BaseCloudController  {
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
 
-    private VEGLJobManager jobManager;
     private FileStagingService fileStagingService;
     private VGLJobStatusAndLogReader jobStatusLogReader;
     private JobStatusMonitor jobStatusMonitor;
@@ -88,7 +87,7 @@ public class JobListController extends BaseCloudController  {
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
     private String adminEmail=null;
-    
+
     /**
      * @return the adminEmail
      */
@@ -111,7 +110,7 @@ public class JobListController extends BaseCloudController  {
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
             VGLPollingJobQueueManager vglPollingJobQueueManager,
             @Value("${HOST.portalAdminEmail}") String adminEmail) {
-        super(cloudStorageServices, cloudComputeServices,vmSh,vmShutdownSh);
+        super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.jobStatusLogReader = jobStatusLogReader;
@@ -140,93 +139,6 @@ public class JobListController extends BaseCloudController  {
             e.printStackTrace();
         }
 
-    }
-
-    /**
-     * Attempts to get a job with a particular ID. If the job ID does NOT belong to the current
-     * user session null will be returned.
-     *
-     * This function will log all appropriate errors.
-     * @param jobId
-     * @return The VEGLJob object on success or null otherwise.
-     */
-    private VEGLJob attemptGetJob(Integer jobId, ANVGLUser user) {
-        logger.info("Getting job with ID " + jobId);
-
-        VEGLJob job = null;
-
-        //Check we have a user email
-        if (user == null || user.getEmail() == null) {
-            logger.warn("The current session is missing an email attribute");
-            return null;
-        }
-
-        //Attempt to fetch our job
-        if (jobId != null) {
-            try {
-                job = jobManager.getJobById(jobId.intValue(), user);
-                logger.debug("Job [" + job.hashCode() + "] retrieved by jobManager [" + jobManager.hashCode() + "]");
-            } catch (AccessDeniedException e) {
-                throw e;
-            } catch (Exception ex) {
-                logger.error(String.format("Exception when accessing jobManager for job id '%1$s'", jobId), ex);
-                return null;
-            }
-        }
-
-        if (job == null) {
-            logger.warn(String.format("Job with ID '%1$s' does not exist", jobId));
-            return null;
-        }
-
-        //Check user matches job
-        if (!user.getEmail().equals(job.getUser())) {
-            logger.warn(String.format("%1$s's attempt to fetch %2$s's job denied!", user, job.getUser()));
-            return null;
-        }
-
-        return job;
-    }
-
-    /**
-     * Attempts to get a series with a particular ID. If the series ID does NOT belong to the current
-     * user session null will be returned.
-     *
-     * This function will log all appropriate errors.
-     * @param jobId
-     * @return The VEGLSeries object on success or null otherwise.
-     */
-    private VEGLSeries attemptGetSeries(Integer seriesId, ANVGLUser user) {
-        VEGLSeries series = null;
-
-        //Check we have a user email
-        if (user == null || user.getEmail() == null) {
-            logger.warn("The current session is missing an email attribute");
-            return null;
-        }
-
-        //Attempt to fetch our job
-        if (seriesId != null) {
-            try {
-                series = jobManager.getSeriesById(seriesId.intValue(), user.getEmail());
-            } catch (Exception ex) {
-                logger.error(String.format("Exception when accessing jobManager for series id '%1$s'", seriesId), ex);
-                return null;
-            }
-        }
-
-        if (series == null) {
-            logger.warn(String.format("Series with ID '%1$s' does not exist", seriesId));
-            return null;
-        }
-
-        //Check user matches job
-        if (!user.getEmail().equals(series.getUser())) {
-            logger.warn(String.format("%1$s's attempt to fetch %2$s's job denied!", user, series.getUser()));
-            return null;
-        }
-
-        return series;
     }
 
 //    /**
@@ -848,16 +760,9 @@ public class JobListController extends BaseCloudController  {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-        VEGLJob job;
-        try {
-            job = jobManager.getJobById(jobId, user);
-        } catch (AccessDeniedException e) {
-            throw e;
-        } catch (Exception e) {
-            return generateJSONResponseMAV(false);
-        }
-        
-        if (job == null || !job.getEmailAddress().equals(user.getEmail())) {
+
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
             return generateJSONResponseMAV(false);
         }
 
@@ -1088,7 +993,7 @@ public class JobListController extends BaseCloudController  {
         } catch (AccessDeniedException e) {
             throw e;
         }
-        
+
         if (oldJob == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job to duplicate.");
         }
@@ -1254,7 +1159,7 @@ public class JobListController extends BaseCloudController  {
             IOUtils.closeQuietly(os);
         }
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
     public @ResponseBody String handleException(AccessDeniedException e) {

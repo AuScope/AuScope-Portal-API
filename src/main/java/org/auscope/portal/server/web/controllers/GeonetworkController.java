@@ -52,13 +52,11 @@ import org.springframework.web.servlet.ModelAndView;
 public class GeonetworkController extends BaseCloudController {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private VEGLJobManager jobManager;
     private GeonetworkService gnService;
 
     @Autowired
     public GeonetworkController(VEGLJobManager jobManager, GeonetworkService gnService, CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices) {
-        super(cloudStorageServices, cloudComputeServices);
-        this.jobManager = jobManager;
+        super(cloudStorageServices, cloudComputeServices, jobManager);
         this.gnService = gnService;
         this.cloudStorageServices = cloudStorageServices;
     }
@@ -225,17 +223,17 @@ public class GeonetworkController extends BaseCloudController {
         //Lookup our appropriate job
         VEGLJob job;
         try {
-            job = jobManager.getJobById(jobId, user);
+            job = attemptGetJob(jobId, user);
         } catch (AccessDeniedException e) {
             throw e;
         }
-        
+
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The specified job does not exist.");
         }
 
         //Lookup our series
-        VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId(), user.getEmail());
+        VEGLSeries jobSeries = attemptGetSeries(job.getSeriesId(), user);
         if (jobSeries == null) {
             return generateJSONResponseMAV(false, null, "The specified job does not belong to a series.");
         }
@@ -280,7 +278,7 @@ public class GeonetworkController extends BaseCloudController {
             return generateJSONResponseMAV(false, null, "Internal error");
         }
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
     public @ResponseBody String handleException(AccessDeniedException e) {

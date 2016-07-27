@@ -1,16 +1,11 @@
 package org.auscope.portal.server.web.service;
 
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-
-import javax.swing.plaf.ToolBarUI;
-import javax.xml.ws.spi.Provider;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -93,21 +88,11 @@ public class ScmEntryService {
      *
      * @param jobId String job ID
      * @param solutionId String solution URL
-     * @param user Authenticated ANVGLUser 
+     * @param user Authenticated ANVGLUser
      * @throws PortalServiceException
      */
-    public void updateJobForSolution(String jobId, Set<String> solutions, ANVGLUser user)
+    public void updateJobForSolution(VEGLJob job, Set<String> solutions, ANVGLUser user)
         throws PortalServiceException {
-        //Lookup our job
-        VEGLJob job = null;
-        try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (Exception ex) {
-            logger.warn("Unable to lookup job with id " + jobId + ": " + ex.getMessage());
-            logger.debug("exception:", ex);
-            throw new PortalServiceException("Unable to lookup job with id " + jobId, ex);
-        }
-
         // Store the solutionId in the job
         job.setJobSolutions(solutions);
 
@@ -236,7 +221,7 @@ public class ScmEntryService {
         for (CloudComputeService ccs: cloudComputeServices) {
             providers.add(ccs.getId());
         }
-        
+
         for (Solution solution: solutions) {
         	useful.add(solution);
         	// Solution with toolbox with at least one image at a
@@ -249,7 +234,7 @@ public class ScmEntryService {
                 }
             }
         }
-        
+
         return useful;
     }
 

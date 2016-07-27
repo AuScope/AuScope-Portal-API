@@ -6,11 +6,11 @@ import java.text.MessageFormat;
 
 import org.apache.commons.io.IOUtils;
 import org.auscope.portal.core.cloud.CloudJob;
-import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
+import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
  * @author Josh Vote
  *
  */
-public abstract class BaseCloudController extends BasePortalController {
+public abstract class BaseCloudController extends BaseModelController {
     /** All cloud storage services that are available to this controller */
     protected CloudStorageService[] cloudStorageServices;
     /** All cloud compute services that are available to this controller */
@@ -32,13 +32,13 @@ public abstract class BaseCloudController extends BasePortalController {
      * @param cloudStorageServices All cloud storage services that are available to this controller
      * @param cloudComputeServices All cloud compute services that are available to this controller
      */
-    public BaseCloudController(CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices) {
-        this(cloudStorageServices,cloudComputeServices,null,null);
+    public BaseCloudController(CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices, VEGLJobManager jobManager) {
+        this(cloudStorageServices,cloudComputeServices, jobManager,null,null);
     }
 
-    public BaseCloudController(CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices,
+    public BaseCloudController(CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices, VEGLJobManager jobManager,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh) {
-        super();
+        super(jobManager);
         this.cloudComputeServices = cloudComputeServices;
         this.cloudStorageServices = cloudStorageServices;
         this.vmSh=vmSh;
@@ -149,7 +149,4 @@ public abstract class BaseCloudController extends BasePortalController {
         String result = MessageFormat.format(bootstrapTemplate, arguments);
         return result;
     }
-
-
-
 }

@@ -51,6 +51,7 @@ import org.auscope.portal.server.web.service.scm.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -79,7 +80,6 @@ public class JobBuilderController extends BaseCloudController {
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
 
-    private VEGLJobManager jobManager;
     private FileStagingService fileStagingService;
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
     private ScmEntryService scmEntryService;
@@ -126,8 +126,7 @@ public class JobBuilderController extends BaseCloudController {
             CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             VGLPollingJobQueueManager vglPollingJobQueueManager, ScmEntryService scmEntryService,
             ANVGLProvenanceService anvglProvenanceService) {
-        super(cloudStorageServices, cloudComputeServices,vmSh,vmShutdownSh);
-        this.jobManager = jobManager;
+        super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
         this.cloudComputeServices = cloudComputeServices;
@@ -152,7 +151,10 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/secure/getJobObject.do")
     public ModelAndView getJobObject(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
         try {
-            VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
+            VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
+            if (job == null) {
+                return generateJSONResponseMAV(false);
+            }
 
             return generateJSONResponseMAV(true, Arrays.asList(job), "");
         } catch (Exception ex) {
@@ -188,10 +190,14 @@ public class JobBuilderController extends BaseCloudController {
         //Lookup our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
+            job = attemptGetJob(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        }
+
+        if (job == null) {
+            return generateJSONResponseMAV(false);
         }
 
         //Get our files
@@ -228,7 +234,11 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam("filename") String filename, @AuthenticationPrincipal ANVGLUser user) throws Exception {
 
         //Lookup our job and download the specified files (any exceptions will return a HTTP 503)
-        VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
+        VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
+        if (job == null) {
+            response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Couldnt access job with that ID");
+            return null;
+        }
         fileStagingService.handleFileDownload(job, filename, response);
         return null;
     }
@@ -251,10 +261,14 @@ public class JobBuilderController extends BaseCloudController {
         //Lookup our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
+            job = attemptGetJob(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        }
+
+        if (job == null) {
+            return generateHTMLResponseMAV(false, null, "");
         }
 
         //Handle incoming file
@@ -288,10 +302,14 @@ public class JobBuilderController extends BaseCloudController {
 
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
+            job = attemptGetJob(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        }
+
+        if (job == null) {
+            return generateJSONResponseMAV(false);
         }
 
         for (String fileName : fileNames) {
@@ -317,10 +335,14 @@ public class JobBuilderController extends BaseCloudController {
 
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
+            job = attemptGetJob(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        }
+
+        if (job == null) {
+            return generateJSONResponseMAV(false);
         }
 
         //Delete the specified ID's
@@ -360,10 +382,14 @@ public class JobBuilderController extends BaseCloudController {
         //Get our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
+            job = attemptGetJob(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        }
+
+        if (job == null) {
+            return generateJSONResponseMAV(false);
         }
 
         return generateJSONResponseMAV(true, job.getStatus(), "");
@@ -383,10 +409,14 @@ public class JobBuilderController extends BaseCloudController {
         //Get our job
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
+            job = attemptGetJob(Integer.parseInt(jobId), user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        }
+
+        if (job == null) {
+            return generateJSONResponseMAV(false);
         }
 
         boolean success = fileStagingService.deleteStageInDirectory(job);
@@ -439,12 +469,17 @@ public class JobBuilderController extends BaseCloudController {
                 //Job creation involves a fair bit of initialisation on the server
                 job = initialiseVEGLJob(request.getSession(), user);
             } else {
-                job = jobManager.getJobById(id, user);
+                job = attemptGetJob(id, user);
             }
         } catch (AccessDeniedException e) {
-            throw e;  
+            throw e;
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
+            return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
+        }
+
+        if (job == null) {
+            logger.error(String.format("Error creating/fetching job with id %1$s", id));
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
         }
 
@@ -524,12 +559,16 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         try {
-            job = jobManager.getJobById(id, user);
+            job = attemptGetJob(id, user);
         } catch (AccessDeniedException e) {
-            throw e;  
+            throw e;
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
+        }
+
+        if (job == null) {
+            return generateJSONResponseMAV(false);
         }
 
         //Update our job from the request parameters
@@ -583,13 +622,17 @@ public class JobBuilderController extends BaseCloudController {
         //Lookup the job
         VEGLJob job;
         try {
-            job = jobManager.getJobById(id, user);
+            job = attemptGetJob(id, user);
         } catch (AccessDeniedException e) {
-          throw e;  
+          throw e;
         } catch (Exception ex) {
             logger.error("Error looking up job with id " + id + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
             return generateJSONResponseMAV(false, null, "Unable to access job");
+        }
+
+        if (job == null) {
+            return generateJSONResponseMAV(false);
         }
 
         List<VglDownload> existingDownloads = job.getJobDownloads();
@@ -623,11 +666,15 @@ public class JobBuilderController extends BaseCloudController {
         //Lookup the job
         VEGLJob job;
         try {
-            job = jobManager.getJobById(jobId, user);
+            job = attemptGetJob(jobId, user);
         } catch (Exception ex) {
             logger.error("Error looking up job with id " + jobId + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
             return generateJSONResponseMAV(false, null, "Unable to access job");
+        }
+
+        if (job == null) {
+            return generateJSONResponseMAV(false);
         }
 
         return generateJSONResponseMAV(true, job.getJobDownloads(), "");
@@ -702,7 +749,7 @@ public class JobBuilderController extends BaseCloudController {
 
         try {
             // Get our job
-            curJob = jobManager.getJobById(Integer.parseInt(jobId), user);
+            curJob = attemptGetJob(Integer.parseInt(jobId), user);
             if (curJob == null) {
                 logger.error("Error fetching job with id " + jobId);
                 errorDescription = "There was a problem retrieving your job from the database.";
@@ -1011,7 +1058,10 @@ public class JobBuilderController extends BaseCloudController {
             List<MachineImage> images = new ArrayList<MachineImage>();
 
             if (jobId != null) {
-                VEGLJob job = jobManager.getJobById(jobId, user);
+                VEGLJob job = attemptGetJob(jobId, user);
+                if (job == null) {
+                    return generateJSONResponseMAV(false);
+                }
 
                 // Filter list to images suitable for job solutions, if specified.
                 Set<Toolbox> toolboxes = scmEntryService.getJobToolboxes(job);
@@ -1122,8 +1172,8 @@ public class JobBuilderController extends BaseCloudController {
             jobCCSIds = scmEntryService.getJobProviders(jobId, user);
         } catch (AccessDeniedException e) {
             throw e;
-        }   
-        
+        }
+
         List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();
 
         for (CloudComputeService ccs : cloudComputeServices) {
@@ -1170,10 +1220,14 @@ public class JobBuilderController extends BaseCloudController {
     public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
         VEGLJob job = null;
         try {
-            job = jobManager.getJobById(jobId, user);
+            job = attemptGetJob(jobId, user);
         } catch (Exception ex) {
             logger.error("Error fetching job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + jobId);
+        }
+
+        if (job == null) {
+            return generateJSONResponseMAV(false);
         }
 
         //Get our files
@@ -1203,7 +1257,7 @@ public class JobBuilderController extends BaseCloudController {
 
         return generateJSONResponseMAV(true, allInputs, "");
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
     public @ResponseBody String handleException(AccessDeniedException e) {
