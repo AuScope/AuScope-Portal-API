@@ -20,6 +20,7 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,9 +31,7 @@ import au.csiro.promsclient.Activity;
 import au.csiro.promsclient.Entity;
 import au.csiro.promsclient.ExternalReport;
 import au.csiro.promsclient.ProvenanceReporter;
-import junit.framework.Assert;
 
-@SuppressWarnings("deprecation")
 public class ANVGLProvenanceServiceTest extends PortalTestClass {
     VEGLJob preparedJob;
     final String serverURL = "http://portal-fake.anvgl.org";
