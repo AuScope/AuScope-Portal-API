@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.http.HttpResponse;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -235,8 +236,9 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             context.checking(new Expectations() {{
             	oneOf(reporter).postReport(pURI, report); will(returnValue(200));
             }});
-            int resp = reporter.postReport(new URI(PROMSURI), report);
-            Assert.assertTrue((resp == 200 || resp == 201));
+            HttpResponse resp = reporter.postReport(new URI(PROMSURI), report);
+            Assert.assertTrue((resp.getStatusLine().getStatusCode() == 200 ||
+                    resp.getStatusLine().getStatusCode() == 201));
         }
 
     }
