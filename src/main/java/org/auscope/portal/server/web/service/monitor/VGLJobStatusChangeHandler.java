@@ -66,7 +66,8 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
                 LOG.trace("Job completion email notification sent. Job id: " + vglJob.getId());
             }
             // Provenance
-            anvglProvenanceService.createEntitiesForOutputs(vglJob);
+            if(newStatus.equals(JobBuilderController.STATUS_DONE))
+                anvglProvenanceService.createEntitiesForOutputs(vglJob);
         }
     }
 
