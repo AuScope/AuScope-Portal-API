@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseFactory;
+import org.apache.http.HttpVersion;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.StatusLine;
+import org.apache.http.impl.DefaultHttpResponseFactory;
+import org.apache.http.message.BasicStatusLine;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -77,6 +83,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             "              <https://plus.google.com/1> .";
 
     ANVGLProvenanceService anvglProvenanceService;
+    final ProvenanceReporter reporter = context.mock(ProvenanceReporter.class);
 
     @Before
     public void setUp() throws Exception {
@@ -100,7 +107,6 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
         final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
 
         FileInformation input = new FileInformation(cloudKey, 0, false, "");
-        final List<FileInformation> fileInfos = Arrays.asList(input);
 
         turtleJob = context.mock(VEGLJob.class, "Turtle Mock Job");
 
@@ -154,6 +160,11 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             will(returnValue(1));
             
             allowing(mockPortalUser).getId();will(returnValue(mockUser));
+            
+            HttpResponseFactory factory = new DefaultHttpResponseFactory();
+            HttpResponse response = factory.newHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, null), null);
+            allowing(reporter).postReport(with(any(URI.class)), with(any(ExternalReport.class)));
+            will(returnValue(response));
         }});
         
         anvglProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, "http://mockurl");
@@ -232,10 +243,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
                     .setReportingSystemUri(new URI(serverURL))
                     .setGeneratedAtTime(new Date());            
             final URI pURI = new URI(PROMSURI);
-            final ProvenanceReporter reporter = context.mock(ProvenanceReporter.class);
-            context.checking(new Expectations() {{
-            	oneOf(reporter).postReport(pURI, report); will(returnValue(200));
-            }});
+            //final ProvenanceReporter reporter = context.mock(ProvenanceReporter.class);
             HttpResponse resp = reporter.postReport(new URI(PROMSURI), report);
             Assert.assertTrue((resp.getStatusLine().getStatusCode() == 200 ||
                     resp.getStatusLine().getStatusCode() == 201));
