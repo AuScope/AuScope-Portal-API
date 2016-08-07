@@ -105,11 +105,13 @@ public class MyHttpResponse extends HttpClientResponse {
     }
 
     @Override
+    @Deprecated
     public HttpParams getParams() {
         return null;
     }
 
     @Override
+    @Deprecated
     public void setParams(HttpParams params) {
         // empty
     }
