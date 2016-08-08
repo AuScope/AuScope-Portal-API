@@ -19,7 +19,6 @@ Ext.define('vegl.models.FileRecord', {
      */
     isVlUtilityFile: function() {
         switch(this.get('name')) {
-        case 'activity.ttl':
         case 'vl.end':
         case 'workflow-version.txt':
             return true;
