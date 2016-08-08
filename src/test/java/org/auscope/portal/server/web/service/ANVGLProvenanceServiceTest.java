@@ -7,20 +7,28 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseFactory;
+import org.apache.http.HttpVersion;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.StatusLine;
+import org.apache.http.impl.DefaultHttpResponseFactory;
+import org.apache.http.message.BasicStatusLine;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
+import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,6 +39,7 @@ import au.csiro.promsclient.Activity;
 import au.csiro.promsclient.Entity;
 import au.csiro.promsclient.ExternalReport;
 import au.csiro.promsclient.ProvenanceReporter;
+import junit.framework.Assert;
 
 public class ANVGLProvenanceServiceTest extends PortalTestClass {
     VEGLJob preparedJob;
@@ -74,6 +83,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             "              <https://plus.google.com/1> .";
 
     ANVGLProvenanceService anvglProvenanceService;
+    final ProvenanceReporter reporter = context.mock(ProvenanceReporter.class);
 
     @Before
     public void setUp() throws Exception {
@@ -96,8 +106,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
         CloudFileInformation cloudFileModel = new CloudFileInformation(activityFileName, 0, "");
         final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
 
-  //     FileInformation input = new FileInformation(cloudKey, 0, false, "");
-  //     final List<FileInformation> fileInfos = Arrays.asList(input);
+        FileInformation input = new FileInformation(cloudKey, 0, false, "");
 
         turtleJob = context.mock(VEGLJob.class, "Turtle Mock Job");
 
@@ -151,6 +160,11 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             will(returnValue(1));
             
             allowing(mockPortalUser).getId();will(returnValue(mockUser));
+            
+            HttpResponseFactory factory = new DefaultHttpResponseFactory();
+            HttpResponse response = factory.newHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, null), null);
+            allowing(reporter).postReport(with(any(URI.class)), with(any(ExternalReport.class)));
+            will(returnValue(response));
         }});
         
         anvglProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, "http://mockurl");
@@ -158,8 +172,8 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     }
 
     @After
-    public void tearDown() {
-        // empty
+    public void tearDown() throws Exception {
+
     }
 
     @Test
@@ -171,31 +185,31 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     }
 
     @Test
-    public void testUploadModel() {
+    public void testUploadModel() throws Exception {
         anvglProvenanceService.uploadModel(plainModel, preparedJob);
     }
 
     @Test
-    public void testJobURL() {
-        String url = ANVGLProvenanceService.jobURL(preparedJob, serverURL);
+    public void testJobURL() throws Exception {
+        String url = anvglProvenanceService.jobURL(preparedJob, serverURL);
         Assert.assertEquals(serverURL + "/secure/getJobObject.do?jobId=1", url);
     }
 
     @Test
     public void testOutputURL() throws Exception {
-        String url = ANVGLProvenanceService.outputURL(preparedJob, fileInformation, serverURL);
+        String url = anvglProvenanceService.outputURL(preparedJob, fileInformation, serverURL);
         Assert.assertEquals(serverURL + "/secure/jobFile.do?jobId=1&key=cloudKey", url);
     }
 
     @Test
-    public void testCreateEntitiesForInputs() {
+    public void testCreateEntitiesForInputs() throws Exception {
         Set<Entity> entities = anvglProvenanceService.createEntitiesForInputs(preparedJob, null, mockPortalUser);
         Assert.assertNotNull(entities);
         Assert.assertEquals(3, entities.size());
     }
 
     @Test
-    public void testCreateEntitiesForOutputs() {
+    public void testCreateEntitiesForOutputs() throws Exception {
         String graph = anvglProvenanceService.createEntitiesForOutputs(preparedJob);
         Assert.assertTrue(graph.contains(initialTurtle));
         Assert.assertTrue(graph.contains(endedTurtle));
@@ -205,72 +219,61 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     public void testPost() throws Exception {
         Set<Entity> outputs = new HashSet<>();
         Set<Entity> usedEntities = new HashSet<>();
-        try (InputStream activityStream = getClass().getResourceAsStream("/activity.ttl")) {
-            Activity activity;
-            Model model = ModelFactory.createDefaultModel();
-            model = model.read(activityStream,
-                    serverURL,
-                    "TURTLE");
-            URI activityURI = new URI(
-                    ANVGLProvenanceService.jobURL(turtleJob, serverURL));
-            activity = new Activity().setActivityUri(activityURI).setTitle(activityURI.toString()).setFromModel(model);
-            if (activity != null) {
-                activity.setEndedAtTime(new Date());
-                String outputURL = serverURL
-                        + "/secure/jobFile.do?jobId=21&key=job-macgo-bt-everbloom_gmail_com-0000000021/1000_yrRP_hazard_map.png";
-                outputs.add(new Entity().setDataUri(new URI(outputURL)).setWasAttributedTo(mockProfileUrl)
-                        .setTitle("1000_yrRP_hazard_map.png"));
-                activity.setGeneratedEntities(outputs);
-                outputURL = serverURL
-                        + "/secure/jobFile.do?jobId=21&key=job-macgo-bt-everbloom_gmail_com-0000000021/20_yrRP_hazard_map.png";
-                usedEntities.add(new Entity().setDataUri(new URI(outputURL)).setWasAttributedTo(mockProfileUrl)
-                        .setTitle("20_yrRP_hazard_map.png"));
-                activity.setUsedEntities(usedEntities);
-                final ExternalReport report = new ExternalReport()
-                        .setActivity(activity)
-                        .setTitle(jobName)
-                        .setNativeId(Integer.toString(jobID))
-                        .setReportingSystemUri(new URI(serverURL))
-                        .setGeneratedAtTime(new Date());
-                final URI pURI = new URI(PROMSURI);
-                final ProvenanceReporter reporter = context.mock(ProvenanceReporter.class);
-                context.checking(new Expectations() {
-                    {
-                        oneOf(reporter).postReport(pURI, report);
-                        will(returnValue(200));
-                    }
-                });
-                int resp = reporter.postReport(new URI(PROMSURI), report);
-                Assert.assertTrue((resp == 200 || resp == 201));
-            }
+        InputStream activityStream = getClass().getResourceAsStream("/activity.ttl");
+        Activity activity;
+        Model model = ModelFactory.createDefaultModel();
+        model = model.read(activityStream,
+                serverURL,
+                "TURTLE");
+        URI activityURI = new URI(
+                anvglProvenanceService.jobURL(turtleJob, serverURL));
+        activity = new Activity().setActivityUri(activityURI).setTitle(activityURI.toString()).setFromModel(model);
+        if (activity != null) {
+            activity.setEndedAtTime(new Date());
+            String outputURL = serverURL + "/secure/jobFile.do?jobId=21&key=job-macgo-bt-everbloom_gmail_com-0000000021/1000_yrRP_hazard_map.png";
+            outputs.add(new Entity().setDataUri(new URI(outputURL)).setWasAttributedTo(mockProfileUrl).setTitle("1000_yrRP_hazard_map.png"));
+            activity.setGeneratedEntities(outputs);
+            outputURL = serverURL + "/secure/jobFile.do?jobId=21&key=job-macgo-bt-everbloom_gmail_com-0000000021/20_yrRP_hazard_map.png";
+            usedEntities.add(new Entity().setDataUri(new URI(outputURL)).setWasAttributedTo(mockProfileUrl).setTitle("20_yrRP_hazard_map.png"));
+            activity.setUsedEntities(usedEntities);
+            final ExternalReport report = new ExternalReport()
+                    .setActivity(activity)
+                    .setTitle(jobName)
+                    .setNativeId(Integer.toString(jobID))
+                    .setReportingSystemUri(new URI(serverURL))
+                    .setGeneratedAtTime(new Date());            
+            final URI pURI = new URI(PROMSURI);
+            //final ProvenanceReporter reporter = context.mock(ProvenanceReporter.class);
+            HttpResponse resp = reporter.postReport(new URI(PROMSURI), report);
+            Assert.assertTrue((resp.getStatusLine().getStatusCode() == 200 ||
+                    resp.getStatusLine().getStatusCode() == 201));
         }
+
     }
 
     @Test
     public void testSetFromModel() throws Exception {
         Set<Entity> outputs = new HashSet<>();
-        try (InputStream activityStream = getClass().getResourceAsStream("/activity.ttl")) {
-            Activity activity;
-            Model model = ModelFactory.createDefaultModel();
-            model = model.read(activityStream,
-                    serverURL,
-                    "TURTLE");
-            activity = new Activity().setActivityUri(new URI(
-                    ANVGLProvenanceService.jobURL(turtleJob, serverURL))).setFromModel(model);
-            if (activity != null) {
-                activity.setEndedAtTime(new Date());
-                String outputURL = serverURL
-                        + "/secure/jobFile.do?jobId=21&key=job-macgo-bt-everbloom_gmail_com-0000000021/1000_yrRP_hazard_map.png";
-                outputs.add(new Entity().setDataUri(new URI(outputURL)).setWasAttributedTo(mockProfileUrl));
-                activity.setGeneratedEntities(outputs);
-                StringWriter out = new StringWriter();
-                activity.getGraph().write(out, "TURTLE", serverURL);
-                String turtle = out.toString();
-                Assert.assertTrue(turtle.contains(initialTurtle));
-                Assert.assertTrue(turtle.contains(endedTurtle));
-                // Assert.assertTrue(turtle.contains(file1Turtle));
-                Assert.assertTrue(turtle.contains(outputURL));
-            }
+        InputStream activityStream = getClass().getResourceAsStream("/activity.ttl");
+        Activity activity;
+        Model model = ModelFactory.createDefaultModel();
+        model = model.read(activityStream,
+                serverURL,
+                "TURTLE");
+        activity = new Activity().setActivityUri(new URI(
+                anvglProvenanceService.jobURL(turtleJob, serverURL))).setFromModel(model);
+        if (activity != null) {
+            activity.setEndedAtTime(new Date());
+            String outputURL = serverURL + "/secure/jobFile.do?jobId=21&key=job-macgo-bt-everbloom_gmail_com-0000000021/1000_yrRP_hazard_map.png";
+            outputs.add(new Entity().setDataUri(new URI(outputURL)).setWasAttributedTo(mockProfileUrl));
+            activity.setGeneratedEntities(outputs);
+            StringWriter out = new StringWriter();
+            activity.getGraph().write(out, "TURTLE", serverURL);
+            String turtle = out.toString();
+            Assert.assertTrue(turtle.contains(initialTurtle));
+            Assert.assertTrue(turtle.contains(endedTurtle));
+            //Assert.assertTrue(turtle.contains(file1Turtle));
+            Assert.assertTrue(turtle.contains(outputURL));
         }
     }
 }

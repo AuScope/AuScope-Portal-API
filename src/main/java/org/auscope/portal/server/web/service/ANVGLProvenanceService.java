@@ -18,6 +18,8 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -58,17 +60,13 @@ public class ANVGLProvenanceService {
     private static final String TURTLE_FORMAT = "TTL";
 
     /* Can be changed in application context */
-    private String promsUrl;// = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
-    
-    public String getPromsUrl() {
-        return promsUrl;
-    }
-
-    public void setPromsUrl(String promsUrl) {
-        this.promsUrl = promsUrl;
-    }
-
+    /*
+    private String promsUrl = "http://proms-dev.geoanalytics.csiro.au/id/report/";
     private final String reportingSystemUrl = "http://anvgl.org.au/rs";
+    */
+    private String promsUrl = "http://proms-dev1-vc.it.csiro.au/id/report/";
+    private final String reportingSystemUrl = "http://localhost/reportingsystem/25b174d9-4a32-4cb5-ae7b-c07b04bf6482";
+    
     private URI PROMSService = null;
 
     /**
@@ -120,9 +118,8 @@ public class ANVGLProvenanceService {
      *            The Virtual Labs Job we want to report provenance on. It
      *            should be just about to execute, but not yet have started.
      * @return The TURTLE text.
-     * @throws PortalServiceException 
      */
-    public String createActivity(final VEGLJob job, final Set<Solution> solutions, ANVGLUser user) throws PortalServiceException {
+    public String createActivity(final VEGLJob job, final Set<Solution> solutions, ANVGLUser user) {
         String jobURL = jobURL(job, serverURL());
         Activity anvglJob = null;
         Set<Entity> inputs = createEntitiesForInputs(job, solutions, user);
@@ -131,7 +128,7 @@ public class ANVGLProvenanceService {
                     .setDescription(job.getDescription()).setStartedAtTime(new Date())
                     .setWasAssociatedWith(new URI(user.getId())).setUsedEntities(inputs);
         } catch (URISyntaxException ex) {
-            throw new PortalServiceException(ex.getMessage(), ex);
+            LOGGER.error(String.format("Error parsing server name %s into URI.", jobURL), ex);
         }
         StringWriter out = new StringWriter();
         Model graph = anvglJob.getGraph();
@@ -235,7 +232,7 @@ public class ANVGLProvenanceService {
             for (VglDownload dataset : job.getJobDownloads()) {
                 URI dataURI = new URI(dataset.getUrl());
                 URI baseURI = new URI(dataURI.getScheme() + "://" + dataURI.getAuthority() + dataURI.getPath());
-                inputs.add(new ServiceEntity().setQuery(dataURI.getQuery()).setServiceBaseUri(baseURI)
+                inputs.add((ServiceEntity) new ServiceEntity().setQuery(dataURI.getQuery()).setServiceBaseUri(baseURI)
                         .setDataUri(dataURI).setDescription(dataset.getDescription())
                         .setWasAttributedTo(new URI(user.getId())).setTitle(dataset.getName()));
                 LOGGER.debug("New Input: " + dataset.getUrl());
@@ -280,15 +277,19 @@ public class ANVGLProvenanceService {
     }
 
     public void generateAndSaveReport(Activity activity, URI PROMSURI, VEGLJob job) {
-      //  String server = ANVGLServerURL.INSTANCE.get();
+        //String server = ANVGLServerURL.INSTANCE.get();
         try {
             Report report = new ExternalReport().setActivity(activity).setTitle(job.getName())
                     .setGeneratedAtTime(new Date()).setNativeId(Integer.toString(job.getId()))
                     .setReportingSystemUri(new URI(reportingSystemUrl));
             ProvenanceReporter reporter = new ProvenanceReporter();
-            int resp = reporter.postReport(PROMSURI, report);
+            HttpResponse resp = reporter.postReport(PROMSURI, report);
+            Header[] headers = resp.getHeaders("Link");
+            if(headers.length > 0) {
+                String reportLink = headers[0].getValue();
+                System.out.println("Report link: " + reportLink);
+            }
             this.uploadModel(report.getGraph(), job);
-
             StringWriter stringWriter = new StringWriter();
             report.getGraph().write(new PrintWriter(stringWriter), "TURTLE");
             String reportString = stringWriter.toString();
@@ -326,14 +327,11 @@ public class ANVGLProvenanceService {
                 }
                 if (information.getName().equals(ACTIVITY_FILE_NAME)) {
                     // Here's our Turtle!
-                    try (InputStream activityStream = cloudStorageService.getJobFile(job, ACTIVITY_FILE_NAME)) {
-                        Model model = ModelFactory.createDefaultModel();
-                        LOGGER.debug("Current server URL: " + serverURL());
-                        model = model.read(activityStream, serverURL(), TURTLE_FORMAT);
-                        activity = new Activity().setActivityUri(new URI(jobURL(job, serverURL()))).setFromModel(model);
-                    } catch (IOException e) {
-                        LOGGER.error("Error reading job file: "+e.getMessage(), e);
-                    }
+                    InputStream activityStream = cloudStorageService.getJobFile(job, ACTIVITY_FILE_NAME);
+                    Model model = ModelFactory.createDefaultModel();
+                    LOGGER.debug("Current server URL: " + serverURL());
+                    model = model.read(activityStream, serverURL(), TURTLE_FORMAT);
+                    activity = new Activity().setActivityUri(new URI(jobURL(job, serverURL()))).setFromModel(model);
                 } else if (!names.contains(information.getName())) {
                     // Ah ha! This must be an output or input.
                     URI outputURI = new URI(outputURL(job, information, serverURL()));
