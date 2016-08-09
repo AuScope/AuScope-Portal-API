@@ -4,7 +4,7 @@
 # NOTE: Please ensure that VL_WORKFLOW_VERSION gets incremented with any changes
 
 #configure our environment
-export VL_WORKFLOW_VERSION="2"
+export VL_WORKFLOW_VERSION="3"
 export EC2_METADATA_SCRIPT="${WORKING_DIR}/ec2-metadata"
 export FINAL_SLEEP_LENGTH="15m"
 export NTP_DATE_SERVER="pool.ntp.org"
@@ -12,6 +12,7 @@ export CLOUD_STORAGE_WRAPPER_URL="https://raw.githubusercontent.com/AuScope/ANVG
 export VL_SCRIPT_PATH="${WORKING_DIR}/vl_script.py"
 export SUBSET_REQUEST_PATH="${WORKING_DIR}/vl-download.sh"
 export ABORT_SHUTDOWN_PATH="${WORKING_DIR}/abort_shutdown"
+export UPLOAD_LOG_SCRIPT="${WORKING_DIR}/upload_logs.sh"
 
 echo "VL Workflow Script... starting"
 
@@ -45,6 +46,19 @@ echo "#### Environment end ####"
 
 #Lets get started by moving to our working directory
 cd $WORKING_DIR
+
+#Create a script for uploading our logfile (that uses the current environment)
+echo '#!/bin/bash' > "$UPLOAD_LOG_SCRIPT"
+export >> "$UPLOAD_LOG_SCRIPT"
+echo 'cloud upload $VL_LOG_FILE_NAME $VL_LOG_FILE' >> "$UPLOAD_LOG_SCRIPT"
+chmod +x "$UPLOAD_LOG_SCRIPT"
+
+#Use CRON to run the upload log script every minute
+tmpCronFile=`mktemp`
+crontab -l > "$tmpCronFile"
+echo "*/1 * * * * $UPLOAD_LOG_SCRIPT" >> "$tmpCronFile"
+crontab "$tmpCronFile"
+rm "$tmpCronFile"
 
 #We NEED the time to be up to date otherwise AWS requests will fail
 echo "Synchronising date with ${NTP_DATE_SERVER}"
@@ -117,10 +131,14 @@ echo "Total time to download input data was `expr $totalDownloadTime / 3600` hou
 echo "#### Time end ####"
 cd $WORKING_DIR
 
-#Finally upload our logs for debug purposes
+#Final upload of our logs for debug purposes
 echo "About to upload output log..."
 echo "cloud upload $VL_LOG_FILE_NAME $VL_LOG_FILE"
 cloud upload $VL_LOG_FILE_NAME $VL_LOG_FILE_NAME
+
+#Signal termination via cloud storage
+date > $VL_TERMINATION_FILE_NAME
+cloud upload $VL_TERMINATION_FILE_NAME $VL_TERMINATION_FILE_NAME
 
 #At this point we can give developers a grace period in which they can login to the VM for debugging
 echo "Sleeping for ${FINAL_SLEEP_LENGTH} before shutting down"

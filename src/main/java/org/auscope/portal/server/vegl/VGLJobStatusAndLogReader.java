@@ -1,6 +1,7 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +41,21 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      * @return
      */
     public ModelMap getSectionedLogs(VEGLJob job) throws PortalServiceException {
+        return getSectionedLogs(job, JobListController.VL_LOG_FILE);
+    }
+
+    /**
+     * Gets a pre parsed version of the specified log file. The resulting object will
+     * contain the logs sectioned into 'named sections' e.g.: Section for python code,
+     * section for environment etc.
+     *
+     * Will always contain a single section called "Full" containing the un-sectioned
+     * original log.
+     *
+     * @param job
+     * @return
+     */
+    public ModelMap getSectionedLogs(VEGLJob job, String logFile) throws PortalServiceException {
         CloudStorageService cloudStorageService = getStorageService(job);
         if (cloudStorageService == null) {
             throw new PortalServiceException(
@@ -51,10 +67,10 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         String logContents = null;
         InputStream is = null;
         try {
-            is = cloudStorageService.getJobFile(job, JobListController.VGL_LOG_FILE);
+            is = cloudStorageService.getJobFile(job, logFile);
             logContents = IOUtils.toString(is);
         } catch (Exception ex) {
-            log.debug(String.format("The job %1$s hasn't uploaded any logs yet.", job.getId()));
+            log.debug(String.format("The job %1$s hasn't uploaded %2$s yet", job.getId(), logFile));
         } finally {
             FileIOUtil.closeQuietly(is);
         }
@@ -140,16 +156,17 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
 
         //The service hangs onto the underlying job Object but the DB is the point of truth
         //Make sure we get an updated job object first!
-        VEGLJob job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role);
+        VEGLJob job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role, cloudJob.getEmailAddress());
         if (job == null) {
             return null;
         }
 
-        //If the job is currently in the done/saved IN_QUEUE or ERROR state - do absolutely nothing.
+        //If the job is currently in the done/saved IN_QUEUE, ERROR or WALLTIME_EXCEEDED state - do absolutely nothing.
         if (job.getStatus().equals(JobBuilderController.STATUS_DONE) ||
                 job.getStatus().equals(JobBuilderController.STATUS_UNSUBMITTED) ||
                         job.getStatus().equals(JobBuilderController.STATUS_INQUEUE) ||
-                                job.getStatus().equals(JobBuilderController.STATUS_ERROR)) {
+                                job.getStatus().equals(JobBuilderController.STATUS_ERROR)|| 
+                                    job.getStatus().equals(JobBuilderController.STATUS_WALLTIME_EXCEEDED)) {
             return job.getStatus();
         }
 
@@ -167,15 +184,56 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         }
 
         boolean jobStarted = containsFile(results, "workflow-version.txt");
-        boolean jobFinished = containsFile(results, JobListController.VGL_LOG_FILE);
+        boolean jobFinished = containsFile(results, JobListController.VL_TERMINATION_FILE);
+        // VM side walltime exceeded
+        boolean jobWalltimeExceeded = containsFile(results, "walltime-exceeded.txt");
 
+        String expectedStatus = JobBuilderController.STATUS_PENDING;
         if (jobFinished) {
-            return JobBuilderController.STATUS_DONE;
+            expectedStatus = JobBuilderController.STATUS_DONE;
         } else if (jobStarted) {
-            return JobBuilderController.STATUS_ACTIVE;
-        } else {
-            return JobBuilderController.STATUS_PENDING;
+            expectedStatus = JobBuilderController.STATUS_ACTIVE;
+        } else if(jobWalltimeExceeded) {
+            expectedStatus = JobBuilderController.STATUS_WALLTIME_EXCEEDED;
         }
+        
+        // If the walltime has exceeded and the VM side walltime check has
+        // failed to shut the instance down, shut it down
+        if(jobStarted && !jobFinished && job.isWalltimeSet()) {
+            if(job.getSubmitDate().getTime() + (job.getWalltime()*60*1000) < new Date().getTime()) {
+                try {
+                    CloudComputeService cloudComputeService = getComputeService(job);
+                    cloudComputeService.terminateJob(job);
+                    return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+                } catch(Exception e) {
+                    log.warn("Exception shutting down terminal: " + job.toString(), e);
+                    return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+                }
+            }
+        }
+
+        //There is also a possibility that the cloud has had issues booting the VM... lets see what we can dig up
+        CloudComputeService cloudComputeService = getComputeService(job);
+        try {
+            switch (cloudComputeService.getJobStatus(job)) {
+            case Missing:
+                if (jobFinished) {
+                    return JobBuilderController.STATUS_DONE;
+                } else if (jobWalltimeExceeded) {
+                    return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
+                } else {
+                    return JobBuilderController.STATUS_ERROR;
+                }
+            case Pending:
+            case Running:
+                return expectedStatus;
+            }
+        } catch (Exception ex) {
+            log.warn("Exception looking up job VM status:" + job.toString(), ex);
+            return job.getStatus();
+        }
+
+        return expectedStatus;
     }
 
     private boolean containsFile(CloudFileInformation[] files, String fileName) {

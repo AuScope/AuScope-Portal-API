@@ -8,7 +8,7 @@ Ext.ns('ScriptBuilder.Components');
  */
 ScriptBuilder.Components.getComponents = function(tree, fn) {
     Ext.Ajax.request({
-    	url : "getSolutions.do",
+    	url : "getProblems.do",
         scope : this,
         headers: {
             Accept: 'application/json'

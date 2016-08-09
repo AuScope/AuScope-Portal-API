@@ -42,6 +42,22 @@ public class JobCompletionMailSender implements JobMailSender {
     private String emailSender;
     private String emailSubject;
 
+    private String portalUrl=null;
+    
+    /**
+     * @return the portalUrl
+     */
+    public String getPortalUrl() {
+        return portalUrl;
+    }
+
+    /**
+     * @param portalUrl the portalUrl to set
+     */
+    public void setPortalUrl(String portalUrl) {
+        this.portalUrl = portalUrl;
+    }
+
     public JobCompletionMailSender(VEGLJobManager jobManager,
             VGLJobStatusAndLogReader jobStatLogReader, MailSender mailSender,
             VelocityEngine velocityEngine) {
@@ -187,9 +203,10 @@ public class JobCompletionMailSender implements JobMailSender {
 
     /**
      * Constructs job completion notification email content.
+     * @param seriesName 
      */
     @Override
-    public String constructMailContent(VEGLSeries jobSeries, VEGLJob job) {
+    public String constructMailContent(String seriesName, VEGLJob job) {
 
         Date submitDate, processDate;
         if(job.getSubmitDate()!=null){
@@ -210,16 +227,18 @@ public class JobCompletionMailSender implements JobMailSender {
 
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("userName", job.getUser().substring(0,job.getUser().indexOf("@")));
-        model.put("seriesName", jobSeries.getName());
         model.put("status", job.getStatus());
         model.put("jobId", job.getId().toString());
+        model.put("seriesName", seriesName);
         model.put("jobName", job.getName());
         model.put("jobDescription", job.getDescription());
         model.put("dateSubmitted", DateUtil.formatDate(submitDate, dateFormat));
         model.put("dateProcessed", DateUtil.formatDate(processDate, dateFormat));
         model.put("timeElapsed", timeElapsed);
         model.put("jobExecLogSnippet", TextUtil.tail(jobStatLogReader.getSectionedLog(job, "Python"), maxLinesForTail));
-
+        model.put("emailSender", getEmailSender());
+        model.put("portalUrl", getPortalUrl());
+        
         return VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, template, model);
     }
 
@@ -229,26 +248,31 @@ public class JobCompletionMailSender implements JobMailSender {
      */
     @Override
     public void sendMail(VEGLJob job) {
-        VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId());
-
-        String seriesName = jobSeries.getName();
         String jobName = job.getName();
+        String seriesName = "";
+        
+        if (job.getSeriesId() != 0) { 
+            VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId(), job.getEmailAddress());
+            if (jobSeries != null) {
+                seriesName = jobSeries.getName();
 
-        if (seriesName.length() > maxLengthForSeriesNameInSubject) {
-            seriesName = seriesName.substring(0, maxLengthForJobNameInSubject);
+                if (seriesName.length() > maxLengthForSeriesNameInSubject) {
+                    seriesName = seriesName.substring(0, maxLengthForJobNameInSubject);
+                }
+            }
         }
 
         if (jobName.length() > maxLengthForJobNameInSubject) {
             jobName = jobName.substring(0, maxLengthForJobNameInSubject);
         }
 
-        String subject = String.format(this.emailSubject, seriesName, jobName);
+        String subject = String.format(this.emailSubject, jobName);
 
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setFrom(this.emailSender);
         msg.setTo(job.getEmailAddress());
         msg.setSubject(subject);
-        msg.setText(constructMailContent(jobSeries, job));
+        msg.setText(constructMailContent(seriesName, job));
 
         try {
             this.mailSender.send(msg);

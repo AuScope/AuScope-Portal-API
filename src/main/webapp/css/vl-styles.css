@@ -53,6 +53,14 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
     background-image: url("../portal-core/img/refresh.png") !important
 }
 
+.trash-icon {
+    background-image: url("../img/trash.png") !important
+}
+
+.setting-icon {
+    background-image: url("../img/setting.png") !important
+}
+
 .settings-icon {
     background-image: url("../img/settings.png") !important
 }
@@ -71,6 +79,16 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
 
 .edit-icon {
     background-image: url("../portal-core/img/edit.png") !important
+}
+
+.world-add-icon {
+    background-image:url(../img/world_add.png) !important;
+    background-size: 16px 16px;'
+}
+
+.download-cloud-icon {
+    background-image:url(../img/download_cloud.png) !important;
+    background-size: 16px 16px;
 }
 
 .openid_form p {

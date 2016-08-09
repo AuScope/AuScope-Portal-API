@@ -8,23 +8,29 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -32,6 +38,7 @@ import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusException;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
@@ -41,11 +48,16 @@ import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -60,7 +72,10 @@ import org.springframework.web.servlet.ModelAndView;
 public class JobListController extends BaseCloudController  {
 
     /** The name of the log file that the job will use*/
-    public static final String VGL_LOG_FILE = "vl.sh.log";
+    public static final String VL_LOG_FILE = "vl.sh.log";
+
+    /** The name of the termination file that the job will use*/
+    public static final String VL_TERMINATION_FILE = "vl.end";
 
     /** Logger for this class */
     private final Log logger = LogFactory.getLog(getClass());
@@ -72,18 +87,37 @@ public class JobListController extends BaseCloudController  {
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
+    private String adminEmail=null;
+    
+    /**
+     * @return the adminEmail
+     */
+    public String getAdminEmail() {
+        return adminEmail;
+    }
+
+    /**
+     * @param adminEmail the adminEmail to set
+     */
+    public void setAdminEmail(String adminEmail) {
+        this.adminEmail = adminEmail;
+    }
+
     @Autowired
     public JobListController(VEGLJobManager jobManager, CloudStorageService[] cloudStorageServices,
             FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
             VGLJobStatusAndLogReader jobStatusLogReader,
             JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
-            PortalPropertyPlaceholderConfigurer hostConfigurer,VGLPollingJobQueueManager vglPollingJobQueueManager) {
-        super(cloudStorageServices, cloudComputeServices,hostConfigurer);
+            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
+            VGLPollingJobQueueManager vglPollingJobQueueManager,
+            @Value("${HOST.portalAdminEmail}") String adminEmail) {
+        super(cloudStorageServices, cloudComputeServices,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.jobStatusLogReader = jobStatusLogReader;
         this.jobStatusMonitor = jobStatusMonitor;
         this.vglPollingJobQueueManager =  vglPollingJobQueueManager;
+        this.adminEmail=adminEmail;
         this.initializeQueue();
     }
 
@@ -132,6 +166,8 @@ public class JobListController extends BaseCloudController  {
             try {
                 job = jobManager.getJobById(jobId.intValue(), user);
                 logger.debug("Job [" + job.hashCode() + "] retrieved by jobManager [" + jobManager.hashCode() + "]");
+            } catch (AccessDeniedException e) {
+                throw e;
             } catch (Exception ex) {
                 logger.error(String.format("Exception when accessing jobManager for job id '%1$s'", jobId), ex);
                 return null;
@@ -172,7 +208,7 @@ public class JobListController extends BaseCloudController  {
         //Attempt to fetch our job
         if (seriesId != null) {
             try {
-                series = jobManager.getSeriesById(seriesId.intValue());
+                series = jobManager.getSeriesById(seriesId.intValue(), user.getEmail());
             } catch (Exception ex) {
                 logger.error(String.format("Exception when accessing jobManager for series id '%1$s'", seriesId), ex);
                 return null;
@@ -193,29 +229,29 @@ public class JobListController extends BaseCloudController  {
         return series;
     }
 
-    /**
-     * Returns a JSON object containing a list of the current user's series.
-     *
-     * @param request The servlet request
-     * @param response The servlet response
-     *
-     * @return A JSON object with a series attribute which is an array of
-     *         VEGLSeries objects.
-     */
-    @RequestMapping("/secure/mySeries.do")
-    public ModelAndView mySeries(HttpServletRequest request,
-            HttpServletResponse response,
-            @AuthenticationPrincipal ANVGLUser user) {
-
-        if (user == null || user.getEmail() == null) {
-            logger.warn("No email attached to session");
-            return generateJSONResponseMAV(false, null, "No email attached to session");
-        }
-        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), null, null);
-
-        logger.debug("Returning " + series);
-        return generateJSONResponseMAV(true, series, "");
-    }
+//    /**
+//     * Returns a JSON object containing a list of the current user's series.
+//     *
+//     * @param request The servlet request
+//     * @param response The servlet response
+//     *
+//     * @return A JSON object with a series attribute which is an array of
+//     *         VEGLSeries objects.
+//     */
+//    @RequestMapping("/secure/mySeries.do")
+//    public ModelAndView mySeries(HttpServletRequest request,
+//            HttpServletResponse response,
+//            @AuthenticationPrincipal ANVGLUser user) {
+//
+//        if (user == null || user.getEmail() == null) {
+//            logger.warn("No email attached to session");
+//            return generateJSONResponseMAV(false, null, "No email attached to session");
+//        }
+//        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(), null, null);
+//
+//        logger.debug("Returning " + series);
+//        return generateJSONResponseMAV(true, series, "");
+//    }
 
     /**
      * Delete the job given by its reference.
@@ -239,9 +275,14 @@ public class JobListController extends BaseCloudController  {
         }
 
         String oldJobStatus = job.getStatus();
+
+        //Always cleanup our compute resources (if there are any)
+        terminateInstance(job, false);
+
         job.setStatus(JobBuilderController.STATUS_DELETED);
         jobManager.saveJob(job);
         jobManager.createJobAuditTrail(oldJobStatus, job, "Job deleted.");
+
         // Failure here is NOT fatal - it will just result in some
         // residual files in staging directory and S3 cloud storage.
         cleanupDeletedJob(job);
@@ -266,7 +307,11 @@ public class JobListController extends BaseCloudController  {
 
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
-            return generateJSONResponseMAV(false, null, "Unable to lookup series.");
+            return generateJSONResponseMAV(false);
+        }
+
+        if (!series.getUser().equals(user.getEmail())) {
+            return generateJSONResponseMAV(false);
         }
 
         List<VEGLJob> jobs = jobManager.getSeriesJobs(seriesId.intValue(), user);
@@ -347,11 +392,17 @@ public class JobListController extends BaseCloudController  {
             }
 
             // terminate the EMI instance
-            terminateInstance(job);
+            terminateInstance(job, true);
         } catch (Exception e) {
             logger.error("Failed to cancel the job.", e);
+            String admin = getAdminEmail();
+            if(TextUtil.isNullOrEmpty(admin)) {
+                admin = "the portal admin";
+            }
+            String errorCorrection = "Please try again in a few minutes or report it to "+admin+".";
+
             return generateJSONResponseMAV(false, null, "There was a problem cancelling your job.",
-                    "Please try again in a few minutes or report it to cg-admin@csiro.au.");
+                    errorCorrection);
         }
 
         return generateJSONResponseMAV(true, null, "");
@@ -363,7 +414,7 @@ public class JobListController extends BaseCloudController  {
      * @param request The HttpServletRequest
      * @param job The job linked the to instance that is to be terminated
      */
-    private void terminateInstance(VEGLJob job) {
+    private void terminateInstance(VEGLJob job, boolean includeAuditTrail) {
         String oldJobStatus = job.getStatus();
         if (oldJobStatus.equals(JobBuilderController.STATUS_DONE) ||
                 oldJobStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
@@ -371,16 +422,21 @@ public class JobListController extends BaseCloudController  {
         }else if(oldJobStatus.equals(JobBuilderController.STATUS_INQUEUE)){
             VGLQueueJob dummyQueueJobForRemoval = new VGLQueueJob(null,null,job,"",null);
             vglPollingJobQueueManager.getQueue().remove(dummyQueueJobForRemoval);
-            job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-            jobManager.saveJob(job);
-            jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+
+            if (includeAuditTrail) {
+                job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+                jobManager.saveJob(job);
+                jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+            }
         }else {
             try {
                 // We allow the job to be cancelled and re-submitted regardless
                 // of its termination status.
-                job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-                jobManager.saveJob(job);
-                jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+                if (includeAuditTrail) {
+                    job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
+                    jobManager.saveJob(job);
+                    jobManager.createJobAuditTrail(oldJobStatus, job, "Job cancelled by user.");
+                }
                 CloudComputeService cloudComputeService = getComputeService(job);
                 if (cloudComputeService == null) {
                     logger.error(String.format("No cloud compute service with id '%1$s' for job '%2$s'. Cloud VM cannot be terminated", job.getComputeServiceId(), job.getId()));
@@ -431,15 +487,47 @@ public class JobListController extends BaseCloudController  {
                 }
 
                 // terminate the EMI instance
-                terminateInstance(job);
+                terminateInstance(job, true);
             } catch (Exception e) {
                 logger.error("Failed to cancel one of the jobs in a given series.", e);
                 return generateJSONResponseMAV(false, null, "There was a problem cancelling one of your jobs in selected series.",
-                        "Please try again in a few minutes or report it to cg-admin@csiro.au.");
+                        "Please try again in a few minutes or report it to "+getAdminEmail()+".");
             }
         }
 
         return generateJSONResponseMAV(true, null, "");
+    }
+
+    /**
+     * Returns a JSON object containing the latest copy of metadata for a given job's file
+     *
+     * @param jobId
+     * @return
+     */
+    @RequestMapping("/secure/getCloudFileMetadata.do")
+    public ModelAndView getCloudFileMetadata(@RequestParam("jobId") Integer jobId,
+            @RequestParam("fileName") String fileName,
+            @AuthenticationPrincipal ANVGLUser user) {
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The requested job was not found.");
+        }
+
+        CloudFileInformation fileDetails = null;
+        try {
+            CloudStorageService cloudStorageService = getStorageService(job);
+            if (cloudStorageService == null) {
+                logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud files cannot be requested", job.getStorageServiceId(), job.getId()));
+                return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+            } else {
+                fileDetails = cloudStorageService.getJobFileMetadata(job, fileName);
+            }
+        } catch (Exception e) {
+            logger.warn("Error fetching job file metadata.", e);
+            return generateJSONResponseMAV(false, null, "Error fetching file metadata");
+        }
+
+        return generateJSONResponseMAV(true, Arrays.asList(fileDetails), "");
     }
 
     /**
@@ -670,44 +758,6 @@ public class JobListController extends BaseCloudController  {
     }
 
     /**
-     * Attempts to creates a new series for the specified user.
-     *
-     * The series object will be returned in a JSON response on success.
-     *
-     * @param seriesName
-     * @param seriesDescription
-     * @return
-     */
-    @RequestMapping("/secure/createSeries.do")
-    public ModelAndView createSeries(HttpServletRequest request,
-            @AuthenticationPrincipal ANVGLUser user) {
-
-        List<VEGLSeries> series = jobManager.querySeries(user.getEmail(),
-                                                         "default",
-                                                         null);
-        if(series==null || series.isEmpty()){
-            VEGLSeries newSeries = new VEGLSeries();
-
-            newSeries.setUser(user.getEmail());
-            newSeries.setName("default");
-            newSeries.setDescription("Everything will now come through to a single default series");
-
-            try {
-                jobManager.saveSeries(newSeries);
-            } catch (Exception ex) {
-                logger.error("failure saving series", ex);
-                return generateJSONResponseMAV(false, null, "Failure saving series");
-            }
-
-            return generateJSONResponseMAV(true, Arrays.asList(newSeries), "");
-        }
-        else{
-            return generateJSONResponseMAV(true, Arrays.asList(series.get(0)), "");
-        }
-
-    };
-
-    /**
      * Attempts to creates a new folder for the specified user.
      * We are resusing existing code for series in place as folder
      * The series object will be returned in a JSON response on success.
@@ -766,7 +816,7 @@ public class JobListController extends BaseCloudController  {
 //          veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
 //          veglJob.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
 //        }
-//        
+//
         if (forceStatusRefresh) {
             try {
                 jobStatusMonitor.statusUpdate(seriesJobs);
@@ -777,6 +827,173 @@ public class JobListController extends BaseCloudController  {
         }
 
         return generateJSONResponseMAV(true, seriesJobs, "");
+    }
+
+    /**
+     * Sets a user's job series ID to a new ID (which can be null indicating default job)
+     *
+     * This will fail if user is not the owner of the job or the new series.
+     *
+     * @param request
+     * @param jobId
+     * @param seriesId
+     * @param user
+     * @return
+     */
+    @RequestMapping("/secure/setJobFolder.do")
+    public ModelAndView setJobFolder(HttpServletRequest request,
+            @RequestParam("jobId") Integer jobId,
+            @RequestParam(required=false, value="seriesId") Integer seriesId,
+            @AuthenticationPrincipal ANVGLUser user) {
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+        VEGLJob job;
+        try {
+            job = jobManager.getJobById(jobId, user);
+        } catch (AccessDeniedException e) {
+            throw e;
+        } catch (Exception e) {
+            return generateJSONResponseMAV(false);
+        }
+        
+        if (job == null || !job.getEmailAddress().equals(user.getEmail())) {
+            return generateJSONResponseMAV(false);
+        }
+
+        //We allow a null series ID
+        if (seriesId != null) {
+            VEGLSeries series = jobManager.getSeriesById(seriesId, user.getEmail());
+            if (!series.getUser().equals(user.getEmail())) {
+                return generateJSONResponseMAV(false);
+            }
+        }
+
+        job.setSeriesId(seriesId);
+        jobManager.saveJob(job);
+        return generateJSONResponseMAV(true);
+    }
+
+    /**
+     * Returns a JSON array of jobStatus and jobId tuples
+     *
+     */
+    @RequestMapping("/secure/jobsStatuses.do")
+    public ModelAndView jobStatuses(HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
+            @AuthenticationPrincipal ANVGLUser user) {
+
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+
+        List<VEGLJob> userJobs = jobManager.getUserJobs(user);
+        if (userJobs == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup jobs.");
+        }
+
+        if (forceStatusRefresh) {
+            try {
+                jobStatusMonitor.statusUpdate(userJobs);
+            } catch (JobStatusException e) {
+                log.info("There was an error updating one or more jobs: " + e.getMessage());
+                log.debug("Exception(s): ", e);
+            }
+        }
+
+        List<ModelMap> tuples = new ArrayList<ModelMap>(userJobs.size());
+        for (VEGLJob job : userJobs) {
+            ModelMap tuple = new ModelMap();
+            tuple.put("jobId", job.getId());
+            tuple.put("status", job.getStatus());
+            tuples.add(tuple);
+        }
+
+        return generateJSONResponseMAV(true, tuples, "");
+    }
+
+    /**
+     * Returns a JSON object containing an tree of all jobs, grouped by series.
+     * Also returns an array of job objects
+     *
+     * @param request The servlet request including a seriesId parameter
+     * @param response The servlet response
+     *
+     * @return A JSON object with a jobs attribute which is an array of
+     *         <code>VEGLJob</code> objects.
+     */
+    @RequestMapping("/secure/treeJobs.do")
+    public ModelAndView treeJobs(HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
+            @AuthenticationPrincipal ANVGLUser user) {
+
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+
+        List<VEGLSeries> userSeries = jobManager.querySeries(user.getEmail(), null, null);
+        List<VEGLJob> userJobs = jobManager.getUserJobs(user);
+        if (userSeries == null || userJobs == null) {
+            return generateJSONResponseMAV(false, null, "Unable to lookup jobs.");
+        }
+
+        if (forceStatusRefresh) {
+            try {
+                jobStatusMonitor.statusUpdate(userJobs);
+            } catch (JobStatusException e) {
+                log.info("There was an error updating one or more jobs: " + e.getMessage());
+                log.debug("Exception(s): ", e);
+            }
+        }
+
+        //Now we organise into a tree structure
+        ModelMap rootNode = new ModelMap();
+        rootNode.put("name", user.getEmail());
+        rootNode.put("expanded", true);
+        rootNode.put("expandable", true);
+        rootNode.put("leaf", false);
+        rootNode.put("root", true);
+        rootNode.put("seriesId", null);
+        rootNode.put("children", new ArrayList<ModelMap>());
+
+        Map<Integer, ModelMap> nodeMap = new HashMap<Integer, ModelMap>();
+        for (VEGLSeries series : userSeries) {
+            ModelMap node = new ModelMap();
+            node.put("leaf", false);
+            node.put("expanded", false);
+            node.put("expandable", true);
+            node.put("name", series.getName());
+            node.put("seriesId", series.getId());
+            node.put("children", new ArrayList<ModelMap>());
+
+            nodeMap.put(series.getId(), node);
+            ((ArrayList<ModelMap>) rootNode.get("children")).add(node);
+        }
+
+        for (VEGLJob job : userJobs) {
+            ModelMap nodeParent = nodeMap.get(job.getSeriesId());
+            if (nodeParent == null) {
+                nodeParent = rootNode;
+            }
+
+            ModelMap node = new ModelMap();
+            node.put("leaf", true);
+            node.put("name", job.getName());
+            node.put("id", job.getId());
+            node.put("submitDate", job.getSubmitDate());
+            node.put("status", job.getStatus());
+            node.put("seriesId", job.getSeriesId());
+
+            ((ArrayList<ModelMap>) nodeParent.get("children")).add(node);
+        }
+
+        ModelMap resultObj = new ModelMap();
+        resultObj.put("nodes", rootNode);
+        resultObj.put("jobs", userJobs);
+
+        return generateJSONResponseMAV(true, resultObj, "");
     }
 
     /**
@@ -802,6 +1019,55 @@ public class JobListController extends BaseCloudController  {
     }
 
     /**
+     * Copies job files from sourceJobId to targetJobId
+     *
+     * Job files will be duplicated in LOCAL staging only. The files duplicated can be
+     * controlled by a list of file names
+     */
+    @RequestMapping("/secure/copyJobFiles.do")
+    public ModelAndView copyJobFiles(HttpServletRequest request,
+            @AuthenticationPrincipal ANVGLUser user,
+            @RequestParam("targetJobId") Integer targetJobId,
+            @RequestParam("sourceJobId") Integer sourceJobId,
+            @RequestParam("key") String[] keys) {
+
+        VEGLJob sourceJob = attemptGetJob(sourceJobId, user);
+        VEGLJob targetJob = attemptGetJob(targetJobId, user);
+
+        if (sourceJob == null || targetJob == null) {
+            logger.error(String.format("sourceJob %1$s or targetJob %2$s inaccessible to user %3$s", sourceJobId, targetJobId, user));
+            return generateJSONResponseMAV(false, null, "Unable to copy files");
+        }
+
+        CloudStorageService cloudStorageService = getStorageService(sourceJob);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cannot copy files", sourceJob.getStorageServiceId(), sourceJob.getId()));
+            return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+        }
+
+        try {
+            InputStream is = null;
+            OutputStream os = null;
+
+            for (String key : keys) {
+                try {
+                    is = cloudStorageService.getJobFile(sourceJob, key);
+                    os = fileStagingService.writeFile(targetJob, key);
+                    IOUtils.copy(is, os);
+                } finally {
+                    IOUtils.closeQuietly(is);
+                    IOUtils.closeQuietly(os);
+                }
+            }
+
+            return generateJSONResponseMAV(true);
+        } catch (Exception ex) {
+            logger.error("Error copying files for job.", ex);
+            return generateJSONResponseMAV(false);
+        }
+    }
+
+    /**
      * Duplicates the job given by its reference, the new job object is returned.
      *
      * Job files will be duplicated in LOCAL staging only. The files duplicated can be
@@ -816,7 +1082,13 @@ public class JobListController extends BaseCloudController  {
         logger.info("Duplicate a new job from job ID "+ jobId);
 
         //Lookup the job we are cloning
-        VEGLJob oldJob = attemptGetJob(jobId, user);
+        VEGLJob oldJob;
+        try {
+             oldJob = attemptGetJob(jobId, user);
+        } catch (AccessDeniedException e) {
+            throw e;
+        }
+        
         if (oldJob == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job to duplicate.");
         }
@@ -888,7 +1160,10 @@ public class JobListController extends BaseCloudController  {
      * @return
      */
     @RequestMapping("/secure/getSectionedLogs.do")
-    public ModelAndView getSectionedLogs(HttpServletRequest request, @RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getSectionedLogs(HttpServletRequest request,
+            @RequestParam("jobId") Integer jobId,
+            @RequestParam(value="file", required=false) String file,
+            @AuthenticationPrincipal ANVGLUser user) {
         //Lookup the job whose logs we are accessing
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -897,11 +1172,92 @@ public class JobListController extends BaseCloudController  {
 
         ModelMap namedSections = null;
         try {
-            namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job);
+            namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job, file == null ? VL_LOG_FILE : file);
         } catch (PortalServiceException ex) {
             return generateJSONResponseMAV(false, null, ex.getMessage());
         }
 
         return generateJSONResponseMAV(true, Arrays.asList(namedSections), "");
+    }
+
+    @RequestMapping("/secure/getPlaintextPreview.do")
+    public ModelAndView getPlaintextPreview(
+            @RequestParam("jobId") Integer jobId,
+            @RequestParam("file") String file,
+            @RequestParam("maxSize") Integer maxSize,
+            @AuthenticationPrincipal ANVGLUser user) {
+
+        if (maxSize > 512 * 1024) {
+            maxSize = 512 * 1024; //Don't allow us to burn GB's on previews
+        }
+
+        //Lookup the job whose logs we are accessing
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The specified job does not exist.");
+        }
+
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
+            return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+        }
+
+        InputStream is = null;
+        try {
+            is = cloudStorageService.getJobFile(job, file);
+            InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8);
+            char[] buffer = new char[maxSize];
+            int charsRead = reader.read(buffer);
+            if (charsRead < 0) {
+                return generateJSONResponseMAV(false, null, "Error reading file from cloud storage.");
+            }
+            return generateJSONResponseMAV(true, new String(buffer, 0, charsRead), "");
+        } catch (Exception ex) {
+            logger.error("Error accessing file:" + file, ex);
+            return generateJSONResponseMAV(false);
+        } finally {
+            IOUtils.closeQuietly(is);
+        }
+    }
+
+    @RequestMapping("/secure/getImagePreview.do")
+    public void getImagePreview(
+            HttpServletResponse response,
+            @RequestParam("jobId") Integer jobId,
+            @RequestParam("file") String file,
+            @AuthenticationPrincipal ANVGLUser user) throws Exception {
+
+        //Lookup the job whose logs we are accessing
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            response.sendError(HttpStatus.SC_NOT_FOUND);
+            return;
+        }
+
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
+            response.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        InputStream is = null;
+        ServletOutputStream os = null;
+        try {
+            is = cloudStorageService.getJobFile(job, file);
+            response.setContentType("image");
+            os = response.getOutputStream();
+            IOUtils.copy(is, os);
+        } finally {
+            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(os);
+        }
+    }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
+    public @ResponseBody String handleException(AccessDeniedException e) {
+        return e.getMessage();
     }
 }

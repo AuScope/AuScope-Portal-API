@@ -24,7 +24,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             model: 'vegl.models.MachineImage',
             proxy: {
                 type: 'ajax',
-                url: 'getVmImagesForComputeService.do',
+                url: 'secure/getVmImagesForComputeService.do',
                 reader: {
                    type: 'json',
                    rootProperty : 'data'
@@ -34,14 +34,13 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }
             }
         });
-        this.imageStore.load();
 
         // create the store and get the compute type
         this.computeTypeStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.ComputeType',
             proxy: {
                 type: 'ajax',
-                url: 'getVmTypesForComputeService.do',
+                url: 'secure/getVmTypesForComputeService.do',
                 reader: {
                    type: 'json',
                    rootProperty : 'data'
@@ -62,50 +61,18 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 jobWizardActive : function() {
                     //If we have a jobId, load that, OTHERWISE the job will be created later
                     if (jobObjectFrm.wizardState.jobId) {
-                        jobObjectFrm.getForm().load({
-                            url : 'getJobObject.do',
-                            waitMsg : 'Loading Job Object...',
-                            params : {
-                                jobId : jobObjectFrm.wizardState.jobId
-                            },
-                            failure : Ext.bind(jobObjectFrm.fireEvent, jobObjectFrm, ['jobWizardLoadException']),
-                            success : function(frm, action) {
-                                var responseObj = Ext.JSON.decode(action.response.responseText);
-                                if (responseObj.success) {
-                                    //Loads the image store of user selected
-                                    //compute provider
-                                    var jobData = responseObj.data[0];
-                                    frm.setValues(jobData);
-                                    if (!Ext.isEmpty(jobData.computeServiceId)) {
-                                        jobObjectFrm.imageStore.load({
-                                            params : {
-                                                computeServiceId : jobData.computeServiceId,
-                                                jobId: jobData.id
-                                            },
-                                            callback: function(records, operation, success) {
-                                                // Set form values from the jobData, but
-                                                // override {compute,storage}ServiceId since
-                                                // they are now constant values (see
-                                                // ANVGL-35)
-                                                frm.setValues({
-                                                    computeServiceId: 'aws-ec2-compute',
-                                                    storageServiceId: 'amazon-aws-storage-sydney'
-                                                });
-                                            }
-                                        });
-                                    }
-
-                                    // Store the vm type if specified
-                                    // in the job, and solutionId, for later use.
-                                    jobObjectFrm.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
-                                    jobObjectFrm.wizardState.solutionId = jobData.solutionId;
-
-                                    jobObjectFrm.wizardState.jobId = frm.getValues().id;
-
-
+                        jobObjectFrm.handleLoadingJobObject();
+                    } else if (jobObjectFrm.wizardState.solutions) {
+                        this.imageStore.load({
+                            callback: Ext.bind(function() {
+                                if (this.imageStore.getCount()) {
+                                    var firstImg = this.imageStore.getAt(0);
+                                    this.down('#image-combo').select(firstImg);
                                 }
-                            }
+                            }, this)
                         });
+                    } else {
+                        this.imageStore.load();
                     }
                 }
             },
@@ -153,7 +120,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 queryMode: 'local',
                 triggerAction: 'all',
                 typeAhead: true,
-                forceSelection: true,
+                forceSelection: false,
                 store : this.imageStore,
                 listConfig : {
                     loadingText: 'Getting tools...',
@@ -198,6 +165,34 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     text: 'Tick to receive email notification upon job processing.'
                 }]
             },
+            {
+                xtype: 'checkbox',
+                fieldLabel: 'Set Job Walltime',
+                name: 'setJobWalltime',
+                itemId: 'setJobWalltime',
+                checked: false,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select to add an optional walltime (minutes) for your job.'
+                }],
+                listeners: {
+	                change: function(cb, checked) {
+	                	Ext.getCmp('walltime').setDisabled(!checked);
+	                	//if(!checked)
+	                	//	Ext.getCmp('walltime').setValue('0');
+	                }
+                }
+            },
+            {
+            	xtype: 'textfield',
+                name: 'walltime',
+                itemId : 'walltime',
+                id: 'walltime',
+                disabled: true,
+                fieldLabel: 'Walltime',
+                maskRe:/[\d]/,
+                allowBlank: true 
+            },
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'storageProvider' },
             { xtype: 'hidden', name: 'storageEndpoint' },
@@ -206,6 +201,114 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             { xtype: 'hidden', name: 'vmSubsetUrl' }
             ]
         }]);
+    },
+
+    handleLoadingJobObject: function() {
+        this.getForm().load({
+            url : 'secure/getJobObject.do',
+            waitMsg : 'Loading Job Object...',
+            params : {
+                jobId : this.wizardState.jobId
+            },
+            scope: this,
+            failure : Ext.bind(this.fireEvent, this, ['jobWizardLoadException']),
+            success : function(frm, action) {
+                var responseObj = Ext.JSON.decode(action.response.responseText);
+                if (responseObj.success) {
+                    //Loads the image store of user selected
+                    //compute provider
+                    var jobData = responseObj.data[0];
+                    frm.setValues(jobData);
+
+                    // Store the vm type if specified
+                    // in the job, and solutionId, for later use.
+                    this.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
+                    this.wizardState.jobId = frm.getValues().id;
+
+                    // Load the solution info for the job into the wizardState
+        	          Ext.Ajax.request({
+                        url: 'getSolutions.do',
+                        scope: this,
+                        headers: { Accept: 'application/json' },
+                        params: { uris: jobData.jobSolutions },
+                        success: function(response) {
+                            results = Ext.JSON.decode(response.responseText);
+                            if (results && results.data) {
+                                this.wizardState.solutions = results.data;
+                            }
+                        },
+
+                        failure: function(response) {
+                            console.log("Load job solutions failed! " + response);
+                        }
+                    });
+
+                    //If we have a solution ID but no selected image, preload the image combo
+                    //with the first image sent from the backend
+                    if (Ext.isEmpty(jobData.computeVmId) && !Ext.isEmpty(jobData.jobSolutions)) {
+                        this.imageStore.getProxy().setExtraParam('jobId', jobData.id);
+                        this.imageStore.load({
+                            callback: Ext.bind(function() {
+                                if (this.imageStore.getCount()) {
+                                    var firstImg = this.imageStore.getAt(0);
+                                    this.down('#image-combo').select(firstImg);
+
+                                    this.handleAutoSelectingImage(jobData.computeServiceId, firstImg.get('imageId'), true);
+                                }
+                            }, this)
+                        });
+                    }
+
+                    if (!Ext.isEmpty(jobData.computeVmId)) {
+                        this.handleAutoSelectingImage(jobData.computeServiceId, jobData.computeVmId);
+                    }
+                }
+            }
+        });
+    },
+
+    /**
+     * We need to handle setting our VM ID's and instance types
+     * but those will need to wait on stores to be loaded (frustrating!)
+     *
+     * forceFinishedUpdating:
+     *      Set to true to ignore the imageStore.updating property and assume it's not updating
+     *
+     *      ANVGL-119 The "load" event in imageStore won't fire if we listen at this point
+     *      even though the "updating" property is set on the store (frustrating!)
+     *      This override allows us to workaround this when calling from an update callback
+     */
+    handleAutoSelectingImage: function(computeServiceId, computeVmId, forceFinishedUpdating) {
+        if (!Ext.isEmpty(computeVmId)) {
+            var jobObjectFrm = this;
+            var whenImagesReady = function() {
+                if (jobObjectFrm.imageStore.getCount() === 0) {
+                    return;
+                }
+
+                jobObjectFrm.computeTypeStore.load({
+                    params : {
+                        computeServiceId : computeServiceId,
+                        machineImageId : computeVmId
+                    },
+                    callback: function() {
+                        jobObjectFrm.preselectVmType();
+                    }
+                });
+            };
+
+
+            if (!forceFinishedUpdating && this.imageStore.updating) {
+                this.imageStore.on('load', whenImagesReady, this, {single: true});
+            } else if (this.imageStore.getCount() === 0) {
+                this.imageStore.getProxy().setExtraParam('jobId', this.wizardState.jobId);
+                this.imageStore.load({
+                    callback: Ext.bind(whenImagesReady, this)
+                });
+            } else {
+                whenImagesReady();
+            }
+        }
     },
 
     /**
@@ -330,10 +433,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         values.jobId = jobObjectFrm.wizardState.jobId;
         values.storageServiceId = "amazon-aws-storage-sydney";
         values.computeServiceId = "aws-ec2-compute";
-
+        
         // update the job here
         Ext.Ajax.request({
-            url : 'updateOrCreateJob.do',
+            url : 'secure/updateOrCreateJob.do',
             params : values,
             callback : function(options, success, response) {
                 if (!success) {
@@ -362,28 +465,10 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 wizardState.ncpus = computeType.get('vcpus');
                 wizardState.nrammb = computeType.get('ramMB');
 
-                // Check with the user if no data set has been captured.
-                var numDownloadReqs = 0;
-                if (updatedJob.jobDownloads !== null) {
-                    numDownloadReqs = updatedJob.jobDownloads.length;
-                }
-                if (!wizardState.skipConfirmPopup && numDownloadReqs === 0) {
-                    Ext.Msg.confirm('Confirm',
-                            'No data set has been captured. Do you want to continue?',
-                            function(button) {
-                                if (button === 'yes') {
-                                    wizardState.skipConfirmPopup = true;
-                                    callback(true);
-                                    return;
-                                } else {
-                                    callback(false);
-                                    return;
-                                }
-                        });
-                } else {
-                    callback(true);
-                    return;
-                }
+                // Don't need to check for data sets at this point since that
+                // was done at the start. Continue with the wizard.
+                callback(true);
+                return;
             }
         });
     },
@@ -398,6 +483,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         var description = this.getComponent('description');
         var toolbox = this.getComponent('image-combo');
         var emailNotification = this.getComponent('emailNotification');
+        var setJobWalltime = this.getComponent('setJobWalltime');
+        var walltime = this.getComponent('walltime');
 
         return [Ext.create('portal.util.help.Instruction', {
             highlightEl : name.getEl(),
@@ -419,6 +506,16 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             title : 'Job completion email notification',
             anchor : 'bottom',
             description : 'The VL will send out email notification to your email address upon job completion. Untick the checkbox if you don\'t want to receive the notification.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : setJobWalltime.getEl(),
+            title : 'Set job walltime',
+            anchor : 'bottom',
+            description : 'If you would like the job to terminate after a set period, check this box and enter a value in the textfield below.'
+        }), Ext.create('portal.util.help.Instruction', {
+            highlightEl : walltime.getEl(),
+            title : 'Walltime',
+            anchor : 'bottom',
+            description : 'If you would like your job to terminate after a set period, enter the walltime (in minutes) here.'
         })];
     }
 });

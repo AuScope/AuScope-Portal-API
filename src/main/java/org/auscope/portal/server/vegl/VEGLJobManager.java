@@ -31,6 +31,10 @@ public class VEGLJobManager {
         return veglJobDao.getJobsOfSeries(seriesId, user);
     }
 
+    public List<VEGLJob> getUserJobs(ANVGLUser user) {
+        return veglJobDao.getJobsOfUser(user);
+    }
+
     public List<VEGLJob> getPendingOrActiveJobs() {
         return veglJobDao.getPendingOrActiveJobs();
     }
@@ -43,16 +47,16 @@ public class VEGLJobManager {
         return veglJobDao.get(jobId, user);
     }
 
-    public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role) {
-        return veglJobDao.get(jobId, stsArn, clientSecret, s3Role);
+    public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role, String userEmail) {
+        return veglJobDao.get(jobId, stsArn, clientSecret, s3Role, userEmail);
     }
 
     public void deleteJob(VEGLJob job) {
         veglJobDao.deleteJob(job);
     }
 
-    public VEGLSeries getSeriesById(int seriesId) {
-        return veglSeriesDao.get(seriesId);
+    public VEGLSeries getSeriesById(int seriesId, String userEmail) {
+        return veglSeriesDao.get(seriesId, userEmail);
     }
 
     public VGLSignature getSignatureByUser(String user) {

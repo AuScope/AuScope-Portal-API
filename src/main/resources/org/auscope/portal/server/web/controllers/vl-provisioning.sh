@@ -11,15 +11,11 @@
 #
 # /////////////////////////////
 
-# Use a local repo/branch until pulled into master
-baseUrl="https://github.com/squireg/ANVGL-Portal.git"
-branch="feature/sssc"
+# baseUrl -- git repository url
+baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
 
-# # baseUrl -- git repository url
-# baseUrl="https://github.com/AuScope/AVNGL-Portal.git"
-
-# # branch -- branch in the git repo
-# branch="master"
+# branch -- branch in the git repo
+branch="master"
 
 # pathSuffix -- path to puppet modules in the repo
 pathSuffix="/vm/puppet/modules/"
@@ -27,15 +23,22 @@ pathSuffix="/vm/puppet/modules/"
 # Install puppet itself if not already available
 if hash puppet 2>/dev/null; then
     echo "Puppet version $(puppet --version ) already installed."
+    if [ -f /etc/debian_version ]; then
+        sudo apt-get update
+        sudo apt-get install -y at
+    else
+        sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
+        sudo yum install -y at
+    fi
 else
     # Determine what OS we're using so we install appropriately
     # Checks for a debian based system, or assumes rpm based
     if [ -f /etc/debian_version ]; then
         sudo apt-get update
-        sudo apt-get install -y puppet
+        sudo apt-get install -y puppet at
     else
         sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
-        yum install -y puppet
+        yum install -y puppet at
     fi
 fi
 
@@ -85,8 +88,9 @@ if [ ! -d "$moduleDir/vl_common" ]; then
     else
         sudo yum install -y wget git
     fi
-    tmpModulesDir="/tmp/modules/"
-    rm -rf "$tmpModulesDir"
+
+    # Assumes our temp dir does not already have content!
+    tmpModulesDir="/opt/anvgl/modules"
     if [ "$1" !=  "" ]
     then
         baseUrl="$1"
@@ -117,8 +121,9 @@ if [ ! -d "$moduleDir/vl_common" ]; then
         exit 2
     fi
 
-    #Tidy up
-    rm -rf "$tmpModulesDir"
+    # Don't tidy up until we're sure this approach works with cloud-init
+    # # Tidy up
+    # rm -rf "$tmpModulesDir"
 else
     echo "Common vl modules found in $moduleDir/vl_common"
 fi

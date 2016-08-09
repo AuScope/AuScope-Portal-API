@@ -182,7 +182,7 @@
                 "s3:*"
               ],
               "Resource": [
-                "arn:aws:s3:::${s3Bucket}"
+                "arn:aws:s3:::${s3Bucket}*"
               ]
             }
           ]
@@ -230,7 +230,9 @@
                 "ec2:CreateTags",
                 "ec2:DeleteTags",
                 "ec2:GetConsoleOutput",
-                "ec2:ModifyInstanceAttribute"
+                "ec2:DescribeInstanceStatus",
+                "ec2:ModifyInstanceAttribute",
+                "ec2:DescribeImages"
               ],
               "Resource": [
                 "*"
@@ -298,6 +300,34 @@
           "id": "e0560b9a-0f01-4f0f-b8f9-6914d40d922c"
         }
       }
+    }
+  },
+  "Outputs": {
+    "AnvglAccessARN": {
+      "Description": "ARN for the role which is used to access the client AWS account.",
+      "Value": { "Fn::Join": [
+                   "",
+                   [
+                     "arn:aws:iam::",
+                     { "Ref": "AWS::AccountId" },
+                     ":role/",
+                     { "Ref": "AnvglStsRole" }
+                   ]
+                 ]
+               }
+    },
+    "JobInstanceARN": {
+      "Description": "ARN for the instance profile which is used when processing user jobs.",
+      "Value": { "Fn::Join": [
+                   "",
+                   [
+                     "arn:aws:iam::",
+                     { "Ref": "AWS::AccountId" },
+                     ":instance-profile/",
+                     { "Ref": "AnvglS3InstanceProfile" }
+                   ]
+                 ]
+               }
     }
   }
 }

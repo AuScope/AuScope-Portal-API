@@ -11,7 +11,7 @@ Ext.define('vegl.widgets.NetcdfSubsetPanel', {
      * Accepts the following:
      * {
      *  region : portal.util.BBox - The selected area (defaults to 0,0,0,0)
-     *  localPath : String - path to where the subset will be downloaded (on the VM) (defaults to '/tmp/subset-request')
+     *  localPath : String - path to where the subset will be downloaded (on the VM) (defaults to '/root/subset-request')
      *  name : String - a descriptive name for this subset (defaults to 'Netcdf Subset Request')
      *  description : String - a longer description for this subset (defaults to ''),
      *  coverageName : String - The name of the coverage (WCS name) being subsetted
@@ -26,7 +26,7 @@ Ext.define('vegl.widgets.NetcdfSubsetPanel', {
             eastBoundLongitude : 0,
             westBoundLongitude : 0});
         var description = config.description ? config.description : '';
-        var localPath = config.localPath ? config.localPath : '/tmp/subset-request';
+        var localPath = config.localPath ? config.localPath : '/root/subset-request';
 
         this.coverageName = config.coverageName;
         this.coverageUrl = config.coverageUrl;

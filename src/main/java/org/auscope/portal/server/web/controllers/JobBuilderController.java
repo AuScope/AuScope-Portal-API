@@ -27,12 +27,13 @@ import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -46,18 +47,23 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
+import org.auscope.portal.server.web.service.scm.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-
 
 /**
  * Controller for the job submission view.
@@ -78,6 +84,23 @@ public class JobBuilderController extends BaseCloudController {
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
     private ScmEntryService scmEntryService;
     private ANVGLProvenanceService anvglProvenanceService;
+    private String adminEmail = null;
+    private String defaultToolbox = null;
+
+    /**
+     * @return the adminEmail
+     */
+    public String getAdminEmail() {
+        return adminEmail;
+    }
+
+
+    /**
+     * @param adminEmail the adminEmail to set
+     */
+    public void setAdminEmail(String adminEmail) {
+        this.adminEmail = adminEmail;
+    }
 
     public static final String STATUS_PENDING = "Pending";//VT:Request accepted by compute service
     public static final String STATUS_ACTIVE = "Active";//VT:Running
@@ -87,21 +110,23 @@ public class JobBuilderController extends BaseCloudController {
     public static final String STATUS_UNSUBMITTED = "Saved";//VT:Job saved, fail to submit for whatever reason.
     public static final String STATUS_INQUEUE = "In Queue";//VT: quota exceeded, placed in queue.
     public static final String STATUS_ERROR = "ERROR";//VT:Exception in job processing.
+    public static final String STATUS_WALLTIME_EXCEEDED = "WALLTIME EXCEEDED";//VT:Walltime exceeded.
 
     public static final String SUBMIT_DATE_FORMAT_STRING = "yyyyMMdd_HHmmss";
 
     public static final String DOWNLOAD_SCRIPT = "vl-download.sh";
     VGLJobStatusChangeHandler vglJobStatusChangeHandler;
 
-
-
     @Autowired
-    public JobBuilderController(VEGLJobManager jobManager, FileStagingService fileStagingService,
-            PortalPropertyPlaceholderConfigurer hostConfigurer, CloudStorageService[] cloudStorageServices,
+    public JobBuilderController(@Value("${HOST.portalAdminEmail}") String adminEmail,
+                                @Value("${HOST.defaultToolbox}") String defaultToolbox,
+            VEGLJobManager jobManager, FileStagingService fileStagingService,
+            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
+            CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             VGLPollingJobQueueManager vglPollingJobQueueManager, ScmEntryService scmEntryService,
             ANVGLProvenanceService anvglProvenanceService) {
-        super(cloudStorageServices, cloudComputeServices,hostConfigurer);
+        super(cloudStorageServices, cloudComputeServices,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
@@ -110,6 +135,8 @@ public class JobBuilderController extends BaseCloudController {
         this.vglPollingJobQueueManager = vglPollingJobQueueManager;
         this.scmEntryService = scmEntryService;
         this.anvglProvenanceService = anvglProvenanceService;
+        this.adminEmail=adminEmail;
+        this.defaultToolbox = defaultToolbox;
     }
 
 
@@ -122,7 +149,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a data attribute containing a populated
      *         VEGLJob object and a success attribute.
      */
-    @RequestMapping("/getJobObject.do")
+    @RequestMapping("/secure/getJobObject.do")
     public ModelAndView getJobObject(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
         try {
             VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
@@ -155,7 +182,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a files attribute which is an array of
      *         filenames.
      */
-    @RequestMapping("/listJobFiles.do")
+    @RequestMapping("/secure/listJobFiles.do")
     public ModelAndView listJobFiles(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
 
         //Lookup our job
@@ -194,7 +221,7 @@ public class JobBuilderController extends BaseCloudController {
      *         failure.
      * @throws IOException
      */
-    @RequestMapping("/downloadInputFile.do")
+    @RequestMapping("/secure/downloadInputFile.do")
     public ModelAndView downloadFile(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") String jobId,
@@ -216,7 +243,7 @@ public class JobBuilderController extends BaseCloudController {
      *
      * @return null
      */
-    @RequestMapping("/uploadFile.do")
+    @RequestMapping("/secure/uploadFile.do")
     public ModelAndView uploadFile(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
@@ -255,7 +282,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a success attribute that indicates whether
      *         the files were successfully deleted.
      */
-    @RequestMapping("/deleteFiles.do")
+    @RequestMapping("/secure/deleteFiles.do")
     public ModelAndView deleteFiles(@RequestParam("jobId") String jobId,
             @RequestParam("fileName") String[] fileNames, @AuthenticationPrincipal ANVGLUser user) {
 
@@ -284,7 +311,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a success attribute that indicates whether
      *         the downloads were successfully deleted.
      */
-    @RequestMapping("/deleteDownloads.do")
+    @RequestMapping("/secure/deleteDownloads.do")
     public ModelAndView deleteDownloads(@RequestParam("jobId") String jobId,
             @RequestParam("downloadId") Integer[] downloadIds, @AuthenticationPrincipal ANVGLUser user) {
 
@@ -327,7 +354,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a success attribute that indicates the status.
      *
      */
-    @RequestMapping("/getJobStatus.do")
+    @RequestMapping("/secure/getJobStatus.do")
     public ModelAndView getJobStatus(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
 
         //Get our job
@@ -350,7 +377,7 @@ public class JobBuilderController extends BaseCloudController {
      *
      * @return null
      */
-    @RequestMapping("/cancelSubmission.do")
+    @RequestMapping("/secure/cancelSubmission.do")
     public ModelAndView cancelSubmission(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
 
         //Get our job
@@ -389,7 +416,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      * @throws ParseException
      */
-    @RequestMapping("/updateOrCreateJob.do")
+    @RequestMapping("/secure/updateOrCreateJob.do")
     public ModelAndView updateOrCreateJob(@RequestParam(value="id", required=false) Integer id,  //The integer ID if not specified will trigger job creation
             @RequestParam(value="name", required=false) String name,
             @RequestParam(value="description", required=false) String description,
@@ -400,6 +427,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="storageServiceId", required=false) String storageServiceId,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
+            @RequestParam(value="walltime", required=false) Integer walltime,
             HttpServletRequest request,
             @AuthenticationPrincipal ANVGLUser user) throws ParseException {
 
@@ -413,6 +441,8 @@ public class JobBuilderController extends BaseCloudController {
             } else {
                 job = jobManager.getJobById(id, user);
             }
+        } catch (AccessDeniedException e) {
+            throw e;  
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
@@ -425,6 +455,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setComputeVmId(computeVmId);
         job.setComputeInstanceType(computeTypeId);
         job.setEmailNotification(emailNotification);
+        job.setWalltime(walltime);
 
         //Updating the storage service means changing the base key
         if (storageServiceId != null) {
@@ -476,7 +507,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      * @throws ParseException
      */
-    @RequestMapping("/updateJobSeries.do")
+    @RequestMapping("/secure/updateJobSeries.do")
     public ModelAndView updateJobSeries(@RequestParam(value="id", required=true) Integer id,  //The integer ID if not specified will trigger job creation
             @RequestParam(value="folderName", required=true) String folderName, //Name of the folder to move to
             HttpServletRequest request,
@@ -494,6 +525,8 @@ public class JobBuilderController extends BaseCloudController {
 
         try {
             job = jobManager.getJobById(id, user);
+        } catch (AccessDeniedException e) {
+            throw e;  
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
@@ -526,7 +559,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      * @throws ParseException
      */
-    @RequestMapping("/updateJobDownloads.do")
+    @RequestMapping("/secure/updateJobDownloads.do")
     public ModelAndView updateJobDownloads(@RequestParam("id") Integer id,  //The integer ID is the only required value
             @RequestParam(required=false, value="append", defaultValue="false") String appendString,
             @RequestParam("name") String[] names,
@@ -551,6 +584,8 @@ public class JobBuilderController extends BaseCloudController {
         VEGLJob job;
         try {
             job = jobManager.getJobById(id, user);
+        } catch (AccessDeniedException e) {
+          throw e;  
         } catch (Exception ex) {
             logger.error("Error looking up job with id " + id + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
@@ -583,7 +618,7 @@ public class JobBuilderController extends BaseCloudController {
      * @param jobId
      * @return
      */
-    @RequestMapping("/getJobDownloads.do")
+    @RequestMapping("/secure/getJobDownloads.do")
     public ModelAndView getJobDownloads(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
         //Lookup the job
         VEGLJob job;
@@ -599,15 +634,15 @@ public class JobBuilderController extends BaseCloudController {
     }
 
 
-    /**
-     * Gets the list of authorised images for the specified job owned by user
-     * @param request The request (from a user) making the query
-     * @param job The job for which the images will be tested
-     * @return
-     */
-    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, VEGLJob job) {
-        return getImagesForJobAndUser(request, job.getComputeServiceId());
-    }
+//    /**
+//     * Gets the list of authorised images for the specified job owned by user
+//     * @param request The request (from a user) making the query
+//     * @param job The job for which the images will be tested
+//     * @return
+//     */
+//    private List<MachineImage> getImagesForJobAndUser(HttpServletRequest request, VEGLJob job) {
+//        return getImagesForJobAndUser(request, job.getComputeServiceId());
+//    }
 
     /**
      * Gets the list of authorised images for the specified job owned by user
@@ -663,6 +698,7 @@ public class JobBuilderController extends BaseCloudController {
         boolean succeeded = false;
         String oldJobStatus = null, errorDescription = null, errorCorrection = null;
         VEGLJob curJob = null;
+        boolean containsPersistentVolumes = false;
 
         try {
             // Get our job
@@ -670,7 +706,11 @@ public class JobBuilderController extends BaseCloudController {
             if (curJob == null) {
                 logger.error("Error fetching job with id " + jobId);
                 errorDescription = "There was a problem retrieving your job from the database.";
-                errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
+                String admin = getAdminEmail();
+                if(TextUtil.isNullOrEmpty(admin)) {
+                    admin = "the portal admin";
+                }
+                errorCorrection = "Please try again in a few minutes or report it to "+admin+".";
                 return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
             } else {
 
@@ -704,7 +744,11 @@ public class JobBuilderController extends BaseCloudController {
                     if (!createDownloadScriptFile(curJob, DOWNLOAD_SCRIPT)) {
                         logger.error(String.format("Error creating download script '%1$s' for job with id %2$s", DOWNLOAD_SCRIPT, jobId));
                         errorDescription = "There was a problem configuring the data download script.";
-                        errorCorrection = "Please try again in a few minutes or report it to cg-admin@csiro.au.";
+                        String admin = getAdminEmail();
+                        if(TextUtil.isNullOrEmpty(admin)) {
+                            admin = "the portal admin";
+                        }
+                        errorCorrection = "Please try again in a few minutes or report it to "+admin+".";
                     } else {
                         // copy files to S3 storage for processing
                         // get job files from local directory
@@ -727,7 +771,13 @@ public class JobBuilderController extends BaseCloudController {
 
                             // Provenance
                             anvglProvenanceService.setServerURL(request.getRequestURL().toString());
-                            anvglProvenanceService.createActivity(curJob, scmEntryService.getJobSolution(curJob), user);
+                            anvglProvenanceService.createActivity(curJob, scmEntryService.getJobSolutions(curJob), user);
+
+                            //ANVGL-120 Check for persistent volumes
+                            if (cloudComputeService instanceof CloudComputeServiceAws) {
+                                containsPersistentVolumes = ((CloudComputeServiceAws) cloudComputeService).containsPersistentVolumes(curJob);
+                                curJob.setContainsPersistentVolumes(containsPersistentVolumes);
+                            }
 
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);
@@ -741,24 +791,40 @@ public class JobBuilderController extends BaseCloudController {
                     }
                 } else {
                     errorDescription = "You do not have the permission to submit this job for processing.";
-                    errorCorrection = "If you think this is wrong, please report it to cg-admin@csiro.au.";
+                    String admin = getAdminEmail();
+                    if(TextUtil.isNullOrEmpty(admin)) {
+                        admin = "the portal admin";
+                    }
+                    errorCorrection = "If you think this is wrong, please report it to "+admin+".";
                 }
             }
         } catch (PortalServiceException e) {
             errorDescription = e.getMessage();
             errorCorrection = e.getErrorCorrection();
+
+            //These are our "STS specific" overrides to some error messages (not an ideal solution but I don't want to have to overhaul everything just to tweak a string).
+            if (errorDescription.equals("Storage credentials are not valid.")) {
+                errorDescription = "Unable to upload job script and/or input files";
+                errorCorrection = "The most likely cause is that your user profile ARN's have been misconfigured.";
+            }
         } catch (IOException e) {
             logger.error("Job bootstrap creation failed.", e);
             errorDescription = "There was a problem creating startup script.";
-            errorCorrection = "Please report this error to cg_admin@csiro.au";
+            errorCorrection = "Please report this error to "+getAdminEmail();
+        } catch (AccessDeniedException e) {
+            logger.error("Job submission failed.", e);
+            errorDescription = "You are not authorized to access the specified job with id: "+ curJob.getId();
+            errorCorrection = "Please report this error to "+getAdminEmail();
         } catch (Exception e) {
             logger.error("Job submission failed.", e);
             errorDescription = "An unexpected error has occurred while submitting your job for processing.";
-            errorCorrection = "Please report this error to cg_admin@csiro.au";
+            errorCorrection = "Please report this error to "+getAdminEmail();
         }
 
         if (succeeded) {
-            return generateJSONResponseMAV(true, null, "");
+            ModelMap responseModel = new ModelMap();
+            responseModel.put("containsPersistentVolumes", containsPersistentVolumes);
+            return generateJSONResponseMAV(true, responseModel, "");
         } else {
             jobManager.createJobAuditTrail(oldJobStatus, curJob, errorDescription);
             return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
@@ -770,7 +836,7 @@ public class JobBuilderController extends BaseCloudController {
         VEGLJob curJob;
         String userDataString;
 
-        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString ){
+        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString){
             this.cloudComputeService = cloudComputeService;
             this.curJob = curJob;
             this.userDataString = userDataString;
@@ -798,7 +864,6 @@ public class JobBuilderController extends BaseCloudController {
                     curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
                     jobManager.saveJob(curJob);
                     jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
-
                 }else{
                     String oldJobStatus = curJob.getStatus();
                     curJob.setStatus(JobBuilderController.STATUS_ERROR);
@@ -807,10 +872,7 @@ public class JobBuilderController extends BaseCloudController {
                     vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
                 }
             }
-
         }
-
-
     }
 
     /**
@@ -919,6 +981,15 @@ public class JobBuilderController extends BaseCloudController {
     }
 
     /**
+     * Request wrapper to get the default toolbox uri.
+     *
+     */
+    @RequestMapping("/getDefaultToolbox.do")
+    public ModelAndView doGetDefaultToolbox() {
+        return generateJSONResponseMAV(true, new String[] {getDefaultToolbox()}, "");
+    }
+
+    /**
      * Gets the set of cloud images available for use by a particular user.
      *
      * If jobId is specified, limit the set to images that are
@@ -929,7 +1000,7 @@ public class JobBuilderController extends BaseCloudController {
      * @param jobId (optional) id of a job to limit suitable images
      * @return
      */
-    @RequestMapping("/getVmImagesForComputeService.do")
+    @RequestMapping("/secure/getVmImagesForComputeService.do")
     public ModelAndView getImagesForComputeService(
         HttpServletRequest request,
         @RequestParam("computeServiceId") String computeServiceId,
@@ -939,12 +1010,23 @@ public class JobBuilderController extends BaseCloudController {
             // Assume all images are usable by the current user
             List<MachineImage> images = new ArrayList<MachineImage>();
 
-            // Filter list to images suitable for job solution, if specified
             if (jobId != null) {
-                Set<String> vmIds = scmEntryService.getJobImages(jobId, user).get(computeServiceId);
-                if (vmIds != null) {
-                    for (String vmId: vmIds) {
-                        images.add(new MachineImage(vmId));
+                VEGLJob job = jobManager.getJobById(jobId, user);
+
+                // Filter list to images suitable for job solutions, if specified.
+                Set<Toolbox> toolboxes = scmEntryService.getJobToolboxes(job);
+
+                // With multiple solutions and multiple toolboxes, do
+                // not give the user the option of selecting the default
+                // portal toolbox for utility functions unless it's the
+                // only toolbox available.
+                int numToolboxes = toolboxes.size();
+                for (Toolbox toolbox: toolboxes) {
+                    if ((numToolboxes == 1) ||
+                        !toolbox.getUri().equals(this.defaultToolbox)) {
+                        images.add(scmEntryService
+                                   .getToolboxImage(toolbox,
+                                                    computeServiceId));
                     }
                 }
             }
@@ -973,7 +1055,7 @@ public class JobBuilderController extends BaseCloudController {
      *
      * @param computeServiceId
      */
-    @RequestMapping("/getVmTypesForComputeService.do")
+    @RequestMapping("/secure/getVmTypesForComputeService.do")
     public ModelAndView getTypesForComputeService(HttpServletRequest request,
             @RequestParam("computeServiceId") String computeServiceId,
             @RequestParam("machineImageId") String machineImageId) {
@@ -1030,14 +1112,18 @@ public class JobBuilderController extends BaseCloudController {
      * @param jobId (optional) job id to limit acceptable services
      * @return
      */
-    @RequestMapping("/getComputeServices.do")
+    @RequestMapping("/secure/getComputeServices.do")
     public ModelAndView getComputeServices(@RequestParam(value="jobId",
                                                          required=false)
                                            Integer jobId,
                                            @AuthenticationPrincipal ANVGLUser user) {
-
-        Set<String> jobCCSIds = scmEntryService.getJobProviders(jobId, user);
-
+        Set<String> jobCCSIds;
+        try {
+            jobCCSIds = scmEntryService.getJobProviders(jobId, user);
+        } catch (AccessDeniedException e) {
+            throw e;
+        }   
+        
         List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();
 
         for (CloudComputeService ccs : cloudComputeServices) {
@@ -1057,7 +1143,7 @@ public class JobBuilderController extends BaseCloudController {
      * Gets a JSON list of id/name pairs for every available storage service
      * @return
      */
-    @RequestMapping("/getStorageServices.do")
+    @RequestMapping("/secure/getStorageServices.do")
     public ModelAndView getStorageServices() {
         List<ModelMap> simpleStorageServices = new ArrayList<ModelMap>();
 
@@ -1080,7 +1166,7 @@ public class JobBuilderController extends BaseCloudController {
      * @param jobId
      * @return
      */
-    @RequestMapping("/getAllJobInputs.do")
+    @RequestMapping("/secure/getAllJobInputs.do")
     public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
         VEGLJob job = null;
         try {
@@ -1117,5 +1203,28 @@ public class JobBuilderController extends BaseCloudController {
 
         return generateJSONResponseMAV(true, allInputs, "");
     }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
+    public @ResponseBody String handleException(AccessDeniedException e) {
+        return e.getMessage();
+    }
 
+    /**
+     * Return the default toolbox URI.
+     *
+     * @returns String with the URI for the default toolbox.
+     */
+    public String getDefaultToolbox() {
+        return this.defaultToolbox;
+    }
+
+    /**
+     * Set the default toolbox URI.
+     *
+     * @param defaultToolbox String containing the URI of the default toolbox to set
+     */
+    public void setDefaultToolbox(String defaultToolbox) {
+        this.defaultToolbox = defaultToolbox;
+    }
 }

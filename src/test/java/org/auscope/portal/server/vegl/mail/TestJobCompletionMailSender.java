@@ -68,7 +68,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         jobCompMailSender.setMaxLengthForJobNameInSubject(15);
         jobCompMailSender.setMaxLinesForTail(5);
         jobCompMailSender.setEmailSender("test-admin@email.com");
-        jobCompMailSender.setEmailSubject("VL Job (%s/%s)");
+        jobCompMailSender.setEmailSubject("VL Job (%s)");
     }
 
     /**
@@ -108,7 +108,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
             oneOf(mockJobStatLogReader).getSectionedLog(mockJob, "Python");will(returnValue(jobLog));
         }});
 
-        String content = jobCompMailSender.constructMailContent(mockSeries, mockJob);
+        String content = jobCompMailSender.constructMailContent(mockSeries.getName(), mockJob);
         //Email content shouldn't be null.
         Assert.assertNotNull(content);
         //Email body must contain user email alias, job id, series name and job name.
@@ -130,29 +130,25 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         final String jobName = "TestJob#1abcdefghijk";
         final String jobDescription = "Job#1Description";
         final String jobLog = "Line1\nLine2\nLine3\nLine4\nLine5\nLine6\nLine7";
-        final String seriesNameInSubject =
-                seriesName.substring(0, jobCompMailSender.getMaxLengthForSeriesNameInSubject());
         final String jobNameInSubject =
                 jobName.substring(0, jobCompMailSender.getMaxLengthForJobNameInSubject());
-        final String subject = String.format(jobCompMailSender.getEmailSubject(),
-                seriesNameInSubject, jobNameInSubject);
+        final String subject = String.format(jobCompMailSender.getEmailSubject(), jobNameInSubject);
         final String jobStatus="Done";
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
-            oneOf(mockJob).getSeriesId();will(returnValue(seriesId));
+            oneOf(mockJobManager).getSeriesById(seriesId, user);will(returnValue(mockSeries));
+            allowing(mockJob).getSeriesId();will(returnValue(seriesId));
 
             oneOf(mockSeries).getName();will(returnValue(seriesName));
 
             oneOf(mockJob).getName();will(returnValue(jobName));
-            oneOf(mockJob).getEmailAddress();will(returnValue(user));
+            allowing(mockJob).getEmailAddress();will(returnValue(user));
 
             //The following expectations are for invoking constructMailContent method.
             allowing(mockJob).getSubmitDate();will(returnValue(dateSubmitted));
             allowing(mockJob).getProcessDate();will(returnValue(dateProcessed));
             allowing(mockJob).getUser();will(returnValue(user));
             allowing(mockJob).getStatus();will(returnValue(jobStatus));
-            oneOf(mockSeries).getName();will(returnValue(seriesName));
             oneOf(mockJob).getId();will(returnValue(jobId));
             oneOf(mockJob).getName();will(returnValue(jobName));
             oneOf(mockJob).getDescription();will(returnValue(jobDescription));
@@ -183,8 +179,8 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         final String jobStatus="Done";
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
-            oneOf(mockJob).getSeriesId();will(returnValue(seriesId));
+            oneOf(mockJobManager).getSeriesById(seriesId, user);will(returnValue(mockSeries));
+            allowing(mockJob).getSeriesId();will(returnValue(seriesId));
 
             oneOf(mockSeries).getName();will(returnValue(seriesName));
 
@@ -196,8 +192,8 @@ public class TestJobCompletionMailSender extends PortalTestClass {
             allowing(mockJob).getProcessDate();will(returnValue(dateProcessed));
             allowing(mockJob).getUser();will(returnValue(user));
             allowing(mockJob).getStatus();will(returnValue(jobStatus));
-            oneOf(mockSeries).getName();will(returnValue(seriesName));
             allowing(mockJob).getId();will(returnValue(jobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(user));
             oneOf(mockJob).getName();will(returnValue(jobName));
             oneOf(mockJob).getDescription();will(returnValue(jobDescription));
             //Ensure we've one call to getSectionedLog to get Python execution log

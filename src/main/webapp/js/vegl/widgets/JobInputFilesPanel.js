@@ -1,6 +1,6 @@
 Ext.define('vegl.widgets.JobInputFilesPanel', {
     /** @lends anvgl.JobBuilder.JobInputFilesPanel */
-    
+
     extend : 'Ext.grid.Panel',
     alias : 'widget.jobinputfilespanel',
 
@@ -17,10 +17,10 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
      */
     constructor : function(config) {
         var jobFilesGrid = this;
-        
+
         // while creating a job the jobId is not available at this stage
         this.currentJobId = config.currentJob ? config.currentJob.get("id") : config.currentJobId;
-        
+
         //Action for downloading a single file
         this.downloadAction = new Ext.Action({
             text: 'Download this input to your machine.',
@@ -36,7 +36,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
                         filename : source.get('name')
                     };
 
-                    portal.util.FileDownloader.downloadFile("downloadInputFile.do", params);
+                    portal.util.FileDownloader.downloadFile("secure/downloadInputFile.do", params);
                 } else if (source instanceof vegl.models.Download) {
                     portal.util.FileDownloader.downloadFile(source.get('url'));
                 }
@@ -55,7 +55,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
                 if (source instanceof vegl.models.FileRecord) {
                     Ext.Ajax.request({
-                        url: 'deleteFiles.do',
+                        url: 'secure/deleteFiles.do',
                         callback: Ext.bind(this.updateFileStore, this),
                         params: {
                             'fileName': source.get('name'),
@@ -64,7 +64,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
                     });
                 } else if (source instanceof vegl.models.Download) {
                     Ext.Ajax.request({
-                        url: 'deleteDownloads.do',
+                        url: 'secure/deleteDownloads.do',
                         callback: Ext.bind(this.updateFileStore, this),
                         params: {
                             'downloadId': source.get('id'),
@@ -109,7 +109,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
         });
 
         this.callParent(arguments);
-        
+
         this.on('selectionchange', this._onSelectionChange, this);
         this.on('celldblclick', this._onDblClick, this);
     },
@@ -124,16 +124,16 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             return;
         }
 
-        //Fire off the first request for already uploaded input files 
+        //Fire off the first request for already uploaded input files
         var loadMask = new Ext.LoadMask({
             msg : 'Requesting input files...',
             target : this,
-            removeMask : true            
+            removeMask : true
         });
         loadMask.show();
 
         Ext.Ajax.request({
-            url : 'listJobFiles.do',
+            url : 'secure/listJobFiles.do',
             params : {
                 jobId : this.currentJobId
             },
@@ -157,7 +157,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
                 //Fire off a second request for the downloads
                 Ext.Ajax.request({
-                    url : 'getJobDownloads.do',
+                    url : 'secure/getJobDownloads.do',
                     params : {
                         jobId : this.currentJobId
                     },
@@ -245,7 +245,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
         this.getSelectionModel().select([record], false);
     },
 
-    
+
     /**
      * @function
      * @param sm

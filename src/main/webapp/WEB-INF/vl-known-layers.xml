@@ -7,73 +7,184 @@
       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
 
-
-<bean id="knownTypeGswaMagMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
-        <constructor-arg name="id" value="gswa-magmerge"/>
+    <bean id="knownTypeGswaGravMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-gravmerge"/>
         <constructor-arg name="knownLayerSelector">
             <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
-                <constructor-arg name="layerName" value="WA_80m_Mag_Merge_landsea_v1_2012"/>
+                <constructor-arg name="layerName" value="gravity_merged"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Magnetic anomaly grid (80m)"/>
-        <property name="description" value="This grid combines merged magnetic anomaly data from onshore and offshore WA. It is generated from Federal and State government data sets acquired with a line spacing of 500 metres or less and over 800 open file Company data sets at various line spacings"/>
+        <property name="name" value="400m Gravity Merged Grid (2016 v1)"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geological Survey of Western Australia"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
+    </bean>
+    
+    <bean id="knownTypeGswa20mMagMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-20mmagmerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="total_magnetic_intensity"/>
+                <constructor-arg name="serviceEndpoints">
+                    <array>
+                        <value>http://dapds00.nci.org.au/thredds/wms/rl1/GSWA_Geophysics/WA_Magnetic_Grids/WA_20m_Mag_Merge_v1_2014.nc</value>
+                    </array>
+                </constructor-arg>
+                <constructor-arg name="includeEndpoints" value="true"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="20m Magnetic Merged Grid (2014 v1)"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geological Survey of Western Australia"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
+    </bean>
+    
+    <bean id="knownTypeGswa40mMagMerge1VD" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-40mmagmerge1vd"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="first_vertical_deriv_tmi"/>
+                <constructor-arg name="serviceEndpoints">
+                    <array>
+                        <value>http://dapds00.nci.org.au/thredds/wms/rl1/GSWA_Geophysics/WA_Magnetic_Grids/WA_40m_Mag_Merge_1VD_v1_2014.nc</value>
+                    </array>
+                </constructor-arg>
+                <constructor-arg name="includeEndpoints" value="true"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="40m Magnetic Merged Grid - 1st Vertical Derivative (2014 v1)"/>
+        <property name="description" value=""/>
         <property name="group" value="Geological Survey of Western Australia"/>
          <property name="order" value="1_Geological Survey of Western Australia_1"/>
     </bean>
 
-
-    <bean id="knownTypeGswaKMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
-        <constructor-arg name="id" value="gswa-kmerge"/>
+    <bean id="knownTypeGswa40mMagMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-40mmagmerge"/>
         <constructor-arg name="knownLayerSelector">
             <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
-                <constructor-arg name="layerName" value="WA_100m_K_Merge_v1_2012"/>
+                <constructor-arg name="layerName" value="total_magnetic_intensity"/>
+                <constructor-arg name="serviceEndpoints">
+                    <array>
+                        <value>http://dapds00.nci.org.au/thredds/wms/rl1/GSWA_Geophysics/WA_Magnetic_Grids/WA_40m_Mag_Merge_v1_2014.nc</value>
+                    </array>
+                </constructor-arg>
+                <constructor-arg name="includeEndpoints" value="true"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Potassium Radiometrics anomaly grid (100m)"/>
-        <property name="description" value="This radioelement grid is generated from Federal and State government data sets acquired with a line spacing of 500 metres or less and selected open file data sets."/>
+        <property name="name" value="40m Magnetic Merged Grid (2014 v1)"/>
+        <property name="description" value=""/>
         <property name="group" value="Geological Survey of Western Australia"/>
-        <property name="order" value="1_Geological Survey of Western Australia_2"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
     </bean>
     
-    <bean id="knownTypeGswaTcMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
-        <constructor-arg name="id" value="gswa-tcmerge"/>
+    <bean id="knownTypeGswa80mMagMerge1VD" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-80mmagmerge1vd"/>
         <constructor-arg name="knownLayerSelector">
             <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
-                <constructor-arg name="layerName" value="WA_100m_TC_Merge_v1_2012"/>
+                <constructor-arg name="layerName" value="first_vertical_deriv_tmi"/>
+                <constructor-arg name="serviceEndpoints">
+                    <array>
+                        <value>http://dapds00.nci.org.au/thredds/wms/rl1/GSWA_Geophysics/WA_Magnetic_Grids/WA_80m_Mag_Merge_1VD_v1_2014.nc</value>
+                    </array>
+                </constructor-arg>
+                <constructor-arg name="includeEndpoints" value="true"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Ternary Radiometrics anomaly grid (100m)"/>
-        <property name="description" value="This merged K, U, Th radioelement grid is generated from Federal and State government data sets acquired with a line spacing of 500 metres or less and selected open file data sets."/>
+        <property name="name" value="80m Magnetic Merged Grid - 1st Vertical Derivative (2014 v1)"/>
+        <property name="description" value=""/>
         <property name="group" value="Geological Survey of Western Australia"/>
-         <property name="order" value="1_Geological Survey of Western Australia_3"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
     </bean>
     
-    <bean id="knownTypeGswaThMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
-        <constructor-arg name="id" value="gswa-thmerge"/>
+    <bean id="knownTypeGswa80mMagMergertp" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-80mmagmergertp"/>
         <constructor-arg name="knownLayerSelector">
             <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
-                <constructor-arg name="layerName" value="WA_100m_Th_Merge_v1_2012"/>
+                <constructor-arg name="layerName" value="reduced_to_pole_tmi"/>
+                <constructor-arg name="serviceEndpoints">
+                    <array>
+                        <value>http://dapds00.nci.org.au/thredds/wms/rl1/GSWA_Geophysics/WA_Magnetic_Grids/WA_80m_Mag_Merge_RTP_v1_2014.nc</value>
+                    </array>
+                </constructor-arg>
+                <constructor-arg name="includeEndpoints" value="true"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Thorium Radiometrics anomaly grid (100m)"/>
-        <property name="description" value="This radioelement grid is generated from Federal and State government data sets acquired with a line spacing of 500 metres or less and selected open file data sets."/>
+        <property name="name" value="80m Magnetic Merged Grid - Reduced to Pole (2014 v1)"/>
+        <property name="description" value=""/>
         <property name="group" value="Geological Survey of Western Australia"/>
-        <property name="order" value="1_Geological Survey of Western Australia_4"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
     </bean>
     
-    <bean id="knownTypeGswaUMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
-        <constructor-arg name="id" value="gswa-umerge"/>
+    <bean id="knownTypeGswa80mMagMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-80mmagmerge"/>
         <constructor-arg name="knownLayerSelector">
             <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
-                <constructor-arg name="layerName" value="WA_100m_U_Merge_v1_2012"/>
+                <constructor-arg name="layerName" value="total_magnetic_intensity"/>
+                <constructor-arg name="serviceEndpoints">
+                    <array>
+                        <value>http://dapds00.nci.org.au/thredds/wms/rl1/GSWA_Geophysics/WA_Magnetic_Grids/WA_80m_Mag_Merge_v1_2014.nc</value>
+                    </array>
+                </constructor-arg>
+                <constructor-arg name="includeEndpoints" value="true"/>
             </bean>
         </constructor-arg>
-        <property name="name" value="Uranium Radiometrics anomaly grid (100m)"/>
-        <property name="description" value="This radioelement grid is generated from Federal and State government data sets acquired with a line spacing of 500 metres or less and selected open file data sets."/>
+        <property name="name" value="80m Magnetic Merged Grid (2014 v1)"/>
+        <property name="description" value=""/>
         <property name="group" value="Geological Survey of Western Australia"/>
-        <property name="order" value="1_Geological Survey of Western Australia_5"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
     </bean>
     
+    <bean id="knownTypeGswa80mKmerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-80mkmerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="percentage_potassium"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="80m Radiometric Merge (K)"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geological Survey of Western Australia"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
+    </bean>
+    
+    <bean id="knownTypeGswa80mTCmerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-80mtcmerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="dose_rate"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="80m Radiometric Merge (Dose Rate)"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geological Survey of Western Australia"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
+    </bean>
+    
+    <bean id="knownTypeGswa80mThmerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-80mthmerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="thorium_ppm"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="80m Radiometric Merge (Th)"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geological Survey of Western Australia"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
+    </bean>
+    
+    <bean id="knownTypeGswa80mUmerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="gswa-80mumerge"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="uranium_ppm"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="80m Radiometric Merge (U)"/>
+        <property name="description" value=""/>
+        <property name="group" value="Geological Survey of Western Australia"/>
+         <property name="order" value="1_Geological Survey of Western Australia_1"/>
+    </bean>    
 
     <bean id="knownTypeMagMap" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
         <constructor-arg name="id" value="ga-magmap-v5-2010"/>
@@ -139,32 +250,6 @@
         <property name="description" value=""/>
         <property name="group" value="Geoscience Australia"/>
         <property name="order" value="3_Geoscience Australia_1"/>
-    </bean>
-    
-    <bean id="KnownTypeGeophysicsDatasets" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
-        <constructor-arg name="id" value="geophysics-datasets"/>
-        <constructor-arg name="knownLayerSelector">
-            <bean class="org.auscope.portal.core.view.knownlayer.CSWRecordSelector">
-                <property name="descriptiveKeyword" value="GeophysicsDataset"/>
-            </bean>
-        </constructor-arg>
-        <property name="name" value="GA Geophysics Projects"/>
-        <property name="description" value="A collection of spatially located geophysics datasets from GA"/>
-        <property name="group" value="Geoscience Australia"/>
-        <property name="order" value="3_Geoscience Australia_2"/>
-        <property name="iconUrl" value="http://maps.google.com/mapfiles/kml/paddle/blu-square.png"/>
-        <property name="iconAnchor">
-            <bean class="java.awt.Point">
-                <constructor-arg index="0" value="16"/>
-                <constructor-arg index="1" value="32"/>
-            </bean>
-        </property>
-        <property name="iconSize">
-            <bean class="java.awt.Dimension">
-                <constructor-arg index="0" value="32"/>
-                <constructor-arg index="1" value="32"/>
-            </bean>
-        </property>
     </bean>
     
     <bean id="knownTypeGocadModels" class="org.auscope.portal.core.view.knownlayer.KnownLayer">

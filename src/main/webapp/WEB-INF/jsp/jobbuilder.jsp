@@ -15,12 +15,10 @@
     </style>
 
     <%-- Code Mirror inclusions --%>
-    <link href="CodeMirror-5.0/lib/codemirror.css" type="text/css" rel="stylesheet" />
-    <link href="CodeMirror-5.0/addon/scroll/simplescrollbars.css" type="text/css" rel="stylesheet" />    
-    <script type="text/javascript" src="CodeMirror-5.0/lib/codemirror.js"></script>
-    <script type="text/javascript" src="CodeMirror-5.0/mode/python/python.js"></script>
-    <script type="text/javascript" src="CodeMirror-5.0/mode/javascript/javascript.js"></script>
-    <script type="text/javascript" src="CodeMirror-5.0/addon/scroll/simplescrollbars.js"></script>
+    <link href="CodeMirror-5.16/lib/codemirror.css" type="text/css" rel="stylesheet" />    
+    <script type="text/javascript" src="CodeMirror-5.16/lib/codemirror.js"></script>
+    <script type="text/javascript" src="CodeMirror-5.16/mode/python/python.js"></script>
+    <script type="text/javascript" src="CodeMirror-5.16/mode/javascript/javascript.js"></script>
 
 
     <!-- Portal Core Includes -->    
@@ -57,15 +55,18 @@
     <script type="text/javascript" src="js/vegl/widgets/JobInputFilesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/BaseJobWizardForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobObjectForm.js"></script>
-    <script type="text/javascript" src="js/vegl/jobwizard/forms/JobSeriesForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobUploadForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/ScriptBuilderForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobSubmitForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/DuplicateJobForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/JobWizard.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobsTree.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>
-    <script type="text/javascript" src="js/vegl/widgets/JobInputFileWindow.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobInputFileCopyWindow.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobInputFileRemoteWindow.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobInputFileUploadWindow.js"></script>
     <script src="js/ScriptBuilder/templates/DynamicTemplate.js" type="text/javascript"></script>
 
     <script type="text/javascript" src="js/vegl/JobBuilder.js"></script>

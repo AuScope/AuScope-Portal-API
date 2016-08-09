@@ -12,12 +12,10 @@ import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.cloud.CloudJob;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -38,7 +36,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.dao.DataAccessException;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -54,12 +51,10 @@ public class TestJobListController extends PortalTestClass {
     private FileStagingService mockFileStagingService;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
-    private PortalPropertyPlaceholderConfigurer mockHostConfigurer;
     private ANVGLUser mockPortalUser;
     private JobStatusMonitor mockJobStatusMonitor;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
-    private HttpSession mockSession;
     private JobListController controller;
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
@@ -72,12 +67,10 @@ public class TestJobListController extends PortalTestClass {
         mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
         mockFileStagingService = context.mock(FileStagingService.class);
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
-        mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
         mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockRequest = context.mock(HttpServletRequest.class);
-        mockSession = context.mock(HttpSession.class);
         mockPortalUser = context.mock(ANVGLUser.class);
         final List<VEGLJob> mockJobs=new ArrayList<VEGLJob>();
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
@@ -90,7 +83,7 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer,vglPollingJobQueueManager);
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
     }
 
     @After
@@ -151,7 +144,6 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
-            allowing(mockHostConfigurer).resolvePlaceholder(with(any(String.class)));
 
             //Here on start is the delete mock
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
@@ -174,6 +166,13 @@ public class TestJobListController extends PortalTestClass {
             allowing(queueMockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_INQUEUE));
             allowing(queueMockJobs.get(0)).getId();will(returnValue(5555));
             allowing(queueMockJobs.get(1)).getId();will(returnValue(jobId));
+            
+            allowing(queueMockJobs.get(0)).isWalltimeSet(); will(returnValue(false));
+            allowing(queueMockJobs.get(1)).isWalltimeSet(); will(returnValue(false));
+
+            allowing(queueMockJobs.get(0)).getWalltime();will(returnValue(null));
+            allowing(queueMockJobs.get(1)).getWalltime();will(returnValue(null));
+            
             oneOf(queueMockJobs.get(1)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
             oneOf(queueMockJobManager).saveJob(queueMockJobs.get(1));
             oneOf(queueMockJobManager).createJobAuditTrail(JobBuilderController.STATUS_INQUEUE, queueMockJobs.get(1), "Job cancelled by user.");
@@ -181,64 +180,59 @@ public class TestJobListController extends PortalTestClass {
 
         JobListController myController = new JobListController(queueMockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,mockHostConfigurer,vglPollingJobQueueManager);
-
-
-
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
 
         Assert.assertEquals(2, vglPollingJobQueueManager.getQueue().size());
 
         myController.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
 
         Assert.assertEquals(1, vglPollingJobQueueManager.getQueue().size());
-
-
     }
 
-    /**
-     * Tests getting a series from the job manager
-     */
-    @Test
-    public void testMySeries() {
-        final String userEmail = "exampleuser@email.com";
-        final VEGLSeries series = context.mock(VEGLSeries.class);
-        final List<VEGLSeries> seriesList = Arrays.asList(series);
-
-        context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-
-            oneOf(mockJobManager).querySeries(userEmail, null, null);will(returnValue(seriesList));
-        }});
-
-        ModelAndView mav = controller.mySeries(mockRequest, mockResponse, mockPortalUser);
-        Assert.assertTrue((Boolean)mav.getModel().get("success"));
-    }
-
-    /**
-     * Tests getting a series when there is no email address in the user's session
-     */
-    @Test
-    public void testMySeriesNoEmail() {
-        context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(null));
-        }});
-
-        ModelAndView mav = controller.mySeries(mockRequest, mockResponse, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
-    }
-
-    /**
-     * Tests getting a series when there is no email address in the user's session
-     */
-    @Test
-    public void testMySeriesNoUser() {
-        context.checking(new Expectations() {{
-
-        }});
-
-        ModelAndView mav = controller.mySeries(mockRequest, mockResponse, null);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
-    }
+//    /**
+//     * Tests getting a series from the job manager
+//     */
+//    @Test
+//    public void testMySeries() {
+//        final String userEmail = "exampleuser@email.com";
+//        final VEGLSeries series = context.mock(VEGLSeries.class);
+//        final List<VEGLSeries> seriesList = Arrays.asList(series);
+//
+//        context.checking(new Expectations() {{
+//            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+//
+//            oneOf(mockJobManager).querySeries(userEmail, null, null);will(returnValue(seriesList));
+//        }});
+//
+//        ModelAndView mav = controller.mySeries(mockRequest, mockResponse, mockPortalUser);
+//        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+//    }
+//
+//    /**
+//     * Tests getting a series when there is no email address in the user's session
+//     */
+//    @Test
+//    public void testMySeriesNoEmail() {
+//        context.checking(new Expectations() {{
+//            allowing(mockPortalUser).getEmail();will(returnValue(null));
+//        }});
+//
+//        ModelAndView mav = controller.mySeries(mockRequest, mockResponse, mockPortalUser);
+//        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+//    }
+//
+//    /**
+//     * Tests getting a series when there is no email address in the user's session
+//     */
+//    @Test
+//    public void testMySeriesNoUser() {
+//        context.checking(new Expectations() {{
+//
+//        }});
+//
+//        ModelAndView mav = controller.mySeries(mockRequest, mockResponse, null);
+//        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+//    }
 
     /**
      * Tests deleting a job successfully
@@ -248,6 +242,7 @@ public class TestJobListController extends PortalTestClass {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String initialStatus = JobBuilderController.STATUS_DONE;
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
@@ -258,10 +253,12 @@ public class TestJobListController extends PortalTestClass {
             //Make sure the job marked as deleted and its transition audit trial record is created
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
-            oneOf(mockJob).getStatus();will(returnValue("old mock job status"));
+            allowing(mockJob).getId();will(returnValue(jobId));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
             oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
             oneOf(mockJobManager).saveJob(mockJob);
-            oneOf(mockJobManager).createJobAuditTrail("old mock job status", mockJob, "Job deleted.");
+            oneOf(mockJobManager).createJobAuditTrail(initialStatus, mockJob, "Job deleted.");
 
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
             oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
@@ -279,25 +276,65 @@ public class TestJobListController extends PortalTestClass {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String initialStatus = JobBuilderController.STATUS_DONE;
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
             allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
 
 
             //Make sure the job marked as deleted and its transition audit trial record is created
-            oneOf(mockJob).getStatus();will(returnValue("old mock job status"));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
             oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
             oneOf(mockJobManager).saveJob(mockJob);
-            oneOf(mockJobManager).createJobAuditTrail("old mock job status", mockJob, "Job deleted.");
+            oneOf(mockJobManager).createJobAuditTrail(initialStatus, mockJob, "Job deleted.");
 
             oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
             oneOf(mockJob).getRegisteredUrl();will(returnValue(null)); //the job isn't registered
             oneOf(mockCloudStorageServices[0]).deleteJobFiles(mockJob); //this must occur if the job isnt registered
+        }});
+
+        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+    }
+
+
+    /**
+     * Tests deleting a running job successfully
+     */
+    @Test
+    public void testDeleteJob_Running() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String initialStatus = JobBuilderController.STATUS_ACTIVE;
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+
+            //Make sure the job marked as deleted and its transition audit trial record is created
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
+            oneOf(mockJobManager).saveJob(mockJob);
+            oneOf(mockJobManager).createJobAuditTrail(initialStatus, mockJob, "Job deleted.");
+
+            oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
+            oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
+
+            oneOf(mockCloudComputeServices[0]).terminateJob(mockJob);
         }});
 
         ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
@@ -360,7 +397,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
             oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(mockJobs));
 
             //Make sure each job marked as deleted, its transition audit trial record
@@ -400,7 +437,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
         }});
 
         ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
@@ -418,7 +455,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
@@ -439,7 +476,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
             oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(null));
         }});
 
@@ -552,7 +589,7 @@ public class TestJobListController extends PortalTestClass {
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(mockJobs));
@@ -603,7 +640,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
         }});
 
@@ -622,7 +659,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
@@ -985,35 +1022,6 @@ public class TestJobListController extends PortalTestClass {
     }
 
     /**
-     * Tests that creating a series succeeds
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testCreateSeries() throws Exception {
-        final String userEmail = "exampleuser@email.com";
-        final String qName = "default";
-        final String qDescription = "Everything will now come through to a single default series";
-
-        context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).querySeries(userEmail, qName, null);will(returnValue(null));
-            oneOf(mockJobManager).saveSeries(with(aVEGLSeries(userEmail, qName, qDescription)));
-        }});
-
-        //Returns MAV on failure
-        ModelAndView mav = controller.createSeries(mockRequest, mockPortalUser);
-        Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        VEGLSeries actualSeries = ((List<VEGLSeries>) mav.getModel().get("data")).get(0);
-
-        Assert.assertNotNull(actualSeries);
-        Assert.assertEquals(userEmail, actualSeries.getUser());
-        Assert.assertEquals(qName, actualSeries.getName());
-        Assert.assertEquals(qDescription, actualSeries.getDescription());
-    }
-
-
-    /**
      * Tests that creating a folder succeeds
      * @throws Exception
      */
@@ -1035,39 +1043,10 @@ public class TestJobListController extends PortalTestClass {
     }
 
     /**
-     * Simple extension to DataAccessException to allow simulating our own Hibernate errors
-     * @author Josh Vote
-     *
-     */
-    private class MyDataAccessException extends DataAccessException {
-        public MyDataAccessException() {
-            super("");
-        }
-    }
-
-    /**
-     * Tests that creating a series will fail if the underlying database fails
-     * @throws Exception
-     */
-    @Test
-    public void testCreateSeriesFailure() throws Exception {
-        final String userEmail = "exampleuser@email.com";
-
-        context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-            oneOf(mockJobManager).querySeries(userEmail, "default", null);will(returnValue(null));
-            oneOf(mockJobManager).saveSeries(with(any(VEGLSeries.class)));will(throwException(new MyDataAccessException()));
-        }});
-
-        //Returns MAV on failure
-        ModelAndView mav = controller.createSeries(mockRequest, mockPortalUser);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
-    }
-
-    /**
      * Tests that listing a job succeeds
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testListJobs() throws Exception {
         final String userEmail = "exampleuser@email.com";
@@ -1083,7 +1062,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(mockJobs));
@@ -1098,6 +1077,7 @@ public class TestJobListController extends PortalTestClass {
      * Tests that listing a job succeeds (as well as correctly updating job statuses)
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testListJobsWithStatusUpdate() throws Exception {
         final String userEmail = "exampleuser@email.com";
@@ -1113,7 +1093,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(userEmail));
 
             oneOf(mockJobManager).getSeriesJobs(seriesId, mockPortalUser);will(returnValue(mockJobs));
@@ -1140,7 +1120,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
         }});
 
@@ -1160,7 +1140,7 @@ public class TestJobListController extends PortalTestClass {
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getSeriesById(seriesId);will(returnValue(null));
+            oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false, mockPortalUser);

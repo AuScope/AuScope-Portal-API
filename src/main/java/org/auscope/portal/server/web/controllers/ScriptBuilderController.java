@@ -9,9 +9,11 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -25,10 +27,14 @@ import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.auscope.portal.server.web.service.scm.Problem;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -74,15 +80,11 @@ public class ScriptBuilderController extends BasePortalController {
     @RequestMapping("/secure/saveScript.do")
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
                                    @RequestParam("sourceText") String sourceText,
-                                   @RequestParam("solutionId") String solutionId,
+                                   @RequestParam("solutions") Set<String> solutions,
                                    @AuthenticationPrincipal ANVGLUser user) {
 
         if (sourceText == null || sourceText.trim().isEmpty()) {
             return generateJSONResponseMAV(false, null, "No source text specified");
-        }
-
-        if (StringUtils.isEmpty(solutionId)) {
-            solutionId = null;
         }
 
         try {
@@ -95,11 +97,11 @@ public class ScriptBuilderController extends BasePortalController {
 
         // Update job with vmId for solution if we have one.
         try {
-            scmEntryService.updateJobForSolution(jobId, solutionId, user);
+            scmEntryService.updateJobForSolution(jobId, solutions, user);
         }
         catch (PortalServiceException e) {
-            logger.warn("Failed to update job (" + jobId + ") for solution (" +
-                        solutionId + "): " + e.getMessage());
+            logger.warn("Failed to update job (" + jobId + ") for solutions (" +
+                        solutions + "): " + e.getMessage());
             logger.debug("error: ", e);
             return generateJSONResponseMAV(false, null, "Unable to write script file");
         }
@@ -173,8 +175,8 @@ public class ScriptBuilderController extends BasePortalController {
     /**
      * Return a JSON list of problems and their solutions.
      */
-    @RequestMapping("/getSolutions.do")
-    public ModelAndView getSolutions() {
+    @RequestMapping("/getProblems.do")
+    public ModelAndView getProblems() {
         // Get the Solutions from the SSC
         List<Solution> solutions = scmEntryService.getSolutions();
 
@@ -211,4 +213,36 @@ public class ScriptBuilderController extends BasePortalController {
         // code is fixed.
         return generateJSONResponseMAV(true, new Solution[] {solution}, "");
     }
+
+    /**
+     * Return a list of solution objects for the corresponding uris.
+     *
+     * @param uris Collection<String> of uris to look up
+     * @return List<Solution> solution objects
+     */
+    @RequestMapping("/getSolutions.do")
+    public ModelAndView doGetSolutions(@RequestParam("uris") Set<String> uris) {
+        ArrayList<Solution> solutions = new ArrayList<Solution>();
+        StringBuilder msg = new StringBuilder();
+
+        for (String uri: uris) {
+            Solution solution = scmEntryService.getScmSolution(uri);
+            if (solution != null) {
+                solutions.add(solution);
+            }
+            else {
+                msg.append(String.format("No solution found (%s)", uri))
+                    .append("; \n");
+            }
+        }
+
+        return generateJSONResponseMAV(true, solutions, msg.toString());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
+    public @ResponseBody String handleException(AccessDeniedException e) {
+        return e.getMessage();
+    }
+
 }

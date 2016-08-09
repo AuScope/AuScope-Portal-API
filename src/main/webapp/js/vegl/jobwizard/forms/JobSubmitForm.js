@@ -28,9 +28,9 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
      * @param {object} callback
      */
     beginValidation : function(callback) {
-        var jobSubmitFrm = this;                
-        Ext.getBody().mask('Submitting Job...');
-        
+        var jobSubmitFrm = this;
+        Ext.getBody().mask('Submitting Job...').setStyle('z-index', '99999'); //ANVGL-107 Ensure this mask doesn't end up behind any modal window masks
+
         Ext.Ajax.request({
             url : 'secure/submitJob.do',
             params : {
@@ -45,10 +45,25 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
                     var responseObj = Ext.JSON.decode(response.responseText);
                     msg = responseObj.msg;
                     if (responseObj.success) {
-                        jobSubmitFrm.noWindowUnloadWarning = true;
-                        callback(true);
-                        window.location = 'joblist.html';
-                        return;
+                        if (responseObj.data && responseObj.data.containsPersistentVolumes) {
+                            Ext.Msg.show({
+                                title: 'Warning',
+                                buttons: Ext.Msg.OK,
+                                icon: Ext.Msg.WARNING,
+                                message: 'This job will create an instance with persistent EBS volumes. These will need to be manually removed from AWS as the portal cannot remove them without potentially causing you to lose data.',
+                                fn: function() {
+                                    jobSubmitFrm.noWindowUnloadWarning = true;
+                                    callback(true);
+                                    window.location = 'joblist.html';
+                                }
+                            });
+                            return;
+                        } else {
+                            jobSubmitFrm.noWindowUnloadWarning = true;
+                            callback(true);
+                            window.location = 'joblist.html';
+                            return;
+                        }
                     } else {
                         errorMsg = responseObj.msg;
                         errorInfo = responseObj.debugInfo;
@@ -78,7 +93,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
     /**
      * Title for the interface
      * @function
-     * @return {string} 
+     * @return {string}
      */
     getTitle : function() {
         return "Review job before submission...";
@@ -87,7 +102,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
     /**
      * 'Next' text
      * @function
-     * @return {string} 
+     * @return {string}
      */
     getNextText : function() {
         return 'Submit Job';
@@ -96,7 +111,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
     /**
      * 'Next' icon
      * @function
-     * @return {string} 
+     * @return {string}
      */
     getNextIconClass : function() {
         return 'submit-icon';
@@ -109,7 +124,7 @@ Ext.define('vegl.jobwizard.forms.JobSubmitForm', {
      */
     saveJob : function() {
         this.noWindowUnloadWarning = true;
-        
+
         Ext.Msg.alert('Job Saved', 'Your job has been saved for later submission. You can attempt submission later from the <a href="joblist.html">Monitor Jobs</a> page. It is now safe to close this window.');
     }
 });

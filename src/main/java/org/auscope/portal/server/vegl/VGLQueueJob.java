@@ -12,14 +12,12 @@ import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 
 public class VGLQueueJob implements Job {
 
-    VEGLJobManager jobManager;
-    CloudComputeService cloudComputeService;
-    VEGLJob curJob;
-    String userDataString;
+    private VEGLJobManager jobManager;
+    private CloudComputeService cloudComputeService;
+    private VEGLJob curJob;
+    private String userDataString;
     private final Log logger = LogFactory.getLog(getClass());
-    VGLJobStatusChangeHandler vglJobStatusChangeHandler;
-
-
+    private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
 
     public VGLQueueJob(VEGLJobManager jobManager,
             CloudComputeService cloudComputeService, VEGLJob curJob,
@@ -29,7 +27,6 @@ public class VGLQueueJob implements Job {
         this.curJob = curJob;
         this.userDataString = userDataString;
         this.vglJobStatusChangeHandler=vglJobStatusChangeHandler;
-
     }
 
     public void updateErrorStatus(Exception e){

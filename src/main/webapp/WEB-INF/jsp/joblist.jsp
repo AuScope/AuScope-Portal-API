@@ -8,18 +8,49 @@
     <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     
     <style type="text/css">
-      #sitenav-01 a {
-        background: url( "img/navigation.gif" ) 0px -38px no-repeat;
-      }
+        #sitenav-01 a {
+            background: url( "img/navigation.gif" ) 0px -38px no-repeat;
+        }
+      
+        .vl-job-details .x-form-value-field {
+	       margin: 0 0 0 0;
+	       padding: 0 0 0 0;
+	       font: bold 28px tahoma,arial,verdana,sans-serif;
+	   }
+	
+	   .vl-job-details .x-form-value-field-label {
+	       margin: 0 0 0 0;
+	       padding: 0 0 0 0;
+	       font: normal 16px tahoma,arial,verdana,sans-serif;
+	       text-align: center;
+	       color: black;
+	   }
+	   
+	   .vl-job-details-small .x-form-value-field {
+           margin: 0 0 0 0;
+           padding: 0 0 0 0;
+           font: bold 18px tahoma,arial,verdana,sans-serif;
+       }
+    
+       .vl-job-details-small .x-form-value-field-label {
+           margin: 0 0 0 0;
+           padding: 0 0 0 0;
+           font: normal 12px tahoma,arial,verdana,sans-serif;
+           text-align: center;
+           color: black;
+       }
+       
+       .x-tree-icon.x-tree-icon-leaf {
+           background-image: none;
+           width: 0px;
+       }
     </style>
 
     <%-- Code Mirror inclusions --%>
-	<link href="CodeMirror-5.0/lib/codemirror.css" type="text/css" rel="stylesheet" />
-	<link href="CodeMirror-5.0/addon/scroll/simplescrollbars.css" type="text/css" rel="stylesheet" />
-	<script type="text/javascript" src="CodeMirror-5.0/lib/codemirror.js"></script>
-	<script type="text/javascript" src="CodeMirror-5.0/mode/python/python.js"></script>
-	<script type="text/javascript" src="CodeMirror-5.0/mode/javascript/javascript.js"></script>	
-	<script type="text/javascript" src="CodeMirror-5.0/addon/scroll/simplescrollbars.js"></script>
+	<link href="CodeMirror-5.16/lib/codemirror.css" type="text/css" rel="stylesheet" />    
+    <script type="text/javascript" src="CodeMirror-5.16/lib/codemirror.js"></script>
+    <script type="text/javascript" src="CodeMirror-5.16/mode/python/python.js"></script>
+    <script type="text/javascript" src="CodeMirror-5.16/mode/javascript/javascript.js"></script>
 	
 
     <!-- Portal Core Includes -->   
@@ -38,12 +69,20 @@
     <script type="text/javascript" src="js/vegl/models/ComputeType.js"></script>
     <script type="text/javascript" src="js/vegl/models/SimpleFeatureProperty.js"></script>
 
+    <script type="text/javascript" src="js/vegl/preview/FilePreviewMixin.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/LogPreview.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/PlainTextPreview.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/ImagePreview.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/FilePreviewPanel.js"></script>
+
     <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
-    <script type="text/javascript" src="js/vegl/widgets/JobLogsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFilesPanel.js"></script>
-    <script type="text/javascript" src="js/vegl/widgets/JobInputFileWindow.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobInputFileCopyWindow.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobInputFileRemoteWindow.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobInputFileUploadWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobsTree.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/SeriesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/FolderPanel.js"></script>

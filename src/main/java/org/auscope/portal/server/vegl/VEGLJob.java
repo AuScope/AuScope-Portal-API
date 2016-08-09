@@ -2,8 +2,10 @@ package org.auscope.portal.server.vegl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,8 +28,13 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private Integer seriesId;
     private boolean emailNotification;
     private String processTimeLog;
-    private String solutionId;
     private String storageBucket;
+    
+    /**
+     * max walltime for the job. 0 or null indicate that no walltime applies to the job
+     */
+    private Integer walltime;
+    private boolean containsPersistentVolumes;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -36,6 +43,18 @@ public class VEGLJob extends CloudJob implements Cloneable {
 
     /** A list of FileInformation objects associated with this job*/
     private List<FileInformation> jobFiles = new ArrayList<FileInformation>();
+
+    /** A set of Solutions associated with this job */
+    private Set<String> jobSolutions = new HashSet<String>();
+
+    public boolean isContainsPersistentVolumes() {
+        return containsPersistentVolumes;
+    }
+
+
+    public void setContainsPersistentVolumes(boolean containsPersistentVolumes) {
+        this.containsPersistentVolumes = containsPersistentVolumes;
+    }
 
     /**
      * Creates an unitialised VEGLJob
@@ -66,6 +85,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param fileStorageId The ID of this job that is used for storing input/output files
      * @param vmSubsetFilePath The File path (on the VM) where the job should look for its input subset file
      * @param vmSubsetUrl The URL of the actual input subset file
+     * @param walltime The walltime (in minutes) for the job
      */
     public VEGLJob(Integer id) {
         super(id);
@@ -212,12 +232,16 @@ public class VEGLJob extends CloudJob implements Cloneable {
         }
     }
 
-    public String getSolutionId() {
-        return solutionId;
+    public Set<String> getJobSolutions() {
+        return this.jobSolutions;
     }
 
-    public void setSolutionId(String solutionId) {
-        this.solutionId = solutionId;
+    public void addJobSolution(String solutionId) {
+        this.jobSolutions.add(solutionId);
+    }
+
+    public void setJobSolutions(Set<String> solutions) {
+        this.jobSolutions = solutions;
     }
 
     /**
@@ -242,8 +266,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setStorageBaseKey(this.getStorageBaseKey());
         newJob.setSubmitDate(this.getSubmitDate()); //this job isn't submitted yet
         newJob.setUser(this.getUser());
-        newJob.setSolutionId(this.getSolutionId());
         newJob.setStorageBucket(this.getStorageBucket());
+        newJob.setWalltime(this.getWalltime());
+        newJob.setContainsPersistentVolumes(this.isContainsPersistentVolumes());
 
         List<VglDownload> newDownloads = new ArrayList<VglDownload>();
         for (VglDownload dl : this.getJobDownloads()) {
@@ -264,6 +289,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
         for (String key : properties.keySet()) {
             newJob.setProperty(key, getProperty(key));
         }
+
+        newJob.setJobSolutions(new HashSet<String>(this.getJobSolutions()));
+
         return newJob;
     }
 
@@ -283,6 +311,25 @@ public class VEGLJob extends CloudJob implements Cloneable {
         this.storageBucket = storageBucket;
     }
 
+    /**
+     * The walltime in minutes.
+     * @return Walltime in minutes or null if no walltime is set.
+     */
+    public Integer getWalltime() {
+        return walltime;
+    }
+
+    public boolean isWalltimeSet() {
+        return getWalltime()!=null && getWalltime()>0;
+    }
+    
+    /**
+     * Set the walltime in minutes
+     * @param walltime
+     */
+    public void setWalltime(Integer walltime) {
+        this.walltime = walltime;
+    }
 
     @Override
     public String toString() {
@@ -290,8 +337,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
                 + seriesId + ", id=" + id + ", name=" + name + ", description="
                 + description + "]";
     }
-
-
 
 
 }

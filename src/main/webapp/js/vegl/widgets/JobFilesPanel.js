@@ -19,10 +19,13 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         //Action for downloading a single file
         this.downloadAction = new Ext.Action({
             text: 'Download',
-            disabled: true,
             iconCls: 'disk-icon',
             handler: function() {
-                var fileRecord = jobFilesGrid.getSelectionModel().getSelection()[0];
+                var files = jobFilesGrid.getSelectionModel().getSelection();
+                if (files.length === 0) {
+                    return;
+                }
+                var fileRecord = files[0];
 
                 var params = {
                     jobId : jobFilesGrid.currentJob.get('id'),
@@ -37,10 +40,12 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         //Action for downloading one or more files in a zip
         this.downloadZipAction = new Ext.Action({
             text: 'Download as Zip',
-            disabled: true,
             iconCls: 'disk-icon',
             handler: function() {
                 var files = jobFilesGrid.getSelectionModel().getSelection();
+                if (files.length === 0) {
+                    return;
+                }
 
                 var fParam = files[0].get('name');
                 for (var i = 1; i < files.length; i++) {
@@ -54,17 +59,17 @@ Ext.define('vegl.widgets.JobFilesPanel', {
             }
         });
 
+        var plugins = config.plugins ? config.plugins : [];
+        plugins.concat({
+            ptype : 'inlinecontextmenu',
+            align : 'left',
+            recordIdProperty: 'name',
+            allowMultipleOpen: false,
+            actions : [this.downloadAction]
+        });
+
         Ext.apply(config, {
-            plugins : [{
-                ptype : 'inlinecontextmenu',
-                align : 'left',
-                actions : [this.downloadAction]
-            },{
-                ptype : 'rowcontextmenu',
-                contextMenu : Ext.create('Ext.menu.Menu', {
-                    items: [this.downloadAction, this.downloadZipAction]
-                })
-            }],
+            plugins : plugins,
             multiSelect : true,
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.models.FileRecord',
@@ -78,12 +83,17 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                     listeners : {
                         exception : function(proxy, response, operation) {
                             responseObj = Ext.JSON.decode(response.responseText);
-                            errorMsg = responseObj.msg;
-                            errorInfo = responseObj.debugInfo;
-                            portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                            if (response.responseObj) {
+                                errorMsg = responseObj.msg;
+                                errorInfo = responseObj.debugInfo;
+                                portal.widgets.window.ErrorWindow.showText('Error', errorMsg, errorInfo);
+                            }
                         }
                     }
-                }
+                },
+                filters: [function(item) {
+                    return !item.isVlUtilityFile(); //Don't display the utility files
+                }]
             }),
             columns: [{ header: 'Filename', width: 200, sortable: true, dataIndex: 'name'},
                       { header: 'Size', width: 100, sortable: true, dataIndex: 'size', renderer: Ext.util.Format.fileSize, align: 'right'}],
@@ -95,8 +105,6 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         });
 
         this.callParent(arguments);
-
-        this.on('selectionchange', this._onSelectionChange, this);
         this.on('celldblclick', this._onDblClick, this);
 
     },
@@ -108,21 +116,6 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         this.downloadAction.execute();
     },
 
-    _onSelectionChange : function(sm) {
-        var totalSelections = this.getSelectionModel().getSelection().length;
-        if (totalSelections === 0) {
-            this.downloadAction.setDisabled(true);
-            this.downloadZipAction.setDisabled(true);
-        } else {
-            if (totalSelections != 1) {
-                this.downloadAction.setDisabled(true);
-            } else {
-                this.downloadAction.setDisabled(false);
-            }
-            this.downloadZipAction.setDisabled(false);
-        }
-    },
-
     /**
      * Reloads this store with all the jobs for the specified series
      */
@@ -130,8 +123,8 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         var store = this.getStore();
         var ajaxProxy = store.getProxy();
         ajaxProxy.extraParams.jobId = job.get('id');
+        ajaxProxy.abort(); //Stop loading any previous job files
         this.currentJob = job;
-        store.removeAll(false);
         store.load();
     },
 

@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.wfs.WFSGetCapabilitiesResponse;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -26,16 +25,17 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 public class TestJobDownloadController extends PortalTestClass {
-    private PortalPropertyPlaceholderConfigurer mockHostConfigurer = context.mock(PortalPropertyPlaceholderConfigurer.class);
     private HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
     private HttpServletResponse mockResponse = context.mock(HttpServletResponse.class);
     private HttpSession mockSession = context.mock(HttpSession.class);
     private SimpleWfsService mockWfsService = context.mock(SimpleWfsService.class);
     private JobDownloadController controller;
+    final String serviceUrl = "http://example.org/service";
 
     @Before
     public void setup() {
-        controller = new JobDownloadController(mockHostConfigurer, mockWfsService);
+
+        controller = new JobDownloadController(mockWfsService, serviceUrl);
     }
 
     @Test
@@ -58,8 +58,6 @@ public class TestJobDownloadController extends PortalTestClass {
         final List<VglDownload> downloads = new ArrayList<VglDownload>();
 
         context.checking(new Expectations() {{
-            oneOf(mockHostConfigurer).resolvePlaceholder("HOST.erddapservice.url");will(returnValue(serviceUrl));
-
             allowing(mockRequest).getSession();will(returnValue(mockSession));
 
             oneOf(mockSession).getAttribute(JobDownloadController.SESSION_DOWNLOAD_LIST);will(returnValue(downloads));
@@ -106,14 +104,11 @@ public class TestJobDownloadController extends PortalTestClass {
         final String name = "name";
         final String description = "desc";
         final String localPath = "localPath";
-        final String serviceUrl = "http://example.org/service";
         final String parentName = "parent data";
         final String parentUrl = "http://example.org/service";
         final String owner = "CoolCompany@cool.com";
         
         context.checking(new Expectations() {{
-            oneOf(mockHostConfigurer).resolvePlaceholder("HOST.erddapservice.url");will(returnValue(serviceUrl));
-
             allowing(mockRequest).getSession();will(returnValue(mockSession));
         }});
 

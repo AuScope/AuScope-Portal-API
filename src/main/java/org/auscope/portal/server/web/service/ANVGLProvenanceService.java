@@ -1,14 +1,26 @@
 package org.auscope.portal.server.web.service;
 
-import au.csiro.promsclient.*;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.server.PortalPropertyPlaceholderConfigurer;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -16,12 +28,18 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
+import au.csiro.promsclient.Activity;
+import au.csiro.promsclient.Entity;
+import au.csiro.promsclient.ExternalReport;
+import au.csiro.promsclient.ProvenanceReporter;
+import au.csiro.promsclient.Report;
+import au.csiro.promsclient.ServiceEntity;
 
 /**
  * Created by Catherine Wise (wis056) on 3/10/2014. Modified by Stuart Woodman
@@ -32,7 +50,6 @@ import java.util.*;
  */
 @Service
 public class ANVGLProvenanceService {
-    public static final String HOST_PROMS_REPORT_URL = "HOST.proms.report.url";
     /** Logger for this class. */
     private static final Log LOGGER = LogFactory.getLog(ANVGLProvenanceService.class);
     /** Default name for the half-baked provenance uploaded to the cloud. */
@@ -43,8 +60,13 @@ public class ANVGLProvenanceService {
     private static final String TURTLE_FORMAT = "TTL";
 
     /* Can be changed in application context */
-    private String promsUrl = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
+    /*
+    private String promsUrl = "http://proms-dev.geoanalytics.csiro.au/id/report/";
     private final String reportingSystemUrl = "http://anvgl.org.au/rs";
+    */
+    private String promsUrl = "http://proms-dev1-vc.it.csiro.au/id/report/";
+    private final String reportingSystemUrl = "http://localhost/reportingsystem/25b174d9-4a32-4cb5-ae7b-c07b04bf6482";
+    
     private URI PROMSService = null;
 
     /**
@@ -76,10 +98,10 @@ public class ANVGLProvenanceService {
     @Autowired
     public ANVGLProvenanceService(final ANVGLFileStagingService anvglFileStagingService,
             final CloudStorageService[] cloudStorageServices,
-            final PortalPropertyPlaceholderConfigurer propertyConfigurer) {
+            @Value("${HOST.proms.report.url}") String promsUrl) {
         this.anvglFileStagingService = anvglFileStagingService;
         this.cloudStorageServices = cloudStorageServices;
-        this.promsUrl = propertyConfigurer.resolvePlaceholder(HOST_PROMS_REPORT_URL);
+        this.promsUrl = promsUrl;
         try {
             this.PROMSService = new URI(promsUrl);
         } catch (URISyntaxException e) {
@@ -97,10 +119,10 @@ public class ANVGLProvenanceService {
      *            should be just about to execute, but not yet have started.
      * @return The TURTLE text.
      */
-    public String createActivity(final VEGLJob job, final Solution solution, ANVGLUser user) {
+    public String createActivity(final VEGLJob job, final Set<Solution> solutions, ANVGLUser user) {
         String jobURL = jobURL(job, serverURL());
         Activity anvglJob = null;
-        Set<Entity> inputs = createEntitiesForInputs(job, solution, user);
+        Set<Entity> inputs = createEntitiesForInputs(job, solutions, user);
         try {
             anvglJob = new Activity().setActivityUri(new URI(jobURL)).setTitle(job.getName())
                     .setDescription(job.getDescription()).setStartedAtTime(new Date())
@@ -203,7 +225,7 @@ public class ANVGLProvenanceService {
      *            The virtual labs job we want to examine the inputs of.
      * @return An array of PROV-O entities. May be empty, but won't be null.
      */
-    public Set<Entity> createEntitiesForInputs(final VEGLJob job, final Solution solution, ANVGLUser user) {
+    public Set<Entity> createEntitiesForInputs(final VEGLJob job, final Set<Solution> solutions, ANVGLUser user) {
         Set<Entity> inputs = new HashSet<>();
         // Downloads first
         try {
@@ -228,7 +250,7 @@ public class ANVGLProvenanceService {
 
             for (CloudFileInformation information : fileInformationSet) {
                 URI inputURI = new URI(outputURL(job, information, serverURL()));
-                LOGGER.debug("New Input: " + inputURI.toString());
+                LOGGER.trace("New Input: " + inputURI.toString());
                 inputs.add(new Entity().setDataUri(inputURI).setWasAttributedTo(new URI(user.getId())));
             }
         } catch (PortalServiceException e) {
@@ -239,34 +261,40 @@ public class ANVGLProvenanceService {
                     ex);
         }
 
-        if (solution != null) {
-            try {
-                URI dataURI = new URI(solution.getUri());
-                inputs.add(new Entity().setWasAttributedTo(new URI(user.getId())).setEntityUri(dataURI)
-                        .setDescription(solution.getDescription()).setCreated(solution.getCreatedAt())
-                        .setTitle(solution.getName()).setMetadataUri(dataURI));
-            } catch (URISyntaxException ex) {
-                LOGGER.error(String.format("Error parsing data source urls %s into URIs.", solution.getUri()), ex);
+        if (solutions != null) {
+            for (Solution solution: solutions) {
+                try {
+                    URI dataURI = new URI(solution.getUri());
+                    inputs.add(new Entity().setWasAttributedTo(new URI(user.getId())).setEntityUri(dataURI)
+                               .setDescription(solution.getDescription()).setCreated(solution.getCreatedAt())
+                               .setTitle(solution.getName()).setMetadataUri(dataURI));
+                } catch (URISyntaxException ex) {
+                    LOGGER.error(String.format("Error parsing data source urls %s into URIs.", solution.getUri()), ex);
+                }
             }
         }
         return inputs;
     }
 
     public void generateAndSaveReport(Activity activity, URI PROMSURI, VEGLJob job) {
-        String server = ANVGLServerURL.INSTANCE.get();
+        //String server = ANVGLServerURL.INSTANCE.get();
         try {
             Report report = new ExternalReport().setActivity(activity).setTitle(job.getName())
                     .setGeneratedAtTime(new Date()).setNativeId(Integer.toString(job.getId()))
                     .setReportingSystemUri(new URI(reportingSystemUrl));
             ProvenanceReporter reporter = new ProvenanceReporter();
-            int resp = reporter.postReport(PROMSURI, report);
+            HttpResponse resp = reporter.postReport(PROMSURI, report);
+            Header[] headers = resp.getHeaders("Link");
+            if(headers.length > 0) {
+                String reportLink = headers[0].getValue();
+                System.out.println("Report link: " + reportLink);
+            }
             this.uploadModel(report.getGraph(), job);
-
             StringWriter stringWriter = new StringWriter();
             report.getGraph().write(new PrintWriter(stringWriter), "TURTLE");
             String reportString = stringWriter.toString();
-            LOGGER.info(reportString);
-            LOGGER.info(resp);
+            LOGGER.trace(reportString);
+            LOGGER.trace(resp);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
@@ -323,7 +351,7 @@ public class ANVGLProvenanceService {
             for (Entity potentialOutput : potentialOutputs) {
                 if (activity.usedEntities != null && !activity.usedEntities.contains(potentialOutput)) {
                     outputs.add(potentialOutput);
-                    LOGGER.debug("Added input from potentials list: " + potentialOutput);
+                    LOGGER.trace("Added input from potentials list: " + potentialOutput);
                 }
             }
             activity.setGeneratedEntities(outputs);

@@ -31,7 +31,6 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
     private VGLJobStatusAndLogReader jobStatusLogReader;
     private ANVGLProvenanceService anvglProvenanceService;
 
-
     public VGLJobStatusChangeHandler(VEGLJobManager jobManager,
             JobMailSender jobMailSender, VGLJobStatusAndLogReader jobStatusLogReader,
             ANVGLProvenanceService anvglProvenanceService) {
@@ -46,25 +45,34 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
         if (!newStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
             VEGLJob vglJob = (VEGLJob)job;
             vglJob.setProcessDate(new Date());
-            this.setProcessDuration(vglJob,newStatus);
+            try {
+                this.setProcessDuration(vglJob,newStatus);
+            } catch (Throwable ex) {
+                LOG.debug("Unable to set process duration for" + job, ex);
+            }
             vglJob.setStatus(newStatus);
             jobManager.saveJob(vglJob);
             jobManager.createJobAuditTrail(oldStatus, vglJob, "Job status updated.");
             //VT: only status done we email here. Any error notification are mailed not by polling but
             //when the job has it status set to error;
-            if ((newStatus.equals(JobBuilderController.STATUS_DONE) && vglJob.getEmailNotification()) || newStatus.equals(JobBuilderController.STATUS_ERROR)) {
+            if ((newStatus.equals(JobBuilderController.STATUS_DONE) && vglJob.getEmailNotification()) ||
+                    newStatus.equals(JobBuilderController.STATUS_ERROR) ||
+                    newStatus.equals(JobBuilderController.STATUS_WALLTIME_EXCEEDED)) {
                 jobMailSender.sendMail(vglJob);
                 LOG.trace("Job completion email notification sent. Job id: " + vglJob.getId());
             }
             // Provenance
-            anvglProvenanceService.createEntitiesForOutputs(vglJob);
+            if(newStatus.equals(JobBuilderController.STATUS_DONE))
+                anvglProvenanceService.createEntitiesForOutputs(vglJob);
         }
     }
 
 
 
     public void setProcessDuration(VEGLJob job,String newStatus){
-        if (newStatus.equals(JobBuilderController.STATUS_DONE) || newStatus.equals(JobBuilderController.STATUS_ERROR)){
+        if (newStatus.equals(JobBuilderController.STATUS_DONE) ||
+                newStatus.equals(JobBuilderController.STATUS_ERROR) ||
+                newStatus.equals(JobBuilderController.STATUS_WALLTIME_EXCEEDED)){
             String time = this.jobStatusLogReader.getSectionedLog(job, "Time");
             job.setProcessTimeLog(time);
         }

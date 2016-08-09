@@ -28,8 +28,10 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
             autoLoad : true,
             filters : [
                 function(item) {
-                    //These two files should not be copyable
-                    return item.get('name') !== 'vl.sh.log' && item.get('name') !== 'workflow-version.txt';
+                    //These three files should not be copyable
+                    return item.get('name') !== 'vl.sh.log' &&
+                           item.get('name') !== 'workflow-version.txt' &&
+                           item.get('name') !== 'vl.end';
                 }
             ],
             proxy : {
@@ -42,6 +44,14 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
                     type : 'json',
                     rootProperty : 'data'
                 }
+            },
+            listeners: {
+                load: Ext.bind(function(store, records) {
+                    var rec = store.findRecord('name', 'vl_script.py');
+                    if (rec) {
+                        this.fileGrid.getSelectionModel().select([rec]);
+                    }
+                }, this)
             }
         });
 
@@ -86,8 +96,8 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
         this.updateFileList();
     },
 
-    deleteJobWithId : function(id) {      
-        
+    deleteJobWithId : function(id) {
+
         Ext.getBody().mask('Removing duplicate job...');
 
         //Tell the backend to remove duplicate job
@@ -124,8 +134,8 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
         for (var i = 0; i < selectedFiles.length; i++) {
             filesToDuplicate.push(selectedFiles[i].get('name'));
         }
-        var jobId = this.wizardState.duplicateJobId;        
-        
+        var jobId = this.wizardState.duplicateJobId;
+
         Ext.getBody().mask('Duplicating Job...');
 
         //Tell the backend to duplicate
@@ -144,6 +154,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
                     if (responseObj.success && Ext.isNumber(responseObj.data[0].id)) {
                         this.wizardState.jobId = responseObj.data[0].id;
                         this.wizardState.seriesId = responseObj.data[0].seriesId;
+                        this.wizardState.solutionId = responseObj.data[0].solutionId;
                         callback(true);
                         return;
                     }
