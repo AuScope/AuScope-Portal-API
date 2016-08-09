@@ -11,6 +11,7 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.client.methods.HttpRequestBase;
+import org.auscope.portal.core.server.http.HttpClientResponse;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.test.ByteBufferedServletOutputStream;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -91,7 +92,7 @@ public class TestDownloadController extends PortalTestClass {
 
                 // calling the service
                 oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
-                    will(returnValue(new MyHttpResponse(dummyJSONResponseIS)));
+                    will(returnValue(new HttpClientResponse(new MyHttpResponse(dummyJSONResponseIS), null)));
             }
         });
 
@@ -147,9 +148,9 @@ public class TestDownloadController extends PortalTestClass {
 
                 // calling the service
                 oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
-                will(returnValue(new MyHttpResponse(dummyJSONResponseIS)));
+                will(returnValue(new HttpClientResponse(new MyHttpResponse(dummyJSONResponseIS), null)));
                 oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
-                will(delayReturnValue(300,new MyHttpResponse(dummyJSONResponseNoMsgIS)));
+                will(delayReturnValue(300, new HttpClientResponse(new MyHttpResponse(dummyJSONResponseNoMsgIS), null)));
             }
         });
 
@@ -208,7 +209,7 @@ public class TestDownloadController extends PortalTestClass {
                 oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
                 will(throwException(new Exception("Exception test")));
                 oneOf(httpServiceCaller).getMethodResponseAsHttpResponse(with(any(HttpRequestBase.class)));
-                will(delayReturnValue(100,new MyHttpResponse(dummyJSONResponseIS2)));
+                will(delayReturnValue(100,new HttpClientResponse(new MyHttpResponse(dummyJSONResponseIS2), null)));
             }
         });
 
