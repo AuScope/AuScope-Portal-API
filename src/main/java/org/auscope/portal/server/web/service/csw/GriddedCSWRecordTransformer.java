@@ -2,6 +2,7 @@ package org.auscope.portal.server.web.service.csw;
 
 import javax.xml.xpath.XPathExpressionException;
 
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.core.services.responses.csw.CSWRecordTransformer;
 import org.w3c.dom.Node;
@@ -14,7 +15,7 @@ import org.w3c.dom.NodeList;
  */
 public class GriddedCSWRecordTransformer extends CSWRecordTransformer {
 
-    public GriddedCSWRecordTransformer() throws Exception {
+    public GriddedCSWRecordTransformer() throws PortalServiceException {
         super();
     }
     
