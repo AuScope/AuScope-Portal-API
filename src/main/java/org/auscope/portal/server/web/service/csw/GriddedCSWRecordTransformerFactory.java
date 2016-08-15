@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.service.csw;
 
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.responses.csw.CSWRecordTransformer;
 import org.auscope.portal.core.services.responses.csw.CSWRecordTransformerFactory;
 import org.w3c.dom.Node;
@@ -21,9 +22,10 @@ public class GriddedCSWRecordTransformerFactory extends
      * Creates a new instance of GriddedCSWRecordTransformer and generates an empty document that will be
      * used for constructing DOM.
      * @return
+     * @throws PortalServiceException 
      */
     @Override
-    public CSWRecordTransformer newCSWRecordTransformer() throws Exception {
+    public CSWRecordTransformer newCSWRecordTransformer() throws PortalServiceException  {
         return new GriddedCSWRecordTransformer();
     }
 }
