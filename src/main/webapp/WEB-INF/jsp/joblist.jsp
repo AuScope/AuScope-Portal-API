@@ -73,6 +73,7 @@
     <script type="text/javascript" src="js/vegl/preview/LogPreview.js"></script>
     <script type="text/javascript" src="js/vegl/preview/PlainTextPreview.js"></script>
     <script type="text/javascript" src="js/vegl/preview/ImagePreview.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/PROMSPreview.js"></script>
     <script type="text/javascript" src="js/vegl/preview/FilePreviewPanel.js"></script>
 
     <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
