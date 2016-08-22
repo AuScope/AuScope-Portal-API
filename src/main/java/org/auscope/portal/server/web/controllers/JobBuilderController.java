@@ -1091,7 +1091,7 @@ public class JobBuilderController extends BaseCloudController {
             Object[] filteredTypes = Arrays.stream(allTypes).filter(new Predicate<ComputeType>() {
                 @Override
                 public boolean test(ComputeType t) {
-                    return t.getId().startsWith("c3") || t.getId().startsWith("m3");
+                    return t.getId().startsWith("c4") || t.getId().startsWith("m4") || t.getId().startsWith("x1");
                 }
             }).toArray();
 
