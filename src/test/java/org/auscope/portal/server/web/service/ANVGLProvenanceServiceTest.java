@@ -167,7 +167,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             will(returnValue(response));
         }});
         
-        anvglProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, "http://mockurl");
+        anvglProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, "http://mockurl", "http://mockreportingsystemuri");
         anvglProvenanceService.setServerURL(serverURL);
     }
 

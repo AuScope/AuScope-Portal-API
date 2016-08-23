@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusChangeListener;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -66,8 +67,13 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
                 LOG.trace("Job completion email notification sent. Job id: " + vglJob.getId());
             }
             // Provenance
-            if(newStatus.equals(JobBuilderController.STATUS_DONE))
-                anvglProvenanceService.createEntitiesForOutputs(vglJob);
+            if(newStatus.equals(JobBuilderController.STATUS_DONE)) {
+                String reportUrl = anvglProvenanceService.createEntitiesForOutputs(vglJob);
+                if(!reportUrl.equals("")) {
+                    vglJob.setPromsReportUrl(reportUrl);
+                    jobManager.saveJob(vglJob);
+                }
+            }
         }
     }
 

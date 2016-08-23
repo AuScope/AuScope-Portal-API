@@ -23,6 +23,7 @@ CREATE TABLE `jobs` (
   `storageBucket` varchar(64) DEFAULT NULL,
   `walltime` int(11) DEFAULT NULL,
   `executeDate` datetime DEFAULT NULL,
+  `promsReportUrl` varchar(255) DEFAULT NULL,
   `folderId` int(11) DEFAULT NULL,
   `containsPersistentVolumes` char(1) DEFAULT 'N',
   PRIMARY KEY (`id`),
