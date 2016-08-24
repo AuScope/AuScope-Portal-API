@@ -124,7 +124,7 @@ computeEndTime=`date +%s`
 echo "#### Python end ####"
 
 echo "#### Execute start ####"
-echo $computeStartTime
+echo `date +%d/%m/%YT%H:%M:%S`
 echo "#### Execute end ####"
 
 echo "#### Time start ####"
