@@ -123,9 +123,9 @@ python $VL_SCRIPT_PATH
 computeEndTime=`date +%s`
 echo "#### Python end ####"
 
-echo "#### ExecuteDate start ####"
-echo computeStartTime
-echo "#### ExecuteDate end ####"
+echo "#### Execute start ####"
+echo $computeStartTime
+echo "#### Execute end ####"
 
 echo "#### Time start ####"
 totalComputeTime=`expr $computeEndTime - $computeStartTime`
