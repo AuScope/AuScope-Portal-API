@@ -1,5 +1,7 @@
 package org.auscope.portal.server.web.service.monitor;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -51,6 +53,8 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
                 LOG.debug("Unable to set process duration for" + job, ex);
             }
             vglJob.setStatus(newStatus);
+            // Execution time, only accurate to 5 minutes and may not be set\
+            // for short jobs so will be set later from the job log 
             if(newStatus.equals(JobBuilderController.STATUS_PENDING) ||
                     newStatus.equals(JobBuilderController.STATUS_ACTIVE))
                 vglJob.setExecuteDate(new Date());
@@ -65,9 +69,24 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
                 jobMailSender.sendMail(vglJob);
                 LOG.trace("Job completion email notification sent. Job id: " + vglJob.getId());
             }
-            // Provenance
-            if(newStatus.equals(JobBuilderController.STATUS_DONE))
+            // Job successfully completed
+            if(newStatus.equals(JobBuilderController.STATUS_DONE)) {
+                // Get job execution date/time from log
+                String execDateLog = jobStatusLogReader.getSectionedLog(vglJob,  "Execute");
+                if(execDateLog != null) {
+                    execDateLog = execDateLog.trim();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy'T'hh:mm:ss");
+                    try {
+                        Date d = formatter.parse(execDateLog);
+                        vglJob.setExecuteDate(d);
+                        jobManager.saveJob(vglJob);
+                    } catch(ParseException pe) {
+                        LOG.warn("Unable to read job execution date from log file");
+                    }
+                }
+                // Provenance
                 anvglProvenanceService.createEntitiesForOutputs(vglJob);
+            }
         }
     }
 

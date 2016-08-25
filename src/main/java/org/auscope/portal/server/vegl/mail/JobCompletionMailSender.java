@@ -221,10 +221,11 @@ public class JobCompletionMailSender implements JobMailSender {
             processDate=new Date();
         }
         
+        // If execution date failed to set revert to submission date
         if(job.getExecuteDate()!=null){
             executeDate=job.getExecuteDate();
         }else{
-            executeDate=new Date();
+            executeDate= job.getSubmitDate();
         }
 
         long[] diff = DateUtil.getTimeDifference(executeDate, processDate);
