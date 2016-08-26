@@ -301,6 +301,7 @@ public class ANVGLProvenanceService {
      * @param job
      *            Completed virtual labs job, about which we will finish our
      *            provenance gathering.
+     * @return the URL of the PROMS report if successful, empty String otherwise
      */
     public String createEntitiesForOutputs(final VEGLJob job) {
         Set<Entity> outputs = new HashSet<>();
