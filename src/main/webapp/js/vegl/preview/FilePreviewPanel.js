@@ -28,7 +28,7 @@ Ext.define('vegl.preview.FilePreviewPanel', {
             Ext.create('vegl.preview.LogPreview', {itemId: 'log'}),
             Ext.create('vegl.preview.PlainTextPreview', {itemId: 'plaintext'}),
             Ext.create('vegl.preview.ImagePreview', {itemId: 'image'}),
-            Ext.create('vegl.preview.PROMSPreview', {itemId: 'proms'})
+            Ext.create('vegl.preview.TTLPreview', {itemId: 'ttl'})
         ];
 
 

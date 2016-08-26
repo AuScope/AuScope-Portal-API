@@ -54,7 +54,7 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
                 LOG.debug("Unable to set process duration for" + job, ex);
             }
             vglJob.setStatus(newStatus);
-            // Execution time, only accurate to 5 minutes and may not be set\
+            // Execution time, only accurate to 5 minutes and may not be set
             // for short jobs so will be set later from the job log 
             if(newStatus.equals(JobBuilderController.STATUS_PENDING) ||
                     newStatus.equals(JobBuilderController.STATUS_ACTIVE))

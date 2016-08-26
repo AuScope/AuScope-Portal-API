@@ -150,7 +150,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
             this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'log');
             break;
         case 'ttl':
-        	this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'proms');
+        	this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'ttl');
         	break;
         default:
             this.down('#logs').clearPreview();
