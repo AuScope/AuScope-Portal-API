@@ -123,6 +123,10 @@ python $VL_SCRIPT_PATH
 computeEndTime=`date +%s`
 echo "#### Python end ####"
 
+echo "#### Execute start ####"
+echo `date +%d/%m/%YT%H:%M:%S`
+echo "#### Execute end ####"
+
 echo "#### Time start ####"
 totalComputeTime=`expr $computeEndTime - $computeStartTime`
 totalDownloadTime=`expr $downloadEndTime - $downloadStartTime`
