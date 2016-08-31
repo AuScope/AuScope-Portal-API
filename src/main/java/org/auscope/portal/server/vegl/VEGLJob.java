@@ -1,6 +1,7 @@
 package org.auscope.portal.server.vegl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,9 @@ public class VEGLJob extends CloudJob implements Cloneable {
      */
     private Integer walltime;
     private boolean containsPersistentVolumes;
+    
+    /** Time when the job executes as opposed to when the job was submitted **/
+    private Date executeDate;
 
     /** A map of VglParameter objects keyed by their parameter names*/
     private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
@@ -86,6 +90,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param vmSubsetFilePath The File path (on the VM) where the job should look for its input subset file
      * @param vmSubsetUrl The URL of the actual input subset file
      * @param walltime The walltime (in minutes) for the job
+     * @param executeDate The date of execution for this job
      */
     public VEGLJob(Integer id) {
         super(id);
@@ -268,6 +273,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setUser(this.getUser());
         newJob.setStorageBucket(this.getStorageBucket());
         newJob.setWalltime(this.getWalltime());
+        newJob.setExecuteDate(this.getExecuteDate());
         newJob.setContainsPersistentVolumes(this.isContainsPersistentVolumes());
 
         List<VglDownload> newDownloads = new ArrayList<VglDownload>();
@@ -329,6 +335,17 @@ public class VEGLJob extends CloudJob implements Cloneable {
      */
     public void setWalltime(Integer walltime) {
         this.walltime = walltime;
+    }
+
+    /**
+     * @return The date of job execution
+     */
+    public Date getExecuteDate() {
+        return executeDate;
+    }
+
+    public void setExecuteDate(Date executeDate) {
+        this.executeDate = executeDate;
     }
 
     @Override

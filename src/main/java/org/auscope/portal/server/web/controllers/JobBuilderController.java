@@ -926,6 +926,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setName("VL-Job " + new Date().toString());
         job.setDescription("");
         job.setStatus(STATUS_UNSUBMITTED);
+        job.setSubmitDate(new Date());
 
         //Transfer the 'session downloads' into actual download objects associated with a job
         @SuppressWarnings("unchecked")

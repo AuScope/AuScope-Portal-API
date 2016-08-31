@@ -21,7 +21,7 @@ Ext.define('vegl.preview.PlainTextPreview', {
     /**
      * Reloads this store with all the jobs for the specified series
      */
-    preview : function(job, fileName, size) {
+    preview : function(job, fileName, size, hash) {
         if (this.currentRequest != null) {
             Ext.Ajax.abort(this.currentRequest);
             this.currentRequest = null;
