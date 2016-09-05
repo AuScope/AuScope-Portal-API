@@ -368,5 +368,4 @@ public class VEGLJob extends CloudJob implements Cloneable {
                 + description + "]";
     }
 
-
 }
