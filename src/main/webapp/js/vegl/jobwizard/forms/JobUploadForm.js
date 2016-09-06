@@ -80,7 +80,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                     align : 'right',
                     scope: this,
                     handler: function() {
-                        this._doPopup('vegl.widgets.JobInputFileCopyWindow', 920, 400);
+                        this._doPopup('vegl.widgets.JobInputFileCopyWindow', 870, 400);
                     }
                 },{
                     text: 'Remote Download',

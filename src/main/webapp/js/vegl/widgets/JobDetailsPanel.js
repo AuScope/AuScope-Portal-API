@@ -111,9 +111,16 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     align: 'stretch'
                 },
                 items: [{
-                    xtype: 'jobfilespanel',
+                    xtype: 'jobinputfilespanel',
                     itemId: 'files',
-                    width: 310,
+                    fileGroupName: 'Files in cloud storage',
+                    remoteGroupName: 'Data service downloads',
+                    hideDeleteButton: true,
+                    hideRowExpander: true,
+                    hideLocationColumn: true,
+                    nameColumnWidth: 150,
+                    emptyText: '<p class="centeredlabel">This job doesn\'t have any input files or service downloads configured.</p>',
+                    width: 350,
                     listeners: {
                         select: Ext.bind(this._onFileSelect, this)
                     }
@@ -131,28 +138,34 @@ Ext.define('vegl.widgets.DetailsPanel', {
     },
 
     _onFileSelect: function(grid, record, index) {
-        var fileName = record.get('name');
-        var parts = fileName.split('.');
-        var extension = parts[parts.length - 1];
+        if (record.get('source') instanceof vegl.models.FileRecord) {
+            var fileRecord = record.get('source');
+            var fileName = fileRecord.get('name');
+            var parts = fileName.split('.');
+            var extension = parts[parts.length - 1];
 
-        switch(extension) {
-        case 'png':
-        case 'jpeg':
-        case 'jpg':
-            this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'image');
-            break;
-        case 'txt':
-        case 'py':
-        case 'sh':
-        case 'ttl':
-            this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'plaintext');
-            break;
-        case 'log':
-            this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'log');
-            break;
-        default:
-            this.down('#logs').clearPreview();
-            break;
+            switch(extension) {
+            case 'png':
+            case 'jpeg':
+            case 'jpg':
+                this.down('#logs').preview(this.job, fileName, fileRecord.get('size'), fileRecord.get('fileHash'), 'image');
+                break;
+            case 'txt':
+            case 'py':
+            case 'sh':
+            case 'ttl':
+                this.down('#logs').preview(this.job, fileName, fileRecord.get('size'), fileRecord.get('fileHash'), 'plaintext');
+                break;
+            case 'log':
+                this.down('#logs').preview(this.job, fileName, fileRecord.get('size'), fileRecord.get('fileHash'), 'log');
+                break;
+            default:
+                this.down('#logs').clearPreview();
+                break;
+            }
+        } else {
+            var download = record.get('source');
+            this.down('#logs').preview(this.job, download, undefined, undefined, 'dataservice');
         }
     },
 

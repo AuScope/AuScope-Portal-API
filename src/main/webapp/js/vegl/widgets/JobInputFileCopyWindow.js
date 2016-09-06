@@ -56,10 +56,11 @@ Ext.define('vegl.widgets.JobInputFileCopyWindow', {
                     xtype: 'splitter'
                 },{
                     xtype: 'jobinputfilespanel',
-                    width: 450,
+                    width: 400,
                     currentJobId: this.jobId,
                     fileGroupName: 'Files in cloud storage',
                     remoteGroupName: 'Data service downloads',
+                    nameColumnWidth: 150,
                     hideDeleteButton: true,
                     hideRowExpander: true,
                     hideLocationColumn: true,

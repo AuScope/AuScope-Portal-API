@@ -18,6 +18,9 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
      * hideRowExpander: Boolean - Whether to hide the row expander column
      * hideLocationColumn: Boolean - Whether to hide the Location column
      * hideDetailsColumn: Boolean - Whether to hide the Details column
+     *
+     * nameColumnWidth: Number - defaults to 200
+     * detailsColumnWidth: Number - defaults to 200
      * emptyText: String - empty text to show
      *
      * Adds the following events:
@@ -34,6 +37,8 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
         this.hideLocationColumn = !!config.hideLocationColumn;
         this.hideDetailsColumn = !!config.hideDetailsColumn;
         this.hideDeleteButton = !!config.hideDeleteButton;
+        this.nameColumnWidth = Ext.isNumber(config.nameColumnWidth) ? config.nameColumnWidth : 200;
+        this.detailsColumnWidth = Ext.isNumber(config.detailsColumnWidth) ? config.detailsColumnWidth : 200;
 
         // while creating a job the jobId is not available at this stage
         this.currentJobId = config.currentJob ? config.currentJob.get("id") : config.currentJobId;
@@ -124,7 +129,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             columns: [{
                 header: 'Name',
                 flex: this.hideDetailsColumn ? 1 : undefined,
-                width: this.hideDetailsColumn ? undefined : 200,
+                width: this.hideDetailsColumn ? undefined : this.nameColumnWidth,
                 sortable: true,
                 dataIndex: 'name'
             },
@@ -132,7 +137,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             {
                 header: 'Details',
                 flex: this.hideDetailsColumn ? undefined : 1,
-                width: this.hideDetailsColumn ? 200 : undefined,
+                width: this.hideDetailsColumn ? this.detailsColumnWidth : undefined,
                 dataIndex: 'details',
                 hidden: this.hideDetailsColumn
             }],
