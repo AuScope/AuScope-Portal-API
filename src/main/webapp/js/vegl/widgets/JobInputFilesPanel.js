@@ -10,6 +10,16 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
     /**
      * A Ext.grid.Panel specialisation for rendering the Jobs available to the current user.
+     *
+     * Adds the following config
+     * fileGroupName: String - the name of the group for files in storage/staging
+     * remoteGroupName:  String - the name of the group for remote web service downloads
+     * hideDeleteButton: Boolean - Whether to hide access to the delete button
+     * hideRowExpander: Boolean - Whether to hide the row expander column
+     * hideLocationColumn: Boolean - Whether to hide the Location column
+     * hideDetailsColumn: Boolean - Whether to hide the Details column
+     * emptyText: String - empty text to show
+     *
      * Adds the following events:
      * selectjob : function(vegl.widgets.SeriesPanel panel, vegl.models.Job selection) - fires whenever a new Job is selected
      * @constructs
@@ -17,6 +27,13 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
      */
     constructor : function(config) {
         var jobFilesGrid = this;
+
+        this.fileGroupName = config.fileGroupName ? config.fileGroupName : 'Your Uploaded Files';
+        this.remoteGroupName = config.remoteGroupName ? config.remoteGroupName : 'Remote Web Service Downloads';
+        this.hideRowExpander = !!config.hideRowExpander;
+        this.hideLocationColumn = !!config.hideLocationColumn;
+        this.hideDetailsColumn = !!config.hideDetailsColumn;
+        this.hideDeleteButton = !!config.hideDeleteButton;
 
         // while creating a job the jobId is not available at this stage
         this.currentJobId = config.currentJob ? config.currentJob.get("id") : config.currentJobId;
@@ -47,6 +64,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
         this.deleteAction = new Ext.Action({
             text: 'Delete this input.',
             disabled: true,
+            hidden: this.hideDeleteButton,
             iconCls: 'cross-icon',
             scope : this,
             handler: function() {
@@ -75,32 +93,49 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             }
         });
 
-        Ext.apply(config, {
-            viewConfig : {
-                emptyText : '<p class="centeredlabel">This job doesn\'t have any input files or service downloads configured. You can add some by using the add button below or by selecting a dataset from the <a href="gmap.html">main page</a>.</p>'
-            },
-            features : [Ext.create('Ext.grid.feature.Grouping',{
-                groupHeaderTpl: '{name} ({[values.rows.length]} {[values.rows.length > 1 ? "Items" : "Item"]})'
-            })],
-            plugins : [{
+        var plugins = [{
+            ptype : 'rowcontextmenu',
+            contextMenu : Ext.create('Ext.menu.Menu', {
+                 items: [this.downloadAction, this.deleteAction]
+            })
+        }];
+        if (!this.hideRowExpander) {
+            plugins.push({
                 ptype: 'rowexpander',
                 rowBodyTpl : [
                     '<p>{description}</p><br>'
                 ]
-            },{
-                ptype : 'rowcontextmenu',
-                contextMenu : Ext.create('Ext.menu.Menu', {
-                     items: [this.downloadAction, this.deleteAction]
-                })
-            }],
+            });
+        }
+
+        Ext.apply(config, {
+            viewConfig : {
+                emptyText : Ext.isEmpty(config.emptyText) ? '<p class="centeredlabel">This job doesn\'t have any input files or service downloads configured. You can add some by using the add button below or by selecting a dataset from the <a href="gmap.html">main page</a>.</p>' : config.emptyText
+            },
+            features : [Ext.create('Ext.grid.feature.Grouping',{
+                groupHeaderTpl: '{name} ({[values.rows.length]} {[values.rows.length > 1 ? "Items" : "Item"]})'
+            })],
+            plugins : plugins,
             store : Ext.create('Ext.data.Store', {
                 model : 'vegl.widgets.JobInputFilesPanel.Item',
                 groupField : 'group',
                 data : []
             }),
-            columns: [{ header: 'Name', width: 200, sortable: true, dataIndex: 'name'},
-                      { header: 'Location', width: 200, dataIndex: 'localPath'},
-                      { header: 'Details', flex : 1, dataIndex: 'details'}],
+            columns: [{
+                header: 'Name',
+                flex: this.hideDetailsColumn ? 1 : undefined,
+                width: this.hideDetailsColumn ? undefined : 200,
+                sortable: true,
+                dataIndex: 'name'
+            },
+            { header: 'Location', width: 200, dataIndex: 'localPath', hidden: this.hideLocationColumn},
+            {
+                header: 'Details',
+                flex: this.hideDetailsColumn ? undefined : 1,
+                width: this.hideDetailsColumn ? 200 : undefined,
+                dataIndex: 'details',
+                hidden: this.hideDetailsColumn
+            }],
               tbar: [{
                   text: 'Actions',
                   iconCls: 'folder-icon',
@@ -205,7 +240,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
                 details : Ext.util.Format.fileSize(fr.get('size')),
                 localPath : 'Local directory',
                 source: fr,
-                group : 'Your Uploaded Files'
+                group : this.fileGroupName
             }));
         }
 
@@ -221,7 +256,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
                 details : Ext.util.Format.format('Service call to <a href="{1}" target="_blank">{0}</a>.', hostName, dl.get('url')),
                 localPath : dl.get('localPath'),
                 source: dl,
-                group : 'Remote Web Service Downloads'
+                group : this.remoteGroupName
             }));
         }
 
@@ -267,8 +302,8 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
      * @param {object} job
      */
     listFilesForJob : function(job) {
-        this.currentJob = job;
-        this._updateStore();
+        this.currentJobId = job.get('id');
+        this.updateFileStore();
     }
 });
 
