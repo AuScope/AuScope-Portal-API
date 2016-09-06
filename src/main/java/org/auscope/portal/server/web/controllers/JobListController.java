@@ -48,8 +48,8 @@ import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -151,7 +151,7 @@ public class JobListController extends BaseCloudController  {
      * @return The VEGLJob object on success or null otherwise.
      */
     private VEGLJob attemptGetJob(Integer jobId, ANVGLUser user) {
-        logger.info("Getting job with ID " + jobId);
+        logger.debug("Getting job with ID " + jobId);
 
         VEGLJob job = null;
 
@@ -547,7 +547,7 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @AuthenticationPrincipal ANVGLUser user) {
-        logger.info("Getting job files for job ID " + jobId);
+        logger.debug("Getting job files for job ID " + jobId);
 
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -562,7 +562,7 @@ public class JobListController extends BaseCloudController  {
                 return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
             } else {
                 fileDetails = cloudStorageService.listJobFiles(job);
-                logger.info(fileDetails.length + " job files located");
+                logger.debug(fileDetails.length + " job files located");
             }
         } catch (Exception e) {
             logger.warn("Error fetching output directory information.", e);
@@ -1172,7 +1172,7 @@ public class JobListController extends BaseCloudController  {
 
         ModelMap namedSections = null;
         try {
-            namedSections = (ModelMap)jobStatusLogReader.getSectionedLogs(job, file == null ? VL_LOG_FILE : file);
+            namedSections = jobStatusLogReader.getSectionedLogs(job, file == null ? VL_LOG_FILE : file);
         } catch (PortalServiceException ex) {
             return generateJSONResponseMAV(false, null, ex.getMessage());
         }
