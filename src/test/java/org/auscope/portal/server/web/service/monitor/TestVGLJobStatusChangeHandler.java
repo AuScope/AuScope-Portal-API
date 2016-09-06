@@ -62,15 +62,18 @@ public class TestVGLJobStatusChangeHandler extends PortalTestClass {
         final String oldStatus = JobBuilderController.STATUS_PENDING;
         final String newStatus = JobBuilderController.STATUS_DONE;
         final String timeLog = "Time is 10";
+        final String executeDateLog = "01/01/2016T10:30:00";
 
         context.checking(new Expectations() {{
             allowing(mockJob).getId();will(returnValue(jobId));
             oneOf(mockJob).getEmailNotification();will(returnValue(false));
             oneOf(mockJob).setProcessDate(with(any(Date.class)));
+            oneOf(mockJob).setExecuteDate(with(any(Date.class)));
             oneOf(mockVGLJobStatusAndLogReader).getSectionedLog(mockJob, "Time");will(returnValue(timeLog));
+            oneOf(mockVGLJobStatusAndLogReader).getSectionedLog(mockJob, "Execute");will(returnValue(executeDateLog));
             oneOf(mockJob).setProcessTimeLog(timeLog);
             oneOf(mockJob).setStatus(newStatus);
-            oneOf(mockJobManager).saveJob(mockJob);
+            allowing(mockJobManager).saveJob(mockJob);
             oneOf(mockJobManager).createJobAuditTrail(oldStatus, mockJob, "Job status updated.");
             oneOf(mockANVGLProvenanceService).createEntitiesForOutputs(mockJob);will(returnValue(""));
         }});
@@ -88,15 +91,18 @@ public class TestVGLJobStatusChangeHandler extends PortalTestClass {
         final String oldStatus = JobBuilderController.STATUS_PENDING;
         final String newStatus = JobBuilderController.STATUS_DONE;
         final String timeLog = "Time is 10";
+        final String executeDateLog = "01/01/2016T10:30:00";
 
         context.checking(new Expectations() {{
             allowing(mockJob).getId();will(returnValue(jobId));
             oneOf(mockJob).getEmailNotification();will(returnValue(true));
             oneOf(mockJob).setProcessDate(with(any(Date.class)));
+            oneOf(mockJob).setExecuteDate(with(any(Date.class)));
             oneOf(mockVGLJobStatusAndLogReader).getSectionedLog(mockJob, "Time");will(returnValue(timeLog));
+            oneOf(mockVGLJobStatusAndLogReader).getSectionedLog(mockJob, "Execute");will(returnValue(executeDateLog));
             oneOf(mockJob).setProcessTimeLog(timeLog);
             oneOf(mockJob).setStatus(newStatus);
-            oneOf(mockJobManager).saveJob(mockJob);
+            allowing(mockJobManager).saveJob(mockJob);
             oneOf(mockJobManager).createJobAuditTrail(oldStatus, mockJob, "Job status updated.");
             oneOf(mockJobMailSender).sendMail(mockJob);
             

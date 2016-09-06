@@ -114,6 +114,11 @@ echo "About to execute ${SUBSET_REQUEST_PATH} as a shell script"
 sh $SUBSET_REQUEST_PATH
 cd $WORKING_DIR
 
+# Capture the job execution start time
+echo "#### Execute start ####"
+echo `date +%d/%m/%YT%H:%M:%S`
+echo "#### Execute end ####"
+
 #Next we can perform our actual work (make sure we indicate where the python logs start/finish)
 chmod +x "$VL_SCRIPT_PATH"
 echo "About to execute ${VL_SCRIPT_PATH} as a python script"
