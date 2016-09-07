@@ -106,7 +106,7 @@ Ext.define('vegl.preview.LogPreview', {
                                     doc.close();
                                     doc.body.setAttribute('style', 'white-space:pre;font-family:monospace;');
 
-                                    doc.body.scrollTo(0, 999999);
+                                    iframe.dom.contentWindow.scrollTo(0, 999999);
                                 }
                             }
                         }]
