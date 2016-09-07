@@ -15,23 +15,26 @@ Ext.define('vegl.preview.DataServicePreview', {
 
         Ext.apply(config, {
             autoScroll: true,
+            border: false,
+            bodyPadding: '10',
             layout: {
                 type: 'vbox',
                 align: 'stretch',
                 pack: 'start'
             },
             items: [{
-                xtype: 'label',
-                itemId: 'title'
-            },{
-                xtype: 'textfield',
-                itemId: 'url',
-                fieldLabel: 'Full URL',
-                readOnly: true
+                xtype: 'displayfield',
+                itemId: 'title',
+                margin: '0 0 10 0',
+                hideLabel: true,
+                fieldStyle: {
+                    'font-size': '16px',
+                    'text-align': 'left'
+                }
             },{
                 xtype: 'panel',
                 itemId: 'map-container',
-                title: 'Spatial Bounds',
+                title: 'Request Spatial Bounds',
                 flex: 1,
                 html: '<div id="' + this.mapContainerId + '" class="smallmap" style="width:100%; height:100%"></div>'
             }]
@@ -64,6 +67,12 @@ Ext.define('vegl.preview.DataServicePreview', {
             this._renderMap();
         }
 
+        //To be consistent with other preview implementations
+        this.job = job;
+        this.fileName = download;
+        this.size = null;
+        this.hash = null;
+
         var bounds = new OpenLayers.Bounds(download.get('westBoundLongitude'), download.get('southBoundLatitude'), download.get('eastBoundLongitude'), download.get('northBoundLatitude'));
         var box = new OpenLayers.Feature.Vector(bounds.toGeometry());
         this.boxesLayer.removeAllFeatures();
@@ -71,11 +80,9 @@ Ext.define('vegl.preview.DataServicePreview', {
         this.map.zoomToExtent(bounds, true);
         this.map.zoomOut();
 
-        this.down('#url').setValue(download.get('url'));
-
         var hostNameMatches = /.*:\/\/(.*?)\//g.exec(download.get('url'));
         var hostName = (hostNameMatches && hostNameMatches.length >= 2) ? hostNameMatches[1] : download.get('url');
-        this.down('#title').setText(Ext.util.Format.format('Service call to {0}', hostName));
+        this.down('#title').setValue(Ext.util.Format.format('Remote service call to <b><a href="{1}" target="_blank">{0}</a></b>', hostName, download.get('url')));
     },
 
     isRefreshRequired: function(callback) {
