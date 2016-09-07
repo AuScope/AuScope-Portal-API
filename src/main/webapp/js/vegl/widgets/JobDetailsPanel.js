@@ -104,7 +104,6 @@ Ext.define('vegl.widgets.DetailsPanel', {
                 margin: '10 0 0 0',
                 padding: '5',
                 flex: 1,
-                style: 'text-align:center;',
                 layout: {
                     type: 'hbox',
                     pack: 'center',
