@@ -18,6 +18,8 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
@@ -58,8 +60,13 @@ public class ANVGLProvenanceService {
     private static final String TURTLE_FORMAT = "TTL";
 
     /* Can be changed in application context */
-    private String promsUrl = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
+    /*
+    private String promsUrl = "http://proms-dev.geoanalytics.csiro.au/id/report/";
     private final String reportingSystemUrl = "http://anvgl.org.au/rs";
+    */
+    private String promsUrl = "http://proms-dev1-vc.it.csiro.au/id/report/";
+    private final String reportingSystemUrl = "http://localhost/reportingsystem/25b174d9-4a32-4cb5-ae7b-c07b04bf6482";
+    
     private URI PROMSService = null;
 
     /**
@@ -270,15 +277,19 @@ public class ANVGLProvenanceService {
     }
 
     public void generateAndSaveReport(Activity activity, URI PROMSURI, VEGLJob job) {
-        String server = ANVGLServerURL.INSTANCE.get();
+        //String server = ANVGLServerURL.INSTANCE.get();
         try {
             Report report = new ExternalReport().setActivity(activity).setTitle(job.getName())
                     .setGeneratedAtTime(new Date()).setNativeId(Integer.toString(job.getId()))
                     .setReportingSystemUri(new URI(reportingSystemUrl));
             ProvenanceReporter reporter = new ProvenanceReporter();
-            int resp = reporter.postReport(PROMSURI, report);
+            HttpResponse resp = reporter.postReport(PROMSURI, report);
+            Header[] headers = resp.getHeaders("Link");
+            if(headers.length > 0) {
+                String reportLink = headers[0].getValue();
+                System.out.println("Report link: " + reportLink);
+            }
             this.uploadModel(report.getGraph(), job);
-
             StringWriter stringWriter = new StringWriter();
             report.getGraph().write(new PrintWriter(stringWriter), "TURTLE");
             String reportString = stringWriter.toString();

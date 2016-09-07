@@ -36,6 +36,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
     private VEGLJob mockJob;
     private Date dateSubmitted = null;
     private Date dateProcessed = null;
+    private Date dateExecuted = null;
 
     @Before
     public void init() throws Exception {
@@ -56,9 +57,11 @@ public class TestJobCompletionMailSender extends PortalTestClass {
 
         //Global test variables to be used in all unit tests.
         Calendar cal1 = new GregorianCalendar(2013, 2, 5, 12, 00, 00);
-        Calendar cal2 = new GregorianCalendar(2013, 2, 5, 12, 00, 45);
+        Calendar cal2 = new GregorianCalendar(2013, 2, 5, 12, 00, 10);
+        Calendar cal3 = new GregorianCalendar(2013, 2, 5, 12, 00, 55);
         dateSubmitted = cal1.getTime();
-        dateProcessed = cal2.getTime();
+        dateExecuted = cal2.getTime();
+        dateProcessed = cal3.getTime();
 
         //Create object under test with mock objects and set its required property fields.
         jobCompMailSender = new JobCompletionMailSender(mockJobManager, mockJobStatLogReader, mockMailSender, velocityEngine);
@@ -96,6 +99,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
 
         context.checking(new Expectations() {{
             allowing(mockJob).getSubmitDate();will(returnValue(dateSubmitted));
+            allowing(mockJob).getExecuteDate();will(returnValue(dateExecuted));
             allowing(mockJob).getProcessDate();will(returnValue(dateProcessed));
             allowing(mockJob).getStatus();will(returnValue(jobStatus));
             allowing(mockJob).getUser();will(returnValue(user));
@@ -146,6 +150,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
 
             //The following expectations are for invoking constructMailContent method.
             allowing(mockJob).getSubmitDate();will(returnValue(dateSubmitted));
+            allowing(mockJob).getExecuteDate();will(returnValue(dateExecuted));
             allowing(mockJob).getProcessDate();will(returnValue(dateProcessed));
             allowing(mockJob).getUser();will(returnValue(user));
             allowing(mockJob).getStatus();will(returnValue(jobStatus));
@@ -189,6 +194,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
 
             //The following expectations are for invoking constructMailContent method.
             allowing(mockJob).getSubmitDate();will(returnValue(dateSubmitted));
+            allowing(mockJob).getExecuteDate();will(returnValue(dateExecuted));
             allowing(mockJob).getProcessDate();will(returnValue(dateProcessed));
             allowing(mockJob).getUser();will(returnValue(user));
             allowing(mockJob).getStatus();will(returnValue(jobStatus));
