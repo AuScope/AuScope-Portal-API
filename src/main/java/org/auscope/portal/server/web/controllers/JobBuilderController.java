@@ -182,8 +182,8 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a files attribute which is an array of
      *         filenames.
      */
-    @RequestMapping("/secure/listJobFiles.do")
-    public ModelAndView listJobFiles(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
+    @RequestMapping("/secure/stagedJobFiles.do")
+    public ModelAndView stagedJobFiles(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
 
         //Lookup our job
         VEGLJob job = null;
@@ -442,7 +442,7 @@ public class JobBuilderController extends BaseCloudController {
                 job = jobManager.getJobById(id, user);
             }
         } catch (AccessDeniedException e) {
-            throw e;  
+            throw e;
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
@@ -526,7 +526,7 @@ public class JobBuilderController extends BaseCloudController {
         try {
             job = jobManager.getJobById(id, user);
         } catch (AccessDeniedException e) {
-            throw e;  
+            throw e;
         } catch (Exception ex) {
             logger.error(String.format("Error creating/fetching job with id %1$s", id), ex);
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
@@ -585,7 +585,7 @@ public class JobBuilderController extends BaseCloudController {
         try {
             job = jobManager.getJobById(id, user);
         } catch (AccessDeniedException e) {
-          throw e;  
+          throw e;
         } catch (Exception ex) {
             logger.error("Error looking up job with id " + id + " :" + ex.getMessage());
             logger.debug("Exception:", ex);
@@ -1123,8 +1123,8 @@ public class JobBuilderController extends BaseCloudController {
             jobCCSIds = scmEntryService.getJobProviders(jobId, user);
         } catch (AccessDeniedException e) {
             throw e;
-        }   
-        
+        }
+
         List<ModelMap> simpleComputeServices = new ArrayList<ModelMap>();
 
         for (CloudComputeService ccs : cloudComputeServices) {
@@ -1204,7 +1204,7 @@ public class JobBuilderController extends BaseCloudController {
 
         return generateJSONResponseMAV(true, allInputs, "");
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
     public @ResponseBody String handleException(AccessDeniedException e) {

@@ -81,7 +81,6 @@
 
     <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
-    <script type="text/javascript" src="js/vegl/widgets/JobInputFilesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileCopyWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileRemoteWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileUploadWindow.js"></script>

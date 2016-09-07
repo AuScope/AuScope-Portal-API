@@ -110,10 +110,11 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     align: 'stretch'
                 },
                 items: [{
-                    xtype: 'jobinputfilespanel',
+                    xtype: 'jobfilespanel',
                     itemId: 'files',
                     fileGroupName: 'Files in cloud storage',
                     remoteGroupName: 'Data service downloads',
+                    fileLookupUrl: 'secure/jobCloudFiles.do',
                     hideDeleteButton: true,
                     hideRowExpander: true,
                     hideLocationColumn: true,

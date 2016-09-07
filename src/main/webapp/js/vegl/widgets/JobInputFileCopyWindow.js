@@ -46,18 +46,19 @@ Ext.define('vegl.widgets.JobInputFileCopyWindow', {
                     listeners: {
                         selectjob : Ext.bind(function(panel, job) {
                             if (job == null) {
-                                this.down('jobinputfilespanel').cleanupDataStore();
+                                this.down('jobfilespanel').cleanupDataStore();
                             } else {
-                                this.down('jobinputfilespanel').listFilesForJob(job);
+                                this.down('jobfilespanel').listFilesForJob(job);
                             }
                         }, this)
                     }
                 },{
                     xtype: 'splitter'
                 },{
-                    xtype: 'jobinputfilespanel',
+                    xtype: 'jobfilespanel',
                     width: 400,
                     currentJobId: this.jobId,
+                    fileLookupUrl: 'secure/jobCloudFiles.do',
                     fileGroupName: 'Files in cloud storage',
                     remoteGroupName: 'Data service downloads',
                     nameColumnWidth: 150,
@@ -122,7 +123,7 @@ Ext.define('vegl.widgets.JobInputFileCopyWindow', {
      */
     addJobFile : function(filePanel) {
         var selectedJobs = this.down('jobstree').getSelection();
-        var selectedItems = this.down('jobinputfilespanel').getSelection();
+        var selectedItems = this.down('jobfilespanel').getSelection();
 
 
         if (Ext.isEmpty(selectedJobs) || Ext.isEmpty(selectedItems)) {

@@ -36,7 +36,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
             ],
             proxy : {
                 type : 'ajax',
-                url : 'secure/jobFiles.do',
+                url : 'secure/jobCloudFiles.do',
                 extraParams : {
                     jobId : wizardState.jobId
                 },

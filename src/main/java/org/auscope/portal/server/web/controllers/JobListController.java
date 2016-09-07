@@ -543,8 +543,8 @@ public class JobListController extends BaseCloudController  {
      *         manager the JSON object will contain an error attribute
      *         indicating the error.
      */
-    @RequestMapping("/secure/jobFiles.do")
-    public ModelAndView jobFiles(HttpServletRequest request,
+    @RequestMapping("/secure/jobCloudFiles.do")
+    public ModelAndView jobCloudFiles(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @AuthenticationPrincipal ANVGLUser user) {

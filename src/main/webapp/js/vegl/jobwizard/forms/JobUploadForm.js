@@ -68,7 +68,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                     }
             },
             items: [{
-                xtype : 'jobinputfilespanel',
+                xtype : 'jobfilespanel',
                 itemId : 'files-panel',
                 currentJobId : wizardState.jobId,
                 title: 'Input files',

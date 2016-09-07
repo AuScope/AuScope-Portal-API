@@ -1,8 +1,8 @@
-Ext.define('vegl.widgets.JobInputFilesPanel', {
-    /** @lends anvgl.JobBuilder.JobInputFilesPanel */
+Ext.define('vegl.widgets.JobFilesPanel', {
+    /** @lends anvgl.JobBuilder.JobFilesPanel */
 
     extend : 'Ext.grid.Panel',
-    alias : 'widget.jobinputfilespanel',
+    alias : 'widget.jobfilespanel',
 
     currentJobId : null,
     downloadAction : null,
@@ -12,6 +12,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
      * A Ext.grid.Panel specialisation for rendering the Jobs available to the current user.
      *
      * Adds the following config
+     * fileLookupUrl: String - The URL where job files will be requested from - defaults to secure/stagedJobFiles.do
      * fileGroupName: String - the name of the group for files in storage/staging
      * remoteGroupName:  String - the name of the group for remote web service downloads
      * hideDeleteButton: Boolean - Whether to hide access to the delete button
@@ -31,6 +32,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
     constructor : function(config) {
         var jobFilesGrid = this;
 
+        this.fileLookupUrl = Ext.isEmpty(config.fileLookupUrl) ? 'secure/stagedJobFiles.do' : config.fileLookupUrl
         this.fileGroupName = config.fileGroupName ? config.fileGroupName : 'Your Uploaded Files';
         this.remoteGroupName = config.remoteGroupName ? config.remoteGroupName : 'Remote Web Service Downloads';
         this.hideRowExpander = !!config.hideRowExpander;
@@ -45,7 +47,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
         //Action for downloading a single file
         this.downloadAction = new Ext.Action({
-            text: 'Download this input to your machine.',
+            text: 'Download this file to your machine.',
             disabled: true,
             iconCls: 'disk-icon',
             scope : this,
@@ -122,7 +124,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             })],
             plugins : plugins,
             store : Ext.create('Ext.data.Store', {
-                model : 'vegl.widgets.JobInputFilesPanel.Item',
+                model : 'vegl.widgets.JobFilesPanel.Item',
                 groupField : 'group',
                 data : []
             }),
@@ -173,7 +175,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
         loadMask.show();
 
         Ext.Ajax.request({
-            url : 'secure/listJobFiles.do',
+            url : this.fileLookupUrl,
             params : {
                 jobId : this.currentJobId
             },
@@ -238,7 +240,11 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 
         for (var i = 0; i < fileRecords.length; i++) {
             var fr = fileRecords[i];
-            dsData.push(Ext.create('vegl.widgets.JobInputFilesPanel.Item', {
+            if (fr.isVlUtilityFile()) {
+                continue;
+            }
+
+            dsData.push(Ext.create('vegl.widgets.JobFilesPanel.Item', {
                 id : 'fr-' + fr.get('name'),
                 name : fr.get('name'),
                 description : 'This file will be made available to the job upon startup. It will be put in the same working directory as the job script.',
@@ -254,7 +260,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
             var hostNameMatches = /.*:\/\/(.*?)\//g.exec(dl.get('url'));
             var hostName = (hostNameMatches && hostNameMatches.length >= 2) ? hostNameMatches[1] : dl.get('url');
 
-            dsData.push(Ext.create('vegl.widgets.JobInputFilesPanel.Item', {
+            dsData.push(Ext.create('vegl.widgets.JobFilesPanel.Item', {
                 id : 'dl-' + dl.get('id'),
                 name : dl.get('name'),
                 description : dl.get('description'),
@@ -315,7 +321,7 @@ Ext.define('vegl.widgets.JobInputFilesPanel', {
 /**
  * Represents a generic model for containing Download or File objects.
  */
-Ext.define('vegl.widgets.JobInputFilesPanel.Item', {
+Ext.define('vegl.widgets.JobFilesPanel.Item', {
     extend: 'Ext.data.Model',
 
     fields: [
