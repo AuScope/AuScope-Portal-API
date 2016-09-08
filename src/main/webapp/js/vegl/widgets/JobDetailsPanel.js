@@ -114,7 +114,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     itemId: 'files',
                     fileGroupName: 'Files in cloud storage',
                     remoteGroupName: 'Data service downloads',
-                    fileLookupUrl: 'secure/jobCloudFiles.do',
+                    cloudFiles: true,
                     hideDeleteButton: true,
                     hideRowExpander: true,
                     hideLocationColumn: true,

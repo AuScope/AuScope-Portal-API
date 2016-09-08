@@ -12,6 +12,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
      * A Ext.grid.Panel specialisation for rendering the Jobs available to the current user.
      *
      * Adds the following config
+     * cloudFiles: Boolean - default false - If true, files will be sourced from cloud. If false, files will be sourced from local staging.
      * fileLookupUrl: String - The URL where job files will be requested from - defaults to secure/stagedJobFiles.do
      * fileGroupName: String - the name of the group for files in storage/staging
      * remoteGroupName:  String - the name of the group for remote web service downloads
@@ -32,7 +33,9 @@ Ext.define('vegl.widgets.JobFilesPanel', {
     constructor : function(config) {
         var jobFilesGrid = this;
 
-        this.fileLookupUrl = Ext.isEmpty(config.fileLookupUrl) ? 'secure/stagedJobFiles.do' : config.fileLookupUrl
+        this.fileLookupUrl = !!config.cloudFiles ? 'secure/jobCloudFiles.do' : 'secure/stagedJobFiles.do';
+        this.fileDownloadUrl = !!config.cloudFiles ? 'secure/downloadFile.do' : 'secure/downloadInputFile.do';
+
         this.fileGroupName = config.fileGroupName ? config.fileGroupName : 'Your Uploaded Files';
         this.remoteGroupName = config.remoteGroupName ? config.remoteGroupName : 'Remote Web Service Downloads';
         this.hideRowExpander = !!config.hideRowExpander;
@@ -57,10 +60,11 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                 if (source instanceof vegl.models.FileRecord) {
                     var params = {
                         jobId : this.currentJobId,
-                        filename : source.get('name')
+                        filename : source.get('name'),
+                        key: source.get('name')
                     };
 
-                    portal.util.FileDownloader.downloadFile("secure/downloadInputFile.do", params);
+                    portal.util.FileDownloader.downloadFile(this.fileDownloadUrl, params);
                 } else if (source instanceof vegl.models.Download) {
                     portal.util.FileDownloader.downloadFile(source.get('url'));
                 }

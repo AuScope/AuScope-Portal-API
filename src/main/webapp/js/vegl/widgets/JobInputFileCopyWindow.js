@@ -58,7 +58,7 @@ Ext.define('vegl.widgets.JobInputFileCopyWindow', {
                     xtype: 'jobfilespanel',
                     width: 400,
                     currentJobId: this.jobId,
-                    fileLookupUrl: 'secure/jobCloudFiles.do',
+                    cloudFiles: true,
                     fileGroupName: 'Files in cloud storage',
                     remoteGroupName: 'Data service downloads',
                     nameColumnWidth: 150,
