@@ -39,10 +39,10 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test
     public void testSaveScript() throws Exception {
-        final String script = "#a pretend script\n";
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
+        String script = "#a pretend script\n";
+        Integer jobId = 123;
+        ANVGLUser user = new ANVGLUser();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId, user);
@@ -63,9 +63,9 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test(expected=PortalServiceException.class)
     public void testSaveScript_JobNotFoundException() throws Exception {
-        final Integer jobId = 123;
-        final String script = "#a pretend script\n";
-        final ANVGLUser user = new ANVGLUser();
+        Integer jobId = 123;
+        String script = "#a pretend script\n";
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId, user);
@@ -77,9 +77,9 @@ public class TestScriptBuilderService extends PortalTestClass {
 
     @Test(expected=PortalServiceException.class)
     public void testSaveScript_Exception() throws Exception {
-        final String script = "#a pretend script\n";
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
+        String script = "#a pretend script\n";
+        Integer jobId = 123;
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {
             {
@@ -100,9 +100,9 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test
     public void testLoadScript() throws Exception {
-        final String script = "#a pretend script\n";
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
+        String script = "#a pretend script\n";
+        Integer jobId = 123;
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId, user);
@@ -121,8 +121,8 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test
     public void testLoadEmptyScript() throws Exception {
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
+        Integer jobId = 123;
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId, user);
@@ -141,8 +141,8 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test(expected=PortalServiceException.class)
     public void testLoadScriptError() throws Exception {
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
+        Integer jobId = 123;
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(jobId, user);
@@ -157,12 +157,11 @@ public class TestScriptBuilderService extends PortalTestClass {
 
     /**
      * Tests templating on a valid template string
-     * @throws Exception
      */
     @Test
-    public void testTemplating() throws Exception {
-        final String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
-        final Map<String, Object> values = new HashMap<String, Object>();
+    public void testTemplating() {
+        String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
+        Map<String, Object> values = new HashMap<>();
         values.put("dog-amount", 2);
         values.put("cat-amount", "3");
         values.put("bird-amount", 4);
@@ -174,12 +173,11 @@ public class TestScriptBuilderService extends PortalTestClass {
 
     /**
      * Tests templating on an invalid template string
-     * @throws Exception
      */
     @Test
-    public void testTemplating_BadTemplate() throws Exception {
-        final String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
-        final Map<String, Object> values = new HashMap<String, Object>();
+    public void testTemplating_BadTemplate() {
+        String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
+        Map<String, Object> values = new HashMap<>();
         values.put("dog-amount", 2);
         values.put("bird-amount", 4);
 

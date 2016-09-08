@@ -232,7 +232,7 @@ public class JobCompletionMailSender implements JobMailSender {
         String timeElapsed = diff[0] + " day(s) " + diff[1] + " hour(s) "
                 + diff[2] + " minute(s) " + diff[3] + " second(s)";
 
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("userName", job.getUser().substring(0,job.getUser().indexOf("@")));
         model.put("status", job.getStatus());
         model.put("jobId", job.getId().toString());

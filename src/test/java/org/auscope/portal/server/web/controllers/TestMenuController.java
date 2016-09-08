@@ -32,6 +32,7 @@ public class TestMenuController extends PortalTestClass {
     @Before
     public void setup() {
         mc = new MenuController(gMapKey, gAnalyticsKey);
+        mc.setBuildStamp("FFFF");
 
         //Global expectations for setting build stamp id
         context.checking(new Expectations() {{

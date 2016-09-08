@@ -83,9 +83,9 @@ public class Solution extends Entry {
         // Only fetch the toolbox detail if we haven't already
         if (this.toolbox.getSource() == null) {
             RestTemplate rest = new RestTemplate();
-            Toolbox toolbox = rest.getForObject(this.toolbox.getUri(),
+            Toolbox tb = rest.getForObject(this.toolbox.getUri(),
                                                 Toolbox.class);
-            setToolbox(toolbox);
+            setToolbox(tb);
         }
     }
 

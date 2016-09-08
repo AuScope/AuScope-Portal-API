@@ -118,9 +118,7 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 //        final HttpSession mockSession = context.mock(HttpSession.class);
 
-        context.checking(new Expectations() {{
-
-        }});
+        context.checking(new Expectations());
 
         ModelAndView mav = controller.getUserSignature(mockRequest, null);
         Assert.assertNotNull(mav);
@@ -231,10 +229,9 @@ public class TestGeonetworkController {
 
     /**
      * Tests that the insertRecord function correctly fails when the job object DNE.
-     * @throws Exception
      */
     @Test
-    public void testInsertRecordJobDNE() throws Exception {
+    public void testInsertRecordJobDNE() {
         final Integer jobId = 1235;
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 
@@ -250,10 +247,9 @@ public class TestGeonetworkController {
 
     /**
      * Tests that the insertRecord function correctly fails when the job series DNE
-     * @throws Exception
      */
     @Test
-    public void testInsertRecordSeriesDNE() throws Exception {
+    public void testInsertRecordSeriesDNE() {
         final Integer jobId = 1235;
         final Integer seriesId = 5432;
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);

@@ -8,20 +8,20 @@ import org.springframework.stereotype.Service;
 
 /**
  * Contains a number of administrative functions specific to the VL Portal
- *
+ * TODO: CF 12/07/2016: This class does nothing. Check if still required.
  * @author Josh Vote
  */
 @Service
 public class VglAdminService extends AdminService {
 
     /** The compute service for running images*/
-    private CloudComputeService[] cloudComputeServices;
+//    private CloudComputeService[] cloudComputeServices;
     /** Used for looking up some config (this service is dependent on some configuration options */
 
     @Autowired
     public VglAdminService(HttpServiceCaller serviceCaller, CloudComputeService[] cloudComputeServices) {
         super(serviceCaller);
-        this.cloudComputeServices = cloudComputeServices;
+//        this.cloudComputeServices = cloudComputeServices;
     }
 
     /**

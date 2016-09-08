@@ -148,6 +148,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      * Using the services internal to the class, determine the current status of this job. Service failure
      * will return the underlying job status
      */
+    @Override
     public String getJobStatus(CloudJob cloudJob) {
 
         String stsArn = cloudJob.getProperty(CloudJob.PROPERTY_STS_ARN);
@@ -236,7 +237,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         return expectedStatus;
     }
 
-    private boolean containsFile(CloudFileInformation[] files, String fileName) {
+    private static boolean containsFile(CloudFileInformation[] files, String fileName) {
         if (files == null) {
             return false;
         }

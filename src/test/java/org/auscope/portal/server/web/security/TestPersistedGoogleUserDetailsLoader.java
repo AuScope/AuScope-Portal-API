@@ -12,13 +12,12 @@ public class TestPersistedGoogleUserDetailsLoader extends PortalTestClass {
 
     /**
      * Throwaway test to ensure that we get slightly random results (i.e. - noone completely stuffed the implementation) that are valid from Amazon's point of view.
-     * @throws Exception
      */
     @Test
-    public void testValidBucketNameGeneration() throws Exception{
+    public void testValidBucketNameGeneration(){
         final int ITERATION_COUNT = 10000;
 
-        HashSet<String> previousNames = new HashSet<String>(ITERATION_COUNT);
+        HashSet<String> previousNames = new HashSet<>(ITERATION_COUNT);
         for (int i = 0; i < ITERATION_COUNT; i++) {
             String bucketName = loader.generateRandomBucketName();
 
