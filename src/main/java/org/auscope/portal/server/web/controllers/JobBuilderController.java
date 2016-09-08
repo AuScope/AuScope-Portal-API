@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Predicate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -1085,18 +1084,9 @@ public class JobBuilderController extends BaseCloudController {
                 //Grab the compute types that are compatible with our disk
                 //requirements
                 allTypes = ccs.getAvailableComputeTypes(null, null, selectedImage.getMinimumDiskGB());
-
             }
 
-            //Filter further due to AWS HVM/PVM compatiblity. See ANVGL-16
-            Object[] filteredTypes = Arrays.stream(allTypes).filter(new Predicate<ComputeType>() {
-                @Override
-                public boolean test(ComputeType t) {
-                    return t.getId().startsWith("c3") || t.getId().startsWith("m3");
-                }
-            }).toArray();
-
-            return generateJSONResponseMAV(true, filteredTypes, "");
+            return generateJSONResponseMAV(true, allTypes, "");
         } catch (Exception ex) {
             log.error("Unable to access compute type list:" + ex.getMessage(), ex);
             return generateJSONResponseMAV(false);
