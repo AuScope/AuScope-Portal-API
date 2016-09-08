@@ -66,7 +66,8 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
 
         this.editor = Ext.create('vegl.widgets.CodeEditorField',{
             mode      : 'python',
-            name      : 'scriptcodefield'
+            name      : 'scriptcodefield',
+            readOnly  : true
         });
 
         var editorPanel =  Ext.create('Ext.form.FormPanel', {
@@ -141,6 +142,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
 
             //Once we have the script text - ask the user what they want to do with it
             if (status === ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_SUCCESS) {
+                me.editor.setReadOnly(false);
                 //If there's nothing in the window - just put text in there and
                 //reset solution set to the single solution.
                 if (me.getScript().length === 0) {
