@@ -55,7 +55,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
      */
     loadSavedScript : function(jobId) {
         // mask body
-        Ext.getBody().mask('Loading saved script...');
+        Ext.getBody().mask('Loading saved script...').setStyle('z-index', '99999');
 
         // fetch the script associated
         try {
