@@ -16,7 +16,6 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
-import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,7 +35,6 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
     private CloudStorageService[] mockCloudStorageServices;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader jobStatLogReader;
-    private ANVGLFileStagingService mockFileStagingService;
 
     @Before
     public void init() {
@@ -345,24 +343,32 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
      */
     @Test
     public void testGetSectionedLogs() throws Exception {
-        final InputStream logContents = ResourceUtil.loadResourceAsStream("sectionedVglLog.txt");
-        final String logContentString = IOUtils.toString(ResourceUtil.loadResourceAsStream("sectionedVglLog.txt"));
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        try (final InputStream logContents = ResourceUtil.loadResourceAsStream("sectionedVglLog.txt")) {
+            final String logContentString = IOUtils.toString(ResourceUtil.loadResourceAsStream("sectionedVglLog.txt"));
+            final VEGLJob mockJob = context.mock(VEGLJob.class);
 
-        context.checking(new Expectations() {{
-            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VL_LOG_FILE);will(returnValue(logContents));
-        }});
+            context.checking(new Expectations() {
+                {
+                    allowing(mockJob).getStorageServiceId();
+                    will(returnValue(storageServiceId));
+                    allowing(mockCloudStorageServices[0]).getId();
+                    will(returnValue(storageServiceId));
+                    oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VL_LOG_FILE);
+                    will(returnValue(logContents));
+                }
+            });
 
-        ModelMap map = jobStatLogReader.getSectionedLogs(mockJob);
+            ModelMap map = jobStatLogReader.getSectionedLogs(mockJob);
 
-        //There should be 3 sections (we don't care about line ending formats - normalise it to unix style \n)
-        Assert.assertEquals(4, map.keySet().size());
-        Assert.assertEquals("contents of env\n", stripCarriageReturns(map.get("environment").toString()));
-        Assert.assertEquals("multiple\nlines\n", stripCarriageReturns(map.get("test").toString()));
-        Assert.assertEquals("text\n", stripCarriageReturns(map.get("spaced header").toString()));
-        Assert.assertEquals(stripCarriageReturns(logContentString), stripCarriageReturns(map.get("Full").toString()));
+            // There should be 3 sections (we don't care about line ending
+            // formats - normalise it to unix style \n)
+            Assert.assertEquals(4, map.keySet().size());
+            Assert.assertEquals("contents of env\n", stripCarriageReturns(map.get("environment").toString()));
+            Assert.assertEquals("multiple\nlines\n", stripCarriageReturns(map.get("test").toString()));
+            Assert.assertEquals("text\n", stripCarriageReturns(map.get("spaced header").toString()));
+            Assert.assertEquals(stripCarriageReturns(logContentString),
+                    stripCarriageReturns(map.get("Full").toString()));
+        }
     }
 
     /**
@@ -370,7 +376,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
      * @throws Exception
      */
     @Test
-    public void testGetSectionedLogs_NoStorageService() throws Exception {
+    public void testGetSectionedLogs_NoStorageService() {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
@@ -459,17 +465,23 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
      */
     @Test
     public void testGetSectionedLogs_WithSectionName() throws Exception {
-        final InputStream logContents = ResourceUtil.loadResourceAsStream("sectionedVglLog.txt");
-        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        try (final InputStream logContents = ResourceUtil.loadResourceAsStream("sectionedVglLog.txt")) {
+            final VEGLJob mockJob = context.mock(VEGLJob.class);
 
-        context.checking(new Expectations() {{
-            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VL_LOG_FILE);will(returnValue(logContents));
-        }});
+            context.checking(new Expectations() {
+                {
+                    allowing(mockJob).getStorageServiceId();
+                    will(returnValue(storageServiceId));
+                    allowing(mockCloudStorageServices[0]).getId();
+                    will(returnValue(storageServiceId));
+                    allowing(mockCloudStorageServices[0]).getJobFile(mockJob, JobListController.VL_LOG_FILE);
+                    will(returnValue(logContents));
+                }
+            });
 
-        String result = jobStatLogReader.getSectionedLog(mockJob, "environment");
-        Assert.assertEquals("contents of env\n", stripCarriageReturns(result));
+            String result = jobStatLogReader.getSectionedLog(mockJob, "environment");
+            Assert.assertEquals("contents of env\n", stripCarriageReturns(result));
+        }
     }
 
     /**
@@ -495,7 +507,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         Assert.assertNull(result);
     }
 
-    private String stripCarriageReturns(String s) {
+    private static String stripCarriageReturns(String s) {
         return s.replaceAll("\r", "");
     }
 }

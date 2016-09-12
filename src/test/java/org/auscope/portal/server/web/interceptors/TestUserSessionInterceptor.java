@@ -68,17 +68,22 @@ public class TestUserSessionInterceptor extends PortalTestClass {
      */
     @Test
     public void testPreHandle_UserSessionExpired() throws Exception {
-        final PrintWriter pw = new PrintWriter(new ByteArrayOutputStream());
+        try (final PrintWriter pw = new PrintWriter(new ByteArrayOutputStream())) {
 
-        context.checking(new Expectations() {{
-            allowing(mockRequest).getUserPrincipal(); will(returnValue(null));
-            allowing(mockRequest).getAttribute(with(any(String.class)));will(returnValue(null));
-            allowing(mockResponse).setContentType(with(any(String.class)));
-            allowing(mockResponse).getWriter();will(returnValue(pw));
-        }});
+            context.checking(new Expectations() {
+                {
+                    allowing(mockRequest).getUserPrincipal();
+                    will(returnValue(null));
+                    allowing(mockRequest).getAttribute(with(any(String.class)));
+                    will(returnValue(null));
+                    allowing(mockResponse).setContentType(with(any(String.class)));
+                    allowing(mockResponse).getWriter();
+                    will(returnValue(pw));
+                }
+            });
 
-
-        boolean result = testInterceptor.preHandle(mockRequest, mockResponse, null);
-        Assert.assertFalse(result);
+            boolean result = testInterceptor.preHandle(mockRequest, mockResponse, null);
+            Assert.assertFalse(result);
+        }
     }
 }

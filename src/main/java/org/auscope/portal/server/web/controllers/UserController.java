@@ -152,7 +152,7 @@ public class UserController extends BasePortalController {
             return;
         }
 
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("s3Bucket", user.getS3Bucket());
         model.put("awsSecret", user.getAwsSecret());
         model.put("awsAccount", awsAccount);

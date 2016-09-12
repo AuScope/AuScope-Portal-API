@@ -12,8 +12,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BaseCSWController;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
@@ -47,7 +45,6 @@ public class WMSController extends BaseCSWController {
     // ----------------------------------------------------- Instance variables
 
     private WMSService wmsService;
-    private final Log log = LogFactory.getLog(getClass());
 
     // ----------------------------------------------------------- Constructors
 
@@ -65,18 +62,16 @@ public class WMSController extends BaseCSWController {
      * creates JSON response for the WMS layers list in the portal
      *
      * @return a JSON representation of the CSWRecord equivalent records
-     *
-     * @throws Exception
      */
     @RequestMapping("/getCustomLayers.do")
-    public ModelAndView getCustomLayers(@RequestParam("service_URL") String serviceUrl) throws Exception {
+    public ModelAndView getCustomLayers(@RequestParam("service_URL") String serviceUrl) {
 
         CSWRecord[] records;
         int invalidLayerCount = 0;
         try {
             GetCapabilitiesRecord capabilitiesRec = wmsService.getWmsCapabilities(serviceUrl,null);
 
-            List<CSWRecord> cswRecords = new ArrayList<CSWRecord>();
+            List<CSWRecord> cswRecords = new ArrayList<>();
 
             if (capabilitiesRec != null) {
                 //Make a best effort of parsing a WMS into a CSWRecord
@@ -163,11 +158,11 @@ public class WMSController extends BaseCSWController {
      * @param serviceUrl The WMS URL to query
      */
     @RequestMapping("/getLayerFormats.do")
-    public ModelAndView getLayerFormats(@RequestParam("serviceUrl") String serviceUrl) throws Exception {
+    public ModelAndView getLayerFormats(@RequestParam("serviceUrl") String serviceUrl) {
         try {
             GetCapabilitiesRecord capabilitiesRec = wmsService.getWmsCapabilities(serviceUrl,null);
 
-            List<ModelMap> data = new ArrayList<ModelMap>();
+            List<ModelMap> data = new ArrayList<>();
             for (String format : capabilitiesRec.getGetMapFormats()) {
                 ModelMap formatItem = new ModelMap();
                 formatItem.put("format", format);

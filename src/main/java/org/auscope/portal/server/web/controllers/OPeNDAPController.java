@@ -6,11 +6,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.methodmakers.OPeNDAPGetDataMethodMaker.OPeNDAPFormat;
@@ -24,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 
 /**
  * A controller for marshaling requests for an arbitrary OPeNDAP resource.
@@ -32,10 +30,6 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class OPeNDAPController extends BasePortalController {
-
-    /** The log. */
-    private final Log log = LogFactory.getLog(getClass());
-
     /** The opendap service. */
     private OpendapService opendapService;
 
@@ -75,11 +69,10 @@ public class OPeNDAPController extends BasePortalController {
      * @param opendapUrl The remote service URL to query
      * @param variableName the variable name
      * @return the variables
-     * @throws Exception the exception
      */
     @RequestMapping("/opendapGetVariables.do")
     public ModelAndView getVariables(@RequestParam("opendapUrl") final String opendapUrl,
-                                     @RequestParam(required=false, value="variableName") final String variableName) throws Exception {
+                                     @RequestParam(required=false, value="variableName") final String variableName) {
 
         //Attempt to parse our response
         try {
@@ -129,8 +122,6 @@ public class OPeNDAPController extends BasePortalController {
             constraints = ViewVariableFactory.fromJSONArray(obj.getJSONArray("constraints"));
         }
 
-
-
         //Make our request, push the contents to the outputstream (as a zipfile)
         response.setContentType("application/zip");
         response.setHeader("Content-Disposition", "inline; filename=OPeNDAPDownload.zip;");
@@ -150,9 +141,7 @@ public class OPeNDAPController extends BasePortalController {
             if (dataStream != null) {
                 dataStream.close();
             }
-            if (zout != null) {
-                zout.close();
-            }
+            zout.close();
         }
     }
 }
