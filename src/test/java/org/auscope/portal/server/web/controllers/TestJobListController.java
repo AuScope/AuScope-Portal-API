@@ -166,13 +166,13 @@ public class TestJobListController extends PortalTestClass {
             allowing(queueMockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_INQUEUE));
             allowing(queueMockJobs.get(0)).getId();will(returnValue(5555));
             allowing(queueMockJobs.get(1)).getId();will(returnValue(jobId));
-            
+
             allowing(queueMockJobs.get(0)).isWalltimeSet(); will(returnValue(false));
             allowing(queueMockJobs.get(1)).isWalltimeSet(); will(returnValue(false));
 
             allowing(queueMockJobs.get(0)).getWalltime();will(returnValue(null));
             allowing(queueMockJobs.get(1)).getWalltime();will(returnValue(null));
-            
+
             oneOf(queueMockJobs.get(1)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
             oneOf(queueMockJobManager).saveJob(queueMockJobs.get(1));
             oneOf(queueMockJobManager).createJobAuditTrail(JobBuilderController.STATUS_INQUEUE, queueMockJobs.get(1), "Job cancelled by user.");
@@ -691,7 +691,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(fileDetails));
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertSame(fileDetails, mav.getModel().get("data"));
     }
@@ -714,7 +714,7 @@ public class TestJobListController extends PortalTestClass {
 
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -733,7 +733,7 @@ public class TestJobListController extends PortalTestClass {
 
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -758,7 +758,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 

@@ -180,8 +180,8 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a files attribute which is an array of
      *         filenames.
      */
-    @RequestMapping("/secure/listJobFiles.do")
-    public ModelAndView listJobFiles(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
+    @RequestMapping("/secure/stagedJobFiles.do")
+    public ModelAndView stagedJobFiles(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
 
         //Lookup our job
         VEGLJob job = null;

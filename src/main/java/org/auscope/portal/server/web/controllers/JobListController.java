@@ -45,6 +45,7 @@ import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VGLQueueJob;
+import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +89,7 @@ public class JobListController extends BaseCloudController  {
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
     private String adminEmail=null;
-    
+
     /**
      * @return the adminEmail
      */
@@ -532,7 +533,7 @@ public class JobListController extends BaseCloudController  {
 
     /**
      * Returns a JSON object containing an array of files belonging to a
-     * given job.
+     * given job AND the associated download objects .
      *
      * @param request The servlet request including a jobId parameter
      * @param response The servlet response
@@ -542,8 +543,8 @@ public class JobListController extends BaseCloudController  {
      *         manager the JSON object will contain an error attribute
      *         indicating the error.
      */
-    @RequestMapping("/secure/jobFiles.do")
-    public ModelAndView jobFiles(HttpServletRequest request,
+    @RequestMapping("/secure/jobCloudFiles.do")
+    public ModelAndView jobCloudFiles(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @AuthenticationPrincipal ANVGLUser user) {
@@ -842,7 +843,7 @@ public class JobListController extends BaseCloudController  {
         } catch (Exception e) {
             return generateJSONResponseMAV(false);
         }
-        
+
         if (job == null || !job.getEmailAddress().equals(user.getEmail())) {
             return generateJSONResponseMAV(false);
         }
@@ -1006,17 +1007,20 @@ public class JobListController extends BaseCloudController  {
     }
 
     /**
-     * Copies job files from sourceJobId to targetJobId
+     * Copies job files and/or downloads from sourceJobId to targetJobId
      *
      * Job files will be duplicated in LOCAL staging only. The files duplicated can be
      * controlled by a list of file names
+     *
+     * Job downloads will be copied directly (but new IDs minted)
      */
     @RequestMapping("/secure/copyJobFiles.do")
     public ModelAndView copyJobFiles(HttpServletRequest request,
             @AuthenticationPrincipal ANVGLUser user,
             @RequestParam("targetJobId") Integer targetJobId,
             @RequestParam("sourceJobId") Integer sourceJobId,
-            @RequestParam("key") String[] keys) {
+            @RequestParam(required=false, value="fileKey") String[] fileKeys,
+            @RequestParam(required=false, value="downloadId") Integer[] downloadIds) {
 
         VEGLJob sourceJob = attemptGetJob(sourceJobId, user);
         VEGLJob targetJob = attemptGetJob(targetJobId, user);
@@ -1036,17 +1040,33 @@ public class JobListController extends BaseCloudController  {
             InputStream is = null;
             OutputStream os = null;
 
-            for (String key : keys) {
-                try {
-                    is = cloudStorageService.getJobFile(sourceJob, key);
-                    os = fileStagingService.writeFile(targetJob, key);
-                    IOUtils.copy(is, os);
-                } finally {
-                    IOUtils.closeQuietly(is);
-                    IOUtils.closeQuietly(os);
+            if (fileKeys != null) {
+                for (String fileKey : fileKeys) {
+                    try {
+                        is = cloudStorageService.getJobFile(sourceJob, fileKey);
+                        os = fileStagingService.writeFile(targetJob, fileKey);
+                        IOUtils.copy(is, os);
+                    } finally {
+                        IOUtils.closeQuietly(is);
+                        IOUtils.closeQuietly(os);
+                    }
                 }
             }
 
+            List<VglDownload> targetDownloads = targetJob.getJobDownloads();
+            if (downloadIds != null) {
+                for (Integer downloadId : downloadIds) {
+                    for (VglDownload download : sourceJob.getJobDownloads()) {
+                        if (download.getId().equals(downloadId)) {
+                            VglDownload newDownload = (VglDownload) download.clone();
+                            newDownload.setParent(targetJob);
+                            newDownload.setId(null);
+                            targetDownloads.add(newDownload);
+                        }
+                    }
+                }
+                jobManager.saveJob(targetJob);
+            }
             return generateJSONResponseMAV(true);
         } catch (Exception ex) {
             logger.error("Error copying files for job.", ex);
@@ -1075,7 +1095,7 @@ public class JobListController extends BaseCloudController  {
         } catch (AccessDeniedException e) {
             throw e;
         }
-        
+
         if (oldJob == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job to duplicate.");
         }
@@ -1236,7 +1256,7 @@ public class JobListController extends BaseCloudController  {
             IOUtils.closeQuietly(os);
         }
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
     public @ResponseBody String handleException(AccessDeniedException e) {
