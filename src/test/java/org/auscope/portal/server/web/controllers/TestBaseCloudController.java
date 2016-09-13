@@ -4,6 +4,7 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VEGLJob;
+import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,7 +18,7 @@ public class TestBaseCloudController extends PortalTestClass {
         public TestableBaseCloudController(
                 CloudStorageService[] cloudStorageServices,
                 CloudComputeService[] cloudComputeServices) {
-            super(cloudStorageServices, cloudComputeServices);
+            super(cloudStorageServices, cloudComputeServices, mockJobManager);
         }
     }
 
@@ -28,6 +29,8 @@ public class TestBaseCloudController extends PortalTestClass {
     CloudComputeService[] mockComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class, "ccs1"),
                                                                             context.mock(CloudComputeService.class, "ccs2"),
                                                                             context.mock(CloudComputeService.class, "ccs3")};
+
+    VEGLJobManager mockJobManager = context.mock(VEGLJobManager.class);
 
     /**
      * Configure mock services

@@ -12,7 +12,6 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
-import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -35,8 +34,6 @@ public class ScriptBuilderService {
 
     /** For saving our files to a staging area*/
     private FileStagingService jobFileService;
-    /** For accessing a job object*/
-    private VEGLJobManager jobManager;
 
     /**
      * Creates a new instance
@@ -44,11 +41,9 @@ public class ScriptBuilderService {
      * @param jobManager
      */
     @Autowired
-    public ScriptBuilderService(FileStagingService jobFileService,
-            VEGLJobManager jobManager) {
+    public ScriptBuilderService(FileStagingService jobFileService) {
         super();
         this.jobFileService = jobFileService;
-        this.jobManager = jobManager;
     }
 
     /**
@@ -57,20 +52,7 @@ public class ScriptBuilderService {
      * @param scriptText
      * @throws PortalServiceException
      */
-    public void saveScript(String jobId, String scriptText, ANVGLUser user) throws PortalServiceException {
-
-        //Lookup our job
-        VEGLJob job = null;
-        try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (AccessDeniedException e) {
-            throw e;
-        } catch (Exception ex) {
-            logger.warn("Unable to lookup job with id " + jobId + ": " + ex.getMessage());
-            logger.debug("exception:", ex);
-            throw new PortalServiceException("Unable to lookup job with id " + jobId, ex);
-        }
-
+    public void saveScript(VEGLJob job, String scriptText, ANVGLUser user) throws PortalServiceException {
         //Apply text contents to job stage in directory
         try (OutputStream scriptFile = jobFileService.writeFile(job, SCRIPT_FILE_NAME)) {
             PrintWriter writer = new PrintWriter(scriptFile);
@@ -79,7 +61,7 @@ public class ScriptBuilderService {
         } catch (Exception e) {
             logger.error("Couldn't write script file: " + e.getMessage());
             logger.debug("error: ", e);
-            throw new PortalServiceException("Couldn't write script file for job with id " + jobId, e);
+            throw new PortalServiceException("Couldn't write script file for job " + job, e);
         }
     }
 
@@ -89,10 +71,7 @@ public class ScriptBuilderService {
      * @return the file contents if the script file exists otherwise an empty string if the script file doesn't exist or is empty.
      * @throws PortalServiceException
      */
-    public String loadScript(String jobId, ANVGLUser user) throws PortalServiceException {
-        //Lookup our job
-        VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
-
+    public String loadScript(VEGLJob job, ANVGLUser user) throws PortalServiceException {
         try (InputStream is = jobFileService.readFile(job, SCRIPT_FILE_NAME)){
             //Load script from VL server's filesystem
 
