@@ -45,6 +45,7 @@ import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VGLQueueJob;
+import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +89,7 @@ public class JobListController extends BaseCloudController  {
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
 
     private String adminEmail=null;
-    
+
     /**
      * @return the adminEmail
      */
@@ -532,7 +533,7 @@ public class JobListController extends BaseCloudController  {
 
     /**
      * Returns a JSON object containing an array of files belonging to a
-     * given job.
+     * given job AND the associated download objects .
      *
      * @param request The servlet request including a jobId parameter
      * @param response The servlet response
@@ -542,8 +543,8 @@ public class JobListController extends BaseCloudController  {
      *         manager the JSON object will contain an error attribute
      *         indicating the error.
      */
-    @RequestMapping("/secure/jobFiles.do")
-    public ModelAndView jobFiles(HttpServletRequest request,
+    @RequestMapping("/secure/jobCloudFiles.do")
+    public ModelAndView jobCloudFiles(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @AuthenticationPrincipal ANVGLUser user) {
@@ -598,47 +599,33 @@ public class JobListController extends BaseCloudController  {
 
         logger.debug("Download " + key);
 
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
+            return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+        }
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=\""+fileName+"\"");
+
         //Get our Input Stream
-        InputStream is = null;
-        try {
-            CloudStorageService cloudStorageService = getStorageService(job);
-            if (cloudStorageService == null) {
-                logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
-                return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+        try (InputStream is = cloudStorageService.getJobFile(job, key)) {
+            try (OutputStream out = response.getOutputStream()) {
+                int n;
+                byte[] buffer = new byte[1024];
+                while ((n = is.read(buffer)) != -1) {
+                    out.write(buffer, 0, n);
+                }
+                out.flush();
+            } catch (Exception e) {
+                logger.warn("Error whilst writing to output stream", e);
             }
-            is = cloudStorageService.getJobFile(job, key);
+            // The output is raw data down the output stream, just return null
+            return null;
         } catch (Exception ex) {
             logger.warn(String.format("Unable to access '%1$s' from the cloud", key), ex);
             return generateJSONResponseMAV(false, null, "Unable to access file from the cloud");
         }
-
-        //start writing our output stream
-        try {
-            response.setContentType("application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment; filename=\""+fileName+"\"");
-
-            //Ensure that our streams get closed
-            OutputStream out = response.getOutputStream();
-            try {
-
-                int n;
-                byte[] buffer = new byte[1024];
-
-                while ((n = is.read(buffer)) != -1) {
-                    out.write(buffer, 0, n);
-                }
-
-                out.flush();
-            } finally {
-                IOUtils.closeQuietly(is);
-                IOUtils.closeQuietly(out);
-            }
-        } catch (Exception ex) {
-            logger.warn("Error whilst writing to output stream", ex);
-        }
-
-        //The output is raw data down the output stream, just return null
-        return null;
     }
 
     /**
@@ -693,16 +680,16 @@ public class JobListController extends BaseCloudController  {
             ZipOutputStream zout = new ZipOutputStream(
                     response.getOutputStream());
             for (String fileKey : fileKeys) {
-                InputStream is = cloudStorageService.getJobFile(job, fileKey);
-
-                byte[] buffer = new byte[16384];
-                int count = 0;
-                zout.putNextEntry(new ZipEntry(fileKey));
-                while ((count = is.read(buffer)) != -1) {
-                    zout.write(buffer, 0, count);
+                try (InputStream is = cloudStorageService.getJobFile(job, fileKey)) {
+                    byte[] buffer = new byte[16384];
+                    int count = 0;
+                    zout.putNextEntry(new ZipEntry(fileKey));
+                    while ((count = is.read(buffer)) != -1) {
+                        zout.write(buffer, 0, count);
+                    }
+                    zout.closeEntry();
+                    readOneOrMoreFiles = true;
                 }
-                zout.closeEntry();
-                readOneOrMoreFiles = true;
             }
 
             if (readOneOrMoreFiles) {
@@ -856,7 +843,7 @@ public class JobListController extends BaseCloudController  {
         } catch (Exception e) {
             return generateJSONResponseMAV(false);
         }
-        
+
         if (job == null || !job.getEmailAddress().equals(user.getEmail())) {
             return generateJSONResponseMAV(false);
         }
@@ -902,7 +889,7 @@ public class JobListController extends BaseCloudController  {
             }
         }
 
-        List<ModelMap> tuples = new ArrayList<ModelMap>(userJobs.size());
+        List<ModelMap> tuples = new ArrayList<>(userJobs.size());
         for (VEGLJob job : userJobs) {
             ModelMap tuple = new ModelMap();
             tuple.put("jobId", job.getId());
@@ -923,6 +910,7 @@ public class JobListController extends BaseCloudController  {
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VEGLJob</code> objects.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/secure/treeJobs.do")
     public ModelAndView treeJobs(HttpServletRequest request,
             HttpServletResponse response,
@@ -958,7 +946,7 @@ public class JobListController extends BaseCloudController  {
         rootNode.put("seriesId", null);
         rootNode.put("children", new ArrayList<ModelMap>());
 
-        Map<Integer, ModelMap> nodeMap = new HashMap<Integer, ModelMap>();
+        Map<Integer, ModelMap> nodeMap = new HashMap<>();
         for (VEGLSeries series : userSeries) {
             ModelMap node = new ModelMap();
             node.put("leaf", false);
@@ -1004,7 +992,7 @@ public class JobListController extends BaseCloudController  {
      * @param fileName
      * @return
      */
-    private boolean cloudFileIncluded(String[] fileNames, CloudFileInformation cloudFile) {
+    private static boolean cloudFileIncluded(String[] fileNames, CloudFileInformation cloudFile) {
         if (fileNames == null) {
             return false;
         }
@@ -1019,17 +1007,20 @@ public class JobListController extends BaseCloudController  {
     }
 
     /**
-     * Copies job files from sourceJobId to targetJobId
+     * Copies job files and/or downloads from sourceJobId to targetJobId
      *
      * Job files will be duplicated in LOCAL staging only. The files duplicated can be
      * controlled by a list of file names
+     *
+     * Job downloads will be copied directly (but new IDs minted)
      */
     @RequestMapping("/secure/copyJobFiles.do")
     public ModelAndView copyJobFiles(HttpServletRequest request,
             @AuthenticationPrincipal ANVGLUser user,
             @RequestParam("targetJobId") Integer targetJobId,
             @RequestParam("sourceJobId") Integer sourceJobId,
-            @RequestParam("key") String[] keys) {
+            @RequestParam(required=false, value="fileKey") String[] fileKeys,
+            @RequestParam(required=false, value="downloadId") Integer[] downloadIds) {
 
         VEGLJob sourceJob = attemptGetJob(sourceJobId, user);
         VEGLJob targetJob = attemptGetJob(targetJobId, user);
@@ -1049,17 +1040,33 @@ public class JobListController extends BaseCloudController  {
             InputStream is = null;
             OutputStream os = null;
 
-            for (String key : keys) {
-                try {
-                    is = cloudStorageService.getJobFile(sourceJob, key);
-                    os = fileStagingService.writeFile(targetJob, key);
-                    IOUtils.copy(is, os);
-                } finally {
-                    IOUtils.closeQuietly(is);
-                    IOUtils.closeQuietly(os);
+            if (fileKeys != null) {
+                for (String fileKey : fileKeys) {
+                    try {
+                        is = cloudStorageService.getJobFile(sourceJob, fileKey);
+                        os = fileStagingService.writeFile(targetJob, fileKey);
+                        IOUtils.copy(is, os);
+                    } finally {
+                        IOUtils.closeQuietly(is);
+                        IOUtils.closeQuietly(os);
+                    }
                 }
             }
 
+            List<VglDownload> targetDownloads = targetJob.getJobDownloads();
+            if (downloadIds != null) {
+                for (Integer downloadId : downloadIds) {
+                    for (VglDownload download : sourceJob.getJobDownloads()) {
+                        if (download.getId().equals(downloadId)) {
+                            VglDownload newDownload = (VglDownload) download.clone();
+                            newDownload.setParent(targetJob);
+                            newDownload.setId(null);
+                            targetDownloads.add(newDownload);
+                        }
+                    }
+                }
+                jobManager.saveJob(targetJob);
+            }
             return generateJSONResponseMAV(true);
         } catch (Exception ex) {
             logger.error("Error copying files for job.", ex);
@@ -1088,7 +1095,7 @@ public class JobListController extends BaseCloudController  {
         } catch (AccessDeniedException e) {
             throw e;
         }
-        
+
         if (oldJob == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job to duplicate.");
         }
@@ -1124,16 +1131,11 @@ public class JobListController extends BaseCloudController  {
             CloudFileInformation[] cloudFiles = cloudStorageService.listJobFiles(oldJob);
             for (CloudFileInformation cloudFile : cloudFiles) {
                 if (cloudFileIncluded(files, cloudFile)) {
-                    InputStream is = cloudStorageService.getJobFile(oldJob, cloudFile.getName());
-                    OutputStream os = null;
-                    try {
-                        os = fileStagingService.writeFile(newJob, cloudFile.getName());
+                    try (InputStream is = cloudStorageService.getJobFile(oldJob, cloudFile.getName());
+                         OutputStream os = fileStagingService.writeFile(newJob, cloudFile.getName())) {
 
                         FileIOUtil.writeInputToOutputStream(is, os, 1024 * 1024, false);
-                    } finally {
-                        FileIOUtil.closeQuietly(os);
-                        FileIOUtil.closeQuietly(is);
-                    }
+                    } 
                 }
             }
         } catch (Exception ex) {
@@ -1254,7 +1256,7 @@ public class JobListController extends BaseCloudController  {
             IOUtils.closeQuietly(os);
         }
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
     public @ResponseBody String handleException(AccessDeniedException e) {

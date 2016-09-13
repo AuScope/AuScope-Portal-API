@@ -9,13 +9,11 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BasePortalController;
@@ -141,7 +139,7 @@ public class ScriptBuilderController extends BasePortalController {
                                   @RequestParam(value="key", required=false) String[] keys,
                                   @RequestParam(value="value", required=false) String[] values) {
         //Turn our KVP inputs into something that we can pass to our service
-        Map<String, Object> kvpMapping = new HashMap<String, Object>();
+        Map<String, Object> kvpMapping = new HashMap<>();
         if (keys != null && values != null) {
             for (int i = 0; i < keys.length && i < values.length; i++) {
                 kvpMapping.put(keys[i], values[i]);
@@ -151,9 +149,8 @@ public class ScriptBuilderController extends BasePortalController {
         //Load our template file into a string
         String templateResource = "/org/auscope/portal/server/scriptbuilder/templates/" + templateName.replaceAll("\\.\\.", "").replaceAll("/","");
         String templateString = null;
-        InputStream is = null;
-        try {
-            is = this.getClass().getResourceAsStream(templateResource);
+
+        try (InputStream is = this.getClass().getResourceAsStream(templateResource)) {
             if (is == null) {
                 logger.error("Unable to find template resource - " + templateResource);
                 return generateJSONResponseMAV(false, null, "Requested template does not exist");
@@ -163,10 +160,8 @@ public class ScriptBuilderController extends BasePortalController {
             logger.error("Unable to read template resource - " + templateResource + ":" + e.getMessage());
             logger.debug("Exception:", e);
             return generateJSONResponseMAV(false, null, "Internal server error when loading template.");
-        } finally {
-            FileIOUtil.closeQuietly(is);
-        }
-
+        } 
+        
         String finalTemplate = sbService.populateTemplate(templateString,
                 kvpMapping);
         return generateJSONResponseMAV(true, finalTemplate, "");
@@ -181,7 +176,7 @@ public class ScriptBuilderController extends BasePortalController {
         List<Solution> solutions = scmEntryService.getSolutions();
 
         // Group solutions by the problem that they solve.
-        HashMap<String, Problem> problems = new HashMap<String, Problem>();
+        HashMap<String, Problem> problems = new HashMap<>();
 
         for (Solution solution: solutions) {
             String problemId = solution.getProblem().getId();
@@ -222,7 +217,7 @@ public class ScriptBuilderController extends BasePortalController {
      */
     @RequestMapping("/getSolutions.do")
     public ModelAndView doGetSolutions(@RequestParam("uris") Set<String> uris) {
-        ArrayList<Solution> solutions = new ArrayList<Solution>();
+        ArrayList<Solution> solutions = new ArrayList<>();
         StringBuilder msg = new StringBuilder();
 
         for (String uri: uris) {

@@ -237,7 +237,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         return expectedStatus;
     }
 
-    private boolean containsFile(CloudFileInformation[] files, String fileName) {
+    private static boolean containsFile(CloudFileInformation[] files, String fileName) {
         if (files == null) {
             return false;
         }

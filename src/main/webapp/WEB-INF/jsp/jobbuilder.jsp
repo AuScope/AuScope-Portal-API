@@ -52,7 +52,6 @@
     <script src="js/ScriptBuilder/InsertionPromptWindow.js" type="text/javascript"></script>
     <script src="js/ScriptBuilder/ScriptBuilder.js" type="text/javascript"></script>
 
-    <script type="text/javascript" src="js/vegl/widgets/JobInputFilesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/BaseJobWizardForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobObjectForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobUploadForm.js"></script>

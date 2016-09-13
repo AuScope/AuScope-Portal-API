@@ -20,6 +20,7 @@ import org.springframework.security.web.savedrequest.DefaultSavedRequest;
  */
 public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHandler {
 
+    @SuppressWarnings("unused")
     private final Log log = LogFactory.getLog(getClass());
 
     @Override

@@ -110,6 +110,7 @@ public class VEGLSeries implements Serializable {
      *
      * @return A summary of the values of this object's fields
      */
+    @Override
     public String toString() {
         return super.toString() +
                ",id=" + id +

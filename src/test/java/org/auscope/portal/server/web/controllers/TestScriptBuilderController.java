@@ -8,8 +8,8 @@ import java.util.Set;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.util.FileIOUtil;
-import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ public class TestScriptBuilderController extends PortalTestClass {
     private ScriptBuilderController controller;
     private ScriptBuilderService mockSbService = context.mock(ScriptBuilderService.class);
     private ScmEntryService mockScmEntryService = context.mock(ScmEntryService.class);
-    
+
     @Before
     public void setup() {
         // Object Under Test
@@ -36,11 +36,11 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testSaveScript() throws Exception {
-        final String jobId = "1";
-        final String sourceText = "print 'test'";
-        final Set<String> solutions = new HashSet<String>();
+        String jobId = "1";
+        String sourceText = "print 'test'";
+        Set<String> solutions = new HashSet<>();
         solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockSbService).saveScript(jobId, sourceText, user);
@@ -53,17 +53,16 @@ public class TestScriptBuilderController extends PortalTestClass {
 
     /**
      * Tests that the saving of empty script for a given job fails.
-     * @throws Exception
      */
     @Test
-    public void testSaveScript_EmptySourceText() throws Exception {
-        final String jobId = "1";
-        final String sourceText = "";
-        final Set<String> solutions = new HashSet<String>();
+    public void testSaveScript_EmptySourceText() {
+        String jobId = "1";
+        String sourceText = "";
+        Set<String> solutions = new HashSet<>();
         solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
 
         ModelAndView mav = controller.saveScript(jobId, sourceText, solutions,
-                                                 new ANVGLUser());
+                new ANVGLUser());
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -74,11 +73,11 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testSaveScript_Exception() throws Exception {
-        final String jobId = "1";
-        final String sourceText = "print 'test'";
-        final Set<String> solutions = new HashSet<String>();
+        String jobId = "1";
+        String sourceText = "print 'test'";
+        Set<String> solutions = new HashSet<>();
         solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockSbService).saveScript(jobId, sourceText, user);
@@ -95,8 +94,8 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testGetSavedScript() throws Exception {
-        final String jobId = "1";
-        final String expectedScriptText = "print 'test'";
+        String jobId = "1";
+        String expectedScriptText = "print 'test'";
         ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
@@ -117,8 +116,8 @@ public class TestScriptBuilderController extends PortalTestClass {
      */
     @Test
     public void testGetSavedScript_Exception() throws Exception {
-        final String jobId = "1";
-        final ANVGLUser user = new ANVGLUser();
+        String jobId = "1";
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
             oneOf(mockSbService).loadScript(jobId, user);
@@ -131,16 +130,15 @@ public class TestScriptBuilderController extends PortalTestClass {
 
     /**
      * Tests that the denormalised key/value pairs are turned into an appropriate map
-     * @throws Exception
      */
     @Test
-    public void testTemplateParameterParsing() throws Exception {
-        final String[] keys = new String[] {"apple", "pear", "banana"};
-        final String[] values = new String[] {"2", "4", "6"};
-        final String templateName = "example.txt";
+    public void testTemplateParameterParsing() {
+        String[] keys = new String[] {"apple", "pear", "banana"};
+        String[] values = new String[] {"2", "4", "6"};
+        String templateName = "example.txt";
 
         //The test is that the above keys/values make their way into a valid map
-        final Map<String, Object> expectedMapping = new HashMap<String, Object>();
+        Map<String, Object> expectedMapping = new HashMap<>();
         expectedMapping.put(keys[0], values[0]);
         expectedMapping.put(keys[1], values[1]);
         expectedMapping.put(keys[2], values[2]);

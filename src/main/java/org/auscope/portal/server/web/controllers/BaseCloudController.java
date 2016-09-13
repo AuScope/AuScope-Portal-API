@@ -102,9 +102,13 @@ public abstract class BaseCloudController extends BasePortalController {
      * @throws IOException
      */
     private String getBootstrapTemplate() throws IOException {
-        InputStream is = this.getClass().getResourceAsStream("vl-bootstrap.sh");
-        String template = IOUtils.toString(is);
-        return template.replaceAll("\r", ""); //Windows style file endings have a tendency to sneak in via StringWriter and the like
+        try (InputStream is = this.getClass().getResourceAsStream("vl-bootstrap.sh")) {
+            String template = IOUtils.toString(is);
+            return template.replaceAll("\r", ""); // Windows style file endings
+                                                  // have a tendency to sneak in
+                                                  // via StringWriter and the
+                                                  // like
+        }
     }
 
     /**
@@ -114,9 +118,13 @@ public abstract class BaseCloudController extends BasePortalController {
      * @throws IOException if fails to load template resource
      */
     private String getProvisioningTemplate() throws IOException {
-        InputStream is = getClass().getResourceAsStream("vl-provisioning.sh");
-        String template = IOUtils.toString(is);
-        return template.replaceAll("\r", ""); //Windows style file endings have a tendency to sneak in via StringWriter and the like
+        try (InputStream is = getClass().getResourceAsStream("vl-provisioning.sh")) {
+            String template = IOUtils.toString(is);
+            return template.replaceAll("\r", ""); // Windows style file endings
+                                                  // have a tendency to sneak in
+                                                  // via StringWriter and the
+                                                  // like
+        }
     }
 
     /**
