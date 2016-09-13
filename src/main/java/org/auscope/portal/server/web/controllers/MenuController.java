@@ -39,7 +39,17 @@ public class MenuController {
 
    private String buildStamp;
 
-   private String googleMapKey;
+    /**
+     * !!! For Unit Testing Only !!!
+     * 
+     * @param buildStamp
+     *            the buildStamp to set
+     */
+    public void setBuildStamp(String buildStamp) {
+        this.buildStamp = buildStamp;
+    }
+
+private String googleMapKey;
 
    private String googleAnalyticsKey;
 
@@ -65,12 +75,12 @@ public class MenuController {
        if (buildStamp != null) {
            return buildStamp;
        }
+       String appServerHome = request.getSession().getServletContext().getRealPath("/");
+       File manifestFile = new File(appServerHome,"META-INF/MANIFEST.MF");
 
-       try {
-           String appServerHome = request.getSession().getServletContext().getRealPath("/");
-           File manifestFile = new File(appServerHome,"META-INF/MANIFEST.MF");
+       try (FileInputStream fis = new FileInputStream(manifestFile)){
            Manifest mf = new Manifest();
-           mf.read(new FileInputStream(manifestFile));
+           mf.read(fis);
            String buildDate = mf.getMainAttributes().getValue("buildDate");
 
            buildStamp = new String(Hex.encodeHex(buildDate.getBytes(Charsets.UTF_8)));
@@ -87,39 +97,37 @@ public class MenuController {
     * @param mav
     * @param request
     */
-   private void addManifest(ModelAndView mav, HttpServletRequest request) {
-       String appServerHome = request.getSession().getServletContext().getRealPath("/");
-       File manifestFile = new File(appServerHome,"META-INF/MANIFEST.MF");
-       Manifest mf = new Manifest();
-       try {
-          mf.read(new FileInputStream(manifestFile));
-          Attributes atts = mf.getMainAttributes();
-          if (mf != null) {
-             mav.addObject("specificationTitle", atts.getValue("Specification-Title"));
-             mav.addObject("implementationVersion", atts.getValue("Implementation-Version"));
-             mav.addObject("implementationBuild", atts.getValue("Implementation-Build"));
-             mav.addObject("buildDate", atts.getValue("buildDate"));
-             mav.addObject("buildJdk", atts.getValue("Build-Jdk"));
-             mav.addObject("javaVendor", atts.getValue("javaVendor"));
-             mav.addObject("builtBy", atts.getValue("Built-By"));
-             mav.addObject("osName", atts.getValue("osName"));
-             mav.addObject("osVersion", atts.getValue("osVersion"));
+    private void addManifest(ModelAndView mav, HttpServletRequest request) {
+        String appServerHome = request.getSession().getServletContext().getRealPath("/");
+        File manifestFile = new File(appServerHome, "META-INF/MANIFEST.MF");
+        Manifest mf = new Manifest();
+        try (FileInputStream fis = new FileInputStream(manifestFile)) {
+            mf.read(fis);
+            Attributes atts = mf.getMainAttributes();
+            mav.addObject("specificationTitle", atts.getValue("Specification-Title"));
+            mav.addObject("implementationVersion", atts.getValue("Implementation-Version"));
+            mav.addObject("implementationBuild", atts.getValue("Implementation-Build"));
+            mav.addObject("buildDate", atts.getValue("buildDate"));
+            mav.addObject("buildJdk", atts.getValue("Build-Jdk"));
+            mav.addObject("javaVendor", atts.getValue("javaVendor"));
+            mav.addObject("builtBy", atts.getValue("Built-By"));
+            mav.addObject("osName", atts.getValue("osName"));
+            mav.addObject("osVersion", atts.getValue("osVersion"));
 
-             mav.addObject("serverName", request.getServerName());
-             mav.addObject("serverInfo", request.getSession().getServletContext().getServerInfo());
-             mav.addObject("serverJavaVersion", System.getProperty("java.version"));
-             mav.addObject("serverJavaVendor", System.getProperty("java.vendor"));
-             mav.addObject("javaHome", System.getProperty("java.home"));
-             mav.addObject("serverOsArch", System.getProperty("os.arch"));
-             mav.addObject("serverOsName", System.getProperty("os.name"));
-             mav.addObject("serverOsVersion", System.getProperty("os.version"));
-          }
-       } catch (IOException e) {
-           /* ignore, since we'll just leave an empty form */
-           logger.info("Error accessing manifest: " + e.getMessage());
-           logger.debug("Exception:", e);
-       }
-   }
+            mav.addObject("serverName", request.getServerName());
+            mav.addObject("serverInfo", request.getSession().getServletContext().getServerInfo());
+            mav.addObject("serverJavaVersion", System.getProperty("java.version"));
+            mav.addObject("serverJavaVendor", System.getProperty("java.vendor"));
+            mav.addObject("javaHome", System.getProperty("java.home"));
+            mav.addObject("serverOsArch", System.getProperty("os.arch"));
+            mav.addObject("serverOsName", System.getProperty("os.name"));
+            mav.addObject("serverOsVersion", System.getProperty("os.version"));
+        } catch (IOException e) {
+            /* ignore, since we'll just leave an empty form */
+            logger.info("Error accessing manifest: " + e.getMessage());
+            logger.debug("Exception:", e);
+        }
+    }
 
    /**
     * Handles all HTML page requests by mapping them to an appropriate view (and adding other details).
@@ -150,8 +158,8 @@ public class MenuController {
        logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
 
        //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
-       if (user != null && user instanceof ANVGLUser) {
-           if (!((ANVGLUser) user).isFullyConfigured()) {
+       if (user != null) {
+           if (!user.isFullyConfigured()) {
                String uri = request.getRequestURI();
                if (!uri.contains("login.html") &&
                    !uri.contains("gmap.html") &&

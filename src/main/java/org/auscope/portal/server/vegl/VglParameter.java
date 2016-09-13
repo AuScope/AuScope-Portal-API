@@ -171,6 +171,7 @@ public class VglParameter implements Serializable, Cloneable {
         return name.hashCode() ^ parent.getId().hashCode();
     }
 
+    @Override
     public Object clone() {
         try {
             return super.clone();

@@ -11,9 +11,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONNull;
-import net.sf.json.JSONObject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -27,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import net.sf.json.JSONNull;
+import net.sf.json.JSONObject;
 
 /**
  * User: Mathew Wyatt
@@ -84,7 +84,7 @@ public class DownloadController extends BasePortalController {
         zout.close();
     }
 
-    private void writeResponseToZip(ArrayList<DownloadResponse> gmlDownloads,ZipOutputStream zout) throws IOException{
+    private static void writeResponseToZip(ArrayList<DownloadResponse> gmlDownloads,ZipOutputStream zout) throws IOException{
         StringBuilder errorMsg=new StringBuilder();
 
         for(int i=0;i<gmlDownloads.size();i++){

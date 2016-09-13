@@ -1,7 +1,5 @@
 package org.auscope.portal.server.web.security;
 
-import java.io.Serializable;
-
 import org.springframework.security.core.GrantedAuthority;
 
 /**
@@ -9,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
  * @author Josh Vote (CSIRO)
  *
  */
-public class ANVGLAuthority implements GrantedAuthority, Serializable {
+public class ANVGLAuthority implements GrantedAuthority {
 
     private Integer id;
     private String authority;
@@ -43,7 +41,6 @@ public class ANVGLAuthority implements GrantedAuthority, Serializable {
 
     @Override
     public String getAuthority() {
-        // TODO Auto-generated method stub
         return authority;
     }
 

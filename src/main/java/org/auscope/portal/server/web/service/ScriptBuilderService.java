@@ -54,9 +54,7 @@ public class ScriptBuilderService {
      */
     public void saveScript(VEGLJob job, String scriptText, ANVGLUser user) throws PortalServiceException {
         //Apply text contents to job stage in directory
-        OutputStream scriptFile = null;
-        try {
-            scriptFile = jobFileService.writeFile(job, SCRIPT_FILE_NAME);
+        try (OutputStream scriptFile = jobFileService.writeFile(job, SCRIPT_FILE_NAME)) {
             PrintWriter writer = new PrintWriter(scriptFile);
             writer.print(scriptText);
             writer.close();
@@ -64,8 +62,6 @@ public class ScriptBuilderService {
             logger.error("Couldn't write script file: " + e.getMessage());
             logger.debug("error: ", e);
             throw new PortalServiceException("Couldn't write script file for job " + job, e);
-        } finally {
-            FileIOUtil.closeQuietly(scriptFile);
         }
     }
 
@@ -76,10 +72,9 @@ public class ScriptBuilderService {
      * @throws PortalServiceException
      */
     public String loadScript(VEGLJob job, ANVGLUser user) throws PortalServiceException {
-        InputStream is = null;
-        try {
+        try (InputStream is = jobFileService.readFile(job, SCRIPT_FILE_NAME)){
             //Load script from VL server's filesystem
-            is = jobFileService.readFile(job, SCRIPT_FILE_NAME);
+
             String script = null;
             if (is == null) {
                 logger.warn("User script file does not exist.");
@@ -88,13 +83,9 @@ public class ScriptBuilderService {
                 script = FileIOUtil.convertStreamtoString(is);
             }
             return script;
-        } catch (AccessDeniedException e) {
-            throw e;
         } catch (Exception ex) {
             logger.error("Error loading script.", ex);
             throw new PortalServiceException("There was a problem loading your script.", "Please report this error to cg_admin@csiro.au");
-        } finally {
-            FileIOUtil.closeQuietly(is);
         }
     }
 

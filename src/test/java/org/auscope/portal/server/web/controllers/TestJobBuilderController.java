@@ -194,7 +194,7 @@ public class TestJobBuilderController {
      * @throws Exception
      */
     @Test
-    public void testListJobFiles() throws Exception {
+    public void testListStagedJobFiles() throws Exception {
         final File mockFile1 = context.mock(File.class, "MockFile1");
         final File mockFile2 = context.mock(File.class, "MockFile2");
         final StagedFile[] mockStageFiles = new StagedFile[] {
@@ -215,7 +215,7 @@ public class TestJobBuilderController {
             oneOf(mockFile2).length();will(returnValue(512L));
         }});
 
-        ModelAndView mav = controller.listJobFiles(jobId, user);
+        ModelAndView mav = controller.stagedJobFiles(jobId, user);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -225,14 +225,14 @@ public class TestJobBuilderController {
      * when the job cannot be found.
      */
     @Test
-    public void testListJobFiles_JobNotFound() {
+    public void testListStagedJobFiles_JobNotFound() {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.listJobFiles(jobId, user);
+        ModelAndView mav = controller.stagedJobFiles(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -243,7 +243,7 @@ public class TestJobBuilderController {
      * @throws Exception
      */
     @Test
-    public void testListJobFiles_Exception() throws Exception {
+    public void testListStagedJobFiles_Exception() throws Exception {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -253,7 +253,7 @@ public class TestJobBuilderController {
             will(throwException(new PortalServiceException("test exception","test exception")));
         }});
 
-        ModelAndView mav = controller.listJobFiles(jobId, user);
+        ModelAndView mav = controller.stagedJobFiles(jobId, user);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }

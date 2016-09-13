@@ -50,10 +50,9 @@ public class TestBaseCloudController extends PortalTestClass {
 
     /**
      * Tests getting a storage service works with a string
-     * @throws Exception
      */
     @Test
-    public void testGetStorageService() throws Exception {
+    public void testGetStorageService() {
         TestableBaseCloudController controller = new TestableBaseCloudController(mockStorageServices, mockComputeServices);
 
         String existingId = "anotherId-s";
@@ -70,10 +69,9 @@ public class TestBaseCloudController extends PortalTestClass {
 
     /**
      * Tests getting a storage service works with a job
-     * @throws Exception
      */
     @Test
-    public void testGetStorageService_Job() throws Exception {
+    public void testGetStorageService_Job() {
         TestableBaseCloudController controller = new TestableBaseCloudController(mockStorageServices, mockComputeServices);
 
         String existingId = "anotherId-s";
@@ -95,10 +93,9 @@ public class TestBaseCloudController extends PortalTestClass {
 
     /**
      * Tests getting a Compute service works with a string
-     * @throws Exception
      */
     @Test
-    public void testGetComputeService() throws Exception {
+    public void testGetComputeService() {
         TestableBaseCloudController controller = new TestableBaseCloudController(mockStorageServices, mockComputeServices);
 
         String existingId = "anotherId-c";
@@ -118,7 +115,7 @@ public class TestBaseCloudController extends PortalTestClass {
      * @throws Exception
      */
     @Test
-    public void testGetComputeService_Job() throws Exception {
+    public void testGetComputeService_Job() {
         TestableBaseCloudController controller = new TestableBaseCloudController(mockStorageServices, mockComputeServices);
 
         String existingId = "anotherId-c";

@@ -77,7 +77,7 @@ public class GeonetworkController extends BaseCloudController {
         }
 
         CloudFileInformation[] outputFiles =  cloudStorageService.listJobFiles(job);
-        List<CSWOnlineResourceImpl> onlineResources = new ArrayList<CSWOnlineResourceImpl>();
+        List<CSWOnlineResourceImpl> onlineResources = new ArrayList<>();
 
         //Add any output files to our online resources tab
         if (outputFiles != null) {
@@ -125,7 +125,7 @@ public class GeonetworkController extends BaseCloudController {
         rp.setPositionName(request.getParameter("positionName"));
 
         //Build our bounding boxes
-        List<CSWGeographicElement> geoEls = new ArrayList<CSWGeographicElement>();
+        List<CSWGeographicElement> geoEls = new ArrayList<>();
         for (VglDownload dl : jobDownloads) {
             if ( dl.getEastBoundLongitude()!= null &&
                     dl.getWestBoundLongitude() != null &&
@@ -161,8 +161,8 @@ public class GeonetworkController extends BaseCloudController {
         String appServerHome = request.getSession().getServletContext().getRealPath("/");
         File manifestFile = new File(appServerHome,"META-INF/MANIFEST.MF");
         Manifest mf = new Manifest();
-        try {
-            mf.read(new FileInputStream(manifestFile));
+        try (FileInputStream fis = new FileInputStream(manifestFile)) {
+            mf.read(fis);
             Attributes atts = mf.getMainAttributes();
             rec.setDataQualityStatement(String.format(
                     "Workflow by %1$s Version %2$s.%3$s. \nProcessed by GRAV3D MPI - Version 4.0 20100108.",
@@ -211,7 +211,7 @@ public class GeonetworkController extends BaseCloudController {
      * @throws Exception
      */
     @RequestMapping("/secure/insertRecord.do")
-    public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request, @AuthenticationPrincipal ANVGLUser user) throws Exception {
+    public ModelAndView insertRecord(@RequestParam("jobId") final Integer jobId, HttpServletRequest request, @AuthenticationPrincipal ANVGLUser user) {
         //Get user email from session
         if (user == null) {
             logger.debug("Unable to get user email as user session has expired.");

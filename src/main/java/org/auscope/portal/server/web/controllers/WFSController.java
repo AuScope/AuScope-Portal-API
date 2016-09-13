@@ -48,7 +48,7 @@ public class WFSController extends BasePortalController {
                                            @RequestParam(required = false, value = "southBoundLatitude") final Double southBoundLatitude,
                                            @RequestParam(required = false, value = "eastBoundLongitude") final Double eastBoundLongitude,
                                            @RequestParam(required = false, value = "westBoundLongitude") final Double westBoundLongitude,
-                                           @RequestParam(required = false, value = "maxFeatures") Integer maxFeatures) throws Exception {
+                                           @RequestParam(required = false, value = "maxFeatures") Integer maxFeatures) {
 
         FilterBoundingBox bbox = null;
         if (northBoundLatitude != null) {
@@ -92,7 +92,7 @@ public class WFSController extends BasePortalController {
         }
 
         //Convert the response from Strings to named JSON objects
-        List<ModelMap> convertedItems = new ArrayList<ModelMap>(response.getGetFeatureOutputFormats().length);
+        List<ModelMap> convertedItems = new ArrayList<>(response.getGetFeatureOutputFormats().length);
         for (String of : response.getGetFeatureOutputFormats()) {
             convertedItems.add(new ModelMap("format", of));
         }
@@ -112,7 +112,7 @@ public class WFSController extends BasePortalController {
     @RequestMapping("/requestFeature.do")
     public ModelAndView requestFeature(@RequestParam("serviceUrl") final String serviceUrl,
                                        @RequestParam("typeName") final String featureType,
-                                       @RequestParam("featureId") final String featureId) throws Exception {
+                                       @RequestParam("featureId") final String featureId) {
         String response = null;
         try {
             response = wfsService.getWfsFeature(serviceUrl, featureType, featureId);

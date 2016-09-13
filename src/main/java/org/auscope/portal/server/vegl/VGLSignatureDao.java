@@ -1,13 +1,9 @@
 package org.auscope.portal.server.vegl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class VGLSignatureDao extends HibernateDaoSupport {
-    protected final Log logger = LogFactory.getLog(getClass());
-
     /**
      * Retrieves the signature of a given user.
      *
@@ -42,7 +38,7 @@ public class VGLSignatureDao extends HibernateDaoSupport {
      * Retrieves the signature with given ID.
      */
     public VGLSignature get(final int id) {
-        return (VGLSignature) getHibernateTemplate()
+        return getHibernateTemplate()
                 .get(VGLSignature.class, id);
     }
 
