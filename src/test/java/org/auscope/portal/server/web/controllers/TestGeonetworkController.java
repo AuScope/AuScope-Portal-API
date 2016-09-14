@@ -26,6 +26,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -62,6 +63,8 @@ public class TestGeonetworkController {
         context.checking(new Expectations() {{
             allowing(cloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(cloudComputeServices[0]).getId();will(returnValue(computeServiceId));
+
+            allowing(mockPortalUser).getEmail();will(returnValue(USER_EMAIL_ADDRESS));
         }});
 
         controller = new GeonetworkController(mockJobManager, mockGNService, cloudStorageServices, cloudComputeServices);
@@ -74,14 +77,13 @@ public class TestGeonetworkController {
     public void testGetUserSignature() {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 //        final HttpSession mockSession = context.mock(HttpSession.class);
-        final String userEmail = "user@test.au";
-        final VGLSignature userSignature = new VGLSignature(1, userEmail);
+        final VGLSignature userSignature = new VGLSignature(1, USER_EMAIL_ADDRESS);
 
         context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(USER_EMAIL_ADDRESS));
 
             //We should have a single call to the database for user signature object
-            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
+            oneOf(mockJobManager).getSignatureByUser(USER_EMAIL_ADDRESS);will(returnValue(userSignature));
         }});
 
         ModelAndView mav = controller.getUserSignature(mockRequest, mockPortalUser);
@@ -96,13 +98,12 @@ public class TestGeonetworkController {
     public void testGetUserSignatureDNE() {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 //        final HttpSession mockSession = context.mock(HttpSession.class);
-        final String userEmail = "user@test.org";
 
         context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(USER_EMAIL_ADDRESS));
 
             //We should have a single call to the database for user signature object
-            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(null));
+            oneOf(mockJobManager).getSignatureByUser(USER_EMAIL_ADDRESS);will(returnValue(null));
         }});
 
         ModelAndView mav = controller.getUserSignature(mockRequest, mockPortalUser);
@@ -118,9 +119,7 @@ public class TestGeonetworkController {
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 //        final HttpSession mockSession = context.mock(HttpSession.class);
 
-        context.checking(new Expectations() {{
-
-        }});
+        context.checking(new Expectations());
 
         ModelAndView mav = controller.getUserSignature(mockRequest, null);
         Assert.assertNotNull(mav);
@@ -165,7 +164,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getDescription();will(returnValue("description"));
             allowing(mockJob).getSubmitDate();will(returnValue(new Date()));
             allowing(mockJob).getName();will(returnValue("name"));
-            allowing(mockJob).getUser();will(returnValue("user"));
+            allowing(mockJob).getUser();will(returnValue(USER_EMAIL_ADDRESS));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL_ADDRESS));
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
@@ -176,6 +175,7 @@ public class TestGeonetworkController {
             //Our series configuration
             allowing(mockSeries).getName();will(returnValue("seriesName"));
             allowing(mockSeries).getDescription();will(returnValue("seriesDescription"));
+            allowing(mockSeries).getUser();will(returnValue(USER_EMAIL_ADDRESS));
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
@@ -231,10 +231,9 @@ public class TestGeonetworkController {
 
     /**
      * Tests that the insertRecord function correctly fails when the job object DNE.
-     * @throws Exception
      */
     @Test
-    public void testInsertRecordJobDNE() throws Exception {
+    public void testInsertRecordJobDNE() {
         final Integer jobId = 1235;
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 
@@ -250,10 +249,9 @@ public class TestGeonetworkController {
 
     /**
      * Tests that the insertRecord function correctly fails when the job series DNE
-     * @throws Exception
      */
     @Test
-    public void testInsertRecordSeriesDNE() throws Exception {
+    public void testInsertRecordSeriesDNE() {
         final Integer jobId = 1235;
         final Integer seriesId = 5432;
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
@@ -262,6 +260,7 @@ public class TestGeonetworkController {
         context.checking(new Expectations() {{
             //Our mock job configuration
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
+            allowing(mockJob).getUser();will(returnValue(USER_EMAIL_ADDRESS));
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
@@ -272,6 +271,30 @@ public class TestGeonetworkController {
         ModelAndView mav = controller.insertRecord(jobId, mockRequest, mockPortalUser);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests that the insertRecord function correctly fails when specifying another user's job
+     * @throws Exception
+     */
+    @Test(expected=AccessDeniedException.class)
+    public void testInsertRecordBadUser() throws Exception {
+        final Integer jobId = 1235;
+        final Integer seriesId = 5432;
+        final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            //Our mock job configuration
+            allowing(mockJob).getSeriesId();will(returnValue(seriesId));
+            allowing(mockJob).getUser();will(returnValue("a@different.email"));
+
+            //We should make a single call to the database for job objects
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockPortalUser).getEmail();will(returnValue(USER_EMAIL_ADDRESS));
+        }});
+
+        controller.insertRecord(jobId, mockRequest, mockPortalUser);
     }
 
     /**
@@ -286,15 +309,17 @@ public class TestGeonetworkController {
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 //        final HttpSession mockSession = context.mock(HttpSession.class);
-        final String userEmail = "user@test.au";
-        final VGLSignature userSignature = new VGLSignature(1, userEmail);
+        final VGLSignature userSignature = new VGLSignature(1, USER_EMAIL_ADDRESS);
 
         context.checking(new Expectations() {{
             //Our mock job configuration
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
+            allowing(mockJob).getUser();will(returnValue(USER_EMAIL_ADDRESS));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
+
+            allowing(mockSeries).getUser();will(returnValue(USER_EMAIL_ADDRESS));
 
             //We should have calls to HttpServletRequest to get parameters needed for registering job to Geonetwork
             allowing(mockRequest).getParameter("organisationName");will(returnValue("organisationName"));
@@ -316,13 +341,13 @@ public class TestGeonetworkController {
 
             //We should make a single call to the database for job objects
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            oneOf(mockJobManager).getSeriesById(seriesId, "user@test.au");will(returnValue(mockSeries));
+            oneOf(mockJobManager).getSeriesById(seriesId, USER_EMAIL_ADDRESS);will(returnValue(mockSeries));
 
             //We should have a call to http request session to get user's email
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+            allowing(mockPortalUser).getEmail();will(returnValue(USER_EMAIL_ADDRESS));
 
             //We should have a single call to the database for user signature object
-            oneOf(mockJobManager).getSignatureByUser(userEmail);will(returnValue(userSignature));
+            oneOf(mockJobManager).getSignatureByUser(USER_EMAIL_ADDRESS);will(returnValue(userSignature));
 
             //We should have a call to the job manager to store user signature object
             oneOf(mockJobManager).saveSignature(userSignature);
@@ -369,7 +394,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getDescription();will(returnValue("description"));
             allowing(mockJob).getSubmitDate();will(returnValue("20110713_105730"));
             allowing(mockJob).getName();will(returnValue("name"));
-            allowing(mockJob).getUser();will(returnValue("user"));
+            allowing(mockJob).getUser();will(returnValue(USER_EMAIL_ADDRESS));
             allowing(mockJob).getSeriesId();will(returnValue(seriesId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL_ADDRESS));
             allowing(mockJob).getJobDownloads();will(returnValue(Arrays.asList(download)));
@@ -378,6 +403,7 @@ public class TestGeonetworkController {
             allowing(mockJob).getStorageBucket();will(returnValue("s3-output-bucket"));
 
             //Our series configuration
+            allowing(mockSeries).getUser();will(returnValue(USER_EMAIL_ADDRESS));
             allowing(mockSeries).getName();will(returnValue("seriesName"));
             allowing(mockSeries).getDescription();will(returnValue("seriesDescription"));
 

@@ -11,10 +11,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will return MGA Zone of 49.
-     * @throws Exception
      */
     @Test
-    public void testCalculateMgaZoneForBBox_MGAZone_49() throws Exception {
+    public void testCalculateMgaZoneForBBox_MGAZone_49() {
         double north = -30;
         double south = -32;
         double east = 125;
@@ -29,10 +28,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will return MGA Zone of 50.
-     * @throws Exception
      */
     @Test
-    public void testCalculateMgaZoneForBBox_MGAZone_50() throws Exception {
+    public void testCalculateMgaZoneForBBox_MGAZone_50() {
         double north = -30;
         double south = -32;
         double east = 125;
@@ -47,10 +45,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will return MGA Zone of 51.
-     * @throws Exception
      */
     @Test
-    public void testCalculateMgaZoneForBBox_MGAZone_51() throws Exception {
+    public void testCalculateMgaZoneForBBox_MGAZone_51() {
         double north = -30;
         double south = -32;
         double east = 150;
@@ -65,10 +62,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will return MGA Zone of 52.
-     * @throws Exception
      */
     @Test
-    public void testCalculateMgaZoneForBBox_MGAZone_52() throws Exception {
+    public void testCalculateMgaZoneForBBox_MGAZone_52() {
         double north = -30;
         double south = -32;
         double east = 150;
@@ -83,10 +79,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will return MGA Zone of 53.
-     * @throws Exception
      */
     @Test
-    public void testCalculateMgaZoneForBBox_MGAZone_53() throws Exception {
+    public void testCalculateMgaZoneForBBox_MGAZone_53() {
         double north = -30;
         double south = -32;
         double east = 170;
@@ -101,10 +96,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will return MGA Zone of 54.
-     * @throws Exception
      */
     @Test
-    public void testCalculateMgaZoneForBBox_MGAZone_54() throws Exception {
+    public void testCalculateMgaZoneForBBox_MGAZone_54() {
         double north = -30;
         double south = -32;
         double east = 180;
@@ -119,10 +113,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will return MGA Zone of 55.
-     * @throws Exception
      */
     @Test
-    public void testCalculateMgaZoneForBBox_MGAZone_55() throws Exception {
+    public void testCalculateMgaZoneForBBox_MGAZone_55() {
         double north = -30;
         double south = -32;
         double east = 190;
@@ -137,10 +130,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will return MGA Zone of 56.
-     * @throws Exception
      */
     @Test
-    public void testCalculateMgaZoneForBBox_MGAZone_56() throws Exception {
+    public void testCalculateMgaZoneForBBox_MGAZone_56() {
         double north = -30;
         double south = -32;
         double east = 200;
@@ -155,10 +147,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will fail.
-     * @throws Exception
      */
     @Test
-    public void testCalculateMgaZoneForBBox_MGAZoneSmallerThanZero() throws Exception {
+    public void testCalculateMgaZoneForBBox_MGAZoneSmallerThanZero() {
         // The following dataset will yield -1 MGA zone
         double north = -30;
         double south = -32;
@@ -173,10 +164,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test to ensure no errors (no validity of conversion is tested)
-     * @throws Exception
      */
     @Test
-    public void testBBoxReproject() throws Exception {
+    public void testBBoxReproject() {
         double north = -30;
         double south = -32;
         double east = 125;
@@ -197,10 +187,9 @@ public class TestReprojectionController extends PortalTestClass {
 
     /**
      * Simple test with dataset that will fail.
-     * @throws Exception
      */
     @Test
-    public void testBBoxReproject_MGAZoneSmallerThanZero() throws Exception {
+    public void testBBoxReproject_MGAZoneSmallerThanZero() {
         // The following dataset will yield -1 MGA zone
         double north = -30;
         double south = -32;

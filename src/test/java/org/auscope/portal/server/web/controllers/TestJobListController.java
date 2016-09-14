@@ -36,6 +36,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -72,7 +73,7 @@ public class TestJobListController extends PortalTestClass {
         mockResponse = context.mock(HttpServletResponse.class);
         mockRequest = context.mock(HttpServletRequest.class);
         mockPortalUser = context.mock(ANVGLUser.class);
-        final List<VEGLJob> mockJobs=new ArrayList<VEGLJob>();
+        final List<VEGLJob> mockJobs=new ArrayList<>();
         vglPollingJobQueueManager = new VGLPollingJobQueueManager();
 
         context.checking(new Expectations() {{
@@ -102,7 +103,7 @@ public class TestJobListController extends PortalTestClass {
     }
 
     @Test
-    public void testInitizeQueueNDelete() throws InterruptedException, PortalServiceException{
+    public void testInitizeQueueNDelete() {
         final String storageBucket = "storage-bucket";
         final String storageAccess = "213-asd-54";
         final String storageSecret = "tops3cret";
@@ -166,13 +167,13 @@ public class TestJobListController extends PortalTestClass {
             allowing(queueMockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_INQUEUE));
             allowing(queueMockJobs.get(0)).getId();will(returnValue(5555));
             allowing(queueMockJobs.get(1)).getId();will(returnValue(jobId));
-            
+
             allowing(queueMockJobs.get(0)).isWalltimeSet(); will(returnValue(false));
             allowing(queueMockJobs.get(1)).isWalltimeSet(); will(returnValue(false));
 
             allowing(queueMockJobs.get(0)).getWalltime();will(returnValue(null));
             allowing(queueMockJobs.get(1)).getWalltime();will(returnValue(null));
-            
+
             oneOf(queueMockJobs.get(1)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
             oneOf(queueMockJobManager).saveJob(queueMockJobs.get(1));
             oneOf(queueMockJobManager).createJobAuditTrail(JobBuilderController.STATUS_INQUEUE, queueMockJobs.get(1), "Job cancelled by user.");
@@ -238,7 +239,7 @@ public class TestJobListController extends PortalTestClass {
      * Tests deleting a job successfully
      */
     @Test
-    public void testDeleteJob() throws Exception {
+    public void testDeleteJob() {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
@@ -344,7 +345,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests deleting a job fails when its another users job
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testDeleteJobNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "adifferentuser@email.com";
@@ -359,8 +360,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
-        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
     }
 
     /**
@@ -385,7 +385,7 @@ public class TestJobListController extends PortalTestClass {
      * Tests deleting a series successfully
      */
     @Test
-    public void testDeleteSeries() throws Exception {
+    public void testDeleteSeries() {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final List<VEGLJob> mockJobs = Arrays.asList(
@@ -426,7 +426,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests deleting a series fails when the user doesn't have permission
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testDeleteSeriesNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
@@ -440,8 +440,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
         }});
 
-        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
     }
 
     /**
@@ -517,7 +516,7 @@ public class TestJobListController extends PortalTestClass {
      * Tests that killing or cancelling job get aborted when the job is processed
      */
     @Test
-    public void testKillJobAborted() throws Exception {
+    public void testKillJobAborted() {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
@@ -536,7 +535,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests that killing a job fails when its not the user's job
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testKillJobNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
@@ -551,8 +550,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
         }});
 
-        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
     }
 
     /**
@@ -630,7 +628,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests that killing all jobs of a series fails when the user lacks permission
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testKillSeriesJobsNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
@@ -644,8 +642,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
         }});
 
-        ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.killSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
     }
 
     /**
@@ -691,7 +688,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob);will(returnValue(fileDetails));
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertSame(fileDetails, mav.getModel().get("data"));
     }
@@ -699,8 +696,8 @@ public class TestJobListController extends PortalTestClass {
     /**
      * tests listing job files fails if the user doesnt have permission
      */
-    @Test
-    public void testListJobFilesNoPermission() throws Exception {
+    @Test(expected=AccessDeniedException.class)
+    public void testListJobFilesNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -714,15 +711,14 @@ public class TestJobListController extends PortalTestClass {
 
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
     }
 
     /**
      * tests listing job files fails if the user doesnt have permission
      */
     @Test
-    public void testListJobFilesDNE() throws Exception {
+    public void testListJobFilesDNE() {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
 
@@ -733,7 +729,7 @@ public class TestJobListController extends PortalTestClass {
 
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -758,7 +754,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockCloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.jobFiles(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -774,36 +770,45 @@ public class TestJobListController extends PortalTestClass {
         final String fileName = "fileName.txt";
         final byte[] data = new byte[] {1,2,4,5,6,7,8,6,5,4,4,3,2,1};
         final InputStream inputStream = new ByteArrayInputStream(data);
-        final ReadableServletOutputStream outStream = new ReadableServletOutputStream();
+        try (final ReadableServletOutputStream outStream = new ReadableServletOutputStream()) {
+            context.checking(new Expectations() {
+                {
+                    allowing(mockPortalUser).getEmail();
+                    will(returnValue(userEmail));
 
-        context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+                    oneOf(mockJobManager).getJobById(jobId, mockPortalUser);
+                    will(returnValue(mockJob));
+                    allowing(mockJob).getUser();
+                    will(returnValue(userEmail));
+                    allowing(mockJob).getStorageServiceId();
+                    will(returnValue(storageServiceId));
+                    allowing(mockJob).getComputeServiceId();
+                    will(returnValue(computeServiceId));
 
-            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            allowing(mockJob).getUser();will(returnValue(userEmail));
-            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+                    oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, key);
+                    will(returnValue(inputStream));
 
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, key);will(returnValue(inputStream));
+                    // Ensure our response stream gets written to
+                    oneOf(mockResponse).setContentType("application/octet-stream");
+                    allowing(mockResponse).setHeader(with(any(String.class)), with(any(String.class)));
+                    oneOf(mockResponse).getOutputStream();
+                    will(returnValue(outStream));
+                }
+            });
 
-            //Ensure our response stream gets written to
-            oneOf(mockResponse).setContentType("application/octet-stream");
-            allowing(mockResponse).setHeader(with(any(String.class)), with(any(String.class)));
-            oneOf(mockResponse).getOutputStream();will(returnValue(outStream));
-        }});
+            // Returns null on success
+            ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key, mockPortalUser);
+            Assert.assertNull(mav);
 
-        //Returns null on success
-        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key, mockPortalUser);
-        Assert.assertNull(mav);
-
-        Assert.assertArrayEquals(data, outStream.getDataWritten());
+            Assert.assertArrayEquals(data, outStream.getDataWritten());
+        }
     }
 
     /**
      * Tests that downloading a single job file fails when the user doesnt own the job
      */
-    @Test
-    public void testDownloadJobFileNoPermission() throws Exception {
+    @Test(expected=AccessDeniedException.class)
+    public void testDownloadJobFileNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -818,16 +823,14 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
-        //Returns null on success
-        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key, mockPortalUser);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
+        controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key, mockPortalUser);
     }
 
     /**
      * Tests that downloading a single job file fails when the job DNE
      */
     @Test
-    public void testDownloadJobFileDNE() throws Exception {
+    public void testDownloadJobFileDNE() {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final String key = "my/file/key";
@@ -862,75 +865,91 @@ public class TestJobListController extends PortalTestClass {
         final InputStream is1 = new ByteArrayInputStream(file1Data);
         final InputStream is2 = new ByteArrayInputStream(file2Data);
         final InputStream is3 = new ByteArrayInputStream(file3Data);
-        final ReadableServletOutputStream outStream = new ReadableServletOutputStream();
         final String jobName = "job WITH !()[]#$%@\\/;\"'";
         final Date submitDate = new SimpleDateFormat("yyyyMMdd").parse("19861009");
 
-        context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+        try (final ReadableServletOutputStream outStream = new ReadableServletOutputStream()) {
+            context.checking(new Expectations() {
+                {
+                    allowing(mockPortalUser).getEmail();
+                    will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
-            allowing(mockJob).getName();will(returnValue(jobName));
-            allowing(mockJob).getUser();will(returnValue(userEmail));
-            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(mockJob).getSubmitDate();will(returnValue(submitDate));
+                    oneOf(mockJobManager).getJobById(jobId, mockPortalUser);
+                    will(returnValue(mockJob));
+                    allowing(mockJob).getName();
+                    will(returnValue(jobName));
+                    allowing(mockJob).getUser();
+                    will(returnValue(userEmail));
+                    allowing(mockJob).getStorageServiceId();
+                    will(returnValue(storageServiceId));
+                    allowing(mockJob).getComputeServiceId();
+                    will(returnValue(computeServiceId));
+                    allowing(mockJob).getSubmitDate();
+                    will(returnValue(submitDate));
 
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey1);will(returnValue(is1));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey2);will(returnValue(is2));
-            oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey3);will(returnValue(is3));
+                    oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey1);
+                    will(returnValue(is1));
+                    oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey2);
+                    will(returnValue(is2));
+                    oneOf(mockCloudStorageServices[0]).getJobFile(mockJob, fileKey3);
+                    will(returnValue(is3));
 
-            //Ensure our response stream gets written to
-            oneOf(mockResponse).setContentType("application/zip");
-            oneOf(mockResponse).setHeader("Content-Disposition", "attachment; filename=\"jobfiles_job_WITH________________19861009.zip\"");
-            oneOf(mockResponse).getOutputStream();will(returnValue(outStream));
-        }});
+                    // Ensure our response stream gets written to
+                    oneOf(mockResponse).setContentType("application/zip");
+                    oneOf(mockResponse).setHeader("Content-Disposition",
+                            "attachment; filename=\"jobfiles_job_WITH________________19861009.zip\"");
+                    oneOf(mockResponse).getOutputStream();
+                    will(returnValue(outStream));
+                }
+            });
 
-        //Returns null on success
-        ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files, mockPortalUser);
-        Assert.assertNull(mav);
+            // Returns null on success
+            ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files, mockPortalUser);
+            Assert.assertNull(mav);
 
-        //Lets decompose our zip stream to verify everything got written correctly
-        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(outStream.getDataWritten()));
-        byte[] buf = null;
-        int dataRead = 0;
+            // Lets decompose our zip stream to verify everything got written
+            // correctly
+            ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(outStream.getDataWritten()));
+            byte[] buf = null;
+            int dataRead = 0;
 
-        //Entry 1
-        ZipEntry entry1 = zis.getNextEntry();
-        Assert.assertNotNull(entry1);
-        Assert.assertEquals(fileKey1, entry1.getName());
-        buf = new byte[file1Data.length];
-        dataRead = zis.read(buf);
-        Assert.assertEquals(buf.length, dataRead);
-        Assert.assertArrayEquals(file1Data, buf);
+            // Entry 1
+            ZipEntry entry1 = zis.getNextEntry();
+            Assert.assertNotNull(entry1);
+            Assert.assertEquals(fileKey1, entry1.getName());
+            buf = new byte[file1Data.length];
+            dataRead = zis.read(buf);
+            Assert.assertEquals(buf.length, dataRead);
+            Assert.assertArrayEquals(file1Data, buf);
 
-        //Entry 2
-        ZipEntry entry2 = zis.getNextEntry();
-        Assert.assertNotNull(entry2);
-        Assert.assertEquals(fileKey2, entry2.getName());
-        buf = new byte[file2Data.length];
-        dataRead = zis.read(buf);
-        Assert.assertEquals(buf.length, dataRead);
-        Assert.assertArrayEquals(file2Data, buf);
+            // Entry 2
+            ZipEntry entry2 = zis.getNextEntry();
+            Assert.assertNotNull(entry2);
+            Assert.assertEquals(fileKey2, entry2.getName());
+            buf = new byte[file2Data.length];
+            dataRead = zis.read(buf);
+            Assert.assertEquals(buf.length, dataRead);
+            Assert.assertArrayEquals(file2Data, buf);
 
-        //Entry 3
-        ZipEntry entry3 = zis.getNextEntry();
-        Assert.assertNotNull(entry3);
-        Assert.assertEquals(fileKey3, entry3.getName());
-        buf = new byte[file3Data.length];
-        dataRead = zis.read(buf);
-        Assert.assertEquals(buf.length, dataRead);
-        Assert.assertArrayEquals(file3Data, buf);
+            // Entry 3
+            ZipEntry entry3 = zis.getNextEntry();
+            Assert.assertNotNull(entry3);
+            Assert.assertEquals(fileKey3, entry3.getName());
+            buf = new byte[file3Data.length];
+            dataRead = zis.read(buf);
+            Assert.assertEquals(buf.length, dataRead);
+            Assert.assertArrayEquals(file3Data, buf);
 
-        //And that should be it
-        Assert.assertNull(zis.getNextEntry());
+            // And that should be it
+            Assert.assertNull(zis.getNextEntry());
+        }
     }
 
     /**
      * Tests that downloading multiple job files fails if user doesn't own job
      */
-    @Test
-    public void testDownloadJobFilesNoPermission() throws Exception {
+    @Test(expected=AccessDeniedException.class)
+    public void testDownloadJobFilesNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -944,15 +963,14 @@ public class TestJobListController extends PortalTestClass {
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files, mockPortalUser);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
+        controller.downloadAsZip(mockRequest, mockResponse, jobId, files, mockPortalUser);
     }
 
     /**
      * Tests that downloading multiple job files fails if job DNE
      */
     @Test
-    public void testDownloadJobFilesDNE() throws Exception {
+    public void testDownloadJobFilesDNE() {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final String files = "filekey1,filekey2";
@@ -972,7 +990,7 @@ public class TestJobListController extends PortalTestClass {
      * Tests that querying for a set of series returns correct values
      */
     @Test
-    public void testQuerySeries() throws Exception {
+    public void testQuerySeries() {
         final String userEmail = "exampleuser@email.com";
         final String qUser = "exampleuser@email.com";
         final String qName = "name";
@@ -997,7 +1015,7 @@ public class TestJobListController extends PortalTestClass {
      * Tests that querying for a set of series with no params filters via session email
      */
     @Test
-    public void testQuerySeriesNoUser() throws Exception {
+    public void testQuerySeriesNoUser() {
         final String userEmail = "exampleuser@email.com";
         final String qName = null;
         final String qDescription = null;
@@ -1026,7 +1044,7 @@ public class TestJobListController extends PortalTestClass {
      * @throws Exception
      */
     @Test
-    public void testCreateFolder() throws Exception {
+    public void testCreateFolder() {
         final String userEmail = "exampleuser@email.com";
         final String qName = "default";
         final String qDescription = "Everything will now come through to a single default series";
@@ -1048,7 +1066,7 @@ public class TestJobListController extends PortalTestClass {
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void testListJobs() throws Exception {
+    public void testListJobs() {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
@@ -1110,8 +1128,8 @@ public class TestJobListController extends PortalTestClass {
      * Tests that listing a job fails when its the incorrect user
      * @throws Exception
      */
-    @Test
-    public void testListJobsNoPermission() throws Exception {
+    @Test(expected=AccessDeniedException.class)
+    public void testListJobsNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
         final int seriesId = 1234;
@@ -1125,7 +1143,6 @@ public class TestJobListController extends PortalTestClass {
         }});
 
         ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false, mockPortalUser);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
     /**
@@ -1133,7 +1150,7 @@ public class TestJobListController extends PortalTestClass {
      * @throws Exception
      */
     @Test
-    public void testListJobsDNE() throws Exception {
+    public void testListJobsDNE() {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
 
@@ -1168,35 +1185,50 @@ public class TestJobListController extends PortalTestClass {
         existingJob.setComputeServiceId(computeServiceId);
         existingJob.setStorageServiceId(storageServiceId);
 
-        final ByteArrayOutputStream bos1 = new ByteArrayOutputStream();
-        final ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
+        try (final ByteArrayOutputStream bos1 = new ByteArrayOutputStream();
+                final ByteArrayOutputStream bos2 = new ByteArrayOutputStream()) {
 
-        context.checking(new Expectations() {{
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+            context.checking(new Expectations() {
+                {
+                    allowing(mockPortalUser).getEmail();
+                    will(returnValue(userEmail));
 
-            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(existingJob));
-            allowing(mockJobManager).saveJob(with(aNonMatchingVeglJob(jobId)));
+                    oneOf(mockJobManager).getJobById(jobId, mockPortalUser);
+                    will(returnValue(existingJob));
+                    allowing(mockJobManager).saveJob(with(aNonMatchingVeglJob(jobId)));
 
-            oneOf(mockFileStagingService).generateStageInDirectory(with(aNonMatchingVeglJob(jobId)));
-            oneOf(mockFileStagingService).writeFile(with(aNonMatchingVeglJob(jobId)), with(cloudFiles[0].getName()));will(returnValue(bos1));
-            oneOf(mockFileStagingService).writeFile(with(aNonMatchingVeglJob(jobId)), with(cloudFiles[1].getName()));will(returnValue(bos2));
+                    oneOf(mockFileStagingService).generateStageInDirectory(with(aNonMatchingVeglJob(jobId)));
+                    oneOf(mockFileStagingService).writeFile(with(aNonMatchingVeglJob(jobId)),
+                            with(cloudFiles[0].getName()));
+                    will(returnValue(bos1));
+                    oneOf(mockFileStagingService).writeFile(with(aNonMatchingVeglJob(jobId)),
+                            with(cloudFiles[1].getName()));
+                    will(returnValue(bos2));
 
-            oneOf(mockCloudStorageServices[0]).generateBaseKey(with(aNonMatchingVeglJob(jobId)));will(returnValue(baseKey));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(aVeglJob(jobId)));will(returnValue(cloudFiles));
-            oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[0].getName()));will(returnValue(is1));
-            oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[1].getName()));will(returnValue(is2));
+                    oneOf(mockCloudStorageServices[0]).generateBaseKey(with(aNonMatchingVeglJob(jobId)));
+                    will(returnValue(baseKey));
+                    oneOf(mockCloudStorageServices[0]).listJobFiles(with(aVeglJob(jobId)));
+                    will(returnValue(cloudFiles));
+                    oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[0].getName()));
+                    will(returnValue(is1));
+                    oneOf(mockCloudStorageServices[0]).getJobFile(with(aVeglJob(jobId)), with(cloudFiles[1].getName()));
+                    will(returnValue(is2));
 
-            //We should have 1 call to our job manager to create a job audit trail record
-            oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)), with(any(String.class)));
-        }});
+                    // We should have 1 call to our job manager to create a job
+                    // audit trail record
+                    oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)),
+                            with(any(String.class)));
+                }
+            });
 
-        ModelAndView mav = controller.duplicateJob(mockRequest, mockResponse, jobId, files, mockPortalUser);
-        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+            ModelAndView mav = controller.duplicateJob(mockRequest, mockResponse, jobId, files, mockPortalUser);
+            Assert.assertTrue((Boolean) mav.getModel().get("success"));
 
-        byte[] fis1Data = bos1.toByteArray();
-        byte[] fis2Data = bos2.toByteArray();
+            byte[] fis1Data = bos1.toByteArray();
+            byte[] fis2Data = bos2.toByteArray();
 
-        Assert.assertArrayEquals(data1, fis1Data);
-        Assert.assertArrayEquals(data2, fis2Data);
+            Assert.assertArrayEquals(data1, fis1Data);
+            Assert.assertArrayEquals(data2, fis2Data);
+        }
     }
 }

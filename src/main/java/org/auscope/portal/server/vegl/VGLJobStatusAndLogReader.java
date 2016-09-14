@@ -20,13 +20,11 @@ import org.springframework.ui.ModelMap;
 
 public class VGLJobStatusAndLogReader extends BaseCloudController implements JobStatusReader {
 
-    private VEGLJobManager jobManager;
 
     public VGLJobStatusAndLogReader(VEGLJobManager jobManager,
             CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices) {
-        super(cloudStorageServices, cloudComputeServices);
-        this.jobManager = jobManager;
+        super(cloudStorageServices, cloudComputeServices, jobManager);
     }
 
     /**
@@ -148,6 +146,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
      * Using the services internal to the class, determine the current status of this job. Service failure
      * will return the underlying job status
      */
+    @Override
     public String getJobStatus(CloudJob cloudJob) {
 
         String stsArn = cloudJob.getProperty(CloudJob.PROPERTY_STS_ARN);
@@ -165,7 +164,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         if (job.getStatus().equals(JobBuilderController.STATUS_DONE) ||
                 job.getStatus().equals(JobBuilderController.STATUS_UNSUBMITTED) ||
                         job.getStatus().equals(JobBuilderController.STATUS_INQUEUE) ||
-                                job.getStatus().equals(JobBuilderController.STATUS_ERROR)|| 
+                                job.getStatus().equals(JobBuilderController.STATUS_ERROR)||
                                     job.getStatus().equals(JobBuilderController.STATUS_WALLTIME_EXCEEDED)) {
             return job.getStatus();
         }
@@ -196,7 +195,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         } else if(jobWalltimeExceeded) {
             expectedStatus = JobBuilderController.STATUS_WALLTIME_EXCEEDED;
         }
-        
+
         // If the walltime has exceeded and the VM side walltime check has
         // failed to shut the instance down, shut it down
         if(jobStarted && !jobFinished && job.isWalltimeSet()) {
@@ -236,7 +235,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         return expectedStatus;
     }
 
-    private boolean containsFile(CloudFileInformation[] files, String fileName) {
+    private static boolean containsFile(CloudFileInformation[] files, String fileName) {
         if (files == null) {
             return false;
         }

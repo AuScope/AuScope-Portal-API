@@ -46,7 +46,7 @@ public class TestWFSController extends PortalTestClass {
         ModelAndView mav = controller.requestFeatureCount(serviceUrl, featureType, bboxCrs, northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, maxFeatures);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success")); 
-        Assert.assertEquals((Integer) result.getNumberOfFeatures(), (Integer) mav.getModel().get("data"));   
+        Assert.assertEquals(result.getNumberOfFeatures(), mav.getModel().get("data"));   
     }
     
     @Test
@@ -88,6 +88,7 @@ public class TestWFSController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success")); 
         
+        @SuppressWarnings("unchecked")
         Collection<ModelMap> data = (Collection<ModelMap>) mav.getModel().get("data");
         Assert.assertNotNull(mav);
         String[] resultingFormats = new String[data.size()];
@@ -133,7 +134,6 @@ public class TestWFSController extends PortalTestClass {
     
     @Test
     public void testRequestFeature_ServiceError() throws Exception {
-        final String gmlBlob = "gmlBlob";
         final String wfsUrl = "http://service/wfs";
         final String featureType = "type:name";
         final String featureId = "feature-id";

@@ -68,7 +68,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                     }
             },
             items: [{
-                xtype : 'jobinputfilespanel',
+                xtype : 'jobfilespanel',
                 itemId : 'files-panel',
                 currentJobId : wizardState.jobId,
                 title: 'Input files',
@@ -80,7 +80,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
                     align : 'right',
                     scope: this,
                     handler: function() {
-                        this._doPopup('vegl.widgets.JobInputFileCopyWindow', 800, 400);
+                        this._doPopup('vegl.widgets.JobInputFileCopyWindow', 870, 400);
                     }
                 },{
                     text: 'Remote Download',

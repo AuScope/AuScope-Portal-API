@@ -56,7 +56,16 @@ Ext.define('vegl.widgets.JobInputFileCopyWindow', {
                     xtype: 'splitter'
                 },{
                     xtype: 'jobfilespanel',
-                    width: 330,
+                    width: 400,
+                    currentJobId: this.jobId,
+                    cloudFiles: true,
+                    fileGroupName: 'Files in cloud storage',
+                    remoteGroupName: 'Data service downloads',
+                    nameColumnWidth: 150,
+                    hideDeleteButton: true,
+                    hideRowExpander: true,
+                    hideLocationColumn: true,
+                    emptyText: '<p class="centeredlabel">This job doesn\'t have any input files or service downloads configured.</p>',
                     selModel: {
                         selType: 'checkboxmodel'
                     }
@@ -64,7 +73,7 @@ Ext.define('vegl.widgets.JobInputFileCopyWindow', {
             }],
             buttons:[{
                 xtype: 'button',
-                text: 'Use files in Job',
+                text: 'Copy selections to Job',
                 scope : this,
                 iconCls : 'add',
                 handler: function() {
@@ -114,17 +123,21 @@ Ext.define('vegl.widgets.JobInputFileCopyWindow', {
      */
     addJobFile : function(filePanel) {
         var selectedJobs = this.down('jobstree').getSelection();
-        var selectedFiles = this.down('jobfilespanel').getSelection();
+        var selectedItems = this.down('jobfilespanel').getSelection();
 
 
-        if (Ext.isEmpty(selectedJobs) || Ext.isEmpty(selectedFiles)) {
+        if (Ext.isEmpty(selectedJobs) || Ext.isEmpty(selectedItems)) {
             Ext.Msg.alert("No Files Selected", "You haven't selected any files to copy to this job.");
             return;
         }
 
-        var keys = selectedFiles.map(function(file) {
-            return file.get('name');
-        });
+        var fileKeys = selectedItems
+            .filter(function(item) {return item.get('source') instanceof vegl.models.FileRecord;})
+            .map(function(file) {return file.get('name');});
+
+        var downloadIds = selectedItems
+            .filter(function(item) {return item.get('source') instanceof vegl.models.Download;})
+            .map(function(download) {return download.get('source').get('id');});
 
         var mask = new Ext.LoadMask({
             msg: 'Copying Files...',
@@ -137,7 +150,8 @@ Ext.define('vegl.widgets.JobInputFileCopyWindow', {
             params: {
                 sourceJobId: selectedJobs[0].get('id'),
                 targetJobId: this.jobId,
-                key: keys
+                fileKey: fileKeys,
+                downloadId: downloadIds,
             },
             scope: this,
             callback: function(options, success, response) {

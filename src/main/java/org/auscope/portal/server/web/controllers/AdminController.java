@@ -48,7 +48,7 @@ public class AdminController {
     public AdminController(@Qualifier(value = "cswServiceList") ArrayList<CSWServiceItem> cswServiceList,
             VglAdminService adminService) {
         this.adminService = adminService;
-        this.cswServiceList = new ArrayList<CSWServiceItem>();
+        this.cswServiceList = new ArrayList<>();
         for (int i = 0; i < cswServiceList.size(); i++) {
             this.cswServiceList.add(cswServiceList.get(i));
         }
@@ -59,7 +59,7 @@ public class AdminController {
      * @param response a response from the AdminService
      * @return
      */
-    private ModelAndView generateTestResponse(AdminDiagnosticResponse response) {
+    private static ModelAndView generateTestResponse(AdminDiagnosticResponse response) {
         JSONView view = new JSONView();
         ModelMap model = new ModelMap();
 
@@ -80,8 +80,8 @@ public class AdminController {
     @RequestMapping("/testExternalConnectivity.diag")
     public ModelAndView testExternalConnectivity() throws MalformedURLException {
         URL[] urlsToTest = new URL[] {
-            new URL("http://www.google.com"),
-            new URL("https://www.google.com")
+                new URL("http://www.google.com"),
+                new URL("https://www.google.com")
         };
 
         AdminDiagnosticResponse response = adminService.externalConnectivity(urlsToTest);
@@ -107,14 +107,14 @@ public class AdminController {
      * @param selectors The selector (WFS type name, WMS layer name etc). Must be the same length as endpoints
      * @return
      */
-    private List<EndpointAndSelector> parseEndpointAndSelectors(String[] endpoints, String[] selectors) {
+    private static List<EndpointAndSelector> parseEndpointAndSelectors(String[] endpoints, String[] selectors) {
         //Make sure the view is calling this method correctly
         if (endpoints == null || selectors == null || endpoints.length != selectors.length) {
             throw new IllegalArgumentException("serviceUrls.length != typeNames.length");
         }
 
         //Build our list of endpoints (skip duplicates)
-        List<EndpointAndSelector> result = new ArrayList<EndpointAndSelector>();
+        List<EndpointAndSelector> result = new ArrayList<>();
         for (int i = 0; i < endpoints.length; i++) {
             EndpointAndSelector eas = new EndpointAndSelector(endpoints[i], selectors[i]);
             if (!result.contains(eas)) {
@@ -136,8 +136,8 @@ public class AdminController {
      */
     @RequestMapping("/testWFS.diag")
     public ModelAndView testWFS(@RequestParam("serviceUrls") String[] serviceUrls,
-                                @RequestParam("typeNames") String[] typeNames,
-                                @RequestParam("bbox") String bboxJson) throws URISyntaxException {
+            @RequestParam("typeNames") String[] typeNames,
+            @RequestParam("bbox") String bboxJson) throws URISyntaxException {
 
         //No point in proceeding with test without a valid bbox
         FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
@@ -164,8 +164,8 @@ public class AdminController {
      */
     @RequestMapping("/testWMS.diag")
     public ModelAndView testWMS(@RequestParam("serviceUrls") String[] serviceUrls,
-                                @RequestParam("layerNames") String[] layerNames,
-                                @RequestParam("bbox") String bboxJson) throws URISyntaxException {
+            @RequestParam("layerNames") String[] layerNames,
+            @RequestParam("bbox") String bboxJson) throws URISyntaxException {
 
         //No point in proceeding with test without a valid bbox
         FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);

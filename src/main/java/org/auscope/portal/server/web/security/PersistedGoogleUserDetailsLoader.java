@@ -47,7 +47,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
      */
     public PersistedGoogleUserDetailsLoader(String defaultRole, Map<String, List<String>> rolesByUser) {
         this.defaultRole = defaultRole;
-        this.rolesByUser = new HashMap<String, List<String>>();
+        this.rolesByUser = new HashMap<>();
         this.random = new SecureRandom();
         if (rolesByUser != null) {
             for (Entry<String, List<String>> entry : rolesByUser.entrySet()) {
@@ -99,10 +99,9 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
         return userInfo.containsKey("id");
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UserDetails createUser(String id, Map<String, Object> userInfo) {
-        List<ANVGLAuthority> authorities = new ArrayList<ANVGLAuthority>();
+        List<ANVGLAuthority> authorities = new ArrayList<>();
         authorities.add(new ANVGLAuthority(defaultRole));
         if (rolesByUser != null) {
             List<String> additionalAuthorities = rolesByUser.get(id);

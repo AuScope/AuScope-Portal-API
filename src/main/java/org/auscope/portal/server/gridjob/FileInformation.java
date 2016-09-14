@@ -9,8 +9,6 @@ package org.auscope.portal.server.gridjob;
 import java.io.File;
 import java.io.Serializable;
 
-import org.auscope.portal.server.vegl.VEGLJob;
-
 /**
  * Simple bean class that stores basic information about a file. Designed to be passed between GUI and backend
  *
@@ -28,7 +26,7 @@ public class FileInformation implements Serializable {
     /** parent directory path */
     private String parentPath = "";
     /** job */
-    private VEGLJob parent;
+//    private VEGLJob parent;
 
     public FileInformation(File file) {
         this.name = file.getName();
@@ -95,9 +93,9 @@ public class FileInformation implements Serializable {
         return parentPath;
     }
 
-    public void setParent(VEGLJob parent) {
-        this.parent = parent;
-    }
+//    public void setParent(VEGLJob parent) {
+//        this.parent = parent;
+//    }
 
     /**
      * @param parentPath the parentPath to set

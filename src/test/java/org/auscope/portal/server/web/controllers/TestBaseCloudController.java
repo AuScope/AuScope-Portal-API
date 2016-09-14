@@ -4,6 +4,7 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VEGLJob;
+import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,7 +18,7 @@ public class TestBaseCloudController extends PortalTestClass {
         public TestableBaseCloudController(
                 CloudStorageService[] cloudStorageServices,
                 CloudComputeService[] cloudComputeServices) {
-            super(cloudStorageServices, cloudComputeServices);
+            super(cloudStorageServices, cloudComputeServices, mockJobManager);
         }
     }
 
@@ -28,6 +29,8 @@ public class TestBaseCloudController extends PortalTestClass {
     CloudComputeService[] mockComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class, "ccs1"),
                                                                             context.mock(CloudComputeService.class, "ccs2"),
                                                                             context.mock(CloudComputeService.class, "ccs3")};
+
+    VEGLJobManager mockJobManager = context.mock(VEGLJobManager.class);
 
     /**
      * Configure mock services
@@ -47,10 +50,9 @@ public class TestBaseCloudController extends PortalTestClass {
 
     /**
      * Tests getting a storage service works with a string
-     * @throws Exception
      */
     @Test
-    public void testGetStorageService() throws Exception {
+    public void testGetStorageService() {
         TestableBaseCloudController controller = new TestableBaseCloudController(mockStorageServices, mockComputeServices);
 
         String existingId = "anotherId-s";
@@ -67,10 +69,9 @@ public class TestBaseCloudController extends PortalTestClass {
 
     /**
      * Tests getting a storage service works with a job
-     * @throws Exception
      */
     @Test
-    public void testGetStorageService_Job() throws Exception {
+    public void testGetStorageService_Job() {
         TestableBaseCloudController controller = new TestableBaseCloudController(mockStorageServices, mockComputeServices);
 
         String existingId = "anotherId-s";
@@ -92,10 +93,9 @@ public class TestBaseCloudController extends PortalTestClass {
 
     /**
      * Tests getting a Compute service works with a string
-     * @throws Exception
      */
     @Test
-    public void testGetComputeService() throws Exception {
+    public void testGetComputeService() {
         TestableBaseCloudController controller = new TestableBaseCloudController(mockStorageServices, mockComputeServices);
 
         String existingId = "anotherId-c";
@@ -115,7 +115,7 @@ public class TestBaseCloudController extends PortalTestClass {
      * @throws Exception
      */
     @Test
-    public void testGetComputeService_Job() throws Exception {
+    public void testGetComputeService_Job() {
         TestableBaseCloudController controller = new TestableBaseCloudController(mockStorageServices, mockComputeServices);
 
         String existingId = "anotherId-c";

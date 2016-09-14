@@ -1,6 +1,5 @@
 package org.auscope.portal.server.web.security;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author Josh Vote (CSIRO)
  *
  */
-public class ANVGLUser implements UserDetails, Serializable {
+public class ANVGLUser implements UserDetails {
 
     private String id;
     private String fullName;
@@ -28,7 +27,7 @@ public class ANVGLUser implements UserDetails, Serializable {
     private Integer acceptedTermsConditions;
 
     public ANVGLUser() {
-        this.authorities = new ArrayList<ANVGLAuthority>();
+        this.authorities = new ArrayList<>();
     }
 
     public ANVGLUser(String id, String fullName, String email, List<ANVGLAuthority> authorities) {
