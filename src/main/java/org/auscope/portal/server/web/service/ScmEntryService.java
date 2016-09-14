@@ -91,18 +91,8 @@ public class ScmEntryService {
      * @param user Authenticated ANVGLUser
      * @throws PortalServiceException
      */
-    public void updateJobForSolution(String jobId, Set<String> solutions, ANVGLUser user)
+    public void updateJobForSolution(VEGLJob job, Set<String> solutions, ANVGLUser user)
             throws PortalServiceException {
-        //Lookup our job
-        VEGLJob job = null;
-        try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (Exception ex) {
-            logger.warn("Unable to lookup job with id " + jobId + ": " + ex.getMessage());
-            logger.debug("exception:", ex);
-            throw new PortalServiceException("Unable to lookup job with id " + jobId, ex);
-        }
-
         // Store the solutionId in the job
         job.setJobSolutions(solutions);
 

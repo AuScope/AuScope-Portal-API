@@ -36,6 +36,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -344,7 +345,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests deleting a job fails when its another users job
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testDeleteJobNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "adifferentuser@email.com";
@@ -359,8 +360,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
-        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
     }
 
     /**
@@ -426,7 +426,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests deleting a series fails when the user doesn't have permission
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testDeleteSeriesNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
@@ -440,8 +440,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getSeriesById(seriesId, userEmail);will(returnValue(mockSeries));
         }});
 
-        ModelAndView mav = controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.deleteSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
     }
 
     /**
@@ -536,7 +535,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests that killing a job fails when its not the user's job
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testKillJobNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
@@ -551,8 +550,7 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
         }});
 
-        ModelAndView mav = controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
     }
 
     /**
@@ -630,7 +628,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests that killing all jobs of a series fails when the user lacks permission
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testKillSeriesJobsNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
@@ -644,8 +642,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
         }});
 
-        ModelAndView mav = controller.killSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.killSeriesJobs(mockRequest, mockResponse, seriesId, mockPortalUser);
     }
 
     /**
@@ -699,7 +696,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * tests listing job files fails if the user doesnt have permission
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testListJobFilesNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
@@ -714,8 +711,7 @@ public class TestJobListController extends PortalTestClass {
 
         }});
 
-        ModelAndView mav = controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
-        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+        controller.jobCloudFiles(mockRequest, mockResponse, jobId, mockPortalUser);
     }
 
     /**
@@ -811,7 +807,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests that downloading a single job file fails when the user doesnt own the job
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testDownloadJobFileNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
@@ -827,9 +823,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockJob).getUser();will(returnValue(jobEmail));
         }});
 
-        //Returns null on success
-        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key, mockPortalUser);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
+        controller.downloadFile(mockRequest, mockResponse, jobId, fileName, key, mockPortalUser);
     }
 
     /**
@@ -954,7 +948,7 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests that downloading multiple job files fails if user doesn't own job
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testDownloadJobFilesNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
@@ -969,8 +963,7 @@ public class TestJobListController extends PortalTestClass {
         }});
 
         //Returns null on success
-        ModelAndView mav = controller.downloadAsZip(mockRequest, mockResponse, jobId, files, mockPortalUser);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
+        controller.downloadAsZip(mockRequest, mockResponse, jobId, files, mockPortalUser);
     }
 
     /**
@@ -1135,7 +1128,7 @@ public class TestJobListController extends PortalTestClass {
      * Tests that listing a job fails when its the incorrect user
      * @throws Exception
      */
-    @Test
+    @Test(expected=AccessDeniedException.class)
     public void testListJobsNoPermission() {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
@@ -1150,7 +1143,6 @@ public class TestJobListController extends PortalTestClass {
         }});
 
         ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false, mockPortalUser);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
 
     /**
