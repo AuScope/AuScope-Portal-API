@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
@@ -67,6 +66,7 @@
         <constructor-arg name="anvglFileStagingService" ref="fileStagingService"/>
         <constructor-arg name="cloudStorageServices" ref="cloudStorageService-aws-sydney"/>
         <constructor-arg name="promsUrl" value="${HOST.proms.report.url}"/>
+        <constructor-arg name="promsReportingSystemUri" value="${HOST.proms.reportingsystem.uri}"/>
     </bean>
     
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
