@@ -7,3 +7,5 @@ src/main/resources/env.properties
 .pydevproject
 /build/
 **/.tern-port
+anvgl
+anvgl.pub

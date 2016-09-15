@@ -59,15 +59,8 @@ public class ANVGLProvenanceService {
     /** Document type for output. */
     private static final String TURTLE_FORMAT = "TTL";
 
-    /* Can be changed in application context */
-    /*
-    private String promsUrl = "http://proms-dev.geoanalytics.csiro.au/id/report/";
-    private final String reportingSystemUrl = "http://anvgl.org.au/rs";
-    */
-    private String promsUrl = "http://proms-dev1-vc.it.csiro.au/id/report/";
-    private final String reportingSystemUrl = "http://localhost/reportingsystem/25b174d9-4a32-4cb5-ae7b-c07b04bf6482";
-    
     private URI PROMSService = null;
+    private String PROMSReportingSystem = "";
 
     /**
      * URL of the current webserver. Will need to be set by classes using this
@@ -98,10 +91,11 @@ public class ANVGLProvenanceService {
     @Autowired
     public ANVGLProvenanceService(final ANVGLFileStagingService anvglFileStagingService,
             final CloudStorageService[] cloudStorageServices,
-            @Value("${HOST.proms.report.url}") String promsUrl) {
+            @Value("${HOST.proms.report.url}") String promsUrl,
+            @Value("${HOST.proms.reportingsystem.uri}") String promsReportingSystemUri) {
         this.anvglFileStagingService = anvglFileStagingService;
         this.cloudStorageServices = cloudStorageServices;
-        this.promsUrl = promsUrl;
+        this.PROMSReportingSystem = promsReportingSystemUri;
         try {
             this.PROMSService = new URI(promsUrl);
         } catch (URISyntaxException e) {
@@ -276,28 +270,25 @@ public class ANVGLProvenanceService {
         return inputs;
     }
 
-    public void generateAndSaveReport(Activity activity, URI PROMSURI, VEGLJob job) {
+    public HttpResponse generateAndSaveReport(Activity activity, VEGLJob job) {
+        HttpResponse response = null;
         //String server = ANVGLServerURL.INSTANCE.get();
         try {
             Report report = new ExternalReport().setActivity(activity).setTitle(job.getName())
                     .setGeneratedAtTime(new Date()).setNativeId(Integer.toString(job.getId()))
-                    .setReportingSystemUri(new URI(reportingSystemUrl));
+                    .setReportingSystemUri(new URI(PROMSReportingSystem));
             ProvenanceReporter reporter = new ProvenanceReporter();
-            HttpResponse resp = reporter.postReport(PROMSURI, report);
-            Header[] headers = resp.getHeaders("Link");
-            if(headers.length > 0) {
-                String reportLink = headers[0].getValue();
-                System.out.println("Report link: " + reportLink);
-            }
+            response = reporter.postReport(PROMSService, report);
             this.uploadModel(report.getGraph(), job);
             StringWriter stringWriter = new StringWriter();
             report.getGraph().write(new PrintWriter(stringWriter), "TURTLE");
             String reportString = stringWriter.toString();
             LOGGER.trace(reportString);
-            LOGGER.trace(resp);
+            LOGGER.trace(response);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
+        return response;
     }
 
     /**
@@ -310,6 +301,7 @@ public class ANVGLProvenanceService {
      * @param job
      *            Completed virtual labs job, about which we will finish our
      *            provenance gathering.
+     * @return the URL of the PROMS report if successful, empty String otherwise
      */
     public String createEntitiesForOutputs(final VEGLJob job) {
         Set<Entity> outputs = new HashSet<>();
@@ -317,6 +309,7 @@ public class ANVGLProvenanceService {
         CloudStorageService cloudStorageService = getStorageService(job);
         CloudFileInformation[] fileInformationSet;
         Activity activity = null;
+        String reportLink = "";
         try {
             fileInformationSet = cloudStorageService.listJobFiles(job);
             for (CloudFileInformation information : fileInformationSet) {
@@ -355,12 +348,17 @@ public class ANVGLProvenanceService {
                 }
             }
             activity.setGeneratedEntities(outputs);
-            generateAndSaveReport(activity, PROMSService, job);
+            HttpResponse response = generateAndSaveReport(activity, job);
             StringWriter out = new StringWriter();
             activity.getGraph().write(out, TURTLE_FORMAT, serverURL());
-            return out.toString();
-        } else {
-            return "";
+            if(response != null) {
+                Header[] headers = response.getHeaders("Link");
+                if(headers.length > 0) {
+                    reportLink = headers[0].getValue();
+                    reportLink = reportLink.substring(reportLink.indexOf('<') + 1, reportLink.indexOf('>'));
+                }
+            }
         }
+        return reportLink;
     }
 }
