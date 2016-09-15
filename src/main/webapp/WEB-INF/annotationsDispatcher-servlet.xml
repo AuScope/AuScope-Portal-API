@@ -32,11 +32,19 @@
 <!--         <property name="ignoreUnresolvablePlaceholders" value="true" />
  -->    </bean>
 
-	 <mvc:annotation-driven>
+	 <mvc:annotation-driven conversion-service="conversionService">
     	<mvc:argument-resolvers>
            <bean class="org.springframework.security.web.bind.support.AuthenticationPrincipalArgumentResolver" />      
       	</mvc:argument-resolvers>
     </mvc:annotation-driven>
+    
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <list>
+                <bean class="org.auscope.portal.server.web.StringToArrayConversionBlocker" />
+            </list>
+        </property>
+    </bean>
 
     <!-- creates a java.util.Properties instance with values loaded from the supplied location -->
     <!-- TO DO: Check if we need this  -->
