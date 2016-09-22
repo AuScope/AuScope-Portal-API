@@ -16,9 +16,10 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.server.vegl.VEGLJob;
+import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
@@ -43,7 +44,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Richard Goh
  */
 @Controller
-public class ScriptBuilderController extends BasePortalController {
+public class ScriptBuilderController extends BaseModelController {
 
     private final Log logger = LogFactory.getLog(getClass());
 
@@ -61,8 +62,9 @@ public class ScriptBuilderController extends BasePortalController {
      */
     @Autowired
     public ScriptBuilderController(ScriptBuilderService sbService,
+                                   VEGLJobManager jobManager,
                                    ScmEntryService scmEntryService) {
-        super();
+        super(jobManager);
         this.sbService = sbService;
         this.scmEntryService = scmEntryService;
     }
@@ -85,8 +87,13 @@ public class ScriptBuilderController extends BasePortalController {
             return generateJSONResponseMAV(false, null, "No source text specified");
         }
 
+        VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
+        if (job == null) {
+            return generateJSONResponseMAV(false);
+        }
+
         try {
-            sbService.saveScript(jobId, sourceText, user);
+            sbService.saveScript(job, sourceText, user);
         } catch (PortalServiceException ex) {
             logger.warn("Unable to save job script for job with id " + jobId + ": " + ex.getMessage());
             logger.debug("error:", ex);
@@ -95,7 +102,7 @@ public class ScriptBuilderController extends BasePortalController {
 
         // Update job with vmId for solution if we have one.
         try {
-            scmEntryService.updateJobForSolution(jobId, solutions, user);
+            scmEntryService.updateJobForSolution(job, solutions, user);
         }
         catch (PortalServiceException e) {
             logger.warn("Failed to update job (" + jobId + ") for solutions (" +
@@ -117,8 +124,13 @@ public class ScriptBuilderController extends BasePortalController {
         logger.debug("getSavedScript with jobId: " + jobId);
         String script = null;
 
+        VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
+        if (job == null) {
+            return generateJSONResponseMAV(false);
+        }
+
         try {
-            script = sbService.loadScript(jobId, user);
+            script = sbService.loadScript(job, user);
         } catch (PortalServiceException ex) {
             logger.error("Unable to load saved script for job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, ex.getMessage(), ex.getErrorCorrection());

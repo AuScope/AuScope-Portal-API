@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusChangeListener;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -53,7 +54,7 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
                 LOG.debug("Unable to set process duration for" + job, ex);
             }
             vglJob.setStatus(newStatus);
-            // Execution time, only accurate to 5 minutes and may not be set\
+            // Execution time, only accurate to 5 minutes and may not be set
             // for short jobs so will be set later from the job log 
             if(newStatus.equals(JobBuilderController.STATUS_PENDING) ||
                     newStatus.equals(JobBuilderController.STATUS_ACTIVE))
@@ -71,6 +72,11 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
             }
             // Job successfully completed
             if(newStatus.equals(JobBuilderController.STATUS_DONE)) {
+                // Provenance
+                String reportUrl = anvglProvenanceService.createEntitiesForOutputs(vglJob);
+                if(!reportUrl.equals("")) {
+                    vglJob.setPromsReportUrl(reportUrl);
+                }
                 // Get job execution date/time from log
                 String execDateLog = jobStatusLogReader.getSectionedLog(vglJob,  "Execute");
                 if(execDateLog != null) {
@@ -79,13 +85,11 @@ public class VGLJobStatusChangeHandler implements JobStatusChangeListener {
                     try {
                         Date d = formatter.parse(execDateLog);
                         vglJob.setExecuteDate(d);
-                        jobManager.saveJob(vglJob);
                     } catch(ParseException pe) {
                         LOG.warn("Unable to read job execution date from log file");
                     }
                 }
-                // Provenance
-                anvglProvenanceService.createEntitiesForOutputs(vglJob);
+                jobManager.saveJob(vglJob);
             }
         }
     }

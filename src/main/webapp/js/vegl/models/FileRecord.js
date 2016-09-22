@@ -21,6 +21,7 @@ Ext.define('vegl.models.FileRecord', {
         switch(this.get('name')) {
         case 'vl.end':
         case 'workflow-version.txt':
+        case 'vl-download.sh':
             return true;
         default:
             return false;

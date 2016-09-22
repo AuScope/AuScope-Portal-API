@@ -136,6 +136,10 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             will(returnValue(new Date()));
             allowing(preparedJob).getUser();
             will(returnValue("foo@test.com"));
+            allowing(preparedJob).getPromsReportUrl();
+            will(returnValue("http://promsurl/id/report"));
+            allowing(preparedJob).getExecuteDate();
+            will(returnValue(new Date()));
             
             /*
             allowing(preparedJob).getJobFiles();
@@ -167,7 +171,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             will(returnValue(response));
         }});
         
-        anvglProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, "http://mockurl");
+        anvglProvenanceService = new ANVGLProvenanceService(fileServer, storageServices, "http://mockurl", "http://mockreportingsystemuri");
         anvglProvenanceService.setServerURL(serverURL);
     }
 
@@ -206,13 +210,6 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
         Set<Entity> entities = anvglProvenanceService.createEntitiesForInputs(preparedJob, null, mockPortalUser);
         Assert.assertNotNull(entities);
         Assert.assertEquals(3, entities.size());
-    }
-
-    @Test
-    public void testCreateEntitiesForOutputs() throws Exception {
-        String graph = anvglProvenanceService.createEntitiesForOutputs(preparedJob);
-        Assert.assertTrue(graph.contains(initialTurtle));
-        Assert.assertTrue(graph.contains(endedTurtle));
     }
 
     @Test

@@ -30,6 +30,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private boolean emailNotification;
     private String processTimeLog;
     private String storageBucket;
+    private String promsReportUrl;
 
     /**
      * max walltime for the job. 0 or null indicate that no walltime applies to the job
@@ -274,6 +275,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setStorageBucket(this.getStorageBucket());
         newJob.setWalltime(this.getWalltime());
         newJob.setExecuteDate(this.getExecuteDate());
+        newJob.setPromsReportUrl(this.getPromsReportUrl());
         newJob.setContainsPersistentVolumes(this.isContainsPersistentVolumes());
 
         List<VglDownload> newDownloads = new ArrayList<>();
@@ -347,6 +349,17 @@ public class VEGLJob extends CloudJob implements Cloneable {
     public void setExecuteDate(Date executeDate) {
         this.executeDate = executeDate;
     }
+    
+    /**
+     * @return The URL of the associated PROMS Report
+     */
+    public String getPromsReportUrl() {
+        return promsReportUrl;
+    }
+
+    public void setPromsReportUrl(String promsReportUrl) {
+        this.promsReportUrl = promsReportUrl;
+    }
 
     @Override
     public String toString() {
@@ -354,6 +367,5 @@ public class VEGLJob extends CloudJob implements Cloneable {
                 + seriesId + ", id=" + id + ", name=" + name + ", description="
                 + description + "]";
     }
-
 
 }
