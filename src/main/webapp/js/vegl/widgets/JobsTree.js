@@ -180,8 +180,11 @@ Ext.define('vegl.widgets.JobsTree', {
                     tooltip: 'Actions for this job / folder.',
                     scope: this,
                     handler: function(grid, rowIndex, colIndex, item, e, node, row) {
-                        grid.getSelectionModel().select(node);
-
+                    	// If more than 1 selection has been made, show menu without selecting row
+                    	if(grid.getSelectionModel().getCount()<2) {
+                    		grid.getSelectionModel().select(node);
+                    	}
+                    	
                         var items = [this.deleteJobAction];
                         if (!this.submitJobAction.isDisabled()) {
                             items.push(this.submitJobAction);
@@ -225,6 +228,13 @@ Ext.define('vegl.widgets.JobsTree', {
         if (selections.length === 0) {
             this.cancelJobAction.setDisabled(true);
             this.deleteJobAction.setDisabled(true);
+            this.duplicateJobAction.setDisabled(true);
+            this.submitJobAction.setDisabled(true);
+            this.editJobAction.setDisabled(true);
+        } else if(selections.length > 1) {
+        	// Currently only allow deletion of multiple jobs if none are active
+        	this.cancelJobAction.setDisabled(true);
+            this.deleteJobAction.setDisabled(false);
             this.duplicateJobAction.setDisabled(true);
             this.submitJobAction.setDisabled(true);
             this.editJobAction.setDisabled(true);

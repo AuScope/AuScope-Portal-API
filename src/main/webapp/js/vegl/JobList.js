@@ -212,9 +212,13 @@ Ext.application({
                     itemId : 'vgl-jobs-tree',
                     rootNode: responseObj.data.nodes,
                     jobStore: jobStore,
+                    selModel: {
+                    	mode: 'MULTI'
+                    },
                     listeners : {
                         selectjob : function(panel, job) {
-                            if (job == null) {
+                        	// Cleanup if no job or more than 1 job selected
+                            if (job == null || this.getSelectionModel().getCount()>1) {
                                 jobDetailsPanel.cleanupDetails();
                             } else {
                                 jobDetailsPanel.showDetailsForJob(job);
