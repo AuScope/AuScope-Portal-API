@@ -482,7 +482,7 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         //JSON encoding of series ID can sometimes turn a null into a 0. We will also never have a seriesId of 0
-        if (seriesId == 0) {
+        if (seriesId != null && seriesId == 0) {
             seriesId = null;
         }
 
