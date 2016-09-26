@@ -49,12 +49,33 @@ Ext.define('vegl.widgets.JobsTree', {
             disabled : true,
             handler: function() {
                 var selection = this.getSelectionModel().getSelection();
-                if (selection.length > 0) {
+                if (selection.length === 1) {
                     if (selection[0].get('leaf')) {
-                        this.deleteJob(selection[0]);
+                        this.confirmDeleteJob(selection[0], true);
                     } else {
-                        this.deleteSeries(selection[0]);
+                        this.confirmDeleteSeries(selection[0], true);
                     }
+                } else if (selection.length > 1) {
+                	Ext.Msg.show({
+        	            title: 'Delete Job',
+        	            msg: Ext.util.Format.format('Are you sure you want to delete the selected jobs and folders?'),
+        	            buttons: Ext.Msg.YESNO,
+        	            icon: Ext.Msg.WARNING,
+        	            modal: true,
+        	            closable: false,
+        	            scope : this,
+        	            fn: function(btn) {
+        	                if (btn == 'yes') {
+			                	for(i=0; i<selection.length; i++) {
+			                		if (selection[i].get('leaf')) {
+			                            this.confirmDeleteJob(selection[i], false);
+			                        } else {
+			                            this.confirmDeleteSeries(selection[i], false);
+			                        }
+			                	}
+        	                }
+        	            }
+                	});
                 }
             }
         });
@@ -347,108 +368,90 @@ Ext.define('vegl.widgets.JobsTree', {
             }
         });
     },
+    
+    confirmDeleteSeries : function(series, confirmDeletion) {
+    	if(confirmDeletion) {
+	        var seriesName = series.get('name');
+	        var childrenNames = series.childNodes.map(function(childNode) {
+	            return childNode.get('name');
+	        });
+	
+	        var message = Ext.util.Format.format('Are you sure you want to delete the folder <b>{0}</b> and its jobs?<br><ul>', seriesName);
+	        Ext.each(childrenNames, function(name) {
+	            message += Ext.util.Format.format('<li><i>{0}</i></li>', name);
+	        });
+	        message += '</ul>';
+	
+	        Ext.Msg.show({
+	            title: 'Delete Folder',
+	            msg: message,
+	            buttons: Ext.Msg.YESNO,
+	            icon: Ext.Msg.WARNING,
+	            modal: true,
+	            closable: false,
+	            scope : this,
+	            fn: function(btn) {
+	                if (btn == 'yes') {
+	                	this.deleteSeries(series);
+	                }
+	            }
+	        });
+    	} else {
+    		this.deleteSeries(series);
+    	}
+    },
+    
+    deleteJob : function(job) {
+    	Ext.getBody().mask('Deleting Job...');
 
-    deleteSeries : function(series) {
-        var seriesName = series.get('name');
-        var childrenNames = series.childNodes.map(function(childNode) {
-            return childNode.get('name');
-        });
-
-        var message = Ext.util.Format.format('Are you sure you want to delete the folder <b>{0}</b> and its jobs?<br><ul>', seriesName);
-        Ext.each(childrenNames, function(name) {
-            message += Ext.util.Format.format('<li><i>{0}</i></li>', name);
-        });
-        message += '</ul>';
-
-        Ext.Msg.show({
-            title: 'Delete Folder',
-            msg: message,
-            buttons: Ext.Msg.YESNO,
-            icon: Ext.Msg.WARNING,
-            modal: true,
-            closable: false,
+        Ext.Ajax.request({
+            url: 'secure/deleteJob.do',
+            params: { 'jobId': job.get('id')},
+            timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
             scope : this,
-            fn: function(btn) {
-                if (btn == 'yes') {
-                    Ext.getBody().mask('Deleting Folder...');
+            callback : function(options, success, response) {
+                Ext.getBody().unmask();
 
-                    Ext.Ajax.request({
-                        url: 'secure/deleteSeriesJobs.do',
-                        params: { 'seriesId': series.get('seriesId')},
-                        timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
-                        scope : this,
-                        callback : function(options, success, response) {
-                            Ext.getBody().unmask();
-
-                            if (!success) {
-                                this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
-                                return;
-                            }
-
-                            var responseObj = Ext.JSON.decode(response.responseText);
-                            if (!responseObj.success) {
-                                this.fireEvent('error', this, Ext.util.Format.format('There was an error deleting this series. {0}', responseObj.msg));
-                                return;
-                            }
-
-                            Ext.each(series.childNodes, function(jobNode) {
-                                this.jobStore.remove(this.jobStore.getById(jobNode.get('id')));
-                                this.getStore().remove(jobNode);
-                            }, this);
-
-                            this.getStore().remove(series);
-                            this.fireEvent('refreshDetailsPanel', this, null);
-                        }
-                    });
+                if (!success) {
+                    this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
+                    return;
                 }
+
+                var responseObj = Ext.JSON.decode(response.responseText);
+                if (!responseObj.success) {
+                    this.fireEvent('error', this, Ext.util.Format.format('There was an error deleting this job. {0}', responseObj.msg));
+                    return;
+                }
+
+                this.jobStore.remove(this.jobStore.getById(job.get('id')));
+                this.getStore().remove(job);
+
+                //refresh Details panel
+                job.set('status', vegl.models.Job.STATUS_DELETED);
+                this.fireEvent('refreshDetailsPanel', this, job);
             }
         });
     },
 
-    deleteJob : function(job) {
-        Ext.Msg.show({
-            title: 'Delete Job',
-            msg: Ext.util.Format.format('Are you sure you want to delete the job <b>{0}</b>?', job.get('name')),
-            buttons: Ext.Msg.YESNO,
-            icon: Ext.Msg.WARNING,
-            modal: true,
-            closable: false,
-            scope : this,
-            fn: function(btn) {
-                if (btn == 'yes') {
-
-                    Ext.getBody().mask('Deleting Job...');
-
-                    Ext.Ajax.request({
-                        url: 'secure/deleteJob.do',
-                        params: { 'jobId': job.get('id')},
-                        timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
-                        scope : this,
-                        callback : function(options, success, response) {
-                            Ext.getBody().unmask();
-
-                            if (!success) {
-                                this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
-                                return;
-                            }
-
-                            var responseObj = Ext.JSON.decode(response.responseText);
-                            if (!responseObj.success) {
-                                this.fireEvent('error', this, Ext.util.Format.format('There was an error deleting this job. {0}', responseObj.msg));
-                                return;
-                            }
-
-                            this.jobStore.remove(this.jobStore.getById(job.get('id')));
-                            this.getStore().remove(job);
-
-                            //refresh Details panel
-                            job.set('status', vegl.models.Job.STATUS_DELETED);
-                            this.fireEvent('refreshDetailsPanel', this, job);
-                        }
-                    });
-                }
-            }
-        });
+    confirmDeleteJob : function(job, confirmDeletion) {
+    	if(confirmDeletion) {
+	        Ext.Msg.show({
+	            title: 'Delete Job',
+	            msg: Ext.util.Format.format('Are you sure you want to delete the job <b>{0}</b>?', job.get('name')),
+	            buttons: Ext.Msg.YESNO,
+	            icon: Ext.Msg.WARNING,
+	            modal: true,
+	            closable: false,
+	            scope : this,
+	            fn: function(btn) {
+	                if (btn == 'yes') {
+	                	this.deleteJob(job);
+	                }
+	            }
+	        });
+    	} else {
+    		this.deleteJob(job);
+    	}
     },
 
     repeatJob : function(job) {
