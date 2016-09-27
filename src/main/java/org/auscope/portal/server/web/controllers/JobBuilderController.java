@@ -481,6 +481,11 @@ public class JobBuilderController extends BaseCloudController {
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
         }
 
+        //JSON encoding of series ID can sometimes turn a null into a 0. We will also never have a seriesId of 0
+        if (seriesId != null && seriesId == 0) {
+            seriesId = null;
+        }
+
         //Update our job from the request parameters
         job.setSeriesId(seriesId);
         job.setName(name);
@@ -1023,7 +1028,7 @@ public class JobBuilderController extends BaseCloudController {
             logger.error("Error creating download script" +  e.getMessage());
             logger.debug("Error:", e);
             return false;
-        } 
+        }
     }
 
     /**
