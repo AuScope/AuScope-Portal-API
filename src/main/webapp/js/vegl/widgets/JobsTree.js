@@ -498,9 +498,9 @@ Ext.define('vegl.widgets.JobsTree', {
                     userAction : 'edit'
                 },
                 forms : [
-                         'vegl.jobwizard.forms.JobObjectForm',
                          'vegl.jobwizard.forms.JobUploadForm',
                          'vegl.jobwizard.forms.ScriptBuilderForm',
+                         'vegl.jobwizard.forms.JobObjectForm',
                          'vegl.jobwizard.forms.JobSubmitForm'
                  ]
             }]
