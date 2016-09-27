@@ -55,7 +55,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
      */
     loadSavedScript : function(jobId) {
         // mask body
-        Ext.getBody().mask('Loading saved script...');
+        Ext.getBody().mask('Loading saved script...').setStyle('z-index', '99999');
 
         // fetch the script associated
         try {
@@ -74,6 +74,9 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
                         var responseObj = Ext.JSON.decode(response.responseText);
                         if (responseObj.success) {
                             this.scriptBuilderFrm.replaceScript(responseObj.data);
+                            if (!Ext.isEmpty(responseObj.data)) {
+                                this.scriptBuilderFrm.editor.setReadOnly(false);
+                            }
                             return;
                         } else {
                             errorMsg = responseObj.msg;
@@ -116,6 +119,12 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         // replace tab with 4 spaces whenever it occurs in the sourceText
         sourceText = sourceText.replace(/\t/g,"\u0020\u0020\u0020\u0020");
 
+        if (Ext.isEmpty(this.wizardState.solutions)) {
+            Ext.Msg.alert('Select a template', 'You must first select a template before you can proceed.');
+            callback(false);
+            return;
+        }
+
         try {
 
             Ext.Ajax.request({
@@ -150,6 +159,7 @@ Ext.define('vegl.jobwizard.forms.ScriptBuilderForm', {
         } catch (exception) {
             console.log("Exception: ScriptBuilderForm.beginValidation(), details below - ");
             console.log(exception);
+            callback(false);
         }
     },
 

@@ -52,7 +52,7 @@ public class WCSController extends BasePortalController {
         this.wcsService = wcsService;
     }
 
-    private String generateOutputFilename(String layerName, String format) throws IllegalArgumentException {
+    private static String generateOutputFilename(String layerName, String format) throws IllegalArgumentException {
         if (format.toLowerCase().contains("geotiff"))
             return String.format("%1$s.tiff", layerName);
         else if (format.toLowerCase().contains("netcdf"))
@@ -68,7 +68,7 @@ public class WCSController extends BasePortalController {
      * @return
      * @throws ParseException
      */
-    private Date[] parseDates(final String[] dateStrings) throws ParseException {
+    private static Date[] parseDates(String[] dateStrings) throws ParseException {
         Date[] dates = new Date[dateStrings.length];
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);
 
@@ -89,14 +89,14 @@ public class WCSController extends BasePortalController {
      * @return
      * @throws ParseException
      */
-    private TimeConstraint parseTimeConstraint(final String[] timePositions,
-                                 final String timePeriodFrom,
-                                 final String timePeriodTo,
-                                 final String timePeriodResolution) throws ParseException {
+    private static TimeConstraint parseTimeConstraint(String[] timePositions,
+            String timePeriodFrom,
+            String timePeriodTo,
+            String timePeriodResolution) throws ParseException {
         //We will receive a list of time positions
         if (timePositions != null && timePositions.length > 0) {
             return TimeConstraint.parseTimeConstraint(parseDates(timePositions));
-        //or an actual time period
+            //or an actual time period
         } else if (timePeriodFrom != null && timePeriodTo != null && !timePeriodFrom.isEmpty() && !timePeriodTo.isEmpty()) {
             DateFormat inputFormat = new SimpleDateFormat(DATE_FORMAT);
             Date from = inputFormat.parse(timePeriodFrom);
@@ -114,8 +114,8 @@ public class WCSController extends BasePortalController {
      * @param customParamIntervals a list of PARAMETER=MIN/MAX/RESOLUTION
      * @return
      */
-    private Map<String, String> generateCustomParamMap(final String[] customParamValues) {
-        Map<String, String> customKvps = new HashMap<String, String>();
+    private static Map<String, String> generateCustomParamMap(String[] customParamValues) {
+        Map<String, String> customKvps = new HashMap<>();
 
         if (customParamValues != null) {
             for (String kvpString : customParamValues) {
@@ -179,25 +179,25 @@ public class WCSController extends BasePortalController {
      * @throws Exception
      */
     @RequestMapping("/downloadWCSAsZip.do")
-    public void downloadWCSAsZip(@RequestParam("serviceUrl") final String serviceUrl,
-                                 @RequestParam("layerName") final String layerName,
-                                 @RequestParam("downloadFormat") final String downloadFormat,
-                                 @RequestParam("inputCrs") final String inputCrs,
-                                 @RequestParam(required=false, value="outputWidth") final Integer outputWidth,
-                                 @RequestParam(required=false, value="outputHeight") final Integer outputHeight,
-                                 @RequestParam(required=false, value="outputResX") final Double outputResX,
-                                 @RequestParam(required=false, value="outputResY") final Double outputResY,
-                                 @RequestParam(required=false, value="outputCrs") final String outputCrs,
-                                 @RequestParam(required=false, defaultValue="0",  value="northBoundLatitude") final double northBoundLatitude,
-                                 @RequestParam(required=false, defaultValue="0", value="southBoundLatitude") final double southBoundLatitude,
-                                 @RequestParam(required=false, defaultValue="0", value="eastBoundLongitude") final double eastBoundLongitude,
-                                 @RequestParam(required=false, defaultValue="0", value="westBoundLongitude") final double westBoundLongitude,
-                                 @RequestParam(required=false, value="timePosition") final String[] timePositions,
-                                 @RequestParam(required=false, value="timePeriodFrom") final String timePeriodFrom,
-                                 @RequestParam(required=false, value="timePeriodTo") final String timePeriodTo,
-                                 @RequestParam(required=false, value="timePeriodResolution") final String timePeriodResolution,
-                                 @RequestParam(required=false, value="customParamValue") final String[] customParamValues,
-                                HttpServletResponse response) throws Exception {
+    public void downloadWCSAsZip(@RequestParam("serviceUrl") String serviceUrl,
+            @RequestParam("layerName") String layerName,
+            @RequestParam("downloadFormat") String downloadFormat,
+            @RequestParam("inputCrs") String inputCrs,
+            @RequestParam(required=false, value="outputWidth") Integer outputWidth,
+            @RequestParam(required=false, value="outputHeight") Integer outputHeight,
+            @RequestParam(required=false, value="outputResX") Double outputResX,
+            @RequestParam(required=false, value="outputResY") Double outputResY,
+            @RequestParam(required=false, value="outputCrs") String outputCrs,
+            @RequestParam(required=false, defaultValue="0",  value="northBoundLatitude") double northBoundLatitude,
+            @RequestParam(required=false, defaultValue="0", value="southBoundLatitude") double southBoundLatitude,
+            @RequestParam(required=false, defaultValue="0", value="eastBoundLongitude") double eastBoundLongitude,
+            @RequestParam(required=false, defaultValue="0", value="westBoundLongitude") double westBoundLongitude,
+            @RequestParam(required=false, value="timePosition") String[] timePositions,
+            @RequestParam(required=false, value="timePeriodFrom") String timePeriodFrom,
+            @RequestParam(required=false, value="timePeriodTo") String timePeriodTo,
+            @RequestParam(required=false, value="timePeriodResolution") String timePeriodResolution,
+            @RequestParam(required=false, value="customParamValue") String[] customParamValues,
+            HttpServletResponse response) throws Exception {
 
         String outFileName = generateOutputFilename(layerName, downloadFormat);
         TimeConstraint timeConstraint = parseTimeConstraint(timePositions, timePeriodFrom, timePeriodTo, timePeriodResolution);
@@ -292,8 +292,8 @@ public class WCSController extends BasePortalController {
         int[] highValues = rg.getEnvelopeHighValues();
         int[] lowValues = rg.getEnvelopeLowValues();
         for (int dimension = 0; dimension < 2; dimension++) {
-            maxX += offsetVectors[dimension][0] * (double) (highValues[0] - lowValues[0]);
-            maxY += offsetVectors[dimension][1] * (double) (highValues[1] - lowValues[1]);
+            maxX += offsetVectors[dimension][0] * (highValues[0] - lowValues[0]);
+            maxY += offsetVectors[dimension][1] * (highValues[1] - lowValues[1]);
         }
 
         return new double[] {maxX, maxY};
@@ -332,8 +332,8 @@ public class WCSController extends BasePortalController {
         //Used the proportional offset as a multiplier against the data indexes
         int[] highIndexes = rg.getEnvelopeHighValues();
         int[] lowIndexes = rg.getEnvelopeLowValues();
-        int indexX = (int) Math.round((((double)(highIndexes[0] - lowIndexes[0])) * proportionalX));
-        int indexY = (int) Math.round((((double)(highIndexes[1] - lowIndexes[1])) * proportionalY));
+        int indexX = (int) Math.round(((highIndexes[0] - lowIndexes[0]) * proportionalX));
+        int indexY = (int) Math.round(((highIndexes[1] - lowIndexes[1]) * proportionalY));
 
         return new Point(indexX, indexY);
     }
@@ -350,11 +350,11 @@ public class WCSController extends BasePortalController {
      */
     @RequestMapping("/estimateCoverageSize.do")
     public ModelAndView estimateCoverageSize(@RequestParam("northBoundLatitude") double northBoundLatitude,
-                                 @RequestParam("southBoundLatitude") double southBoundLatitude,
-                                 @RequestParam("eastBoundLongitude") double eastBoundLongitude,
-                                 @RequestParam("westBoundLongitude") double westBoundLongitude,
-                                 @RequestParam("serviceUrl") String serviceUrl,
-                                 @RequestParam("coverageName") String coverageName) {
+            @RequestParam("southBoundLatitude") double southBoundLatitude,
+            @RequestParam("eastBoundLongitude") double eastBoundLongitude,
+            @RequestParam("westBoundLongitude") double westBoundLongitude,
+            @RequestParam("serviceUrl") String serviceUrl,
+            @RequestParam("coverageName") String coverageName) {
 
         //Perform our calculations based on coverage description
         DescribeCoverageRecord[] records = null;

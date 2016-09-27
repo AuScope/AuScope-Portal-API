@@ -25,6 +25,8 @@
         <property name="storageBaseKey"/>
         <property name="emailNotification" type="yes_no" />
         <property name="walltime"/>
+        <property name="executeDate"/>
+        <property name="promsReportUrl"/>
         <property name="storageBucket"/>
         <property name="containsPersistentVolumes" type="yes_no"/>
 

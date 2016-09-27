@@ -20,8 +20,6 @@ public class KnownLayerController extends BaseCSWController {
 
     /** Used for requesting groupings of CSWRecords under known layers*/
     private KnownLayerService knownLayerService;
-    /** Used for converting data to something the view can understand*/
-    private ViewKnownLayerFactory viewKnownLayerFactory;
 
     @Autowired
     public KnownLayerController(KnownLayerService knownLayerService,

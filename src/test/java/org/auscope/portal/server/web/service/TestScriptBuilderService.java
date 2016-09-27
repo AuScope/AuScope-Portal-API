@@ -2,7 +2,6 @@ package org.auscope.portal.server.web.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +9,6 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VEGLJob;
-import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -25,12 +23,11 @@ import org.junit.Test;
 public class TestScriptBuilderService extends PortalTestClass {
     private ScriptBuilderService service;
     private FileStagingService mockFileStagingService = context.mock(FileStagingService.class);
-    private VEGLJobManager mockJobManager = context.mock(VEGLJobManager.class);
     private VEGLJob mockJob = context.mock(VEGLJob.class);
 
     @Before
     public void init() {
-        service = new ScriptBuilderService(mockFileStagingService, mockJobManager);
+        service = new ScriptBuilderService(mockFileStagingService);
     }
 
     /**
@@ -39,60 +36,34 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test
     public void testSaveScript() throws Exception {
-        final String script = "#a pretend script\n";
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
+        String script = "#a pretend script\n";
+        ANVGLUser user = new ANVGLUser();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, user);
-            will(returnValue(mockJob));
-
             oneOf(mockFileStagingService).writeFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
             will(returnValue(bos));
         }});
 
-        service.saveScript(jobId.toString(), script, user);
+        service.saveScript(mockJob, script, user);
         String actual = new String(bos.toByteArray());
         Assert.assertEquals(script, actual);
     }
 
-    /**
-     * Tests script saving errors appropriately
-     * @throws Exception
-     */
-    @Test(expected=PortalServiceException.class)
-    public void testSaveScript_JobNotFoundException() throws Exception {
-        final Integer jobId = 123;
-        final String script = "#a pretend script\n";
-        final ANVGLUser user = new ANVGLUser();
-
-        context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, user);
-            will(throwException(new ConnectException()));
-        }});
-
-        service.saveScript(jobId.toString(), script, user);
-    }
-
     @Test(expected=PortalServiceException.class)
     public void testSaveScript_Exception() throws Exception {
-        final String script = "#a pretend script\n";
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
+        String script = "#a pretend script\n";
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {
             {
-                oneOf(mockJobManager).getJobById(jobId, user);
-                will(returnValue(mockJob));
-
                 oneOf(mockFileStagingService).writeFile(mockJob,
                         ScriptBuilderService.SCRIPT_FILE_NAME);
                 will(throwException(new Exception()));
             }
         });
 
-        service.saveScript(jobId.toString(), script, user);
+        service.saveScript(mockJob, script, user);
     }
 
     /**
@@ -100,19 +71,15 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test
     public void testLoadScript() throws Exception {
-        final String script = "#a pretend script\n";
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
+        String script = "#a pretend script\n";
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, user);
-            will(returnValue(mockJob));
-
             oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
             will(returnValue(new ByteArrayInputStream(script.getBytes())));
         }});
 
-        String actualScript = service.loadScript(jobId.toString(), user);
+        String actualScript = service.loadScript(mockJob, user);
         Assert.assertEquals(script, actualScript);
     }
 
@@ -121,18 +88,14 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test
     public void testLoadEmptyScript() throws Exception {
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, user);
-            will(returnValue(mockJob));
-
             oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
             will(returnValue(null));
         }});
 
-        String actualScript = service.loadScript(jobId.toString(), user);
+        String actualScript = service.loadScript(mockJob, user);
         Assert.assertEquals("", actualScript);
     }
 
@@ -141,28 +104,23 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test(expected=PortalServiceException.class)
     public void testLoadScriptError() throws Exception {
-        final Integer jobId = 123;
-        final ANVGLUser user = new ANVGLUser();
+        ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, user);
-            will(returnValue(mockJob));
-
             oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
             will(throwException(new PortalServiceException("Test load script exception")));
         }});
 
-        service.loadScript(jobId.toString(), user);
+        service.loadScript(mockJob, user);
     }
 
     /**
      * Tests templating on a valid template string
-     * @throws Exception
      */
     @Test
-    public void testTemplating() throws Exception {
-        final String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
-        final Map<String, Object> values = new HashMap<String, Object>();
+    public void testTemplating() {
+        String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
+        Map<String, Object> values = new HashMap<>();
         values.put("dog-amount", 2);
         values.put("cat-amount", "3");
         values.put("bird-amount", 4);
@@ -174,12 +132,11 @@ public class TestScriptBuilderService extends PortalTestClass {
 
     /**
      * Tests templating on an invalid template string
-     * @throws Exception
      */
     @Test
-    public void testTemplating_BadTemplate() throws Exception {
-        final String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
-        final Map<String, Object> values = new HashMap<String, Object>();
+    public void testTemplating_BadTemplate() {
+        String template = "I have ${dog-amount} dogs and ${cat-amount} cats";
+        Map<String, Object> values = new HashMap<>();
         values.put("dog-amount", 2);
         values.put("bird-amount", 4);
 

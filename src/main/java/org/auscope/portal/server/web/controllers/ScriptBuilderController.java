@@ -9,18 +9,17 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.server.vegl.VEGLJob;
+import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
@@ -45,7 +44,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Richard Goh
  */
 @Controller
-public class ScriptBuilderController extends BasePortalController {
+public class ScriptBuilderController extends BaseModelController {
 
     private final Log logger = LogFactory.getLog(getClass());
 
@@ -63,8 +62,9 @@ public class ScriptBuilderController extends BasePortalController {
      */
     @Autowired
     public ScriptBuilderController(ScriptBuilderService sbService,
+                                   VEGLJobManager jobManager,
                                    ScmEntryService scmEntryService) {
-        super();
+        super(jobManager);
         this.sbService = sbService;
         this.scmEntryService = scmEntryService;
     }
@@ -87,8 +87,13 @@ public class ScriptBuilderController extends BasePortalController {
             return generateJSONResponseMAV(false, null, "No source text specified");
         }
 
+        VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
+        if (job == null) {
+            return generateJSONResponseMAV(false);
+        }
+
         try {
-            sbService.saveScript(jobId, sourceText, user);
+            sbService.saveScript(job, sourceText, user);
         } catch (PortalServiceException ex) {
             logger.warn("Unable to save job script for job with id " + jobId + ": " + ex.getMessage());
             logger.debug("error:", ex);
@@ -97,7 +102,7 @@ public class ScriptBuilderController extends BasePortalController {
 
         // Update job with vmId for solution if we have one.
         try {
-            scmEntryService.updateJobForSolution(jobId, solutions, user);
+            scmEntryService.updateJobForSolution(job, solutions, user);
         }
         catch (PortalServiceException e) {
             logger.warn("Failed to update job (" + jobId + ") for solutions (" +
@@ -119,8 +124,13 @@ public class ScriptBuilderController extends BasePortalController {
         logger.debug("getSavedScript with jobId: " + jobId);
         String script = null;
 
+        VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
+        if (job == null) {
+            return generateJSONResponseMAV(false);
+        }
+
         try {
-            script = sbService.loadScript(jobId, user);
+            script = sbService.loadScript(job, user);
         } catch (PortalServiceException ex) {
             logger.error("Unable to load saved script for job with id " + jobId, ex);
             return generateJSONResponseMAV(false, null, ex.getMessage(), ex.getErrorCorrection());
@@ -141,7 +151,7 @@ public class ScriptBuilderController extends BasePortalController {
                                   @RequestParam(value="key", required=false) String[] keys,
                                   @RequestParam(value="value", required=false) String[] values) {
         //Turn our KVP inputs into something that we can pass to our service
-        Map<String, Object> kvpMapping = new HashMap<String, Object>();
+        Map<String, Object> kvpMapping = new HashMap<>();
         if (keys != null && values != null) {
             for (int i = 0; i < keys.length && i < values.length; i++) {
                 kvpMapping.put(keys[i], values[i]);
@@ -151,9 +161,8 @@ public class ScriptBuilderController extends BasePortalController {
         //Load our template file into a string
         String templateResource = "/org/auscope/portal/server/scriptbuilder/templates/" + templateName.replaceAll("\\.\\.", "").replaceAll("/","");
         String templateString = null;
-        InputStream is = null;
-        try {
-            is = this.getClass().getResourceAsStream(templateResource);
+
+        try (InputStream is = this.getClass().getResourceAsStream(templateResource)) {
             if (is == null) {
                 logger.error("Unable to find template resource - " + templateResource);
                 return generateJSONResponseMAV(false, null, "Requested template does not exist");
@@ -163,10 +172,8 @@ public class ScriptBuilderController extends BasePortalController {
             logger.error("Unable to read template resource - " + templateResource + ":" + e.getMessage());
             logger.debug("Exception:", e);
             return generateJSONResponseMAV(false, null, "Internal server error when loading template.");
-        } finally {
-            FileIOUtil.closeQuietly(is);
-        }
-
+        } 
+        
         String finalTemplate = sbService.populateTemplate(templateString,
                 kvpMapping);
         return generateJSONResponseMAV(true, finalTemplate, "");
@@ -181,7 +188,7 @@ public class ScriptBuilderController extends BasePortalController {
         List<Solution> solutions = scmEntryService.getSolutions();
 
         // Group solutions by the problem that they solve.
-        HashMap<String, Problem> problems = new HashMap<String, Problem>();
+        HashMap<String, Problem> problems = new HashMap<>();
 
         for (Solution solution: solutions) {
             String problemId = solution.getProblem().getId();
@@ -222,7 +229,7 @@ public class ScriptBuilderController extends BasePortalController {
      */
     @RequestMapping("/getSolutions.do")
     public ModelAndView doGetSolutions(@RequestParam("uris") Set<String> uris) {
-        ArrayList<Solution> solutions = new ArrayList<Solution>();
+        ArrayList<Solution> solutions = new ArrayList<>();
         StringBuilder msg = new StringBuilder();
 
         for (String uri: uris) {

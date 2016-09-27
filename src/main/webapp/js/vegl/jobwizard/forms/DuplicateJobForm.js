@@ -36,7 +36,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
             ],
             proxy : {
                 type : 'ajax',
-                url : 'secure/jobFiles.do',
+                url : 'secure/jobCloudFiles.do',
                 extraParams : {
                     jobId : wizardState.jobId
                 },
@@ -98,7 +98,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
 
     deleteJobWithId : function(id) {
 
-        Ext.getBody().mask('Removing duplicate job...');
+        Ext.getBody().mask('Removing duplicate job...').setStyle('z-index', '99999');
 
         //Tell the backend to remove duplicate job
         Ext.Ajax.request({
@@ -136,7 +136,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
         }
         var jobId = this.wizardState.duplicateJobId;
 
-        Ext.getBody().mask('Duplicating Job...');
+        Ext.getBody().mask('Duplicating Job...').setStyle('z-index', '99999');;
 
         //Tell the backend to duplicate
         Ext.Ajax.request({
@@ -155,6 +155,7 @@ Ext.define('vegl.jobwizard.forms.DuplicateJobForm', {
                         this.wizardState.jobId = responseObj.data[0].id;
                         this.wizardState.seriesId = responseObj.data[0].seriesId;
                         this.wizardState.solutionId = responseObj.data[0].solutionId;
+                        this.wizardState.solutions = responseObj.data[0].jobSolutions;
                         callback(true);
                         return;
                     }

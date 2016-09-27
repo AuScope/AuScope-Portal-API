@@ -1,10 +1,10 @@
 /**
- * A Ext.panel.Panel specialisation for rendering a single instance of plaintext
+ * A Ext.panel.Panel specialisation for rendering a single instance of a TTL file
  *
  */
-Ext.define('vegl.preview.PlainTextPreview', {
+Ext.define('vegl.preview.TTLPreview', {
     extend : 'Ext.panel.Panel',
-    alias : 'widget.plaintextpreview',
+    alias : 'widget.ttlpreview',
 
     mixins: {
         preview: 'vegl.preview.FilePreviewMixin'
@@ -22,6 +22,7 @@ Ext.define('vegl.preview.PlainTextPreview', {
      * Reloads this store with all the jobs for the specified series
      */
     preview : function(job, fileName, size, hash) {
+    	promsReportUrl = job.get('promsReportUrl');
         if (this.currentRequest != null) {
             Ext.Ajax.abort(this.currentRequest);
             this.currentRequest = null;
@@ -64,15 +65,20 @@ Ext.define('vegl.preview.PlainTextPreview', {
                 }
 
                 var previewText = responseObj.data;
-                this.writeText(previewText);
+                this.writeText(previewText, promsReportUrl);
             }
         });
     },
 
-    writeText: function(text) {
+    writeText: function(text, reportUrl) {
+    	text = text.replace(/</g, "&lt;");
+    	text = text.replace(/>/g, "&gt;");
         var iframe = this.getEl().down('iframe');
         var doc = iframe.dom.contentWindow.document;
         doc.open();
+        if(reportUrl!=null && reportUrl!="") {
+        	doc.write('<a href="' + reportUrl + '" target="_blank">View PROMS Report</a><br><br>');
+        }
         doc.write(text);
         doc.close();
         doc.body.setAttribute('style', 'white-space:pre;font-family:monospace;');
@@ -86,6 +92,6 @@ Ext.define('vegl.preview.PlainTextPreview', {
         this.fileName = null;
         this.size = null;
         this.hash = null;
-        this.writeText('');
+        this.writeText('', null);
     }
 });

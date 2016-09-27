@@ -1,6 +1,7 @@
 package org.auscope.portal.server.vegl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,23 +30,27 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private boolean emailNotification;
     private String processTimeLog;
     private String storageBucket;
-    
+    private String promsReportUrl;
+
     /**
      * max walltime for the job. 0 or null indicate that no walltime applies to the job
      */
     private Integer walltime;
     private boolean containsPersistentVolumes;
+    
+    /** Time when the job executes as opposed to when the job was submitted **/
+    private Date executeDate;
 
     /** A map of VglParameter objects keyed by their parameter names*/
-    private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
+    private Map<String, VglParameter> jobParameters = new HashMap<>();
     /** A list of VglDownload objects associated with this job*/
-    private List<VglDownload> jobDownloads = new ArrayList<VglDownload>();
+    private List<VglDownload> jobDownloads = new ArrayList<>();
 
     /** A list of FileInformation objects associated with this job*/
-    private List<FileInformation> jobFiles = new ArrayList<FileInformation>();
+    private List<FileInformation> jobFiles = new ArrayList<>();
 
     /** A set of Solutions associated with this job */
-    private Set<String> jobSolutions = new HashSet<String>();
+    private Set<String> jobSolutions = new HashSet<>();
 
     public boolean isContainsPersistentVolumes() {
         return containsPersistentVolumes;
@@ -86,6 +91,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param vmSubsetFilePath The File path (on the VM) where the job should look for its input subset file
      * @param vmSubsetUrl The URL of the actual input subset file
      * @param walltime The walltime (in minutes) for the job
+     * @param executeDate The date of execution for this job
      */
     public VEGLJob(Integer id) {
         super(id);
@@ -193,11 +199,11 @@ public class VEGLJob extends CloudJob implements Cloneable {
 
     /**
      * Gets the VglParameter with a particular name
-     * @param name
+     * @param key
      * @return
      */
-    public VglParameter getJobParameter(String name) {
-        return this.jobParameters.get(name);
+    public VglParameter getJobParameter(String key) {
+        return this.jobParameters.get(key);
     }
 
 
@@ -225,12 +231,12 @@ public class VEGLJob extends CloudJob implements Cloneable {
         return jobFiles;
     }
 
-    public void setJobFiles(List<FileInformation> jobFiles) {
-        this.jobFiles = jobFiles;
-        for (FileInformation fi : jobFiles) {
-            fi.setParent(this);
-        }
-    }
+    //    public void setJobFiles(List<FileInformation> jobFiles) {
+    //        this.jobFiles = jobFiles;
+    //        for (FileInformation fi : jobFiles) {
+    //            fi.setParent(this);
+    //        }
+    //    }
 
     public Set<String> getJobSolutions() {
         return this.jobSolutions;
@@ -268,9 +274,11 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setUser(this.getUser());
         newJob.setStorageBucket(this.getStorageBucket());
         newJob.setWalltime(this.getWalltime());
+        newJob.setExecuteDate(this.getExecuteDate());
+        newJob.setPromsReportUrl(this.getPromsReportUrl());
         newJob.setContainsPersistentVolumes(this.isContainsPersistentVolumes());
 
-        List<VglDownload> newDownloads = new ArrayList<VglDownload>();
+        List<VglDownload> newDownloads = new ArrayList<>();
         for (VglDownload dl : this.getJobDownloads()) {
             VglDownload dlClone = (VglDownload) dl.clone();
             dlClone.setId(null);
@@ -278,7 +286,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         }
         newJob.setJobDownloads(newDownloads);
 
-        Map<String, VglParameter> newParams = new HashMap<String, VglParameter>();
+        Map<String, VglParameter> newParams = new HashMap<>();
         for (String key : this.jobParameters.keySet()) {
             VglParameter paramClone = (VglParameter)this.jobParameters.get(key).clone();
             paramClone.setId(null);
@@ -290,7 +298,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
             newJob.setProperty(key, getProperty(key));
         }
 
-        newJob.setJobSolutions(new HashSet<String>(this.getJobSolutions()));
+        newJob.setJobSolutions(new HashSet<>(this.getJobSolutions()));
 
         return newJob;
     }
@@ -322,7 +330,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     public boolean isWalltimeSet() {
         return getWalltime()!=null && getWalltime()>0;
     }
-    
+
     /**
      * Set the walltime in minutes
      * @param walltime
@@ -331,12 +339,33 @@ public class VEGLJob extends CloudJob implements Cloneable {
         this.walltime = walltime;
     }
 
+    /**
+     * @return The date of job execution
+     */
+    public Date getExecuteDate() {
+        return executeDate;
+    }
+
+    public void setExecuteDate(Date executeDate) {
+        this.executeDate = executeDate;
+    }
+    
+    /**
+     * @return The URL of the associated PROMS Report
+     */
+    public String getPromsReportUrl() {
+        return promsReportUrl;
+    }
+
+    public void setPromsReportUrl(String promsReportUrl) {
+        this.promsReportUrl = promsReportUrl;
+    }
+
     @Override
     public String toString() {
         return "VEGLJob [registeredUrl=" + registeredUrl + ", seriesId="
                 + seriesId + ", id=" + id + ", name=" + name + ", description="
                 + description + "]";
     }
-
 
 }

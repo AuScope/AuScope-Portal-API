@@ -125,7 +125,7 @@ public class SimpleWfsService extends BaseWFSService {
             XPathExpression expr = DOMUtil.compileXPathExpr(String.format("xsd:schema/xsd:complexType/xsd:complexContent/xsd:extension/xsd:sequence/xsd:element", featureType), nc);
             NodeList elementNodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 
-            List<SimpleFeatureProperty> featureTypes = new ArrayList<SimpleFeatureProperty>();
+            List<SimpleFeatureProperty> featureTypes = new ArrayList<>();
             for (int i = 0; i < elementNodes.getLength(); i++) {
                 Node n = elementNodes.item(i);
 
