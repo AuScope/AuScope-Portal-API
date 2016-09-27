@@ -52,6 +52,9 @@
     <script type="text/javascript" src="CodeMirror-5.16/mode/python/python.js"></script>
     <script type="text/javascript" src="CodeMirror-5.16/mode/javascript/javascript.js"></script>
 	
+    <!-- OpenLayers Includes -->
+    <link rel="stylesheet" href="portal-core/js/OpenLayers-2.13.1/theme/default/style.css" type="text/css">
+    <script src="portal-core/js/OpenLayers-2.13.1/OpenLayers.js" type="text/javascript"></script>
 
     <!-- Portal Core Includes -->   
     <jsp:include page="../../portal-core/jsimports.jsp"/>
@@ -70,14 +73,15 @@
     <script type="text/javascript" src="js/vegl/models/SimpleFeatureProperty.js"></script>
 
     <script type="text/javascript" src="js/vegl/preview/FilePreviewMixin.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/DataServicePreview.js"></script>
     <script type="text/javascript" src="js/vegl/preview/LogPreview.js"></script>
     <script type="text/javascript" src="js/vegl/preview/PlainTextPreview.js"></script>
     <script type="text/javascript" src="js/vegl/preview/ImagePreview.js"></script>
     <script type="text/javascript" src="js/vegl/preview/FilePreviewPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/preview/TTLPreview.js"></script>
 
     <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
-    <script type="text/javascript" src="js/vegl/widgets/JobInputFilesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileCopyWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileRemoteWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobInputFileUploadWindow.js"></script>

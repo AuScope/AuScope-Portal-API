@@ -1,16 +1,11 @@
 package org.auscope.portal.server.web.service;
 
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-
-import javax.swing.plaf.ToolBarUI;
-import javax.xml.ws.spi.Provider;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,7 +40,7 @@ public class ScmEntryService {
 
     /** Puppet module template resource */
     protected static final String PUPPET_TEMPLATE =
-        "org/auscope/portal/server/web/service/template.pp";
+            "org/auscope/portal/server/web/service/template.pp";
 
     private VLScmSnapshotDao vlScmSnapshotDao;
     private VelocityEngine velocityEngine;
@@ -59,9 +54,9 @@ public class ScmEntryService {
      */
     @Autowired
     public ScmEntryService(VLScmSnapshotDao vlScmSnapshotDao,
-                           VEGLJobManager jobManager,
-                           VelocityEngine velocityEngine,
-                           CloudComputeService[] cloudComputeServices) {
+            VEGLJobManager jobManager,
+            VelocityEngine velocityEngine,
+            CloudComputeService[] cloudComputeServices) {
         super();
         this.vlScmSnapshotDao = vlScmSnapshotDao;
         this.jobManager = jobManager;
@@ -77,10 +72,10 @@ public class ScmEntryService {
      * @return Snapshot id if one exists, otherwise null
      */
     public String getScmEntrySnapshotId(String entryId,
-                                        String computeServiceId) {
+            String computeServiceId) {
         String vmId = null;
         VLScmSnapshot snapshot = vlScmSnapshotDao
-            .getSnapshotForEntryAndProvider(entryId, computeServiceId);
+                .getSnapshotForEntryAndProvider(entryId, computeServiceId);
         if (snapshot != null) {
             vmId = snapshot.getComputeVmId();
         }
@@ -93,21 +88,11 @@ public class ScmEntryService {
      *
      * @param jobId String job ID
      * @param solutionId String solution URL
-     * @param user Authenticated ANVGLUser 
+     * @param user Authenticated ANVGLUser
      * @throws PortalServiceException
      */
-    public void updateJobForSolution(String jobId, Set<String> solutions, ANVGLUser user)
-        throws PortalServiceException {
-        //Lookup our job
-        VEGLJob job = null;
-        try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (Exception ex) {
-            logger.warn("Unable to lookup job with id " + jobId + ": " + ex.getMessage());
-            logger.debug("exception:", ex);
-            throw new PortalServiceException("Unable to lookup job with id " + jobId, ex);
-        }
-
+    public void updateJobForSolution(VEGLJob job, Set<String> solutions, ANVGLUser user)
+            throws PortalServiceException {
         // Store the solutionId in the job
         job.setJobSolutions(solutions);
 
@@ -152,9 +137,9 @@ public class ScmEntryService {
 
         // Create the puppet module
         return VelocityEngineUtils.mergeTemplateIntoString(velocityEngine,
-                                                           PUPPET_TEMPLATE,
-                                                           "UTF-8",
-                                                           vars);
+                PUPPET_TEMPLATE,
+                "UTF-8",
+                vars);
     }
 
     /**
@@ -202,8 +187,8 @@ public class ScmEntryService {
         if (problem != null) {
             url.append("?problem={problem_id}");
             solutions = rest.getForObject(url.toString(),
-                                          Entries.class,
-                                          problem.getId());
+                    Entries.class,
+                    problem.getId());
         }
         else {
             solutions = rest.getForObject(url.toString(), Entries.class);
@@ -229,27 +214,27 @@ public class ScmEntryService {
      *
      */
     private List<Solution> usefulSolutions(List<Solution> solutions) {
-        ArrayList<Solution> useful = new ArrayList<Solution>();
+        ArrayList<Solution> useful = new ArrayList<>();
 
         // Collect our set of available providers
-        Set<String> providers = new HashSet<String>();
+        Set<String> providers = new HashSet<>();
         for (CloudComputeService ccs: cloudComputeServices) {
             providers.add(ccs.getId());
         }
-        
+
         for (Solution solution: solutions) {
-        	useful.add(solution);
-        	// Solution with toolbox with at least one image at a
+            useful.add(solution);
+            // Solution with toolbox with at least one image at a
             // provider we can use is useful.
             for (Map<String, String> image:
-                     solution.getToolbox(true).getImages()) {
+                solution.getToolbox(true).getImages()) {
                 if (providers.contains(image.get("provider"))) {
                     useful.add(solution);
                     break;
                 }
             }
         }
-        
+
         return useful;
     }
 
@@ -261,7 +246,7 @@ public class ScmEntryService {
      */
     public Set<Solution> getJobSolutions(VEGLJob job) {
         Solution solution = null;
-        HashSet<Solution> solutions = new HashSet<Solution>();
+        HashSet<Solution> solutions = new HashSet<>();
 
         if (job != null) {
             for (String uri: job.getJobSolutions()) {
@@ -282,7 +267,7 @@ public class ScmEntryService {
      * @returns Set of Solution Objects.
      */
     public Set<Toolbox> getJobToolboxes(VEGLJob job) {
-        HashSet<Toolbox> toolboxes = new HashSet<Toolbox>();
+        HashSet<Toolbox> toolboxes = new HashSet<>();
 
         for (Solution solution: getJobSolutions(job)) {
             toolboxes.add(solution.getToolbox(true));
@@ -331,7 +316,7 @@ public class ScmEntryService {
             return null;
         }
 
-        Map<String, Set<MachineImage>> images = new HashMap<String, Set<MachineImage>>();
+        Map<String, Set<MachineImage>> images = new HashMap<>();
         VEGLJob job = jobManager.getJobById(jobId, user);
 
         for (Toolbox toolbox: getJobToolboxes(job)) {
@@ -339,7 +324,7 @@ public class ScmEntryService {
                 String providerId = img.get("provider");
                 Set<MachineImage> vms = images.get(providerId);
                 if (vms == null) {
-                    vms = new HashSet<MachineImage>();
+                    vms = new HashSet<>();
                     images.put(providerId, vms);
                 }
                 MachineImage mi = new MachineImage(img.get("image_id"));
@@ -366,25 +351,25 @@ public class ScmEntryService {
     }
 
     private Map<String, Object> puppetTemplateVars(Solution solution) {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         // Make sure we have full Toolbox details.
         Toolbox toolbox = solution.getToolbox(true);
 
         vars.put("sc_name", safeScName(toolbox));
         vars.put("source", toolbox.getSource());
 
-        ArrayList<String> systemPackages = new ArrayList<String>();
-        ArrayList<String> pythonPackages = new ArrayList<String>();
-        ArrayList<String> requirements = new ArrayList<String>();
+        ArrayList<String> systemPackages = new ArrayList<>();
+        ArrayList<String> pythonPackages = new ArrayList<>();
+        ArrayList<String> requirements = new ArrayList<>();
         // Merge dependencies from solution and toolbox
         dependencies(toolbox.getDependencies(),
-                     systemPackages,
-                     pythonPackages,
-                     requirements);
+                systemPackages,
+                pythonPackages,
+                requirements);
         dependencies(solution.getDependencies(),
-                     systemPackages,
-                     pythonPackages,
-                     requirements);
+                systemPackages,
+                pythonPackages,
+                requirements);
         vars.put("system_packages", systemPackages);
         vars.put("python_packages", pythonPackages);
         vars.put("python_requirements", requirements);
@@ -392,9 +377,9 @@ public class ScmEntryService {
     }
 
     private void dependencies(List<Map<String, String>> deps,
-                              List<String> systemPackages,
-                              List<String> pythonPackages,
-                              List<String> requirements) {
+            List<String> systemPackages,
+            List<String> pythonPackages,
+            List<String> requirements) {
         for (Map<String, String> dep: deps) {
             switch (dep.get("type")) {
             case "system":
@@ -424,7 +409,7 @@ public class ScmEntryService {
      * by the java regex spec.
      *
      */
-    private String safeScName(Toolbox toolbox) {
+    private static String safeScName(Toolbox toolbox) {
         return toolbox.getName().replaceAll("\\W", "");
     }
 

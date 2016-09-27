@@ -62,7 +62,7 @@ public class VGLPollingJobQueueManager extends QuartzJobBean{
 
 
         public VGLTimePollQueue(){
-            queue= new ConcurrentLinkedQueue<Job>();
+            queue= new ConcurrentLinkedQueue<>();
 
         }
 

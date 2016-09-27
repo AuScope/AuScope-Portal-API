@@ -12,11 +12,9 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
-import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,8 +34,6 @@ public class ScriptBuilderService {
 
     /** For saving our files to a staging area*/
     private FileStagingService jobFileService;
-    /** For accessing a job object*/
-    private VEGLJobManager jobManager;
 
     /**
      * Creates a new instance
@@ -45,11 +41,9 @@ public class ScriptBuilderService {
      * @param jobManager
      */
     @Autowired
-    public ScriptBuilderService(FileStagingService jobFileService,
-            VEGLJobManager jobManager) {
+    public ScriptBuilderService(FileStagingService jobFileService) {
         super();
         this.jobFileService = jobFileService;
-        this.jobManager = jobManager;
     }
 
     /**
@@ -58,33 +52,16 @@ public class ScriptBuilderService {
      * @param scriptText
      * @throws PortalServiceException
      */
-    public void saveScript(String jobId, String scriptText, ANVGLUser user) throws PortalServiceException {
-
-        //Lookup our job
-        VEGLJob job = null;
-        try {
-            job = jobManager.getJobById(Integer.parseInt(jobId), user);
-        } catch (AccessDeniedException e) {
-            throw e;
-        } catch (Exception ex) {
-            logger.warn("Unable to lookup job with id " + jobId + ": " + ex.getMessage());
-            logger.debug("exception:", ex);
-            throw new PortalServiceException("Unable to lookup job with id " + jobId, ex);
-        }
-
+    public void saveScript(VEGLJob job, String scriptText, ANVGLUser user) throws PortalServiceException {
         //Apply text contents to job stage in directory
-        OutputStream scriptFile = null;
-        try {
-            scriptFile = jobFileService.writeFile(job, SCRIPT_FILE_NAME);
+        try (OutputStream scriptFile = jobFileService.writeFile(job, SCRIPT_FILE_NAME)) {
             PrintWriter writer = new PrintWriter(scriptFile);
             writer.print(scriptText);
             writer.close();
         } catch (Exception e) {
             logger.error("Couldn't write script file: " + e.getMessage());
             logger.debug("error: ", e);
-            throw new PortalServiceException("Couldn't write script file for job with id " + jobId, e);
-        } finally {
-            FileIOUtil.closeQuietly(scriptFile);
+            throw new PortalServiceException("Couldn't write script file for job " + job, e);
         }
     }
 
@@ -94,13 +71,10 @@ public class ScriptBuilderService {
      * @return the file contents if the script file exists otherwise an empty string if the script file doesn't exist or is empty.
      * @throws PortalServiceException
      */
-    public String loadScript(String jobId, ANVGLUser user) throws PortalServiceException {
-        InputStream is = null;
-        try {
-            //Lookup our job
-            VEGLJob job = jobManager.getJobById(Integer.parseInt(jobId), user);
+    public String loadScript(VEGLJob job, ANVGLUser user) throws PortalServiceException {
+        try (InputStream is = jobFileService.readFile(job, SCRIPT_FILE_NAME)){
             //Load script from VL server's filesystem
-            is = jobFileService.readFile(job, SCRIPT_FILE_NAME);
+
             String script = null;
             if (is == null) {
                 logger.warn("User script file does not exist.");
@@ -109,13 +83,9 @@ public class ScriptBuilderService {
                 script = FileIOUtil.convertStreamtoString(is);
             }
             return script;
-        } catch (AccessDeniedException e) {
-            throw e;
         } catch (Exception ex) {
             logger.error("Error loading script.", ex);
             throw new PortalServiceException("There was a problem loading your script.", "Please report this error to cg_admin@csiro.au");
-        } finally {
-            FileIOUtil.closeQuietly(is);
         }
     }
 
@@ -129,7 +99,7 @@ public class ScriptBuilderService {
     public String populateTemplate(String templateText, Map<String, Object> values) {
         return StrSubstitutor.replace(templateText, values);
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value =  org.springframework.http.HttpStatus.FORBIDDEN)
     public @ResponseBody String handleException(AccessDeniedException e) {

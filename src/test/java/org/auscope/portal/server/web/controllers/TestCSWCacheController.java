@@ -65,11 +65,9 @@ public class TestCSWCacheController extends PortalTestClass {
 
     /**
      * Setup.
-     *
-     * @throws Exception the exception
      */
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         context.checking(new Expectations() {{
             oneOf(mockCSWService).updateCache();
         }});
@@ -84,9 +82,9 @@ public class TestCSWCacheController extends PortalTestClass {
      */
     @Test
     public void testGetRecordResponse_Success() throws Exception {
-        final StringWriter actualJSONResponse = new StringWriter();
-        final ModelMap viewCSWRecord1 = new ModelMap();
-        final ModelMap viewCSWRecord2 = new ModelMap();
+        StringWriter actualJSONResponse = new StringWriter();
+        ModelMap viewCSWRecord1 = new ModelMap();
+        ModelMap viewCSWRecord2 = new ModelMap();
 
         viewCSWRecord1.put("rec1", "val1");
         viewCSWRecord2.put("rec2", "val2");
@@ -133,9 +131,9 @@ public class TestCSWCacheController extends PortalTestClass {
      */
     @Test
     public void testGetRecordResponse_TransformError() throws Exception {
-        final StringWriter actualJSONResponse = new StringWriter();
-        final ModelMap viewCSWRecord1 = new ModelMap();
-        final ModelMap viewCSWRecord2 = new ModelMap();
+        StringWriter actualJSONResponse = new StringWriter();
+        ModelMap viewCSWRecord1 = new ModelMap();
+        ModelMap viewCSWRecord2 = new ModelMap();
 
         viewCSWRecord1.put("rec1", "val1");
         viewCSWRecord2.put("rec2", "val2");
@@ -174,9 +172,9 @@ public class TestCSWCacheController extends PortalTestClass {
      */
     @Test
     public void testGetKeywords() {
-        final Map<String, Set<CSWRecord>> expectedKeywords = new HashMap<String, Set<CSWRecord>>();
-        expectedKeywords.put("keyword1", new HashSet<CSWRecord>(Arrays.asList(new CSWRecord("a"), new CSWRecord("b"))));
-        expectedKeywords.put("keyword1", new HashSet<CSWRecord>(Arrays.asList(new CSWRecord("c"), new CSWRecord("b"), new CSWRecord("a"))));
+        Map<String, Set<CSWRecord>> expectedKeywords = new HashMap<>();
+        expectedKeywords.put("keyword1", new HashSet<>(Arrays.asList(new CSWRecord("a"), new CSWRecord("b"))));
+        expectedKeywords.put("keyword1", new HashSet<>(Arrays.asList(new CSWRecord("c"), new CSWRecord("b"), new CSWRecord("a"))));
 
         ModelMap kw1 = new ModelMap();
         kw1.put("keyword", "keyword1");
@@ -194,6 +192,8 @@ public class TestCSWCacheController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get(SUCCESSJSON));
 
+        @SuppressWarnings("unchecked")
+        final
         List<ModelMap> data = (List<ModelMap>) mav.getModel().get("data");
         Assert.assertEquals(expectedKeywords.size(), data.size());
         for (ModelMap kwResponse : data) {

@@ -2,8 +2,6 @@ package org.auscope.portal.server.vegl;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -12,8 +10,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author Richard Goh
  */
 public class VGLJobAuditLogDao extends HibernateDaoSupport {
-    protected final Log logger = LogFactory.getLog(getClass());
-
     public VGLJobAuditLogDao() {
         super();
     }
@@ -33,7 +29,7 @@ public class VGLJobAuditLogDao extends HibernateDaoSupport {
      * Retrieves the series with given ID.
      */
     public VGLJobAuditLog get(final int id) {
-        return (VGLJobAuditLog) getHibernateTemplate().get(VGLJobAuditLog.class, id);
+        return getHibernateTemplate().get(VGLJobAuditLog.class, id);
     }
 
     /**

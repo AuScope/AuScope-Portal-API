@@ -59,6 +59,7 @@ CREATE TABLE `jobs` (
   `executeDate` datetime DEFAULT NULL,
   `folderId` int(11) DEFAULT NULL,
   `containsPersistentVolumes` char(1) DEFAULT 'N',
+  `promsReportUrl` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY `SERIES` (`seriesId`)
      REFERENCES series(`id`)

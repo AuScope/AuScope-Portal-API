@@ -2,8 +2,6 @@ package org.auscope.portal.server.vegl;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.security.ANVGLUser;
@@ -16,8 +14,6 @@ import org.springframework.security.access.AccessDeniedException;
  *
  */
 public class VEGLJobDao extends HibernateDaoSupport {
-    protected final Log logger = LogFactory.getLog(getClass());
-
     /**
      * Retrieves jobs that are grouped under given series.
      * It excludes jobs that are deleted.
@@ -108,7 +104,7 @@ public class VEGLJobDao extends HibernateDaoSupport {
      * @param user
      */
     public VEGLJob get(final int id, ANVGLUser user) {
-        VEGLJob job = (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
+        VEGLJob job = getHibernateTemplate().get(VEGLJob.class, id);
         job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
         job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
         job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
@@ -133,7 +129,7 @@ public class VEGLJobDao extends HibernateDaoSupport {
     }
 
     public VEGLJob get(int id, String stsArn, String clientSecret, String s3Role, String userEmail) {
-        VEGLJob job = (VEGLJob) getHibernateTemplate().get(VEGLJob.class, id);
+        VEGLJob job = getHibernateTemplate().get(VEGLJob.class, id);
 
         if( job.getEmailAddress() == null || userEmail==null || (!job.getEmailAddress().trim().equalsIgnoreCase(userEmail.trim()) ))
             throw new AccessDeniedException("User does not have access to the requested job");

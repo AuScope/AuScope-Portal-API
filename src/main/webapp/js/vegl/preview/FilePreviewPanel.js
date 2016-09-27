@@ -25,9 +25,11 @@ Ext.define('vegl.preview.FilePreviewPanel', {
                 itemId: 'empty',
                 html: '<div style="display:table;width:100%;height:50%;"><div style="display:table-cell;vertical-align:middle;"><p class="centeredlabel">Select a file to the left to preview it here.</p></div></div>'
             },
+            Ext.create('vegl.preview.DataServicePreview', {itemId: 'dataservice'}),
             Ext.create('vegl.preview.LogPreview', {itemId: 'log'}),
             Ext.create('vegl.preview.PlainTextPreview', {itemId: 'plaintext'}),
-            Ext.create('vegl.preview.ImagePreview', {itemId: 'image'})
+            Ext.create('vegl.preview.ImagePreview', {itemId: 'image'}),
+            Ext.create('vegl.preview.TTLPreview', {itemId: 'ttl'})
         ];
 
 

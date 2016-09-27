@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -16,7 +14,6 @@ import org.springframework.security.access.AccessDeniedException;
  * @author Josh Vote  -- Modified for VEGL
  */
 public class VEGLSeriesDao extends HibernateDaoSupport {
-    protected final Log logger = LogFactory.getLog(getClass());
 
     /**
      * Queries for series matching the given criteria. Some but not all of
@@ -55,7 +52,7 @@ public class VEGLSeriesDao extends HibernateDaoSupport {
      * @param user 
      */
     public VEGLSeries get(final int id, String userEmail) {
-        VEGLSeries res = (VEGLSeries) getHibernateTemplate().get(VEGLSeries.class, id);
+        VEGLSeries res = getHibernateTemplate().get(VEGLSeries.class, id);
         if( (res!=null) && (! res.getUser().equalsIgnoreCase(userEmail))) {
             throw new AccessDeniedException("User not authorized to access series: "+id);
         }

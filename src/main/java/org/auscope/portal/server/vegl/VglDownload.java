@@ -240,6 +240,7 @@ public class VglDownload implements Serializable, Cloneable {
         this.parent = parent;
     }
 
+    @Override
     public Object clone() {
         try {
             return super.clone();
@@ -253,15 +254,15 @@ public class VglDownload implements Serializable, Cloneable {
         if (this == obj) {
             return true;
         }
-        
+
         if (obj == null) {
             return false;
         }
-        
+
         if (!(obj instanceof VglDownload)) {
             return false;
         }
-        
+
         return this.id.equals(((VglDownload)obj).id);
     }
 
