@@ -319,6 +319,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
     listFilesForJob : function(job) {
         this.currentJobId = job.get('id');
         this.updateFileStore();
+        this.getSelectionModel().clearSelections();
     }
 });
 
