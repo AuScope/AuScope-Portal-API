@@ -741,28 +741,30 @@ public class JobListController extends BaseCloudController  {
      */
     @RequestMapping("/secure/setJobFolder.do")
     public ModelAndView setJobFolder(HttpServletRequest request,
-            @RequestParam("jobId") Integer jobId,
+            @RequestParam("jobIds") Integer[] jobIds,
             @RequestParam(required=false, value="seriesId") Integer seriesId,
             @AuthenticationPrincipal ANVGLUser user) {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
 
-        VEGLJob job = attemptGetJob(jobId, user);
-        if (job == null) {
-            return generateJSONResponseMAV(false);
-        }
-
-        //We allow a null series ID
-        if (seriesId != null) {
-            VEGLSeries series = jobManager.getSeriesById(seriesId, user.getEmail());
-            if (!series.getUser().equals(user.getEmail())) {
+        for(Integer jobId : jobIds) {
+            VEGLJob job = attemptGetJob(jobId, user);
+            if (job == null) {
                 return generateJSONResponseMAV(false);
             }
+    
+            //We allow a null series ID
+            if (seriesId != null) {
+                VEGLSeries series = jobManager.getSeriesById(seriesId, user.getEmail());
+                if (!series.getUser().equals(user.getEmail())) {
+                    return generateJSONResponseMAV(false);
+                }
+            }
+    
+            job.setSeriesId(seriesId);
+            jobManager.saveJob(job);
         }
-
-        job.setSeriesId(seriesId);
-        jobManager.saveJob(job);
         return generateJSONResponseMAV(true);
     }
 
