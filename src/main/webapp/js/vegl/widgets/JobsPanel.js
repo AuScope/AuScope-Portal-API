@@ -88,7 +88,9 @@ Ext.define('vegl.widgets.JobsPanel', {
             handler: function() {
                 var selection = this.getSelectionModel().getSelection();
                 if (selection.length > 0) {
-                    this.deleteJob(selection[0]);
+                	for(i=0;i<selection.length;i++) {
+                		this.deleteJob(selection[i]);
+                	}
                 }
             }
         });
