@@ -29,6 +29,22 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
 .jobdesc-content {
 }
 
+.filter-icon {
+	background-image: url("../img/search.png") !important;
+    background-position: 0 center !important;
+}
+
+.eye-icon {
+    background-image: url("../portal-core/img/eye.png") !important;
+    background-position: 0 center !important;
+}
+
+.draw-icon {
+    background-image: url("../img/select.png") !important;
+    background-position: 0 center !important;
+    backg
+}
+
 .disk-icon {
     background-image: url("../portal-core/img/disk.png") !important
 }
@@ -119,3 +135,16 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
     padding-left: 25px !important;
 }
 
+#activeLayersPanel {
+    top: 60px !important;
+}
+
+.olControlPanel {
+    left: 13px !important; 
+    top: 353px !important;
+}
+
+.olControlPanel button {
+	margin-left:0px !important;
+	float: left !important;
+}

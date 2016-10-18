@@ -14,46 +14,6 @@ Ext.application({
         var urlParams = Ext.Object.fromQueryString(window.location.search.substring(1));
         var isDebugMode = urlParams.debug;
 
-        var layersSorter = new Ext.util.Sorter({
-            sorterFn: function(record1, record2) {
-            	// 'order' is always received on the JSON
-            	// if it is an empty string, the layers are sorted on layer name, ascending
-                var order1 = (record1.data.order.length ? record1.data.order : record1.data.name);
-                var order2 = (record2.data.order.length ? record2.data.order : record2.data.name);
-                return order1 > order2 ? 1 : (order1 < order2 ? -1 : 0);
-            },
-            direction: 'ASC'
-        })
-
-        var layersGrouper = new Ext.util.Grouper({
-            groupFn: function(item) {
-                return item.data.group;
-            },
-            sorterFn: function(record1, record2) {
-            	// 'order' is always received on the JSON
-            	// if it is an empty string, the groups are sorted on group name, ascending
-            	var order1 = (record1.data.order.length ? record1.data.order : record1.data.group);
-            	var order2 = (record2.data.order.length ? record2.data.order : record2.data.group);
-                return order1 > order2 ? 1 : (order1 < order2 ? -1 : 0);
-            },
-            direction: 'ASC'
-        });
-
-        var knownLayerStore = Ext.create('Ext.data.Store', {
-            model : 'portal.knownlayer.KnownLayer',
-            proxy : {
-                type : 'ajax',
-                url : 'getKnownLayers.do',
-                reader : {
-                    type : 'json',
-                    rootProperty : 'data'
-                }
-            },
-            sorters: [layersSorter],
-            grouper: layersGrouper,
-            autoLoad : true
-        });
-
 
         //Create our store for holding the set of
         //layers that have been added to the map
@@ -67,6 +27,7 @@ Ext.application({
             container : null,   //We will be performing a delayed render of this map
             layerStore : layerStore,
             allowDataSelection : true,
+            portalIsHandlingLayerSwitcher : true,
             listeners : {
                 query : function(mapWrapper, queryTargets) {
                     queryTargetHandler.handleQueryTargets(mapWrapper, queryTargets);
@@ -147,43 +108,6 @@ Ext.application({
             }
         };
 
-        var knownLayersPanel = Ext.create('portal.widgets.panel.KnownLayerPanel', {
-            title : 'Featured',
-            store : knownLayerStore,
-            activelayerstore : layerStore,
-            map : map,
-            layerFactory : layerFactory,
-            tooltip : {
-                anchor : 'top',
-                title : 'Featured Layers',
-                text : '<p1>This is where the portal groups data services with a common theme under a layer. This allows you to interact with multiple data providers using a common interface.</p><br><p>The underlying data services are discovered from a remote registry. If no services can be found for a layer, it will be disabled.</p1>',
-                showDelay : 100,
-                icon : 'portal-core/img/information.png',
-                dismissDelay : 30000
-            }
-        });
-
-        // basic tabs 1, built from existing content
-        var tabsPanel = Ext.create('Ext.TabPanel', {
-            id : 'auscope-tabs-panel',
-            activeTab : 0,
-            region : 'center',
-            split : true,
-            height : '70%',
-            width : '100%',
-            enableTabScroll : true,
-            items:[
-                knownLayersPanel
-            ]
-        });
-
-        /* the footer, currently sits beneath tabsPanel */
-        var southPanel = {
-    		items : [{xtype: 'ANVGLFooter'}],
-    		layout : 'fit',
-            region :'south'
-        };
-
         /**
          * Used as a placeholder for the tree and details panel on the left of screen
          */
@@ -194,7 +118,16 @@ Ext.application({
             split:true,
             margin:'60 0 0 3',
             width: 370,
-            items:[tabsPanel, southPanel]
+            items:[{
+                xtype: 'facetedsearchpanel',
+                region: 'center',
+                map: map,
+                layerFactory: layerFactory
+            },{
+                items : [{xtype: 'ANVGLFooter'}],
+                layout : 'fit',
+                region :'south'
+            }]
         };
 
         /**
@@ -222,6 +155,62 @@ Ext.application({
             layout:'border',
             items:[westPanel, centerPanel]
         });
+
+        var activeLayersPanel = Ext.create('Ext.panel.Panel', {
+            id : 'activeLayersPanel',
+            title : 'Active Layers',
+             layout: {
+                 type: 'vbox',         // Arrange child items vertically
+                 align: 'stretch',     // Each takes up full width
+                 padding: 1
+             },
+             renderTo: Ext.getBody(),
+             items : [{
+                      xtype: 'activelayerpanel',
+                      store : layerStore,
+                      //onlineResourcePanelType : 'gaonlineresourcespanel',
+                      serviceInformationIcon: 'img/information.png',
+                      //mapExtentIcon: 'img/extent3.png',
+                      map : map,
+                      layerFactory : layerFactory,
+                      tooltip : {
+                          anchor : 'top',
+                          title : 'Featured Layers',
+                          text : '<p>This is where the portal groups data services with a common theme under a layer. This allows you to interact with multiple data providers using a common interface.</p><br><p>The underlying data services are discovered from a remote registry. If no services can be found for a layer, it will be disabled.</p>',
+                          showDelay : 100,
+                          icon : 'img/information.png',
+                          dismissDelay : 30000
+                      }
+                  },{
+                     xtype : 'label',
+                     id : 'baseMap',
+                     html : '<div id="layerSwitcher"></div>',
+                     listeners: {
+                         afterrender: function (view) {
+                             map._drawOpenLayerSwitcher('layerSwitcher');
+                         }
+                     }
+                  }
+             ],
+             minHeight: 170,
+             width: 500,
+             collapsible: true,
+             collapsed: true,
+             animCollapse : true,
+             collapseDirection : 'top'
+        });
+        layerStore.on('add', function() {
+            var alp = Ext.getCmp('activeLayersPanel');
+
+            if (alp.getCollapsed()) {
+                alp.expand();
+                alp.down('activelayerpanel')._updateEmptyText();
+            }
+        });
+
+        activeLayersPanel.show();
+        activeLayersPanel.setZIndex(1000);
+        activeLayersPanel.anchorTo(Ext.getBody(), 'tr-tr', [0, 100], true);
 
 
         // The subset button needs a handler for when the user draws a subset bbox on the map:
@@ -294,7 +283,6 @@ Ext.application({
             var decodedVersion = urlParams.v;
 
             deserializationHandler = Ext.create('portal.util.permalink.DeserializationHandler', {
-                knownLayerStore : knownLayerStore,
                 layerFactory : layerFactory,
                 layerStore : layerStore,
                 map : map,
