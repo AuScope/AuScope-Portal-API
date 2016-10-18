@@ -188,8 +188,6 @@ public class LocalCSWFilterService {
                 lastIndex = performLocalFilter(cswResponse.getRecords(), result.getRecords(), localFacets, recordsRemaining);
             }
 
-            log.error(String.format("Requesting records from %1$s (pageSize %3$s)- Found %2$s total records", currentStartIndex, result.getRecords().size(), recsToRequest));
-
             if (lastIndex < 0) {
                 //If we got an empty response then we are done.
                 result.setNextIndex(0);
