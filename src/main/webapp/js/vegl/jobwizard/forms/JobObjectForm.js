@@ -19,6 +19,36 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     constructor: function(wizardState) {
         var jobObjectFrm = this;
 
+        this.storageServicesStore = Ext.create('Ext.data.Store', {
+            fields : [{name: 'id', type: 'string'},
+                      {name: 'name', type: 'string'}],
+            proxy: {
+                type: 'ajax',
+                url: 'secure/getStorageServices.do',
+                reader: {
+                   type: 'json',
+                   rootProperty : 'data'
+                }
+            },
+            autoLoad : true
+        });
+        this.storageServicesStore.load();
+
+        this.computeServicesStore = Ext.create('Ext.data.Store', {
+            fields : [{name: 'id', type: 'string'},
+                      {name: 'name', type: 'string'}],
+            proxy: {
+                type: 'ajax',
+                url: 'secure/getComputeServices.do',
+                reader: {
+                   type: 'json',
+                   rootProperty : 'data'
+                }
+            },
+            autoLoad : true
+        });
+        this.storageServicesStore.load();
+
         // create the store, get the machine image
         this.imageStore = Ext.create('Ext.data.Store', {
             model: 'vegl.models.MachineImage',
@@ -28,9 +58,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 reader: {
                    type: 'json',
                    rootProperty : 'data'
-                },
-                extraParams: {
-                    computeServiceId: 'aws-ec2-compute' //See ANVGL-35
                 }
             }
         });
@@ -63,14 +90,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     if (jobObjectFrm.wizardState.jobId) {
                         jobObjectFrm.handleLoadingJobObject();
                     } else if (jobObjectFrm.wizardState.solutions) {
-                        this.imageStore.load({
-                            callback: Ext.bind(function() {
-                                if (this.imageStore.getCount()) {
-                                    var firstImg = this.imageStore.getAt(0);
-                                    this.down('#image-combo').select(firstImg);
-                                }
-                            }, this)
-                        });
+                        this.imageStore.load();
                     } else {
                         this.imageStore.load();
                     }
@@ -100,17 +120,50 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 }],
                 allowBlank: true
             },{
-                //See ANVGL-35
-                xtype : 'hiddenfield',
-                itemId: 'computeServiceId',
+                xtype : 'combo',
+                fieldLabel : 'Compute Provider',
                 name: 'computeServiceId',
-                value: 'aws-ec2-compute'
+                itemId : 'computeServiceId',
+                allowBlank: false,
+                queryMode: 'local',
+                triggerAction: 'all',
+                displayField: 'name',
+                valueField : 'id',
+                typeAhead: true,
+                forceSelection: true,
+                store : this.computeServicesStore,
+                listConfig : {
+                    loadingText: 'Getting Compute Services...',
+                    emptyText: 'No compute services found.'
+                },
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select a location where your data will be processed. Different locations will have different toolboxes.'
+                }],
+                listeners : {
+                    select : Ext.bind(this.onComputeSelect, this)
+                }
             },{
-                //See ANVGL-35
-                xtype : 'hiddenfield',
-                itemId: 'storageServiceId',
+                xtype : 'combo',
+                fieldLabel : 'Storage Provider',
                 name: 'storageServiceId',
-                value: 'amazon-aws-storage-sydney'
+                itemId : 'storageServiceId',
+                allowBlank: false,
+                queryMode: 'local',
+                triggerAction: 'all',
+                displayField: 'name',
+                valueField : 'id',
+                typeAhead: true,
+                forceSelection: true,
+                store : this.storageServicesStore,
+                listConfig : {
+                    loadingText: 'Getting Storage Services...',
+                    emptyText: 'No storage services found.'
+                },
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'Select a location where your data will be stored.'
+                }]
             },{
                 xtype : 'machineimagecombo',
                 fieldLabel : 'Toolbox<span>*</span>',
@@ -191,7 +244,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 disabled: true,
                 fieldLabel: 'Walltime',
                 maskRe:/[\d]/,
-                allowBlank: true 
+                allowBlank: true
             },
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'storageProvider' },
@@ -225,6 +278,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     this.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
                     this.wizardState.jobId = frm.getValues().id;
 
+                    this.imageStore.getProxy().setExtraParam('jobId', this.wizardState.jobId);
+
                     // Load the solution info for the job into the wizardState
         	          Ext.Ajax.request({
                         url: 'getSolutions.do',
@@ -242,22 +297,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                             console.log("Load job solutions failed! " + response);
                         }
                     });
-
-                    //If we have a solution ID but no selected image, preload the image combo
-                    //with the first image sent from the backend
-                    if (Ext.isEmpty(jobData.computeVmId) && !Ext.isEmpty(jobData.jobSolutions)) {
-                        this.imageStore.getProxy().setExtraParam('jobId', jobData.id);
-                        this.imageStore.load({
-                            callback: Ext.bind(function() {
-                                if (this.imageStore.getCount()) {
-                                    var firstImg = this.imageStore.getAt(0);
-                                    this.down('#image-combo').select(firstImg);
-
-                                    this.handleAutoSelectingImage(jobData.computeServiceId, firstImg.get('imageId'), true);
-                                }
-                            }, this)
-                        });
-                    }
 
                     if (!Ext.isEmpty(jobData.computeVmId)) {
                         this.handleAutoSelectingImage(jobData.computeServiceId, jobData.computeVmId);
@@ -347,19 +386,28 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     },
 
     /**
-     * loads images for computeServiceId 'aws-ec2-compute'
+     * loads images for computeServiceId
      * @function
      */
     loadImages : function() {
         this.getComponent('image-combo').clearValue();
         this.getComponent('resource-combo').clearValue();
-        this.imageStore.load({
-            params : {
-                computeServiceId : 'aws-ec2-compute' //See ANVGl-35
-            }
-        });
+        this.imageStore.getProxy().setExtraParam('computeServiceId', this.getComponent('computeServiceId').getValue());
+        this.imageStore.load();
     },
 
+    onComputeSelect : function(combo, records) {
+        if (!records) {
+            this.imageStore.removeAll();
+            this.computeTypeStore.removeAll();
+            return;
+        }
+
+        this.getComponent('image-combo').clearValue();
+        this.getComponent('resource-combo').clearValue();
+        this.imageStore.getProxy().setExtraParam('computeServiceId', records.get('id'));
+        this.imageStore.load();
+    },
 
     /**
      * Handles the selection on 'Toolbox'
@@ -375,7 +423,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
         this.getComponent('resource-combo').clearValue();
         var selectedComputeService = this.getComponent('computeServiceId').getValue();
-        var selectedComputeService = "aws-ec2-compute";
 
         this.computeTypeStore.load({
             params : {
@@ -431,9 +478,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         var values = jobObjectFrm.getForm().getValues();
         values.seriesId = jobObjectFrm.wizardState.seriesId;
         values.jobId = jobObjectFrm.wizardState.jobId;
-        values.storageServiceId = "amazon-aws-storage-sydney";
-        values.computeServiceId = "aws-ec2-compute";
-        
+
         // update the job here
         Ext.Ajax.request({
             url : 'secure/updateOrCreateJob.do',
