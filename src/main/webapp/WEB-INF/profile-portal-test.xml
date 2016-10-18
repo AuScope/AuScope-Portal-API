@@ -44,7 +44,8 @@
     <bean id="cswServiceList" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-                <ref bean="cswVeglProduction" />              
+                <ref bean="cswNCI" />
+                      
             </list>
         </constructor-arg>
     </bean>

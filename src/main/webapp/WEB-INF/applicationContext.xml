@@ -152,6 +152,15 @@
         </constructor-arg>
         <property name="forceGetMethods" value="true"/>
     </bean>
+    
+    <bean id="cswFilterService" class="org.auscope.portal.core.services.CSWFilterService">
+        <constructor-arg name="executor" ref="taskExecutor"/>
+        <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="cswServiceList" ref="cswServiceList"/> <!-- This is pulled from the profile xml -->
+        <constructor-arg name="transformerFactory">
+            <bean class="org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory"/>
+        </constructor-arg>
+    </bean>
 
     <bean id="cswKnownLayerService" class="org.auscope.portal.core.services.KnownLayerService">
         <constructor-arg name="knownTypes" ref="knownTypes"/> <!-- This is pulled from the profile xml -->
