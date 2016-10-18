@@ -85,6 +85,7 @@ Ext.define('portal.widgets.panel.BaseActiveRecordPanel', {
                 },
                 clickHandler: function(value, record) {
                     ActiveLayerManager.removeLayer(record);
+                    record.get('source').set('layer', null);
                 }
             }],
             childPanelGenerator: function(layer) {
