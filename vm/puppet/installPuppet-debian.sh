@@ -24,6 +24,7 @@ branch="master"
 pathSuffix="/vm/puppet/modules/"
 
 apt-get update
+apt-get -y upgrade
 apt-get install -y puppet
 
 #/////////////////////////////

@@ -4,13 +4,6 @@ import "python_pip"
 import "puppi"
 import "autofsck"
 
-class {["epel", "python_pip", "vl_common"]:}
-
-# Disable fsck on boot
-class { autofsck:
-  ensure => present, # default
-}
-
 #Install escript specific packages...
 class escript_packages {
 
@@ -134,14 +127,15 @@ case $::osfamily {
     default: {
         $scons_cfg_contents = '# Puppet generated SCONS config for debian
 from templates.jessie_options import *
-prefix = \'/opt/escript\' 
+prefix = \'/opt/escript\'
+werror = False 
 verbose = True
 openmp = True
 mpi = \'OPENMPI\' 
 netcdf = True
 netcdf_prefix = [\'/usr/include/\', \'/usr/lib\']
 umfpack = True
-lapack = \'clapack\'
+lapack = True
 silo = True
 '
         file {"debian-scons-cfg-env":
