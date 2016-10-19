@@ -1,8 +1,8 @@
-import "vl_common"
-import "epel"
-import "python_pip"
-import "puppi"
-import "autofsck"
+include "vl_common"
+include "epel"
+include "python_pip"
+include "puppi"
+include "autofsck"
 
 #Install escript specific packages...
 class escript_packages {
