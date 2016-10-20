@@ -10,10 +10,23 @@
         <constructor-arg name="id" value="cswVeglProduction"/>
         <constructor-arg name="title" value="SISS ANU Geonetwork"/>
         <constructor-arg name="serviceUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/csw"/>
-         <constructor-arg name="recordInformationUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s"/>
+        <constructor-arg name="recordInformationUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s"/>
         <property name="userName" value="${env.outputgeonetwork.user}"/>
         <property name="password" value="${env.outputgeonetwork.password}"/>
     </bean>
 
+    <bean id="cswGAECat" class="org.auscope.portal.core.services.csw.CSWServiceItem">
+        <constructor-arg name="id" value="cswGAECat"/>
+        <constructor-arg name="title" value="Geoscience Australia eCat"/>
+        <constructor-arg name="serviceUrl" value="http://ecat.ga.gov.au/geonetwork/srv/eng/csw"/>
+        <constructor-arg name="recordInformationUrl" value="http://ecat.ga.gov.au/geonetwork/srv/eng/main.home?uuid=%1$s"/>
+    </bean>
+    
+    <bean id="cswNCI" class="org.auscope.portal.core.services.csw.CSWServiceItem">
+        <constructor-arg name="id" value="cswNCI"/>
+        <constructor-arg name="title" value="NCI Data Portal"/>
+        <constructor-arg name="serviceUrl" value="http://geonetworkrr2.nci.org.au/geonetwork/srv/eng/csw"/>
+        <constructor-arg name="recordInformationUrl" value="https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
+    </bean>
 
 </beans>
