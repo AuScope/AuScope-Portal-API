@@ -19,21 +19,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
     constructor: function(wizardState) {
         var jobObjectFrm = this;
 
-        this.storageServicesStore = Ext.create('Ext.data.Store', {
-            fields : [{name: 'id', type: 'string'},
-                      {name: 'name', type: 'string'}],
-            proxy: {
-                type: 'ajax',
-                url: 'secure/getStorageServices.do',
-                reader: {
-                   type: 'json',
-                   rootProperty : 'data'
-                }
-            },
-            autoLoad : true
-        });
-        this.storageServicesStore.load();
-
         this.computeServicesStore = Ext.create('Ext.data.Store', {
             fields : [{name: 'id', type: 'string'},
                       {name: 'name', type: 'string'}],
@@ -47,7 +32,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             },
             autoLoad : true
         });
-        this.storageServicesStore.load();
 
         // create the store, get the machine image
         this.imageStore = Ext.create('Ext.data.Store', {
@@ -143,27 +127,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 listeners : {
                     select : Ext.bind(this.onComputeSelect, this)
                 }
-            },{
-                xtype : 'combo',
-                fieldLabel : 'Storage Provider',
-                name: 'storageServiceId',
-                itemId : 'storageServiceId',
-                allowBlank: false,
-                queryMode: 'local',
-                triggerAction: 'all',
-                displayField: 'name',
-                valueField : 'id',
-                typeAhead: true,
-                forceSelection: true,
-                store : this.storageServicesStore,
-                listConfig : {
-                    loadingText: 'Getting Storage Services...',
-                    emptyText: 'No storage services found.'
-                },
-                plugins: [{
-                    ptype: 'fieldhelptext',
-                    text: 'Select a location where your data will be stored.'
-                }]
             },{
                 xtype : 'machineimagecombo',
                 fieldLabel : 'Toolbox<span>*</span>',
