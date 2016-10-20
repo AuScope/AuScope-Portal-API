@@ -6,7 +6,6 @@ Ext.application({
     //monolithic 'do everything' function
     launch : function() {
         var reportFailure = function() {
-
             return;
         };
 
@@ -39,8 +38,7 @@ Ext.application({
                 region: 'north',
                 applyTo: 'body',
                 height: 100
-            },
-            {
+            },{
                 region: 'center',
                 margin: '10 0 10 0',
                 border: false,
@@ -105,7 +103,40 @@ Ext.application({
 	                    }]
                 	},{
                 		title: 'NCI',
-                		html: 'Tab 2'
+                		xtype: 'panel',
+	                    border: false,
+	                    maxWidth: 800,
+	                    width: '100%',
+	                    height: 500,
+	                    margin: '10 10 10 10',
+	                    items: [{
+	                    	xtype: 'panel',
+	                        title: 'Enter Your NCI Credentials',
+	                        flex: 0.6,
+	                        height: '100%',
+	                        margin: '0 0 0 10',
+	                        bodyStyle: {
+	                            'background-color': 'white'
+	                        },
+	                        layout: 'fit',
+	                        items: [{
+	                            border: false,
+	                            xtype: 'nciuserpanel'
+	                        }]
+	                    	/*
+	                    	xtype: 'panel',
+	                        title: 'Enter Your NCI Credentials',
+	                        flex: 0.4,
+	                        height: '100%',
+	                        margin: '0 10 0 0',
+	                        bodyStyle: {
+	                            'background-color': 'white',
+	                            padding: '5px',
+	                        },
+	                        html: 'Hello',
+	                        */
+	                    	
+	                    }]
                 	}]
                 }]
             }],

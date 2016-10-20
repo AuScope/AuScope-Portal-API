@@ -19,6 +19,8 @@ CREATE TABLE `users` (
   `awsAccount` varchar(128) DEFAULT NULL,
   `awsKeyName` varchar(45) DEFAULT NULL,
   `s3Bucket` varchar(64) DEFAULT NULL,
+  `nciUsername` varchar(128) DEFAULT NULL,
+  `nciKey` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `EMAIL` (`email`) USING BTREE
 );

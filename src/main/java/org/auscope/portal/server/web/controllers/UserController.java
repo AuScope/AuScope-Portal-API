@@ -74,6 +74,7 @@ public class UserController extends BasePortalController {
         userObj.put("arnStorage", user.getArnStorage());
         userObj.put("acceptedTermsConditions", user.getAcceptedTermsConditions());
         userObj.put("awsKeyName", user.getAwsKeyName());
+        userObj.put("nciUsername", user.getNciUsername());
 
         return generateJSONResponseMAV(true, userObj, "");
     }
@@ -91,7 +92,9 @@ public class UserController extends BasePortalController {
             @RequestParam(required=false, value="arnExecution") String arnExecution,
             @RequestParam(required=false, value="arnStorage") String arnStorage,
             @RequestParam(required=false, value="acceptedTermsConditions") Integer acceptedTermsConditions,
-            @RequestParam(required=false, value="awsKeyName") String awsKeyName) {
+            @RequestParam(required=false, value="awsKeyName") String awsKeyName,
+            @RequestParam(required=false, value="nciUsername") String nciUsername,
+            @RequestParam(required=false, value="nciKey") String nciKey) {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -115,6 +118,16 @@ public class UserController extends BasePortalController {
 
         if (!StringUtils.equals(user.getAwsKeyName(), awsKeyName)) {
             user.setAwsKeyName(awsKeyName);
+            modified = true;
+        }
+        
+        if (!StringUtils.equals(user.getNciUsername(), nciUsername)) {
+            user.setNciUsername(nciUsername);
+            modified = true;
+        }
+        
+        if (!StringUtils.equals(user.getNciKey(), nciKey)) {
+            user.setNciKey(nciKey);
             modified = true;
         }
 
