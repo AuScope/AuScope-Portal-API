@@ -9,7 +9,7 @@ class vl_common {
     # Install default packages (curl/wget declared in puppi)
   package { ["subversion", "mercurial", "ftp", "bzip2",
              "elfutils", "ntp", "ntpdate", "gcc", "make", "swig", "mlocate",
-             "expect-dev", "gfortran", "build-essential", "at"]:
+             "expect-dev", "gfortran", "build-essential", "at", "python-swiftclient"]:
     ensure => installed,
     require => Class["epel"],
   }
