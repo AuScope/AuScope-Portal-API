@@ -9,3 +9,4 @@ src/main/resources/env.properties
 **/.tern-port
 anvgl
 anvgl.pub
+src/local/
