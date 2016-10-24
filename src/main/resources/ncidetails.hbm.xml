@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="org.auscope.portal.server.web.security.NCIDetails" table="nci_details">
+        <id name="id" column="id">
+            <generator class="native"/>
+        </id>
+        <property name="username"/>
+        <property name="project"/>
+        <property name="key"/>
+        <many-to-one name="user" column="user" class="org.auscope.portal.server.web.security.ANVGLUser" not-null="true"></many-to-one>
+    </class>
+</hibernate-mapping>

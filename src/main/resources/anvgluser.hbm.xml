@@ -14,8 +14,6 @@
         <property name="awsKeyName"/>
         <property name="s3Bucket"/>
         <property name="acceptedTermsConditions"/>
-        <property name="nciUsername"/>
-        <property name="nciKey"/>
         
         <bag name="authorities" lazy="false" cascade="all-delete-orphan" inverse="true">
             <key column="userId" />

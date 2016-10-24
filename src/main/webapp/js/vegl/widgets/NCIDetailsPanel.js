@@ -5,9 +5,9 @@
  * Adds the following events
  *
  */
-Ext.define('vegl.widgets.NCIUserPanel', {
+Ext.define('vegl.widgets.NCIDetailsPanel', {
     extend : 'Ext.panel.Panel',
-    alias : 'widget.nciuserpanel',
+    alias : 'widget.ncidetailspanel',
 
     /**
      * Accepts the config for a Ext.grid.Panel along with the following additions:
@@ -16,8 +16,8 @@ Ext.define('vegl.widgets.NCIUserPanel', {
      */
     constructor : function(config) {
         tm = new Ext.util.TextMetrics(),
-        n = tm.getWidth("NCI Username:");
-      
+        n = tm.getWidth("NCI Project Code:");
+
         Ext.apply(config, {
             layout: 'fit',
             items: [{
@@ -32,77 +32,39 @@ Ext.define('vegl.widgets.NCIUserPanel', {
                     fieldLabel: 'NCI Username',
                     labelWidth: n,
                     anchor: '100%',
-                    allowBlank: false,
+                    allowBlank: true,
                     allowOnlyWhitespace: false,
                     plugins: [{
                         ptype: 'fieldhelptext',
                         text: 'The username for the NCI account.'
                     }]
                 },{
-                	xtype: 'panel',
-                	border: false,
-                	
-                	//width: '100%',
-                	
-                	layout: {
-                		type: 'hbox',
-                		
-                		//pack: 'justify'
-                			
-                	},
-                	items: [{
-                		xtype: 'textfield',
-                        itemId: 'nciKey',
-                        name: 'nciKey',
-                        fieldLabel: 'NCI Key',
-                        labelWidth: n,
-                        anchor: '100%',
-                        
-                        layout: 'fit',
-                        flex: 1,
-                        
-                        //allowBlank: false,
-                        //allowOnlyWhitespace: false,
-                        readOnly: true,
-                        plugins: [{
-                            ptype: 'fieldhelptext',
-                            text: 'The NCI key (SSH) for the NCI account.'
-                        }]
-                	},{
-                		xtype: 'button',
-                		margin: '0 0 0 5',
-                        cls: 'important-button',
-                        scale: 'small',
-                        text: 'Upload'
-                		
-                	}]
-                }
-                /*,{
                     xtype: 'textfield',
-                    itemId: 'arnStorage',
-                    name: 'arnStorage',
-                    fieldLabel: 'Job Instance ARN',
-                    labelWidth: n,
-                    anchor: '100%',
-                    allowBlank: false,
-                    allowOnlyWhitespace: false,
-                    plugins: [{
-                        ptype: 'fieldhelptext',
-                        text: 'The Amazon resource name for the instance profile which is used when processing user jobs.'
-                    }]
-                },{
-                    xtype: 'textfield',
-                    itemId: 'awsKeyName',
-                    name: 'awsKeyName',
-                    fieldLabel: 'AWS Key Name',
+                    itemId: 'nciProjectCode',
+                    name: 'nciProjectCode',
+                    fieldLabel: 'NCI Project Code',
                     labelWidth: n,
                     anchor: '100%',
                     allowBlank: true,
+                    allowOnlyWhitespace: false,
                     plugins: [{
                         ptype: 'fieldhelptext',
-                        text: 'The (optional) name of the key to be applied to every VM started by ANVGL'
+                        text: 'The default NCI project code.'
                     }]
-                }*/]
+                },{
+                	xtype : 'fileuploadfield',
+                	itemId: 'nciKey',
+                    name: 'nciKey',
+                    fieldLabel: 'NCI Key',
+                    labelWidth: n,
+                    anchor: '100%',
+                    allowBlank: true,
+                    emptyText : 'Select SSH File',
+                    plugins: [{
+                        ptype: 'fieldhelptext',
+                        text: 'The NCI key (SSH) for the NCI account.'
+                    }]
+                }]
             }],
             dockedItems: [{
                 xtype: 'toolbar',
@@ -121,8 +83,8 @@ Ext.define('vegl.widgets.NCIUserPanel', {
                     scale: 'large',
                     text: 'Save Changes',
                     handler: function(btn) {
-                        var formPanel = btn.up('nciuserpanel').down('form');
-                        var statusLabel = btn.up('nciuserpanel').down('#status');
+                        var formPanel = btn.up('ncidetailspanel').down('form');
+                        var statusLabel = btn.up('ncidetailspanel').down('#status');
                         if (!formPanel.isValid()) {
                             return;
                         }
@@ -157,9 +119,9 @@ Ext.define('vegl.widgets.NCIUserPanel', {
                 }]
             }],
             listeners: {
-                afterrender: function(nciUserPanel) {
+                afterrender: function(nciDetailsPanel) {
                     if (config.user) {
-                        nciUserPanel.setUser(config.user);
+                        nciDetailsPanel.setUser(config.user);
                     }
                 }
             }
@@ -169,12 +131,18 @@ Ext.define('vegl.widgets.NCIUserPanel', {
     },
 
     setUser: function(user) {
-    	this.down('#nciUsername').setValue(user.get('nciUsername'));
+    	//this.down('#nciUsername').setValue(user.get('nciUsername'));
     	//this.down('#nciKey').setValue(user.get('nciKey'));
     	/*
         this.down('#awsKeyName').setValue(user.get('awsKeyName'));
         this.down('#arnExecution').setValue(user.get('arnExecution'));
         this.down('#arnStorage').setValue(user.get('arnStorage'));
         */
+    },
+    
+    setDetails: function(nciDetails) {
+    	this.down('#username').setValue(user.get('username'));
+    	this.down('#project').setValue(user.get('project'));
+    	this.down('#key').setValue(user.get('key'));
     }
 });

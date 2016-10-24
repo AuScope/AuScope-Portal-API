@@ -25,8 +25,6 @@ public class ANVGLUser implements UserDetails {
     private String awsSecret;
     private String awsKeyName;
     private Integer acceptedTermsConditions;
-    private String nciUsername;
-    private String nciKey;
 
     public ANVGLUser() {
         this.authorities = new ArrayList<>();
@@ -138,38 +136,6 @@ public class ANVGLUser implements UserDetails {
         this.acceptedTermsConditions = acceptedTermsConditions;
     }
     
-    /**
-     * The user's NCI username (or null if not needed)
-     * @return
-     */
-    public String getNciUsername() {
-        return this.nciUsername;
-    }
-    
-    /**
-     * The user's NCI username (or null if not needed)
-     * @param nciUsername
-     */
-    public void setNciUsername(String nciUsername) {
-        this.nciUsername = nciUsername;
-    }
-    
-    /**
-     * The user's NCI key (or null if not needed)
-     * @return
-     */
-    public String getNciKey() {
-        return this.nciKey;
-    }
-    
-    /**
-     * The user's NCI key (or null if not needed)
-     * @param nciUsername
-     */
-    public void setNciKey(String nciKey) {
-        this.nciKey = nciKey;
-    }
-
     @Override
     public String toString() {
         return "ANVGLUser [id=" + id + ", fullName=" + fullName + ", authorities=" + authorities + "]";

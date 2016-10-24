@@ -121,21 +121,8 @@ Ext.application({
 	                        layout: 'fit',
 	                        items: [{
 	                            border: false,
-	                            xtype: 'nciuserpanel'
+	                            xtype: 'ncidetailspanel'
 	                        }]
-	                    	/*
-	                    	xtype: 'panel',
-	                        title: 'Enter Your NCI Credentials',
-	                        flex: 0.4,
-	                        height: '100%',
-	                        margin: '0 10 0 0',
-	                        bodyStyle: {
-	                            'background-color': 'white',
-	                            padding: '5px',
-	                        },
-	                        html: 'Hello',
-	                        */
-	                    	
 	                    }]
                 	}]
                 }]

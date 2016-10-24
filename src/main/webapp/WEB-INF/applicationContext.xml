@@ -316,6 +316,7 @@
                 <value>vglsignature.hbm.xml</value>
                 <value>anvgluser.hbm.xml</value>
                 <value>anvglauthority.hbm.xml</value>
+                <value>ncidetails.hbm.xml</value>
                 <value>scmentrysnapshot.hbm.xml</value>
             </list>
         </property>

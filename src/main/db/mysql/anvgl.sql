@@ -19,8 +19,6 @@ CREATE TABLE `users` (
   `awsAccount` varchar(128) DEFAULT NULL,
   `awsKeyName` varchar(45) DEFAULT NULL,
   `s3Bucket` varchar(64) DEFAULT NULL,
-  `nciUsername` varchar(128) DEFAULT NULL,
-  `nciKey` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `EMAIL` (`email`) USING BTREE
 );
@@ -154,5 +152,17 @@ CREATE TABLE `signatures` (
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user`)
      REFERENCES users(`email`)
+     ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE `nci_details` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user` varchar(128) DEFAULT NULL,
+  `username` varchar(128) DEFAULT NULL,
+  `key` varchar(256) DEFAULT NULL,
+  `project` varchar(128) DEFAULT NULL,  
+  PRIMARY KEY (`id`)
+  FOREIGN KEY (`user`)
+     REFERENCES users(`id`)
      ON DELETE CASCADE ON UPDATE CASCADE
 );
