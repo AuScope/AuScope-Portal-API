@@ -178,14 +178,12 @@ public class CloudComputeServiceNci extends CloudComputeService {
         logger.info(res);
     }
 
-    private String workingDirPrefix = "/short/gv3/cxf599/vgl-";
-
     @Override
     public String executeJob(CloudJob job, String userDataString) throws PortalServiceException {
         JSch jsch = new JSch();
         Session session = null;
         String jobId = null;
-        String workingDir = workingDirPrefix + job.getId();
+        String workingDir = CloudStorageServiceNCI.getJobDirectory(job);
 
         try {
             String prvkey = job.getProperty(NCI_USER_KEY);
