@@ -249,7 +249,7 @@
         
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
-        <property name="requireSts" value="${HOST.aws.stsonly}"/>
+        <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
         
         <property name="availableImages">
             <list>
