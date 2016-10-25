@@ -137,7 +137,17 @@ public abstract class BaseCloudController extends BaseModelController {
     public String createBootstrapForJob(VEGLJob job) throws IOException {
         String bootstrapTemplate = getBootstrapTemplate();
         CloudStorageService cloudStorageService = getStorageService(job);
-        boolean useSts = ! TextUtil.isNullOrEmpty(job.getProperty(CloudJob.PROPERTY_STS_ARN));
+
+        boolean useSts = false;
+        switch(cloudStorageService.getStsRequirement()) {
+        case ForceNone:
+            useSts = false;
+            break;
+        case Mandatory:
+            useSts = true;
+        case Permissable:
+            useSts = !TextUtil.isNullOrEmpty(job.getProperty(CloudJob.PROPERTY_STS_ARN));
+        }
 
         Object[] arguments = new Object[] {
                 job.getStorageBucket(), // STORAGE_BUCKET
