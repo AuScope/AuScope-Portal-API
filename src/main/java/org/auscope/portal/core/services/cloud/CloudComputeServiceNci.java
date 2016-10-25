@@ -1,18 +1,12 @@
 package org.auscope.portal.core.services.cloud;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.SshCloudConnector.ExecResult;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
@@ -23,8 +17,6 @@ import com.jcraft.jsch.Session;
  * @author Carsten Friedrich
  */
 public class CloudComputeServiceNci extends CloudComputeService {
-    public static final String NCI_USER_NAME = "nci_username";
-    public static final String NCI_USER_KEY = "nci_userkey";
 
     /**
      * Any getStatus request on a job whose submission time is less than
@@ -36,7 +28,10 @@ public class CloudComputeServiceNci extends CloudComputeService {
      */
     public static final long STATUS_PENDING_SECONDS = 30;
 
+    @SuppressWarnings("unused")
     private final Log logger = LogFactory.getLog(getClass());
+    private CloudStorageServiceNci storageService;
+    private SshCloudConnector sshCloudConnector;
 
     /**
      * Creates a new instance with the specified credentials
@@ -50,154 +45,26 @@ public class CloudComputeServiceNci extends CloudComputeService {
      * @param apiVersion
      *            The API version
      */
-    public CloudComputeServiceNci(String endpoint) {
+    public CloudComputeServiceNci(CloudStorageServiceNci storageService, String endpoint) {
         super(ProviderType.RAIJIN, endpoint, null);
+        this.storageService=storageService;
+        this.sshCloudConnector = new SshCloudConnector(endpoint);
     }
 
-    class ExecResult {
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString() {
-            return "ExecResult [out=" + out + ", err=" + err + ", exitStatus=" + exitStatus + "]";
-        }
-
-        private String out;
-
-        public ExecResult(String out, String err, int exitStatus) {
-            super();
-            this.out = out;
-            this.err = err;
-            this.exitStatus = exitStatus;
-        }
-
-        /**
-         * @return the out
-         */
-        public String getOut() {
-            return out;
-        }
-
-        /**
-         * @param out
-         *            the out to set
-         */
-        public void setOut(String out) {
-            this.out = out;
-        }
-
-        /**
-         * @return the err
-         */
-        public String getErr() {
-            return err;
-        }
-
-        /**
-         * @param err
-         *            the err to set
-         */
-        public void setErr(String err) {
-            this.err = err;
-        }
-
-        /**
-         * @return the exitStatus
-         */
-        public int getExitStatus() {
-            return exitStatus;
-        }
-
-        /**
-         * @param exitStatus
-         *            the exitStatus to set
-         */
-        public void setExitStatus(int exitStatus) {
-            this.exitStatus = exitStatus;
-        }
-
-        private String err;
-        private int exitStatus;
-    }
-
-    String readStream(InputStream in, Channel channel) throws IOException, InterruptedException {
-        StringBuilder res = new StringBuilder();
-        byte[] tmp = new byte[1024];
-        while (true) {
-            while (in.available() > 0) {
-                int i = in.read(tmp, 0, 1024);
-                if (i < 0) {
-                    break;
-                }
-                res.append(new String(tmp, 0, i));
-            }
-            if (channel.isClosed()) {
-                if (in.available() > 0) {
-                    continue;
-                }
-                break;
-            }
-            Thread.sleep(1000);
-        }
-        return res.toString();
-    }
-
-    ExecResult executeCommand(Session session, String command) throws PortalServiceException {
-        ChannelExec channel = null;
-
-        try {
-            channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand(command);
-            channel.setInputStream(null);
-            channel.setErrStream(null);
-
-            channel.connect();
-
-            try (InputStream out = channel.getInputStream();
-                    InputStream err = channel.getErrStream()) {
-                String outStr = readStream(out, channel);
-                String errStr = readStream(err, channel);
-                return new ExecResult(outStr, errStr, channel.getExitStatus());
-            } catch (IOException | InterruptedException e) {
-                throw new PortalServiceException(e.getMessage(), e);
-            }
-        } catch (JSchException e) {
-            throw new PortalServiceException(e.getMessage(), e);
-        } finally {
-            if (channel != null) {
-                channel.disconnect();
-            }
-        }
-    }
-
-    void createWorkingDirectory(Session session, String dirName) throws PortalServiceException {
-        ExecResult res = executeCommand(session, dirName);
-        logger.info(res);
-    }
-
+    
     @Override
     public String executeJob(CloudJob job, String userDataString) throws PortalServiceException {
-        JSch jsch = new JSch();
-        Session session = null;
-        String jobId = null;
-        String workingDir = CloudStorageServiceNCI.getJobDirectory(job);
-
+        String workingDir = storageService.getJobDirectory(job);
+        Session session= null;
         try {
-            String prvkey = job.getProperty(NCI_USER_KEY);
-            jsch.addIdentity(new IdentityString(jsch, prvkey), null);
-            String userName = job.getProperty(NCI_USER_NAME);
-            session = jsch.getSession(userName, getEndpoint(), 22);
-            session.setConfig("StrictHostKeyChecking", "no");
-            if (!session.isConnected()) {
-                session.connect();
-            }
-
-            createWorkingDirectory(session, "mkdir " + workingDir);
-            uploadPbs(session, workingDir, userDataString);
-
+            session = sshCloudConnector.getSession(job);
+            sshCloudConnector.createDirectory(session, workingDir);
+            sshCloudConnector.scpStringToFile(session, workingDir, "job.pbs", userDataString);
+            ExecResult res = sshCloudConnector.executeCommand(session, "qsub job.pbs", workingDir);
+            if(res.getExitStatus()==0) {
+                return res.getOut();
+            } 
+            throw new PortalServiceException("Error executing PBS job: "+res.getErr());
         } catch (JSchException e) {
             throw new PortalServiceException(e.getMessage(), e);
         } finally {
@@ -205,84 +72,6 @@ public class CloudComputeServiceNci extends CloudComputeService {
                 session.disconnect();
             }
         }
-
-        return jobId;
-    }
-
-    static int checkAck(InputStream in) throws IOException, PortalServiceException {
-        int b = in.read();
-        // b may be 0 for success,
-        // 1 for error,
-        // 2 for fatal error,
-        // -1
-        if (b == 0)
-            return b;
-        if (b == -1)
-            return b;
-
-        if (b == 1 || b == 2) {
-            StringBuilder sb = new StringBuilder();
-            int c;
-            do {
-                c = in.read();
-                sb.append((char) c);
-            } while (c != '\n');
-            if (b == 1) { // error
-                throw new PortalServiceException("SSH ACK error: " + sb.toString());
-            }
-            if (b == 2) { // fatal error
-                throw new PortalServiceException("SSH ACK fatal error: " + sb.toString());
-            }
-        }
-        return b;
-    }
-
-    void uploadPbs(Session session, String workingDir, String userDataString) throws PortalServiceException {
-        String rfile = "job.pbs";
-        String command = "scp -t " + workingDir+"/"+rfile;
-
-        ChannelExec channel;
-        try {
-            channel = (ChannelExec) session.openChannel("exec");
-        } catch (JSchException e1) {
-            throw new PortalServiceException(e1.getMessage(), e1);
-        }
-        channel.setCommand(command);
-
-        // get I/O streams for remote scp
-        try (OutputStream out = channel.getOutputStream(); InputStream in = channel.getInputStream()) {
-            channel.connect();
-
-            checkAck(in);
-
-            byte[] userData = userDataString.getBytes("UTF-8");
-
-            // send "C0644 filesize filename", where filename should not include '/'
-            long filesize = userData.length;
-            command = "C0644 " + filesize + " " + rfile;
-            // if (lfile.lastIndexOf('/') > 0) {
-            // command += lfile.substring(lfile.lastIndexOf('/') + 1);
-            // } else {
-            // command += lfile;
-            // }
-            command += "\n";
-            out.write(command.getBytes());
-            out.flush();
-
-            checkAck(in);
-
-            out.write(userData);
-            out.write(0);
-
-            out.flush();
-            checkAck(in);
-            out.close();
-
-        } catch (IOException | JSchException e) {
-            throw new PortalServiceException(e.getMessage(), e);
-        }
-
-        channel.disconnect();
     }
 
     /**
