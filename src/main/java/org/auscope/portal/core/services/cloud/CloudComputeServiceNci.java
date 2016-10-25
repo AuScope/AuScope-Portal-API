@@ -58,12 +58,18 @@ public class CloudComputeServiceNci extends CloudComputeService {
         Session session= null;
         try {
             session = sshCloudConnector.getSession(job);
-            sshCloudConnector.createDirectory(session, workingDir);
-            sshCloudConnector.scpStringToFile(session, workingDir, "job.pbs", userDataString);
-            ExecResult res = sshCloudConnector.executeCommand(session, "qsub job.pbs", workingDir);
+            ExecResult res = sshCloudConnector.executeCommand(session, "qsub staging.pbs", workingDir);
+            if(res.getExitStatus()!=0) {
+                throw new PortalServiceException("Could not start data staging: "+res.getErr());
+            } 
+            
+            String stagingJobId = res.getOut().substring(0, res.getOut().indexOf(".")); 
+            logger.debug("Staging job id: "+stagingJobId);
+            res = sshCloudConnector.executeCommand(session, "qsub -W depend=afterok:"+stagingJobId+" job.pbs", workingDir);
             if(res.getExitStatus()==0) {
                 return res.getOut();
-            } 
+            }
+            
             throw new PortalServiceException("Error executing PBS job: "+res.getErr());
         } catch (JSchException e) {
             throw new PortalServiceException(e.getMessage(), e);
@@ -83,7 +89,20 @@ public class CloudComputeServiceNci extends CloudComputeService {
      */
     @Override
     public void terminateJob(CloudJob job) throws PortalServiceException {
-        // TODO
+        Session session= null;
+        try {
+            session = sshCloudConnector.getSession(job);
+            ExecResult res = sshCloudConnector.executeCommand(session, "qdel "+job.getComputeInstanceId());
+            if(res.getExitStatus()!=0) {
+                throw new PortalServiceException("Could not delete job: "+res.getErr());
+            }             
+        } catch (JSchException e) {
+            throw new PortalServiceException(e.getMessage(), e);
+        } finally {
+            if (session != null) {
+                session.disconnect();
+            }
+        }
     }
 
     /**
@@ -108,7 +127,26 @@ public class CloudComputeServiceNci extends CloudComputeService {
      */
     @Override
     public String getConsoleLog(CloudJob job, int numLines) throws PortalServiceException {
-        return "Not implemented yet";
+
+        Session session= null;
+        try {
+            session = sshCloudConnector.getSession(job);
+            ExecResult res = sshCloudConnector.executeCommand(session, "qcat "+job.getComputeInstanceId());
+            if(res.getExitStatus()!=0) {
+                if(res.getOut().contains("Job is not running")) 
+                    return "";
+                
+                throw new PortalServiceException("Could not query job log: "+res.getErr());
+            }             
+            
+            return res.getOut();
+        } catch (JSchException e) {
+            throw new PortalServiceException(e.getMessage(), e);
+        } finally {
+            if (session != null) {
+                session.disconnect();
+            }
+        }
     }
 
     /**
@@ -123,6 +161,29 @@ public class CloudComputeServiceNci extends CloudComputeService {
      */
     @Override
     public InstanceStatus getJobStatus(CloudJob job) throws PortalServiceException {
-        return InstanceStatus.Missing;
+
+        Session session= null;
+        try {
+            session = sshCloudConnector.getSession(job);
+            ExecResult res = sshCloudConnector.executeCommand(session, "qstat -s "+job.getComputeInstanceId());
+            if(res.getExitStatus()!=0) {
+                if(res.getErr().contains("Job has finished")) {
+                    return InstanceStatus.Missing;
+                }
+                throw new PortalServiceException("Could not query job status for job '"+job.getComputeInstanceId()+"': "+res.getErr());
+            }             
+            
+            if(res.getOut().contains("Job has finished")) {
+                return InstanceStatus.Missing;
+            }
+
+            return InstanceStatus.Running;
+        } catch (JSchException e) {
+            throw new PortalServiceException(e.getMessage(), e);
+        } finally {
+            if (session != null) {
+                session.disconnect();
+            }
+        }
     }
 }

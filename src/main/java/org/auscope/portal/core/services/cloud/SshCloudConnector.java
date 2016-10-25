@@ -175,7 +175,6 @@ public class SshCloudConnector {
 
     public void createDirectory(Session session, String dirName) throws PortalServiceException {
         ExecResult res = executeCommand(session, "mkdir -p " + dirName);
-        logger.info(res);
     }
 
 
