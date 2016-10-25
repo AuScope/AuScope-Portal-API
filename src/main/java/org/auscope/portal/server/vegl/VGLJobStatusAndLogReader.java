@@ -160,12 +160,15 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
             return null;
         }
 
-        //If the job is currently in the done/saved IN_QUEUE, ERROR or WALLTIME_EXCEEDED state - do absolutely nothing.
+        //Some states are terminated states, do absolutely nothing
+        //Other states are managed by the JobBuilder
         if (job.getStatus().equals(JobBuilderController.STATUS_DONE) ||
                 job.getStatus().equals(JobBuilderController.STATUS_UNSUBMITTED) ||
                         job.getStatus().equals(JobBuilderController.STATUS_INQUEUE) ||
                                 job.getStatus().equals(JobBuilderController.STATUS_ERROR)||
-                                    job.getStatus().equals(JobBuilderController.STATUS_WALLTIME_EXCEEDED)) {
+                                    job.getStatus().equals(JobBuilderController.STATUS_WALLTIME_EXCEEDED) ||
+                                        job.getStatus().equals(JobBuilderController.STATUS_PROVISION) ||
+                                            job.getStatus().equals(JobBuilderController.STATUS_INQUEUE)) {
             return job.getStatus();
         }
 
