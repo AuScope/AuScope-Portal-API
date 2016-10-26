@@ -147,7 +147,9 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     text: 'Select a toolbox that contains software that you would like to use to process your data.'
                 }],
                 listeners : {
-                    select : Ext.bind(this.onImageSelect, this)
+                    select : this.onImageSelect,
+                    change : this.onImageChange,
+                    scope: this
                 }
             },{
                 xtype : 'combo',
@@ -369,7 +371,23 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         this.getComponent('image-combo').clearValue();
         this.getComponent('resource-combo').clearValue();
         this.imageStore.getProxy().setExtraParam('computeServiceId', records.get('id'));
-        this.imageStore.load();
+        this.imageStore.load({
+            scope: this,
+            callback: function(records, operation, success) {
+                if (records.length === 1) {
+                    this.getComponent('image-combo').setValue(records[0]);
+                }
+            }
+        });
+    },
+
+    /**
+     * Handles the setting of a raw value on a 'Toolbox'
+     * @function
+     */
+    onImageChange: function(combo, newValue, oldValue) {
+        var rec = this.imageStore.getById(newValue);
+        this.onImageSelect(combo, rec);
     },
 
     /**
