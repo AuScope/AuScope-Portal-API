@@ -4,11 +4,11 @@
 <hibernate-mapping>
     <class name="org.auscope.portal.server.web.security.NCIDetails" table="nci_details">
         <id name="id" column="id">
-            <generator class="native"/>
+            <generator class="increment"/>
         </id>
-        <property name="username"/>
-        <property name="project"/>
-        <property name="key"/>
-        <many-to-one name="user" column="user" class="org.auscope.portal.server.web.security.ANVGLUser" not-null="true"></many-to-one>
+        <property name="username" column="nci_username"/>
+        <property name="key" column="nci_key"/>
+        <property name="project" column="nci_project"/>
+        <many-to-one name="user" column="user" class="org.auscope.portal.server.web.security.ANVGLUser"></many-to-one>
     </class>
 </hibernate-mapping>

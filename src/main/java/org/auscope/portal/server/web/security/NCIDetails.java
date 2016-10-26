@@ -12,11 +12,8 @@ public class NCIDetails implements Serializable {
     private String project;
     private String key;
     
-    public NCIDetails(ANVGLUser user, String username, String project, String key) {
-        this.user = user;
-        this.username = username;
-        this.project = project;
-        this.key = key;
+    public NCIDetails() {
+        super();
     }
     
     public Integer getId() {

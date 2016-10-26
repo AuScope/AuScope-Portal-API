@@ -175,6 +175,22 @@ Ext.application({
                                         }
                                     }).show();
                                 }
+                                
+                                mask = new Ext.LoadMask({msg: 'Loading NCI Details', target: vp});
+                                mask.show();
+                                Ext.Ajax.request({
+                                    url: 'secure/getNCIDetails.do',
+                                    callback: function(options, success, response) {
+                                    	var detailsPanel = vp.down('ncidetailspanel');
+                                    	responseObj = Ext.JSON.decode(response.responseText);
+                                        if (!responseObj.success) {
+                                            return;
+                                        }                                    	
+                                        var details = Ext.create('vegl.models.NCIDetails', responseObj.data);
+                                        detailsPanel.setDetails(details);
+                                    	mask.hide();
+                                    }
+                                });                                
                             }
                         });
                     });

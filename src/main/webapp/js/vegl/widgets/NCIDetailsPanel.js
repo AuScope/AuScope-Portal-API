@@ -40,8 +40,8 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
                     }]
                 },{
                     xtype: 'textfield',
-                    itemId: 'nciProjectCode',
-                    name: 'nciProjectCode',
+                    itemId: 'nciProject',
+                    name: 'nciProject',
                     fieldLabel: 'NCI Project Code',
                     labelWidth: n,
                     anchor: '100%',
@@ -88,10 +88,9 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
                         if (!formPanel.isValid()) {
                             return;
                         }
-
                         statusLabel.setText('Saving your changes...');
                         Ext.Ajax.request({
-                            url: 'secure/setUser.do',
+                            url: 'secure/setNCIDetails.do',
                             params: formPanel.getValues(),
                             callback: function(options, success, response) {
                                 if (!success) {
@@ -130,19 +129,9 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
         this.callParent(arguments);
     },
 
-    setUser: function(user) {
-    	//this.down('#nciUsername').setValue(user.get('nciUsername'));
-    	//this.down('#nciKey').setValue(user.get('nciKey'));
-    	/*
-        this.down('#awsKeyName').setValue(user.get('awsKeyName'));
-        this.down('#arnExecution').setValue(user.get('arnExecution'));
-        this.down('#arnStorage').setValue(user.get('arnStorage'));
-        */
-    },
-    
     setDetails: function(nciDetails) {
-    	this.down('#username').setValue(user.get('username'));
-    	this.down('#project').setValue(user.get('project'));
-    	this.down('#key').setValue(user.get('key'));
+    	this.down('#nciUsername').setValue(nciDetails.get('nciUsername'));
+    	this.down('#nciProject').setValue(nciDetails.get('nciProject'));
+    	this.down('#nciKey').setValue(nciDetails.get('nciKey'));
     }
 });

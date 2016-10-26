@@ -15,6 +15,8 @@ import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUserDao;
+import org.auscope.portal.server.web.security.NCIDetails;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,7 @@ public class UserController extends BasePortalController {
     protected final Log logger = LogFactory.getLog(getClass());
 
     private ANVGLUserDao userDao;
+    private NCIDetailsDao nciDetailsDao;
     private VelocityEngine velocityEngine;
 
     private String awsAccount;
@@ -44,11 +47,13 @@ public class UserController extends BasePortalController {
     private String tacVersion;
 
     @Autowired
-    public UserController(ANVGLUserDao userDao, VelocityEngine velocityEngine, 
+    public UserController(ANVGLUserDao userDao, NCIDetailsDao nciDetailsDao,
+            VelocityEngine velocityEngine, 
             @Value("${env.aws.account}") String awsAccount,
             @Value("${termsconditions.version}") String tacVersion) {
         super();
         this.userDao = userDao;
+        this.nciDetailsDao = nciDetailsDao;
         this.velocityEngine = velocityEngine;
         this.awsAccount=awsAccount;
         this.tacVersion=tacVersion;
@@ -167,5 +172,63 @@ public class UserController extends BasePortalController {
         } catch (IOException e) {
             response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
+    }
+    
+    @RequestMapping("/secure/getNCIDetails.do")
+    public ModelAndView getNCIDetails(@AuthenticationPrincipal ANVGLUser user) {
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+        //String id = user.getId();
+        //NCIDetails details = nciDetailsDao.getByUserId(id);
+        ModelMap detailsObj = new ModelMap();
+        NCIDetails details = nciDetailsDao.getByUser(user);
+        if(details != null) {
+            detailsObj.put("nciUsername", details.getUsername());
+            detailsObj.put("nciProject", details.getProject());
+            detailsObj.put("nciKey", details.getKey());
+            return generateJSONResponseMAV(true, detailsObj, "");
+        }
+        return generateJSONResponseMAV(false);
+    }
+    
+    @RequestMapping("/secure/setNCIDetails.do")
+    public ModelAndView setNCIDetails(@AuthenticationPrincipal ANVGLUser user,
+            @RequestParam(required=false, value="nciUsername") String username,
+            @RequestParam(required=false, value="nciProject") String project,
+            @RequestParam(required=false, value="nciKey") String key) {
+
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+        //NCIDetails details = nciDetailsDao.getByUserId(user.getId());
+        NCIDetails details = nciDetailsDao.getByUser(user);
+        if(details == null) {
+            details = new NCIDetails();
+            details.setUser(user);
+        }
+        boolean modified = false;
+        if (!StringUtils.isEmpty(username) || !StringUtils.equals(details.getUsername(), username)) {
+            details.setUsername(username);
+            modified = true;
+        }
+        if (!StringUtils.isEmpty(project) || !StringUtils.equals(details.getProject(), project)) {
+            details.setProject(project);
+            modified = true;
+        }
+        if (!StringUtils.isEmpty(key) || !StringUtils.equals(details.getKey(), key)) {
+            details.setKey(key);
+            modified = true;
+        }
+        
+        // TODO: Fix nciKey as fileuploadfield isn't providing a string
+        else {
+            details.setKey("key");
+        }
+        
+        if (modified) {
+            nciDetailsDao.save(details);
+        }
+        return generateJSONResponseMAV(true);
     }
 }
