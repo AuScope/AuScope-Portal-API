@@ -2,7 +2,7 @@
 # Also installs a number of dependencies
 class visit {
 
-    package {["xutils-dev", "python-libxml2", "libglu-dev", "libglu1", "libglu1-mesa-dev", "libxt-dev", "libqt4-dev", "libqt4-opengl-dev"]:
+    package {["xutils-dev", "python-libxml2", "libglu-dev", "libglu1", "libglu1-mesa-dev", "libxt-dev", "libqt4-dev", "libqt4-opengl-dev", "cmake"]:
         ensure => installed,
     }
     
@@ -38,7 +38,7 @@ class visit {
     
     exec { "visit-build":
         cwd => "/mnt",
-        command => "/bin/bash build_visit_stripped --mesa --console --silo --visit --system-python --system-qt --prefix /usr/local/visit",
+        command => "/bin/bash build_visit_stripped --mesa --console --silo --visit --system-python --system-qt --system-cmake --system-mesa --prefix /usr/local/visit",
         timeout => 0,
         require => Exec["visit-strip"],
     }
