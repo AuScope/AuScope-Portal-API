@@ -4,21 +4,21 @@
          xmlns:beans="http://www.springframework.org/schema/beans"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.springframework.org/schema/beans
-                             http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                             http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
                              http://www.springframework.org/schema/security
-                             http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+                             http://www.springframework.org/schema/security/spring-security-4.0.xsd">
 
    <http entry-point-ref="oAuth2EntryPoint">
-        <intercept-url pattern="/gridsubmit.html" access="ROLE_USER"/>
-        <intercept-url pattern="/jobbuilder.html" access="ROLE_USER"/>
-        <intercept-url pattern="/user.html" access="ROLE_USER"/>
-        <intercept-url pattern="/login.html" access="ROLE_USER"/>
-        <intercept-url pattern="/joblist.html" access="ROLE_USER"/>
-        <intercept-url pattern="/admin.html" access="ROLE_ADMINISTRATOR"/>
-        <intercept-url pattern="/*.diag" access="ROLE_ADMINISTRATOR"/>
-        <intercept-url pattern="/secure/*" access="ROLE_USER"/>
+        <intercept-url pattern="/gridsubmit.html" access="hasRole('ROLE_USER')"/>
+        <intercept-url pattern="/jobbuilder.html" access="hasRole('ROLE_USER')"/>
+        <intercept-url pattern="/user.html" access="hasRole('ROLE_USER')"/>
+        <intercept-url pattern="/login.html" access="hasRole('ROLE_USER')"/>
+        <intercept-url pattern="/joblist.html" access="hasRole('ROLE_USER')"/>
+        <intercept-url pattern="/admin.html" access="hasRole('ROLE_ADMINISTRATOR')"/>
+        <intercept-url pattern="/*.diag" access="hasRole('ROLE_ADMINISTRATOR')"/>
+        <intercept-url pattern="/secure/*" access="hasRole('ROLE_USER')"/>
         <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
-        <logout logout-success-url="/gmap.html"/>
+        <logout logout-url="/j_spring_security_logout" logout-success-url="/gmap.html"/>
     </http>
 
     <beans:bean id="oAuth2EntryPoint" class="com.racquettrack.security.oauth.OAuth2AuthenticationEntryPoint">
