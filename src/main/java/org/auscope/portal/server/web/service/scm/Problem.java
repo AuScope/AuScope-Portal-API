@@ -1,7 +1,9 @@
 package org.auscope.portal.server.web.service.scm;
 
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 /**
  * Problem from the Scientific Solution Centre.
@@ -10,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Problem extends Entry {
+    @JsonManagedReference
     private List<Solution> solutions;
 
     public List<Solution> getSolutions() {

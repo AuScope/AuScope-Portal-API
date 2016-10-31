@@ -2,13 +2,16 @@ package org.auscope.portal.server.web.service.scm;
 
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Solution extends Entry {
     private String template;
+    @JsonBackReference
     private Problem problem;
     private Toolbox toolbox;
     private List<Map<String, String>> dependencies;
