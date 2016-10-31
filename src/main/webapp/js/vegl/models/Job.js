@@ -29,7 +29,7 @@ Ext.define('vegl.models.Job', {
             if (!value) {
                 return null;
             } else {
-                return new Date(value.time);
+                return new Date(value);
             }
         }}, //When this job was submitted to the cloud
         { name: 'processTimeLog', type: 'string'},

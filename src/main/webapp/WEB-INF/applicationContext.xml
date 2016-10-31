@@ -219,7 +219,7 @@
         <property name="id" value="amazon-aws-storage-sydney"/>
         <property name="bucket" value="anvgl-csiro-"/>
         <property name="adminEmail" value="${HOST.portalAdminEmail}"/>
-        <property name="requireSts" value="${HOST.aws.stsonly}"/>
+        <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
     </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
@@ -232,7 +232,7 @@
         
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
-        <property name="requireSts" value="${HOST.aws.stsonly}"/>
+        <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
         
         <property name="availableImages">
             <list>

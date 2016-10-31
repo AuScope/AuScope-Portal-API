@@ -34,7 +34,7 @@
 
 	 <mvc:annotation-driven conversion-service="conversionService">
     	<mvc:argument-resolvers>
-           <bean class="org.springframework.security.web.bind.support.AuthenticationPrincipalArgumentResolver" />      
+           <bean class="org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver" />      
       	</mvc:argument-resolvers>
     </mvc:annotation-driven>
     

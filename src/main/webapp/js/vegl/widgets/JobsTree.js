@@ -60,7 +60,7 @@ Ext.define('vegl.widgets.JobsTree', {
 	                    	confirmationTitle = 'Delete Series';
 	                    	confirmationMessage = Ext.util.Format.format('Are you sure you want to delete the folder <b>{0}</b> and its jobs?<br><ul>', selection[0].get('name'));
 	                    }
-	                }	                
+	                }
 	                Ext.Msg.show({
 	                    title: confirmationTitle,
 	                    msg: confirmationMessage,
@@ -144,7 +144,7 @@ Ext.define('vegl.widgets.JobsTree', {
                             if (!value) {
                                 return null;
                             } else {
-                                return new Date(value.time);
+                                return new Date(value);
                             }
                 }}],
                 sorters: [{
@@ -209,7 +209,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     	if(grid.getSelectionModel().getCount()<2) {
                     		grid.getSelectionModel().select(node);
                     	}
-                    	
+
                         var items = [this.deleteJobAction];
                         if (!this.submitJobAction.isDisabled()) {
                             items.push(this.submitJobAction);
@@ -372,7 +372,7 @@ Ext.define('vegl.widgets.JobsTree', {
             }
         });
     },
-    
+
     deleteSeries : function(series) {
         Ext.getBody().mask('Deleting Folder...');
 
@@ -405,7 +405,7 @@ Ext.define('vegl.widgets.JobsTree', {
             }
         });
     },
-    
+
     deleteJob : function(job) {
     	Ext.getBody().mask('Deleting Job...');
 
