@@ -20,6 +20,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.jmock.ReadableServletOutputStream;
@@ -145,6 +146,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
+            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Mandatory));
 
             //Here on start is the delete mock
             allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
