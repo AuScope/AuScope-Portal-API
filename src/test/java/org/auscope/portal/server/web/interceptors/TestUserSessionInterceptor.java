@@ -1,13 +1,11 @@
 package org.auscope.portal.server.web.interceptors;
 
-import java.io.PrintWriter;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.server.security.oauth2.PortalUser;
+import org.auscope.portal.core.test.ByteBufferedServletOutputStream;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -68,17 +66,19 @@ public class TestUserSessionInterceptor extends PortalTestClass {
      */
     @Test
     public void testPreHandle_UserSessionExpired() throws Exception {
-        try (final PrintWriter pw = new PrintWriter(new ByteArrayOutputStream())) {
+        try (final ByteBufferedServletOutputStream rawResponse = new ByteBufferedServletOutputStream(128)) {
 
             context.checking(new Expectations() {
                 {
-                    allowing(mockRequest).getUserPrincipal();
-                    will(returnValue(null));
-                    allowing(mockRequest).getAttribute(with(any(String.class)));
+                    allowing(mockRequest).getUserPrincipal();will(returnValue(null));
+                    allowing(mockRequest).getAttribute(with(any(String.class)));will(returnValue(null));
+
+                    allowing(mockRequest).getParameter(with(any(String.class)));
                     will(returnValue(null));
                     allowing(mockResponse).setContentType(with(any(String.class)));
-                    allowing(mockResponse).getWriter();
-                    will(returnValue(pw));
+                    allowing(mockResponse).setCharacterEncoding(with(any(String.class)));
+                    allowing(mockResponse).addHeader(with(any(String.class)), with(any(String.class)));
+                    allowing(mockResponse).getOutputStream();will(returnValue(rawResponse));
                 }
             });
 

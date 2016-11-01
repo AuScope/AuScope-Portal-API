@@ -2,6 +2,8 @@ package org.auscope.portal.server.vegl;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 
 /**
@@ -35,6 +37,7 @@ public class VglParameter implements Serializable, Cloneable {
     /** The 'type' of this parameter. Can be 'number' or 'string'*/
     private String type;
     /** The job that owns this parameter*/
+    @JsonIgnore
     private VEGLJob parent;
 
 

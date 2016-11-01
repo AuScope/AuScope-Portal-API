@@ -101,8 +101,20 @@
     padding: 12px 16px;
 }
 
+.sub-menu input {
+    background:none!important;
+    border:none; 
+    padding:12px 16px!important;
+    font:bold 14px/40px sans-serif;
+    cursor: pointer;
+}
+
 .sub-menu a:hover {
 	background-color: #f1f1f1
+}
+
+.sub-menu input:hover {
+    background-color: #f1f1f1
 }
 
 .login-widget:hover .sub-menu {

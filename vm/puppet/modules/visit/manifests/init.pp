@@ -2,7 +2,7 @@
 # Also installs a number of dependencies
 class visit {
 
-    package {["xutils-dev", "python-libxml2", "libglu-dev", "libglu1", "libglu1-mesa-dev", "libxt-dev", "libqt4-dev", "libqt4-opengl-dev"]:
+    package {["xutils-dev", "python-libxml2", "libglu-dev", "libglu1", "libglu1-mesa-dev", "libxt-dev", "libqt4-dev", "libqt4-opengl-dev", "cmake"]:
         ensure => installed,
     }
     
@@ -14,8 +14,8 @@ class visit {
     #Get build_visit script
     exec { "visit-dl":
         cwd => "/mnt",
-        command => "/usr/bin/wget http://portal.nersc.gov/project/visit/releases/2.9.2/build_visit2_9_2",
-        creates => "/mnt/build_visit2_9_2",
+        command => "/usr/bin/wget http://portal.nersc.gov/project/visit/releases/2.11.0/build_visit2_11_0",
+        creates => "/mnt/build_visit2_11_0",
         require => [File["/usr/local/visit"], Package["python-libxml2"], Package["xutils-dev"], Package["libglu-dev"], Package["libglu1"], Package["libglu1-mesa-dev"], Package["libxt-dev"], Package["libqt4-dev"], Package["libqt4-opengl-dev"]],
         timeout => 0,
     }
@@ -38,8 +38,9 @@ class visit {
     
     exec { "visit-build":
         cwd => "/mnt",
-        command => "/bin/bash build_visit_stripped --mesa --console --silo --visit --system-python --system-qt --prefix /usr/local/visit",
+        command => "/bin/bash build_visit_stripped --mesa --console --silo --visit --system-python --system-qt --system-cmake --prefix /usr/local/visit",
         timeout => 0,
+        creates => "/usr/local/visit/current",
         require => Exec["visit-strip"],
     }
 
