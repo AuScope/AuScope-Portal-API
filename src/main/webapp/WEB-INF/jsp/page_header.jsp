@@ -1,4 +1,5 @@
 <%@ taglib prefix='security' uri='http://www.springframework.org/security/tags' %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <div class="header-container">
     <div class="banner"
@@ -16,20 +17,23 @@
 		
 
 		<div class="login-widget menu-item">
-			<security:authorize ifAllGranted="ROLE_ANONYMOUS">
+			<security:authorize access="hasRole('ROLE_ANONYMOUS')">
 				<div class="login-text"><a href="login.html">Login</a></div>
 			</security:authorize>
 
-			<security:authorize ifNotGranted="ROLE_ANONYMOUS">
+			<security:authorize access="!hasRole('ROLE_ANONYMOUS')">
 				<div>Hello <security:authentication property="principal.email" /><div class="dropdownicon"></div> 
 				</div>
 				
 				<div class="sub-menu">
-				    <security:authorize ifAllGranted="ROLE_ADMINISTRATOR">
+				    <security:authorize access="hasRole('ROLE_ADMINISTRATOR')">
                         <a href="admin.html">Administration</a>
                     </security:authorize>
                     <a href="user.html">Profile</a>
-                    <a href="j_spring_security_logout">Logout</a>
+                    <form method="post" action="${pageContext.request.contextPath}/j_spring_security_logout" id="form-logout">
+					    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+					    <input type="submit" value="Logout">         
+					</form>
 				</div>
 			</security:authorize>
 		</div>
