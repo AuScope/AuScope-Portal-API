@@ -212,9 +212,13 @@ Ext.application({
                     itemId : 'vgl-jobs-tree',
                     rootNode: responseObj.data.nodes,
                     jobStore: jobStore,
+                    selModel: {
+                    	mode: 'MULTI'
+                    },
                     listeners : {
                         selectjob : function(panel, job) {
-                            if (job == null) {
+                        	// Cleanup if no job or more than 1 job selected
+                            if (job == null || this.getSelectionModel().getCount()>1) {
                                 jobDetailsPanel.cleanupDetails();
                             } else {
                                 jobDetailsPanel.showDetailsForJob(job);
@@ -257,13 +261,15 @@ Ext.application({
                                 }
 
                                 var seriesId = overModel.get('seriesId');
-                                var jobId = data.records[0].get('id');
+                                var jobIds = [data.records.length];
+                                for(i=0; i<data.records.length; i++)
+                                	jobIds[i] = data.records[i].get('id');
 
                                 Ext.Ajax.request({
                                     url: 'secure/setJobFolder.do',
                                     params: {
                                         seriesId: seriesId,
-                                        jobId: jobId
+                                        jobIds: jobIds
                                     },
                                     callback: function(options, success, response) {
                                         if (!success || !Ext.JSON.decode(response.responseText).success) {

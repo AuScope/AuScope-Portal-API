@@ -22,7 +22,7 @@ Ext.define('vegl.preview.TTLPreview', {
      * Reloads this store with all the jobs for the specified series
      */
     preview : function(job, fileName, size, hash) {
-    	promsReportUrl = job.get('promsReportUrl');
+    	var promsReportUrl = job.get('promsReportUrl');
         if (this.currentRequest != null) {
             Ext.Ajax.abort(this.currentRequest);
             this.currentRequest = null;
@@ -78,6 +78,8 @@ Ext.define('vegl.preview.TTLPreview', {
         doc.open();
         if(reportUrl!=null && reportUrl!="") {
         	doc.write('<a href="' + reportUrl + '" target="_blank">View PROMS Report</a><br><br>');
+        } else {
+        	doc.write('No associated PROMS Report could be located.<br><br>');
         }
         doc.write(text);
         doc.close();
