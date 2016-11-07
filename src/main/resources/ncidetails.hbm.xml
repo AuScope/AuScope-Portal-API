@@ -2,13 +2,16 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
+    <typedef name="encrypted" class="org.jasypt.hibernate3.type.EncryptedStringType">
+        <param name="encryptorRegisteredName">strongHibernateStringEncryptor</param>
+    </typedef>
     <class name="org.auscope.portal.server.web.security.NCIDetails" table="nci_details">
         <id name="id" column="id">
             <generator class="increment"/>
         </id>
-        <property name="username" column="nci_username"/>
-        <property name="key" column="nci_key"/>
-        <property name="project" column="nci_project"/>
+        <property name="username" column="nci_username" type="encrypted"/>
+        <property name="key" column="nci_key" type="encrypted"/>
+        <property name="project" column="nci_project" type="encrypted"/>
         <many-to-one name="user" column="user" class="org.auscope.portal.server.web.security.ANVGLUser"></many-to-one>
     </class>
 </hibernate-mapping>

@@ -78,5 +78,25 @@
         <beans:property name="oAuth2UserInfoProvider" ref="oAuth2DefaultUserInfoProvider"/>
     </beans:bean>
 
+    <beans:bean id="strongEncryptor" class="org.jasypt.encryption.pbe.PooledPBEStringEncryptor">
+        <beans:property name="algorithm">
+	        <beans:value>PBEWithMD5AndTripleDES</beans:value>
+	    </beans:property>
+	    <beans:property name="password">
+	        <beans:value>jasypt</beans:value>
+	    </beans:property>
+	    <beans:property name="poolSize">
+	        <beans:value>4</beans:value>
+	    </beans:property>
+    </beans:bean>
+  
+	<beans:bean id="hibernateStringEncryptor" class="org.jasypt.hibernate3.encryptor.HibernatePBEStringEncryptor">
+		<beans:property name="registeredName">
+		    <beans:value>strongHibernateStringEncryptor</beans:value>
+		</beans:property>
+		<beans:property name="encryptor">
+		    <beans:ref bean="strongEncryptor" />
+		</beans:property>
+	</beans:bean>
 
 </beans:beans>

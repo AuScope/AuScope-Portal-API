@@ -509,5 +509,11 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt-hibernate3</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+        
     </dependencies>
 </project>

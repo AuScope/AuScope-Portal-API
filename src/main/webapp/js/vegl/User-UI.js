@@ -184,6 +184,7 @@ Ext.application({
                                     	var detailsPanel = vp.down('ncidetailspanel');
                                     	responseObj = Ext.JSON.decode(response.responseText);
                                         if (!responseObj.success) {
+                                        	mask.hide();
                                             return;
                                         }                                    	
                                         var details = Ext.create('vegl.models.NCIDetails', responseObj.data);
