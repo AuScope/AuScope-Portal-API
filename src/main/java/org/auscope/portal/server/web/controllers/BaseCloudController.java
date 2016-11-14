@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -139,14 +140,16 @@ public abstract class BaseCloudController extends BaseModelController {
         CloudStorageService cloudStorageService = getStorageService(job);
 
         boolean useSts = false;
-        switch(cloudStorageService.getStsRequirement()) {
-        case ForceNone:
-            useSts = false;
-            break;
-        case Mandatory:
-            useSts = true;
-        case Permissable:
-            useSts = !TextUtil.isNullOrEmpty(job.getProperty(CloudJob.PROPERTY_STS_ARN));
+        if (cloudStorageService instanceof CloudStorageServiceJClouds) {
+            switch(((CloudStorageServiceJClouds)cloudStorageService).getStsRequirement()) {
+            case ForceNone:
+                useSts = false;
+                break;
+            case Mandatory:
+                useSts = true;
+            case Permissable:
+                useSts = !TextUtil.isNullOrEmpty(job.getProperty(CloudJob.PROPERTY_STS_ARN));
+            }
         }
 
         Object[] arguments = new Object[] {

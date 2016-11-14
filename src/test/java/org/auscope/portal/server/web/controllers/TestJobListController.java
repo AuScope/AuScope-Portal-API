@@ -18,7 +18,7 @@ import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
-import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
@@ -49,7 +49,7 @@ public class TestJobListController extends PortalTestClass {
     private final String computeServiceId = "comp-service-id";
     private final String storageServiceId = "storage-service-id";
     private VEGLJobManager mockJobManager;
-    private CloudStorageService[] mockCloudStorageServices;
+    private CloudStorageServiceJClouds[] mockCloudStorageServices;
     private FileStagingService mockFileStagingService;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
@@ -66,7 +66,7 @@ public class TestJobListController extends PortalTestClass {
     @Before
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
-        mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
+        mockCloudStorageServices = new CloudStorageServiceJClouds[] {context.mock(CloudStorageServiceJClouds.class)};
         mockFileStagingService = context.mock(FileStagingService.class);
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);

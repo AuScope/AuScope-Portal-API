@@ -26,7 +26,7 @@ import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
-import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -67,7 +67,7 @@ public class TestJobBuilderController {
     }};
 
     private VEGLJobManager mockJobManager;
-    private CloudStorageService[] mockCloudStorageServices;
+    private CloudStorageServiceJClouds[] mockCloudStorageServices;
     private CloudComputeService[] mockCloudComputeServices;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
@@ -100,7 +100,7 @@ public class TestJobBuilderController {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockFileStagingService = context.mock(ANVGLFileStagingService.class);
         mockPortalUser = context.mock(ANVGLUser.class);
-        mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
+        mockCloudStorageServices = new CloudStorageServiceJClouds[] {context.mock(CloudStorageServiceJClouds.class)};
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);

@@ -31,7 +31,9 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -518,7 +520,11 @@ public class JobBuilderController extends BaseCloudController {
             }
 
             //We may need to specify ARN details depending on the service we are using
-            switch (css.getStsRequirement()) {
+            STSRequirement stsReq = STSRequirement.ForceNone;
+            if (css instanceof CloudStorageServiceJClouds) {
+                stsReq = ((CloudStorageServiceJClouds) css).getStsRequirement();
+            }
+            switch (stsReq) {
             case Permissable:
                 if (StringUtils.isEmpty(user.getArnStorage())) {
                     job.setStorageBucket(css.getBucket());
