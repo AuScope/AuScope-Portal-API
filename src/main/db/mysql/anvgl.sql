@@ -158,9 +158,9 @@ CREATE TABLE `signatures` (
 CREATE TABLE `nci_details` (
   `id` int(11) NOT NULL,
   `user` varchar(128) DEFAULT NULL,
-  `nci_username` varchar(128) DEFAULT NULL,
-  `nci_key` varchar(256) DEFAULT NULL,
-  `nci_project` varchar(128) DEFAULT NULL,
+  `nci_username` blob DEFAULT NULL,
+  `nci_key` blob DEFAULT NULL,
+  `nci_project` blob DEFAULT NULL,
   PRIMARY KEY (`id`)
   FOREIGN KEY (`user`)
      REFERENCES users(`id`)

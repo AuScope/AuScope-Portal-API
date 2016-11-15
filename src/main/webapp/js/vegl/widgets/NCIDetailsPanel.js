@@ -52,7 +52,7 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
                         text: 'The default NCI project code.'
                     }]
                 },{
-                	xtype : 'fileuploadfield',
+                	xtype : 'filefield',
                 	itemId: 'nciKey',
                     name: 'nciKey',
                     fieldLabel: 'NCI Key',
@@ -63,7 +63,12 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
                     plugins: [{
                         ptype: 'fieldhelptext',
                         text: 'The NCI key (SSH) for the NCI account.'
-                    }]
+                    }],
+                    listeners: {
+                    	change: function(f, new_val) {
+                    		console.log(new_val);
+                    	}
+                    }
                 }]
             }],
             dockedItems: [{
@@ -89,30 +94,24 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
                             return;
                         }
                         statusLabel.setText('Saving your changes...');
-                        Ext.Ajax.request({
-                            url: 'secure/setNCIDetails.do',
-                            params: formPanel.getValues(),
-                            callback: function(options, success, response) {
-                                if (!success) {
-                                    statusLabel.setText('');
-                                    Ext.MessageBox.alert('Error', 'There was an error saving your changes. Please try refreshing the page.');
-                                    return;
-                                }
-
-                                var responseObj = Ext.JSON.decode(response.responseText);
-                                if (!responseObj.success) {
-                                    statusLabel.setText('');
-                                    Ext.MessageBox.alert('Error', 'There was an error saving your changes. Please try refreshing the page.');
-                                    return;
-                                }
-
-                                statusLabel.setText('Saved!');
-
+                        
+                        formPanel.submit({
+                        	url: 'secure/setNCIDetails.do',
+                        	params: formPanel.getValues(),
+                        	success: function() {
+                        		statusLabel.setText('Saved!');
                                 var queryParams = Ext.Object.fromQueryString(window.location.search);
                                 if (queryParams.next) {
                                     window.location.href = queryParams.next;
                                 }
-                            }
+                                return;
+                        	},
+                        	//failure: function(options, success, response) {
+                        	failure: function() {
+                        		statusLabel.setText('');
+                                Ext.MessageBox.alert('Error', 'There was an error saving your changes. Please try refreshing the page.');
+                                return;
+                        	}
                         });
                     }
                 }]

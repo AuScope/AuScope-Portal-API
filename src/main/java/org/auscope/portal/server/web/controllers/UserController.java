@@ -1,9 +1,12 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.Charsets;
@@ -26,6 +29,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -179,14 +183,16 @@ public class UserController extends BasePortalController {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-        //String id = user.getId();
-        //NCIDetails details = nciDetailsDao.getByUserId(id);
         ModelMap detailsObj = new ModelMap();
         NCIDetails details = nciDetailsDao.getByUser(user);
         if(details != null) {
-            detailsObj.put("nciUsername", details.getUsername());
-            detailsObj.put("nciProject", details.getProject());
-            detailsObj.put("nciKey", details.getKey());
+            try {
+                detailsObj.put("nciUsername", decrypt(details.getUsername()));
+                detailsObj.put("nciProject", decrypt(details.getProject()));
+                detailsObj.put("nciKey", decrypt(details.getKey()));
+            } catch(Exception e) {
+                logger.error("Unable to decrypt NCI details: " + e.getLocalizedMessage());
+            }
             return generateJSONResponseMAV(true, detailsObj, "");
         }
         return generateJSONResponseMAV(false);
@@ -196,39 +202,58 @@ public class UserController extends BasePortalController {
     public ModelAndView setNCIDetails(@AuthenticationPrincipal ANVGLUser user,
             @RequestParam(required=false, value="nciUsername") String username,
             @RequestParam(required=false, value="nciProject") String project,
-            @RequestParam(required=false, value="nciKey") String key) {
+            @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-        //NCIDetails details = nciDetailsDao.getByUserId(user.getId());
         NCIDetails details = nciDetailsDao.getByUser(user);
         if(details == null) {
             details = new NCIDetails();
             details.setUser(user);
         }
         boolean modified = false;
-        if (!StringUtils.isEmpty(username) || !StringUtils.equals(details.getUsername(), username)) {
-            details.setUsername(username);
-            modified = true;
+        try {
+            if (!StringUtils.isEmpty(username) || !StringUtils.equals(decrypt(details.getUsername()), username)) {
+                details.setUsername(encrypt(username));
+                modified = true;
+            }
+            if (!StringUtils.isEmpty(project) || !StringUtils.equals(decrypt(details.getProject()), project)) {
+                details.setProject(encrypt(project));
+                modified = true;
+            }
+            if (key != null ) {
+                String keyString = key.getFileItem().getString();
+                if (!StringUtils.isEmpty(keyString) || !StringUtils.equals(decrypt(details.getKey()), keyString)) {            
+                    details.setKey(encrypt(keyString));
+                    modified = true;
+                }
+            }
+        } catch(Exception e) {
+            logger.error(e.getLocalizedMessage());
         }
-        if (!StringUtils.isEmpty(project) || !StringUtils.equals(details.getProject(), project)) {
-            details.setProject(project);
-            modified = true;
-        }
-        if (!StringUtils.isEmpty(key) || !StringUtils.equals(details.getKey(), key)) {
-            details.setKey(key);
-            modified = true;
-        }
-        
-        // TODO: Fix nciKey as fileuploadfield isn't providing a string
-        else {
-            details.setKey("key");
-        }
-        
+            
         if (modified) {
             nciDetailsDao.save(details);
         }
-        return generateJSONResponseMAV(true);
+        return generateJSONResponseMAV(true);        
+    }
+    
+    private byte[] encrypt(String message) throws Exception {
+        byte[] keyBytes = "Cxi3Mspe8QmK11Qh".getBytes();
+        Key key = new SecretKeySpec(keyBytes, "AES");
+        Cipher c = Cipher.getInstance("AES");
+        c.init(Cipher.ENCRYPT_MODE, key);
+        return c.doFinal(message.getBytes());
+    }
+    
+    private String decrypt(byte[] encryptedText) throws Exception {
+        byte[] keyBytes = "Cxi3Mspe8QmK11Qh".getBytes();
+        Key key = new SecretKeySpec(keyBytes, "AES");
+        Cipher c = Cipher.getInstance("AES");
+        c.init(Cipher.DECRYPT_MODE, key);
+        byte[] decValue = c.doFinal(encryptedText);
+        String decryptedValue = new String(decValue);
+        return decryptedValue;
     }
 }
