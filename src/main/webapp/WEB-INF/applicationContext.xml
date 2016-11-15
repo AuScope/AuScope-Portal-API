@@ -207,7 +207,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+    <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
         <constructor-arg name="provider" value="aws-s3"/>
         <constructor-arg name="endpoint"><null/></constructor-arg>
         <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
