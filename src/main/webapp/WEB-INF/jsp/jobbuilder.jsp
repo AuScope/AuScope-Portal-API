@@ -15,16 +15,21 @@
     </style>
 
     <%-- Code Mirror inclusions --%>
-    <link href="CodeMirror-5.16/lib/codemirror.css" type="text/css" rel="stylesheet" />    
+    <link href="CodeMirror-5.16/lib/codemirror.css" type="text/css" rel="stylesheet" />
+    <link href="CodeMirror-5.16/addon/lint/lint.css" type="text/css" rel="stylesheet" />
     <script type="text/javascript" src="CodeMirror-5.16/lib/codemirror.js"></script>
     <script type="text/javascript" src="CodeMirror-5.16/mode/python/python.js"></script>
     <script type="text/javascript" src="CodeMirror-5.16/mode/javascript/javascript.js"></script>
+    <script type="text/javascript" src="CodeMirror-5.16/addon/lint/lint.js"></script>
 
 
     <!-- Portal Core Includes -->    
     <jsp:include page="../../portal-core/jsimports.jsp"/>
     <jsp:include page="../../portal-core/cssimports.jsp"/>
     <jsp:include page="../../cssimports.htm"/>
+
+    <!-- Linters for templates -->
+    <script type="text/javascript" src="js/vegl/lint/pylint.js"></script>
 
     <!-- component includes -->
     <script type="text/javascript" src="js/vegl/widgets/CodeEditorField.js"></script>  
@@ -70,6 +75,7 @@
 
     <script type="text/javascript" src="js/vegl/JobBuilder.js"></script>
     <script type="text/javascript" src="js/vegl/HelpHandler.js"></script>
+
 </head>
 
 <body>

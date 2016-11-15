@@ -13,6 +13,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
+import org.auscope.portal.server.web.service.TemplateLintService;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,6 +27,7 @@ public class TestScriptBuilderController extends PortalTestClass {
     private ScriptBuilderController controller;
     private ScriptBuilderService mockSbService = context.mock(ScriptBuilderService.class);
     private ScmEntryService mockScmEntryService = context.mock(ScmEntryService.class);
+    private TemplateLintService mockTemplateLintService = context.mock(TemplateLintService.class);
     private VEGLJobManager mockJobManager = context.mock(VEGLJobManager.class);
     private VEGLJob mockJob = context.mock(VEGLJob.class);
 
@@ -35,7 +37,7 @@ public class TestScriptBuilderController extends PortalTestClass {
     @Before
     public void setup() {
         // Object Under Test
-        controller = new ScriptBuilderController(mockSbService, mockJobManager, mockScmEntryService);
+        controller = new ScriptBuilderController(mockSbService, mockJobManager, mockScmEntryService, mockTemplateLintService);
         user = new ANVGLUser();
         user.setId("456");
         user.setEmail("user@example.com");

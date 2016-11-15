@@ -28,6 +28,10 @@ Ext.define('vegl.widgets.CodeEditorField', {
                         mode: config.mode
                     });
 
+                    if (config.lint) {
+                        this.editor.setOption('lint', config.lint);
+                    }
+
                     if (config.value) {
                         obj.setValue(config.value);
                     }

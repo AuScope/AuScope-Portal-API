@@ -57,7 +57,6 @@ public class TemplateLintService {
     /**
      * Create a new instance.
      */
-    @Autowired
     public TemplateLintService() {
         super();
     }
