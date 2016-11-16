@@ -1116,6 +1116,9 @@ public class JobListController extends BaseCloudController  {
                 return generateJSONResponseMAV(false, null, "The compute service exists for this job no longer exists.");
             }
             String rawLog = service.getConsoleLog(job, 5000);
+            if (StringUtils.isEmpty(rawLog)) {
+                return generateJSONResponseMAV(false, null, "No compute logs were accessible for this job.");
+            }
             return generateJSONResponseMAV(true, rawLog, "");
         } catch (PortalServiceException ex) {
             return generateJSONResponseMAV(false, null, ex.getMessage());

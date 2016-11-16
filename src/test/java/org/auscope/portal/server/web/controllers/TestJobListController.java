@@ -1314,4 +1314,30 @@ public class TestJobListController extends PortalTestClass {
         ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
+
+    /**
+     * Tests requesting instance logs fails gracefully when the underlying service returns null
+     */
+    @Test
+    public void testGetRawInstanceLogs_NullLogs() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+
+            oneOf(mockCloudComputeServices[0]).getConsoleLog(with(mockJob), with(any(Integer.class)));
+            will(returnValue(null));
+        }});
+
+        ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
 }
