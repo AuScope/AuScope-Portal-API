@@ -1101,7 +1101,7 @@ public class JobListController extends BaseCloudController  {
      * @return
      */
     @RequestMapping("/secure/getRawInstanceLogs.do")
-    public ModelAndView getSectionedLogs(HttpServletRequest request,
+    public ModelAndView getRawInstanceLogs(HttpServletRequest request,
             @RequestParam("jobId") Integer jobId,
             @AuthenticationPrincipal ANVGLUser user) {
         //Lookup the job whose logs we are accessing
