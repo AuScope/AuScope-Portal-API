@@ -42,6 +42,8 @@ import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.vegl.VGLJobAuditLog;
+import org.auscope.portal.server.vegl.VGLJobAuditLogDao;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.vegl.VGLQueueJob;
@@ -86,6 +88,7 @@ public class JobListController extends BaseCloudController  {
     private JobStatusMonitor jobStatusMonitor;
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
     private VGLPollingJobQueueManager vglPollingJobQueueManager;
+    private VGLJobAuditLogDao vglAuditLogDao;
 
     private String adminEmail=null;
 
@@ -110,7 +113,8 @@ public class JobListController extends BaseCloudController  {
             JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
             VGLPollingJobQueueManager vglPollingJobQueueManager,
-            @Value("${HOST.portalAdminEmail}") String adminEmail) {
+            @Value("${HOST.portalAdminEmail}") String adminEmail,
+            VGLJobAuditLogDao vglAuditLogDao) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
@@ -118,6 +122,7 @@ public class JobListController extends BaseCloudController  {
         this.jobStatusMonitor = jobStatusMonitor;
         this.vglPollingJobQueueManager =  vglPollingJobQueueManager;
         this.adminEmail=adminEmail;
+        this.vglAuditLogDao = vglAuditLogDao;
         this.initializeQueue();
     }
 
@@ -753,7 +758,7 @@ public class JobListController extends BaseCloudController  {
             if (job == null) {
                 return generateJSONResponseMAV(false);
             }
-    
+
             //We allow a null series ID
             if (seriesId != null) {
                 VEGLSeries series = jobManager.getSeriesById(seriesId, user.getEmail());
@@ -761,7 +766,7 @@ public class JobListController extends BaseCloudController  {
                     return generateJSONResponseMAV(false);
                 }
             }
-    
+
             job.setSeriesId(seriesId);
             jobManager.saveJob(job);
         }
@@ -1042,7 +1047,7 @@ public class JobListController extends BaseCloudController  {
                          OutputStream os = fileStagingService.writeFile(newJob, cloudFile.getName())) {
 
                         FileIOUtil.writeInputToOutputStream(is, os, 1024 * 1024, false);
-                    } 
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -1087,6 +1092,36 @@ public class JobListController extends BaseCloudController  {
         }
 
         return generateJSONResponseMAV(true, Arrays.asList(namedSections), "");
+    }
+
+    /**
+     * Gets a raw dump of the instance logs (as reported by the cloud) for a particular job. This request
+     * will fail if the instance has been terminated.
+     *
+     *
+     * @param jobId
+     * @return
+     */
+    @RequestMapping("/secure/getRawInstanceLogs.do")
+    public ModelAndView getSectionedLogs(HttpServletRequest request,
+            @RequestParam("jobId") Integer jobId,
+            @AuthenticationPrincipal ANVGLUser user) {
+        //Lookup the job whose logs we are accessing
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The specified job does not exist.");
+        }
+
+        try {
+            CloudComputeService service = getComputeService(job);
+            if (service == null) {
+                return generateJSONResponseMAV(false, null, "The compute service exists for this job no longer exists.");
+            }
+            String rawLog = service.getConsoleLog(job, 5000);
+            return generateJSONResponseMAV(true, rawLog, "");
+        } catch (PortalServiceException ex) {
+            return generateJSONResponseMAV(false, null, ex.getMessage());
+        }
     }
 
     @RequestMapping("/secure/getPlaintextPreview.do")
@@ -1161,6 +1196,29 @@ public class JobListController extends BaseCloudController  {
         } finally {
             IOUtils.closeQuietly(is);
             IOUtils.closeQuietly(os);
+        }
+    }
+
+    /**
+     * Gets all AuditLog entries for the specified jobId. If the authenticated user doesn't own the specified job an error will be returned.
+     * @param jobId
+     * @param user
+     * @return
+     */
+    @RequestMapping("/secure/getAuditLogsForJob.do")
+    public ModelAndView getAuditLogsForJob(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false,  null, "The specified job does not exist.");
+        }
+
+        try {
+            List<VGLJobAuditLog> auditLogs = vglAuditLogDao.getAuditLogsOfJob(jobId);
+            return generateJSONResponseMAV(true, auditLogs, "");
+        } catch (Exception ex) {
+            log.error("Unable to access job audit logs for " + jobId + ": " + ex.getMessage());
+            log.debug("Exception:", ex);
+            return generateJSONResponseMAV(false,  null, "Unable to access audit logs for this job due to an internal error. Please try refreshing the page.");
         }
     }
 
