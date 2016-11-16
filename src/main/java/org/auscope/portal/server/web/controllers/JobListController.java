@@ -460,7 +460,6 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @AuthenticationPrincipal ANVGLUser user) {
-        logger.info("Getting job files for job ID " + jobId);
 
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -475,7 +474,6 @@ public class JobListController extends BaseCloudController  {
                 return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
             } else {
                 fileDetails = cloudStorageService.listJobFiles(job);
-                logger.info(fileDetails.length + " job files located");
             }
         } catch (Exception e) {
             logger.warn("Error fetching output directory information.", e);
@@ -753,7 +751,7 @@ public class JobListController extends BaseCloudController  {
             if (job == null) {
                 return generateJSONResponseMAV(false);
             }
-    
+
             //We allow a null series ID
             if (seriesId != null) {
                 VEGLSeries series = jobManager.getSeriesById(seriesId, user.getEmail());
@@ -761,7 +759,7 @@ public class JobListController extends BaseCloudController  {
                     return generateJSONResponseMAV(false);
                 }
             }
-    
+
             job.setSeriesId(seriesId);
             jobManager.saveJob(job);
         }
@@ -1042,7 +1040,7 @@ public class JobListController extends BaseCloudController  {
                          OutputStream os = fileStagingService.writeFile(newJob, cloudFile.getName())) {
 
                         FileIOUtil.writeInputToOutputStream(is, os, 1024 * 1024, false);
-                    } 
+                    }
                 }
             }
         } catch (Exception ex) {
