@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
@@ -30,7 +31,9 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
@@ -452,7 +455,6 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="computeServiceId", required=false) String computeServiceId,
             @RequestParam(value="computeVmId", required=false) String computeVmId,
             @RequestParam(value="computeTypeId", required=false) String computeTypeId,
-            @RequestParam(value="storageServiceId", required=false) String storageServiceId,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
             @RequestParam(value="walltime", required=false) Integer walltime,
@@ -495,23 +497,9 @@ public class JobBuilderController extends BaseCloudController {
         job.setEmailNotification(emailNotification);
         job.setWalltime(walltime);
 
-        //Updating the storage service means changing the base key
-        if (storageServiceId != null) {
-            CloudStorageService css = getStorageService(storageServiceId);
-            if (css == null) {
-                logger.error(String.format("Error fetching storage service with id %1$s", storageServiceId));
-                return generateJSONResponseMAV(false, null, "Storage service does not exist");
-            }
-
-            job.setStorageServiceId(storageServiceId);
-            job.setStorageBaseKey(css.generateBaseKey(job));
-        } else {
-            job.setStorageServiceId(null);
-            job.setStorageBaseKey(null);
-        }
-
         //Dont allow the user to specify a cloud compute service that DNE
         // Updating the compute service means updating the dev keypair
+        // We also auto choose storage service based on compute service selection
         if (computeServiceId != null) {
             CloudComputeService ccs = getComputeService(computeServiceId);
             if (ccs == null) {
@@ -519,9 +507,46 @@ public class JobBuilderController extends BaseCloudController {
                 return generateJSONResponseMAV(false, null, "No compute/storage service with those ID's");
             }
 
+            //Choose a storage service appropriate for the compute service (we could also make this configurable)
+            CloudStorageService css = null;
+            if (ccs instanceof CloudComputeServiceAws) {
+                css = getStorageService("amazon-aws-storage-sydney");
+            } else {
+                css = getStorageService("nectar-openstack-storage-melb");
+            }
+            if (css == null) {
+                logger.error(String.format("Error fetching storage service linked to compute service id %1$s", computeServiceId));
+                return generateJSONResponseMAV(false, null, "No linked storage service exists for your compute service selection");
+            }
+
+            //We may need to specify ARN details depending on the service we are using
+            STSRequirement stsReq = STSRequirement.ForceNone;
+            if (css instanceof CloudStorageServiceJClouds) {
+                stsReq = ((CloudStorageServiceJClouds) css).getStsRequirement();
+            }
+            switch (stsReq) {
+            case Permissable:
+                if (StringUtils.isEmpty(user.getArnStorage())) {
+                    job.setStorageBucket(css.getBucket());
+                } else {
+                    job.setStorageBucket(user.getS3Bucket());
+                }
+                break;
+            case Mandatory:
+                job.setStorageBucket(user.getS3Bucket());
+                break;
+            case ForceNone:
+                job.setStorageBucket(css.getBucket());
+                break;
+            }
+
             job.setComputeServiceId(computeServiceId);
+            job.setStorageServiceId(css.getId());
+            job.setStorageBaseKey(css.generateBaseKey(job));
         } else {
             job.setComputeServiceId(null);
+            job.setStorageServiceId(null);
+            job.setStorageBaseKey(null);
         }
 
         //Save the VEGL job
@@ -910,15 +935,17 @@ public class JobBuilderController extends BaseCloudController {
                 curJob.setSubmitDate(new Date());
                 jobManager.saveJob(curJob);
 
-            }catch(PortalServiceException e){
+            } catch(Exception e) {
                 //only for this specific error we wanna queue the job
-                if(e.getErrorCorrection()!= null && e.getErrorCorrection().contains("Quota exceeded")){
+                if (e instanceof PortalServiceException &&
+                   ((PortalServiceException) e).getErrorCorrection() != null &&
+                   ((PortalServiceException) e).getErrorCorrection().contains("Quota exceeded")) {
                     vglPollingJobQueueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
                     String oldJobStatus = curJob.getStatus();
                     curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
                     jobManager.saveJob(curJob);
                     jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
-                }else{
+                } else {
                     String oldJobStatus = curJob.getStatus();
                     curJob.setStatus(JobBuilderController.STATUS_ERROR);
                     jobManager.saveJob(curJob);
@@ -944,9 +971,6 @@ public class JobBuilderController extends BaseCloudController {
         jobManager.saveJob(job);
         log.debug(String.format("Created a new job row id=%1$s", job.getId()));
 
-        job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
-        job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
-        job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
         job.setComputeInstanceKey(user.getAwsKeyName());
         job.setStorageBucket(user.getS3Bucket());
 

@@ -221,6 +221,21 @@
         <property name="adminEmail" value="${HOST.portalAdminEmail}"/>
         <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
     </bean>
+    
+    <bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
+        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+        <constructor-arg name="provider" value="openstack-swift"/>
+        <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
+        <constructor-arg name="regionName" value="Melbourne"/>
+        <constructor-arg name="relaxHostName" value="false"/>
+        <constructor-arg name="stripExpectHeader" value="true"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources"/>
+        <property name="id" value="nectar-openstack-storage-melb"/>
+        <property name="bucket" value="vgl-portal"/>
+        <property name="authVersion" value="2.0"/>
+        <property name="stsRequirement" value="ForceNone"/>
+    </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
 
@@ -260,6 +275,16 @@
                 </bean>
             </list>
         </property>
+    </bean>
+
+    <bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNectar">
+        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+        <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
+        <property name="id" value="nectar-nova-compute"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources"/>
+        <property name="groupName" value ="vl-#{inetAddress.hostName.toLowerCase()}"/>
+        <property name="keypair" value="vgl-developers"/>
     </bean>
 
     <bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">

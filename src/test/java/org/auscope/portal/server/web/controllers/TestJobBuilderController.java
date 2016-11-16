@@ -26,7 +26,8 @@ import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
-import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
+import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -66,7 +67,7 @@ public class TestJobBuilderController {
     }};
 
     private VEGLJobManager mockJobManager;
-    private CloudStorageService[] mockCloudStorageServices;
+    private CloudStorageServiceJClouds[] mockCloudStorageServices;
     private CloudComputeService[] mockCloudComputeServices;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
@@ -99,7 +100,7 @@ public class TestJobBuilderController {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockFileStagingService = context.mock(ANVGLFileStagingService.class);
         mockPortalUser = context.mock(ANVGLUser.class);
-        mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
+        mockCloudStorageServices = new CloudStorageServiceJClouds[] {context.mock(CloudStorageServiceJClouds.class)};
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);
@@ -685,6 +686,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
+            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Permissable));
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
@@ -920,6 +922,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
+            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Permissable));
 
             //We should have 1 call to upload them
             allowing(mockCloudStorageServices[0]).uploadJobFiles(with(equal(job)), with(any(File[].class)));
@@ -1033,6 +1036,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
+            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Permissable));
 
             //We should have 1 call to upload them
             oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(job)), with(any(File[].class)));
@@ -1225,6 +1229,7 @@ public class TestJobBuilderController {
             atLeast(1).of(mockCloudStorageServices[0]).getEndpoint();will(returnValue(endpoint));
             atLeast(1).of(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             atLeast(1).of(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
+            atLeast(1).of(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Permissable));
         }});
 
         job.setStorageBaseKey("test/key");
@@ -1276,6 +1281,7 @@ public class TestJobBuilderController {
             allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(endpoint));
             allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
             allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
+            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Permissable));
         }});
 
         job.setStorageBaseKey("test/key");
@@ -1349,10 +1355,8 @@ public class TestJobBuilderController {
     @Test
     public void testUpdateOrCreateJob_CreateJobObject() throws Exception {
         final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
-        final String storageProvider = "swift";
-        final String storageEndpoint = "http://example.org/storage";
         final String baseKey = "base/key";
-        final String storageServiceId = "storage-service";
+        final String storageServiceId = "nectar-openstack-storage-melb";
         final String computeServiceId = "compute-service";
         final String computeVmType = "compute-vm-type";
         final String computeVmId = "compute-vm";
@@ -1387,6 +1391,7 @@ public class TestJobBuilderController {
 
             oneOf(mockCloudStorageServices[0]).generateBaseKey(with(any(VEGLJob.class)));will(returnValue(baseKey));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
+            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Mandatory));
 
             oneOf(mockFileStagingService).generateStageInDirectory(with(any(VEGLJob.class)));
 
@@ -1407,7 +1412,6 @@ public class TestJobBuilderController {
                 computeServiceId,
                 computeVmId,
                 computeVmType,
-                storageServiceId,
                 null,
                 emailNotification,
                 null,
@@ -1450,7 +1454,7 @@ public class TestJobBuilderController {
      * @throws Exception
      */
     @Test
-    public void testUpdateOrCreateJob_UpdateJob() throws Exception {
+    public void testUpdateOrCreateJob_UpdateJobSTSEnabled() throws Exception {
         final int seriesId = 12;
         final int jobId = 1234;
         final String computeVmType = "compute-vm-type";
@@ -1469,14 +1473,15 @@ public class TestJobBuilderController {
             oneOf(mockJob).setDescription("description");
             oneOf(mockJob).setComputeVmId("computeVmId");
             oneOf(mockJob).setComputeServiceId("computeServiceId");
-            oneOf(mockJob).setStorageServiceId("storageServiceId");
+            oneOf(mockJob).setStorageServiceId("nectar-openstack-storage-melb");
             oneOf(mockJob).setStorageBaseKey(newBaseKey);
             oneOf(mockJob).setEmailNotification(emailNotification);
             oneOf(mockJob).setComputeInstanceType(computeVmType);
             oneOf(mockJob).setWalltime(walltime);
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue("storageServiceId"));
+            allowing(mockCloudStorageServices[0]).getId();will(returnValue("nectar-openstack-storage-melb"));
+            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Permissable));
 
             oneOf(mockCloudStorageServices[0]).generateBaseKey(mockJob);will(returnValue(newBaseKey));
             //We should have 1 call to save our job
@@ -1484,6 +1489,10 @@ public class TestJobBuilderController {
 
             oneOf(mockCloudComputeServices[0]).getKeypair();will(returnValue(keypair));
             oneOf(mockJob).setComputeInstanceKey(keypair);
+
+            oneOf(mockPortalUser).getArnStorage();will(returnValue("aws:arn"));
+            allowing(mockPortalUser).getS3Bucket();will(returnValue("userbucket"));
+            oneOf(mockJob).setStorageBucket("userbucket");
         }});
 
         ModelAndView mav = controller.updateOrCreateJob(jobId,
@@ -1493,7 +1502,68 @@ public class TestJobBuilderController {
                 "computeServiceId",
                 "computeVmId",
                 computeVmType,
-                "storageServiceId",
+                "registeredUrl",
+                emailNotification,
+                Integer.valueOf(walltime),
+                mockRequest,
+                mockPortalUser);
+        Assert.assertNotNull(mav);
+        Assert.assertTrue((Boolean) mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests that the updateJob works as expected
+     * @throws Exception
+     */
+    @Test
+    public void testUpdateOrCreateJob_UpdateJobSTSDisabled() throws Exception {
+        final int seriesId = 12;
+        final int jobId = 1234;
+        final String computeVmType = "compute-vm-type";
+        final String newBaseKey = "base/key";
+        final boolean emailNotification = true;
+        final String keypair = "vl-developers";
+        final Integer walltime = Integer.valueOf(0);
+
+        context.checking(new Expectations() {{
+            //We should have 1 call to our job manager to get our job object and 1 call to save it
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+
+            //We should have the following fields updated
+            oneOf(mockJob).setSeriesId(seriesId);
+            oneOf(mockJob).setName("name");
+            oneOf(mockJob).setDescription("description");
+            oneOf(mockJob).setComputeVmId("computeVmId");
+            oneOf(mockJob).setComputeServiceId("computeServiceId");
+            oneOf(mockJob).setStorageServiceId("nectar-openstack-storage-melb");
+            oneOf(mockJob).setStorageBaseKey(newBaseKey);
+            oneOf(mockJob).setEmailNotification(emailNotification);
+            oneOf(mockJob).setComputeInstanceType(computeVmType);
+            oneOf(mockJob).setWalltime(walltime);
+
+            allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
+            allowing(mockCloudStorageServices[0]).getId();will(returnValue("nectar-openstack-storage-melb"));
+            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Permissable));
+            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue("storagebucket"));
+
+            oneOf(mockCloudStorageServices[0]).generateBaseKey(mockJob);will(returnValue(newBaseKey));
+            //We should have 1 call to save our job
+            oneOf(mockJobManager).saveJob(mockJob);
+
+            oneOf(mockCloudComputeServices[0]).getKeypair();will(returnValue(keypair));
+            oneOf(mockJob).setComputeInstanceKey(keypair);
+
+            oneOf(mockPortalUser).getArnStorage();will(returnValue(null));
+            oneOf(mockJob).setStorageBucket("storagebucket");
+        }});
+
+        ModelAndView mav = controller.updateOrCreateJob(jobId,
+                "name",
+                "description",
+                seriesId,
+                "computeServiceId",
+                "computeVmId",
+                computeVmType,
                 "registeredUrl",
                 emailNotification,
                 Integer.valueOf(walltime),
@@ -1567,13 +1637,18 @@ public class TestJobBuilderController {
             oneOf(mockJob).setDescription("description");
             oneOf(mockJob).setComputeVmId("computeVmId");
             oneOf(mockJob).setComputeServiceId("computeServiceId");
-            oneOf(mockJob).setStorageServiceId("storageServiceId");
+            oneOf(mockJob).setStorageServiceId("nectar-openstack-storage-melb");
             oneOf(mockJob).setEmailNotification(emailNotification);
             oneOf(mockJob).setComputeInstanceType(computeVmType);
+            oneOf(mockJob).setStorageBucket("bucket");
             oneOf(mockJob).setWalltime(walltime);
+            oneOf(mockJob).setStorageBaseKey("base/key");
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId"));
+            allowing(mockCloudStorageServices[0]).getId();will(returnValue("nectar-openstack-storage-melb"));
+            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.ForceNone));
+            allowing(mockCloudStorageServices[0]).generateBaseKey(mockJob);will(returnValue("base/key"));
+            allowing(mockCloudStorageServices[0]).getBucket();will(returnValue("bucket"));
 
             //We should have 1 call to save our job but will throw Exception
             oneOf(mockJobManager).saveJob(mockJob);will(throwException(new Exception("")));
@@ -1586,56 +1661,6 @@ public class TestJobBuilderController {
                 "computeServiceId",
                 "computeVmId",
                 computeVmType,
-                "storageServiceId",
-                "registeredUrl",
-                emailNotification,
-                walltime,
-                mockRequest,
-                mockPortalUser);
-        Assert.assertNotNull(mav);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
-    }
-
-    /**
-     * Tests that the updateJob fails as expected with a bad storage id
-     * @throws Exception
-     */
-    @Test
-    public void testUpdateOrCreateJob_UpdateJobWithBadStorageId() throws Exception {
-        final boolean emailNotification = true;
-        final String computeVmType = "compute-vm-type";
-        final Integer walltime = Integer.valueOf(0);
-
-        context.checking(new Expectations() {{
-            //We should have 1 call to our job manager to get our job object and 1 call to save it
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(mockJob));
-
-            //We should have the following fields updated
-            oneOf(mockJob).setSeriesId(Integer.parseInt(seriesId));
-            oneOf(mockJob).setName("name");
-            oneOf(mockJob).setDescription("description");
-            oneOf(mockJob).setComputeVmId("computeVmId");
-            oneOf(mockJob).setComputeServiceId("computeServiceId");
-            oneOf(mockJob).setStorageServiceId("storageServiceId");
-            oneOf(mockJob).setEmailNotification(emailNotification);
-            oneOf(mockJob).setComputeInstanceType(computeVmType);
-            oneOf(mockJob).setWalltime(walltime);
-
-            allowing(mockCloudComputeServices[0]).getId();will(returnValue("computeServiceId"));
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue("computeStorageId-thatDNE"));
-
-            //We should have 1 call to save our job
-            oneOf(mockJobManager).saveJob(mockJob);
-        }});
-
-        ModelAndView mav = controller.updateOrCreateJob(Integer.parseInt(jobId),
-                "name",
-                "description",
-                Integer.parseInt(seriesId),
-                "computeServiceId",
-                "computeVmId",
-                computeVmType,
-                "storageServiceId",
                 "registeredUrl",
                 emailNotification,
                 walltime,
@@ -1665,7 +1690,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setDescription("description");
             oneOf(mockJob).setComputeVmId("computeVmId");
             oneOf(mockJob).setComputeServiceId("computeServiceId");
-            oneOf(mockJob).setStorageServiceId("storageServiceId");
+            oneOf(mockJob).setStorageServiceId("nectar-openstack-storage-melb");
             oneOf(mockJob).setEmailNotification(emailNotification);
             oneOf(mockJob).setComputeInstanceType(computeVmType);
             oneOf(mockJob).setWalltime(walltime);
@@ -1684,7 +1709,6 @@ public class TestJobBuilderController {
                 "computeServiceId",
                 "computeVmId",
                 computeVmType,
-                "storageServiceId",
                 "registeredUrl",
                 emailNotification,
                 walltime,
