@@ -49,18 +49,22 @@ public class UserController extends BasePortalController {
     private String awsAccount;
 
     private String tacVersion;
+    
+    private String encryptionKey;
 
     @Autowired
     public UserController(ANVGLUserDao userDao, NCIDetailsDao nciDetailsDao,
             VelocityEngine velocityEngine, 
             @Value("${env.aws.account}") String awsAccount,
-            @Value("${termsconditions.version}") String tacVersion) {
+            @Value("${termsconditions.version}") String tacVersion,
+            @Value("${env.nci.encryption.128bitkey}") String encryptionKey) {
         super();
         this.userDao = userDao;
         this.nciDetailsDao = nciDetailsDao;
         this.velocityEngine = velocityEngine;
         this.awsAccount=awsAccount;
         this.tacVersion=tacVersion;
+        this.encryptionKey = encryptionKey;
     }
 
 
@@ -240,7 +244,7 @@ public class UserController extends BasePortalController {
     }
     
     private byte[] encrypt(String message) throws Exception {
-        byte[] keyBytes = "Cxi3Mspe8QmK11Qh".getBytes();
+        byte[] keyBytes = encryptionKey.getBytes();
         Key key = new SecretKeySpec(keyBytes, "AES");
         Cipher c = Cipher.getInstance("AES");
         c.init(Cipher.ENCRYPT_MODE, key);
@@ -248,7 +252,7 @@ public class UserController extends BasePortalController {
     }
     
     private String decrypt(byte[] encryptedText) throws Exception {
-        byte[] keyBytes = "Cxi3Mspe8QmK11Qh".getBytes();
+        byte[] keyBytes = encryptionKey.getBytes();
         Key key = new SecretKeySpec(keyBytes, "AES");
         Cipher c = Cipher.getInstance("AES");
         c.init(Cipher.DECRYPT_MODE, key);

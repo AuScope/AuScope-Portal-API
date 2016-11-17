@@ -161,7 +161,7 @@ CREATE TABLE `nci_details` (
   `nci_username` blob DEFAULT NULL,
   `nci_key` blob DEFAULT NULL,
   `nci_project` blob DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
   FOREIGN KEY (`user`)
      REFERENCES users(`id`)
      ON DELETE CASCADE ON UPDATE CASCADE
