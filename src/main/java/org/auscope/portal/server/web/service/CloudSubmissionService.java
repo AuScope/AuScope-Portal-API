@@ -154,7 +154,6 @@ public class CloudSubmissionService {
                 jobManager.saveJob(curJob);
                 vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
             } catch(Exception e) {
-                logger.error("BACON:", e);
                 boolean errorState = true;
                 if (e instanceof PortalServiceException &&
                     ((PortalServiceException) e).getErrorCorrection() != null &&
@@ -170,7 +169,6 @@ public class CloudSubmissionService {
                             vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
                             errorState = false;
                         } catch (RejectedExecutionException ex) {
-                            logger.error("BACON2:", e);
                             logger.error("Cannot reschedule job submission:" + ex.getMessage());
                             logger.debug("Exception:", ex);
                         }
