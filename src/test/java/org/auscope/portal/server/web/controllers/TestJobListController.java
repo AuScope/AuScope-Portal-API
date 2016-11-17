@@ -15,12 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.FileStagingService;
-import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.jmock.ReadableServletOutputStream;
@@ -30,10 +28,9 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
-import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.jmock.Expectations;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +55,7 @@ public class TestJobListController extends PortalTestClass {
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
     private JobListController controller;
-    private VGLPollingJobQueueManager vglPollingJobQueueManager;
+    private CloudSubmissionService mockCloudSubmissionService;
 
     /**
      * Load our mock objects
@@ -74,8 +71,8 @@ public class TestJobListController extends PortalTestClass {
         mockResponse = context.mock(HttpServletResponse.class);
         mockRequest = context.mock(HttpServletRequest.class);
         mockPortalUser = context.mock(ANVGLUser.class);
+        mockCloudSubmissionService = context.mock(CloudSubmissionService.class);
         final List<VEGLJob> mockJobs=new ArrayList<>();
-        vglPollingJobQueueManager = new VGLPollingJobQueueManager();
 
         context.checking(new Expectations() {{
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
@@ -85,12 +82,7 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
-    }
-
-    @After
-    public void destroy(){
-        vglPollingJobQueueManager.getQueue().clear();
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,"dummy@dummy.com", mockCloudSubmissionService);
     }
 
 
@@ -101,95 +93,6 @@ public class TestJobListController extends PortalTestClass {
 
     public static VEGLJobMatcher aNonMatchingVeglJob(Integer id) {
         return new VEGLJobMatcher(id, true);
-    }
-
-    @Test
-    public void testInitizeQueueNDelete() {
-        final String storageBucket = "storage-bucket";
-        final String storageAccess = "213-asd-54";
-        final String storageSecret = "tops3cret";
-        final String storageEndpoint = "http://example.org";
-        final String storageProvider = "provider";
-        final String storageAuthVersion = "1.2.3";
-        final String regionName = null;
-
-        final String userEmail = "exampleuser@email.com";
-        final int jobId = 1234;
-
-        final List<VEGLJob> queueMockJobs = Arrays.asList(
-                context.mock(VEGLJob.class, "queueMockJob1"),
-                context.mock(VEGLJob.class, "queueMockJob2"));
-
-        final VEGLJobManager queueMockJobManager = context.mock(VEGLJobManager.class,"queueMockJobManager");
-
-        context.checking(new Expectations() {{
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
-            allowing(queueMockJobManager).getInQueueJobs();will(returnValue(queueMockJobs));
-
-            allowing(queueMockJobs.get(0)).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(queueMockJobs.get(0)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(queueMockJobs.get(0)).getStorageBaseKey();will(returnValue(""));
-            allowing(queueMockJobs.get(0)).getStorageBucket();will(returnValue(storageBucket));
-            allowing(queueMockJobs.get(1)).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(queueMockJobs.get(1)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(queueMockJobs.get(1)).getStorageBaseKey();will(returnValue(""));
-            allowing(queueMockJobs.get(1)).getStorageBucket();will(returnValue(storageBucket));
-
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
-            allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
-            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
-            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
-            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
-            allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
-            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
-            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
-            allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
-            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Mandatory));
-
-            //Here on start is the delete mock
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-
-            allowing(queueMockJobs.get(1)).getUser();will(returnValue(userEmail));
-            //allowing(queueMockJobs.get(0)).getUser();will(returnValue(userEmail));
-
-            oneOf(queueMockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(queueMockJobs.get(1)));
-
-            allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
-            allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
-            allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
-
-            allowing(queueMockJobs.get(1)).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
-            allowing(queueMockJobs.get(1)).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
-            allowing(queueMockJobs.get(1)).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
-
-            allowing(queueMockJobs.get(1)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(queueMockJobs.get(1)).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(queueMockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_INQUEUE));
-            allowing(queueMockJobs.get(0)).getId();will(returnValue(5555));
-            allowing(queueMockJobs.get(1)).getId();will(returnValue(jobId));
-
-            allowing(queueMockJobs.get(0)).isWalltimeSet(); will(returnValue(false));
-            allowing(queueMockJobs.get(1)).isWalltimeSet(); will(returnValue(false));
-
-            allowing(queueMockJobs.get(0)).getWalltime();will(returnValue(null));
-            allowing(queueMockJobs.get(1)).getWalltime();will(returnValue(null));
-
-            oneOf(queueMockJobs.get(1)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-            oneOf(queueMockJobManager).saveJob(queueMockJobs.get(1));
-            oneOf(queueMockJobManager).createJobAuditTrail(JobBuilderController.STATUS_INQUEUE, queueMockJobs.get(1), "Job cancelled by user.");
-        }});
-
-        JobListController myController = new JobListController(queueMockJobManager,
-                mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
-
-        Assert.assertEquals(2, vglPollingJobQueueManager.getQueue().size());
-
-        myController.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
-
-        Assert.assertEquals(1, vglPollingJobQueueManager.getQueue().size());
     }
 
 //    /**
@@ -338,6 +241,42 @@ public class TestJobListController extends PortalTestClass {
             oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
 
             oneOf(mockCloudComputeServices[0]).terminateJob(mockJob);
+        }});
+
+        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests deleting a queued job successfully
+     */
+    @Test
+    public void testDeleteJob_InQueue() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String initialStatus = JobBuilderController.STATUS_INQUEUE;
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+
+            //Make sure the job marked as deleted and its transition audit trial record is created
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
+            oneOf(mockJobManager).saveJob(mockJob);
+            oneOf(mockJobManager).createJobAuditTrail(initialStatus, mockJob, "Job deleted.");
+
+            oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
+            oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
+
+            oneOf(mockCloudSubmissionService).dequeueSubmission(mockJob, mockCloudComputeServices[0]);
         }});
 
         ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
