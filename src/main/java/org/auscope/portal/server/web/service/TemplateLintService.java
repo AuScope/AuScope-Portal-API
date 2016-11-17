@@ -109,8 +109,9 @@ public class TemplateLintService {
         BufferedInputStream stdout;
         try {
             ProcessBuilder pb =
-            new ProcessBuilder("pylint", "-r", "n", f.getFileName().toString())
-            .directory(f.getParent().toFile());
+                new ProcessBuilder("pylint", "-r", "n", "-f", "json",
+                                   f.getFileName().toString())
+                .directory(f.getParent().toFile());
 
             Process p = pb.start();
             stdout = new BufferedInputStream(p.getInputStream());
@@ -120,16 +121,22 @@ public class TemplateLintService {
                 throw new PortalServiceException(String.format("pylint process failed to complete before {} second timeout elapsed", DEFAULT_TIMEOUT));
             }
 
-            // Finished successfully?
+            // Finished successfully? pylint returns 0 on success *with no
+            // issues*, 1 on failure to run properly, 2/4/8/16 for successful
+            // completion with python convention/refactor/warning/error (codes
+            // 2-16 bit-ORd into final result) or 32 on usage error.
             int rv = p.exitValue();
-            if (rv != 0) {
-                logger.debug("pylint stderr:");
-                String line = stderr.readLine();
-                while (line != null) {
-                    logger.debug(line);
-                    line = stderr.readLine();
-                }
+            if (rv == 1 || rv == 32) {
+                logger.error("pylint failed");
+                logger.debug("\npylint stderr:");
+                stderr.lines().forEachOrdered(l -> logger.debug(l));
+                logger.debug("\npylint stdout:");
+                (new BufferedReader(new InputStreamReader(stdout)))
+                    .lines().forEachOrdered(l -> logger.debug(l));
                 throw new PortalServiceException(String.format("pylint process returned non-zero exit value: {}", rv));
+            }
+            else if (rv != 0) {
+                logger.info("pylint found issues");
             }
         }
         catch (PortalServiceException pse) {
@@ -186,12 +193,16 @@ public class TemplateLintService {
                 result.get("type").asText().equals("error")
                 ? LintResult.Severity.ERROR
                 : LintResult.Severity.WARNING;
-            lints.add(new LintResult(severity,
-                                     result.get("message").asText(),
-                                     new int[] {
-                                         result.get("line").asInt(),
-                                         result.get("column").asInt()
-                                     }));
+            lints.add(
+                new LintResult(severity,
+                               result.get("message").asText(),
+
+                               // pylint returns 1-based line count.
+                               new LintResult.Location(
+                                   result.get("line").asInt() - 1,
+                                   result.get("column").asInt())
+                               )
+                      );
         }
 
         return lints;

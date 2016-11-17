@@ -68,7 +68,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
             mode      : 'python',
             name      : 'scriptcodefield',
             readOnly  : true,
-            lint      : lintPython
+            lint      : { getAnnotations: lintPython, delay: 2000 }
         });
 
         var editorPanel =  Ext.create('Ext.form.FormPanel', {

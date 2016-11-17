@@ -17,13 +17,16 @@ function lintPython(text, callback) {
                             var found = [], issue;
 
                             responseObj.data.forEach(function(it) {
-                                var from = CodeMirror.Pos(it.from[0], it.from[1]);
-                                var to = from;
+                                var from = CodeMirror.Pos(it.from.line, it.from.column);
+                                var to;
                                 if (it.to) {
-                                    to = CodeMirror.Pos(it.to[0], it.to[1]);
+                                    to = CodeMirror.Pos(it.to.line, it.to.column);
+                                }
+                                else {
+                                    to = CodeMirror.Pos(it.from.line, it.from.column + 1);
                                 }
                                 found.push({
-                                    severity: it.severity.toLowerCase(),
+                                    severity: it.severity,
                                     message: it.message,
                                     from: from,
                                     to: to

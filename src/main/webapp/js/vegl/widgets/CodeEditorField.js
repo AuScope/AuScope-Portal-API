@@ -25,12 +25,10 @@ Ext.define('vegl.widgets.CodeEditorField', {
                     this.editor = CodeMirror.fromTextArea(element,{
                         lineNumbers: true,
                         scrollbarStyle: 'null',
-                        mode: config.mode
+                        mode: config.mode,
+                        gutters: ["CodeMirror-lint-markers"],
+                        lint: config.lint || false
                     });
-
-                    if (config.lint) {
-                        this.editor.setOption('lint', config.lint);
-                    }
 
                     if (config.value) {
                         obj.setValue(config.value);
