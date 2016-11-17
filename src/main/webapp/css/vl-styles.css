@@ -65,6 +65,10 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
     background-image: url("../portal-core/img/grid.png") !important
 }
 
+.status-icon {
+    background-image: url("../portal-core/img/information.png") !important
+}
+
 .refresh-icon {
     background-image: url("../portal-core/img/refresh.png") !important
 }
