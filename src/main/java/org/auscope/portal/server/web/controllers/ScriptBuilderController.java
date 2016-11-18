@@ -299,8 +299,7 @@ public class ScriptBuilderController extends BaseModelController {
             }
         }
         catch (PortalServiceException ex) {
-            logger.warn("Template code check failed: " + ex.getMessage());
-            logger.debug(ex);
+            logger.warn("Template code check failed: " + ex.getMessage(), ex);
             return generateJSONResponseMAV(false, null, "Template code check failed: " + ex.getMessage());
         }
 
