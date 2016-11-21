@@ -29,7 +29,8 @@ Ext.application({
         }
 
         Ext.create('Ext.container.Viewport', {
-            layout: 'border',
+        	layout: 'border',
+        	region: 'center',
             style: {
                 'background-color': 'white'
             },
@@ -39,93 +40,87 @@ Ext.application({
                 applyTo: 'body',
                 height: 100
             },{
-                region: 'center',
-                margin: '10 0 10 0',
-                border: false,
-                bodyStyle: {
-                    'background-color': 'white'
-                },
-                items: [{
-                	xtype: 'tabpanel',
-                	layout: 'fit',
-                	items: [{
-                		title: 'AWS',
-                		xtype: 'panel',
-	                    border: false,
-	                    maxWidth: 1200,
-	                    width: '100%',
-	                    height: 500,
-	                    margin: '10 10 10 10',
-	                    layout: {
-	                        type: 'hbox',
-	                        pack: 'center',
-	                    },
-	                    items: [{
-	                        xtype: 'panel',
-	                        title: 'Step 1: Initialising your AWS',
-	                        flex: 0.4,
-	                        height: '100%',
-	                        margin: '0 10 0 0',
-	                        bodyStyle: {
-	                            'background-color': 'white',
-	                            padding: '5px',
-	                        },
-	                        html: '<h1>Tutorial Video</h1><img src="http://placehold.it/450x250"><p>You can also follow instructions at our wiki</p>',
-	                        dockedItems: [{
-	                            xtype: 'toolbar',
-	                            dock: 'bottom',
-	                            items: [{
-	                                xtype: 'tbfill'
-	                            },{
-	                                xtype: 'button',
-	                                scale: 'large',
-	                                cls: 'important-button',
-	                                text: 'Download Cloud Formation Policy',
-	                                handler: function() {
-	                                    portal.util.FileDownloader.downloadFile('secure/getCloudFormationScript.do');
-	                                }
-	                            }]
-	                        }]
-	                    },{
-	                        xtype: 'panel',
-	                        title: 'Step 2: Configuring ANVGL',
-	                        flex: 0.6,
-	                        height: '100%',
-	                        margin: '0 0 0 10',
-	                        bodyStyle: {
-	                            'background-color': 'white'
-	                        },
-	                        layout: 'fit',
-	                        items: [{
-	                            border: false,
-	                            xtype: 'userpanel'
-	                        }]
-	                    }]
-                	},{
-                		title: 'NCI',
-                		xtype: 'panel',
-	                    border: false,
-	                    maxWidth: 800,
-	                    width: '100%',
-	                    height: 500,
-	                    margin: '10 10 10 10',
-	                    items: [{
-	                    	xtype: 'panel',
-	                        title: 'Enter Your NCI Credentials',
-	                        flex: 0.6,
-	                        height: '100%',
-	                        margin: '0 0 0 10',
-	                        bodyStyle: {
-	                            'background-color': 'white'
-	                        },
-	                        layout: 'fit',
-	                        items: [{
-	                            border: false,
-	                            xtype: 'ncidetailspanel'
-	                        }]
-	                    }]
-                	}]
-                }]
+            	xtype: 'tabpanel',
+            	layout: 'fit',
+            	region: 'center',
+            	margin: '10 10 10 10',
+            	items: [{
+            		title: 'AWS',
+            		xtype: 'panel',
+                    border: false,
+                    maxWidth: 1200,
+                    width: '100%',
+                    height: 500,
+                    margin: '10 10 10 10',
+                    layout: {
+                        type: 'hbox',
+                        pack: 'center',
+                    },
+                    items: [{
+                        xtype: 'panel',
+                        title: 'Step 1: Initialising your AWS',
+                        flex: 0.4,
+                        height: '100%',
+                        margin: '0 10 0 0',
+                        bodyStyle: {
+                            'background-color': 'white',
+                            padding: '5px',
+                        },
+                        html: '<h1>Tutorial Video</h1><img src="http://placehold.it/450x250"><p>You can also follow instructions at our wiki</p>',
+                        dockedItems: [{
+                            xtype: 'toolbar',
+                            dock: 'bottom',
+                            items: [{
+                                xtype: 'tbfill'
+                            },{
+                                xtype: 'button',
+                                scale: 'large',
+                                cls: 'important-button',
+                                text: 'Download Cloud Formation Policy',
+                                handler: function() {
+                                    portal.util.FileDownloader.downloadFile('secure/getCloudFormationScript.do');
+                                }
+                            }]
+                        }]
+                    },{
+                        xtype: 'panel',
+                        title: 'Step 2: Configuring ANVGL',
+                        flex: 0.6,
+                        height: '100%',
+                        margin: '0 0 0 10',
+                        bodyStyle: {
+                            'background-color': 'white'
+                        },
+                        layout: 'fit',
+                        items: [{
+                            border: false,
+                            xtype: 'userpanel'
+                        }]
+                    }]
+            	},{
+            		title: 'NCI',
+            		xtype: 'panel',
+                    border: false,
+                    maxWidth: 800,
+                    width: '100%',
+                    height: 500,
+                    margin: '10 10 10 10',
+                    items: [{
+                    	xtype: 'panel',
+                        title: 'Enter Your NCI Credentials',
+                        flex: 0.6,
+                        height: '100%',
+                        margin: '0 0 0 10',
+                        bodyStyle: {
+                            'background-color': 'white'
+                        },
+                        layout: 'fit',
+                        items: [{
+                            border: false,
+                            xtype: 'ncidetailspanel'
+                        }]
+                    }]
+            	}]
             }],
             listeners: {
                 afterrender: function(vp) {

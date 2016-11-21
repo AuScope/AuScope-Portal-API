@@ -106,7 +106,6 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
                                 }
                                 return;
                         	},
-                        	//failure: function(options, success, response) {
                         	failure: function() {
                         		statusLabel.setText('');
                                 Ext.MessageBox.alert('Error', 'There was an error saving your changes. Please try refreshing the page.');
