@@ -80,6 +80,44 @@ public class TestCloudSubmissionService extends PortalTestClass {
     }
 
     /**
+     * Tests that jobs are updated in lock step with the internal cache.
+     * @throws Exception
+     */
+    @Test
+    public void testJobSynchronisation() throws Exception {
+        //Instantiate our job object
+        final String userDataString = "user-data";
+        final String instanceId = "instance-id";
+        final VEGLJob job = new VEGLJob(213);
+
+        job.setStatus(JobBuilderController.STATUS_PROVISION);
+
+
+        context.checking(new Expectations() {{
+            allowing(mockCloudComputeService).getId();will(returnValue("ccs-id"));
+
+            allowing(mockJobManager).createJobAuditTrail(with(any(String.class)), with(job), with(any(Exception.class)));
+            allowing(mockJobManager).createJobAuditTrail(with(any(String.class)), with(job), with(any(String.class)));
+
+            oneOf(mockCloudComputeService).executeJob(with(job), with(userDataString));will(returnValue(instanceId));
+            oneOf(mockJobManager).saveJob(job);will(delayReturnValue(2000L, null));
+            oneOf(mockVglJobStatusChangeHandler).handleStatusChange(job, JobBuilderController.STATUS_PENDING, JobBuilderController.STATUS_PROVISION);
+        }});
+
+        try {
+            service.queueSubmission(mockCloudComputeService, job, userDataString);
+            Thread.sleep(2000L);
+            Assert.assertFalse("Returned submitting status while updating job status.", service.isSubmitting(job, mockCloudComputeService));
+        } finally {
+            executor.shutdown();
+        }
+        executor.awaitTermination(10000, TimeUnit.MILLISECONDS);
+
+        Assert.assertEquals(instanceId, job.getComputeInstanceId());
+        Assert.assertNotNull(job.getSubmitDate());
+    }
+
+    /**
      * Tests that job submission succeeds in a best case scenario
      * @throws Exception
      */
@@ -87,7 +125,6 @@ public class TestCloudSubmissionService extends PortalTestClass {
     public void testJobSubmissionError() throws Exception {
         //Instantiate our job object
         final String userDataString = "user-data";
-        final String instanceId = "instance-id";
         final VEGLJob job = new VEGLJob(213);
 
         job.setStatus(JobBuilderController.STATUS_PROVISION);
@@ -122,7 +159,6 @@ public class TestCloudSubmissionService extends PortalTestClass {
     public void testJobSubmission_NoInstanceId() throws Exception {
         //Instantiate our job object
         final String userDataString = "user-data";
-        final String instanceId = "instance-id";
         final VEGLJob job = new VEGLJob(213);
 
         job.setStatus(JobBuilderController.STATUS_PROVISION);

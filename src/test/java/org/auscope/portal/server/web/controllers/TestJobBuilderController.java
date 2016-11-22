@@ -694,8 +694,8 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(job);
 
             //We should have 1 call to our job manager to create a job audit trail record
-            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, job, "Set job to provisioning");
-            oneOf(mockJobManager).createJobAuditTrail("Provisioning", job, "Set job to Pending");
+            oneOf(mockJobManager).createJobAuditTrail(with(JobBuilderController.STATUS_UNSUBMITTED), with(job), with(any(String.class)));
+            oneOf(mockCloudSubmissionService).queueSubmission(with(mockCloudComputeServices[0]), with(job), with(any(String.class)));
 
             oneOf(mockRequest).getRequestURL();will(returnValue(new StringBuffer("http://mock.fake/secure/something")));
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(job)));will(returnValue(cloudList));
@@ -714,10 +714,6 @@ public class TestJobBuilderController {
         ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
 
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
-        Thread.sleep(1000);
-        Assert.assertEquals(instanceId, job.getComputeInstanceId());
-        Assert.assertEquals(JobBuilderController.STATUS_PENDING, job.getStatus());
-        Assert.assertNotNull(job.getSubmitDate());
     }
 
     /**
@@ -850,120 +846,6 @@ public class TestJobBuilderController {
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, job.getStatus());
-    }
-
-    /**
-     * Tests that job submission fails correctly when files cannot be uploaded to S3
-     * @throws Exception
-     */
-    @Test
-    public void testJobSubmission_ExecuteFailure() throws Exception {
-        //Instantiate our job object
-        final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
-
-        final String computeVmId = "compute-vmi-id";
-        final String computeServiceId = "compute-service-id";
-
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
-        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(job, "mockFile1", mockFile1), new StagedFile(job, "mockFile2", mockFile2)};
-        final OutputStream mockOutputStream = context.mock(OutputStream.class);
-        final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final String computeKeyName = "key-name";
-        final String storageBucket = "storage-bucket";
-        final String storageAccess = "213-asd-54";
-        final String storageSecret = "tops3cret";
-        final String storageProvider = "provider";
-        final String storageAuthVersion = "1.2.3";
-        final String storageEndpoint = "http://example.org";
-        final String storageServiceId = "storage-service-id";
-        final String regionName = "region-name";
-        final PortalServiceException exception = new PortalServiceException("Some random error","Some error correction");
-        final File activityFile = File.createTempFile("activity", ".ttl");
-        final String activityFileName = "activity.ttl";
-        final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
-        CloudFileInformation cloudFileModel = new CloudFileInformation("two", 0, "");
-        final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
-        final String mockUser = "jo@me.com";
-
-        job.setComputeVmId(computeVmId);
-        //As submitJob method no longer explicitly checks for empty storage credentials,
-        //we need to manually set the storageBaseKey property to avoid NullPointerException
-        job.setStorageBaseKey("storageBaseKey");
-        //By default, a job is in SAVED state
-        job.setStatus(jobInSavedState);
-        job.setComputeServiceId(computeServiceId);
-        job.setStorageServiceId(storageServiceId);
-        job.setStorageBucket(storageBucket);
-
-        context.checking(new Expectations() {{
-            //We should have 1 call to our job manager to get our job object and 1 call to save it
-            //oneOf(mockJobManager).getJobById(job.getId(), user);will(returnValue(job));
-            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);will(returnValue(job));
-
-            oneOf(mockFileStagingService).writeFile(job, JobBuilderController.DOWNLOAD_SCRIPT);
-            will(returnValue(mockOutputStream));
-            allowing(mockOutputStream).close();
-
-            //We should have 1 call to get our stage in files
-            oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stageInFiles));
-
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
-            allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
-            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
-            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
-            allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
-            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
-            allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
-            allowing(mockCloudStorageServices[0]).getStsRequirement();will(returnValue(STSRequirement.Permissable));
-
-            //We should have 1 call to upload them
-            allowing(mockCloudStorageServices[0]).uploadJobFiles(with(equal(job)), with(any(File[].class)));
-
-            //We should have access control check to ensure user has permission to run the job
-            oneOf(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(mockImages));
-            oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
-            oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"testRole1"}));
-            allowing(mockRequest).isUserInRole("testRole1");will(returnValue(true));
-
-            allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
-
-            allowing(mockJobManager).saveJob(job);
-
-            //And finally 1 call to execute the job (which will throw PortalServiceException indicating failure)
-            oneOf(mockCloudComputeServices[0]).executeJob(with(any(VEGLJob.class)), with(any(String.class)));will(throwException(exception));
-
-            //We should have 1 call to our job manager to create a job audit trail record
-            oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, job, "Set job to provisioning");
-
-            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PROVISION, job, exception);
-
-            oneOf(mockJobManager).createJobAuditTrail(JobBuilderController.STATUS_PROVISION, job, "Job status updated.");
-
-            oneOf(mockJobMailSender).sendMail(job);
-            oneOf(mockVGLJobStatusAndLogReader).getSectionedLog(job, "Time");
-
-            oneOf(mockRequest).getRequestURL();will(returnValue(new StringBuffer("http://mock.fake/secure/something")));
-            oneOf(mockCloudStorageServices[0]).listJobFiles(with(equal(job)));will(returnValue(cloudList));
-            allowing(mockFileStagingService).createLocalFile(activityFileName, job);will(returnValue(activityFile));
-            allowing(mockPortalUser).getId();will(returnValue(mockUser));
-            allowing(mockPortalUser).getAwsKeyName();will(returnValue(computeKeyName));
-            allowing(mockAnvglProvenanceService).createActivity(job, null, mockPortalUser);will(returnValue(""));
-            oneOf(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
-            oneOf(mockAnvglProvenanceService).createActivity(job, null, mockPortalUser);
-            oneOf(mockScmEntryService).getJobSolutions(job);will(returnValue(null));
-        }});
-
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
-
-        Assert.assertTrue((Boolean)mav.getModel().get("success"));
-        //VT:wait a while for the thread to finish before getting the status.
-        Thread.sleep(1000);
-
-        Assert.assertEquals(JobBuilderController.STATUS_ERROR, job.getStatus());
-        Assert.assertTrue(job.getProcessDate()!=null);
-
     }
 
     /**

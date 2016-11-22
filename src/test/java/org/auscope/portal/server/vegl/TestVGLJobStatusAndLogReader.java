@@ -16,6 +16,7 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
+import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,20 +36,21 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
     private CloudStorageService[] mockCloudStorageServices;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader jobStatLogReader;
+    private CloudSubmissionService mockCloudSubmissionService;
 
     @Before
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockCloudStorageServices = new CloudStorageService[] { context.mock(CloudStorageService.class) };
         mockCloudComputeServices = new CloudComputeService[] { context.mock(CloudComputeService.class) };
-
+        mockCloudSubmissionService = context.mock(CloudSubmissionService.class);
         context.checking(new Expectations() {{
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
         }});
 
         jobStatLogReader = new VGLJobStatusAndLogReader(mockJobManager,
-                mockCloudStorageServices, mockCloudComputeServices);
+                mockCloudStorageServices, mockCloudComputeServices, mockCloudSubmissionService);
     }
 
     /**
@@ -254,6 +256,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             oneOf(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
@@ -301,6 +304,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
             allowing(mockJob).getStorageServiceId();will(returnValue("does-not-exist"));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
@@ -327,6 +331,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockCloudStorageServices[0]).listJobFiles(mockJob);will(throwException(new PortalServiceException("error")));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
@@ -335,6 +340,85 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
 
         String status = jobStatLogReader.getJobStatus(mockJob);
         Assert.assertEquals(job123Status, status);
+    }
+
+    /**
+     * Tests that the status of a job shifts to error if the job submission service loses a job
+     * @throws Exception
+     */
+    @Test
+    public void testGetJobStatus_SubmissionServiceError() throws Exception {
+        final int jobId = 123;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            allowing(mockJob).getId();will(returnValue(jobId));
+            allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
+            allowing(mockJob).getStatus();will(returnValue(JobBuilderController.STATUS_PROVISION));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+
+            oneOf(mockCloudSubmissionService).isSubmitting(mockJob, mockCloudComputeServices[0]);will(returnValue(false));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+        }});
+
+        String status = jobStatLogReader.getJobStatus(mockJob);
+        Assert.assertEquals(JobBuilderController.STATUS_ERROR, status);
+    }
+
+    /**
+     * Tests that a job updating underneath us due to the CloudSubmissionService won't erroneously
+     * shift a job to ERROR
+     * @throws Exception
+     */
+    @Test
+    public void testGetJobStatus_SubmissionServiceTransition() throws Exception {
+        final int jobId = 123;
+        final VEGLJob mockJob1 = context.mock(VEGLJob.class, "mockJob1");
+        final VEGLJob mockJob2 = context.mock(VEGLJob.class, "mockJob2");
+        final CloudFileInformation[] jobActiveFiles = new CloudFileInformation[] {
+                new CloudFileInformation("key2/filename", 100L, "http://public.url2/filename"),
+                new CloudFileInformation("key2/filename3", 102L, "http://public.url2/filename3"),
+                new CloudFileInformation("key2/workflow-version.txt", 102L, "http://public.url2/filename3"),
+        };
+
+        context.checking(new Expectations() {{
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob1));
+            allowing(mockJob1).getId();will(returnValue(jobId));
+            allowing(mockJob1).getEmailAddress();will(returnValue(USER_EMAIL));
+            allowing(mockJob1).getStatus();will(returnValue(JobBuilderController.STATUS_PROVISION));
+            allowing(mockJob1).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob1).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob1).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
+            allowing(mockJob1).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
+            allowing(mockJob1).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+
+            //Pretend our job is going to shift to Pending while we are checking everything. Make sure we catch it and then
+            //proceed with a normal Pending - Active job check
+            oneOf(mockCloudSubmissionService).isSubmitting(mockJob1, mockCloudComputeServices[0]);will(returnValue(false));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob2));
+            allowing(mockJob2).getStatus();will(returnValue(JobBuilderController.STATUS_PENDING));
+            allowing(mockJob2).getId();will(returnValue(jobId));
+            allowing(mockJob2).getEmailAddress();will(returnValue(USER_EMAIL));
+            allowing(mockJob2).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob2).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
+            oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob2));will(returnValue(jobActiveFiles));
+            allowing(mockJob2).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
+            allowing(mockJob2).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
+            allowing(mockJob2).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob2).getSubmitDate(); will(returnValue(new Date()));
+            allowing(mockJob2).isWalltimeSet(); will(returnValue(false));
+            allowing(mockJob2).getWalltime(); will(returnValue(null));
+            oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob2);will(returnValue(InstanceStatus.Running));
+        }});
+
+        String status = jobStatLogReader.getJobStatus(mockJob1);
+        Assert.assertEquals(JobBuilderController.STATUS_ACTIVE, status);
     }
 
     /**

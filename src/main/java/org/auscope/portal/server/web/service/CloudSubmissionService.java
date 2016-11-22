@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,7 @@ public class CloudSubmissionService {
     private ConcurrentHashMap<String, Future<?>> submittingJobs;
     private long quotaResubmitTime = QUOTA_RESUBMIT_MINUTES;
     private TimeUnit quotaResubmitUnits = TimeUnit.MINUTES;
+    private Semaphore updateJobSemaphore;
 
     @Autowired
     public CloudSubmissionService(VEGLJobManager jobManager, VGLJobStatusChangeHandler vglJobStatusChangeHandler) {
@@ -51,6 +53,7 @@ public class CloudSubmissionService {
         this.vglJobStatusChangeHandler = vglJobStatusChangeHandler;
         this.submittingJobs = new ConcurrentHashMap<String, Future<?>>();
         this.executor = executor;
+        this.updateJobSemaphore = new Semaphore(1, true);
     }
 
     private String generateKey(VEGLJob job, CloudComputeService cloudComputeService) {
@@ -77,8 +80,12 @@ public class CloudSubmissionService {
     public void queueSubmission(CloudComputeService cloudComputeService, VEGLJob job, String userDataString) throws PortalServiceException {
         SubmissionRunnable runnable = new SubmissionRunnable(cloudComputeService, job, userDataString, jobManager, vglJobStatusChangeHandler, submittingJobs, executor, quotaResubmitTime, quotaResubmitUnits);
         try {
-            Future<?> future = executor.submit(runnable);
-            submittingJobs.put(generateKey(job, cloudComputeService), future);
+            //Make sure we synchronize so that updates to the job/cache can't start until
+            //this future is properly put in the cache
+            synchronized(submittingJobs) {
+                Future<?> future = executor.submit(runnable);
+                submittingJobs.put(generateKey(job, cloudComputeService), future);
+            }
         } catch (RejectedExecutionException ex) {
             logger.warn("Unable to start thread for submitting job: " + ex.getMessage());
             logger.debug("Exception:", ex);
@@ -102,12 +109,18 @@ public class CloudSubmissionService {
 
     /**
      * Returns true if the specified job is submitting to the specified cloudComputeService.
+     *
+     * Any updates to the internal cache will be synchronized against job status updates so if this
+     * method returns false then you can be certain that the underlying job has been saved to the DB
+     *
      * @param job
      * @param cloudComputeService
      * @return
      */
     public boolean isSubmitting(VEGLJob job, CloudComputeService cloudComputeService) {
-        return submittingJobs.containsKey(generateKey(job, cloudComputeService));
+        synchronized(submittingJobs) {
+            return submittingJobs.containsKey(generateKey(job, cloudComputeService));
+        }
     }
 
     private class SubmissionRunnable implements Runnable {
@@ -137,52 +150,65 @@ public class CloudSubmissionService {
         @Override
         public void run() {
             String instanceId = null;
-            boolean deleteEntry = true;
+            boolean successfulSubmit = false;
+            boolean reschedule = false;
+            Exception caughtException = null;
+
             try {
                 instanceId = cloudComputeService.executeJob(curJob, userDataString);
                 if (StringUtils.isEmpty(instanceId)) {
                     throw new PortalServiceException(String.format("Null/Empty instance ID returned for submission to %1$s for job %2$s",cloudComputeService.getId(), curJob.getId()));
                 }
-
                 logger.debug("Launched instance: " + instanceId);
-                // set reference as instanceId for use when killing a job
-                curJob.setComputeInstanceId(instanceId);
-                String oldJobStatus = curJob.getStatus();
-                curJob.setStatus(JobBuilderController.STATUS_PENDING);
-                jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to Pending. Instance ID:" + instanceId);
-                curJob.setSubmitDate(new Date());
-                jobManager.saveJob(curJob);
-                vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
+
+                successfulSubmit = true;
             } catch(Exception e) {
-                boolean errorState = true;
+                caughtException = e;
+                successfulSubmit = false;
                 if (e instanceof PortalServiceException &&
                     ((PortalServiceException) e).getErrorCorrection() != null &&
                     ((PortalServiceException) e).getErrorCorrection().contains("Quota exceeded")) {
-                        try {
-                            Future<?> newFuture = executor.schedule(this, this.quotaResubmitTime, this.quotaResubmitUnits); //reschedule this to run again in 30 minutes
-                            submittingJobs.put(generateKey(curJob, cloudComputeService), newFuture);
-                            deleteEntry = false;
-                            String oldJobStatus = curJob.getStatus();
-                            curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
-                            jobManager.saveJob(curJob);
-                            jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
-                            vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
-                            errorState = false;
-                        } catch (RejectedExecutionException ex) {
-                            logger.error("Cannot reschedule job submission:" + ex.getMessage());
-                            logger.debug("Exception:", ex);
-                        }
+                    reschedule = true;
                 }
+            }
 
-                if (errorState) {
-                    String oldJobStatus = curJob.getStatus();
+            //Update job status / fire listeners.
+            String oldJobStatus = curJob.getStatus();
+            synchronized(submittingJobs) {
+                if (successfulSubmit) {
+                    //Everything went OK
+                    curJob.setComputeInstanceId(instanceId);
+                    curJob.setStatus(JobBuilderController.STATUS_PENDING);
+                    jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to Pending. Instance ID:" + instanceId);
+                    curJob.setSubmitDate(new Date());
+                    jobManager.saveJob(curJob);
+                    vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
+                    submittingJobs.remove(generateKey(curJob, cloudComputeService));
+                } else if (reschedule) {
+                    //Can't get resources now - reschedule for future run
+                    try {
+                        Future<?> newFuture = executor.schedule(this, this.quotaResubmitTime, this.quotaResubmitUnits); //reschedule this to run again in 30 minutes
+                        submittingJobs.put(generateKey(curJob, cloudComputeService), newFuture);
+                        curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
+                        jobManager.saveJob(curJob);
+                        jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
+                        vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
+                    } catch (RejectedExecutionException ex) {
+                        //This is bad - can't submit more jobs for queue - forced to kill job submission
+                        logger.error("Cannot reschedule job submission:" + ex.getMessage());
+                        logger.debug("Exception:", ex);
+                        curJob.setStatus(JobBuilderController.STATUS_ERROR);
+                        submittingJobs.remove(generateKey(curJob, cloudComputeService));
+                        jobManager.saveJob(curJob);
+                        jobManager.createJobAuditTrail(oldJobStatus, curJob, "Unable to queue job for resubmission: " + ex.getMessage());
+                        vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
+                    }
+                } else {
+                    //Error state
                     curJob.setStatus(JobBuilderController.STATUS_ERROR);
                     jobManager.saveJob(curJob);
-                    jobManager.createJobAuditTrail(oldJobStatus, curJob, e);
+                    jobManager.createJobAuditTrail(oldJobStatus, curJob, caughtException);
                     vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
-                }
-            } finally {
-                if (deleteEntry) {
                     submittingJobs.remove(generateKey(curJob, cloudComputeService));
                 }
             }

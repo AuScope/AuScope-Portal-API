@@ -16,15 +16,19 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.web.controllers.BaseCloudController;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
+import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.springframework.ui.ModelMap;
 
 public class VGLJobStatusAndLogReader extends BaseCloudController implements JobStatusReader {
 
+    private CloudSubmissionService cloudSubmissionService;
 
     public VGLJobStatusAndLogReader(VEGLJobManager jobManager,
             CloudStorageService[] cloudStorageServices,
-            CloudComputeService[] cloudComputeServices) {
+            CloudComputeService[] cloudComputeServices,
+            CloudSubmissionService cloudSubmissionService) {
         super(cloudStorageServices, cloudComputeServices, jobManager);
+        this.cloudSubmissionService = cloudSubmissionService;
     }
 
     /**
@@ -160,6 +164,20 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
             return null;
         }
 
+        //If we are provisioning BUT the cloudSubmissionService has no record of the provisioning then we may have problems
+        CloudComputeService cloudComputeService = getComputeService(job);
+        if (job.getStatus().equals(JobBuilderController.STATUS_PROVISION) &&
+            !cloudSubmissionService.isSubmitting(job, cloudComputeService)) {
+
+            //Just to rule out a possible race condition - get the latest copy of the job from the DB to rule out the possibility
+            //of a state transition occuring since the last refresh (no state transition can occur once isSubmitting returns false)
+            job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role, cloudJob.getEmailAddress());
+            if (job.getStatus().equals(JobBuilderController.STATUS_PROVISION)) {
+                //if after all that we are confident that provisioning has failed AND the status still says provisioning, update to ERROR
+                return JobBuilderController.STATUS_ERROR;
+            }
+        }
+
         //Some states are terminated states, do absolutely nothing
         //Other states are managed by the JobBuilder
         if (job.getStatus().equals(JobBuilderController.STATUS_DONE) ||
@@ -204,7 +222,6 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         if(jobStarted && !jobFinished && job.isWalltimeSet()) {
             if(job.getSubmitDate().getTime() + (job.getWalltime()*60*1000) < new Date().getTime()) {
                 try {
-                    CloudComputeService cloudComputeService = getComputeService(job);
                     cloudComputeService.terminateJob(job);
                     return JobBuilderController.STATUS_WALLTIME_EXCEEDED;
                 } catch(Exception e) {
@@ -215,7 +232,6 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         }
 
         //There is also a possibility that the cloud has had issues booting the VM... lets see what we can dig up
-        CloudComputeService cloudComputeService = getComputeService(job);
         try {
             switch (cloudComputeService.getJobStatus(job)) {
             case Missing:
