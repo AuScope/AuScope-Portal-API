@@ -68,6 +68,7 @@
     </bean>
     
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
+    
     <bean name="VGLJobStatusChangeHandler" class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor">
         <constructor-arg name="anvglProvenanceService" ref="ANVGLProvenanceService"/>
     </bean>

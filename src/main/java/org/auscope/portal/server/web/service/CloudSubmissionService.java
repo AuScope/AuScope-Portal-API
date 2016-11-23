@@ -6,8 +6,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -33,27 +34,44 @@ public class CloudSubmissionService {
     public static final long QUOTA_RESUBMIT_MINUTES = 30;
 
     private final Log logger = LogFactory.getLog(getClass());
+    @Autowired
     private VEGLJobManager jobManager;
-    private ScheduledExecutorService executor;
+    @Autowired
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
+    private ScheduledExecutorService executor;
     private ConcurrentHashMap<String, Future<?>> submittingJobs;
     private long quotaResubmitTime = QUOTA_RESUBMIT_MINUTES;
     private TimeUnit quotaResubmitUnits = TimeUnit.MINUTES;
-    private Semaphore updateJobSemaphore;
 
-    @Autowired
-    public CloudSubmissionService(VEGLJobManager jobManager, VGLJobStatusChangeHandler vglJobStatusChangeHandler) {
-        this(jobManager, vglJobStatusChangeHandler, Executors.newScheduledThreadPool(THREAD_POOL_SIZE));
+    public CloudSubmissionService() {
+        this(Executors.newScheduledThreadPool(THREAD_POOL_SIZE));
     }
 
-    public CloudSubmissionService(VEGLJobManager jobManager,
-            VGLJobStatusChangeHandler vglJobStatusChangeHandler, ScheduledExecutorService executor) {
+    public CloudSubmissionService(ScheduledExecutorService executor) {
         super();
-        this.jobManager = jobManager;
-        this.vglJobStatusChangeHandler = vglJobStatusChangeHandler;
         this.submittingJobs = new ConcurrentHashMap<String, Future<?>>();
         this.executor = executor;
-        this.updateJobSemaphore = new Semaphore(1, true);
+    }
+
+    @PostConstruct
+    public void init() {
+        this.vglJobStatusChangeHandler.getJobStatusLogReader().setCloudSubmissionService(this);
+    }
+
+    public VEGLJobManager getJobManager() {
+        return jobManager;
+    }
+
+    public void setJobManager(VEGLJobManager jobManager) {
+        this.jobManager = jobManager;
+    }
+
+    public VGLJobStatusChangeHandler getVglJobStatusChangeHandler() {
+        return vglJobStatusChangeHandler;
+    }
+
+    public void setVglJobStatusChangeHandler(VGLJobStatusChangeHandler vglJobStatusChangeHandler) {
+        this.vglJobStatusChangeHandler = vglJobStatusChangeHandler;
     }
 
     private String generateKey(VEGLJob job, CloudComputeService cloudComputeService) {

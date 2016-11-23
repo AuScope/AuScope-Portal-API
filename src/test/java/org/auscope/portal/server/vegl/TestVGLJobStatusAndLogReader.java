@@ -50,7 +50,8 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         }});
 
         jobStatLogReader = new VGLJobStatusAndLogReader(mockJobManager,
-                mockCloudStorageServices, mockCloudComputeServices, mockCloudSubmissionService);
+                mockCloudStorageServices, mockCloudComputeServices);
+        jobStatLogReader.setCloudSubmissionService(mockCloudSubmissionService);
     }
 
     /**

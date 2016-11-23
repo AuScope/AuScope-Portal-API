@@ -31,7 +31,9 @@ public class TestCloudSubmissionService extends PortalTestClass {
     @Before
     public void init() {
         executor = Executors.newScheduledThreadPool(1);
-        service = new CloudSubmissionService(mockJobManager, mockVglJobStatusChangeHandler, executor);
+        service = new CloudSubmissionService(executor);
+        service.setJobManager(mockJobManager);
+        service.setVglJobStatusChangeHandler(mockVglJobStatusChangeHandler);
     }
 
     @After

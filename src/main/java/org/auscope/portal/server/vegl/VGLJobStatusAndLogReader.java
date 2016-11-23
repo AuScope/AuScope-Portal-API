@@ -21,13 +21,24 @@ import org.springframework.ui.ModelMap;
 
 public class VGLJobStatusAndLogReader extends BaseCloudController implements JobStatusReader {
 
+
     private CloudSubmissionService cloudSubmissionService;
+
+    public VGLJobStatusAndLogReader() {
+        super(null, null, null);
+    }
 
     public VGLJobStatusAndLogReader(VEGLJobManager jobManager,
             CloudStorageService[] cloudStorageServices,
-            CloudComputeService[] cloudComputeServices,
-            CloudSubmissionService cloudSubmissionService) {
+            CloudComputeService[] cloudComputeServices) {
         super(cloudStorageServices, cloudComputeServices, jobManager);
+    }
+
+    public CloudSubmissionService getCloudSubmissionService() {
+        return cloudSubmissionService;
+    }
+
+    public void setCloudSubmissionService(CloudSubmissionService cloudSubmissionService) {
         this.cloudSubmissionService = cloudSubmissionService;
     }
 
@@ -164,8 +175,13 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
             return null;
         }
 
-        //If we are provisioning BUT the cloudSubmissionService has no record of the provisioning then we may have problems
         CloudComputeService cloudComputeService = getComputeService(job);
+        if (cloudComputeService == null) {
+            log.warn(String.format("No cloud storage service with id '%1$s' for job '%2$s'. cannot update job status", job.getComputeServiceId(), job.getId()));
+            return job.getStatus();
+        }
+
+        //If we are provisioning BUT the cloudSubmissionService has no record of the provisioning then we may have problems
         if (job.getStatus().equals(JobBuilderController.STATUS_PROVISION) &&
             !cloudSubmissionService.isSubmitting(job, cloudComputeService)) {
 
