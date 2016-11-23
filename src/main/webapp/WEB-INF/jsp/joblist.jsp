@@ -64,6 +64,7 @@
 
     <script type="text/javascript" src="js/vegl/widgets/CodeEditorField.js"></script>
     <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
+    <script type="text/javascript" src="js/vegl/models/AuditLog.js"></script>
     <script type="text/javascript" src="js/vegl/models/Job.js"></script>
     <script type="text/javascript" src="js/vegl/models/Series.js"></script>
     <script type="text/javascript" src="js/vegl/models/MachineImage.js"></script>
@@ -88,6 +89,7 @@
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsTree.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobStatusWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/SeriesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/FolderPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobRegisterPanel.js"></script>

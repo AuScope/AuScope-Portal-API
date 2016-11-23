@@ -27,6 +27,7 @@ import org.auscope.portal.jmock.VEGLSeriesMatcher;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.vegl.VGLJobAuditLogDao;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
@@ -50,6 +51,7 @@ public class TestJobListController extends PortalTestClass {
     private FileStagingService mockFileStagingService;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
+    private VGLJobAuditLogDao mockJobAuditLogDao;
     private ANVGLUser mockPortalUser;
     private JobStatusMonitor mockJobStatusMonitor;
     private HttpServletRequest mockRequest;
@@ -70,6 +72,7 @@ public class TestJobListController extends PortalTestClass {
         mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockRequest = context.mock(HttpServletRequest.class);
+        mockJobAuditLogDao = context.mock(VGLJobAuditLogDao.class);
         mockPortalUser = context.mock(ANVGLUser.class);
         mockCloudSubmissionService = context.mock(CloudSubmissionService.class);
         final List<VEGLJob> mockJobs=new ArrayList<>();
@@ -82,7 +85,7 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,"dummy@dummy.com", mockCloudSubmissionService);
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,"dummy@dummy.com", mockCloudSubmissionService, mockJobAuditLogDao);
     }
 
 
@@ -1171,5 +1174,109 @@ public class TestJobListController extends PortalTestClass {
             Assert.assertArrayEquals(data1, fis1Data);
             Assert.assertArrayEquals(data2, fis2Data);
         }
+    }
+
+    /**
+     * Tests requesting instance logs in the best case scenario
+     */
+    @Test
+    public void testGetRawInstanceLogs() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String consoleData = "console\ndata\n";
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+
+            oneOf(mockCloudComputeServices[0]).getConsoleLog(with(mockJob), with(any(Integer.class)));
+            will(returnValue(consoleData));
+        }});
+
+        ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Assert.assertEquals(consoleData, (String)mav.getModel().get("data"));
+    }
+
+    /**
+     * Tests getting instance logs fails with bad service ID
+     */
+    @Test
+    public void testGetRawInstanceLogs_BadService() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getComputeServiceId();will(returnValue("SERVICE-DNE"));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+
+        }});
+
+        ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests requesting instance logs fails gracefully when the underlying service throws an exception
+     */
+    @Test
+    public void testGetRawInstanceLogs_UnableToRequest() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+
+            oneOf(mockCloudComputeServices[0]).getConsoleLog(with(mockJob), with(any(Integer.class)));
+            will(throwException(new PortalServiceException("error")));
+        }});
+
+        ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests requesting instance logs fails gracefully when the underlying service returns null
+     */
+    @Test
+    public void testGetRawInstanceLogs_NullLogs() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+
+            oneOf(mockCloudComputeServices[0]).getConsoleLog(with(mockJob), with(any(Integer.class)));
+            will(returnValue(null));
+        }});
+
+        ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 }
