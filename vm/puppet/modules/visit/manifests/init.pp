@@ -30,7 +30,7 @@ class visit {
     #Strip out any console questions
     exec { "visit-strip":
         cwd => "/mnt",
-        command => "/bin/sed 's/read RESPONSE/RESPONSE=\"yes\"/g' build_visit2_9_2 > build_visit_stripped",
+        command => "/bin/sed 's/read RESPONSE/RESPONSE=\"yes\"/g' build_visit2_11_0 > build_visit_stripped",
         creates => "/mnt/build_visit_stripped",
         timeout => 0,
         require => Exec["visit-dl"],

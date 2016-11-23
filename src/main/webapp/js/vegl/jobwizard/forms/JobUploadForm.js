@@ -250,10 +250,6 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
             params.name = Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'd M Y g:i a'));
         }
 
-        // see ANVGL 35
-        params.computeServiceId = "aws-ec2-compute";
-        params.storageServiceId = "amazon-aws-storage-sydney";
-
         Ext.Ajax.request({
             url : 'secure/updateOrCreateJob.do',
             params : params,

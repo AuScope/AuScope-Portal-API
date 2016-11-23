@@ -30,8 +30,7 @@ public class BaseModelController extends BasePortalController {
      * @return The VEGLJob object on success or null otherwise.
      */
     protected VEGLJob attemptGetJob(Integer jobId, ANVGLUser user) {
-        log.info("Getting job with ID " + jobId);
-
+        log.trace("Getting job with ID " + jobId);
         VEGLJob job = null;
 
         //Check we have a user email

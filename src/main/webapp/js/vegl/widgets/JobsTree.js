@@ -133,6 +133,26 @@ Ext.define('vegl.widgets.JobsTree', {
             }
         });
 
+        this.statusJobAction = new Ext.Action({
+            text: 'Status',
+            iconCls: 'status-icon',
+            scope : this,
+            disabled : true,
+            handler: function() {
+                var selection = this.getSelectionModel().getSelection();
+                if (selection.length > 0) {
+                    var popup = Ext.create('vegl.widgets.JobStatusWindow', {
+                        job: selection[0],
+                        modal: true,
+                        width: 700,
+                        height: 400
+                    });
+
+                    popup.show();
+                }
+            }
+        });
+
         Ext.apply(config, {
             rootVisible: false,
             store : Ext.create('Ext.data.TreeStore', {
@@ -223,6 +243,10 @@ Ext.define('vegl.widgets.JobsTree', {
                             items.push(this.duplicateJobAction);
                         }
 
+                        if (!this.statusJobAction.isDisabled()) {
+                            items.push(this.statusJobAction);
+                        }
+
                         Ext.create('Ext.menu.Menu', {
                             width: 100,
                             items: items
@@ -256,6 +280,7 @@ Ext.define('vegl.widgets.JobsTree', {
             this.duplicateJobAction.setDisabled(true);
             this.submitJobAction.setDisabled(true);
             this.editJobAction.setDisabled(true);
+            this.statusJobAction.setDisabled(true);
         } else if(selections.length > 1) {
         	// Currently only allow deletion of multiple jobs if none are active
         	this.cancelJobAction.setDisabled(true);
@@ -263,12 +288,14 @@ Ext.define('vegl.widgets.JobsTree', {
             this.duplicateJobAction.setDisabled(true);
             this.submitJobAction.setDisabled(true);
             this.editJobAction.setDisabled(true);
+            this.statusJobAction.setDisabled(true);
         } else if (!Ext.isNumber(Number(selections[0].get('id')))) {
             this.cancelJobAction.setDisabled(true);
             this.deleteJobAction.setDisabled(false);
             this.duplicateJobAction.setDisabled(true);
             this.submitJobAction.setDisabled(true);
             this.editJobAction.setDisabled(true);
+            this.statusJobAction.setDisabled(true);
         } else {
             // Change the job available options based on its actual status
             switch(selections[0].get('status')) {
@@ -278,6 +305,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
+                    this.statusJobAction.setDisabled(false);
                     break;
                 case vegl.models.Job.STATUS_UNSUBMITTED:
                     this.cancelJobAction.setDisabled(true);
@@ -285,6 +313,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     this.duplicateJobAction.setDisabled(true);
                     this.submitJobAction.setDisabled(false);
                     this.editJobAction.setDisabled(false);
+                    this.statusJobAction.setDisabled(true);
                     break;
                 case vegl.models.Job.STATUS_ERROR:
                 case vegl.models.Job.STATUS_WALLTIME_EXCEEDED:
@@ -294,6 +323,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
+                    this.statusJobAction.setDisabled(false);
                     break;
                 default:
                     // Job status is STATUS_PENDING
@@ -302,6 +332,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
+                    this.statusJobAction.setDisabled(false);
                     break;
             }
         }
