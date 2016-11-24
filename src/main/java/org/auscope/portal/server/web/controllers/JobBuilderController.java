@@ -13,8 +13,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,13 +37,12 @@ import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
-import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
-import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
+import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.auscope.portal.server.web.service.scm.Toolbox;
@@ -82,11 +79,11 @@ public class JobBuilderController extends BaseCloudController {
     private final Log logger = LogFactory.getLog(getClass());
 
     private FileStagingService fileStagingService;
-    private VGLPollingJobQueueManager vglPollingJobQueueManager;
     private ScmEntryService scmEntryService;
     private ANVGLProvenanceService anvglProvenanceService;
     private String adminEmail = null;
     private String defaultToolbox = null;
+    private CloudSubmissionService cloudSubmissionService;
 
     /**
      * @return the adminEmail
@@ -124,19 +121,19 @@ public class JobBuilderController extends BaseCloudController {
             VEGLJobManager jobManager, FileStagingService fileStagingService,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
             CloudStorageService[] cloudStorageServices,
-            CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
-            VGLPollingJobQueueManager vglPollingJobQueueManager, ScmEntryService scmEntryService,
-            ANVGLProvenanceService anvglProvenanceService) {
+            CloudComputeService[] cloudComputeServices, VGLJobStatusChangeHandler vglJobStatusChangeHandler,
+            ScmEntryService scmEntryService, ANVGLProvenanceService anvglProvenanceService,
+            CloudSubmissionService cloudSubmissionService) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
         this.cloudComputeServices = cloudComputeServices;
         this.vglJobStatusChangeHandler=vglJobStatusChangeHandler;
-        this.vglPollingJobQueueManager = vglPollingJobQueueManager;
         this.scmEntryService = scmEntryService;
         this.anvglProvenanceService = anvglProvenanceService;
         this.adminEmail=adminEmail;
         this.defaultToolbox = defaultToolbox;
+        this.cloudSubmissionService = cloudSubmissionService;
     }
 
 
@@ -857,10 +854,9 @@ public class JobBuilderController extends BaseCloudController {
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);
                             jobManager.saveJob(curJob);
-                            jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to provisioning");
+                            jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to provisioning at " + cloudComputeService.getId());
 
-                            ExecutorService es = Executors.newSingleThreadExecutor();
-                            es.execute(new CloudThreadedExecuteService(cloudComputeService,curJob,userDataString));
+                            cloudSubmissionService.queueSubmission(cloudComputeService, curJob, userDataString);
                             succeeded = true;
                         }
                     }
@@ -907,52 +903,6 @@ public class JobBuilderController extends BaseCloudController {
         } else {
             jobManager.createJobAuditTrail(oldJobStatus, curJob, errorDescription);
             return generateJSONResponseMAV(false, null, errorDescription, errorCorrection);
-        }
-    }
-
-    private class CloudThreadedExecuteService implements Runnable{
-        CloudComputeService cloudComputeService;
-        VEGLJob curJob;
-        String userDataString;
-
-        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString){
-            this.cloudComputeService = cloudComputeService;
-            this.curJob = curJob;
-            this.userDataString = userDataString;
-        }
-
-        @Override
-        public void run() {
-            String instanceId = null;
-            try{
-                instanceId = cloudComputeService.executeJob(curJob, userDataString);
-                logger.info("Launched instance: " + instanceId);
-                // set reference as instanceId for use when killing a job
-                curJob.setComputeInstanceId(instanceId);
-                String oldJobStatus = curJob.getStatus();
-                curJob.setStatus(STATUS_PENDING);
-                jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to Pending");
-                curJob.setSubmitDate(new Date());
-                jobManager.saveJob(curJob);
-
-            } catch(Exception e) {
-                //only for this specific error we wanna queue the job
-                if (e instanceof PortalServiceException &&
-                   ((PortalServiceException) e).getErrorCorrection() != null &&
-                   ((PortalServiceException) e).getErrorCorrection().contains("Quota exceeded")) {
-                    vglPollingJobQueueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
-                    String oldJobStatus = curJob.getStatus();
-                    curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
-                    jobManager.saveJob(curJob);
-                    jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
-                } else {
-                    String oldJobStatus = curJob.getStatus();
-                    curJob.setStatus(JobBuilderController.STATUS_ERROR);
-                    jobManager.saveJob(curJob);
-                    jobManager.createJobAuditTrail(oldJobStatus, curJob, e);
-                    vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
-                }
-            }
         }
     }
 

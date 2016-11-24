@@ -45,10 +45,9 @@ import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobAuditLog;
 import org.auscope.portal.server.vegl.VGLJobAuditLogDao;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
-import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
-import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,7 +86,7 @@ public class JobListController extends BaseCloudController  {
     private VGLJobStatusAndLogReader jobStatusLogReader;
     private JobStatusMonitor jobStatusMonitor;
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
-    private VGLPollingJobQueueManager vglPollingJobQueueManager;
+    private CloudSubmissionService cloudSubmissionService;
     private VGLJobAuditLogDao vglAuditLogDao;
 
     private String adminEmail=null;
@@ -112,39 +111,17 @@ public class JobListController extends BaseCloudController  {
             VGLJobStatusAndLogReader jobStatusLogReader,
             JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
-            VGLPollingJobQueueManager vglPollingJobQueueManager,
             @Value("${HOST.portalAdminEmail}") String adminEmail,
+            CloudSubmissionService cloudSubmissionService,
             VGLJobAuditLogDao vglAuditLogDao) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.jobStatusLogReader = jobStatusLogReader;
         this.jobStatusMonitor = jobStatusMonitor;
-        this.vglPollingJobQueueManager =  vglPollingJobQueueManager;
         this.adminEmail=adminEmail;
+        this.cloudSubmissionService = cloudSubmissionService;
         this.vglAuditLogDao = vglAuditLogDao;
-        this.initializeQueue();
-    }
-
-    protected void initializeQueue() {
-        try{
-
-            if(vglPollingJobQueueManager.getQueue().hasJob()){
-                //a fail safe catch all
-                return;
-            }
-            List<VEGLJob> seriesJobs = jobManager.getInQueueJobs();
-            for(VEGLJob curJob:seriesJobs){
-                CloudComputeService cloudComputeService = getComputeService(curJob);
-                String userDataString = null;
-                userDataString = createBootstrapForJob(curJob);
-                vglPollingJobQueueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
-            }
-        }catch(Exception e){
-            logger.error("Error initializing job queue",e);
-            e.printStackTrace();
-        }
-
     }
 
 //    /**
@@ -338,8 +315,7 @@ public class JobListController extends BaseCloudController  {
                 oldJobStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
             logger.debug("Skipping finished or unsubmitted job "+job.getId());
         }else if(oldJobStatus.equals(JobBuilderController.STATUS_INQUEUE)){
-            VGLQueueJob dummyQueueJobForRemoval = new VGLQueueJob(null,null,job,"",null);
-            vglPollingJobQueueManager.getQueue().remove(dummyQueueJobForRemoval);
+            cloudSubmissionService.dequeueSubmission(job, getComputeService(job));
 
             if (includeAuditTrail) {
                 job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
