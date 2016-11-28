@@ -9,6 +9,9 @@
                              http://www.springframework.org/schema/security/spring-security-4.0.xsd">
 
    <http entry-point-ref="oAuth2EntryPoint">
+        <headers>
+        	<frame-options policy="SAMEORIGIN"/>
+        </headers>
         <intercept-url pattern="/login.html" access="isAuthenticated()"/>
         <intercept-url pattern="/gridsubmit.html" access="isAuthenticated()"/>
         <intercept-url pattern="/jobbuilder.html" access="isAuthenticated()"/>
