@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.auscope.portal.core.services.cloud;
 
@@ -29,15 +29,16 @@ public class SshCloudConnector {
 
     public static final String SSH_USER_NAME = "nci_username";
     public static final String SSH_USER_KEY = "nci_userkey";
+    public static final String SSH_PROJECT_CODE = "nci_projcode";
 
     public SshCloudConnector(String endPoint) {
         this.endPoint= endPoint;
     }
-    
+
     public class ExecResult {
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.lang.Object#toString()
          */
         @Override
@@ -128,7 +129,7 @@ public class SshCloudConnector {
     public ExecResult executeCommand(Session session, String command) throws PortalServiceException {
         return executeCommand(session, command, null);
     }
-    
+
     public Session getSession(CloudFileOwner job) throws JSchException {
         JSch jsch = new JSch();
         String prvkey = job.getProperty(SSH_USER_KEY);
@@ -141,13 +142,13 @@ public class SshCloudConnector {
         }
         return session;
     }
-    
+
     public ExecResult executeCommand(Session session, String command, String workingDir) throws PortalServiceException {
         ChannelExec channel = null;
         if(workingDir!=null) {
             command = "cd "+workingDir+"; "+command;
         }
-        
+
         try {
             channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);

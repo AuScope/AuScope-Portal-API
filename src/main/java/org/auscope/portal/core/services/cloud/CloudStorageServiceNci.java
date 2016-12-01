@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.auscope.portal.core.services.cloud;
 
@@ -25,7 +25,11 @@ import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
 /**
+ * Cloud storage service for reading/writing files to NCI's lustre file system over SSH
+ *
+ *
  * @author fri096
+ * @author Josh Vote (CSIRO)
  *
  */
 public class CloudStorageServiceNci extends CloudStorageService {
@@ -38,22 +42,34 @@ public class CloudStorageServiceNci extends CloudStorageService {
         this.sshCloudConnector = new SshCloudConnector(endpoint);
     }
 
-    public static final String JOB_DIR_PREFIX = "/short/gv3/";
+    /**
+     * Gets the full POSIX path to the working directory of the job (where the downloaded files will be stored)
+     * @param job
+     * @return
+     */
+    public String getWorkingJobDirectory(CloudFileOwner job) {
+        return String.format("/short/%1$s/vl-workingdir/%2$s", job.getProperty(SshCloudConnector.SSH_PROJECT_CODE), generateBaseKey(job));
+    }
 
-    public String getJobDirectory(CloudFileOwner job) {
-        return JOB_DIR_PREFIX + job.getProperty(SshCloudConnector.SSH_USER_NAME) + "/vgl/job-" + job.getId();
+    /**
+     * Gets the full POSIX path to the output directory of the job (where the scripts and output files will be stored)
+     * @param job
+     * @return
+     */
+    public String getOutputJobDirectory(CloudFileOwner job) {
+        return String.format("/g/data/%1$s/vl-jobs/%2$s", job.getProperty(SshCloudConnector.SSH_PROJECT_CODE), generateBaseKey(job));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.auscope.portal.core.services.cloud.CloudStorageService#getJobFile(org
      * .auscope.portal.core.cloud.CloudFileOwner, java.lang.String)
      */
     @Override
     public InputStream getJobFile(CloudFileOwner job, String fileName) throws PortalServiceException {
-        String fullPath = getJobDirectory(job) + "/" + fileName;
+        String fullPath = getOutputJobDirectory(job) + "/" + fileName;
         try {
             Session session = sshCloudConnector.getSession(job);
             Channel channel = session.openChannel("sftp");
@@ -67,14 +83,14 @@ public class CloudStorageServiceNci extends CloudStorageService {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.auscope.portal.core.services.cloud.CloudStorageService#listJobFiles(
      * org.auscope.portal.core.cloud.CloudFileOwner)
      */
     @Override
     public CloudFileInformation[] listJobFiles(CloudFileOwner job) throws PortalServiceException {
-        String fullPath = getJobDirectory(job);
+        String fullPath = getOutputJobDirectory(job);
         Session session = null;
         Channel channel = null;
         try {
@@ -118,20 +134,20 @@ public class CloudStorageServiceNci extends CloudStorageService {
                 channel.rm(entryFullPath);
             }
         }
-        
+
         channel.rmdir(path);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.auscope.portal.core.services.cloud.CloudStorageService#deleteJobFiles
      * (org.auscope.portal.core.cloud.CloudFileOwner)
      */
     @Override
     public void deleteJobFiles(CloudFileOwner job) throws PortalServiceException {
-        String fullPath = getJobDirectory(job);
+        String fullPath = getWorkingJobDirectory(job);
         Session session = null;
         Channel channel = null;
 
@@ -156,14 +172,14 @@ public class CloudStorageServiceNci extends CloudStorageService {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.auscope.portal.core.services.cloud.CloudStorageService#
      * getJobFileMetadata(org.auscope.portal.core.cloud.CloudFileOwner,
      * java.lang.String)
      */
     @Override
     public CloudFileInformation getJobFileMetadata(CloudFileOwner job, String fileName) throws PortalServiceException {
-        String fullPath = getJobDirectory(job)+"/"+fileName;
+        String fullPath = getWorkingJobDirectory(job)+"/"+fileName;
         Session session = null;
         Channel channel = null;
         try {
@@ -187,32 +203,32 @@ public class CloudStorageServiceNci extends CloudStorageService {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.auscope.portal.core.services.cloud.CloudStorageService#uploadJobFiles
      * (org.auscope.portal.core.cloud.CloudFileOwner, java.io.File[])
      */
     @Override
     public void uploadJobFiles(CloudFileOwner job, File[] files) throws PortalServiceException {
-        String fullPath = getJobDirectory(job);
+        String fullPath = getWorkingJobDirectory(job);
         Session session = null;
         Channel channel = null;
 
         try {
             session = sshCloudConnector.getSession(job);
             sshCloudConnector.createDirectory(session, fullPath);
-            
+
             channel = session.openChannel("sftp");
             channel.connect();
             ChannelSftp c = (ChannelSftp) channel;
             c.cd(fullPath);
-            
+
             for (File file : files) {
                 try (InputStream in= new FileInputStream(file)) {
                     c.put(in, file.getName());
                 } catch (IOException e) {
                     throw new PortalServiceException(e.getMessage(),e);
-                } 
+                }
             }
         } catch (JSchException | SftpException e) {
             throw new PortalServiceException(e.getMessage(), e);

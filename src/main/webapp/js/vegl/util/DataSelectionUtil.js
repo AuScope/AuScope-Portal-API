@@ -39,7 +39,7 @@ Ext.define('vegl.util.DataSelectionUtil', {
             description : or.get('description'),
             url : or.get('url'),
             method : 'POST',
-            localPath : '/root/' + or.get('name'),
+            localPath : './' + or.get('name'),
             crs : (defaultBbox ? defaultBbox.crs : ''),
             eastBoundLongitude : (defaultBbox ? defaultBbox.eastBoundLongitude : 0),
             northBoundLatitude : (defaultBbox ? defaultBbox.northBoundLatitude : 0),
