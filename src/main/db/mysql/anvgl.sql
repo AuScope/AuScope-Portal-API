@@ -154,3 +154,15 @@ CREATE TABLE `signatures` (
      REFERENCES users(`email`)
      ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE `nci_details` (
+  `id` int(11) NOT NULL,
+  `user` varchar(128) DEFAULT NULL,
+  `nci_username` blob DEFAULT NULL,
+  `nci_key` blob DEFAULT NULL,
+  `nci_project` blob DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user`)
+     REFERENCES users(`id`)
+     ON DELETE CASCADE ON UPDATE CASCADE
+);

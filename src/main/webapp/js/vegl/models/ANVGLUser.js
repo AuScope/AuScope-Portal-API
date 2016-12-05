@@ -12,6 +12,8 @@ Ext.define('vegl.models.ANVGLUser', {
         { name: 'arnStorage', type: 'string' }, //Amazon resource name for storage
         { name: 'acceptedTermsConditions', type: 'int' }, //The last version of the T&C's the user accepted
         { name: 'awsKeyName', type: 'string' }, //Amazon key name to be used for started VMs (or null)
+        { name: 'nciUsername', type: 'string' }, //NCI username (or null)
+        { name: 'nciKey', type: 'string' }, //NCI key (or null)
     ],
 
     idProperty : 'id'
