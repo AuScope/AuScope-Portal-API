@@ -1160,7 +1160,7 @@ public class TestJobListController extends PortalTestClass {
 
                     // We should have 1 call to our job manager to create a job
                     // audit trail record
-                    oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)),
+                    oneOf(mockJobManager).createJobAuditTrail(with(aNull(String.class)), with(any(VEGLJob.class)),
                             with(any(String.class)));
                 }
             });

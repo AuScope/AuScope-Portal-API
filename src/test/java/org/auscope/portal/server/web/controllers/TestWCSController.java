@@ -59,7 +59,7 @@ public class TestWCSController extends PortalTestClass {
             WCSController controller = new WCSController(wcsService);
             controller.downloadWCSAsZip("url", "layer", "GeoTIFF", "inputCrs", 1, 1, null, null, "outputCrs", 1, 2, 3, 4, timePositions, null, null, null, null , mockResponse);
             Assert.fail("Should've failed to parse time");
-        } catch (ParseException ex) { 
+        } catch (ParseException ex) {
             // empty
         }
 
@@ -68,7 +68,7 @@ public class TestWCSController extends PortalTestClass {
             WCSController controller = new WCSController(wcsService);
             controller.downloadWCSAsZip("url", "layer", "GeoTIFF", "inputCrs", 1, 1, null, null, "outputCrs", 1, 2, 3, 4, timePositions, null, null, null, null , mockResponse);
             Assert.fail("Should've failed to parse time");
-        } catch (ParseException ex) { 
+        } catch (ParseException ex) {
             // empty
         }
     }
@@ -80,7 +80,7 @@ public class TestWCSController extends PortalTestClass {
             WCSController controller = new WCSController(wcsService);
             controller.downloadWCSAsZip("url", "layer", "GeoTIFF", "inputCrs", 1, 1, null, null, "outputCrs", 1, 2, 3, 4, null, null, null, null, customParamValue , mockResponse);
             Assert.fail("Should've failed to parse custom params");
-        } catch (IllegalArgumentException ex) { 
+        } catch (IllegalArgumentException ex) {
             // empty
         }
 
@@ -89,7 +89,7 @@ public class TestWCSController extends PortalTestClass {
             WCSController controller = new WCSController(wcsService);
             controller.downloadWCSAsZip("url", "layer", "GeoTIFF", "inputCrs", 1, 1, null, null, "outputCrs", 1, 2, 3, 4, null, null, null, null, customParamValue , mockResponse);
             Assert.fail("Should've failed to parse custom params");
-        } catch (IllegalArgumentException ex) { 
+        } catch (IllegalArgumentException ex) {
             // empty
         }
 
@@ -134,11 +134,11 @@ public class TestWCSController extends PortalTestClass {
                     with(layerName),
                     with(format),
                     with(equal(new Dimension(outputWidth, outputHeight))),
-                    with((Resolution) null),
+                    with(aNull(Resolution.class)),
                     with(outputCrs),
                     with(inputCrs),
                     with(any(CSWGeographicBoundingBox.class)),
-                    with(any(TimeConstraint.class)),
+                    with(aNull(TimeConstraint.class)),
                     with(aMap(new String[] {"param1", "param2"}, new String[] {"1/2/3,5", "4"})));
             will(returnValue(new ByteArrayInputStream(geotiffData)));
 
