@@ -81,5 +81,4 @@
         <beans:property name="oAuth2UserInfoProvider" ref="oAuth2DefaultUserInfoProvider"/>
     </beans:bean>
 
-
 </beans:beans>

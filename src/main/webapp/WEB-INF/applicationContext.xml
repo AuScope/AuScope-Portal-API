@@ -322,6 +322,10 @@
     <bean id="anvglUserDao" class="org.auscope.portal.server.web.security.ANVGLUserDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
+    
+    <bean id="nciDetailsDao" class="org.auscope.portal.server.web.security.NCIDetailsDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
+    </bean>
 
     <bean id="veglSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
@@ -335,6 +339,7 @@
                 <value>vglsignature.hbm.xml</value>
                 <value>anvgluser.hbm.xml</value>
                 <value>anvglauthority.hbm.xml</value>
+                <value>ncidetails.hbm.xml</value>
                 <value>scmentrysnapshot.hbm.xml</value>
             </list>
         </property>
