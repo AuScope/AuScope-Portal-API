@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileOwner;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.server.web.security.NCIDetails;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -26,10 +27,6 @@ public class SshCloudConnector {
     private final Log logger = LogFactory.getLog(getClass());
 
     private String endPoint;
-
-    public static final String SSH_USER_NAME = "nci_username";
-    public static final String SSH_USER_KEY = "nci_userkey";
-    public static final String SSH_PROJECT_CODE = "nci_projcode";
 
     public SshCloudConnector(String endPoint) {
         this.endPoint= endPoint;
@@ -130,17 +127,36 @@ public class SshCloudConnector {
         return executeCommand(session, command, null);
     }
 
-    public Session getSession(CloudFileOwner job) throws JSchException {
-        JSch jsch = new JSch();
-        String prvkey = job.getProperty(SSH_USER_KEY);
-        jsch.addIdentity(new IdentityString(jsch, prvkey), null);
-        String userName = job.getProperty(SSH_USER_NAME);
-        Session session = jsch.getSession(userName, endPoint, 22);
-        session.setConfig("StrictHostKeyChecking", "no");
-        if (!session.isConnected()) {
-            session.connect();
+    /**
+     * Retrieves the session for the specified Job. If the session hasn't been connected yet it will be
+     * switched to the appropriate project using switchproj
+     * @param job
+     * @return
+     * @throws PortalServiceException
+     */
+    public Session getSession(CloudFileOwner job) throws PortalServiceException {
+        try {
+            JSch jsch = new JSch();
+            String prvkey = job.getProperty(NCIDetails.PROPERTY_NCI_KEY);
+            jsch.addIdentity(new IdentityString(jsch, prvkey), null);
+            String userName = job.getProperty(NCIDetails.PROPERTY_NCI_USER);
+            Session session = jsch.getSession(userName, endPoint, 22);
+            session.setConfig("StrictHostKeyChecking", "no");
+            if (!session.isConnected()) {
+                session.connect();
+                ExecResult switchResult = executeCommand(session, "switchproj " + job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT));
+                if (switchResult.getExitStatus() != 0) {
+                    throw new PortalServiceException("Unable to switch to project: " + job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT) + " for job " + job.getId() + ":" + switchResult.getErr());
+                }
+            }
+
+            return session;
+        } catch (JSchException ex) {
+            logger.error("Unable to retrieve SSH session for job " + job.getId() + ":" + ex.getMessage());
+            logger.debug("Exception:", ex);
+            throw new PortalServiceException("Unable to retrieve SSH session for job " + job.getId(), ex);
         }
-        return session;
+
     }
 
     public ExecResult executeCommand(Session session, String command, String workingDir) throws PortalServiceException {

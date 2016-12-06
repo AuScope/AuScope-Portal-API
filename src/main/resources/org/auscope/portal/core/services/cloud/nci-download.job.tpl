@@ -19,6 +19,9 @@ export VL_JOB_ID="{1}"
 export VL_WORKING_DIR="{2}"
 export VL_OUTPUT_DIR="{3}"
 export VL_TERMINATION_FILE="vl.end"
+export VL_JOBID_FILE="$VL_OUTPUT_DIR/vl.jobid"
+
+echo $PBS_JOBID > $VL_JOBID_FILE
 
 # Set our workflow version to indicate that the job is running
 echo "$VL_WORKFLOW_VERSION" > "$VL_OUTPUT_DIR/workflow-version.txt" || finish 2 "ERROR: Set workflow version in $VL_WORKING_DIR/workflow-version.txt"
@@ -38,5 +41,7 @@ echo "#### Download end ####"
 
 
 # Submit our actual processing job
-cd "$VL_OUTPUT_DIR" || finish 2 "ERROR: Unable to return to $VL_OUTPUT_DIR" 
-qsub nci-run.job
+cd "$VL_OUTPUT_DIR" || finish 2 "ERROR: Unable to return to $VL_OUTPUT_DIR"
+RAWID=`qsub nci-run.job`
+echo "${RAWID%.*}" > $VL_JOBID_FILE
+

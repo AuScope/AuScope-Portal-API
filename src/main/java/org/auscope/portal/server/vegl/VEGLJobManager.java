@@ -7,6 +7,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetails;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 
 /**
  * Class that talks to the data objects to retrieve or save data
@@ -22,17 +24,22 @@ public class VEGLJobManager {
     private VEGLSeriesDao veglSeriesDao;
     private VGLJobAuditLogDao vglJobAuditLogDao;
     private VGLSignatureDao vglSignatureDao;
+    private NCIDetailsDao nciDetailsDao;
+    private String nciEncryptionKey;
 
     public List<VEGLSeries> querySeries(String user, String name, String desc) {
         return veglSeriesDao.query(user, name, desc);
     }
 
     public List<VEGLJob> getSeriesJobs(int seriesId, ANVGLUser user) {
-        return veglJobDao.getJobsOfSeries(seriesId, user);
+        List<VEGLJob> jobs = veglJobDao.getJobsOfSeries(seriesId, user);
+        return applyNCIDetails(jobs, user);
     }
 
     public List<VEGLJob> getUserJobs(ANVGLUser user) {
-        return veglJobDao.getJobsOfUser(user);
+
+        List<VEGLJob> jobs = veglJobDao.getJobsOfUser(user);
+        return applyNCIDetails(jobs, user);
     }
 
     public List<VEGLJob> getPendingOrActiveJobs() {
@@ -44,7 +51,7 @@ public class VEGLJobManager {
     }
 
     public VEGLJob getJobById(int jobId, ANVGLUser user) {
-        return veglJobDao.get(jobId, user);
+        return applyNCIDetails(veglJobDao.get(jobId, user), user);
     }
 
     public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role, String userEmail) {
@@ -147,6 +154,47 @@ public class VEGLJobManager {
 
     public void setVglSignatureDao(VGLSignatureDao vglSignatureDao) {
         this.vglSignatureDao = vglSignatureDao;
+    }
+
+    public NCIDetailsDao getNciDetailsDao() {
+        return nciDetailsDao;
+    }
+
+    public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
+        this.nciDetailsDao = nciDetailsDao;
+    }
+
+    public void setNciEncryptionKey(String nciEncryptionKey) {
+        this.nciEncryptionKey = nciEncryptionKey;
+    }
+
+    private VEGLJob applyNCIDetails(VEGLJob job, NCIDetails nciDetails) {
+        if (nciDetails != null) {
+            try {
+                nciDetails.applyToJobProperties(job, nciEncryptionKey);
+            } catch (Exception e) {
+                logger.error("Unable to apply nci details to job:", e);
+                throw new RuntimeException("Unable to decrypt NCI Details", e);
+            }
+        }
+
+        return job;
+    }
+
+    private VEGLJob applyNCIDetails(VEGLJob job, ANVGLUser user) {
+        return applyNCIDetails(job, nciDetailsDao.getByUser(user));
+    }
+
+    private List<VEGLJob> applyNCIDetails(List<VEGLJob> jobs, ANVGLUser user) {
+        NCIDetails nciDetails = nciDetailsDao.getByUser(user);
+
+        if (nciDetails != null) {
+            for (VEGLJob job: jobs) {
+                applyNCIDetails(job, nciDetails);
+            }
+        }
+
+        return jobs;
     }
 
 }
