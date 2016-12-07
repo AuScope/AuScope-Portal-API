@@ -128,8 +128,7 @@ public class SshCloudConnector {
     }
 
     /**
-     * Retrieves the session for the specified Job. If the session hasn't been connected yet it will be
-     * switched to the appropriate project using switchproj
+     * Retrieves the session for the specified Job.
      * @param job
      * @return
      * @throws PortalServiceException
@@ -144,10 +143,6 @@ public class SshCloudConnector {
             session.setConfig("StrictHostKeyChecking", "no");
             if (!session.isConnected()) {
                 session.connect();
-                ExecResult switchResult = executeCommand(session, "switchproj " + job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT));
-                if (switchResult.getExitStatus() != 0) {
-                    throw new PortalServiceException("Unable to switch to project: " + job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT) + " for job " + job.getId() + ":" + switchResult.getErr());
-                }
             }
 
             return session;
@@ -191,7 +186,11 @@ public class SshCloudConnector {
     }
 
     public void createDirectory(Session session, String dirName) throws PortalServiceException {
-        ExecResult res = executeCommand(session, "mkdir -p " + dirName);
+        String command = "mkdir -p " + dirName;
+        ExecResult res = executeCommand(session, command);
+        if (res.getExitStatus() > 0) {
+            throw new PortalServiceException("command '" + command + "' returned status" + res.getExitStatus() + " : stderr: " + res.getErr());
+        }
     }
 
 

@@ -34,6 +34,7 @@ cp "$VL_OUTPUT_DIR/*" "$PBS_JOBFS" || finish 2 "ERROR: Unable to copy data from 
 cd "$PBS_JOBFS" || finish 2 "ERROR: Unable to access job filesystem at $PBS_JOBFS"
 
 # Load Modules
+module purge
 {8}
 
 # Emulate our "cloud" command line tool

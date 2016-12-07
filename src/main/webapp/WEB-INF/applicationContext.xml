@@ -223,6 +223,13 @@
         <property name="authVersion" value="2.0"/>
         <property name="stsRequirement" value="ForceNone"/>
     </bean>
+    
+    <bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageServiceNci">
+        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
+        <constructor-arg name="provider" value="nci-raijin"/>
+        <property name="name" value="National Computing Infrastructure - Raijin"/>
+        <property name="id" value="nci-raijin-storage"/>
+    </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
 
@@ -273,6 +280,13 @@
         <property name="groupName" value ="vl-#{inetAddress.hostName.toLowerCase()}"/>
         <property name="keypair" value="vgl-developers"/>
     </bean>
+    
+    <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNci">
+        <constructor-arg name="storageService" ref="cloudStorageService-nci"/>
+        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
+        <property name="name" value="National Computing Infrastructure - Raijin"/>
+        <property name="id" value="nci-raijin-compute"/>
+    </bean>
 
     <bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">
         <constructor-arg name="stagingInformation">
@@ -301,6 +315,8 @@
         <property name="veglSeriesDao" ref="veglSeriesDao"/>
         <property name="vglJobAuditLogDao" ref="vglJobAuditLogDao"/>
         <property name="vglSignatureDao" ref="vglSignatureDao"/>
+        <property name="nciDetailsDao" ref="nciDetailsDao"/>
+        <property name="nciEncryptionKey" value="${env.nci.encryption.128bitkey}"/>
     </bean>
 
     <bean id="veglJobDao" class="org.auscope.portal.server.vegl.VEGLJobDao">
