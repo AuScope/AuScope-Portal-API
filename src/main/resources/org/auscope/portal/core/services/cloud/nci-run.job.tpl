@@ -6,19 +6,22 @@
 #PBS -l jobfs={7}
 #PBS -l ncpus={5}
 #PBS -l wd
-#PBS Join_Path=oe
-#PBS Output_Path={3}/vl.sh.log
+#PBS -j oe
+#PBS -o {3}/vl.sh.log
 
 # This batch file is expected to be copied into and then run directly from the VL_OUTPUT_DIR
-# It is responsible for running the user's job script in an environment with all modules loaded
+# It is responsible for running the users job script in an environment with all modules loaded
 # and data downloaded. The script will write all pertinent output files to  VL_OUTPUT_DIR
 source nci-util.sh
+
+# Preserve our download logs
+cat "{3}/.download.log"
 
 export VL_PROJECT_ID="{0}"
 export VL_JOB_ID="{1}"
 export VL_WORKING_DIR="{2}"
 export VL_OUTPUT_DIR="{3}"
-export VL_TERMINATION_FILE="vl.end"
+export VL_TERMINATION_FILE="$VL_OUTPUT_DIR/vl.end"
 
 echo "#### Environment start ####"
 echo "VL_PROJECT_ID = $VL_PROJECT_ID"
@@ -29,8 +32,8 @@ echo "VL_TERMINATION_FILE = $VL_TERMINATION_FILE"
 echo "#### Environment end ####"
 
 # Move our working data to the job node file system
-cp "$VL_WORKING_DIR/*" "$PBS_JOBFS" || finish 2 "ERROR: Unable to copy data from $VL_WORKING_DIR to job filesystem at $PBS_JOBFS"
-cp "$VL_OUTPUT_DIR/*" "$PBS_JOBFS" || finish 2 "ERROR: Unable to copy data from $VL_OUTPUT_DIR to job filesystem at $PBS_JOBFS"
+cp -r "$VL_WORKING_DIR/." "$PBS_JOBFS" || finish 2 "ERROR: Unable to copy data from $VL_WORKING_DIR to job filesystem at $PBS_JOBFS"
+cp -r "$VL_OUTPUT_DIR/." "$PBS_JOBFS" || finish 2 "ERROR: Unable to copy data from $VL_OUTPUT_DIR to job filesystem at $PBS_JOBFS"
 cd "$PBS_JOBFS" || finish 2 "ERROR: Unable to access job filesystem at $PBS_JOBFS"
 
 # Load Modules
@@ -39,7 +42,7 @@ module purge
 
 # Emulate our "cloud" command line tool
 export PATH="$PBS_JOBFS:$PATH"
-echo 'cp "$2" "$VL_OUTPUT_DIR/$2"' > cloud
+echo ''cp "$2" "$VL_OUTPUT_DIR/$2"'' > cloud
 chmod +x cloud
 
 # Run User Script

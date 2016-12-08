@@ -38,7 +38,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
      */
     public static final long STATUS_PENDING_SECONDS = 30;
 
-    public static final String JOB_ID_FILE = "vl.jobid";
+    public static final String JOB_ID_FILE = ".jobid";
 
     @SuppressWarnings("unused")
     private final Log logger = LogFactory.getLog(getClass());
@@ -154,7 +154,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
             extractParamFromComputeType("ncpus", job.getComputeInstanceType()),
             extractParamFromComputeType("mem", job.getComputeInstanceType()),
             extractParamFromComputeType("jobfs", job.getComputeInstanceType()),
-            "module load escript/5.0\nmodule load openmpi/2.0.0\nmodule load python/2.7.11-matplotlib\nmodule load visit/2.8.1p" //TODO: Extract these from the solution centre
+            "module load escript/5.0\nmodule load visit/2.8.1p" //TODO: Extract these from the solution centre
         });
 
         //storageService.uploadJobFile(job, files);
@@ -181,9 +181,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
                 throw new PortalServiceException("Could not submit job file: " + res.getErr());
             }
 
-            String stdOut = res.getOut();
-            String[] parts = stdOut.split(".");
-            return parts[0];
+            return res.getOut();
         } catch (IOException e) {
             throw new PortalServiceException("Error executing job " + job.getId(), e);
         } finally {

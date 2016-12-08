@@ -102,6 +102,10 @@ public class CloudStorageServiceNci extends CloudStorageService {
             Vector<LsEntry> files = c.ls(fullPath);
             ArrayList<CloudFileInformation> res = new ArrayList<>(files.size());
             for (LsEntry entry : files) {
+                String fileName = entry.getFilename();
+                if (fileName.startsWith(".")) {
+                    continue;
+                }
                 res.add(new CloudFileInformation(entry.getFilename(), entry.getAttrs().getSize(), null));
             }
             return res.toArray(new CloudFileInformation[0]);

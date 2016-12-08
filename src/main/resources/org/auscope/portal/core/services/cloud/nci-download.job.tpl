@@ -5,8 +5,9 @@
 #PBS -l mem=300MB
 #PBS -l ncpus=1
 #PBS -l wd
-#PBS Join_Path=oe
-#PBS Output_Path={3}/vl.sh.log
+#PBS -j oe
+#PBS -k oe
+#PBS -o {3}/vl.sh.log
 
 # This batch file is expected to be copied into and then run directly from the VL_OUTPUT_DIR
 # It is responsible for downloading all remote data services into the working directory
@@ -14,12 +15,14 @@
 
 source nci-util.sh
 
+echo "#### Download Environment start ####"
 export VL_PROJECT_ID="{0}"
 export VL_JOB_ID="{1}"
 export VL_WORKING_DIR="{2}"
 export VL_OUTPUT_DIR="{3}"
-export VL_TERMINATION_FILE="vl.end"
-export VL_JOBID_FILE="$VL_OUTPUT_DIR/vl.jobid"
+export VL_TERMINATION_FILE="$VL_OUTPUT_DIR/vl.end"
+export VL_JOBID_FILE="$VL_OUTPUT_DIR/.jobid"
+echo "#### Download Environment start ####"
 
 echo $PBS_JOBID > $VL_JOBID_FILE
 
@@ -39,9 +42,10 @@ totalDownloadTime=`expr $downloadEndTime - $downloadStartTime`
 echo "Total download time was `expr $totalDownloadTime / 3600` hour(s), `expr $totalDownloadTime % 3600 / 60` minutes and `expr $totalDownloadTime % 60` seconds"
 echo "#### Download end ####"
 
+# Save our logs so they arent immediately overwritten by the run job
+cp "$PBS_JOBFS/spool/$PBS_JOBID.OU" "{3}/.download.log"
 
 # Submit our actual processing job
 cd "$VL_OUTPUT_DIR" || finish 2 "ERROR: Unable to return to $VL_OUTPUT_DIR"
-RAWID=`qsub nci-run.job`
-echo "${RAWID%.*}" > $VL_JOBID_FILE
-
+RAWID=`qsub nci-run.job` || finish 3 "ERROR: Unable to submit nci-run.job"
+echo "$'{'RAWID%.*'}'" > $VL_JOBID_FILE

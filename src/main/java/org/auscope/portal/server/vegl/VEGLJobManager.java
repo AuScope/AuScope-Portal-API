@@ -106,7 +106,7 @@ public class VEGLJobManager {
      * @param curJob
      * @param message
      */
-    public void createJobAuditTrail(String oldJobStatus, VEGLJob curJob, Exception exception) {
+    public void createJobAuditTrail(String oldJobStatus, VEGLJob curJob, Throwable exception) {
         String message = ExceptionUtils.getStackTrace(exception);
         if(message.length() > 1000){
             message = message.substring(0,1000);

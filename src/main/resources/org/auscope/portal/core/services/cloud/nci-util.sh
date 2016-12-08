@@ -9,7 +9,6 @@ function finish {
   fi
   
   date > "$VL_TERMINATION_FILE"
-  cloud upload "$VL_TERMINATION_FILE"
 
   if [ "$2" != "" ]
   then
