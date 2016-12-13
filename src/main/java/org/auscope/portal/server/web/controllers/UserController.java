@@ -1,11 +1,19 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
-import java.security.Key;
+import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUserDao;
 import org.auscope.portal.server.web.security.NCIDetails;
@@ -50,21 +59,24 @@ public class UserController extends BasePortalController {
 
     private String tacVersion;
     
-    private String encryptionKey;
+    private String encryptionPassword;
 
     @Autowired
     public UserController(ANVGLUserDao userDao, NCIDetailsDao nciDetailsDao,
             VelocityEngine velocityEngine, 
             @Value("${env.aws.account}") String awsAccount,
             @Value("${termsconditions.version}") String tacVersion,
-            @Value("${env.nci.encryption.128bitkey}") String encryptionKey) {
+            @Value("${env.encryption.password}") String encryptionPassword) throws PortalServiceException {
         super();
+        
+        if(encryptionPassword==null || encryptionPassword.isEmpty())
+            throw new PortalServiceException("Configuration parameter env.encryption.password must not be empty!");
         this.userDao = userDao;
         this.nciDetailsDao = nciDetailsDao;
         this.velocityEngine = velocityEngine;
         this.awsAccount=awsAccount;
         this.tacVersion=tacVersion;
-        this.encryptionKey = encryptionKey;
+        this.encryptionPassword = encryptionPassword;
     }
 
 
@@ -243,21 +255,70 @@ public class UserController extends BasePortalController {
         return generateJSONResponseMAV(true);        
     }
     
-    private byte[] encrypt(String message) throws Exception {
-        byte[] keyBytes = encryptionKey.getBytes();
-        Key key = new SecretKeySpec(keyBytes, "AES");
-        Cipher c = Cipher.getInstance("AES");
-        c.init(Cipher.ENCRYPT_MODE, key);
-        return c.doFinal(message.getBytes());
+    public static final String SECRET_KEY_SPEC = "AES";
+    public static final String CIPHER = "AES/CBC/PKCS5Padding";
+    public static final String PASSWORD_BASED_ALGO = "PBKDF2WithHmacSHA1";
+    public static final int KEY_SIZE = 128;
+    public static final int CRYPTO_ITERATIONS = 1024;
+
+    public static byte[] generateSalt(int size) {
+        byte[] res = new byte[size];
+        SecureRandom r = new SecureRandom();
+        r.nextBytes(res);
+        return res;
+      }
+
+    public String decrypt(byte[] data)
+            throws PortalServiceException {
+        try {
+            String cryptoString = new String(data, StandardCharsets.UTF_8);
+            String[] cyptoInfo = cryptoString.split("@");
+            if(cyptoInfo.length!=3) 
+                throw new PortalServiceException("Invalid crypto info: "+cryptoString);
+            
+            SecretKeyFactory kf = SecretKeyFactory.getInstance(PASSWORD_BASED_ALGO);
+            PBEKeySpec keySpec = new PBEKeySpec(encryptionPassword.toCharArray(), Base64.getDecoder().decode(cyptoInfo[0]),
+                    CRYPTO_ITERATIONS, KEY_SIZE);
+            SecretKey tmp = kf.generateSecret(keySpec);
+
+            byte[] endcoded = tmp.getEncoded();
+            SecretKey key = new SecretKeySpec(endcoded, SECRET_KEY_SPEC);
+
+            Cipher ciph = Cipher.getInstance(CIPHER);
+
+            ciph.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(Base64.getDecoder().decode(cyptoInfo[1])));
+            return  new String(ciph.doFinal(Base64.getDecoder().decode(cyptoInfo[2])), StandardCharsets.UTF_8);
+
+        } catch (GeneralSecurityException e) {
+            throw new PortalServiceException("Decryption error: " + e.getMessage(), e);
+        }
     }
-    
-    private String decrypt(byte[] encryptedText) throws Exception {
-        byte[] keyBytes = encryptionKey.getBytes();
-        Key key = new SecretKeySpec(keyBytes, "AES");
-        Cipher c = Cipher.getInstance("AES");
-        c.init(Cipher.DECRYPT_MODE, key);
-        byte[] decValue = c.doFinal(encryptedText);
-        String decryptedValue = new String(decValue);
-        return decryptedValue;
+
+    public byte[] encrypt(String dataStr) throws PortalServiceException {
+        try {
+            byte[] salt = generateSalt(8);
+            SecretKeyFactory kf = SecretKeyFactory.getInstance(PASSWORD_BASED_ALGO);
+
+            PBEKeySpec keySpec = new PBEKeySpec(encryptionPassword.toCharArray(), salt, CRYPTO_ITERATIONS,
+                    KEY_SIZE);
+
+            SecretKey tmp = kf.generateSecret(keySpec);
+            SecretKey key = new SecretKeySpec(tmp.getEncoded(), SECRET_KEY_SPEC);
+
+            Cipher ciph = Cipher.getInstance(CIPHER);
+
+            ciph.init(Cipher.ENCRYPT_MODE, key);
+            AlgorithmParameters params = ciph.getParameters();
+            byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+
+            byte[] cipherText = ciph.doFinal(dataStr.getBytes(StandardCharsets.UTF_8));
+            String resultString = Base64.getEncoder().encodeToString(salt) + "@" +
+                    Base64.getEncoder().encodeToString(iv) + "@" +
+                    Base64.getEncoder().encodeToString(cipherText);
+            return resultString.getBytes(StandardCharsets.UTF_8);
+        } catch (GeneralSecurityException e) {
+            throw new PortalServiceException("Encryption error: " + e.getMessage(), e);
+        }
     }
+
 }
