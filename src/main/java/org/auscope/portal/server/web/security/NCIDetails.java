@@ -118,7 +118,8 @@ public class NCIDetails implements Serializable {
 
     /**
      * Sets the user's NCI key from an unencrypted keyValue. Encrypts using keyString
-     * @param keyString The actu
+     * @param keyString The actual encryption key to be used
+     * @param keyValue The unencrypted key value to be encrypted using keyString and persisted
      * @throws Exception
      */
     public void setUnencryptedKey(String keyString, String keyValue) throws Exception {

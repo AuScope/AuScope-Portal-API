@@ -6,23 +6,26 @@
 #PBS -l ncpus=1
 #PBS -l wd
 #PBS -j oe
-#PBS -k oe
-#PBS -o {3}/vl.sh.log
+#PBS -N vl{1}
+#PBS -o {3}/.download.log
 
 # This batch file is expected to be copied into and then run directly from the VL_OUTPUT_DIR
 # It is responsible for downloading all remote data services into the working directory
 # And then submitting the actual run job 
 
-source nci-util.sh
-
-echo "#### Download Environment start ####"
 export VL_PROJECT_ID="{0}"
 export VL_JOB_ID="{1}"
 export VL_WORKING_DIR="{2}"
 export VL_OUTPUT_DIR="{3}"
 export VL_TERMINATION_FILE="$VL_OUTPUT_DIR/vl.end"
 export VL_JOBID_FILE="$VL_OUTPUT_DIR/.jobid"
+export VL_WORKFLOW_VERSION="1"
+
 echo "#### Download Environment start ####"
+env
+echo "#### Download Environment end ####"
+
+source nci-util.sh
 
 echo $PBS_JOBID > $VL_JOBID_FILE
 
@@ -41,9 +44,6 @@ downloadEndTime=`date +%s`
 totalDownloadTime=`expr $downloadEndTime - $downloadStartTime`
 echo "Total download time was `expr $totalDownloadTime / 3600` hour(s), `expr $totalDownloadTime % 3600 / 60` minutes and `expr $totalDownloadTime % 60` seconds"
 echo "#### Download end ####"
-
-# Save our logs so they arent immediately overwritten by the run job
-cp "$PBS_JOBFS/spool/$PBS_JOBID.OU" "{3}/.download.log"
 
 # Submit our actual processing job
 cd "$VL_OUTPUT_DIR" || finish 2 "ERROR: Unable to return to $VL_OUTPUT_DIR"

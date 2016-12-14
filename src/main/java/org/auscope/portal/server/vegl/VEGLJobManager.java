@@ -54,8 +54,8 @@ public class VEGLJobManager {
         return applyNCIDetails(veglJobDao.get(jobId, user), user);
     }
 
-    public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role, String userEmail) {
-        return veglJobDao.get(jobId, stsArn, clientSecret, s3Role, userEmail);
+    public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role, String userEmail, String nciUser, String nciProj, String nciKey) {
+        return veglJobDao.get(jobId, stsArn, clientSecret, s3Role, userEmail, nciUser, nciProj, nciKey);
     }
 
     public void deleteJob(VEGLJob job) {
@@ -182,6 +182,9 @@ public class VEGLJobManager {
     }
 
     private VEGLJob applyNCIDetails(VEGLJob job, ANVGLUser user) {
+        if (job == null) {
+            return null;
+        }
         return applyNCIDetails(job, nciDetailsDao.getByUser(user));
     }
 

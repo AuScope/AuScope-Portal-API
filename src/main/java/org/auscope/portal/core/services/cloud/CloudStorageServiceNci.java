@@ -110,7 +110,7 @@ public class CloudStorageServiceNci extends CloudStorageService {
             }
             return res.toArray(new CloudFileInformation[0]);
         } catch (JSchException | SftpException e) {
-            throw new PortalServiceException(e.getMessage(), e);
+            throw new PortalServiceException("Error listing job " + job.getId() + " files at " + fullPath , e);
         } finally {
             if (channel != null) {
                 channel.disconnect();

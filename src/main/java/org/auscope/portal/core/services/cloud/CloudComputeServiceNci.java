@@ -154,7 +154,8 @@ public class CloudComputeServiceNci extends CloudComputeService {
             extractParamFromComputeType("ncpus", job.getComputeInstanceType()),
             extractParamFromComputeType("mem", job.getComputeInstanceType()),
             extractParamFromComputeType("jobfs", job.getComputeInstanceType()),
-            "module load escript/5.0\nmodule load visit/2.8.1p" //TODO: Extract these from the solution centre
+            "module load escript/5.0", //TODO: Extract these from the solution centre
+            "run-escript" //TODO: Extract these from the solution centre
         });
 
         //storageService.uploadJobFile(job, files);
@@ -247,7 +248,8 @@ public class CloudComputeServiceNci extends CloudComputeService {
             session = sshCloudConnector.getSession(job);
             ExecResult res = sshCloudConnector.executeCommand(session, "qcat " + runningJobId);
             if (res.getExitStatus() != 0) {
-                if (res.getOut().contains("Job is not running"))
+                if (res.getOut().contains("Job is not running") ||
+                    res.getOut().contains("Job has finished"))
                     return "";
 
                 throw new PortalServiceException("Could not query job log: "+res.getErr());
