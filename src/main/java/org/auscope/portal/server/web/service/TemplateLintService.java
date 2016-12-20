@@ -16,11 +16,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.aopalliance.reflect.Code;
 import org.apache.commons.logging.Log;
@@ -106,16 +108,23 @@ public class TemplateLintService {
         }
 
         // Run pylint in the temp file's directory
-        BufferedInputStream stdout;
+        String results;
+        String errors;
         try {
             ProcessBuilder pb =
                 new ProcessBuilder("pylint", "-r", "n", "-f", "json",
                                    f.getFileName().toString())
                 .directory(f.getParent().toFile());
 
+            // Start the process, and consume the results immediately so Windows is happy.
             Process p = pb.start();
-            stdout = new BufferedInputStream(p.getInputStream());
-            BufferedReader stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            BufferedReader stdout =
+                new BufferedReader(new InputStreamReader(p.getInputStream()));
+            results = stdout.lines().collect(Collectors.joining("\n"));
+            BufferedReader stderr =
+                new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            errors = stderr.lines().collect(Collectors.joining("\n"));
+
             if (!p.waitFor(DEFAULT_TIMEOUT, TimeUnit.SECONDS)) {
                 // Timed out
                 throw new PortalServiceException(String.format("pylint process failed to complete before {} second timeout elapsed", DEFAULT_TIMEOUT));
@@ -128,11 +137,8 @@ public class TemplateLintService {
             int rv = p.exitValue();
             if (rv == 1 || rv == 32) {
                 logger.error("pylint failed");
-                logger.debug("\npylint stderr:");
-                stderr.lines().forEachOrdered(l -> logger.debug(l));
-                logger.debug("\npylint stdout:");
-                (new BufferedReader(new InputStreamReader(stdout)))
-                    .lines().forEachOrdered(l -> logger.debug(l));
+                logger.debug("\npylint stderr:\n" + errors);
+                logger.debug("\npylint stdout:\n" + results);
                 throw new PortalServiceException(String.format("pylint process returned non-zero exit value: {}", rv));
             }
             else if (rv != 0) {
@@ -147,7 +153,7 @@ public class TemplateLintService {
         }
 
         // Parse results into LintResult objects
-        lints = parsePylintResults(stdout);
+        lints = parsePylintResults(results);
 
         // Clean up
         try {
@@ -166,7 +172,7 @@ public class TemplateLintService {
      * @param input InputStream with results text
      * @return List<LintResult> with issues
      */
-    private List<LintResult> parsePylintResults(InputStream input)
+    private List<LintResult> parsePylintResults(String input)
         throws PortalServiceException
     {
         List<LintResult> lints = new ArrayList<LintResult>();
