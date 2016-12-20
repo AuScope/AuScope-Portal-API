@@ -153,6 +153,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
             case 'txt':
             case 'py':
             case 'sh':
+            case 'job':
             	this.down('#logs').preview(this.job, fileName, record.get('size'), record.get('fileHash'), 'plaintext');
                 break;
             case 'ttl':

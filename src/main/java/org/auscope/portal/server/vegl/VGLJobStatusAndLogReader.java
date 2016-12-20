@@ -16,6 +16,7 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.web.controllers.BaseCloudController;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
+import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.springframework.ui.ModelMap;
 
@@ -167,10 +168,14 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         String stsArn = cloudJob.getProperty(CloudJob.PROPERTY_STS_ARN);
         String clientSecret = cloudJob.getProperty(CloudJob.PROPERTY_CLIENT_SECRET);
         String s3Role = cloudJob.getProperty(CloudJob.PROPERTY_S3_ROLE);
+        String nciUser = cloudJob.getProperty(NCIDetails.PROPERTY_NCI_USER);
+        String nciProj = cloudJob.getProperty(NCIDetails.PROPERTY_NCI_PROJECT);
+        String nciKey = cloudJob.getProperty(NCIDetails.PROPERTY_NCI_KEY);
+
 
         //The service hangs onto the underlying job Object but the DB is the point of truth
         //Make sure we get an updated job object first!
-        VEGLJob job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role, cloudJob.getEmailAddress());
+        VEGLJob job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role, cloudJob.getEmailAddress(), nciUser, nciProj, nciKey);
         if (job == null) {
             return null;
         }
@@ -187,7 +192,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
 
             //Just to rule out a possible race condition - get the latest copy of the job from the DB to rule out the possibility
             //of a state transition occuring since the last refresh (no state transition can occur once isSubmitting returns false)
-            job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role, cloudJob.getEmailAddress());
+            job = jobManager.getJobById(cloudJob.getId(), stsArn, clientSecret, s3Role, cloudJob.getEmailAddress(), nciUser, nciProj, nciKey);
             if (job.getStatus().equals(JobBuilderController.STATUS_PROVISION)) {
                 //if after all that we are confident that provisioning has failed AND the status still says provisioning, update to ERROR
                 return JobBuilderController.STATUS_ERROR;
@@ -216,6 +221,8 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         try {
             results = cloudStorageService.listJobFiles(job);
         } catch (Exception e) {
+            log.error("Error listing job files for job " + job.getId() + ":" + e.getMessage());
+            log.debug("Exception:", e);
             return job.getStatus();
         }
 

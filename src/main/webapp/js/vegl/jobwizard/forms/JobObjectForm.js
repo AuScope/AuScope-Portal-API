@@ -173,6 +173,45 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     text: 'Select a compute resource configuration that is sufficient for your needs.'
                 }]
             },{
+                xtype: 'numberfield',
+                name: 'ncpus',
+                itemId : 'ncpus',
+                fieldLabel: 'Number of CPUs',
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'This will be the number of CPU\'s that the job scripts will request from the HPC.'
+                }],
+                allowBlank: false,
+                disabled: true,
+                hidden: true,
+                value: wizardState.ncpus
+            },{
+                xtype: 'numberfield',
+                name: 'mem',
+                itemId : 'mem',
+                fieldLabel: 'Memory (GB)',
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'How much memory (in GB) should be requested for the running job.'
+                }],
+                allowBlank: false,
+                disabled: true,
+                hidden: true,
+                value: 64
+            },{
+                xtype: 'numberfield',
+                name: 'jobfs',
+                itemId : 'jobfs',
+                fieldLabel: 'Disk Space (GB)',
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'How much working disk space (in GB) should be requested for the running jobs.'
+                }],
+                allowBlank: false,
+                disabled: true,
+                hidden: true,
+                value: 16
+            },{
                 xtype : 'checkboxfield',
                 fieldLabel : 'Email Notification',
                 name: 'emailNotification',
@@ -182,8 +221,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     ptype: 'fieldhelptext',
                     text: 'Tick to receive email notification upon job processing.'
                 }]
-            },
-            {
+            },{
                 xtype: 'checkbox',
                 fieldLabel: 'Set Job Walltime',
                 name: 'setJobWalltime',
@@ -200,8 +238,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 	                	//	Ext.getCmp('walltime').setValue('0');
 	                }
                 }
-            },
-            {
+            },{
             	xtype: 'textfield',
                 name: 'walltime',
                 itemId : 'walltime',
@@ -369,16 +406,31 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         }
 
         this.getComponent('image-combo').clearValue();
-        this.getComponent('resource-combo').clearValue();
-        this.imageStore.getProxy().setExtraParam('computeServiceId', records.get('id'));
-        this.imageStore.load({
-            scope: this,
-            callback: function(records, operation, success) {
-                if (records.length === 1) {
-                    this.getComponent('image-combo').setValue(records[0]);
+        var resourceCombo = this.getComponent('resource-combo');
+        resourceCombo.clearValue();
+
+        if (combo.getValue() === 'nci-raijin-compute') {
+            resourceCombo.setHidden(true).setDisabled(true);
+
+            this.getComponent('ncpus').setHidden(false).setDisabled(false);
+            this.getComponent('jobfs').setHidden(false).setDisabled(false);
+            this.getComponent('mem').setHidden(false).setDisabled(false);
+        } else {
+            resourceCombo.setDisabled(false).setHidden(false);
+            this.getComponent('ncpus').setHidden(true).setDisabled(true);
+            this.getComponent('jobfs').setHidden(true).setDisabled(true);
+            this.getComponent('mem').setHidden(true).setDisabled(true);
+
+            this.imageStore.getProxy().setExtraParam('computeServiceId', records.get('id'));
+            this.imageStore.load({
+                scope: this,
+                callback: function(records, operation, success) {
+                    if (records.length === 1) {
+                        this.getComponent('image-combo').setValue(records[0]);
+                    }
                 }
-            }
-        });
+            });
+        }
     },
 
     /**
@@ -487,9 +539,16 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 // Store selected resource limits into wizard state. These values will be included
                 // in template generation (to ensure valid numbers of CPU's are chosen etc)
                 var computeTypeId = jobObjectFrm.getComponent('resource-combo').getValue();
-                var computeType = jobObjectFrm.computeTypeStore.getById(computeTypeId);
-                wizardState.ncpus = computeType.get('vcpus');
-                wizardState.nrammb = computeType.get('ramMB');
+
+                if (computeTypeId) {
+                    var computeType = jobObjectFrm.computeTypeStore.getById(computeTypeId);
+
+                    wizardState.ncpus = computeType.get('vcpus');
+                    wizardState.nrammb = computeType.get('ramMB');
+                } else {
+                    wizardState.ncpus = jobObjectFrm.getComponent('ncpus').getValue();
+                    wizardState.nrammb = jobObjectFrm.getComponent('mem').getValue();
+                }
 
                 // Don't need to check for data sets at this point since that
                 // was done at the start. Continue with the wizard.
