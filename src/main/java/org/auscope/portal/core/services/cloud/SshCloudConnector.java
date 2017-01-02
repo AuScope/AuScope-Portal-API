@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.auscope.portal.core.services.cloud;
 
@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudFileOwner;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.server.web.security.NCIDetails;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -27,17 +28,14 @@ public class SshCloudConnector {
 
     private String endPoint;
 
-    public static final String SSH_USER_NAME = "nci_username";
-    public static final String SSH_USER_KEY = "nci_userkey";
-
     public SshCloudConnector(String endPoint) {
         this.endPoint= endPoint;
     }
-    
+
     public class ExecResult {
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.lang.Object#toString()
          */
         @Override
@@ -128,26 +126,40 @@ public class SshCloudConnector {
     public ExecResult executeCommand(Session session, String command) throws PortalServiceException {
         return executeCommand(session, command, null);
     }
-    
-    public Session getSession(CloudFileOwner job) throws JSchException {
-        JSch jsch = new JSch();
-        String prvkey = job.getProperty(SSH_USER_KEY);
-        jsch.addIdentity(new IdentityString(jsch, prvkey), null);
-        String userName = job.getProperty(SSH_USER_NAME);
-        Session session = jsch.getSession(userName, endPoint, 22);
-        session.setConfig("StrictHostKeyChecking", "no");
-        if (!session.isConnected()) {
-            session.connect();
+
+    /**
+     * Retrieves the session for the specified Job.
+     * @param job
+     * @return
+     * @throws PortalServiceException
+     */
+    public Session getSession(CloudFileOwner job) throws PortalServiceException {
+        try {
+            JSch jsch = new JSch();
+            String prvkey = job.getProperty(NCIDetails.PROPERTY_NCI_KEY);
+            jsch.addIdentity(new IdentityString(jsch, prvkey), null);
+            String userName = job.getProperty(NCIDetails.PROPERTY_NCI_USER);
+            Session session = jsch.getSession(userName, endPoint, 22);
+            session.setConfig("StrictHostKeyChecking", "no");
+            if (!session.isConnected()) {
+                session.connect();
+            }
+
+            return session;
+        } catch (JSchException ex) {
+            logger.error("Unable to retrieve SSH session for job " + job.getId() + ":" + ex.getMessage());
+            logger.debug("Exception:", ex);
+            throw new PortalServiceException("Unable to retrieve SSH session for job " + job.getId(), ex);
         }
-        return session;
+
     }
-    
+
     public ExecResult executeCommand(Session session, String command, String workingDir) throws PortalServiceException {
         ChannelExec channel = null;
         if(workingDir!=null) {
             command = "cd "+workingDir+"; "+command;
         }
-        
+
         try {
             channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
@@ -174,7 +186,11 @@ public class SshCloudConnector {
     }
 
     public void createDirectory(Session session, String dirName) throws PortalServiceException {
-        ExecResult res = executeCommand(session, "mkdir -p " + dirName);
+        String command = "mkdir -p " + dirName;
+        ExecResult res = executeCommand(session, command);
+        if (res.getExitStatus() > 0) {
+            throw new PortalServiceException("command '" + command + "' returned status" + res.getExitStatus() + " : stderr: " + res.getErr());
+        }
     }
 
 

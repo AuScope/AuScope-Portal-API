@@ -5,6 +5,7 @@ import java.util.List;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetails;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -110,7 +111,7 @@ public class VEGLJobDao extends HibernateDaoSupport {
         job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
         if( job.getEmailAddress() == null || user.getEmail()==null || (!job.getEmailAddress().trim().equalsIgnoreCase(user.getEmail().trim()) ))
             throw new AccessDeniedException("User does not have access to the requested job");
-        
+
         return job;
     }
 
@@ -128,15 +129,18 @@ public class VEGLJobDao extends HibernateDaoSupport {
         getHibernateTemplate().saveOrUpdate(job);
     }
 
-    public VEGLJob get(int id, String stsArn, String clientSecret, String s3Role, String userEmail) {
+    public VEGLJob get(int id, String stsArn, String clientSecret, String s3Role, String userEmail, String nciUser, String nciProj, String nciKey) {
         VEGLJob job = getHibernateTemplate().get(VEGLJob.class, id);
 
         if( job.getEmailAddress() == null || userEmail==null || (!job.getEmailAddress().trim().equalsIgnoreCase(userEmail.trim()) ))
             throw new AccessDeniedException("User does not have access to the requested job");
-        
+
         job.setProperty(CloudJob.PROPERTY_STS_ARN, stsArn);
         job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, clientSecret);
         job.setProperty(CloudJob.PROPERTY_S3_ROLE, s3Role);
+        job.setProperty(NCIDetails.PROPERTY_NCI_USER, nciUser);
+        job.setProperty(NCIDetails.PROPERTY_NCI_PROJECT, nciProj);
+        job.setProperty(NCIDetails.PROPERTY_NCI_KEY, nciKey);
         return job;
     }
 }

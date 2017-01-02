@@ -28,6 +28,7 @@ import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
+import org.auscope.portal.core.services.cloud.CloudComputeServiceNci;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.FileStagingService;
@@ -452,6 +453,9 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="computeServiceId", required=false) String computeServiceId,
             @RequestParam(value="computeVmId", required=false) String computeVmId,
             @RequestParam(value="computeTypeId", required=false) String computeTypeId,
+            @RequestParam(value="ncpus", required=false) Integer ncpus,
+            @RequestParam(value="jobfs", required=false) Integer jobFs,
+            @RequestParam(value="mem", required=false) Integer mem,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
             @RequestParam(value="walltime", required=false) Integer walltime,
@@ -490,9 +494,15 @@ public class JobBuilderController extends BaseCloudController {
         job.setName(name);
         job.setDescription(description);
         job.setComputeVmId(computeVmId);
-        job.setComputeInstanceType(computeTypeId);
         job.setEmailNotification(emailNotification);
         job.setWalltime(walltime);
+
+        //HPC doesn't support compute types - for this case we munge our parameters into a the compute instance type string
+        if (StringUtils.isEmpty(computeTypeId)) {
+            job.setComputeInstanceType(String.format("ncpus=%1$d&jobfs=%2$dgb&mem=%3$dgb", ncpus, jobFs, mem));
+        } else {
+            job.setComputeInstanceType(computeTypeId);
+        }
 
         //Dont allow the user to specify a cloud compute service that DNE
         // Updating the compute service means updating the dev keypair
@@ -508,6 +518,8 @@ public class JobBuilderController extends BaseCloudController {
             CloudStorageService css = null;
             if (ccs instanceof CloudComputeServiceAws) {
                 css = getStorageService("amazon-aws-storage-sydney");
+            } else if (ccs instanceof CloudComputeServiceNci) {
+                css = getStorageService("nci-raijin-storage");
             } else {
                 css = getStorageService("nectar-openstack-storage-melb");
             }

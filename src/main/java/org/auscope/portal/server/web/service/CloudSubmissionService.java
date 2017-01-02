@@ -170,7 +170,7 @@ public class CloudSubmissionService {
             String instanceId = null;
             boolean successfulSubmit = false;
             boolean reschedule = false;
-            Exception caughtException = null;
+            Throwable caughtException = null;
 
             try {
                 instanceId = cloudComputeService.executeJob(curJob, userDataString);
@@ -180,7 +180,7 @@ public class CloudSubmissionService {
                 logger.debug("Launched instance: " + instanceId);
 
                 successfulSubmit = true;
-            } catch(Exception e) {
+            } catch(Throwable e) {
                 caughtException = e;
                 successfulSubmit = false;
                 if (e instanceof PortalServiceException &&
@@ -188,6 +188,9 @@ public class CloudSubmissionService {
                     ((PortalServiceException) e).getErrorCorrection().contains("Quota exceeded")) {
                     reschedule = true;
                 }
+
+                logger.error("Exception when submitting job " + curJob.getId() + ": " + e.getMessage());
+                logger.debug("Exception:", e);
             }
 
             //Update job status / fire listeners.
