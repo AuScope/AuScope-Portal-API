@@ -16,6 +16,7 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.ResourceUtil;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
+import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -71,7 +72,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
@@ -81,6 +82,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Pending));
         }});
@@ -106,7 +110,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
@@ -116,6 +120,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Running));
         }});
@@ -141,7 +148,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
@@ -151,6 +158,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
             oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Missing));
         }});
@@ -177,7 +187,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
@@ -188,6 +198,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
             allowing(mockJob).getSubmitDate(); will(returnValue(new Date()));
             allowing(mockJob).isWalltimeSet(); will(returnValue(false));
             allowing(mockJob).getWalltime(); will(returnValue(null));
@@ -222,7 +235,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
 		downloads.add(download);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(mockJobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(mockJobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(mockJobStatus));
@@ -235,6 +248,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
             oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Missing));
         }});
 
@@ -253,14 +269,17 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, "a", "b", "c", USER_EMAIL, "d", "e", "f");will(returnValue(mockJob));
             oneOf(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
             allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
-            allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
-            allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue("a"));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue("b"));
+            allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue("c"));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue("d"));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue("e"));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue("f"));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -277,12 +296,15 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(null));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(null));
             oneOf(mockJob).getId();will(returnValue(jobId));
             oneOf(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -300,7 +322,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
@@ -309,6 +331,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -327,7 +352,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(job123Status));
@@ -337,6 +362,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -353,7 +381,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob));
             allowing(mockJob).getId();will(returnValue(jobId));
             allowing(mockJob).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob).getStatus();will(returnValue(JobBuilderController.STATUS_PROVISION));
@@ -362,9 +390,12 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
 
             oneOf(mockCloudSubmissionService).isSubmitting(mockJob, mockCloudComputeServices[0]);will(returnValue(false));
-            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob));
         }});
 
         String status = jobStatLogReader.getJobStatus(mockJob);
@@ -388,7 +419,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
         };
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob1));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob1));
             allowing(mockJob1).getId();will(returnValue(jobId));
             allowing(mockJob1).getEmailAddress();will(returnValue(USER_EMAIL));
             allowing(mockJob1).getStatus();will(returnValue(JobBuilderController.STATUS_PROVISION));
@@ -397,11 +428,14 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob1).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob1).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob1).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob1).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob1).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob1).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
 
             //Pretend our job is going to shift to Pending while we are checking everything. Make sure we catch it and then
             //proceed with a normal Pending - Active job check
             oneOf(mockCloudSubmissionService).isSubmitting(mockJob1, mockCloudComputeServices[0]);will(returnValue(false));
-            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL);will(returnValue(mockJob2));
+            oneOf(mockJobManager).getJobById(jobId, null, null, null, USER_EMAIL, null, null, null);will(returnValue(mockJob2));
             allowing(mockJob2).getStatus();will(returnValue(JobBuilderController.STATUS_PENDING));
             allowing(mockJob2).getId();will(returnValue(jobId));
             allowing(mockJob2).getEmailAddress();will(returnValue(USER_EMAIL));
@@ -412,6 +446,9 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob2).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
             allowing(mockJob2).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob2).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
+            allowing(mockJob2).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
+            allowing(mockJob2).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
+            allowing(mockJob2).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
             allowing(mockJob2).getSubmitDate(); will(returnValue(new Date()));
             allowing(mockJob2).isWalltimeSet(); will(returnValue(false));
             allowing(mockJob2).getWalltime(); will(returnValue(null));

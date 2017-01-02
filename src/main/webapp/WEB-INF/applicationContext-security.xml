@@ -172,11 +172,4 @@
     </http>
 -->
 
-    <!-- XXX No bean named ‘springSecurityFilterChain’ is defined -->
-<!-- 
-    <http auto-config='true'>
-        <intercept-url pattern="/**" access="ROLE_USER" />
-    </http>
--->
-
 </beans:beans>

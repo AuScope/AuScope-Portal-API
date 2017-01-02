@@ -2,7 +2,7 @@ package org.auscope.portal.jmock;
 
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.hamcrest.Description;
-import org.junit.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Matcher for matching VEGLJob objects

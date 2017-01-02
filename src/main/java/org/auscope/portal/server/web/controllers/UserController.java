@@ -1,9 +1,12 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.Charsets;
@@ -15,6 +18,8 @@ import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUserDao;
+import org.auscope.portal.server.web.security.NCIDetails;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -24,6 +29,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -37,21 +43,28 @@ public class UserController extends BasePortalController {
     protected final Log logger = LogFactory.getLog(getClass());
 
     private ANVGLUserDao userDao;
+    private NCIDetailsDao nciDetailsDao;
     private VelocityEngine velocityEngine;
 
     private String awsAccount;
 
     private String tacVersion;
+    
+    private String encryptionKey;
 
     @Autowired
-    public UserController(ANVGLUserDao userDao, VelocityEngine velocityEngine, 
+    public UserController(ANVGLUserDao userDao, NCIDetailsDao nciDetailsDao,
+            VelocityEngine velocityEngine, 
             @Value("${env.aws.account}") String awsAccount,
-            @Value("${termsconditions.version}") String tacVersion) {
+            @Value("${termsconditions.version}") String tacVersion,
+            @Value("${env.nci.encryption.128bitkey}") String encryptionKey) {
         super();
         this.userDao = userDao;
+        this.nciDetailsDao = nciDetailsDao;
         this.velocityEngine = velocityEngine;
         this.awsAccount=awsAccount;
         this.tacVersion=tacVersion;
+        this.encryptionKey = encryptionKey;
     }
 
 
@@ -167,5 +180,84 @@ public class UserController extends BasePortalController {
         } catch (IOException e) {
             response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
+    }
+    
+    @RequestMapping("/secure/getNCIDetails.do")
+    public ModelAndView getNCIDetails(@AuthenticationPrincipal ANVGLUser user) {
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+        ModelMap detailsObj = new ModelMap();
+        NCIDetails details = nciDetailsDao.getByUser(user);
+        if(details != null) {
+            try {
+                detailsObj.put("nciUsername", decrypt(details.getUsername()));
+                detailsObj.put("nciProject", decrypt(details.getProject()));
+                detailsObj.put("nciKey", decrypt(details.getKey()));
+            } catch(Exception e) {
+                logger.error("Unable to decrypt NCI details: " + e.getLocalizedMessage());
+            }
+            return generateJSONResponseMAV(true, detailsObj, "");
+        }
+        return generateJSONResponseMAV(false);
+    }
+    
+    @RequestMapping("/secure/setNCIDetails.do")
+    public ModelAndView setNCIDetails(@AuthenticationPrincipal ANVGLUser user,
+            @RequestParam(required=false, value="nciUsername") String username,
+            @RequestParam(required=false, value="nciProject") String project,
+            @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) {
+
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+        NCIDetails details = nciDetailsDao.getByUser(user);
+        if(details == null) {
+            details = new NCIDetails();
+            details.setUser(user);
+        }
+        boolean modified = false;
+        try {
+            if (!StringUtils.isEmpty(username) || !StringUtils.equals(decrypt(details.getUsername()), username)) {
+                details.setUsername(encrypt(username));
+                modified = true;
+            }
+            if (!StringUtils.isEmpty(project) || !StringUtils.equals(decrypt(details.getProject()), project)) {
+                details.setProject(encrypt(project));
+                modified = true;
+            }
+            if (key != null ) {
+                String keyString = key.getFileItem().getString();
+                if (!StringUtils.isEmpty(keyString) || !StringUtils.equals(decrypt(details.getKey()), keyString)) {            
+                    details.setKey(encrypt(keyString));
+                    modified = true;
+                }
+            }
+        } catch(Exception e) {
+            logger.error(e.getLocalizedMessage());
+        }
+            
+        if (modified) {
+            nciDetailsDao.save(details);
+        }
+        return generateJSONResponseMAV(true);        
+    }
+    
+    private byte[] encrypt(String message) throws Exception {
+        byte[] keyBytes = encryptionKey.getBytes();
+        Key key = new SecretKeySpec(keyBytes, "AES");
+        Cipher c = Cipher.getInstance("AES");
+        c.init(Cipher.ENCRYPT_MODE, key);
+        return c.doFinal(message.getBytes());
+    }
+    
+    private String decrypt(byte[] encryptedText) throws Exception {
+        byte[] keyBytes = encryptionKey.getBytes();
+        Key key = new SecretKeySpec(keyBytes, "AES");
+        Cipher c = Cipher.getInstance("AES");
+        c.init(Cipher.DECRYPT_MODE, key);
+        byte[] decValue = c.doFinal(encryptedText);
+        String decryptedValue = new String(decValue);
+        return decryptedValue;
     }
 }

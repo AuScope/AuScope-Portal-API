@@ -1168,7 +1168,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(with(any(VEGLJob.class))); //one save to include updates
 
             //We should have 1 call to our job manager to create a job audit trail record
-            oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)), with(any(String.class)));
+            oneOf(mockJobManager).createJobAuditTrail(with(aNull(String.class)), with(any(VEGLJob.class)), with(any(String.class)));
 
             oneOf(mockCloudComputeServices[0]).getKeypair();
         }});
@@ -1180,6 +1180,9 @@ public class TestJobBuilderController {
                 computeServiceId,
                 computeVmId,
                 computeVmType,
+                null,
+                null,
+                null,
                 null,
                 emailNotification,
                 null,
@@ -1270,6 +1273,9 @@ public class TestJobBuilderController {
                 "computeServiceId",
                 "computeVmId",
                 computeVmType,
+                null,
+                null,
+                null,
                 "registeredUrl",
                 emailNotification,
                 Integer.valueOf(walltime),
@@ -1332,6 +1338,9 @@ public class TestJobBuilderController {
                 "computeServiceId",
                 "computeVmId",
                 computeVmType,
+                null,
+                null,
+                null,
                 "registeredUrl",
                 emailNotification,
                 Integer.valueOf(walltime),
@@ -1429,6 +1438,9 @@ public class TestJobBuilderController {
                 "computeServiceId",
                 "computeVmId",
                 computeVmType,
+                null,
+                null,
+                null,
                 "registeredUrl",
                 emailNotification,
                 walltime,
@@ -1477,6 +1489,9 @@ public class TestJobBuilderController {
                 "computeServiceId",
                 "computeVmId",
                 computeVmType,
+                null,
+                null,
+                null,
                 "registeredUrl",
                 emailNotification,
                 walltime,

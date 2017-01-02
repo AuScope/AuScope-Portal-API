@@ -135,7 +135,7 @@ public class ANVGLUser implements UserDetails {
     public void setAcceptedTermsConditions(Integer acceptedTermsConditions) {
         this.acceptedTermsConditions = acceptedTermsConditions;
     }
-
+    
     @Override
     public String toString() {
         return "ANVGLUser [id=" + id + ", fullName=" + fullName + ", authorities=" + authorities + "]";
