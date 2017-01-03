@@ -194,6 +194,10 @@
         </constructor-arg>
     </bean>
 
+    <bean id="encryption-service" class="org.auscope.portal.server.web.service.VGLCryptoService">
+        <constructor-arg name="encryptionPassword" value="${env.encryption.password}"/>
+    </bean>
+    
     <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
         <constructor-arg name="provider" value="aws-s3"/>
         <constructor-arg name="endpoint"><null/></constructor-arg>
@@ -316,7 +320,6 @@
         <property name="vglJobAuditLogDao" ref="vglJobAuditLogDao"/>
         <property name="vglSignatureDao" ref="vglSignatureDao"/>
         <property name="nciDetailsDao" ref="nciDetailsDao"/>
-        <property name="nciEncryptionKey" value="${env.nci.encryption.128bitkey}"/>
     </bean>
 
     <bean id="veglJobDao" class="org.auscope.portal.server.vegl.VEGLJobDao">
@@ -340,6 +343,7 @@
     </bean>
     
     <bean id="nciDetailsDao" class="org.auscope.portal.server.web.security.NCIDetailsDao">
+        <constructor-arg name="encryptionService" ref="encryption-service"/>
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
 

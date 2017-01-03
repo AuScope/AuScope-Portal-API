@@ -2,23 +2,18 @@ package org.auscope.portal.server.web.security;
 
 import java.io.Serializable;
 
-import org.auscope.portal.core.cloud.CloudJob;
-
-public class NCIDetails implements Serializable {
-
-    private static final long serialVersionUID = -7219385540898450290L;
-
+public class NCIDetailsEnc implements Serializable {
     public final static String PROPERTY_NCI_USER = "nci_user";
     public final static String PROPERTY_NCI_KEY = "nci_key";
     public final static String PROPERTY_NCI_PROJECT = "nci_project";
 
     private Integer id;
     private ANVGLUser user;
-    private String username;
-    private String project;
-    private String key;
+    private byte[] username;
+    private byte[] project;
+    private byte[] key;
 
-    public NCIDetails() {
+    public NCIDetailsEnc() {
         super();
     }
 
@@ -50,7 +45,7 @@ public class NCIDetails implements Serializable {
      * The user's NCI username (encrypted)
      * @return
      */
-    public String getUsername() {
+    public byte[] getUsername() {
         return this.username;
     }
 
@@ -58,7 +53,7 @@ public class NCIDetails implements Serializable {
      * The user's NCI username (encrypted)
      * @param nciUsername
      */
-    public void setUsername(String username) {
+    public void setUsername(byte[] username) {
         this.username = username;
     }
 
@@ -66,7 +61,7 @@ public class NCIDetails implements Serializable {
      * The default project for the NCI user (encrypted)
      * @return
      */
-    public String getProject() {
+    public byte[] getProject() {
         return project;
     }
 
@@ -74,7 +69,7 @@ public class NCIDetails implements Serializable {
      * The default project for the NCI user (encrypted)
      * @param project
      */
-    public void setProject(String project) {
+    public void setProject(byte[] project) {
         this.project = project;
     }
 
@@ -82,7 +77,7 @@ public class NCIDetails implements Serializable {
      * The user's NCI key (encrypted)
      * @return
      */
-    public String getKey() {
+    public byte[] getKey() {
         return this.key;
     }
 
@@ -90,13 +85,8 @@ public class NCIDetails implements Serializable {
      * The user's NCI key (encrypted)
      * @param nciUsername
      */
-    public void setKey(String key) {
+    public void setKey(byte[] key) {
         this.key = key;
     }
 
-    public void applyToJobProperties(CloudJob job) throws Exception {
-        job.setProperty(PROPERTY_NCI_USER, getUsername());
-        job.setProperty(PROPERTY_NCI_PROJECT, getProject());
-        job.setProperty(PROPERTY_NCI_KEY, getKey());
-    }
 }

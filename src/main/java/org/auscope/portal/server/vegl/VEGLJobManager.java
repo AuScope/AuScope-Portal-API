@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.security.NCIDetailsDao;
@@ -25,18 +26,17 @@ public class VEGLJobManager {
     private VGLJobAuditLogDao vglJobAuditLogDao;
     private VGLSignatureDao vglSignatureDao;
     private NCIDetailsDao nciDetailsDao;
-    private String nciEncryptionKey;
 
     public List<VEGLSeries> querySeries(String user, String name, String desc) {
         return veglSeriesDao.query(user, name, desc);
     }
 
-    public List<VEGLJob> getSeriesJobs(int seriesId, ANVGLUser user) {
+    public List<VEGLJob> getSeriesJobs(int seriesId, ANVGLUser user) throws PortalServiceException {
         List<VEGLJob> jobs = veglJobDao.getJobsOfSeries(seriesId, user);
         return applyNCIDetails(jobs, user);
     }
 
-    public List<VEGLJob> getUserJobs(ANVGLUser user) {
+    public List<VEGLJob> getUserJobs(ANVGLUser user) throws PortalServiceException {
 
         List<VEGLJob> jobs = veglJobDao.getJobsOfUser(user);
         return applyNCIDetails(jobs, user);
@@ -50,7 +50,7 @@ public class VEGLJobManager {
         return veglJobDao.getInQueueJobs();
     }
 
-    public VEGLJob getJobById(int jobId, ANVGLUser user) {
+    public VEGLJob getJobById(int jobId, ANVGLUser user) throws PortalServiceException {
         return applyNCIDetails(veglJobDao.get(jobId, user), user);
     }
 
@@ -164,14 +164,10 @@ public class VEGLJobManager {
         this.nciDetailsDao = nciDetailsDao;
     }
 
-    public void setNciEncryptionKey(String nciEncryptionKey) {
-        this.nciEncryptionKey = nciEncryptionKey;
-    }
-
     private VEGLJob applyNCIDetails(VEGLJob job, NCIDetails nciDetails) {
         if (nciDetails != null) {
             try {
-                nciDetails.applyToJobProperties(job, nciEncryptionKey);
+                nciDetails.applyToJobProperties(job);
             } catch (Exception e) {
                 logger.error("Unable to apply nci details to job:", e);
                 throw new RuntimeException("Unable to decrypt NCI Details", e);
@@ -181,14 +177,14 @@ public class VEGLJobManager {
         return job;
     }
 
-    private VEGLJob applyNCIDetails(VEGLJob job, ANVGLUser user) {
+    private VEGLJob applyNCIDetails(VEGLJob job, ANVGLUser user) throws PortalServiceException {
         if (job == null) {
             return null;
         }
         return applyNCIDetails(job, nciDetailsDao.getByUser(user));
     }
 
-    private List<VEGLJob> applyNCIDetails(List<VEGLJob> jobs, ANVGLUser user) {
+    private List<VEGLJob> applyNCIDetails(List<VEGLJob> jobs, ANVGLUser user) throws PortalServiceException {
         NCIDetails nciDetails = nciDetailsDao.getByUser(user);
 
         if (nciDetails != null) {

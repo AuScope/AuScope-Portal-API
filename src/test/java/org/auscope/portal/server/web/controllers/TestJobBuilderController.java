@@ -153,9 +153,10 @@ public class TestJobBuilderController {
 
     /**
      * Tests that retrieving job object succeeds.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testGetJobObject() {
+    public void testGetJobObject() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -170,9 +171,10 @@ public class TestJobBuilderController {
     /**
      * Tests that retrieving job object fails when the
      * underlying job manager's job query service fails.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testGetJobObject_Exception() {
+    public void testGetJobObject_Exception() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -218,9 +220,10 @@ public class TestJobBuilderController {
     /**
      * Tests that the retrieving of job files fails
      * when the job cannot be found.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testListStagedJobFiles_JobNotFound() {
+    public void testListStagedJobFiles_JobNotFound() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -275,9 +278,10 @@ public class TestJobBuilderController {
 
     /**
      * Tests that the deleting of given job files succeeds.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteFiles() {
+    public void testDeleteFiles() throws PortalServiceException {
         final String file1 = "file1.txt";
         final String file2 = "file2.txt";
         final String[] filenames = new String[] { file1, file2 };
@@ -302,9 +306,10 @@ public class TestJobBuilderController {
     /**
      * Tests that the deleting of given job files fails
      * when the job cannot be found.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteFiles_JobNotFoundException() {
+    public void testDeleteFiles_JobNotFoundException() throws PortalServiceException {
         final String file1 = "file1.txt";
         final String file2 = "file2.txt";
         final String[] filenames = new String[] { file1, file2 };
@@ -322,9 +327,10 @@ public class TestJobBuilderController {
 
     /**
      * Tests that the deleting of a given job's download objects succeeds.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteDownloads() {
+    public void testDeleteDownloads() throws PortalServiceException {
         int downloadId1 = 13579;
         int downloadId2 = 23480;
         final Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
@@ -351,9 +357,10 @@ public class TestJobBuilderController {
     /**
      * Tests that the deleting of a given job's download objects fails
      * when job saving fails.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteDownloads_SaveJobException() {
+    public void testDeleteDownloads_SaveJobException() throws PortalServiceException {
         int downloadId1 = 13579;
         int downloadId2 = 23480;
         final Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
@@ -381,9 +388,10 @@ public class TestJobBuilderController {
     /**
      * Tests that the deleting of a given job's download objects fails
      * when the job cannot be found.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteDownloads_JobNotFoundException() {
+    public void testDeleteDownloads_JobNotFoundException() throws PortalServiceException {
         int downloadId1 = 13579;
         int downloadId2 = 23480;
         final Integer[] downloadIds = new Integer[] { downloadId1, downloadId2 };
@@ -478,9 +486,10 @@ public class TestJobBuilderController {
 
     /**
      * Tests that retrieving of a given job's download objects succeeds.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testGetJobDownloads() {
+    public void testGetJobDownloads() throws PortalServiceException {
         final VglDownload[] existingDownloads = new VglDownload[] { new VglDownload(12356) };
         final List<VglDownload> downloadList = new ArrayList<VglDownload>(Arrays.asList(existingDownloads));
 
@@ -502,9 +511,10 @@ public class TestJobBuilderController {
     /**
      * Tests that retrieving of a given job's download objects fails
      * when the given job cannot be found.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testGetJobDownloads_Exception() {
+    public void testGetJobDownloads_Exception() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -518,9 +528,10 @@ public class TestJobBuilderController {
 
     /**
      * Tests that the getting of job status succeeds.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testGetJobStatus() {
+    public void testGetJobStatus() throws PortalServiceException {
         final String expectedStatus = "Pending";
 
         context.checking(new Expectations() {{
@@ -544,9 +555,10 @@ public class TestJobBuilderController {
     /**
      * Tests that the retrieving of job status fails
      * when the job cannot be found.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testGetJobStatus_JobNotFound() {
+    public void testGetJobStatus_JobNotFound() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
@@ -1704,7 +1716,7 @@ public class TestJobBuilderController {
 
         Object[] actual = (Object[])mav.getModel().get("data");
         Assert.assertEquals(result.length, actual.length);
-        Assert.assertSame(result[0], (ComputeType) actual[0]);
+        Assert.assertSame(result[0], actual[0]);
     }
 
     /**

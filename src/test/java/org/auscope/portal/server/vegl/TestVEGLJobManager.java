@@ -3,6 +3,7 @@ package org.auscope.portal.server.vegl;
 import java.util.Arrays;
 import java.util.List;
 
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.security.ANVGLUser;
@@ -45,7 +46,6 @@ public class TestVEGLJobManager extends PortalTestClass {
         jobManager.setVglJobAuditLogDao(mockJobAuditLogDao);
         jobManager.setVglSignatureDao(mockSignatureDao);
         jobManager.setNciDetailsDao(mockNciDetailsDao);
-        jobManager.setNciEncryptionKey(TEST_ENC_KEY);
     }
 
     /**
@@ -69,9 +69,10 @@ public class TestVEGLJobManager extends PortalTestClass {
 
     /**
      * Tests that retrieving jobs of a given series succeeds.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testGetSeriesJobs() {
+    public void testGetSeriesJobs() throws PortalServiceException {
         final int seriesId = 1;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final List<VEGLJob> jobList = Arrays.asList(mockJob);
@@ -97,9 +98,9 @@ public class TestVEGLJobManager extends PortalTestClass {
         final ANVGLUser user = new ANVGLUser();
         final NCIDetails nciDetails = new NCIDetails();
 
-        nciDetails.setUnencryptedKey(TEST_ENC_KEY, "mykey");
-        nciDetails.setUnencryptedProject(TEST_ENC_KEY, "myproj");
-        nciDetails.setUnencryptedUsername(TEST_ENC_KEY, "myuser");
+        nciDetails.setKey("mykey");
+        nciDetails.setProject("myproj");
+        nciDetails.setUsername("myuser");
 
         context.checking(new Expectations() {{
             oneOf(mockJobDao).get(jobId1, user);will(returnValue(mockJob));

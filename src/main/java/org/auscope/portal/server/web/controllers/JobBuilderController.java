@@ -1142,12 +1142,13 @@ public class JobBuilderController extends BaseCloudController {
      *
      * @param jobId (optional) job id to limit acceptable services
      * @return
+     * @throws PortalServiceException 
      */
     @RequestMapping("/secure/getComputeServices.do")
     public ModelAndView getComputeServices(@RequestParam(value="jobId",
     required=false) final
             Integer jobId,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
         Set<String> jobCCSIds;
         try {
             jobCCSIds = scmEntryService.getJobProviders(jobId, user);

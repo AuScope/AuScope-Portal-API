@@ -2,6 +2,7 @@ package org.auscope.portal.server.web.controllers;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
+import org.auscope.portal.server.web.service.VGLCryptoService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,13 +11,13 @@ import org.junit.Test;
  * Unit tests for MenuController
  *
  */
-public class TestUserController extends PortalTestClass {
-    private UserController uc = null;
+public class TestEncryptionService extends PortalTestClass {
+    private VGLCryptoService uc = null;
     final String PASSWORD = "testPassword1234";
     
     @Before
     public void setup() throws PortalServiceException {
-        uc=  new UserController(null, null, null, null, null, PASSWORD);
+        uc=  new VGLCryptoService(PASSWORD);
     }
 
     /**

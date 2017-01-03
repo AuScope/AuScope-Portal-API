@@ -1,20 +1,9 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.AlgorithmParameters;
-import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.Charsets;
@@ -59,24 +48,18 @@ public class UserController extends BasePortalController {
 
     private String tacVersion;
     
-    private String encryptionPassword;
-
     @Autowired
     public UserController(ANVGLUserDao userDao, NCIDetailsDao nciDetailsDao,
-            VelocityEngine velocityEngine, 
+            VelocityEngine velocityEngine,
             @Value("${env.aws.account}") String awsAccount,
-            @Value("${termsconditions.version}") String tacVersion,
-            @Value("${env.encryption.password}") String encryptionPassword) throws PortalServiceException {
+            @Value("${termsconditions.version}") String tacVersion) throws PortalServiceException {
         super();
         
-        if(encryptionPassword==null || encryptionPassword.isEmpty())
-            throw new PortalServiceException("Configuration parameter env.encryption.password must not be empty!");
         this.userDao = userDao;
         this.nciDetailsDao = nciDetailsDao;
         this.velocityEngine = velocityEngine;
         this.awsAccount=awsAccount;
         this.tacVersion=tacVersion;
-        this.encryptionPassword = encryptionPassword;
     }
 
 
@@ -195,7 +178,7 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/getNCIDetails.do")
-    public ModelAndView getNCIDetails(@AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getNCIDetails(@AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -203,9 +186,9 @@ public class UserController extends BasePortalController {
         NCIDetails details = nciDetailsDao.getByUser(user);
         if(details != null) {
             try {
-                detailsObj.put("nciUsername", decrypt(details.getUsername()));
-                detailsObj.put("nciProject", decrypt(details.getProject()));
-                detailsObj.put("nciKey", decrypt(details.getKey()));
+                detailsObj.put("nciUsername", details.getUsername());
+                detailsObj.put("nciProject", details.getProject());
+                detailsObj.put("nciKey", details.getKey());
             } catch(Exception e) {
                 logger.error("Unable to decrypt NCI details: " + e.getLocalizedMessage());
             }
@@ -218,7 +201,7 @@ public class UserController extends BasePortalController {
     public ModelAndView setNCIDetails(@AuthenticationPrincipal ANVGLUser user,
             @RequestParam(required=false, value="nciUsername") String username,
             @RequestParam(required=false, value="nciProject") String project,
-            @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) {
+            @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) throws PortalServiceException {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -230,18 +213,18 @@ public class UserController extends BasePortalController {
         }
         boolean modified = false;
         try {
-            if (!StringUtils.isEmpty(username) || !StringUtils.equals(decrypt(details.getUsername()), username)) {
-                details.setUsername(encrypt(username));
+            if (!StringUtils.isEmpty(username) || !StringUtils.equals(details.getUsername(), username)) {
+                details.setUsername(username);
                 modified = true;
             }
-            if (!StringUtils.isEmpty(project) || !StringUtils.equals(decrypt(details.getProject()), project)) {
-                details.setProject(encrypt(project));
+            if (!StringUtils.isEmpty(project) || !StringUtils.equals(details.getProject(), project)) {
+                details.setProject(project);
                 modified = true;
             }
             if (key != null ) {
                 String keyString = key.getFileItem().getString();
-                if (!StringUtils.isEmpty(keyString) || !StringUtils.equals(decrypt(details.getKey()), keyString)) {            
-                    details.setKey(encrypt(keyString));
+                if (!StringUtils.isEmpty(keyString) || !StringUtils.equals(details.getKey(), keyString)) {            
+                    details.setKey(keyString);
                     modified = true;
                 }
             }
@@ -255,70 +238,4 @@ public class UserController extends BasePortalController {
         return generateJSONResponseMAV(true);        
     }
     
-    public static final String SECRET_KEY_SPEC = "AES";
-    public static final String CIPHER = "AES/CBC/PKCS5Padding";
-    public static final String PASSWORD_BASED_ALGO = "PBKDF2WithHmacSHA1";
-    public static final int KEY_SIZE = 128;
-    public static final int CRYPTO_ITERATIONS = 1024;
-
-    public static byte[] generateSalt(int size) {
-        byte[] res = new byte[size];
-        SecureRandom r = new SecureRandom();
-        r.nextBytes(res);
-        return res;
-      }
-
-    public String decrypt(byte[] data)
-            throws PortalServiceException {
-        try {
-            String cryptoString = new String(data, StandardCharsets.UTF_8);
-            String[] cyptoInfo = cryptoString.split("@");
-            if(cyptoInfo.length!=3) 
-                throw new PortalServiceException("Invalid crypto info: "+cryptoString);
-            
-            SecretKeyFactory kf = SecretKeyFactory.getInstance(PASSWORD_BASED_ALGO);
-            PBEKeySpec keySpec = new PBEKeySpec(encryptionPassword.toCharArray(), Base64.getDecoder().decode(cyptoInfo[0]),
-                    CRYPTO_ITERATIONS, KEY_SIZE);
-            SecretKey tmp = kf.generateSecret(keySpec);
-
-            byte[] endcoded = tmp.getEncoded();
-            SecretKey key = new SecretKeySpec(endcoded, SECRET_KEY_SPEC);
-
-            Cipher ciph = Cipher.getInstance(CIPHER);
-
-            ciph.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(Base64.getDecoder().decode(cyptoInfo[1])));
-            return  new String(ciph.doFinal(Base64.getDecoder().decode(cyptoInfo[2])), StandardCharsets.UTF_8);
-
-        } catch (GeneralSecurityException e) {
-            throw new PortalServiceException("Decryption error: " + e.getMessage(), e);
-        }
-    }
-
-    public byte[] encrypt(String dataStr) throws PortalServiceException {
-        try {
-            byte[] salt = generateSalt(8);
-            SecretKeyFactory kf = SecretKeyFactory.getInstance(PASSWORD_BASED_ALGO);
-
-            PBEKeySpec keySpec = new PBEKeySpec(encryptionPassword.toCharArray(), salt, CRYPTO_ITERATIONS,
-                    KEY_SIZE);
-
-            SecretKey tmp = kf.generateSecret(keySpec);
-            SecretKey key = new SecretKeySpec(tmp.getEncoded(), SECRET_KEY_SPEC);
-
-            Cipher ciph = Cipher.getInstance(CIPHER);
-
-            ciph.init(Cipher.ENCRYPT_MODE, key);
-            AlgorithmParameters params = ciph.getParameters();
-            byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
-
-            byte[] cipherText = ciph.doFinal(dataStr.getBytes(StandardCharsets.UTF_8));
-            String resultString = Base64.getEncoder().encodeToString(salt) + "@" +
-                    Base64.getEncoder().encodeToString(iv) + "@" +
-                    Base64.getEncoder().encodeToString(cipherText);
-            return resultString.getBytes(StandardCharsets.UTF_8);
-        } catch (GeneralSecurityException e) {
-            throw new PortalServiceException("Encryption error: " + e.getMessage(), e);
-        }
-    }
-
 }
