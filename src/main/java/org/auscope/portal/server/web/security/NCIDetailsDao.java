@@ -15,7 +15,7 @@ public class NCIDetailsDao extends HibernateDaoSupport {
     }
     
     public NCIDetails getByUser(ANVGLUser user) throws PortalServiceException {
-        List<?> resList = getHibernateTemplate().findByNamedParam("from NCIDetails d where d.user =:p", "p", user);
+        List<?> resList = getHibernateTemplate().findByNamedParam("from NCIDetailsEnc d where d.user =:p", "p", user);
         if(resList.isEmpty()) return null;
         NCIDetailsEnc encRes = (NCIDetailsEnc) resList.get(0);
         NCIDetails res = new NCIDetails();

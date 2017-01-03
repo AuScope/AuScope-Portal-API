@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
 
 /**
- * Created by Carsten Friedrich (fri096) for ANVGL.
+ * Created by Carsten Friedrich (fri096) for VGL.
  *
  * A Service for basic encryption and decryption
  */
