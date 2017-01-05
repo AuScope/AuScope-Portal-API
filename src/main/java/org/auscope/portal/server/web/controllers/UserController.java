@@ -29,6 +29,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -260,4 +261,20 @@ public class UserController extends BasePortalController {
         String decryptedValue = new String(decValue);
         return decryptedValue;
     }
+    
+    /*
+    @RequestMapping("/aaf.do")
+    public void authenticateAAF(@AuthenticationPrincipal ANVGLUser user) {
+    public void authenticateAAF() {
+        logger.info("Hello");
+    }
+    
+    @RequestMapping("/aaf")
+    public ModelAndView authenticateAAF_2(@AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView authenticateAAF_2() {
+        logger.info("Hello_2");
+        return generateJSONResponseMAV(true);
+    }
+    */
+
 }
