@@ -2,6 +2,7 @@ package org.auscope.portal.server.web.security.aaf;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -18,22 +19,23 @@ public class AAFAuthenticationFilter extends AbstractAuthenticationProcessingFil
     
     public AAFAuthenticationFilter() {
         //super(new AntPathRequestMatcher("/aaf.html", "POST"));
-        //super(new AntPathRequestMatcher("/aaf/login", "POST"));
-        super(new AntPathRequestMatcher("/aaf/login"));
+        super(new AntPathRequestMatcher("/aaf/login", "POST"));
+        //super(new AntPathRequestMatcher("/aaf", "POST"));
+        //super(new AntPathRequestMatcher("/aaf/login.html", "POST"));
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
-        /*
         boolean postOnly = true;
         if (postOnly && !request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException(
                     "Authentication method not supported: " + request.getMethod());
         }
-        */
 
         String aafAssertion = request.getParameter("assertion");
+        
+        AuthenticationManager testPoop = this.getAuthenticationManager();
 
         return this.getAuthenticationManager().authenticate(new AAFAuthenticationToken(aafAssertion));
     }
