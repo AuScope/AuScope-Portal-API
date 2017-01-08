@@ -30,7 +30,7 @@
     <!-- <http pattern="/aaf/login" security="none"/>-->
     
     <!-- <http pattern="/aaf" security="none"/>-->
-    <http pattern="/aaf/**" entry-point-ref="clientAuthenticationEntryPoint_2" create-session="stateless">
+    <http pattern="/aaf/**" entry-point-ref="clientAuthenticationEntryPoint_2" create-session="stateless" authentication-manager-ref="aafAuthenticationManager">
         <intercept-url pattern="/aaf/login" access="isAnonymous()"/>
         <csrf disabled="true"/>
         <custom-filter before="FORM_LOGIN_FILTER" ref="aafFilter"/>
@@ -40,7 +40,7 @@
     
     <beans:bean id="aafFilter" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter">
        <!-- <beans:property name="authenticationManager" ref="aafAuthenticationManager" />-->
-       <beans:property name="authenticationManager" ref="authenticationManager" />
+       <beans:property name="authenticationManager" ref="aafAuthenticationManager" />
     </beans:bean>
         
     <beans:bean id="aafProvider" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationProvider">
@@ -53,14 +53,16 @@
        <!-- <beans:property name="dataSource" ref="dataSource"/>-->
    </beans:bean>
    
+   <!-- 
    <authentication-manager alias="authenticationManager">
         <authentication-provider ref="aafProvider" />
    </authentication-manager>
-   <!-- 
+   -->
+    
    <authentication-manager id="aafAuthenticationManager">
         <authentication-provider ref="aafProvider" />
    </authentication-manager>
-   -->
+   
    
    
    
@@ -99,7 +101,7 @@
 
 
     <!-- ORIGINAL GOOGLE AUTH -->
-    <http entry-point-ref="oAuth2EntryPoint">
+    <http entry-point-ref="oAuth2EntryPoint" authentication-manager-ref="authenticationManager">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
         </headers>
