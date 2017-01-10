@@ -310,8 +310,9 @@ public class ScmEntryService {
      * Return a map of computeServiceId to imageIds valid for job.
      *
      * @return Map<String, Set<String>> with images for job, or null.
+     * @throws PortalServiceException 
      */
-    public Map<String, Set<MachineImage>> getJobImages(Integer jobId, ANVGLUser user) {
+    public Map<String, Set<MachineImage>> getJobImages(Integer jobId, ANVGLUser user) throws PortalServiceException {
         if (jobId == null) {
             return null;
         }
@@ -341,8 +342,9 @@ public class ScmEntryService {
      * Return a Set of compute service ids with images for job with jobId.
      *
      * @return Set<String> of compute service ids for job, or null if jobId == null.
+     * @throws PortalServiceException 
      */
-    public Set<String> getJobProviders(Integer jobId, ANVGLUser user) {
+    public Set<String> getJobProviders(Integer jobId, ANVGLUser user) throws PortalServiceException {
         Map<String, Set<MachineImage>> images = getJobImages(jobId, user);
         if (images != null) {
             return images.keySet();

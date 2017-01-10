@@ -145,9 +145,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a job successfully
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteJob() {
+    public void testDeleteJob() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
@@ -288,9 +289,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a job fails when its another users job
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testDeleteJobNoPermission() {
+    public void testDeleteJobNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "adifferentuser@email.com";
         final int jobId = 1234;
@@ -309,9 +311,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a job fails when the jobID DNE
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteJobDNE() {
+    public void testDeleteJobDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
 
@@ -327,9 +330,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a series successfully
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteSeries() {
+    public void testDeleteSeries() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final List<VEGLJob> mockJobs = Arrays.asList(
@@ -369,9 +373,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a series fails when the user doesn't have permission
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testDeleteSeriesNoPermission() {
+    public void testDeleteSeriesNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
         final int seriesId = 1234;
@@ -389,9 +394,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a series fails when series DNE
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteSeriesDNE() {
+    public void testDeleteSeriesDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
 
@@ -408,9 +414,10 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests that deleting a series fails when job
      * list is null.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteSeries_JobListIsNull() {
+    public void testDeleteSeries_JobListIsNull() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
@@ -458,9 +465,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing or cancelling job get aborted when the job is processed
+     * @throws PortalServiceException 
      */
     @Test
-    public void testKillJobAborted() {
+    public void testKillJobAborted() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
@@ -478,9 +486,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing a job fails when its not the user's job
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testKillJobNoPermission() {
+    public void testKillJobNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -499,9 +508,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing a job fails when the job cannot be found
+     * @throws PortalServiceException 
      */
     @Test
-    public void testKillJobDNE() {
+    public void testKillJobDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
 
@@ -571,9 +581,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing all jobs of a series fails when the user lacks permission
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testKillSeriesJobsNoPermission() {
+    public void testKillSeriesJobsNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
         final int seriesId = 1234;
@@ -591,9 +602,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing all jobs of a series fails when the user lacks permission
+     * @throws PortalServiceException 
      */
     @Test
-    public void testKillSeriesJobsDNE() {
+    public void testKillSeriesJobsDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
 
@@ -639,9 +651,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * tests listing job files fails if the user doesnt have permission
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testListJobFilesNoPermission() {
+    public void testListJobFilesNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -660,9 +673,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * tests listing job files fails if the user doesnt have permission
+     * @throws PortalServiceException 
      */
     @Test
-    public void testListJobFilesDNE() {
+    public void testListJobFilesDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
 
@@ -750,9 +764,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that downloading a single job file fails when the user doesnt own the job
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testDownloadJobFileNoPermission() {
+    public void testDownloadJobFileNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -772,9 +787,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that downloading a single job file fails when the job DNE
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDownloadJobFileDNE() {
+    public void testDownloadJobFileDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final String key = "my/file/key";
@@ -891,9 +907,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that downloading multiple job files fails if user doesn't own job
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testDownloadJobFilesNoPermission() {
+    public void testDownloadJobFilesNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -912,9 +929,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that downloading multiple job files fails if job DNE
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDownloadJobFilesDNE() {
+    public void testDownloadJobFilesDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final String files = "filekey1,filekey2";
@@ -1006,11 +1024,12 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that listing a job succeeds
+     * @throws PortalServiceException 
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void testListJobs() {
+    public void testListJobs() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
@@ -1070,10 +1089,11 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that listing a job fails when its the incorrect user
+     * @throws PortalServiceException 
      * @throws Exception
      */
     @Test(expected=AccessDeniedException.class)
-    public void testListJobsNoPermission() {
+    public void testListJobsNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
         final int seriesId = 1234;
@@ -1091,10 +1111,11 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that listing a job fails when its the incorrect user
+     * @throws PortalServiceException 
      * @throws Exception
      */
     @Test
-    public void testListJobsDNE() {
+    public void testListJobsDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
 
@@ -1201,7 +1222,7 @@ public class TestJobListController extends PortalTestClass {
 
         ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
-        Assert.assertEquals(consoleData, (String)mav.getModel().get("data"));
+        Assert.assertEquals(consoleData, mav.getModel().get("data"));
     }
 
     /**

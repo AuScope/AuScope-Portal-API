@@ -231,9 +231,10 @@ public class TestGeonetworkController {
 
     /**
      * Tests that the insertRecord function correctly fails when the job object DNE.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testInsertRecordJobDNE() {
+    public void testInsertRecordJobDNE() throws PortalServiceException {
         final Integer jobId = 1235;
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
 
@@ -249,9 +250,10 @@ public class TestGeonetworkController {
 
     /**
      * Tests that the insertRecord function correctly fails when the job series DNE
+     * @throws PortalServiceException 
      */
     @Test
-    public void testInsertRecordSeriesDNE() {
+    public void testInsertRecordSeriesDNE() throws PortalServiceException {
         final Integer jobId = 1235;
         final Integer seriesId = 5432;
         final HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
