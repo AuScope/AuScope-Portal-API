@@ -36,7 +36,7 @@ public class AAFAuthenticationProvider implements AuthenticationProvider, Initia
     public void setJwtManagement(JWTManagement jwtManagement) {
         this.jwtManagement = jwtManagement;
     }
-
+    
     public Authentication authenticate(Authentication authentication)
             throws AuthenticationException {
         Assert.isInstanceOf(AAFAuthenticationToken.class, authentication, messages.getMessage(
@@ -49,4 +49,5 @@ public class AAFAuthenticationProvider implements AuthenticationProvider, Initia
     public boolean supports(Class<?> authentication) {
         return (AAFAuthenticationToken.class.isAssignableFrom(authentication));
     }
+    
 }

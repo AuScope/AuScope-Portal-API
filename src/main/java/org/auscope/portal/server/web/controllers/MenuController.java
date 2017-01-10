@@ -162,12 +162,18 @@ private String googleMapKey;
            if (!user.isFullyConfigured()) {
                String uri = request.getRequestURI();
                if (!uri.contains("login.html") &&
+                       
+                   
+                   //!uri.contains("aaf/login") &&
+                   !uri.contains("aaf") &&
+                       
+                       
                    !uri.contains("gmap.html") &&
                    !uri.contains("user.html") &&
                    !uri.contains("admin.html")) {
 
                    String params = "";
-                   if (!uri.contains("login.html")) {
+                   if (!uri.contains("login.html") || uri.contains("aaf")) {
                        params = "?next=" + new URI(uri).getPath();
                    }
 

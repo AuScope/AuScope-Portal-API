@@ -1,9 +1,12 @@
 package org.auscope.portal.server.web.security.aaf;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.racquettrack.security.oauth.OAuth2UserDetailsLoader;
+
 //import org.auscope.portal.server.web.security.aaf.VFSException;
 import org.auscope.portal.server.web.security.aaf.AAFAuthentication;
 import org.auscope.portal.server.web.security.aaf.AAFJWT;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.aaf.AAFAttributes;
 //import org.auscope.portal.server.web.security.aaf.CryptographicToolBox;
 //import org.auscope.portal.server.web.security.aaf.PKCS8GeneratorCF;
@@ -20,6 +23,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
@@ -34,7 +38,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by wis056 on 7/04/2015.
@@ -43,14 +49,27 @@ import java.util.List;
 @Component
 public class JWTManagement {
     final static Logger logger = Logger.getLogger(JWTManagement.class);
+    /*
     final private String INSERT = "INSERT INTO aafreplay (token) values (?);";
     final String AAF_INSERT = "insert into users (username, public_key, private_key, isaaf, enabled, password) values (?, ?, ?, ?, ?, ?);";
     final String AAF_ROLES = "insert into authorities (username, authority) values (?, ?);";
     final String KEY_GET = "select public_key is not null from users where username=?;";
+    */
 
+    
+    private OAuth2UserDetailsLoader<UserDetails> userDetailsLoader;
+    
+    
     private String jwtSecret;
     private String rootServiceUrl;
 
+    
+    
+    public void setUserDetailsLoader(OAuth2UserDetailsLoader<UserDetails> userDetailsLoader) {
+        this.userDetailsLoader = userDetailsLoader;
+    }
+    
+    
     public void setJwtSecret(String jwtSecret) {
         this.jwtSecret = jwtSecret;
     }
@@ -58,7 +77,7 @@ public class JWTManagement {
     public void setRootServiceUrl(String rootServiceUrl) {
         this.rootServiceUrl = rootServiceUrl;
     }
-
+    
     /* XXX
     private JdbcTemplate jdbcTemplate;
 
@@ -112,13 +131,11 @@ public class JWTManagement {
                         "token already exists, so this is probably a replay attack.");
             }
             */
-
-            boolean didAdd = registerAAFUser(token.attributes);
-
-            logger.debug("First login for AAF user? " + Boolean.toString(didAdd));
-
-            return new AAFAuthentication(token.attributes, token, true);
-
+            //boolean didAdd = registerAAFUser(token.attributes);
+            ANVGLUser anvglUser = registerAAFUser(token.attributes);
+            //logger.debug("First login for AAF user? " + Boolean.toString(didAdd));
+            
+            return new AAFAuthentication(anvglUser, token.attributes, token, true);
         } catch (IOException e) {
             throw new AuthenticationServiceException(e.getLocalizedMessage());
         }
@@ -142,33 +159,49 @@ public class JWTManagement {
         */
 
         return hasKey;
-        
     }
 
-    private boolean registerAAFUser(AAFAttributes attributes) {
-        boolean didRegister = false;
+    //private boolean registerAAFUser(AAFAttributes attributes) {
+    private ANVGLUser registerAAFUser(AAFAttributes attributes) {
+        //boolean didRegister = false;
+        ANVGLUser anvglUser = null;
 
         boolean hasKey = checkUserExists(attributes.email);
-        logger.debug("User " + attributes.email + " has public key? " + Boolean.toString(hasKey));
         if (!hasKey) {
-            try {
+            String userId = UUID.randomUUID().toString();
+            Map<String, Object> userAttributes = new HashMap<String, Object>();
+            userAttributes.put("id", userId);
+            userAttributes.put("email", attributes.email);
+            if(attributes.displayName != null && !attributes.displayName.equals(""))
+                userAttributes.put("name", attributes.displayName);
+            
+            
+            // XXX
+            anvglUser = (ANVGLUser)userDetailsLoader.createUser(userId, userAttributes);
+            //userDetails.
+            
+            
+            //didRegister = true;
+            //try {
+                /* XXX
                 List<String> keypair = generateKeypair(attributes.email);
                 String publicKey = keypair.get(0);
                 String privateKey = keypair.get(1);
-                /* XXX
                 this.jdbcTemplate.update(AAF_INSERT, attributes.email, publicKey, privateKey, true, true, "");
                 this.jdbcTemplate.update(AAF_ROLES, attributes.email, "ROLE_USER");
                 */
-                didRegister = true;
-            } catch (IOException e) {
-                logger.error(e.getMessage());
-                // return false
-            }
+                //didRegister = true;
+            //} catch (IOException e) {
+            //    logger.error(e.getMessage());
+            //    // return false
+            //}
         }
-        return didRegister;
+        //return didRegister;
+        return anvglUser;
     }
 
     // XXX Fix security
+/*    
     private List<String> generateKeypair(String username) throws IOException {
         try {
             KeyPairGenerator keyGenerator;
@@ -184,7 +217,6 @@ public class JWTManagement {
         } catch (NoSuchAlgorithmException e) {
             throw new IOException(e);
         }
-            /*
             StringWriter stringer = new StringWriter();
             PemObject pemKey = new PKCS8GeneratorCF(privateKey).generate();
             try (PemWriter writer = new PemWriter(stringer)) {
@@ -207,6 +239,7 @@ public class JWTManagement {
         } catch (NoSuchAlgorithmException | VFSException e) {
             throw new IOException(e);
         }
-        */
     }
+*/
+    
 }
