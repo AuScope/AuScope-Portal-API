@@ -12,8 +12,11 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 /**
  * Default authentication endpoint that will restrict access to the secure
  * URLs, while the authorisation itself is assigned to separate endpoints.
+ * 
+ * Exists only to redirect any unauthorised access to the URLs to the default
+ * login page where the user can select from login options.
  *  
- * Feels like overkill.
+ * Which feels like overkill.
  * 
  * @author woo392
  *
@@ -27,11 +30,4 @@ public class DefaultEntryPoint extends BasicAuthenticationEntryPoint {
         response.sendRedirect("/login.html");
     }
     
-    /*
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        // TODO Auto-generated method stub
-        super.afterPropertiesSet();
-    }
-    */
 }
