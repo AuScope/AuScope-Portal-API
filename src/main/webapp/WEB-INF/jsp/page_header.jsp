@@ -18,7 +18,7 @@
 
 		<div class="login-widget menu-item">
 			<security:authorize access="hasRole('ROLE_ANONYMOUS')">
-				<div class="login-text"><a href="login.html">Login</a></div>
+				<div class="login-text"><a href="oauth/google_login.html">Google</a> <a href="aaf/aaf_login.html">AAF</a></div>
 			</security:authorize>
 
 			<security:authorize access="!hasRole('ROLE_ANONYMOUS')">

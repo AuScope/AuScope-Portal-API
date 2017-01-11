@@ -9,20 +9,28 @@
                              http://www.springframework.org/schema/security/spring-security-4.0.xsd">
 
 
+    
+
+
     <!-- AAF -->
-    <beans:bean id="clientAuthenticationEntryPoint_2" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+    <beans:bean id="clientAafAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
         <beans:property name="realmName" value="ANVGL-Portal-AAF-login" />
     </beans:bean>
     
-    <!-- <http pattern="/aaf/**" entry-point-ref="clientAuthenticationEntryPoint_2" create-session="stateless" authentication-manager-ref="aafAuthenticationManager"> -->
-    <http entry-point-ref="clientAuthenticationEntryPoint_2" create-session="stateless" authentication-manager-ref="aafAuthenticationManager">
+    <!-- <http pattern="/aaf/**" entry-point-ref="clientAafAuthenticationEntryPoint" create-session="stateless" authentication-manager-ref="aafAuthenticationManager"> -->
+    <!-- <http entry-point-ref="clientAafAuthenticationEntryPoint" create-session="stateless" authentication-manager-ref="aafAuthenticationManager"> -->
+    <http pattern="/aaf/**" entry-point-ref="clientAafAuthenticationEntryPoint" create-session="stateless">
+    <!-- <http pattern="/aaf/**" entry-point-ref="clientAafAuthenticationEntryPoint" create-session="stateless"> -->
+    <!-- <http entry-point-ref="clientAafAuthenticationEntryPoint" create-session="stateless"> -->
         <headers>
             <frame-options policy="SAMEORIGIN"/>
         </headers>
     
         <intercept-url pattern="/aaf/login" access="isAnonymous()"/>
-        
-        <intercept-url pattern="/login.html" access="isAuthenticated()"/>
+
+        <intercept-url pattern="/aaf/aaf_login.html" access="isAuthenticated()"/>
+        <!-- 
+        <intercept-url pattern="/aaf/aaf_login.html" access="isAuthenticated()"/>
         <intercept-url pattern="/gridsubmit.html" access="isAuthenticated()"/>
         <intercept-url pattern="/jobbuilder.html" access="isAuthenticated()"/>
         <intercept-url pattern="/user.html" access="isAuthenticated()"/>
@@ -30,14 +38,13 @@
         <intercept-url pattern="/secure/*" access="isAuthenticated()"/>
         <intercept-url pattern="/admin.html" access="hasRole('ROLE_ADMINISTRATOR')"/>
         <intercept-url pattern="/*.diag" access="hasRole('ROLE_ADMINISTRATOR')"/>
+        -->
         
         <logout logout-url="/j_spring_security_logout" logout-success-url="/gmap.html"/>
         
         <csrf disabled="true"/>
         <custom-filter before="FORM_LOGIN_FILTER" ref="aafFilter"/>
     </http>
-    
-    
     
     <beans:bean id="aafFilter" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter">
        <!-- <beans:property name="authenticationManager" ref="aafAuthenticationManager" />-->
@@ -69,51 +76,28 @@
    </authentication-manager>
    
    
-<!--
-    <authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
-        <authentication-provider>
-            <jdbc-user-service data-source-ref="dataSource" />
-            <password-encoder ref="passwordEncoder" />
-        </authentication-provider>
--->
-
-<!-- 
-<bean id="propertyConfigurer"
-   class="csiro.truststore.util.HostPrecedingPropertyPlaceholderConfigurer">
-   <property name="location" value="classpath:config.properties" />
-  </bean>
-  
--->
-
-    <!-- AAF -->
-<!-- 
-    <http pattern="/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
-        xmlns="http://www.springframework.org/schema/security">
-        <intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" />
-        <anonymous enabled="false" />
-        <http-basic entry-point-ref="clientAuthenticationEntryPoint" />
--->
-        <!-- include this only if you need to authenticate clients via request parameters -->
-<!-- 
-        <custom-filter ref="clientCredentialsTokenEndpointFilter" before="BASIC_AUTH_FILTER" />
-        <access-denied-handler ref="oauthAccessDeniedHandler" />
-    </http>
--->
-
-
     <!-- GOOGLE OAuth -->
-    <http entry-point-ref="oAuth2EntryPoint" authentication-manager-ref="authenticationManager">
+    <!-- <http entry-point-ref="oAuth2EntryPoint" authentication-manager-ref="authenticationManager"> -->
+    <!-- <http entry-point-ref="oAuth2EntryPoint" authentication-manager-ref="authenticationManager"> -->
+    <!-- <http entry-point-ref="oAuth2EntryPoint"> -->
+    <http pattern="/oauth/**" entry-point-ref="oAuth2EntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
         </headers>
-        <intercept-url pattern="/login.html" access="isAuthenticated()"/>
+        <!-- <intercept-url pattern="/login.html" access="isAuthenticated()"/> -->
+        
+        <intercept-url pattern="/oauth/google_login.html" access="isAuthenticated()"/>
+        
+        <!-- 
         <intercept-url pattern="/gridsubmit.html" access="isAuthenticated()"/>
         <intercept-url pattern="/jobbuilder.html" access="isAuthenticated()"/>
         <intercept-url pattern="/user.html" access="isAuthenticated()"/>
         <intercept-url pattern="/joblist.html" access="isAuthenticated()"/>
         <intercept-url pattern="/secure/*" access="isAuthenticated()"/>
         <intercept-url pattern="/admin.html" access="hasRole('ROLE_ADMINISTRATOR')"/>
-        <intercept-url pattern="/*.diag" access="hasRole('ROLE_ADMINISTRATOR')"/>                
+        <intercept-url pattern="/*.diag" access="hasRole('ROLE_ADMINISTRATOR')"/>
+        -->
+        
         <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
         <logout logout-url="/j_spring_security_logout" logout-success-url="/gmap.html"/>
         <s:csrf disabled="true"/>
@@ -138,7 +122,7 @@
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
     </beans:bean>
 
-    <authentication-manager id="authenticationManager">
+    <authentication-manager alias="authenticationManager">
         <authentication-provider ref="oauth2AuthenticationProvider">
         </authentication-provider>
     </authentication-manager>
@@ -174,5 +158,31 @@
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
         <beans:property name="oAuth2UserInfoProvider" ref="oAuth2DefaultUserInfoProvider"/>
     </beans:bean>
+    
+    
+    
+    
+    <!-- Secure URLs regardless of authentication -->
+    <beans:bean id="clientAuthenticationEntryPointBasic" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+        <beans:property name="realmName" value="ANVGL-Portal-AAF-login" />
+    </beans:bean>
+    <http entry-point-ref="clientAuthenticationEntryPointBasic">
+        <headers>
+            <frame-options policy="SAMEORIGIN"/>
+        </headers>
+        <!-- <intercept-url pattern="/login.html" access="isAuthenticated()"/> -->
+        <intercept-url pattern="/gridsubmit.html" access="isAuthenticated()"/>
+        <intercept-url pattern="/jobbuilder.html" access="isAuthenticated()"/>
+        <intercept-url pattern="/user.html" access="isAuthenticated()"/>
+        <intercept-url pattern="/joblist.html" access="isAuthenticated()"/>
+        <intercept-url pattern="/secure/*" access="isAuthenticated()"/>
+        <intercept-url pattern="/admin.html" access="hasRole('ROLE_ADMINISTRATOR')"/>
+        <intercept-url pattern="/*.diag" access="hasRole('ROLE_ADMINISTRATOR')"/>
+        <logout logout-url="/j_spring_security_logout" logout-success-url="/gmap.html"/>
+        <s:csrf disabled="true"/>
+    </http>
+    
+    
+    
 
 </beans:beans>
