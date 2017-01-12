@@ -73,6 +73,9 @@ public class CloudComputeServiceNci extends CloudComputeService {
      */
     private String getJobLastInstanceId(CloudJob job) throws PortalServiceException {
         try (InputStream is = storageService.getJobFile(job, JOB_ID_FILE)) {
+            if (is == null) {
+                return job.getComputeInstanceId();
+            }
             return IOUtils.toString(is);
         } catch (IOException e) {
             throw new PortalServiceException("Unable to access job ID file for " + job.getId(), e);
@@ -155,7 +158,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
             extractParamFromComputeType("mem", job.getComputeInstanceType()),
             extractParamFromComputeType("jobfs", job.getComputeInstanceType()),
             "module load escript/5.0", //TODO: Extract these from the solution centre
-            "run-escript" //TODO: Extract these from the solution centre
+            "run-escript -n $VL_TOTAL_NODES -p $VL_CPUS_PER_NODE" //TODO: Extract these from the solution centre
         });
 
         //storageService.uploadJobFile(job, files);

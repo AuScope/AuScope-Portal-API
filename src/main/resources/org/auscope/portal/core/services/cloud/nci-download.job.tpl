@@ -22,7 +22,7 @@ export VL_JOBID_FILE="$VL_OUTPUT_DIR/.jobid"
 export VL_WORKFLOW_VERSION="1"
 
 echo "#### Download Environment start ####"
-env
+env | sort
 echo "#### Download Environment end ####"
 
 source nci-util.sh
