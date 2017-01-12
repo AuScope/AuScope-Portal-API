@@ -78,6 +78,9 @@ public abstract class BaseCloudController extends BaseModelController {
      * @return
      */
     protected CloudComputeService getComputeService(String id) {
+        if(TextUtil.isNullOrEmpty(id)) 
+            return null;
+                
         for (CloudComputeService s : cloudComputeServices) {
             if (s.getId().equals(id)) {
                 return s;
