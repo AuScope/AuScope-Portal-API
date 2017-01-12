@@ -62,7 +62,13 @@
     
     <bean name="ANVGLProvenanceService" class="org.auscope.portal.server.web.service.ANVGLProvenanceService" autowire="constructor">
         <constructor-arg name="anvglFileStagingService" ref="fileStagingService"/>
-        <constructor-arg name="cloudStorageServices" ref="cloudStorageService-aws-sydney"/>
+        <constructor-arg name="cloudStorageServices"> 
+            <array>  
+                <ref bean="cloudStorageService-aws-sydney" /> 
+                <ref bean="cloudStorageService-nci" /> 
+                <ref bean="cloudStorageService-nectar-melb" /> 
+            </array> 
+        </constructor-arg>
         <constructor-arg name="promsUrl" value="${HOST.proms.report.url}"/>
         <constructor-arg name="promsReportingSystemUri" value="${HOST.proms.reportingsystem.uri}"/>
     </bean>
@@ -89,6 +95,7 @@
                 <entry key="jobManager" value-ref="veglJobManager"/>
                 <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
                 <entry key="jobUserDao" value-ref="anvglUserDao"/>
+                <entry key="nciDetailsDao" value-ref="nciDetailsDao"/>
             </map>
         </property>
     </bean>

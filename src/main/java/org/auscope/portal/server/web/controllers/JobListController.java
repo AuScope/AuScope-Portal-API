@@ -459,7 +459,8 @@ public class JobListController extends BaseCloudController  {
                 fileDetails = cloudStorageService.listJobFiles(job);
             }
         } catch (Exception e) {
-            logger.warn("Error fetching output directory information.", e);
+            logger.warn("Error fetching output directory information."+e.getMessage());
+            logger.debug("Exception details:",e);
             return generateJSONResponseMAV(false, null, "Error fetching output directory information");
         }
 
