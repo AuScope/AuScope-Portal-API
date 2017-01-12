@@ -14,11 +14,10 @@
 			<div class="menu-item<%if (request.getRequestURL().toString().contains("/jobbuilder.jsp")) {%> current<%} %>"><a href="jobbuilder.html">Submit</a></div>
 			<div class="menu-item<%if (request.getRequestURL().toString().contains("/joblist.jsp")) {%> current<%} %>"><a href="joblist.html">Monitor</a></div>
 
-		
-
 		<div class="login-widget menu-item">
 			<security:authorize access="hasRole('ROLE_ANONYMOUS')">
-				<div class="login-text"><a href="oauth/google_login.html">Google</a> <a href="aaf/aaf_login.html">AAF</a></div>
+				<!-- <div class="login-text"><a href="oauth/google_login.html">Google</a> <a href="aaf/aaf_login.html">AAF</a></div> -->
+				<div class="google-small-icon" title="Login with Google"></div><div class="aaf-small-icon" title="Login with AAF"></div>
 			</security:authorize>
 
 			<security:authorize access="!hasRole('ROLE_ANONYMOUS')">

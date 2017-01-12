@@ -27,7 +27,7 @@ public class DefaultEntryPoint extends BasicAuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
         // Redirect to login page
-        response.sendRedirect("/login.html");
+        response.sendRedirect("login.html");
     }
     
 }

@@ -1,0 +1,40 @@
+.login-message {
+    color: #000000;
+    font-style: normal;
+    font-weight: bold;
+    font-size: large;
+    text-decoration: none;
+    position: relative;
+    top: 100px;
+    left: 10px;
+}
+
+.google-medium-icon {
+    background-image: url("../img/google_132x54.png");
+    cursor: pointer;
+    width: 132px;
+    height: 54px;
+}
+
+.google-small-icon {
+    background-image: url("../img/google_64x26.png");
+    cursor: pointer;
+    width: 64px;
+    height: 26px;
+    display: inline-block;
+}
+
+.aaf-medium-icon {
+    background-image: url("../img/aaf_service_223x54.png");
+    cursor: pointer;
+    width: 223px;
+    height: 54px;
+}
+
+.aaf-small-icon {
+    background-image: url("../img/aaf_service_110x26.png");
+    cursor: pointer;
+    width: 110px;
+    height: 26px;
+    display: inline-block;
+}
