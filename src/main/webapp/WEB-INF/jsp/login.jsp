@@ -41,7 +41,7 @@
 	    <div class="login-message">
 	    <p>Please log in to the system by choosing one of the login options below.</p>
 	    
-	    <div class="google-medium-icon" onclick="location.href='google/google_login.html';"></div><br>
+	    <div class="google-medium-icon" onclick="location.href='oauth/google_login.html';"></div><br>
 	    <div class="aaf-medium-icon" onclick="location.href='aaf/aaf_login.html';"></div>
 	    
 	    </div>

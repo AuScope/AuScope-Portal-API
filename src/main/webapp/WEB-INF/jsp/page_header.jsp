@@ -17,7 +17,8 @@
 		<div class="login-widget menu-item">
 			<security:authorize access="hasRole('ROLE_ANONYMOUS')">
 				<!-- <div class="login-text"><a href="oauth/google_login.html">Google</a> <a href="aaf/aaf_login.html">AAF</a></div> -->
-				<div class="google-small-icon" title="Login with Google"></div><div class="aaf-small-icon" title="Login with AAF"></div>
+				<div class="google-small-icon" title="Login with Google" onclick="location.href='oauth/google_login.html';"></div>
+				<div class="aaf-small-icon" title="Login with AAF" onclick="location.href='aaf/aaf_login.html';"></div>
 			</security:authorize>
 
 			<security:authorize access="!hasRole('ROLE_ANONYMOUS')">

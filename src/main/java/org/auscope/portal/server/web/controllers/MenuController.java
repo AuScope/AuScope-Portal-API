@@ -197,9 +197,8 @@ private String googleMapKey;
        return mav;
    }
    
-   /*
-   @RequestMapping("/google/login.html")
-   public ModelAndView handleLoginHtmlToView(@AuthenticationPrincipal ANVGLUser user, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+   @RequestMapping("/oauth/google_login.html")
+   public ModelAndView handleGoogleLoginHtmlToView(@AuthenticationPrincipal ANVGLUser user, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
        //Detect whether this is a new session or not...
        HttpSession session = request.getSession();
        boolean isNewSession = session.getAttribute("existingSession") == null;
@@ -213,36 +212,39 @@ private String googleMapKey;
            response.sendError(HttpStatus.SC_NOT_FOUND, "Resource not found : " + requestUri);
            return null;
        }
-       String requestedResource = requestComponents[requestComponents.length - 1];
-       String resourceName = requestedResource.replace(".html", "");
-
-       logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
+       
+       //String requestedResource = requestComponents[requestComponents.length - 1];
+       //String resourceName = requestedResource.replace(".html", "");
+       //logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
 
        //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
        if (user != null) {
            if (!user.isFullyConfigured()) {
                String uri = request.getRequestURI();
-               if (!uri.contains("google/login.html") &&
+               //if (!uri.contains("google/login.html") &&
                        
                    
                    //!uri.contains("aaf/login") &&
                    //!uri.contains("aaf") &&
                        
                        
-                   !uri.contains("gmap.html") &&
-                   !uri.contains("user.html") &&
-                   !uri.contains("admin.html")) {
+                   //!uri.contains("gmap.html") &&
+                   //!uri.contains("user.html") &&
+                   //!uri.contains("admin.html")) {
 
                    String params = "";
-                   if (!uri.contains("google/login.html")) {
+                   //if (!uri.contains("google/login.html")) {
                        params = "?next=" + new URI(uri).getPath();
-                   }
+                   //}
 
                    return new ModelAndView("redirect:/user.html" + params);
-               }
+               //}
            }
        }
 
+       //String resourceName = "oauth.google_login";
+       String resourceName = "google_login";
+       
        //Give the user the view they are actually requesting
        ModelAndView mav = new ModelAndView(resourceName);
 
@@ -257,5 +259,5 @@ private String googleMapKey;
 
        return mav;
    }
-   */
+   
 }
