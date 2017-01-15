@@ -161,8 +161,10 @@ private String googleMapKey;
        if (user != null) {
            if (!user.isFullyConfigured()) {
                String uri = request.getRequestURI();
-               if (!uri.contains("google_login.html") &&
+               if (!uri.contains("login.html") &&
                        
+                       !uri.contains("google_login.html") &&
+                       !uri.contains("aaf_login.html") &&
                    
                    //!uri.contains("aaf/login") &&
                    //!uri.contains("aaf") &&
