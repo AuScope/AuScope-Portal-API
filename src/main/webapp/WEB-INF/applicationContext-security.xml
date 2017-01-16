@@ -8,86 +8,48 @@
                              http://www.springframework.org/schema/security
                              http://www.springframework.org/schema/security/spring-security-4.0.xsd">
 
-
     <!-- AAF -->
-    
     <beans:bean id="aafFilter" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter">
-       <!-- <beans:property name="authenticationManager" ref="aafAuthenticationManager" />-->
        <beans:property name="authenticationManager" ref="aafAuthenticationManager" />
-       
-       <!-- 
+
        <beans:property name="authenticationSuccessHandler">
             <beans:bean class="org.auscope.portal.server.web.security.RedirectUnconfiguredUserHandler" />        
-        </beans:property>
-       -->
-       
+       </beans:property>
+
     </beans:bean>
-        
+
     <beans:bean id="aafProvider" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationProvider">
        <beans:property name="jwtManagement" ref="jwtManagement" />
    </beans:bean>
 
    <beans:bean id="jwtManagement" class="org.auscope.portal.server.web.security.aaf.JWTManagement">
-   
-       <beans:property name="userDetailsLoader" ref="simpleUserLoader" />
-   
+       <beans:property name="userDetailsLoader" ref="simpleUserLoader" />   
        <beans:property name="jwtSecret" value="${HOST.jwtSecret}" />
        <beans:property name="rootServiceUrl" value="${HOST.rootServiceUrl}" />
-       <!-- <beans:property name="dataSource" ref="dataSource"/>-->
    </beans:bean>
-      
+
    <authentication-manager id="aafAuthenticationManager">
         <authentication-provider ref="aafProvider" />
    </authentication-manager>
-   
-   
 
-    <!-- GOOGLE OAuth -->
     <http entry-point-ref="oAuth2EntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
         </headers>
-        <!-- <intercept-url pattern="/login.html" access="isAuthenticated()"/> -->
-        
-        
-        <!-- <intercept-url pattern="/oauth/google_login.html" access="isAuthenticated()"/> -->
-        <intercept-url pattern="/oauth/google_login.html" access="isAnonymous()"/>
-        
-        
-        
-        <intercept-url pattern="/aaf/login" access="isAnonymous()"/>
-        
-        
-        
-        <!-- <intercept-url pattern="/login.html" access="isAnonymous()"/> -->
+        <!-- <intercept-url pattern="/oauth/google_login.html" access="isAnonymous()"/>-->
         <intercept-url pattern="/login.html" access="isAuthenticated()"/>
-        
-        
-        
+        <intercept-url pattern="/aaf/login" access="isAnonymous()"/>
         <intercept-url pattern="/gridsubmit.html" access="isAuthenticated()"/>
         <intercept-url pattern="/jobbuilder.html" access="isAuthenticated()"/>
         <intercept-url pattern="/user.html" access="isAuthenticated()"/>
         <intercept-url pattern="/joblist.html" access="isAuthenticated()"/>
         <intercept-url pattern="/secure/*" access="isAuthenticated()"/>
         <intercept-url pattern="/admin.html" access="hasRole('ROLE_ADMINISTRATOR')"/>
-        <intercept-url pattern="/*.diag" access="hasRole('ROLE_ADMINISTRATOR')"/>
-        
-        
-        <!-- <form-login login-page="/oauth/google_login.html"/> -->
-        
+        <intercept-url pattern="/*.diag" access="hasRole('ROLE_ADMINISTRATOR')"/>        
         <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
-        
-        
         <custom-filter ref="aafFilter" before="FORM_LOGIN_FILTER"/> <!-- XXX Check C_AAF -->
-        
-        
-        
         <logout logout-url="/j_spring_security_logout" logout-success-url="/gmap.html"/>
         <s:csrf disabled="true"/>
-        
-        
-        <!-- <access-denied-handler error-page="/login.html" /> -->
-        
     </http>
 
     <beans:bean id="oAuth2EntryPoint" class="com.racquettrack.security.oauth.OAuth2AuthenticationEntryPoint">
@@ -135,7 +97,7 @@
         </beans:constructor-arg>
         <beans:property name="userDao" ref="anvglUserDao"/>
     </beans:bean>
-    
+
     <beans:bean id="oAuth2DefaultUserInfoProvider" class="com.racquettrack.security.oauth.DefaultOAuth2UserInfoProvider">
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
     </beans:bean>
@@ -145,7 +107,5 @@
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
         <beans:property name="oAuth2UserInfoProvider" ref="oAuth2DefaultUserInfoProvider"/>
     </beans:bean>
-    
-    
-    
+
 </beans:beans>

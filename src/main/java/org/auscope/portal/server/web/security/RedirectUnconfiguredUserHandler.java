@@ -34,7 +34,8 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
                 String params = "";
                 if (savedRequest != null) {
                     URL requestUrl = new URL(savedRequest.getRequestURL());
-                    if (!requestUrl.getPath().contains("login.html") && !requestUrl.getPath().contains("google_login.html") && !requestUrl.getPath().contains("aaf_login.html")) {
+                    //if (!requestUrl.getPath().contains("login.html") && !requestUrl.getPath().contains("google_login.html") && !requestUrl.getPath().contains("aaf_login.html")) {
+                    if (!requestUrl.getPath().contains("login.html") && !requestUrl.getPath().contains("aaf")) {
                         params = "?next=" + requestUrl.getPath();
                     }
                 }
