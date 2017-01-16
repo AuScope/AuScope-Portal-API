@@ -6,7 +6,6 @@ import org.auscope.portal.server.web.security.aaf.AAFAuthentication;
 import org.auscope.portal.server.web.security.aaf.AAFJWT;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.aaf.AAFAttributes;
-import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -28,7 +27,6 @@ import java.util.UUID;
 
 @Component
 public class JWTManagement {
-    final static Logger logger = Logger.getLogger(JWTManagement.class);
     
     static private String AAF_PRODUCTION = "https://rapid.aaf.edu.au";
     static private String AAF_TEST = "https://rapid.test.aaf.edu.au";
@@ -54,7 +52,6 @@ public class JWTManagement {
             throw new AuthenticationCredentialsNotFoundException("Unable to authenticate. No AAF credentials found.");
         Jwt jwt = JwtHelper.decodeAndVerify(tokenString, new MacSigner(jwtSecret.getBytes()));
         String claims = jwt.getClaims();
-        logger.debug(claims);
         ObjectMapper mapper = new ObjectMapper();
         try {
             AAFJWT token = mapper.readValue(claims, AAFJWT.class);

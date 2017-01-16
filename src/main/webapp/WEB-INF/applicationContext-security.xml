@@ -8,6 +8,7 @@
                              http://www.springframework.org/schema/security
                              http://www.springframework.org/schema/security/spring-security-4.0.xsd">
 
+    <!-- Common entry point -->
     <http entry-point-ref="oAuth2EntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
