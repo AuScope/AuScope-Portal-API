@@ -1,26 +1,21 @@
 package org.auscope.portal.server.web.security.aaf;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.racquettrack.security.oauth.OAuth2UserDetailsLoader;
 
 import org.auscope.portal.server.web.security.aaf.AAFAuthentication;
 import org.auscope.portal.server.web.security.aaf.AAFJWT;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.aaf.AAFAttributes;
 import org.apache.log4j.Logger;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +29,15 @@ import java.util.UUID;
 @Component
 public class JWTManagement {
     final static Logger logger = Logger.getLogger(JWTManagement.class);
+    
+    static private String AAF_PRODUCTION = "https://rapid.aaf.edu.au";
+    static private String AAF_TEST = "https://rapid.test.aaf.edu.au";
 
-    private OAuth2UserDetailsLoader<UserDetails> userDetailsLoader;
+    private PersistedAAFUserDetailsLoader userDetailsLoader;
     private String jwtSecret;
     private String rootServiceUrl;
 
-    public void setUserDetailsLoader(OAuth2UserDetailsLoader<UserDetails> userDetailsLoader) {
+    public void setUserDetailsLoader(PersistedAAFUserDetailsLoader userDetailsLoader) {
         this.userDetailsLoader = userDetailsLoader;
     }
     
@@ -50,9 +48,6 @@ public class JWTManagement {
     public void setRootServiceUrl(String rootServiceUrl) {
         this.rootServiceUrl = rootServiceUrl;
     }
-    
-    static private String AAF_PRODUCTION = "https://rapid.aaf.edu.au";
-    static private String AAF_TEST = "https://rapid.test.aaf.edu.au";
 
     public AAFAuthentication parseJWT(String tokenString) throws AuthenticationException {
         if (tokenString == null)
@@ -92,40 +87,17 @@ public class JWTManagement {
                         "token already exists, so this is probably a replay attack.");
             }
             */
-            //boolean didAdd = registerAAFUser(token.attributes);
-            ANVGLUser anvglUser = registerAAFUser(token.attributes);
-            //logger.debug("First login for AAF user? " + Boolean.toString(didAdd));
             
+            ANVGLUser anvglUser = registerAAFUser(token.attributes);
             return new AAFAuthentication(anvglUser, token.attributes, token, true);
         } catch (IOException e) {
             throw new AuthenticationServiceException(e.getLocalizedMessage());
         }
     }
 
-    private boolean checkUserExists(String username) {
-        boolean hasKey = false;
-
-        RowMapper<Boolean> mapper = new RowMapper<Boolean>() {
-            public Boolean mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return rs.getBoolean(1);
-            }
-        };
-
-        /* XXX
-        List<Boolean> keys = this.jdbcTemplate.query(KEY_GET, mapper, username);
-
-        if(!keys.isEmpty()) {
-            hasKey = keys.get(0);
-        }
-        */
-
-        return hasKey;
-    }
-
     private ANVGLUser registerAAFUser(AAFAttributes attributes) {
-        ANVGLUser anvglUser = null;
-        boolean hasKey = checkUserExists(attributes.email);
-        if (!hasKey) {
+        ANVGLUser anvglUser = userDetailsLoader.getUserByUserEmail(attributes.email);
+        if (anvglUser == null) {
             String userId = UUID.randomUUID().toString();
             Map<String, Object> userAttributes = new HashMap<String, Object>();
             userAttributes.put("id", userId);
