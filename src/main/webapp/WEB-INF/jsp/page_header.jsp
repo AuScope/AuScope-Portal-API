@@ -16,16 +16,12 @@
 
 		<div class="login-widget menu-item">
 			<security:authorize access="hasRole('ROLE_ANONYMOUS')">
-			
-			
                 <div class="login-text">Login<div class="dropdownicon"></div>
                 </div>
-                <div class="sub-menu-image">
+                <div class="sub-menu">
 					<div class="google-small-icon" title="Login with Google" onclick="location.href='login.html';"></div>
-					<div class="aaf-small-icon" title="Login with AAF" onclick="location.href='aaf/aaf_login.html';"></div>
+					<div class="aaf-small-icon" title="Login with AAF" onclick="location.href='https://rapid.test.aaf.edu.au/jwt/authnrequest/research/a_06vzrZrZR3Xxqm1kHR4g'"></div>
 				</div>
-				
-				
 			</security:authorize>
 
 			<security:authorize access="!hasRole('ROLE_ANONYMOUS')">
