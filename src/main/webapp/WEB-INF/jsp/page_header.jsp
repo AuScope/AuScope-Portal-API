@@ -20,7 +20,7 @@
                 </div>
                 <div class="sub-menu">
 					<div class="google-small-icon" title="Login with Google" onclick="location.href='login.html';"></div>
-					<div class="aaf-small-icon" title="Login with AAF" onclick="location.href='https://rapid.test.aaf.edu.au/jwt/authnrequest/research/a_06vzrZrZR3Xxqm1kHR4g'"></div>
+					<div id="aaf-login" class="aaf-small-icon" title="Login with AAF"></div>
 				</div>
 			</security:authorize>
 
@@ -48,3 +48,10 @@
     <div id="permalink"><a href="javascript:void(0)">Permanent Link</a></div>
     <%} %>
 </div>
+
+<script type="text/javascript">
+    var AAF_LOGIN_URL = "${aafLoginUrl}";
+    window.onload = function() {
+    	document.getElementById('aaf-login').onclick = function() { location=AAF_LOGIN_URL };
+    }
+</script>

@@ -52,12 +52,15 @@ public class MenuController {
 private String googleMapKey;
 
    private String googleAnalyticsKey;
+   private String aafLoginUrl;
 
    @Autowired
-   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey, @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey) {
+   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey, @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey,
+           @Value("${HOST.aafLoginUrl}") String aafLoginUrl) {
        this.buildStamp = null;
        this.googleMapKey = googleMapKey;
        this.googleAnalyticsKey = googleAnalyticsKey;
+       this.aafLoginUrl = aafLoginUrl;
    }
 
    /**
@@ -161,24 +164,14 @@ private String googleMapKey;
        if (user != null) {
            if (!user.isFullyConfigured()) {
                String uri = request.getRequestURI();
-               if (!uri.contains("login.html") &&
-                       
-                       !uri.contains("google_login.html") &&
-                       !uri.contains("aaf_login.html") &&
-                   
-                   //!uri.contains("aaf/login") &&
-                   //!uri.contains("aaf") &&
-                       
-                       
+               if (!uri.contains("login.html") &&                       
                    !uri.contains("gmap.html") &&
                    !uri.contains("user.html") &&
                    !uri.contains("admin.html")) {
-
                    String params = "";
-                   if (!uri.contains("google_login.html")/* || uri.contains("aaf")*/) {
+                   if (!uri.contains("login.html")) {
                        params = "?next=" + new URI(uri).getPath();
                    }
-
                    return new ModelAndView("redirect:/user.html" + params);
                }
            }
@@ -188,69 +181,7 @@ private String googleMapKey;
        ModelAndView mav = new ModelAndView(resourceName);
 
        mav.addObject("isNewSession", isNewSession);
-
-       //Customise the model as required
-       addGoogleKeys(mav); //always add the google keys
-       if (resourceName.equals("about") || resourceName.equals("admin")) {
-           addManifest(mav, request); //The manifest details aren't really required by much
-       }
-       mav.addObject("buildTimestamp", getOrGenerateBuildStamp(request));
-
-       return mav;
-   }
-   
-   @RequestMapping("/oauth/google_login.html")
-   public ModelAndView handleGoogleLoginHtmlToView(@AuthenticationPrincipal ANVGLUser user, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
-       //Detect whether this is a new session or not...
-       HttpSession session = request.getSession();
-       boolean isNewSession = session.getAttribute("existingSession") == null;
-       session.setAttribute("existingSession", true);
-
-       //Decode our request to get the view name we are actually requesting
-       String requestUri = request.getRequestURI();
-       String[] requestComponents = requestUri.split("/");
-       if (requestComponents.length == 0) {
-           logger.debug(String.format("request '%1$s' doesnt contain any extractable components", requestUri));
-           response.sendError(HttpStatus.SC_NOT_FOUND, "Resource not found : " + requestUri);
-           return null;
-       }
-       
-       //String requestedResource = requestComponents[requestComponents.length - 1];
-       //String resourceName = requestedResource.replace(".html", "");
-       //logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
-
-       //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
-       if (user != null) {
-           if (!user.isFullyConfigured()) {
-               String uri = request.getRequestURI();
-               //if (!uri.contains("google/login.html") &&
-                       
-                   
-                   //!uri.contains("aaf/login") &&
-                   //!uri.contains("aaf") &&
-                       
-                       
-                   //!uri.contains("gmap.html") &&
-                   //!uri.contains("user.html") &&
-                   //!uri.contains("admin.html")) {
-
-                   String params = "";
-                   //if (!uri.contains("google/login.html")) {
-                       params = "?next=" + new URI(uri).getPath();
-                   //}
-
-                   return new ModelAndView("redirect:/user.html" + params);
-               //}
-           }
-       }
-
-       //String resourceName = "oauth.google_login";
-       String resourceName = "google_login";
-       
-       //Give the user the view they are actually requesting
-       ModelAndView mav = new ModelAndView(resourceName);
-
-       mav.addObject("isNewSession", isNewSession);
+       mav.addObject("aafLoginUrl", aafLoginUrl);
 
        //Customise the model as required
        addGoogleKeys(mav); //always add the google keys
