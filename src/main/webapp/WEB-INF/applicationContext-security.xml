@@ -117,7 +117,7 @@
    <beans:bean id="jwtManagement" class="org.auscope.portal.server.web.security.aaf.JWTManagement">
        <beans:property name="userDetailsLoader" ref="simpleAafUserLoader" />
        <beans:property name="jwtSecret" value="${HOST.jwtSecret}" />
-       <beans:property name="rootServiceUrl" value="${HOST.rootServiceUrl}" />
+       <beans:property name="rootServiceUrl" value="${HOST.portalUrl}" />
    </beans:bean>
 
    <authentication-manager id="aafAuthenticationManager">

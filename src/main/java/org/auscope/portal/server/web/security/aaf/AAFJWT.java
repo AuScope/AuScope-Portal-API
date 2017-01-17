@@ -17,6 +17,9 @@ import java.util.Date;
  * Created by wis056 on 8/04/2015.
  */
 public class AAFJWT implements Serializable {
+    
+    private static final long serialVersionUID = -507178727156039646L;
+
     @JsonProperty("iss")
     public String aafServiceUrl;
 
@@ -46,7 +49,6 @@ public class AAFJWT implements Serializable {
 
     @JsonProperty("sub")
     public String targetedID;
-
 
 
     public AAFJWT() {

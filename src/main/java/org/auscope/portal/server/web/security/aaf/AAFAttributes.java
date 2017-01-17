@@ -14,6 +14,8 @@ import java.util.Collection;
  */
 public class AAFAttributes implements UserDetails, Serializable {
 
+    private static final long serialVersionUID = -7842095359474432151L;
+
     @JsonProperty("cn")
     public String commonName;
 

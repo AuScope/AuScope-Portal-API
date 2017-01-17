@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by wis056 on 8/04/2015.
+ * Modified by woo392.
  */
 public class AAFAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     

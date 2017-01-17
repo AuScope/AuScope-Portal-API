@@ -13,23 +13,18 @@ import java.util.Collection;
  * Created by wis056 on 8/04/2015.
  */
 public class AAFAuthentication implements Authentication {
+    
+    private static final long serialVersionUID = -2116084302655572118L;
     private final AAFAttributes attributes;
     private final AAFJWT jwt;
-    private boolean isVoid = false;
-    
-    
+    private boolean isVoid = false;    
     private ANVGLUser principal; 
-    
 
     public AAFAuthentication(ANVGLUser principal, AAFAttributes attributes, AAFJWT jwt, boolean valid) {
         this.attributes = attributes;
         this.jwt = jwt;
         if (!valid) isVoid = true;
-        
-
         this.principal = principal;
-        
-        
     }
 
     @Override
@@ -42,20 +37,11 @@ public class AAFAuthentication implements Authentication {
         return this.attributes;
     }
 
-    /*
-    @Override
-    public AAFAttributes getPrincipal() {
-        return this.attributes;
-    }
-    */
-    
-    
     @Override
     public ANVGLUser getPrincipal() {
         return principal;
     }
     
-
     @Override
     public String getName() {
         return this.attributes.email;

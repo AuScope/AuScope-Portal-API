@@ -6,6 +6,9 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
  * Created by wis056 on 8/04/2015.
  */
 public class AAFAuthenticationToken  extends AbstractAuthenticationToken {
+    
+    private static final long serialVersionUID = -1118229819090274846L;
+    
     private String credentials;
 
     public AAFAuthenticationToken(String token) {
