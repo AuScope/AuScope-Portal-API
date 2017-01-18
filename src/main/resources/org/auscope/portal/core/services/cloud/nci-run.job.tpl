@@ -27,24 +27,30 @@ export VL_JOB_ID="{1}"
 export VL_WORKING_DIR="{2}"
 export VL_OUTPUT_DIR="{3}"
 export VL_TERMINATION_FILE="$VL_OUTPUT_DIR/vl.end"
+export VL_TOTAL_CPU_COUNT="{5}"
+if [ `expr $VL_TOTAL_CPU_COUNT % 16` -eq "0" ]; then
+    export VL_TOTAL_NODES=`expr $VL_TOTAL_CPU_COUNT / 16`
+else
+    export VL_TOTAL_NODES=`expr $VL_TOTAL_CPU_COUNT / 16 + 1`
+fi
+export VL_CPUS_PER_NODE=`expr $VL_TOTAL_CPU_COUNT / $VL_TOTAL_NODES`
 
 echo "#### Compute Environment start ####"
-env
+env | sort
 echo "#### Compute Environment end ####"
 
 source nci-util.sh
 
 # Move our working data to the job node file system
-cp -r "$VL_WORKING_DIR/." "$PBS_JOBFS" || finish 2 "ERROR: Unable to copy data from $VL_WORKING_DIR to job filesystem at $PBS_JOBFS"
-cp -r "$VL_OUTPUT_DIR/." "$PBS_JOBFS" || finish 2 "ERROR: Unable to copy data from $VL_OUTPUT_DIR to job filesystem at $PBS_JOBFS"
-cd "$PBS_JOBFS" || finish 2 "ERROR: Unable to access job filesystem at $PBS_JOBFS"
+cp -r "$VL_OUTPUT_DIR/." "$VL_WORKING_DIR" || finish 2 "ERROR: Unable to copy data from $VL_OUTPUT_DIR to working dir at $VL_WORKING_DIR"
+cd "$VL_WORKING_DIR" || finish 2 "ERROR: Unable to access working directory at $VL_WORKING_DIR"
 
 # Load Modules
 module purge
 {8}
 
 # Emulate our "cloud" command line tool
-export PATH="$PBS_JOBFS:$PATH"
+export PATH="$VL_WORKING_DIR:$PATH"
 echo ''#!/bin/bash'' > cloud
 echo ''cp "$2" "$VL_OUTPUT_DIR/$2"'' >> cloud
 chmod +x cloud

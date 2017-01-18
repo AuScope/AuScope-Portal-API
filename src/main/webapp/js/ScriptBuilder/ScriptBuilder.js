@@ -67,7 +67,8 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         this.editor = Ext.create('vegl.widgets.CodeEditorField',{
             mode      : 'python',
             name      : 'scriptcodefield',
-            readOnly  : true
+            readOnly  : true,
+            lint      : { getAnnotations: lintPython, delay: 2000 }
         });
 
         var editorPanel =  Ext.create('Ext.form.FormPanel', {

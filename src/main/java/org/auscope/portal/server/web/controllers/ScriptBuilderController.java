@@ -21,8 +21,11 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.LintResult;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
+import org.auscope.portal.server.web.service.TemplateLintService;
+import org.auscope.portal.server.web.service.TemplateLintService.TemplateLanguage;
 import org.auscope.portal.server.web.service.scm.Problem;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +57,9 @@ public class ScriptBuilderController extends BaseModelController {
     /** Handles SCM entries. */
     private ScmEntryService scmEntryService;
 
+    /** Script checking */
+    private TemplateLintService templateLintService;
+
     /**
      * Creates a new instance
      *
@@ -63,10 +69,12 @@ public class ScriptBuilderController extends BaseModelController {
     @Autowired
     public ScriptBuilderController(ScriptBuilderService sbService,
                                    VEGLJobManager jobManager,
-                                   ScmEntryService scmEntryService) {
+                                   ScmEntryService scmEntryService,
+                                   TemplateLintService templateLintService) {
         super(jobManager);
         this.sbService = sbService;
         this.scmEntryService = scmEntryService;
+        this.templateLintService = templateLintService;
     }
 
     /**
@@ -244,6 +252,58 @@ public class ScriptBuilderController extends BaseModelController {
         }
 
         return generateJSONResponseMAV(true, solutions, msg.toString());
+    }
+
+    /**
+     * Return a list of errors/warnings about a template.
+     *
+     * Passes the template string to pylint and turns the results into a list of
+     * error objects. Each entry contains a severity (error, warning etc),
+     * message string and the location in the code (from, to).
+     *
+     * The template language must be one of the following values:
+     * - python3
+     * - python2
+     *
+     * @param template String with template code
+     * @param lang String identifying template language (default=python3)
+     * @return List<LintResult> lint result objects
+     */
+    @RequestMapping("/lintTemplate.do")
+    public ModelAndView doLintTemplate(@RequestParam("template") String template,
+                                       @RequestParam(value="lang",
+                                                     required=false) String lang) {
+        TemplateLanguage templateLanguage = null;
+        String msg = "No errors or warnings found.";
+        List<LintResult> lints = null;
+
+        // Make sure it's a supported language
+        if (lang == null) {
+            templateLanguage = TemplateLanguage.PYTHON3;
+        }
+        else {
+            try {
+                templateLanguage = TemplateLanguage.valueOf(lang.toUpperCase());
+            }
+            catch (IllegalArgumentException ex) {
+                logger.error("Invalid template language for template linting", ex);
+                return generateJSONResponseMAV(false, null, "Unable to check unsupported template language.");
+            }
+        }
+
+        // Get the linter to do its thing
+        try {
+            lints = templateLintService.checkTemplate(template, templateLanguage);
+            if (lints != null && lints.size() > 0) {
+                msg = String.format("Found {} issues", lints.size());
+            }
+        }
+        catch (PortalServiceException ex) {
+            logger.warn("Template code check failed: " + ex.getMessage(), ex);
+            return generateJSONResponseMAV(false, null, "Template code check failed: " + ex.getMessage());
+        }
+
+        return generateJSONResponseMAV(lints != null, lints, msg);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

@@ -61,6 +61,14 @@ public class CloudStorageServiceNci extends CloudStorageService {
         return String.format("/g/data/%1$s/vl-jobs/%2$s", job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT), generateBaseKey(job));
     }
 
+    private boolean jobFileExists(ChannelSftp c, String fullPath) throws PortalServiceException {
+        try {
+            return c.ls(fullPath).size() > 0; // JSCH always throws an exception on missing paths. This is a catchall in case the behavior changes
+        } catch (SftpException ex) {
+            return false;
+        }
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -76,7 +84,11 @@ public class CloudStorageServiceNci extends CloudStorageService {
             Channel channel = session.openChannel("sftp");
             channel.connect();
             ChannelSftp c = (ChannelSftp) channel;
-            return new SshInputStream(session, c, c.get(fullPath));
+            if (jobFileExists(c, fullPath)) {
+                return new SshInputStream(session, c, c.get(fullPath));
+            } else {
+                return null;
+            }
         } catch (JSchException | SftpException e) {
             throw new PortalServiceException(e.getMessage(), e);
         }

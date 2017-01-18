@@ -1,12 +1,9 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
-import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.Charsets;
@@ -16,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUserDao;
 import org.auscope.portal.server.web.security.NCIDetails;
@@ -29,7 +27,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -51,21 +48,18 @@ public class UserController extends BasePortalController {
 
     private String tacVersion;
     
-    private String encryptionKey;
-
     @Autowired
     public UserController(ANVGLUserDao userDao, NCIDetailsDao nciDetailsDao,
-            VelocityEngine velocityEngine, 
+            VelocityEngine velocityEngine,
             @Value("${env.aws.account}") String awsAccount,
-            @Value("${termsconditions.version}") String tacVersion,
-            @Value("${env.nci.encryption.128bitkey}") String encryptionKey) {
+            @Value("${termsconditions.version}") String tacVersion) throws PortalServiceException {
         super();
+        
         this.userDao = userDao;
         this.nciDetailsDao = nciDetailsDao;
         this.velocityEngine = velocityEngine;
         this.awsAccount=awsAccount;
         this.tacVersion=tacVersion;
-        this.encryptionKey = encryptionKey;
     }
 
 
@@ -184,7 +178,7 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/getNCIDetails.do")
-    public ModelAndView getNCIDetails(@AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getNCIDetails(@AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -192,9 +186,9 @@ public class UserController extends BasePortalController {
         NCIDetails details = nciDetailsDao.getByUser(user);
         if(details != null) {
             try {
-                detailsObj.put("nciUsername", decrypt(details.getUsername()));
-                detailsObj.put("nciProject", decrypt(details.getProject()));
-                detailsObj.put("nciKey", decrypt(details.getKey()));
+                detailsObj.put("nciUsername", details.getUsername());
+                detailsObj.put("nciProject", details.getProject());
+                detailsObj.put("nciKey", details.getKey());
             } catch(Exception e) {
                 logger.error("Unable to decrypt NCI details: " + e.getLocalizedMessage());
             }
@@ -207,7 +201,7 @@ public class UserController extends BasePortalController {
     public ModelAndView setNCIDetails(@AuthenticationPrincipal ANVGLUser user,
             @RequestParam(required=false, value="nciUsername") String username,
             @RequestParam(required=false, value="nciProject") String project,
-            @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) {
+            @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) throws PortalServiceException {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -219,18 +213,18 @@ public class UserController extends BasePortalController {
         }
         boolean modified = false;
         try {
-            if (!StringUtils.isEmpty(username) || !StringUtils.equals(decrypt(details.getUsername()), username)) {
-                details.setUsername(encrypt(username));
+            if (!StringUtils.isEmpty(username) || !StringUtils.equals(details.getUsername(), username)) {
+                details.setUsername(username);
                 modified = true;
             }
-            if (!StringUtils.isEmpty(project) || !StringUtils.equals(decrypt(details.getProject()), project)) {
-                details.setProject(encrypt(project));
+            if (!StringUtils.isEmpty(project) || !StringUtils.equals(details.getProject(), project)) {
+                details.setProject(project);
                 modified = true;
             }
             if (key != null ) {
                 String keyString = key.getFileItem().getString();
-                if (!StringUtils.isEmpty(keyString) || !StringUtils.equals(decrypt(details.getKey()), keyString)) {            
-                    details.setKey(encrypt(keyString));
+                if (!StringUtils.isEmpty(keyString) || !StringUtils.equals(details.getKey(), keyString)) {            
+                    details.setKey(keyString);
                     modified = true;
                 }
             }
@@ -243,23 +237,5 @@ public class UserController extends BasePortalController {
         }
         return generateJSONResponseMAV(true);        
     }
-    
-    private byte[] encrypt(String message) throws Exception {
-        byte[] keyBytes = encryptionKey.getBytes();
-        Key key = new SecretKeySpec(keyBytes, "AES");
-        Cipher c = Cipher.getInstance("AES");
-        c.init(Cipher.ENCRYPT_MODE, key);
-        return c.doFinal(message.getBytes());
-    }
-    
-    private String decrypt(byte[] encryptedText) throws Exception {
-        byte[] keyBytes = encryptionKey.getBytes();
-        Key key = new SecretKeySpec(keyBytes, "AES");
-        Cipher c = Cipher.getInstance("AES");
-        c.init(Cipher.DECRYPT_MODE, key);
-        byte[] decValue = c.doFinal(encryptedText);
-        String decryptedValue = new String(decValue);
-        return decryptedValue;
-    }
-    
+
 }

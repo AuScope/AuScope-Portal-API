@@ -10,6 +10,8 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUserDao;
+import org.auscope.portal.server.web.security.NCIDetails;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -35,6 +37,23 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     private JobStatusMonitor jobStatusMonitor;
     private ANVGLUserDao jobUserDao;
     
+    private NCIDetailsDao nciDetailsDao;
+    
+    
+    /**
+     * @return the nciDetailsDao
+     */
+    public NCIDetailsDao getNciDetailsDao() {
+        return nciDetailsDao;
+    }
+
+    /**
+     * @param nciDetailsDao the nciDetailsDao to set
+     */
+    public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
+        this.nciDetailsDao = nciDetailsDao;
+    }
+
     public ANVGLUserDao getJobUserDao() {
         return jobUserDao;
     }
@@ -63,13 +82,19 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext ctx)
             throws JobExecutionException {
-        List<VEGLJob> jobs = jobManager.getPendingOrActiveJobs();
-        for (VEGLJob veglJob : jobs) {
-            ANVGLUser user = jobUserDao.getByEmail(veglJob.getEmailAddress());
-            veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
-            veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
-        }
         try {
+            List<VEGLJob> jobs = jobManager.getPendingOrActiveJobs();
+            for (VEGLJob veglJob : jobs) {
+                ANVGLUser user = jobUserDao.getByEmail(veglJob.getEmailAddress());
+                veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
+                veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
+                NCIDetails nciDetails = nciDetailsDao.getByUser(user);
+                if (nciDetails != null) {
+                    veglJob.setProperty(NCIDetails.PROPERTY_NCI_USER, nciDetails.getUsername());
+                    veglJob.setProperty(NCIDetails.PROPERTY_NCI_PROJECT, nciDetails.getProject());
+                    veglJob.setProperty(NCIDetails.PROPERTY_NCI_KEY, nciDetails.getKey());
+                }
+            }
             jobStatusMonitor.statusUpdate(jobs);
         } catch (Exception ex) {
             LOG.info(String.format("Error update jobs: %1$s", ex.getMessage()));

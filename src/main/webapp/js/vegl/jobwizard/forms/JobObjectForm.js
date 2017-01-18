@@ -405,32 +405,33 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             return;
         }
 
-        this.getComponent('image-combo').clearValue();
+        var imageCombo = this.getComponent('image-combo');
+        imageCombo.clearValue();
         var resourceCombo = this.getComponent('resource-combo');
         resourceCombo.clearValue();
 
         if (combo.getValue() === 'nci-raijin-compute') {
             resourceCombo.setHidden(true).setDisabled(true);
-
             this.getComponent('ncpus').setHidden(false).setDisabled(false);
             this.getComponent('jobfs').setHidden(false).setDisabled(false);
             this.getComponent('mem').setHidden(false).setDisabled(false);
+
         } else {
             resourceCombo.setDisabled(false).setHidden(false);
             this.getComponent('ncpus').setHidden(true).setDisabled(true);
             this.getComponent('jobfs').setHidden(true).setDisabled(true);
             this.getComponent('mem').setHidden(true).setDisabled(true);
-
-            this.imageStore.getProxy().setExtraParam('computeServiceId', records.get('id'));
-            this.imageStore.load({
-                scope: this,
-                callback: function(records, operation, success) {
-                    if (records.length === 1) {
-                        this.getComponent('image-combo').setValue(records[0]);
-                    }
-                }
-            });
         }
+
+        this.imageStore.getProxy().setExtraParam('computeServiceId', records.get('id'));
+        this.imageStore.load({
+            scope: this,
+            callback: function(records, operation, success) {
+                if (records.length === 1) {
+                    this.getComponent('image-combo').setValue(records[0]);
+                }
+            }
+        });
     },
 
     /**

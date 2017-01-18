@@ -193,12 +193,13 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a success attribute and an error attribute
      *         in case the series was not found in the job manager.
+     * @throws PortalServiceException 
      */
     @RequestMapping("/secure/deleteSeriesJobs.do")
     public ModelAndView deleteSeriesJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
 
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
@@ -351,12 +352,13 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a success attribute and an error attribute
      *         in case the series was not found in the job manager.
+     * @throws PortalServiceException 
      */
     @RequestMapping("/secure/killSeriesJobs.do")
     public ModelAndView killSeriesJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
 
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
@@ -457,7 +459,8 @@ public class JobListController extends BaseCloudController  {
                 fileDetails = cloudStorageService.listJobFiles(job);
             }
         } catch (Exception e) {
-            logger.warn("Error fetching output directory information.", e);
+            logger.warn("Error fetching output directory information."+e.getMessage());
+            logger.debug("Exception details:",e);
             return generateJSONResponseMAV(false, null, "Error fetching output directory information");
         }
 
@@ -672,13 +675,14 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VEGLJob</code> objects.
+     * @throws PortalServiceException 
      */
     @RequestMapping("/secure/listJobs.do")
     public ModelAndView listJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
@@ -749,13 +753,14 @@ public class JobListController extends BaseCloudController  {
 
     /**
      * Returns a JSON array of jobStatus and jobId tuples
+     * @throws PortalServiceException 
      *
      */
     @RequestMapping("/secure/jobsStatuses.do")
     public ModelAndView jobStatuses(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -795,13 +800,14 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VEGLJob</code> objects.
+     * @throws PortalServiceException 
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/secure/treeJobs.do")
     public ModelAndView treeJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
