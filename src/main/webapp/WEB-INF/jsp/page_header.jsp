@@ -50,8 +50,9 @@
 </div>
 
 <script type="text/javascript">
-    var AAF_LOGIN_URL = "${aafLoginUrl}";
     window.onload = function() {
-    	document.getElementById('aaf-login').onclick = function() { location=AAF_LOGIN_URL };
+    	var aafLogin = document.getElementById('aaf-login');
+    	if (aafLogin)
+    		   aafLogin.onclick = function() { location="${aafLoginUrl}" };
     }
 </script>
