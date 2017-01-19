@@ -138,7 +138,7 @@ private String googleMapKey;
     * @param response
     * @return
     * @throws IOException
- * @throws URISyntaxException
+    * @throws URISyntaxException
     */
    @RequestMapping("/*.html")
    public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
@@ -165,11 +165,12 @@ private String googleMapKey;
            if (!user.isFullyConfigured()) {
                String uri = request.getRequestURI();
                if (!uri.contains("login.html") &&                       
+                   /*!uri.contains("login_oauth.html") &&*/
                    !uri.contains("gmap.html") &&
                    !uri.contains("user.html") &&
                    !uri.contains("admin.html")) {
                    String params = "";
-                   if (!uri.contains("login.html")) {
+                   if (!uri.contains("login.html")/* && !uri.contains("login_oauth.html")*/) {
                        params = "?next=" + new URI(uri).getPath();
                    }
                    return new ModelAndView("redirect:/user.html" + params);

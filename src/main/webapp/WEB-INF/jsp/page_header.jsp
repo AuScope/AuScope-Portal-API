@@ -19,7 +19,7 @@
                 <div class="login-text">Login<div class="dropdownicon"></div>
                 </div>
                 <div class="sub-menu">
-					<div class="google-small-icon" title="Login with Google" onclick="location.href='login.html';"></div>
+					<div id="google-login" class="google-small-icon" title="Login with Google" onclick="location.href='oauth/login.html';"></div>
 					<div id="aaf-login" class="aaf-small-icon" title="Login with AAF"></div>
 				</div>
 			</security:authorize>

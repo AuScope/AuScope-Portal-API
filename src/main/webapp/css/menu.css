@@ -151,6 +151,20 @@
     right: 0;
 }
 
+.google-medium-icon {
+    background-image: url("../img/google_132x54.png");
+    cursor: pointer;
+    width: 132px;
+    height: 54px;
+}
+
+.aaf-medium-icon {
+    background-image: url("../img/aaf_service_223x54.png");
+    cursor: pointer;
+    width: 223px;
+    height: 54px;
+}
+
 #latlng, #permalinkicon, #permalink {
     display: none;
 }

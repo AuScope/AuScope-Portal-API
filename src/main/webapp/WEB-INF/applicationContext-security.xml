@@ -8,12 +8,36 @@
                              http://www.springframework.org/schema/security
                              http://www.springframework.org/schema/security/spring-security-4.0.xsd">
 
-    <!-- Common entry point -->
-    <http entry-point-ref="oAuth2EntryPoint">
+
+    <!-- Default entry point ref to redirect to login page on unauthorised attempts to access secure pages -->
+    <beans:bean id="defaultEntryPoint" class="org.auscope.portal.server.web.security.DefaultEntryPoint">
+        <beans:property name="realmName" value="ANVGL-Portal" />
+        <!-- <beans:property name="aafLoginUrl" value="${HOST.aafLoginUrl}" /> -->
+    </beans:bean>
+    
+    
+    <!-- Google OAuth2 endpoint required now that login.html doesn't send users to their Google account -->
+    <http pattern="/oauth/**" entry-point-ref="oAuth2EntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
         </headers>
-        <intercept-url pattern="/login.html" access="isAuthenticated()"/>
+        <intercept-url pattern="/oauth/login.html" access="isAuthenticated()"/>
+        <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
+        <logout logout-url="/j_spring_security_logout" logout-success-url="/gmap.html"/>
+        <s:csrf disabled="true"/>
+    </http>
+    
+
+    <!-- Common entry point -->
+    <!-- <http entry-point-ref="oAuth2EntryPoint"> -->
+    <http entry-point-ref="defaultEntryPoint">
+        <headers>
+            <frame-options policy="SAMEORIGIN"/>
+        </headers>
+        
+        <!-- <intercept-url pattern="/login.html" access="isAuthenticated()"/> -->
+        <intercept-url pattern="/login.html" access="isAnonymous()"/>
+        
         <intercept-url pattern="/aaf/login" access="isAnonymous()"/>
         <intercept-url pattern="/gridsubmit.html" access="isAuthenticated()"/>
         <intercept-url pattern="/jobbuilder.html" access="isAuthenticated()"/>
@@ -22,11 +46,13 @@
         <intercept-url pattern="/secure/*" access="isAuthenticated()"/>
         <intercept-url pattern="/admin.html" access="hasRole('ROLE_ADMINISTRATOR')"/>
         <intercept-url pattern="/*.diag" access="hasRole('ROLE_ADMINISTRATOR')"/>        
-        <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
+        <!-- <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/> -->
+        <custom-filter ref="oauth2AuthFilter" after="FORM_LOGIN_FILTER"/>
         <custom-filter ref="aafFilter" before="FORM_LOGIN_FILTER"/>
         <logout logout-url="/j_spring_security_logout" logout-success-url="/gmap.html"/>
         <s:csrf disabled="true"/>
     </http>
+
 
     <!-- Google OAuth2 -->
     <beans:bean id="oAuth2EntryPoint" class="com.racquettrack.security.oauth.OAuth2AuthenticationEntryPoint">
