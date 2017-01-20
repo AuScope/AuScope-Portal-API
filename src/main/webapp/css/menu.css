@@ -127,10 +127,16 @@
 .sub-menu-image {
     display:none;
     position:absolute;
-    background: #ffffff;    
+    background: #ffffff;
     padding:2px 5px 2px 5px;
     min-width: 120px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.login-message {
+	font: 18px/40px sans-serif;
+    color: black;
+    padding: 12px 16px;
 }
 
 .google-small-icon {

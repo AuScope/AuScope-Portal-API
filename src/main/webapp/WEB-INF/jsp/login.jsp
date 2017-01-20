@@ -20,13 +20,7 @@
     <script type="text/javascript" src="CodeMirror-5.16/mode/python/python.js"></script>
     <script type="text/javascript" src="CodeMirror-5.16/mode/javascript/javascript.js"></script>
     
-
     <!-- Portal Core Includes -->
-    <%-- 
-    <jsp:include page="../../portal-core/jsimports.jsp"/>
-    <jsp:include page="../../portal-core/cssimports.jsp"/>
-    <jsp:include page="../../cssimports.htm"/>
-    --%>
     <jsp:include page="../../portal-core/cssimports.jsp"/>
     <jsp:include page="../../cssimports.htm"/>
 </head>
@@ -34,10 +28,10 @@
 <body>
     <%@ include file="page_header.jsp" %>
     <div id="body">
-    <br><br><br><br><br>
+    <br><br><br><br>
         <div class="login-message">
-        <p>Please log in to the system by choosing one of the login options below.</p>
-        <div id="google-login-choice" class="google-medium-icon" title="Log in with Google"></div><br>
+        <p>You are not authorised to view the page you have selected.<br>Did you forgot to log in? Please choose one of the options below.</p>
+        <div id="google-login-choice" class="google-medium-icon" title="Log in with Google" onclick="location.href='oauth/google_login.html';"></div><br>
         <div id="aaf-login-choice" class="aaf-medium-icon" title="Log in with AAF"></div>
         </div>
     </div>

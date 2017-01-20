@@ -140,7 +140,7 @@ private String googleMapKey;
     * @throws IOException
     * @throws URISyntaxException
     */
-   @RequestMapping("/*.html")
+   @RequestMapping("/**/*.html")
    public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
        //Detect whether this is a new session or not...
        HttpSession session = request.getSession();
@@ -156,6 +156,9 @@ private String googleMapKey;
            return null;
        }
        String requestedResource = requestComponents[requestComponents.length - 1];
+       // OAuth login requires a lower level url, check for this
+       if(requestComponents.length > 1 && requestUri.contains("oauth"))
+           requestedResource = "oauth/" + requestedResource;
        String resourceName = requestedResource.replace(".html", "");
 
        logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
@@ -164,13 +167,12 @@ private String googleMapKey;
        if (user != null) {
            if (!user.isFullyConfigured()) {
                String uri = request.getRequestURI();
-               if (!uri.contains("login.html") &&                       
-                   /*!uri.contains("login_oauth.html") &&*/
+               if (!uri.contains("login.html") &&
                    !uri.contains("gmap.html") &&
                    !uri.contains("user.html") &&
                    !uri.contains("admin.html")) {
                    String params = "";
-                   if (!uri.contains("login.html")/* && !uri.contains("login_oauth.html")*/) {
+                   if (!uri.contains("login.html")) {
                        params = "?next=" + new URI(uri).getPath();
                    }
                    return new ModelAndView("redirect:/user.html" + params);
@@ -193,5 +195,5 @@ private String googleMapKey;
 
        return mav;
    }
-   
+
 }
