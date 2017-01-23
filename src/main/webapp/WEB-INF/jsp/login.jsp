@@ -36,12 +36,3 @@
 </body>
 
 </html>
-
-<script type="text/javascript">
-    window.onload = function() {
-    	var aafLoginItems = document.getElementsByName('aaf-login');
-        for(var i=0; i<aafLoginItems.length; i++) {
-               aafLoginItems[i].onclick = function() { location="${aafLoginUrl}" };
-        }
-    }
-</script>
