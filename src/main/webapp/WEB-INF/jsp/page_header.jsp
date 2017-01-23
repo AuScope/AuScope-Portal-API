@@ -19,8 +19,8 @@
                 <div class="login-text">Login<div class="dropdownicon"></div>
                 </div>
                 <div class="sub-menu">
-					<div id="google-login" class="google-small-icon" title="Login with Google" onclick="location.href='oauth/google_login.html';"></div>
-					<div id="aaf-login" class="aaf-small-icon" title="Login with AAF"></div>
+					<div name="google-login" class="google-small-icon" title="Login with Google" onclick="location.href='oauth/google_login.html';"></div>
+					<div name="aaf-login" class="aaf-small-icon" title="Login with AAF"></div>
 				</div>
 			</security:authorize>
 
@@ -51,8 +51,9 @@
 
 <script type="text/javascript">
     window.onload = function() {
-    	var aafLogin = document.getElementById('aaf-login');
-    	if (aafLogin)
-    		   aafLogin.onclick = function() { location="${aafLoginUrl}" };
+    	var aafLoginItems = document.getElementsByName('aaf-login');
+        for(var i=0; i<aafLoginItems.length; i++) {
+               aafLoginItems[i].onclick = function() { location="${aafLoginUrl}" };
+        }
     }
 </script>

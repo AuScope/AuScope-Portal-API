@@ -26,9 +26,10 @@
     <%@ include file="page_header.jsp" %>
     <div id="body">
         <div class="login-message">
-	        <p>You are not authorised to view the page you have selected.<br>Did you forgot to log in? Please choose one of the options below.</p>
-	        <div id="google-login-choice" class="google-medium-icon" title="Log in with Google" onclick="location.href='oauth/google_login.html';"></div><br>
-	        <div id="aaf-login-choice" class="aaf-medium-icon" title="Log in with AAF"></div>
+	        <h2>Authorisation Required</h2>You are not authorised to view the page you have selected.<br>
+	        Did you forgot to log in? Please log in using one of the options below.<br>
+	        <div name="google-login" class="google-medium-icon" title="Log in with Google" onclick="location.href='oauth/google_login.html';"></div>
+	        <div name="aaf-login" class="aaf-medium-icon" title="Log in with AAF"></div>
         </div>
     </div>
     <%@ include file="page_footer.jsp" %>
@@ -38,8 +39,9 @@
 
 <script type="text/javascript">
     window.onload = function() {
-        var aafLogin = document.getElementById('aaf-login-choice');
-        if (aafLogin)
-               aafLogin.onclick = function() { location="${aafLoginUrl}" };
+    	var aafLoginItems = document.getElementsByName('aaf-login');
+        for(var i=0; i<aafLoginItems.length; i++) {
+               aafLoginItems[i].onclick = function() { location="${aafLoginUrl}" };
+        }
     }
 </script>
