@@ -134,9 +134,14 @@
 }
 
 .login-message {
+	border: 1px solid #000000;
 	font: 18px/40px sans-serif;
     color: black;
-    padding: 12px 16px;
+    padding: 12px 12px;
+    margin: 10px 10px;
+    position: relative;
+    width: 50%;
+    top: 80px;
 }
 
 .google-small-icon {

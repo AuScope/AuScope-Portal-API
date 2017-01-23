@@ -28,7 +28,7 @@
 <body>
     <%@ include file="page_header.jsp" %>
     <div id="body">
-    <br><br><br><br>
+        <!-- <br><br><br><br> -->
         <div class="login-message">
         <p>You are not authorised to view the page you have selected.<br>Did you forgot to log in? Please choose one of the options below.</p>
         <div id="google-login-choice" class="google-medium-icon" title="Log in with Google" onclick="location.href='oauth/google_login.html';"></div><br>
