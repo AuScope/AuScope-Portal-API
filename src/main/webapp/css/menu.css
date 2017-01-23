@@ -140,8 +140,14 @@
     cursor: pointer;
     width: 64px;
     height: 26px;
-    left: auto;
-    right: 0;
+    padding-right: 46px;
+    background-repeat: no-repeat;
+    position: relative;
+    right: 4px;
+}
+
+.google-small-icon:hover {
+    border: 1px solid #1368ad;
 }
 
 .aaf-small-icon {
@@ -149,8 +155,13 @@
     cursor: pointer;
     width: 110px;
     height: 26px;
-    left: auto;
-    right: 0;
+    
+    position: relative;
+    right: 4px;
+}
+
+.aaf-small-icon:hover {
+	border: 1px solid #1368ad;
 }
 
 .google-medium-icon {
