@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by wis056 on 7/04/2015.
@@ -96,13 +95,12 @@ public class JWTManagement {
     private ANVGLUser registerAAFUser(AAFAttributes attributes) {
         ANVGLUser anvglUser = userDetailsLoader.getUserByUserEmail(attributes.email);
         if (anvglUser == null) {
-            String userId = UUID.randomUUID().toString();
             Map<String, Object> userAttributes = new HashMap<String, Object>();
-            userAttributes.put("id", userId);
+            userAttributes.put("id", attributes.email);
             userAttributes.put("email", attributes.email);
             if(attributes.displayName != null && !attributes.displayName.equals(""))
                 userAttributes.put("name", attributes.displayName);
-            anvglUser = (ANVGLUser)userDetailsLoader.createUser(userId, userAttributes);
+            anvglUser = (ANVGLUser)userDetailsLoader.createUser(attributes.email, userAttributes);
         }
         return anvglUser;
     }
