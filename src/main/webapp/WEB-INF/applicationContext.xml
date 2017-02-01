@@ -56,7 +56,7 @@
         <property name="maxLengthForJobNameInSubject" value="15" />
         <property name="maxLinesForTail" value="5" />
         <property name="emailSender" value="${HOST.portalAdminEmail}"/>
-        <property name="emailSubject" value="ANVGL Job (%s)" />
+        <property name="emailSubject" value="VGL Job (%s)" />
         <property name="portalUrl" value="${HOST.portalUrl}"/>
     </bean>
     
@@ -215,7 +215,7 @@
         <constructor-arg name="stripExpectHeader" value="true"/>
         <property name="name" value="Amazon Web Services - S3"/>
         <property name="id" value="amazon-aws-storage-sydney"/>
-        <property name="bucket" value="anvgl-csiro-"/>
+        <property name="bucket" value="vgl-csiro-"/>
         <property name="adminEmail" value="${HOST.portalAdminEmail}"/>
         <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
     </bean>

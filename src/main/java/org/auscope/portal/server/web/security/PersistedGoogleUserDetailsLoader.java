@@ -86,7 +86,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     }
 
     protected String generateRandomBucketName() {
-        return "anvgl-" + RandomStringUtils.random(32, 0, 0, false, false, BUCKET_NAME_WHITELIST, this.random);
+        return "vgl-" + RandomStringUtils.random(32, 0, 0, false, false, BUCKET_NAME_WHITELIST, this.random);
     }
 
     @Override

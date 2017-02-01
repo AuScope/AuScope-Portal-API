@@ -4,8 +4,8 @@
 <div class="header-container">
     <div class="banner"
         onclick="window.open('about.html','AboutWin','toolbar=no, menubar=no,location=no,resizable=no,scrollbars=yes,statusbar=no,top=100,left=200,height=650,width=450');return false">
-	    <span class="sr-only">Government of Western Australia - Department of Mines and Petroleum</span>
-        <span id="app-title" class="sr-only">Australian National <br/> Virtual Geophysics Laboratory</span>
+	    <span class="sr-only">AuScope</span>
+        <span id="app-title" class="sr-only">CSIRO </br> Virtual Geophysics Laboratory</span>
 	</div>
 	<div class="menu">
 		

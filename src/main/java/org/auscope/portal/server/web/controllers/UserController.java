@@ -168,7 +168,7 @@ public class UserController extends BasePortalController {
         String cloudFormationScript = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, CLOUD_FORMATION_RESOURCE, "UTF-8", model);
 
         response.setContentType("application/octet");
-        response.setHeader("Content-Disposition", "inline; filename=anvgl-cloudformation.json;");
+        response.setHeader("Content-Disposition", "inline; filename=vgl-cloudformation.json;");
 
         try {
             response.getOutputStream().write(cloudFormationScript.getBytes(Charsets.UTF_8));

@@ -1,6 +1,6 @@
 Dear ${userName},
 
-Your ANVGL job has finished processing.
+Your VGL job has finished processing.
 
 Job details:
 ------------

@@ -90,7 +90,7 @@ if [ ! -d "$moduleDir/vl_common" ]; then
     fi
 
     # Assumes our temp dir does not already have content!
-    tmpModulesDir="/opt/anvgl/modules"
+    tmpModulesDir="/opt/vgl/modules"
     if [ "$1" !=  "" ]
     then
         baseUrl="$1"

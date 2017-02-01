@@ -16,7 +16,7 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
      */
     constructor : function(config) {
         tm = new Ext.util.TextMetrics(),
-        n = tm.getWidth("ANVGL Access ARN:");
+        n = tm.getWidth("VGL Access ARN:");
       
         Ext.apply(config, {
             layout: 'fit',
@@ -29,7 +29,7 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     xtype: 'textfield',
                     itemId: 'arnExecution',
                     name: 'arnExecution',
-                    fieldLabel: 'ANVGL Access ARN',
+                    fieldLabel: 'VGL Access ARN',
                     labelWidth: n,
                     anchor: '100%',
                     allowBlank: false,
@@ -61,7 +61,7 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     allowBlank: true,
                     plugins: [{
                         ptype: 'fieldhelptext',
-                        text: 'The (optional) name of the key to be applied to every VM started by ANVGL'
+                        text: 'The (optional) name of the key to be applied to every VM started by VGL'
                     }]
                 }]
             }],

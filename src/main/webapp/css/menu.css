@@ -8,8 +8,8 @@
 
 .banner {
 	width:700px;
-	height: 60px;
-	background:url(../img/banner.png) 0 0px no-repeat;
+	height: 100px;
+	background:url(../img/img-auscope-banner.gif) 0 0px no-repeat;
 	cursor: pointer;
 }
 
