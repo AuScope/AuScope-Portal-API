@@ -138,12 +138,12 @@
 }
 
 .google-small-icon {
-    background-image: url("../img/google_64x26.png");
+    background-image: url("../img/btn_google_signin_light_normal_web.png");
     background-repeat: no-repeat;
+    background-size: contain;
     cursor: pointer;
-    width: 64px;
     height: 26px;
-    padding-right: 46px;
+    width: 110px;
     position: relative;
     right: 4px;
 }
@@ -167,10 +167,12 @@
 }
 
 .google-medium-icon {
-    background-image: url("../img/google_132x54.png");
+    background-image: url("../img/btn_google_signin_light_normal_web2x.png");
+    background-repeat: no-repeat;
+    background-size: contain;
     cursor: pointer;
-    width: 132px;
     height: 54px;
+    width: 223px;
     margin-top: 20px;
     float: left;
 }
