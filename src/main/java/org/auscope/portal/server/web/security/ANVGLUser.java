@@ -14,6 +14,10 @@ import org.springframework.security.core.userdetails.UserDetails;
  *
  */
 public class ANVGLUser implements UserDetails {
+    
+    // Authentication frameworks
+    public static final Integer GOOGLE_AUTH = 0;
+    public static final Integer AAF_AUTH = 1;
 
     private String id;
     private String fullName;
@@ -25,6 +29,7 @@ public class ANVGLUser implements UserDetails {
     private String awsSecret;
     private String awsKeyName;
     private Integer acceptedTermsConditions;
+    private Integer authenticationFramework;
 
     public ANVGLUser() {
         this.authorities = new ArrayList<>();
@@ -39,7 +44,8 @@ public class ANVGLUser implements UserDetails {
     }
 
     /**
-     * Gets the ID as reported by the remote authentication service (Probably google)
+     * Gets the ID as reported by the remote authentication service (Probably google).
+     * AAF doesn't return a unique ID so we use the user's email address in this case.
      * @return
      */
     public String getId() {
@@ -47,7 +53,8 @@ public class ANVGLUser implements UserDetails {
     }
 
     /**
-     * Sets the ID as reported by the remote authentication service (Probably google)
+     * Sets the ID as reported by the remote authentication service (Probably google).
+     * AAF doesn't return a unique ID so we use the user's email address in this case.
      * @return
      */
     public void setId(String id) {
@@ -175,6 +182,14 @@ public class ANVGLUser implements UserDetails {
 
     public void setAwsSecret(String awsSecret) {
         this.awsSecret = awsSecret;
+    }
+    
+    public Integer getAuthenticationFramework() {
+        return this.authenticationFramework;
+    }
+    
+    public void setAuthenticationFramework(Integer authenticationFramework) {
+        this.authenticationFramework = authenticationFramework;
     }
 
     /**

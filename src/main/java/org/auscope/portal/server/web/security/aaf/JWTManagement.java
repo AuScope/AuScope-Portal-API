@@ -101,6 +101,7 @@ public class JWTManagement {
             if(attributes.displayName != null && !attributes.displayName.equals(""))
                 userAttributes.put("name", attributes.displayName);
             anvglUser = (ANVGLUser)userDetailsLoader.createUser(attributes.email, userAttributes);
+            anvglUser.setAuthenticationFramework(ANVGLUser.AAF_AUTH);
         }
         return anvglUser;
     }

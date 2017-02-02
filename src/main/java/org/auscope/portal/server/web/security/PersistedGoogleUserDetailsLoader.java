@@ -114,6 +114,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
 
         ANVGLUser newUser = new ANVGLUser();
         applyInfoToUser(newUser, userInfo);
+        newUser.setAuthenticationFramework(ANVGLUser.GOOGLE_AUTH);
         userDao.save(newUser); //create our new user
 
         synchronized(this.random) {
