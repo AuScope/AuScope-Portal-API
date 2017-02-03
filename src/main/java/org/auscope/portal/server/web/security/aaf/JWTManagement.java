@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.auscope.portal.server.web.security.aaf.AAFAuthentication;
 import org.auscope.portal.server.web.security.aaf.AAFJWT;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
 import org.auscope.portal.server.web.security.aaf.AAFAttributes;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -101,7 +102,7 @@ public class JWTManagement {
             if(attributes.displayName != null && !attributes.displayName.equals(""))
                 userAttributes.put("name", attributes.displayName);
             anvglUser = (ANVGLUser)userDetailsLoader.createUser(attributes.email, userAttributes);
-            anvglUser.setAuthenticationFramework(ANVGLUser.AAF_AUTH);
+            anvglUser.setAuthentication(AuthenticationFramework.AAF);
         }
         return anvglUser;
     }

@@ -16,8 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class ANVGLUser implements UserDetails {
     
     // Authentication frameworks
-    public static final Integer GOOGLE_AUTH = 0;
-    public static final Integer AAF_AUTH = 1;
+    public enum AuthenticationFramework { GOOGLE, AAF }
 
     private String id;
     private String fullName;
@@ -29,7 +28,7 @@ public class ANVGLUser implements UserDetails {
     private String awsSecret;
     private String awsKeyName;
     private Integer acceptedTermsConditions;
-    private Integer authenticationFramework;
+    private AuthenticationFramework authentication;
 
     public ANVGLUser() {
         this.authorities = new ArrayList<>();
@@ -184,12 +183,12 @@ public class ANVGLUser implements UserDetails {
         this.awsSecret = awsSecret;
     }
     
-    public Integer getAuthenticationFramework() {
-        return this.authenticationFramework;
+    public AuthenticationFramework getAuthentication() {
+        return this.authentication;
     }
     
-    public void setAuthenticationFramework(Integer authenticationFramework) {
-        this.authenticationFramework = authenticationFramework;
+    public void setAuthentication(AuthenticationFramework authentication) {
+        this.authentication = authentication;
     }
 
     /**
