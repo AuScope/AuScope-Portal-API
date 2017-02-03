@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.racquettrack.security.oauth.OAuth2UserDetailsLoader;
@@ -114,6 +115,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
 
         ANVGLUser newUser = new ANVGLUser();
         applyInfoToUser(newUser, userInfo);
+        newUser.setAuthentication(AuthenticationFramework.GOOGLE);
         userDao.save(newUser); //create our new user
 
         synchronized(this.random) {
