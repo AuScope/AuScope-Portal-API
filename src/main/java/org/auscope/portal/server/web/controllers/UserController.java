@@ -237,5 +237,5 @@ public class UserController extends BasePortalController {
         }
         return generateJSONResponseMAV(true);        
     }
-    
+
 }

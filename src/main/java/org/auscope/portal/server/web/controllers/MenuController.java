@@ -52,12 +52,15 @@ public class MenuController {
 private String googleMapKey;
 
    private String googleAnalyticsKey;
+   private String aafLoginUrl;
 
    @Autowired
-   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey, @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey) {
+   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey, @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey,
+           @Value("${HOST.aafLoginUrl}") String aafLoginUrl) {
        this.buildStamp = null;
        this.googleMapKey = googleMapKey;
        this.googleAnalyticsKey = googleAnalyticsKey;
+       this.aafLoginUrl = aafLoginUrl;
    }
 
    /**
@@ -135,9 +138,9 @@ private String googleMapKey;
     * @param response
     * @return
     * @throws IOException
- * @throws URISyntaxException
+    * @throws URISyntaxException
     */
-   @RequestMapping("/*.html")
+   @RequestMapping("/**/*.html")
    public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
        //Detect whether this is a new session or not...
        HttpSession session = request.getSession();
@@ -153,6 +156,9 @@ private String googleMapKey;
            return null;
        }
        String requestedResource = requestComponents[requestComponents.length - 1];
+       // OAuth login requires a lower level url, check for this
+       if(requestComponents.length > 1 && requestUri.contains("oauth"))
+           requestedResource = "oauth/" + requestedResource;
        String resourceName = requestedResource.replace(".html", "");
 
        logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
@@ -165,12 +171,10 @@ private String googleMapKey;
                    !uri.contains("gmap.html") &&
                    !uri.contains("user.html") &&
                    !uri.contains("admin.html")) {
-
                    String params = "";
                    if (!uri.contains("login.html")) {
                        params = "?next=" + new URI(uri).getPath();
                    }
-
                    return new ModelAndView("redirect:/user.html" + params);
                }
            }
@@ -180,6 +184,7 @@ private String googleMapKey;
        ModelAndView mav = new ModelAndView(resourceName);
 
        mav.addObject("isNewSession", isNewSession);
+       mav.addObject("aafLoginUrl", aafLoginUrl);
 
        //Customise the model as required
        addGoogleKeys(mav); //always add the google keys
@@ -190,4 +195,5 @@ private String googleMapKey;
 
        return mav;
    }
+
 }

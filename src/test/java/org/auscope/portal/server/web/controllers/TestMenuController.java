@@ -31,7 +31,7 @@ public class TestMenuController extends PortalTestClass {
 
     @Before
     public void setup() {
-        mc = new MenuController(gMapKey, gAnalyticsKey);
+        mc = new MenuController(gMapKey, gAnalyticsKey, "aaf_login_url.html");
         mc.setBuildStamp("FFFF");
 
         //Global expectations for setting build stamp id
