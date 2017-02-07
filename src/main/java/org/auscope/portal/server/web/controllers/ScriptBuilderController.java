@@ -180,8 +180,8 @@ public class ScriptBuilderController extends BaseModelController {
             logger.error("Unable to read template resource - " + templateResource + ":" + e.getMessage());
             logger.debug("Exception:", e);
             return generateJSONResponseMAV(false, null, "Internal server error when loading template.");
-        } 
-        
+        }
+
         String finalTemplate = sbService.populateTemplate(templateString,
                 kvpMapping);
         return generateJSONResponseMAV(true, finalTemplate, "");
@@ -303,7 +303,7 @@ public class ScriptBuilderController extends BaseModelController {
             return generateJSONResponseMAV(false, null, "Template code check failed: " + ex.getMessage());
         }
 
-        return generateJSONResponseMAV(lints != null, lints, msg);
+        return generateJSONResponseMAV(true, lints, msg);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
