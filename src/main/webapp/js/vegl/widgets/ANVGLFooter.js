@@ -5,9 +5,10 @@ Ext.define('vegl.widgets.ANVGLFooter', {
 	alias	: 'widget.ANVGLFooter',
 	extend	: 'Ext.panel.Panel',
 	height	: 90,
+	width	: 371,
 	html	: '<ul>'
-			+ 	'<li><img id="img-gswa" src="img/logos/geographical-survey-of-western-australia.jpg" alt="Geographical Survey of Western Australia" /></li>'
-			+ 	'<li><img id="img-eic" src="img/logos/exploration-incentive-scheme.jpg" alt="Exploration Incentive Scheme" /></li>'
+        +     '<li><img height="90" width="90" id="img-csiro" src="img/logos/CSIRO_Grad_RGB_lr.jpg" alt="CSIRO" /></li>'
+        +     '<li><img height="90" width="281" id="img-auscope" src="img/logos/auscope.jpg" alt="CSIRO" /></li>'
 			+ '</ul>',
 	id		: "anvgl-footer"
 });

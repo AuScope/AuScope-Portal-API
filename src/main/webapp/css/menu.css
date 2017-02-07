@@ -7,9 +7,9 @@
 }
 
 .banner {
-	width:700px;
-	height: 60px;
-	background:url(../img/banner.png) 0 0px no-repeat;
+	width:372px;
+	height: 57px;
+	background:url(../img/img-auscope-banner.gif) 3px 3px/372px 52px no-repeat;
 	cursor: pointer;
 }
 
@@ -207,7 +207,4 @@
 	vertical-align : middle;
 }
 
-#anvgl-footer li img {
-	width : 180px;
-}
 /* !ANVGL-12 updates */

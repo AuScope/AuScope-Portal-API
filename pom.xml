@@ -3,14 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auscope.portal</groupId>
-    <artifactId>ANVGL-Portal</artifactId>
+    <artifactId>VGL-Portal</artifactId>
     <packaging>war</packaging>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ANVGL-Portal</name>
-    <url>https://confluence.csiro.au/display/ANVGL/ANVGL</url>
+    <name>VGL-Portal</name>
+    <url>https://confluence.csiro.au/display/VGL/VGL</url>
     <issueManagement>
         <system>Jira</system>
-        <url>https://jira.csiro.au/browse/ANVGL</url>
+        <url>https://jira.csiro.au/projects/VGL</url>
     </issueManagement>
     <scm>
         <connection>scm:git:https://github.com/AuScope/ANVGL-Portal</connection>
@@ -24,7 +24,7 @@
         <url>http://csiro.au</url>
     </organization>
     <build>
-        <finalName>ANVGL-Portal</finalName>
+        <finalName>VGL-Portal</finalName>
         <plugins>
         
             <plugin>

@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <title>ANVGL Portal - Monitor Jobs</title>
+    <title>VGL Portal - Monitor Jobs</title>
     
     <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     

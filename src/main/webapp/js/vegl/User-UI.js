@@ -84,7 +84,7 @@ Ext.application({
                         }]
                     },{
                         xtype: 'panel',
-                        title: 'Step 2: Configuring ANVGL',
+                        title: 'Step 2: Configuring VGL',
                         flex: 0.6,
                         height: '100%',
                         margin: '0 0 0 10',
@@ -128,7 +128,7 @@ Ext.application({
                     mask.show();
                     getTCs(function(tcSuccess, tcHtml, tcVersion) {
                         if (!tcSuccess) {
-                            Ext.MessageBox.alert('Error','Failed to contact ANVGL server. Please try refreshing the page.');
+                            Ext.MessageBox.alert('Error','Failed to contact VGL server. Please try refreshing the page.');
                             mask.hide();
                             return;
                         }
@@ -138,7 +138,7 @@ Ext.application({
                             callback: function(options, success, response) {
                                 mask.hide();
                                 if (!success) {
-                                    Ext.MessageBox.alert('Error','Failed to contact ANVGL server. Please try refreshing the page.');
+                                    Ext.MessageBox.alert('Error','Failed to contact VGL server. Please try refreshing the page.');
                                     return;
                                 }
 

@@ -230,7 +230,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
 
         final List<VglDownload> downloads = new ArrayList<>();
 		VglDownload download = new VglDownload(1);
-		download.setUrl("http://portal-uploads.anvgl.org/file1");
+		download.setUrl("http://portal-uploads.vgl.org/file1");
 		download.setName("file1");
 		downloads.add(download);
 
