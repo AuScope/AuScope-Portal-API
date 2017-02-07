@@ -50,7 +50,7 @@ function lintPython(text, callback) {
           var errorObj = {
             title : 'Script Checking Error',
             message : "Failed to connect to server for template checking.",
-            info : "Please try again in a few minutes or report this error to cg_admin@csiro.au."
+            info : "Please try again in a few minutes or report this error to " + adminEmail + "."
           };
 
           var errorWin = Ext.create('portal.widgets.window.ErrorWindow', {

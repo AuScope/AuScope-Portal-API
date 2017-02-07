@@ -54,14 +54,26 @@ private String googleMapKey;
    private String googleAnalyticsKey;
    private String aafLoginUrl;
 
+    private String adminEmail;
+
    @Autowired
-   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey, @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey,
-           @Value("${HOST.aafLoginUrl}") String aafLoginUrl) {
+   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey,
+                         @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey,
+                         @Value("${HOST.portalAdminEmail}") String adminEmail,
+                         @Value("${HOST.aafLoginUrl}") String aafLoginUrl) {
        this.buildStamp = null;
        this.googleMapKey = googleMapKey;
        this.googleAnalyticsKey = googleAnalyticsKey;
        this.aafLoginUrl = aafLoginUrl;
+       this.adminEmail = adminEmail;
    }
+
+    /**
+     * Return configured admin email address.
+     */
+    public String getAdminEmail() {
+        return this.adminEmail;
+    }
 
    /**
     * Adds the google maps/analytics keys to the specified model
@@ -141,7 +153,9 @@ private String googleMapKey;
     * @throws URISyntaxException
     */
    @RequestMapping("/**/*.html")
-   public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+   public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user,
+                                        HttpServletRequest request,
+                                        HttpServletResponse response) throws IOException, URISyntaxException {
        //Detect whether this is a new session or not...
        HttpSession session = request.getSession();
        boolean isNewSession = session.getAttribute("existingSession") == null;
@@ -185,6 +199,7 @@ private String googleMapKey;
 
        mav.addObject("isNewSession", isNewSession);
        mav.addObject("aafLoginUrl", aafLoginUrl);
+       mav.addObject("adminEmail", this.adminEmail);
 
        //Customise the model as required
        addGoogleKeys(mav); //always add the google keys
