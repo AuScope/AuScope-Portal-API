@@ -151,3 +151,12 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
 	margin-left:0px !important;
 	float: left !important;
 }
+
+.vl-disabled-treenode {
+	color: #AAA;
+}
+
+.vl-disabled-treenode-icon {
+	background-image:url(../img/clear.png) !important;
+    background-size: 16px 16px;
+}

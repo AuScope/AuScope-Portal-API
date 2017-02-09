@@ -27,6 +27,7 @@ import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.auscope.portal.server.web.service.LintResult;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
+import org.auscope.portal.server.web.service.SolutionResponse;
 import org.auscope.portal.server.web.service.TemplateLintService;
 import org.auscope.portal.server.web.service.TemplateLintService.TemplateLanguage;
 import org.auscope.portal.server.web.service.csw.SearchFacet;
@@ -182,7 +183,7 @@ public class ScriptBuilderController extends BaseCloudController {
         }
         ModelMap mm = new ModelMap();
         mm.put("providerId", "");
-        mm.put("name", "All Configured Providers");
+        mm.put("name", "All Providers");
         parsedItems.add(mm);
 
         return generateJSONResponseMAV(true, parsedItems, "");
@@ -290,25 +291,42 @@ public class ScriptBuilderController extends BaseCloudController {
 
         // Get the Solutions from the SSC
         List<CloudComputeService> configuredServices = getConfiguredComputeServices(user, nciDetailsDao);
-        List<Solution> solutions = scmEntryService.getSolutions(facets, configuredServices.toArray(new CloudComputeService[configuredServices.size()]));
+        SolutionResponse solutions = scmEntryService.getSolutions(facets, configuredServices.toArray(new CloudComputeService[configuredServices.size()]));
 
         // Group solutions by the problem that they solve.
-        HashMap<String, Problem> problems = new HashMap<>();
+        HashMap<String, Problem> configuredProblems = new HashMap<>();
+        HashMap<String, Problem> unconfiguredProblems = new HashMap<>();
 
-        for (Solution solution: solutions) {
+        for (Solution solution: solutions.getConfiguredSolutions()) {
             String problemId = solution.getProblem().getId();
-            Problem problem = problems.get(problemId);
+            Problem problem = configuredProblems.get(problemId);
 
             if (problem == null) {
                 problem = solution.getProblem();
                 problem.setSolutions(new ArrayList<Solution>());
-                problems.put(problem.getId(), problem);
+                configuredProblems.put(problem.getId(), problem);
             }
             problem.getSolutions().add(solution);
         }
 
+        for (Solution solution: solutions.getUnconfiguredSolutions()) {
+            String problemId = solution.getProblem().getId();
+            Problem problem = unconfiguredProblems.get(problemId);
+
+            if (problem == null) {
+                problem = solution.getProblem();
+                problem.setSolutions(new ArrayList<Solution>());
+                unconfiguredProblems.put(problem.getId(), problem);
+            }
+            problem.getSolutions().add(solution);
+        }
+
+        ModelMap result = new ModelMap();
+        result.put("configuredProblems", configuredProblems.values());
+        result.put("unconfiguredProblems", unconfiguredProblems.values());
+
         // Return the result
-        return generateJSONResponseMAV(true, problems.values(), "");
+        return generateJSONResponseMAV(true, result, "");
     }
 
     /**

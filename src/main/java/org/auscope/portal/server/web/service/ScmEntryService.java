@@ -171,7 +171,7 @@ public class ScmEntryService {
      * Retieve and return listing of all solutions available.
      *
      */
-    public List<Solution> getSolutions() {
+    public SolutionResponse getSolutions() {
         return getSolutions((List<SearchFacet<? extends Object>>) null);
     }
 
@@ -182,7 +182,7 @@ public class ScmEntryService {
      * @return List<Solution> list of Solutions if any.
      *
      */
-    public List<Solution> getSolutions(Problem problem) {
+    public SolutionResponse getSolutions(Problem problem) {
         return getSolutions(Arrays.asList(new SearchFacet<Problem>(problem, "problem", Comparison.Equal)));
     }
 
@@ -194,7 +194,7 @@ public class ScmEntryService {
      * @return List<Solution> list of Solutions if any.
      *
      */
-    public List<Solution> getSolutions(List<SearchFacet<? extends Object>> facets) {
+    public SolutionResponse getSolutions(List<SearchFacet<? extends Object>> facets) {
         return getSolutions(facets, null);
     }
 
@@ -206,7 +206,7 @@ public class ScmEntryService {
      * @return List<Solution> list of Solutions if any.
      *
      */
-    public List<Solution> getSolutions(List<SearchFacet<? extends Object>> facets, CloudComputeService[] providers) {
+    public SolutionResponse getSolutions(List<SearchFacet<? extends Object>> facets, CloudComputeService[] providers) {
         StringBuilder url = new StringBuilder();
         RestTemplate rest = new RestTemplate();
         Entries solutions;
@@ -259,29 +259,39 @@ public class ScmEntryService {
      * @return List<Solution> subset of solutions that are usable
      *
      */
-    private List<Solution> usefulSolutions(List<Solution> solutions, String providerFilter, CloudComputeService[] computeServices) {
-        ArrayList<Solution> useful = new ArrayList<>();
+    private SolutionResponse usefulSolutions(List<Solution> solutions, String providerFilter, CloudComputeService[] configuredComputeServices) {
+        SolutionResponse useful = new SolutionResponse();
 
-        if (computeServices == null) {
-            computeServices = this.cloudComputeServices;
-        }
+        Set<String> allProviders = new HashSet<String>();
+        Set<String> configuredProviders = new HashSet<String>();
 
-        // Collect our set of available providers
-        Set<String> providers = new HashSet<>();
-        for (CloudComputeService ccs: computeServices) {
-            if (StringUtils.isEmpty(providerFilter) || providerFilter.equals(ccs.getId())) {
-                providers.add(ccs.getId());
-            }
-        }
+        Arrays.stream(configuredComputeServices).forEach(ccs -> configuredProviders.add(ccs.getId()));
+        Arrays.stream(cloudComputeServices).forEach(ccs -> allProviders.add(ccs.getId()));
 
         for (Solution solution: solutions) {
             // Solution with toolbox with at least one image at a
             // provider we can use is useful.
+            boolean foundUseful = false;
             for (Map<String, String> image: solution.getToolbox(true).getImages()) {
-                if (providers.contains(image.get("provider"))) {
-                    useful.add(solution);
+                String provider = image.get("provider");
+
+                if (StringUtils.isNotEmpty(providerFilter) && !providerFilter.equals(provider)) {
+                    continue;
+                }
+
+                if (configuredProviders.contains(provider)) {
+                    foundUseful = true;
+                    useful.getConfiguredSolutions().add(solution);
+                    break;
+                } else if (allProviders.contains(provider)) {
+                    foundUseful = true;
+                    useful.getUnconfiguredSolutions().add(solution);
                     break;
                 }
+            }
+
+            if (!foundUseful) {
+                useful.getOtherSolutions().add(solution);
             }
         }
 

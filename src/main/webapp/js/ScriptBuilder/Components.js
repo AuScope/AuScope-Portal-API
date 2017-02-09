@@ -38,8 +38,36 @@ ScriptBuilder.Components.getComponents = function(tree, fn, filterFacets) {
             var root = tree.getRootNode();
             root.removeAll();
 
-            for (var i in data) {
-                var problem = data[i];
+            //Reassemble our configured vs unconfigured problem/solutions (and tag configured/unconfigured solutions)
+            var problemMap = {};
+            for (var i in data.configuredProblems) {
+                var problem = data.configuredProblems[i];
+                for (var j in problem.solutions) {
+                    problem.solutions[j].configured = true;
+                }
+
+                if (problemMap[problem.id]) {
+                    problemMap[problem.id].solutions = problemMap[problem.id].solutions.concat(problem.solutions);
+                } else {
+                    problemMap[problem.id] = problem;
+                }
+            }
+            for (var i in data.unconfiguredProblems) {
+                var problem = data.unconfiguredProblems[i];
+                for (var j in problem.solutions) {
+                    problem.solutions[j].configured = false;
+                }
+
+                if (problemMap[problem.id]) {
+                    problemMap[problem.id].solutions = problemMap[problem.id].solutions.concat(problem.solutions);
+                } else {
+                    problemMap[problem.id] = problem;
+                }
+            }
+
+            //Build our tree of nodes
+            for (var i in problemMap) {
+                var problem = problemMap[i];
 
                 children = [];
 
@@ -50,7 +78,10 @@ ScriptBuilder.Components.getComponents = function(tree, fn, filterFacets) {
                         id: solution.uri,
                         type: "s",
                         text: solution.name,
-                        qtip: solution.description,
+                        cls: solution.configured ? '' : 'vl-disabled-treenode',
+                        qtip: solution.configured ? solution.description : 'This solution can\'t run in any of your configured compute locations. You will need to configure additional compute locations in your user profile.',
+                        disabled: !solution.configured,
+                        iconCls: solution.configured ? '' : 'vl-disabled-treenode-icon',
                         leaf: true
                     });
                 }
