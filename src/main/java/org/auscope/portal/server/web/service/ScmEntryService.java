@@ -1,12 +1,14 @@
 package org.auscope.portal.server.web.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
@@ -18,6 +20,8 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VLScmSnapshot;
 import org.auscope.portal.server.vegl.VLScmSnapshotDao;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.csw.SearchFacet;
+import org.auscope.portal.server.web.service.csw.SearchFacet.Comparison;
 import org.auscope.portal.server.web.service.scm.Entries;
 import org.auscope.portal.server.web.service.scm.Problem;
 import org.auscope.portal.server.web.service.scm.Solution;
@@ -168,7 +172,7 @@ public class ScmEntryService {
      *
      */
     public List<Solution> getSolutions() {
-        return getSolutions(null);
+        return getSolutions((List<SearchFacet<? extends Object>>) null);
     }
 
     /**
@@ -179,22 +183,63 @@ public class ScmEntryService {
      *
      */
     public List<Solution> getSolutions(Problem problem) {
+        return getSolutions(Arrays.asList(new SearchFacet<Problem>(problem, "problem", Comparison.Equal)));
+    }
+
+    /**
+     * Return the Solutions filtered by the specified search facets.
+     *
+     * @param problem Problem to find Solutions for, or all Solutions if null.
+     * @param providers The set of cloud compute services to consider, if null it will use the default provider set
+     * @return List<Solution> list of Solutions if any.
+     *
+     */
+    public List<Solution> getSolutions(List<SearchFacet<? extends Object>> facets) {
+        return getSolutions(facets, null);
+    }
+
+    /**
+     * Return the Solutions filtered by the specified search facets.
+     *
+     * @param problem Problem to find Solutions for, or all Solutions if null.
+     * @param providers The set of cloud compute services to consider, if null it will use the default provider set
+     * @return List<Solution> list of Solutions if any.
+     *
+     */
+    public List<Solution> getSolutions(List<SearchFacet<? extends Object>> facets, CloudComputeService[] providers) {
         StringBuilder url = new StringBuilder();
         RestTemplate rest = new RestTemplate();
         Entries solutions;
 
         url.append(solutionsUrl).append("/solutions");
-        if (problem != null) {
+
+        //Apply our search facets to the query
+        String problemIdFilter = null;
+        String providerFilter = null;
+        if (facets != null) {
+            for (SearchFacet<? extends Object> facet : facets) {
+                if (facet.getValue() instanceof Problem) {
+                    problemIdFilter = ((Problem) facet.getValue()).getId();
+                } else if (facet.getValue() instanceof String) {
+                    if (facet.getField().equals("text")) {
+                        logger.error("Any Text filtering currently unsupported");
+                    } else if (facet.getField().equals("provider")) {
+                        providerFilter = (String) facet.getValue();
+                    }
+                }
+            }
+        }
+        if (problemIdFilter != null) {
             url.append("?problem={problem_id}");
             solutions = rest.getForObject(url.toString(),
                     Entries.class,
-                    problem.getId());
+                    problemIdFilter);
         }
         else {
             solutions = rest.getForObject(url.toString(), Entries.class);
         }
 
-        return usefulSolutions(solutions.getSolutions());
+        return usefulSolutions(solutions.getSolutions(), providerFilter, providers);
     }
 
     /**
@@ -210,24 +255,29 @@ public class ScmEntryService {
      * infrastructure in place.
      *
      * @param solutions List<Solution> solutions from the SSC
+     * @param providerFilter If non null, the available provider list will be limited to providers with this ID.
      * @return List<Solution> subset of solutions that are usable
      *
      */
-    private List<Solution> usefulSolutions(List<Solution> solutions) {
+    private List<Solution> usefulSolutions(List<Solution> solutions, String providerFilter, CloudComputeService[] computeServices) {
         ArrayList<Solution> useful = new ArrayList<>();
+
+        if (computeServices == null) {
+            computeServices = this.cloudComputeServices;
+        }
 
         // Collect our set of available providers
         Set<String> providers = new HashSet<>();
-        for (CloudComputeService ccs: cloudComputeServices) {
-            providers.add(ccs.getId());
+        for (CloudComputeService ccs: computeServices) {
+            if (StringUtils.isEmpty(providerFilter) || providerFilter.equals(ccs.getId())) {
+                providers.add(ccs.getId());
+            }
         }
 
         for (Solution solution: solutions) {
-            useful.add(solution);
             // Solution with toolbox with at least one image at a
             // provider we can use is useful.
-            for (Map<String, String> image:
-                solution.getToolbox(true).getImages()) {
+            for (Map<String, String> image: solution.getToolbox(true).getImages()) {
                 if (providers.contains(image.get("provider"))) {
                     useful.add(solution);
                     break;
@@ -310,7 +360,7 @@ public class ScmEntryService {
      * Return a map of computeServiceId to imageIds valid for job.
      *
      * @return Map<String, Set<String>> with images for job, or null.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     public Map<String, Set<MachineImage>> getJobImages(Integer jobId, ANVGLUser user) throws PortalServiceException {
         if (jobId == null) {
@@ -342,7 +392,7 @@ public class ScmEntryService {
      * Return a Set of compute service ids with images for job with jobId.
      *
      * @return Set<String> of compute service ids for job, or null if jobId == null.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     public Set<String> getJobProviders(Integer jobId, ANVGLUser user) throws PortalServiceException {
         Map<String, Set<MachineImage>> images = getJobImages(jobId, user);

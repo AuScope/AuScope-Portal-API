@@ -3,15 +3,22 @@ package org.auscope.portal.server.web.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.auscope.portal.core.cloud.CloudJob;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
+import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetails;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -78,9 +85,9 @@ public abstract class BaseCloudController extends BaseModelController {
      * @return
      */
     protected CloudComputeService getComputeService(String id) {
-        if(TextUtil.isNullOrEmpty(id)) 
+        if(TextUtil.isNullOrEmpty(id))
             return null;
-                
+
         for (CloudComputeService s : cloudComputeServices) {
             if (s.getId().equals(id)) {
                 return s;
@@ -89,6 +96,40 @@ public abstract class BaseCloudController extends BaseModelController {
 
         log.warn(String.format("CloudComputeService with ID '%1$s' doesn't exist", id));
         return null;
+    }
+
+    /**
+     * Gets the subset of cloudComputeServices that the specified user has successfully configured in their setup page.
+     * @param user
+     * @param nciDetailsDao
+     * @return
+     * @throws PortalServiceException
+     */
+    protected List<CloudComputeService> getConfiguredComputeServices(ANVGLUser user, NCIDetailsDao nciDetailsDao) throws PortalServiceException {
+        List<CloudComputeService> configuredServices = new ArrayList<CloudComputeService>(cloudComputeServices.length);
+        for (CloudComputeService ccs : cloudComputeServices) {
+
+            switch(ccs.getId()) {
+            case "aws-ec2-compute":
+                if (StringUtils.isNotEmpty(user.getArnExecution()) && StringUtils.isNotEmpty(user.getArnStorage())) {
+                    configuredServices.add(ccs);
+                }
+                break;
+            case "nci-raijin-compute":
+                NCIDetails details = nciDetailsDao.getByUser(user);
+                if (details != null && StringUtils.isNotEmpty(details.getKey())) {
+                    configuredServices.add(ccs);
+                }
+                break;
+            case "nectar-nova-compute":
+                if (user.getId().contains("@")) { //HACK - this is assuming that AAF ID's will be an email and contain an '@' where google OAuth will not.
+                    configuredServices.add(ccs);
+                }
+                break;
+            }
+        }
+
+        return configuredServices;
     }
 
     /**

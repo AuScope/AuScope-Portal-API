@@ -16,7 +16,7 @@ Ext.define('vegl.widgets.search.FacetedSearchPanel', {
             change: this.onChange
         };
 
-        Ext.apply(config, {
+        Ext.applyIf(config, {
             plugins: ['collapsedaccordian'],
             autoScroll: true,
             layout: {
