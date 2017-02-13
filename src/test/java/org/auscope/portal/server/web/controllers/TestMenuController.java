@@ -26,12 +26,13 @@ public class TestMenuController extends PortalTestClass {
     private HttpSession mockSession = context.mock(HttpSession.class);
     final String gMapKey = "13421asdasd";
     final String gAnalyticsKey = "faf3113f1";
+    final String adminEmail = "cg-admin@csiro.au";
 
     private MenuController mc = null;
 
     @Before
     public void setup() {
-        mc = new MenuController(gMapKey, gAnalyticsKey, "aaf_login_url.html");
+        mc = new MenuController(gMapKey, gAnalyticsKey, adminEmail, "aaf_login_url.html");
         mc.setBuildStamp("FFFF");
 
         //Global expectations for setting build stamp id

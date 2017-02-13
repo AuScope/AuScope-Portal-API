@@ -178,37 +178,40 @@ public class TemplateLintService {
         List<LintResult> lints = new ArrayList<LintResult>();
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = null;
-        try {
-            root = mapper.readTree(input);
-        }
-        catch (Exception ex) {
-            throw new PortalServiceException("Failed to parse pylint result json", ex);
-        }
-        if (root == null) {
-            throw new PortalServiceException("No JSON content found in pylint results");
-        }
-        else if (!root.isArray()) {
-            throw new PortalServiceException
-                (String.format("Unsupported pylint results: {}",
-                               root.toString()));
-        }
 
-        // Parsed json, so extract LintResult objects
-        for (JsonNode result: root) {
-            LintResult.Severity severity =
-                result.get("type").asText().equals("error")
-                ? LintResult.Severity.ERROR
-                : LintResult.Severity.WARNING;
-            lints.add(
-                new LintResult(severity,
-                               result.get("message").asText(),
+        if (!input.trim().isEmpty()) {
+            try {
+                root = mapper.readTree(input);
+            }
+            catch (Exception ex) {
+                throw new PortalServiceException("Failed to parse pylint result json", ex);
+            }
+            if (root == null) {
+                throw new PortalServiceException("No JSON content found in pylint results");
+            }
+            else if (!root.isArray()) {
+                throw new PortalServiceException
+                    (String.format("Unsupported pylint results: {}",
+                                   root.toString()));
+            }
 
-                               // pylint returns 1-based line count.
-                               new LintResult.Location(
-                                   result.get("line").asInt() - 1,
-                                   result.get("column").asInt())
-                               )
-                      );
+            // Parsed json, so extract LintResult objects
+            for (JsonNode result: root) {
+                LintResult.Severity severity =
+                    result.get("type").asText().equals("error")
+                    ? LintResult.Severity.ERROR
+                    : LintResult.Severity.WARNING;
+                lints.add(
+                    new LintResult(severity,
+                                   result.get("message").asText(),
+
+                                   // pylint returns 1-based line count.
+                                   new LintResult.Location(
+                                        result.get("line").asInt() - 1,
+                                        result.get("column").asInt())
+                                   )
+                );
+            }
         }
 
         return lints;

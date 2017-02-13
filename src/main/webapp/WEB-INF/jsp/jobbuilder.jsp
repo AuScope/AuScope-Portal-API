@@ -82,6 +82,10 @@
     <%@ include file="page_header.jsp" %>
     <div id="body"></div>
     <%@ include file="page_footer.jsp" %>
+
+    <script type="text/javascript">
+     var adminEmail = "${adminEmail}";
+    </script>
 </body>
 
 </html>
