@@ -3,8 +3,6 @@ package org.auscope.portal.server.web.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.auscope.portal.core.server.controllers.BaseCSWController;
 import org.auscope.portal.core.services.CSWCacheService;
@@ -33,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
+
+import net.sf.json.JSONObject;
 
 /**
  * Controller for handling search requests for a remote CSW
@@ -184,7 +184,9 @@ public class CSWSearchController extends BaseCSWController {
     private boolean nameIsRewriteCandidate(String name) {
         return name.equalsIgnoreCase("Link to Web Map Service") ||
                name.equalsIgnoreCase("Link to Web Coverage Service") ||
-               name.contains("S for dataset ");
+               name.contains("S for dataset ") ||
+               name.equals("WCS") ||
+               name.equals("WMS");
     }
 
     /**
