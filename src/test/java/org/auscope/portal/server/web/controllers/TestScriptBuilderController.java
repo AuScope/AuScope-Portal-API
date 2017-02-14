@@ -6,11 +6,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.auscope.portal.server.web.service.TemplateLintService;
@@ -30,14 +33,19 @@ public class TestScriptBuilderController extends PortalTestClass {
     private TemplateLintService mockTemplateLintService = context.mock(TemplateLintService.class);
     private VEGLJobManager mockJobManager = context.mock(VEGLJobManager.class);
     private VEGLJob mockJob = context.mock(VEGLJob.class);
+    private CloudStorageService[] mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
+    private CloudComputeService[] mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
+    private NCIDetailsDao nciDetailsDao = context.mock(NCIDetailsDao.class);
 
     private ANVGLUser user;
 
+    private static final String VM_SH = "vm.sh";
+    private static final String VM_SHUTDOWN_SH = "vm-shutdown.sh";
 
     @Before
     public void setup() {
         // Object Under Test
-        controller = new ScriptBuilderController(mockSbService, mockJobManager, mockScmEntryService, mockTemplateLintService);
+        controller = new ScriptBuilderController(mockSbService, mockJobManager, mockScmEntryService, mockTemplateLintService, mockCloudStorageServices, mockCloudComputeServices, VM_SH, VM_SHUTDOWN_SH, nciDetailsDao);
         user = new ANVGLUser();
         user.setId("456");
         user.setEmail("user@example.com");

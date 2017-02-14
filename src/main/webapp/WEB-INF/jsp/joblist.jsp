@@ -76,6 +76,7 @@
     <script type="text/javascript" src="js/vegl/models/Download.js"></script>
     <script type="text/javascript" src="js/vegl/models/ComputeType.js"></script>
     <script type="text/javascript" src="js/vegl/models/SimpleFeatureProperty.js"></script>
+    <script type="text/javascript" src="js/vegl/models/SearchFacet.js"></script>
 
     <script type="text/javascript" src="js/vegl/preview/FilePreviewMixin.js"></script>
     <script type="text/javascript" src="js/vegl/preview/DataServicePreview.js"></script>
@@ -84,6 +85,9 @@
     <script type="text/javascript" src="js/vegl/preview/ImagePreview.js"></script>
     <script type="text/javascript" src="js/vegl/preview/FilePreviewPanel.js"></script>
     <script type="text/javascript" src="js/vegl/preview/TTLPreview.js"></script>
+    
+    <script type="text/javascript" src="js/vegl/widgets/search/BaseFacetWidget.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/search/FacetedSearchPanel.js"></script>
 
     <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
@@ -104,6 +108,9 @@
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobUploadForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobSubmitForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/ScriptBuilderForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/sssc/ProviderFacet.js"></script>
+	<script type="text/javascript" src="js/vegl/jobwizard/sssc/TextFacet.js"></script>
+	<script type="text/javascript" src="js/vegl/jobwizard/sssc/FacetedFilterPanel.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/JobWizard.js"></script>
 
     <script src="js/ScriptBuilder/templates/BaseTemplate.js" type="text/javascript"></script>

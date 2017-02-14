@@ -81,10 +81,54 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         this.componentsPanel = Ext.create('ScriptBuilder.ComponentTreePanel', {
             region : 'west',
             title : 'Available Templates',
+            plugins: [{
+                ptype:'headericons',
+                icons: [{
+                    location: 'text',
+                    tip: 'Click to filter the available templates.',
+                    src: 'img/filter.png',
+                    style: 'cursor: pointer;',
+                    width: 22,
+                    height: 22,
+                    handler: Ext.bind(function() {
+                        if (this.filterWindow) {
+                            if (this.filterWindow.isHidden()) {
+                                this.filterWindow.show();
+                            } else {
+                                this.filterWindow.hide();
+                            }
+                        }
+                    }, this)
+                }]
+            }],
             itemId : 'sb-templates-panel',
             width : 250,
             listeners : {
-                addcomponent : Ext.bind(this.onAddComponent, this)
+                scope: this,
+                addcomponent : this.onAddComponent,
+                afterrender: function(cmpPanel) {
+                    this.filterWindow = Ext.create('Ext.window.Window', {
+                        title: 'Filters',
+                        closeAction: 'hide',
+                        alignTarget: cmpPanel.getHeader(),
+                        draggable: false,
+                        defaultAlign: 'tl-tr',
+                        width: 300,
+                        height: 190,
+                        animateTarget: cmpPanel.getHeader(),
+                        layout: 'fit',
+                        items: [{
+                            xtype: 'facetedfilterpanel',
+                            listeners: {
+                                scope: this,
+                                change: function(filterPanel) {
+                                    this.filterFacets = filterPanel.extractSearchFacets();
+                                    this.buildComponentsPanel();
+                                }
+                            }
+                        }]
+                    });
+                }
             }
         });
 
@@ -198,7 +242,8 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
             function() {
                 // If a solution is currently active, select it
                 self.selectSolution();
-            });
+            },
+            this.filterFacets);
     },
 
 
