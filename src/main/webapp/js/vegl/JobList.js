@@ -62,37 +62,26 @@ Ext.application({
             }).delay(500);
         };
 
-        var onError = function(component, message) {
-            Ext.Msg.show({
-                title: 'Error',
-                msg: message,
-                buttons: Ext.Msg.OK,
-                icon: Ext.Msg.ERROR
-            });
+        var onError = function(cmp, message) {
+            portal.widgets.window.ErrorWindow.showText('Error', message, null);
         };
 
         //This is used for updating statuses of existing jobs that have been loaded
         var refreshJobStatus = function(jobStore, treePanel) {
-            Ext.Ajax.request({
+            portal.util.Ajax.request({
                 url: 'secure/jobsStatuses.do',
                 params: {
                     forceStatusRefresh: true
                 },
-                callback: function(options, success, response) {
+                callback: function(success, data, message, debugInfo) {
                     if (!success) {
-                        onError(treePanel, "Unable to update your jobs due to a connection error. Please try refreshing the page.")
-                        return;
-                    }
-
-                    var responseObj = Ext.JSON.decode(response.responseText);
-                    if (!responseObj || !responseObj.success) {
-                        onError(treePanel, "Unable to update your jobs due to a server error. Please try refreshing the page.")
+                        portal.widgets.window.ErrorWindow.showText('Error', 'Unable to update your jobs due to an error. Please try refreshing the page.', debugInfo);
                         return;
                     }
 
                     var treeStore = treePanel.getStore();
-                    for (var i = 0; i < responseObj.data.length; i++) {
-                        var tuple  = responseObj.data[i];
+                    for (var i = 0; i < data.length; i++) {
+                        var tuple  = data[i];
                         var record = jobStore.getById(tuple.jobId);
                         if (record) {
                             record.set('status', tuple.status);
@@ -117,29 +106,23 @@ Ext.application({
             }
             refreshRunning = true;
             treePanel.getEl().mask('Loading...');
-            Ext.Ajax.request({
+            portal.util.Ajax.request({
                 url: 'secure/treeJobs.do',
                 params: {
                     forceStatusRefresh: forceStatusRefresh ? true : false
                 },
-                callback: function(options, success, response) {
+                callback: function(success, data, message, debugInfo) {
                     treePanel.getEl().unmask();
                     refreshRunning = false;
                     if (!success) {
-                        onError(treePanel, "Unable to update your jobs due to a connection error. Please try refreshing the page.")
+                        portal.widgets.window.ErrorWindow.showText('Error', 'Unable to update your jobs due to an error. Please try refreshing the page.', debugInfo);
                         return;
                     }
 
-                    var responseObj = Ext.JSON.decode(response.responseText);
-                    if (!responseObj || !responseObj.success) {
-                        onError(treePanel, "Unable to update your jobs due to a server error. Please try refreshing the page.")
-                        return;
-                    }
-
-                    jobStore.loadData(responseObj.data.jobs);
+                    jobStore.loadData(data.jobs);
                     treePanel.getStore().removeAll();
                     treePanel.getStore().fireEvent('clear', treePanel.getStore()); //This isn't fired in Ext 5.1.0 - we fire it manually
-                    treePanel.getStore().setRoot(responseObj.data.nodes);
+                    treePanel.getStore().setRoot(data.nodes);
                 }
             });
         };
@@ -155,14 +138,17 @@ Ext.application({
                 modal: true,
                 fn: function(buttonId, text) {
                     if (buttonId === 'ok' && !Ext.isEmpty(text.trim())) {
-                        Ext.Ajax.request({
+                        portal.util.Ajax.request({
                             url: 'secure/createFolder.do',
                             params: {
                                 seriesName: text.trim(),
                                 seriesDescription: ''
                             },
-                            callback: function(options, success, response) {
+                            success: function(data, message, debugInfo) {
                                 refreshJobNodes(jobStore, treePanel);
+                            },
+                            failure: function(message, debugInfo) {
+                                portal.widgets.window.ErrorWindow.showText('Error', 'Unable to create folder due to a server error. Please try refreshing the page.', debugInfo);
                             }
                         });
                     }
@@ -170,17 +156,11 @@ Ext.application({
             });
         };
 
-        Ext.Ajax.request({
+        portal.util.Ajax.request({
             url: 'secure/treeJobs.do',
-            callback: function(options, success, response) {
+            callback: function(success, data, message) {
                 if (!success) {
-                    showFatalError("Unable to load your jobs due to a connection error. Please try refreshing the page.");
-                    return;
-                }
-
-                var responseObj = Ext.JSON.decode(response.responseText);
-                if (!responseObj || !responseObj.success) {
-                    showFatalError("Unable to load your jobs due to a server error. Please try refreshing the page.");
+                    showFatalError("Unable to load your jobs due to an error. Please try refreshing the page.");
                     return;
                 }
 
@@ -193,7 +173,7 @@ Ext.application({
                         }
                     }
                 });
-                jobStore.loadData(responseObj.data.jobs);
+                jobStore.loadData(data.jobs);
 
                 var jobDetailsPanel = Ext.create('vegl.widgets.DetailsPanel', {
                     title: 'Description',
@@ -210,7 +190,7 @@ Ext.application({
                     region: 'center',
                     stripeRows: true,
                     itemId : 'vgl-jobs-tree',
-                    rootNode: responseObj.data.nodes,
+                    rootNode: data.nodes,
                     jobStore: jobStore,
                     selModel: {
                     	mode: 'MULTI'
@@ -265,15 +245,15 @@ Ext.application({
                                 for(i=0; i<data.records.length; i++)
                                 	jobIds[i] = data.records[i].get('id');
 
-                                Ext.Ajax.request({
+                                portal.util.Ajax.request({
                                     url: 'secure/setJobFolder.do',
                                     params: {
                                         seriesId: seriesId,
                                         jobIds: jobIds
                                     },
-                                    callback: function(options, success, response) {
-                                        if (!success || !Ext.JSON.decode(response.responseText).success) {
-                                            onError(jobsTree, "There was an error reassigning job folders. Please refresh the page.");
+                                    callback: function(success, data, message, debugInfo) {
+                                        if (!success) {
+                                            portal.widgets.window.ErrorWindow.showText('Error', 'There was an error reassigning job folders. Please refresh the page.', debugInfo);
                                         }
                                     }
                                 });

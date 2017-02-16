@@ -30,7 +30,15 @@ Ext.define('vegl.widgets.JobStatusWindow', {
             sorters: [{
                 property: 'transitionDate',
                 direction: 'DESC'
-            }]
+            }],
+            listeners: {
+                load: function(store, records, successful) {
+                    if (!successful) {
+                        portal.widgets.window.ErrorWindow.showText('Error', 'Unable to request status information for your job. Please try refreshing the page.', debugInfo);
+                        return;
+                    }
+                }
+            }
         });
 
         switch (status) {

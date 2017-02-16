@@ -119,7 +119,7 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     hideRowExpander: true,
                     hideLocationColumn: true,
                     nameColumnWidth: 150,
-                    emptyText: '<p class="centeredlabel">This job doesn\'t have any input files or service downloads configured.</p>',
+                    emptyText: '<p class="centeredlabel">This job doesn\'t have any uploaded input files or service downloads configured. Unsubmitted jobs will not have their input files visible here.</p>',
                     width: 350,
                     listeners: {
                         select: Ext.bind(this._onFileSelect, this)
@@ -184,7 +184,6 @@ Ext.define('vegl.widgets.DetailsPanel', {
         this.updateJobDetails();
 
         this.down('#logs').clearPreview();
-        this.down('#files').listFilesForJob(job);
 
         this.updateSubmitTime();
 
@@ -204,11 +203,22 @@ Ext.define('vegl.widgets.DetailsPanel', {
             return;
         }
 
+        //Type string should treat HPC type as a special case
+        var typeString = this.job.get('computeInstanceType') ? this.job.get('computeInstanceType') : 'N/A';
+        if (typeString.indexOf('&') >= 0) {
+            decodedType = Ext.Object.fromQueryString(typeString);
+            if (!decodedType['ncpus'] || !decodedType['mem'] || decodedType['ncpus'] == 'null') {
+                typeString = 'N/A';
+            } else {
+                typeString = Ext.util.Format.format('{0} cpus, {1} mem', decodedType['ncpus'], decodedType['mem']);
+            }
+        }
+
         this.setTitle(this.job.get('name'));
         var style = vegl.widgets.JobsPanel.styleFromStatus(this.job.get('status'));
         this.down('#status').setValue(Ext.util.Format.format('<span title="{0}" style="color:{1};">{2}</span>', style.tip, style.color, style.text));
         this.down('#ami').setValue(this.job.get('computeInstanceId') ? this.job.get('computeInstanceId') : 'N/A');
-        this.down('#type').setValue(this.job.get('computeInstanceType') ? this.job.get('computeInstanceType') : 'N/A');
+        this.down('#type').setValue(typeString);
         this.down('#jobid').setValue(this.job.get('id'));
 
         this.updateSubmitTime();
