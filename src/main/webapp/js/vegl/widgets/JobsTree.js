@@ -407,22 +407,16 @@ Ext.define('vegl.widgets.JobsTree', {
     deleteSeries : function(series) {
         Ext.getBody().mask('Deleting Folder...');
 
-        Ext.Ajax.request({
+        portal.util.Ajax.request({
             url: 'secure/deleteSeriesJobs.do',
             params: { 'seriesId': series.get('seriesId')},
             timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
             scope : this,
-            callback : function(options, success, response) {
+            callback : function(success, data, message, debugInfo) {
                 Ext.getBody().unmask();
 
                 if (!success) {
                     this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
-                    return;
-                }
-
-                var responseObj = Ext.JSON.decode(response.responseText);
-                if (!responseObj.success) {
-                    this.fireEvent('error', this, Ext.util.Format.format('There was an error deleting this series. {0}', responseObj.msg));
                     return;
                 }
 
@@ -440,22 +434,16 @@ Ext.define('vegl.widgets.JobsTree', {
     deleteJob : function(job) {
     	Ext.getBody().mask('Deleting Job...');
 
-        Ext.Ajax.request({
+    	portal.util.Ajax.request({
             url: 'secure/deleteJob.do',
             params: { 'jobId': job.get('id')},
             timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
             scope : this,
-            callback : function(options, success, response) {
+            callback : function(success, data, message, debugInfo) {
                 Ext.getBody().unmask();
 
                 if (!success) {
                     this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
-                    return;
-                }
-
-                var responseObj = Ext.JSON.decode(response.responseText);
-                if (!responseObj.success) {
-                    this.fireEvent('error', this, Ext.util.Format.format('There was an error deleting this job. {0}', responseObj.msg));
                     return;
                 }
 

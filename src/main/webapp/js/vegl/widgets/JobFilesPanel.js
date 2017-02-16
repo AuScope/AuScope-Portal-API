@@ -178,55 +178,46 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         });
         loadMask.show();
 
-        Ext.Ajax.request({
+        portal.util.Ajax.request({
             url : this.fileLookupUrl,
             params : {
                 jobId : this.currentJobId
             },
             scope : this,
-            callback : function(options, success, response) {
+            callback : function(success, data, message, debugInfo) {
                 if (!success) {
                     loadMask.hide();
-                    return;
-                }
-
-                var responseObj = Ext.JSON.decode(response.responseText);
-                if (!responseObj.success || !responseObj.data) {
-                    loadMask.hide();
+                    portal.widgets.window.ErrorWindow.showText('Error', 'Unable to request list of files: ' + message + ' Please try refreshing the page.', debugInfo);
                     return;
                 }
 
                 var fileRecords = [];
-                for (var i = 0; i < responseObj.data.length; i++) {
-                    fileRecords.push(Ext.create('vegl.models.FileRecord', responseObj.data[i]));
+                for (var i = 0; i < data.length; i++) {
+                    fileRecords.push(Ext.create('vegl.models.FileRecord', data[i]));
                 }
 
                 //Fire off a second request for the downloads
-                Ext.Ajax.request({
+                portal.util.Ajax.request({
                     url : 'secure/getJobDownloads.do',
                     params : {
                         jobId : this.currentJobId
                     },
                     scope : this,
                     fileRecords : fileRecords,
-                    callback : function(options, success, response) {
+                    callback : Ext.bind(function(success, data, message, debugInfo, fileRecords) {
                         loadMask.hide();
                         if (!success) {
-                            return;
-                        }
-
-                        var responseObj = Ext.JSON.decode(response.responseText);
-                        if (!responseObj.success || !responseObj.data) {
+                            portal.widgets.window.ErrorWindow.showText('Error', 'Unable to request list of job downloads. Please try refreshing the page.', debugInfo);
                             return;
                         }
 
                         var downloads = [];
-                        for (var i = 0; i < responseObj.data.length; i++) {
-                            downloads.push(Ext.create('vegl.models.Download', responseObj.data[i]));
+                        for (var i = 0; i < data.length; i++) {
+                            downloads.push(Ext.create('vegl.models.Download', data[i]));
                         }
 
-                        this._setStoreData(options.fileRecords, downloads);
-                    }
+                        this._setStoreData(fileRecords, downloads);
+                    }, this, [fileRecords], true)
                 });
             }
         });

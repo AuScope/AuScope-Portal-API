@@ -193,7 +193,7 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a success attribute and an error attribute
      *         in case the series was not found in the job manager.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @RequestMapping("/secure/deleteSeriesJobs.do")
     public ModelAndView deleteSeriesJobs(HttpServletRequest request,
@@ -352,7 +352,7 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a success attribute and an error attribute
      *         in case the series was not found in the job manager.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @RequestMapping("/secure/killSeriesJobs.do")
     public ModelAndView killSeriesJobs(HttpServletRequest request,
@@ -453,8 +453,7 @@ public class JobListController extends BaseCloudController  {
         try {
             CloudStorageService cloudStorageService = getStorageService(job);
             if (cloudStorageService == null) {
-                logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud files cannot be listed", job.getStorageServiceId(), job.getId()));
-                return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+                return generateJSONResponseMAV(true, new CloudFileInformation[0], "No cloud storage service found for job");
             } else {
                 fileDetails = cloudStorageService.listJobFiles(job);
             }
@@ -675,7 +674,7 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VEGLJob</code> objects.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @RequestMapping("/secure/listJobs.do")
     public ModelAndView listJobs(HttpServletRequest request,
@@ -753,7 +752,7 @@ public class JobListController extends BaseCloudController  {
 
     /**
      * Returns a JSON array of jobStatus and jobId tuples
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      *
      */
     @RequestMapping("/secure/jobsStatuses.do")
@@ -800,7 +799,7 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VEGLJob</code> objects.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/secure/treeJobs.do")
