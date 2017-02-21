@@ -15,11 +15,11 @@ Ext.define('vegl.jobwizard.sssc.FacetedFilterPanel', {
         };
 
         Ext.applyIf(config, {
-            items: [{
+            items: [/*{
                 xtype: 'textfacet',
                 map: config.map,
                 listeners: listeners
-            },{
+            },*/{
                 xtype: 'providerfacet',
                 listeners: listeners
             }]
