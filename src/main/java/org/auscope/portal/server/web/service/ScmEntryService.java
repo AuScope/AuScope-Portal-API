@@ -271,7 +271,8 @@ public class ScmEntryService {
         for (Solution solution: solutions) {
             // Solution with toolbox with at least one image at a
             // provider we can use is useful.
-            boolean foundUseful = false;
+            boolean foundConfigured = false;
+            boolean foundUnconfigured = false;
             for (Map<String, String> image: solution.getToolbox(true).getImages()) {
                 String provider = image.get("provider");
 
@@ -280,17 +281,18 @@ public class ScmEntryService {
                 }
 
                 if (configuredProviders.contains(provider)) {
-                    foundUseful = true;
-                    useful.getConfiguredSolutions().add(solution);
+                    foundConfigured = true;
                     break;
                 } else if (allProviders.contains(provider)) {
-                    foundUseful = true;
-                    useful.getUnconfiguredSolutions().add(solution);
-                    break;
+                    foundUnconfigured = true;
                 }
             }
 
-            if (!foundUseful) {
+            if (foundConfigured) {
+                useful.getConfiguredSolutions().add(solution);
+            } else if (foundUnconfigured) {
+                useful.getUnconfiguredSolutions().add(solution);
+            } else {
                 useful.getOtherSolutions().add(solution);
             }
         }
