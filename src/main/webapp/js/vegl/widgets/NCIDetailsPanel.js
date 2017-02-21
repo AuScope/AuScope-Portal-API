@@ -23,15 +23,17 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
             items: [{
                 xtype: 'form',
                 border: false,
-                padding: '10 20 20 5',
-                layout: 'anchor',
+                padding: '10 20 10 0',
+                defaults: {
+                    labelWidth: n,
+                    width: '100%',
+                    margin: '15 0 7 0'
+                },
                 items: [{
                     xtype: 'textfield',
                     itemId: 'nciUsername',
                     name: 'nciUsername',
                     fieldLabel: 'NCI Username',
-                    labelWidth: n,
-                    anchor: '100%',
                     allowBlank: true,
                     allowOnlyWhitespace: false,
                     plugins: [{
@@ -43,8 +45,6 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
                     itemId: 'nciProject',
                     name: 'nciProject',
                     fieldLabel: 'NCI Project Code',
-                    labelWidth: n,
-                    anchor: '100%',
                     allowBlank: true,
                     allowOnlyWhitespace: false,
                     plugins: [{
@@ -56,8 +56,6 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
                 	itemId: 'nciKey',
                     name: 'nciKey',
                     fieldLabel: 'NCI Key',
-                    labelWidth: n,
-                    anchor: '100%',
                     allowBlank: true,
                     emptyText : 'Select SSH File',
                     plugins: [{
@@ -94,7 +92,7 @@ Ext.define('vegl.widgets.NCIDetailsPanel', {
                             return;
                         }
                         statusLabel.setText('Saving your changes...');
-                        
+
                         formPanel.submit({
                         	url: 'secure/setNCIDetails.do',
                         	params: formPanel.getValues(),
