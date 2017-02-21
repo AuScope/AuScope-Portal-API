@@ -234,8 +234,6 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 listeners: {
 	                change: function(cb, checked) {
 	                	Ext.getCmp('walltime').setDisabled(!checked);
-	                	//if(!checked)
-	                	//	Ext.getCmp('walltime').setValue('0');
 	                }
                 }
             },{
@@ -246,7 +244,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 disabled: true,
                 fieldLabel: 'Walltime',
                 maskRe:/[\d]/,
-                allowBlank: true
+                allowBlank: false
             },
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'storageProvider' },
@@ -415,12 +413,14 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
             this.getComponent('ncpus').setHidden(false).setDisabled(false);
             this.getComponent('jobfs').setHidden(false).setDisabled(false);
             this.getComponent('mem').setHidden(false).setDisabled(false);
+            this.getComponent('setJobWalltime').setValue(true).setHidden(true).setDisabled(true);
 
         } else {
             resourceCombo.setDisabled(false).setHidden(false);
             this.getComponent('ncpus').setHidden(true).setDisabled(true);
             this.getComponent('jobfs').setHidden(true).setDisabled(true);
             this.getComponent('mem').setHidden(true).setDisabled(true);
+            this.getComponent('setJobWalltime').setValue(false).setHidden(false).setDisabled(false);
         }
 
         this.imageStore.getProxy().setExtraParam('computeServiceId', records.get('id'));
