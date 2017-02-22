@@ -93,7 +93,21 @@ Ext.application({
                         }
                     }
 
-                    Ext.getCmp('job-details-panel').updateJobDetails();
+                    //Update job details panel for jobs that can have updated files
+                    var jobDetailsPanel = Ext.getCmp('job-details-panel');
+                    if (jobDetailsPanel.job) {
+                        switch(jobDetailsPanel.job.get('status')) {
+                        case vegl.models.Job.STATUS_ACTIVE:
+                        case vegl.models.Job.STATUS_PENDING:
+                        case vegl.models.Job.STATUS_INQUEUE:
+                        case vegl.models.Job.STATUS_PROVISIONING:
+                            jobDetailsPanel.updateJobDetails();
+                            break;
+                        default:
+                            jobDetailsPanel.updateSubmitTime();
+                            break;
+                        }
+                    }
                 }
             });
         };

@@ -106,6 +106,17 @@ public abstract class BaseCloudController extends BaseModelController {
      * @throws PortalServiceException
      */
     protected List<CloudComputeService> getConfiguredComputeServices(ANVGLUser user, NCIDetailsDao nciDetailsDao) throws PortalServiceException {
+        return getConfiguredComputeServices(user, nciDetailsDao, cloudComputeServices);
+    }
+
+    /**
+     * Gets the subset of cloudComputeServices that the specified user has successfully configured in their setup page.
+     * @param user
+     * @param nciDetailsDao
+     * @return
+     * @throws PortalServiceException
+     */
+    public static List<CloudComputeService> getConfiguredComputeServices(ANVGLUser user, NCIDetailsDao nciDetailsDao, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
         List<CloudComputeService> configuredServices = new ArrayList<CloudComputeService>(cloudComputeServices.length);
         for (CloudComputeService ccs : cloudComputeServices) {
 
@@ -126,11 +137,16 @@ public abstract class BaseCloudController extends BaseModelController {
                     configuredServices.add(ccs);
                 }
                 break;
+            default:
+                configuredServices.add(ccs);
+                break;
+
             }
         }
 
         return configuredServices;
     }
+
 
     /**
      * Lookup a cloud compute service by ID (as configured in job). Returns null if the service DNE

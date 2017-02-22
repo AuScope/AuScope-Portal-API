@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.server.web.controllers.BaseCloudController;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,7 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  *
  */
 public class ANVGLUser implements UserDetails {
-    
+
     // Authentication frameworks
     public enum AuthenticationFramework { GOOGLE, AAF }
 
@@ -141,7 +143,7 @@ public class ANVGLUser implements UserDetails {
     public void setAcceptedTermsConditions(Integer acceptedTermsConditions) {
         this.acceptedTermsConditions = acceptedTermsConditions;
     }
-    
+
     @Override
     public String toString() {
         return "ANVGLUser [id=" + id + ", fullName=" + fullName + ", authorities=" + authorities + "]";
@@ -182,26 +184,35 @@ public class ANVGLUser implements UserDetails {
     public void setAwsSecret(String awsSecret) {
         this.awsSecret = awsSecret;
     }
-    
+
     public AuthenticationFramework getAuthentication() {
         return this.authentication;
     }
-    
+
     public void setAuthentication(AuthenticationFramework authentication) {
         this.authentication = authentication;
     }
 
     /**
-     * Returns true iff this ANVGLUser instance has all the relevant fields set that are required for
-     * submitting an AWS job. Returning false would indicate that the user has more data to enter before
-     * they can begin submitting jobs.
+     * Returns true iff this ANVGLUser instance has accepted the latest version of the terms and conditions.
      */
-    public boolean isFullyConfigured() {
-        return StringUtils.isNotEmpty(arnStorage) &&
-                StringUtils.isNotEmpty(awsSecret) &&
-                StringUtils.isNotEmpty(arnExecution) &&
-                acceptedTermsConditions != null &&
+    public boolean isAcceptedTermsConditions() {
+        return acceptedTermsConditions != null &&
                 acceptedTermsConditions > 0;
+    }
+
+    /**
+     * Returns true iff this ANVGLUser instance returns true for isAcceptedTermsConditions AND has at least 1 compute service
+     * which has been properly configured.
+     *
+     * @param nciDetailsDao
+     * @param cloudComputeServices
+     * @return
+     * @throws PortalServiceException
+     */
+    public boolean hasMinimumConfiguration(NCIDetailsDao nciDetailsDao, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
+        return isAcceptedTermsConditions() &&
+               !BaseCloudController.getConfiguredComputeServices(this, nciDetailsDao, cloudComputeServices).isEmpty();
     }
 
     @Override

@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
@@ -20,6 +23,34 @@ import org.springframework.security.web.savedrequest.DefaultSavedRequest;
  */
 public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHandler {
 
+    protected CloudStorageService[] cloudStorageServices;
+    protected CloudComputeService[] cloudComputeServices;
+    protected NCIDetailsDao nciDetailsDao;
+
+    public NCIDetailsDao getNciDetailsDao() {
+        return nciDetailsDao;
+    }
+
+    public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
+        this.nciDetailsDao = nciDetailsDao;
+    }
+
+    public CloudStorageService[] getCloudStorageServices() {
+        return cloudStorageServices;
+    }
+
+    public void setCloudStorageServices(CloudStorageService[] cloudStorageServices) {
+        this.cloudStorageServices = cloudStorageServices;
+    }
+
+    public CloudComputeService[] getCloudComputeServices() {
+        return cloudComputeServices;
+    }
+
+    public void setCloudComputeServices(CloudComputeService[] cloudComputeServices) {
+        this.cloudComputeServices = cloudComputeServices;
+    }
+
     @SuppressWarnings("unused")
     private final Log log = LogFactory.getLog(getClass());
 
@@ -30,16 +61,22 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
         DefaultSavedRequest savedRequest = (DefaultSavedRequest) request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST");
 
         if (principal instanceof ANVGLUser) {
-            if (!((ANVGLUser) principal).isFullyConfigured()) {
-                String params = "";
-                if (savedRequest != null) {
-                    URL requestUrl = new URL(savedRequest.getRequestURL());
-                    if (!requestUrl.getPath().contains("login.html")) {
-                        params = "?next=" + requestUrl.getPath();
+            ANVGLUser user = (ANVGLUser) principal;
+            try {
+                //Redirect if the user needs to accept T&Cs OR if they don't have any config services setup
+                if (!user.hasMinimumConfiguration(nciDetailsDao, cloudComputeServices)) {
+                    String params = "";
+                    if (savedRequest != null) {
+                        URL requestUrl = new URL(savedRequest.getRequestURL());
+                        if (!requestUrl.getPath().contains("login.html")) {
+                            params = "?next=" + requestUrl.getPath();
+                        }
                     }
+                    response.sendRedirect("../noconfig.html" + params);
+                    return;
                 }
-                response.sendRedirect("../user.html" + params);
-                return;
+            } catch (PortalServiceException e) {
+                log.error("Unable to verify if user is fully configured:", e);
             }
         }
 

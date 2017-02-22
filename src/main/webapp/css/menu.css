@@ -186,6 +186,16 @@
     margin-left: 250px;
 }
 
+.setup-medium-icon {
+    background-image: url("../img/btn_setup_vl.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    height: 54px;
+    width: 223px;
+    margin-top: 20px;
+}
+
 #latlng, #permalinkicon, #permalink {
     display: none;
 }

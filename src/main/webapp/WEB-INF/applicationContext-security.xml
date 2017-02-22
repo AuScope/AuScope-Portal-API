@@ -49,6 +49,9 @@
     </http>
 
 
+    <beans:bean id="redirectUnconfigUserHandler" class="org.auscope.portal.server.web.security.RedirectUnconfiguredUserHandler" autowire="byType">
+    </beans:bean>
+
     <!-- Google OAuth2 -->
     <beans:bean id="oAuth2EntryPoint" class="com.racquettrack.security.oauth.OAuth2AuthenticationEntryPoint">
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
@@ -58,9 +61,7 @@
         <beans:constructor-arg name="defaultFilterProcessesUrl" value="/oauth/callback"/>
         <beans:property name="authenticationManager" ref="authenticationManager"/>
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
-        <beans:property name="authenticationSuccessHandler">
-            <beans:bean class="org.auscope.portal.server.web.security.RedirectUnconfiguredUserHandler">
-            </beans:bean>        
+        <beans:property name="authenticationSuccessHandler" ref="redirectUnconfigUserHandler">
         </beans:property>
     </beans:bean>
 
@@ -124,11 +125,7 @@
     
     <beans:bean id="aafFilter" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter">
        <beans:property name="authenticationManager" ref="aafAuthenticationManager" />
-
-       <beans:property name="authenticationSuccessHandler">
-            <beans:bean class="org.auscope.portal.server.web.security.RedirectUnconfiguredUserHandler" />        
-       </beans:property>
-
+       <beans:property name="authenticationSuccessHandler" ref="redirectUnconfigUserHandler"/>        
     </beans:bean>
 
     <beans:bean id="aafProvider" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationProvider">

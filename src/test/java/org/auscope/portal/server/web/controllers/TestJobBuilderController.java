@@ -38,6 +38,7 @@ import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
@@ -76,6 +77,7 @@ public class TestJobBuilderController {
     private CloudSubmissionService mockCloudSubmissionService;
     private ANVGLProvenanceService mockAnvglProvenanceService;
     private ANVGLFileStagingService mockFileStagingService;
+    private NCIDetailsDao mockNciDetailsDao;
 
     private JobMailSender mockJobMailSender;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
@@ -104,6 +106,7 @@ public class TestJobBuilderController {
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockSession = context.mock(HttpSession.class);
+        mockNciDetailsDao = context.mock(NCIDetailsDao.class);
 
         mockJobMailSender = context.mock(JobMailSender.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
@@ -131,7 +134,8 @@ public class TestJobBuilderController {
                                      vglJobStatusChangeHandler,
                                      mockScmEntryService,
                                      mockAnvglProvenanceService,
-                                     mockCloudSubmissionService);
+                                     mockCloudSubmissionService,
+                                     mockNciDetailsDao);
 
         user = new ANVGLUser();
         user.setEmail("user@example.com");
@@ -153,7 +157,7 @@ public class TestJobBuilderController {
 
     /**
      * Tests that retrieving job object succeeds.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testGetJobObject() throws PortalServiceException {
@@ -171,7 +175,7 @@ public class TestJobBuilderController {
     /**
      * Tests that retrieving job object fails when the
      * underlying job manager's job query service fails.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testGetJobObject_Exception() throws PortalServiceException {
@@ -220,7 +224,7 @@ public class TestJobBuilderController {
     /**
      * Tests that the retrieving of job files fails
      * when the job cannot be found.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testListStagedJobFiles_JobNotFound() throws PortalServiceException {
@@ -278,7 +282,7 @@ public class TestJobBuilderController {
 
     /**
      * Tests that the deleting of given job files succeeds.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testDeleteFiles() throws PortalServiceException {
@@ -306,7 +310,7 @@ public class TestJobBuilderController {
     /**
      * Tests that the deleting of given job files fails
      * when the job cannot be found.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testDeleteFiles_JobNotFoundException() throws PortalServiceException {
@@ -327,7 +331,7 @@ public class TestJobBuilderController {
 
     /**
      * Tests that the deleting of a given job's download objects succeeds.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testDeleteDownloads() throws PortalServiceException {
@@ -357,7 +361,7 @@ public class TestJobBuilderController {
     /**
      * Tests that the deleting of a given job's download objects fails
      * when job saving fails.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testDeleteDownloads_SaveJobException() throws PortalServiceException {
@@ -388,7 +392,7 @@ public class TestJobBuilderController {
     /**
      * Tests that the deleting of a given job's download objects fails
      * when the job cannot be found.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testDeleteDownloads_JobNotFoundException() throws PortalServiceException {
@@ -486,7 +490,7 @@ public class TestJobBuilderController {
 
     /**
      * Tests that retrieving of a given job's download objects succeeds.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testGetJobDownloads() throws PortalServiceException {
@@ -511,7 +515,7 @@ public class TestJobBuilderController {
     /**
      * Tests that retrieving of a given job's download objects fails
      * when the given job cannot be found.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testGetJobDownloads_Exception() throws PortalServiceException {
@@ -528,7 +532,7 @@ public class TestJobBuilderController {
 
     /**
      * Tests that the getting of job status succeeds.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testGetJobStatus() throws PortalServiceException {
@@ -555,7 +559,7 @@ public class TestJobBuilderController {
     /**
      * Tests that the retrieving of job status fails
      * when the job cannot be found.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testGetJobStatus_JobNotFound() throws PortalServiceException {
@@ -1645,11 +1649,11 @@ public class TestJobBuilderController {
         final String name = "name";
         final String id = "id";
 
-
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getName();will(returnValue(name));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(id));
             allowing(mockScmEntryService).getJobProviders(null, user);will(returnValue(null));
+            oneOf(mockNciDetailsDao).getByUser(mockPortalUser);will(returnValue(null));
         }});
 
 		ModelAndView mav = controller.getComputeServices(null, user);
