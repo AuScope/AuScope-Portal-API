@@ -192,12 +192,13 @@ public class MenuController {
                if (!uri.contains("login.html") &&
                    !uri.contains("gmap.html") &&
                    !uri.contains("user.html") &&
+                   !uri.contains("noconfig.html") &&
                    !uri.contains("admin.html")) {
                    String params = "";
                    if (!uri.contains("login.html")) {
                        params = "?next=" + new URI(uri).getPath();
                    }
-                   return new ModelAndView("redirect:/user.html" + params);
+                   return new ModelAndView("redirect:/noconfig.html" + params);
                }
            }
        }

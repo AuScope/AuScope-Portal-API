@@ -3,7 +3,7 @@
 
 <html>
 <head>
-    <title>ANVGL Portal - Login</title>
+    <title>VGL Portal - Login</title>
     <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     
     <style type="text/css">
@@ -21,7 +21,7 @@
     <div id="body">
         <div class="login-message">
 	        <h2>Authorisation Required</h2>You are not authorised to view the page you have selected.<br>
-	        Did you forgot to log in? Please log in using one of the options below.<br>
+	        Did you forget to log in? Please log in using one of the options below.<br>
 	        <div name="google-login" class="google-medium-icon" title="Log in with Google" onclick="location.href='oauth/google_login.html';"></div>
 	        <div name="aaf-login" class="aaf-medium-icon" title="Log in with AAF"></div>
         </div>

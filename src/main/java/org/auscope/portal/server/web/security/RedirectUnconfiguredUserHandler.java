@@ -72,7 +72,7 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
                             params = "?next=" + requestUrl.getPath();
                         }
                     }
-                    response.sendRedirect("../user.html" + params);
+                    response.sendRedirect("../noconfig.html" + params);
                     return;
                 }
             } catch (PortalServiceException e) {
