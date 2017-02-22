@@ -161,7 +161,7 @@ public class TestMenuController extends PortalTestClass {
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
 
         Assert.assertNotNull(mav);
-        Assert.assertEquals("redirect:/user.html?next=/context/path/resource.html", mav.getViewName());
+        Assert.assertEquals("redirect:/noconfig.html?next=/context/path/resource.html", mav.getViewName());
     }
 
     @Test

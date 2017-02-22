@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,7 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.ScmEntryService;
@@ -85,6 +87,7 @@ public class JobBuilderController extends BaseCloudController {
     private String adminEmail = null;
     private String defaultToolbox = null;
     private CloudSubmissionService cloudSubmissionService;
+    private NCIDetailsDao nciDetailsDao;
 
     /**
      * @return the adminEmail
@@ -124,7 +127,8 @@ public class JobBuilderController extends BaseCloudController {
             CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices, VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             ScmEntryService scmEntryService, ANVGLProvenanceService anvglProvenanceService,
-            CloudSubmissionService cloudSubmissionService) {
+            CloudSubmissionService cloudSubmissionService,
+            NCIDetailsDao nciDetailsDao) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
@@ -135,6 +139,7 @@ public class JobBuilderController extends BaseCloudController {
         this.adminEmail=adminEmail;
         this.defaultToolbox = defaultToolbox;
         this.cloudSubmissionService = cloudSubmissionService;
+        this.nciDetailsDao = nciDetailsDao;
     }
 
 
@@ -1140,9 +1145,11 @@ public class JobBuilderController extends BaseCloudController {
      * compatible with that job. Currently that is only those services
      * that have images available for the solution used for the job.
      *
+     * Compute services that haven't been configured by the user will be ignored
+     *
      * @param jobId (optional) job id to limit acceptable services
      * @return
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @RequestMapping("/secure/getComputeServices.do")
     public ModelAndView getComputeServices(@RequestParam(value="jobId",
@@ -1156,15 +1163,20 @@ public class JobBuilderController extends BaseCloudController {
             throw e;
         }
 
+        Set<String> configuredServiceIds = new HashSet<String>();
+        getConfiguredComputeServices(user, nciDetailsDao).stream().forEach(x -> configuredServiceIds.add(x.getId()));
+
         List<ModelMap> simpleComputeServices = new ArrayList<>();
 
         for (CloudComputeService ccs : cloudComputeServices) {
             // Add the ccs to the list if it's valid for job or we have no job
             if (jobCCSIds == null || jobCCSIds.contains(ccs.getId())) {
-                ModelMap map = new ModelMap();
-                map.put("id", ccs.getId());
-                map.put("name", ccs.getName());
-                simpleComputeServices.add(map);
+                if (configuredServiceIds.contains(ccs.getId())) {
+                    ModelMap map = new ModelMap();
+                    map.put("id", ccs.getId());
+                    map.put("name", ccs.getName());
+                    simpleComputeServices.add(map);
+                }
             }
         }
 

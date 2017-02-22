@@ -137,6 +137,10 @@ public abstract class BaseCloudController extends BaseModelController {
                     configuredServices.add(ccs);
                 }
                 break;
+            default:
+                configuredServices.add(ccs);
+                break;
+
             }
         }
 
