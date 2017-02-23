@@ -141,11 +141,13 @@ public class CloudComputeServiceNci extends CloudComputeService {
      */
     private void initialiseWorkingDirectory(VEGLJob job) throws PortalServiceException, IOException {
         String utilFileContents = getNamedResourceString("nci-util.sh");
+        String wallTimeString = wallTimeToString(job.getWalltime());
         String downloadJobContents = MessageFormat.format(getNamedResourceString("nci-download.job.tpl"), new Object[] {
             job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT),
             job.getId(),
             storageService.getWorkingJobDirectory(job),
-            storageService.getOutputJobDirectory(job)
+            storageService.getOutputJobDirectory(job),
+            wallTimeString
         });
 
         String runJobContents = MessageFormat.format(getNamedResourceString("nci-run.job.tpl"), new Object[] {
@@ -153,7 +155,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
             job.getId(),
             storageService.getWorkingJobDirectory(job),
             storageService.getOutputJobDirectory(job),
-            wallTimeToString(job.getWalltime()),
+            wallTimeString,
             extractParamFromComputeType("ncpus", job.getComputeInstanceType()),
             extractParamFromComputeType("mem", job.getComputeInstanceType()),
             extractParamFromComputeType("jobfs", job.getComputeInstanceType()),
