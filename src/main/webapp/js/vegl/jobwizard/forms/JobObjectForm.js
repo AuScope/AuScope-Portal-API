@@ -278,6 +278,9 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     this.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
                     this.wizardState.jobId = frm.getValues().id;
 
+                    var computeServicesCombo = this.getComponent('computeServiceId');
+                    this.onComputeSelect(computeServicesCombo, this.computeServicesStore.getById(jobData.computeServiceId));
+
                     this.imageStore.getProxy().setExtraParam('jobId', this.wizardState.jobId);
 
                     // Load the solution info for the job into the wizardState
@@ -325,6 +328,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     return;
                 }
 
+                jobObjectFrm.getComponent('image-combo').setValue(computeVmId);
+
                 jobObjectFrm.computeTypeStore.load({
                     params : {
                         computeServiceId : computeServiceId,
@@ -341,6 +346,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 this.imageStore.on('load', whenImagesReady, this, {single: true});
             } else if (this.imageStore.getCount() === 0) {
                 this.imageStore.getProxy().setExtraParam('jobId', this.wizardState.jobId);
+                this.imageStore.getProxy().setExtraParam('computeServiceId', computeServiceId);
                 this.imageStore.load({
                     callback: Ext.bind(whenImagesReady, this)
                 });
