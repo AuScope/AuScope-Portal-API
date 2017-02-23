@@ -457,6 +457,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="seriesId", required=false) Integer seriesId,
             @RequestParam(value="computeServiceId", required=false) String computeServiceId,
             @RequestParam(value="computeVmId", required=false) String computeVmId,
+            @RequestParam(value="computeVmRunCommand", required=false) String computeVmRunCommand,
             @RequestParam(value="computeTypeId", required=false) String computeTypeId,
             @RequestParam(value="ncpus", required=false) Integer ncpus,
             @RequestParam(value="jobfs", required=false) Integer jobFs,
@@ -499,6 +500,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setName(name);
         job.setDescription(description);
         job.setComputeVmId(computeVmId);
+        job.setComputeVmRunCommand(computeVmRunCommand);
         job.setEmailNotification(emailNotification);
         job.setWalltime(walltime);
 

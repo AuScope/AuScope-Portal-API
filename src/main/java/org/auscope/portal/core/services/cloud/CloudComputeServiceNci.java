@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
@@ -140,6 +141,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
      * @throws IOException
      */
     private void initialiseWorkingDirectory(VEGLJob job) throws PortalServiceException, IOException {
+        String runCommand = StringUtils.isEmpty(job.getComputeVmRunCommand()) ? "python" : job.getComputeVmRunCommand();
         String utilFileContents = getNamedResourceString("nci-util.sh");
         String downloadJobContents = MessageFormat.format(getNamedResourceString("nci-download.job.tpl"), new Object[] {
             job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT),
@@ -158,7 +160,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
             extractParamFromComputeType("mem", job.getComputeInstanceType()),
             extractParamFromComputeType("jobfs", job.getComputeInstanceType()),
             "module load escript/5.0", //TODO: Extract these from the solution centre
-            "run-escript -n $VL_TOTAL_NODES -p $VL_CPUS_PER_NODE" //TODO: Extract these from the solution centre
+            runCommand + " -n $VL_TOTAL_NODES -p $VL_CPUS_PER_NODE" //TODO: Extract these from the solution centre
         });
 
         //storageService.uploadJobFile(job, files);

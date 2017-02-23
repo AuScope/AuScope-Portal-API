@@ -360,6 +360,7 @@ public class ScmEntryService {
                     MachineImage image = new MachineImage(img.get("image_id"));
                     image.setName(toolbox.getName());
                     image.setDescription(toolbox.getDescription());
+                    image.setRunCommand(img.get("sc_path"));
                     return image;
                 }
             }

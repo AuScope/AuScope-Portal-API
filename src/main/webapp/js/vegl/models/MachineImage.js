@@ -8,7 +8,8 @@ Ext.define('vegl.models.MachineImage', {
         { name: 'imageId', type: 'string' }, //Unique ID for this image
         { name: 'name', type: 'string' }, //Short title of this image
         { name: 'description', type: 'string' }, //Long description of this image
-        { name: 'keywords', type: 'auto'} //An array of strings
+        { name: 'keywords', type: 'auto'}, //An array of strings
+        { name: 'runCommand', type: 'string' } //Long description of this image
     ],
 
     idProperty : 'imageId'
