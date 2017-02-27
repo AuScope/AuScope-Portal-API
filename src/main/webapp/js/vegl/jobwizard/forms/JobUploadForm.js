@@ -247,7 +247,7 @@ Ext.define('vegl.jobwizard.forms.JobUploadForm', {
         }
 
         if (typeof wizardState.name === "undefined") {
-            params.name = Ext.util.Format.format('ANVGL Job - {0}', Ext.Date.format(new Date(), 'd M Y g:i a'));
+            params.name = Ext.util.Format.format('VGL Job - {0}', Ext.Date.format(new Date(), 'd M Y g:i a'));
         }
 
         Ext.Ajax.request({
