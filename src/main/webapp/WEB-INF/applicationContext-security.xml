@@ -11,7 +11,7 @@
 
     <!-- Default entry point ref to redirect to login page on unauthorised attempts to access secure pages -->
     <beans:bean id="defaultEntryPoint" class="org.auscope.portal.server.web.security.DefaultEntryPoint">
-        <beans:property name="realmName" value="ANVGL-Portal" />
+        <beans:property name="realmName" value="VGL-Portal" />
     </beans:bean>
     
     
