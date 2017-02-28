@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -P {0}
 #PBS -q copyq
-#PBS -l walltime=8:00:00
+#PBS -l walltime={4}
 #PBS -l mem=300MB
 #PBS -l ncpus=1
 #PBS -l wd

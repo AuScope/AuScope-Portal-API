@@ -232,6 +232,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 name: 'setJobWalltime',
                 itemId: 'setJobWalltime',
                 checked: false,
+                margin: '0 0 20 0',
                 plugins: [{
                     ptype: 'fieldhelptext',
                     text: 'Select to add an optional walltime (minutes) for your job.'
@@ -249,7 +250,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 disabled: true,
                 fieldLabel: 'Walltime',
                 maskRe:/[\d]/,
-                allowBlank: false
+                allowBlank: false,
+                plugins: [{
+                    ptype: 'fieldhelptext',
+                    text: 'The walltime in minutes for your job.'
+                }],
             },
             { xtype: 'hidden', name: 'id' },
             { xtype: 'hidden', name: 'storageProvider' },
