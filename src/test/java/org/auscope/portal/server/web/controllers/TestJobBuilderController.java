@@ -1195,6 +1195,7 @@ public class TestJobBuilderController {
                 seriesId,
                 computeServiceId,
                 computeVmId,
+                "run-command",
                 computeVmType,
                 null,
                 null,
@@ -1259,6 +1260,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setName("name");
             oneOf(mockJob).setDescription("description");
             oneOf(mockJob).setComputeVmId("computeVmId");
+            oneOf(mockJob).setComputeVmRunCommand("run-command");
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("nectar-openstack-storage-melb");
             oneOf(mockJob).setStorageBaseKey(newBaseKey);
@@ -1288,6 +1290,7 @@ public class TestJobBuilderController {
                 seriesId,
                 "computeServiceId",
                 "computeVmId",
+                "run-command",
                 computeVmType,
                 null,
                 null,
@@ -1324,6 +1327,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setName("name");
             oneOf(mockJob).setDescription("description");
             oneOf(mockJob).setComputeVmId("computeVmId");
+            oneOf(mockJob).setComputeVmRunCommand("run-command");
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("nectar-openstack-storage-melb");
             oneOf(mockJob).setStorageBaseKey(newBaseKey);
@@ -1353,6 +1357,7 @@ public class TestJobBuilderController {
                 seriesId,
                 "computeServiceId",
                 "computeVmId",
+                "run-command",
                 computeVmType,
                 null,
                 null,
@@ -1429,6 +1434,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setName("name");
             oneOf(mockJob).setDescription("description");
             oneOf(mockJob).setComputeVmId("computeVmId");
+            oneOf(mockJob).setComputeVmRunCommand("run-command");
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("nectar-openstack-storage-melb");
             oneOf(mockJob).setEmailNotification(emailNotification);
@@ -1453,6 +1459,7 @@ public class TestJobBuilderController {
                 Integer.parseInt(seriesId),
                 "computeServiceId",
                 "computeVmId",
+                "run-command",
                 computeVmType,
                 null,
                 null,
@@ -1485,6 +1492,7 @@ public class TestJobBuilderController {
             oneOf(mockJob).setName("name");
             oneOf(mockJob).setDescription("description");
             oneOf(mockJob).setComputeVmId("computeVmId");
+            oneOf(mockJob).setComputeVmRunCommand(null);
             oneOf(mockJob).setComputeServiceId("computeServiceId");
             oneOf(mockJob).setStorageServiceId("nectar-openstack-storage-melb");
             oneOf(mockJob).setEmailNotification(emailNotification);
@@ -1504,6 +1512,7 @@ public class TestJobBuilderController {
                 Integer.parseInt(seriesId),
                 "computeServiceId",
                 "computeVmId",
+                null,
                 computeVmType,
                 null,
                 null,

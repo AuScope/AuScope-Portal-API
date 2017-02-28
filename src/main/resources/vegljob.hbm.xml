@@ -16,6 +16,7 @@
         <property name="status"/>
         <property name="computeServiceId"/>
         <property name="computeVmId"/>
+        <property name="computeVmRunCommand"/>
         <property name="computeInstanceId"/>
         <property name="computeInstanceType"/>
         <property name="computeInstanceKey"/>

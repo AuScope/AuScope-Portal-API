@@ -60,6 +60,7 @@ CREATE TABLE `jobs` (
   `folderId` int(11) DEFAULT NULL,
   `containsPersistentVolumes` char(1) DEFAULT 'N',
   `promsReportUrl` varchar(255) DEFAULT NULL,
+  `computeVmRunCommand` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY `SERIES` (`seriesId`)
      REFERENCES series(`id`)

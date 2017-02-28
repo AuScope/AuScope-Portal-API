@@ -152,6 +152,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     scope: this
                 }
             },{
+                xtype: 'hidden',
+                name: 'computeVmRunCommand',
+                itemId: 'computeVmRunCommand',
+                value : null
+            },{
                 xtype : 'combo',
                 fieldLabel : 'Resources<span>*</span>',
                 name: 'computeTypeId',
@@ -452,11 +457,14 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
 
         if (!records) {
             this.computeTypeStore.removeAll();
+            this.getComponent('computeVmRunCommand').setValue(null);
             return;
         }
 
         this.getComponent('resource-combo').clearValue();
         var selectedComputeService = this.getComponent('computeServiceId').getValue();
+
+        this.getComponent('computeVmRunCommand').setValue(records.get('runCommand'));
 
         this.computeTypeStore.load({
             params : {
