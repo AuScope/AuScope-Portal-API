@@ -288,6 +288,9 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     this.wizardState.jobComputeInstanceType = jobData.computeInstanceType;
                     this.wizardState.jobId = frm.getValues().id;
 
+                    var computeServicesCombo = this.getComponent('computeServiceId');
+                    this.onComputeSelect(computeServicesCombo, this.computeServicesStore.getById(jobData.computeServiceId));
+
                     this.imageStore.getProxy().setExtraParam('jobId', this.wizardState.jobId);
 
                     // Load the solution info for the job into the wizardState
@@ -335,6 +338,8 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                     return;
                 }
 
+                jobObjectFrm.getComponent('image-combo').setValue(computeVmId);
+
                 jobObjectFrm.computeTypeStore.load({
                     params : {
                         computeServiceId : computeServiceId,
@@ -351,6 +356,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 this.imageStore.on('load', whenImagesReady, this, {single: true});
             } else if (this.imageStore.getCount() === 0) {
                 this.imageStore.getProxy().setExtraParam('jobId', this.wizardState.jobId);
+                this.imageStore.getProxy().setExtraParam('computeServiceId', computeServiceId);
                 this.imageStore.load({
                     callback: Ext.bind(whenImagesReady, this)
                 });
@@ -419,17 +425,28 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
         resourceCombo.clearValue();
 
         if (combo.getValue() === 'nci-raijin-compute') {
+            var ncpusVal = null;
+            var jobfsVal = null;
+            var memVal = null;
+            if (!Ext.isEmpty(this.wizardState.jobComputeInstanceType) &&
+                this.wizardState.jobComputeInstanceType.indexOf('&') >= 0) {
+                var hpcParams = Ext.Object.fromQueryString(this.wizardState.jobComputeInstanceType);
+                ncpusVal = hpcParams.ncpus;
+                jobfsVal = hpcParams.jobfs;
+                memVal = hpcParams.mem;
+            }
+
             resourceCombo.setHidden(true).setDisabled(true);
-            this.getComponent('ncpus').setHidden(false).setDisabled(false);
-            this.getComponent('jobfs').setHidden(false).setDisabled(false);
-            this.getComponent('mem').setHidden(false).setDisabled(false);
+            this.getComponent('ncpus').setHidden(false).setDisabled(false).setValue(ncpusVal);
+            this.getComponent('jobfs').setHidden(false).setDisabled(false).setValue(jobfsVal);
+            this.getComponent('mem').setHidden(false).setDisabled(false).setValue(memVal);
             this.getComponent('setJobWalltime').setValue(true).setHidden(true).setDisabled(true);
 
         } else {
             resourceCombo.setDisabled(false).setHidden(false);
-            this.getComponent('ncpus').setHidden(true).setDisabled(true);
-            this.getComponent('jobfs').setHidden(true).setDisabled(true);
-            this.getComponent('mem').setHidden(true).setDisabled(true);
+            this.getComponent('ncpus').setHidden(true).setDisabled(true).setValue(null);
+            this.getComponent('jobfs').setHidden(true).setDisabled(true).setValue(null);
+            this.getComponent('mem').setHidden(true).setDisabled(true).setValue(null);
             this.getComponent('setJobWalltime').setValue(false).setHidden(false).setDisabled(false);
         }
 
