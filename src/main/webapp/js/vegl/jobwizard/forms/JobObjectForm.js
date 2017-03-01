@@ -29,8 +29,7 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                    type: 'json',
                    rootProperty : 'data'
                 }
-            },
-            autoLoad : true
+            }
         });
 
         // create the store, get the machine image
@@ -72,11 +71,11 @@ Ext.define('vegl.jobwizard.forms.JobObjectForm', {
                 jobWizardActive : function() {
                     //If we have a jobId, load that, OTHERWISE the job will be created later
                     if (jobObjectFrm.wizardState.jobId) {
-                        jobObjectFrm.handleLoadingJobObject();
-                    } else if (jobObjectFrm.wizardState.solutions) {
-                        this.imageStore.load();
-                    } else {
-                        this.imageStore.load();
+                        this.computeServicesStore.getProxy().extraParams.jobId = jobObjectFrm.wizardState.jobId;
+                        this.computeServicesStore.load({
+                            scope: this,
+                            callback: jobObjectFrm.handleLoadingJobObject
+                        });
                     }
                 }
             },
