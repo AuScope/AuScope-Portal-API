@@ -307,4 +307,9 @@ public class CloudComputeServiceNci extends CloudComputeService {
             }
         }
     }
+
+    @Override
+    public ComputeType[] getAvailableComputeTypes(String machineImageId) {
+        return getAvailableComputeTypes();
+    }
 }
