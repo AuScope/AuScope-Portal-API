@@ -196,7 +196,12 @@ public class ANVGLUser implements UserDetails {
     /**
      * Returns true iff this ANVGLUser instance has accepted the latest version of the terms and conditions.
      */
-    public boolean isAcceptedTermsConditions() {
+    // Carsten VGL-208: this method can not be named isAcceptedTermsConditions() or hasAcceptedTermsConditions()
+    //                  as this can non-deterministicly cause hibernate to think it is a boolean - which causes all kinds of
+    //                  type casting / mismatch issues.
+    // https://jira.csiro.au/browse/VGL-208
+    public boolean acceptedTermsConditionsStatus() {
+        // Carsten 
         return acceptedTermsConditions != null &&
                 acceptedTermsConditions > 0;
     }
@@ -211,7 +216,7 @@ public class ANVGLUser implements UserDetails {
      * @throws PortalServiceException
      */
     public boolean hasMinimumConfiguration(NCIDetailsDao nciDetailsDao, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
-        return isAcceptedTermsConditions() &&
+        return acceptedTermsConditionsStatus() &&
                !BaseCloudController.getConfiguredComputeServices(this, nciDetailsDao, cloudComputeServices).isEmpty();
     }
 
