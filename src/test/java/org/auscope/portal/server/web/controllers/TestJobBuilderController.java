@@ -1718,7 +1718,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeId));
-            allowing(mockCloudComputeServices[0]).getAvailableComputeTypes(null, null, 1000);will(returnValue(result));
+            allowing(mockCloudComputeServices[0]).getAvailableComputeTypes("image-id");will(returnValue(result));
             allowing(mockCloudComputeServices[0]).getAvailableImages();will(returnValue(machineImages));
         }});
 
