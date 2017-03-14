@@ -1109,30 +1109,11 @@ public class JobBuilderController extends BaseCloudController {
         try {
             CloudComputeService ccs = getComputeService(computeServiceId);
             if (ccs == null) {
-                return generateJSONResponseMAV(false, null, "Unknown compute service");
+                return generateJSONResponseMAV(false, null, "Unknown compute service: "+computeServiceId);
             }
 
-            List<MachineImage> images = getImagesForJobAndUser(request, computeServiceId);
-            MachineImage selectedImage = null;
-            for (MachineImage image : images) {
-                if (image.getImageId().equals(machineImageId)) {
-                    selectedImage = image;
-                    break;
-                }
-            }
-
-            ComputeType[] allTypes = null;
-            if (selectedImage == null) {
-                // Unknown image, presumably from the SSSC, so start with all
-                // compute types for the selected compute service.
-                allTypes = ccs.getAvailableComputeTypes();
-            }
-            else {
-                //Grab the compute types that are compatible with our disk
-                //requirements
-                allTypes = ccs.getAvailableComputeTypes(null, null, selectedImage.getMinimumDiskGB());
-            }
-
+            ComputeType[] allTypes = ccs.getAvailableComputeTypes(machineImageId);
+            
             return generateJSONResponseMAV(true, allTypes, "");
         } catch (Exception ex) {
             log.error("Unable to access compute type list:" + ex.getMessage(), ex);
