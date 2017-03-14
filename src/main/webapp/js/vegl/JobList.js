@@ -203,7 +203,7 @@ Ext.application({
                     title: 'Your Jobs',
                     region: 'center',
                     stripeRows: true,
-                    itemId : 'vgl-jobs-tree',
+                    id : 'vgl-jobs-tree',
                     rootNode: data.nodes,
                     jobStore: jobStore,
                     selModel: {
