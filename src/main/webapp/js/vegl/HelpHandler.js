@@ -85,7 +85,7 @@ Ext.define('vegl.HelpHandler', {
         if (window.location.pathname.endsWith('/gmap.html')) {
             helpButtonEl.on('click', function() {
                 vegl.HelpHandler.manager.showInstructions([Ext.create('portal.util.help.Instruction', {
-                    highlightEl : 'auscope-tabs-panel',
+                    highlightEl : 'vlsearchpanel',
                     title : 'Find data/layers',
                     description : 'In this panel a list of all available datasets in the form of layers will be presented to you.  Select the layer you would like to visualise.  Selecting a layer will also bring up any advanced filter options in the window below. <br/><br/>Further information about the data behind each layer can be displayed by clicking the icons alongside the layer name.'
                 }),Ext.create('portal.util.help.Instruction', {
@@ -117,32 +117,16 @@ Ext.define('vegl.HelpHandler', {
             });
         } else if (window.location.pathname.endsWith('/joblist.html')) {
             helpButtonEl.on('click', function() {
-                var vp = Ext.getCmp('vgl-joblist-viewport');
-                var seriesP = vp.queryById('vgl-series-panel');
-                var jobsP = vp.queryById('vgl-jobs-panel');
-                var detailsP = vp.queryById('vgl-details-panel');
-                var registerB = vp.queryById('btnRegister');
-
                 vegl.HelpHandler.manager.showInstructions([Ext.create('portal.util.help.Instruction', {
-                    highlightEl : seriesP.getEl(),
-                    title : 'Choose a Series',
-                    anchor : 'right',
-                    description : 'This panel will display every series that you\'ve created. Selecting a series will display all jobs owned by that series. You can manage an entire series by right clicking it or by selecting the desired series and pressing \'Actions\''
-                }),Ext.create('portal.util.help.Instruction', {
-                    highlightEl : jobsP.getEl(),
+                    highlightEl : 'vgl-jobs-tree',
                     title : 'Manage Jobs',
                     anchor : 'right',
-                    description : 'After selecting a series, a list of all jobs belonging to that series will be displayed here. Selecting a job will bring up information about that job in the details panel. You can manage individual jobs by right clicking them or by selecting a job and pressing \'Actions\'<br/><br/>If you\'d like more information about the job states, please consult the <a target="_blank" href="https://www.seegrid.csiro.au/wiki/VirtualLabs/VGL/VglUserGuide">VGL wiki</a>.'
+                    description : 'All jobs that you have created will be listed here. Selecting a job will bring up information about that job in the details panel. You can manage individual/multiple jobs by clicking the cog icon<br/><br/>If you\'d like more information about the job states, please consult the <a target="_blank" href="https://www.seegrid.csiro.au/wiki/VirtualLabs/VGL/VglUserGuide">VGL wiki</a>.'
                 }),Ext.create('portal.util.help.Instruction', {
-                    highlightEl : detailsP.getEl(),
+                    highlightEl : 'job-details-panel',
                     title : 'Inspect Job',
                     anchor : 'left',
-                    description : 'When you select a job, information about the job\'s metadata, logs and input/output files will be displayed here.<br/><br/>The description tab will provide a rough overview of the job. It will also contain a link to a remote provenance record (if one has been published).<br/><br/>The logs tab will display the entire console logs of a finished job. The logs will be divided into relevant sections. Please note that logs will not be available until after the job has finished processing.<br/><br/>The files tab contains all input/output files. Files from this list can be downloaded individually or as an archived zip file.'
-                }),Ext.create('portal.util.help.Instruction', {
-                    highlightEl : registerB.getEl(),
-                    title : 'Register Job',
-                    anchor : 'top',
-                    description : 'If a job contains information that you would like to publish, selecting this button on a completed job will publish all provenance information to a remote Geonetwork registry. A link to the published record will be displayed in the \'Details\' Panel, under the \'Description\' tab.<br/><br/>Please note that this button will disabled unless you select a job whose status is \'Done\''
+                    description : 'When you select a job, information about the job\'s metadata, logs and input/output files will be displayed here.<br/><br/>The description tab will provide a rough overview of the job.<br/><br/>The logs tab will display the entire console logs of a finished job. The logs will be divided into relevant sections.<br/><br/>The files tab contains all input/output files. Files from this list can be downloaded individually or as an archived zip file.'
                 })]);
             });
         } else {

@@ -120,6 +120,7 @@ Ext.application({
             width: 370,
             items:[{
                 xtype: 'facetedsearchpanel',
+                id: 'vlsearchpanel',
                 region: 'center',
                 map: map,
                 layerFactory: layerFactory
