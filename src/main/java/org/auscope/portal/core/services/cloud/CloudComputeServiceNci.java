@@ -290,7 +290,8 @@ public class CloudComputeServiceNci extends CloudComputeService {
             session = sshCloudConnector.getSession(job);
             ExecResult res = sshCloudConnector.executeCommand(session, "qstat -s " + runningJobId);
             if (res.getExitStatus() != 0) {
-                if (res.getErr().contains("Job has finished")) {
+                String errMsg = res.getErr();
+                if (errMsg.contains("Job has finished") || errMsg.contains("Unknown Job Id")) {
                     return InstanceStatus.Missing;
                 }
                 throw new PortalServiceException("Could not query job status for job '"+job.getComputeInstanceId()+"': "+res.getErr());
