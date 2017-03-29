@@ -25,7 +25,7 @@ if hash puppet 2>/dev/null; then
     echo "Puppet version $(puppet --version ) already installed."
     if [ -f /etc/debian_version ]; then
         sudo apt-get update
-        sudo apt-get install -y at
+        sudo apt-get install -y --force-yes at
     else
         sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
         sudo yum install -y at
@@ -35,7 +35,7 @@ else
     # Checks for a debian based system, or assumes rpm based
     if [ -f /etc/debian_version ]; then
         sudo apt-get update
-        sudo apt-get install -y puppet at
+        sudo apt-get install -y --force-yes puppet at
     else
         sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
         yum install -y puppet at
@@ -84,7 +84,7 @@ moduleDir="/etc/puppet/modules"
 if [ ! -d "$moduleDir/vl_common" ]; then
     echo "Installing vl common modules into $moduleDir/vl_common"
     if [ -f /etc/debian_version ]; then
-        sudo apt-get install -y wget git
+        sudo apt-get install -y --force-yes wget git
     else
         sudo yum install -y wget git
     fi
