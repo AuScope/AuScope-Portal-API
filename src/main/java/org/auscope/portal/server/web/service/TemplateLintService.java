@@ -112,17 +112,9 @@ public class TemplateLintService {
         String errors;
         try {
             ProcessBuilder pb =
-                new ProcessBuilder("pylint", "-r", "n", "-f", "json",
-                                   "--disable=all",
-                                   "--enable=variables",
-                                   "--enable=stdlib",
-                                   "--enable=basic",
-                                   "--enable=iterable_check",
-                                   "--enable=format",
-                                   "--enable=typecheck",
-                                   "--enable=classes",
-                                   "--enable=string_constant",
-                                   "--enable=exceptions",
+                new ProcessBuilder("pylint",
+                                   "-r", "n",
+                                   "-f", "json",
                                    "--disable=R,C",
                                    f.getFileName().toString())
                 .directory(f.getParent().toFile());
