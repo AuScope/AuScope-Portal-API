@@ -108,6 +108,8 @@ Ext.define('vegl.widgets.search.VLCSWRecordPanel', {
 
         Ext.create('Ext.window.Window', {
             title : 'CSW Record Information',
+            maxHeight: Math.max(100, window.innerHeight - 50),
+            autoScroll: true,
             items : [{
                 xtype : 'cswmetadatapanel',
                 width : 500,
