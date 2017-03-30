@@ -119,6 +119,9 @@ Ext.define('vegl.widgets.DetailsPanel', {
                     hideRowExpander: true,
                     hideLocationColumn: true,
                     nameColumnWidth: 150,
+                    selModel: {
+                        mode: 'MULTI'
+                    },
                     emptyText: '<p class="centeredlabel">This job doesn\'t have any uploaded input files or service downloads configured. Unsubmitted jobs will not have their input files visible here.</p>',
                     width: 350,
                     listeners: {
