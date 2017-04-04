@@ -63,16 +63,22 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
         if (principal instanceof ANVGLUser) {
             ANVGLUser user = (ANVGLUser) principal;
             try {
+                boolean tcs = user.acceptedTermsConditionsStatus();
+                boolean configured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServices);
+
                 //Redirect if the user needs to accept T&Cs OR if they don't have any config services setup
-                if (!user.hasMinimumConfiguration(nciDetailsDao, cloudComputeServices)) {
+                if (!configured || !tcs) {
                     String params = "";
+                    String redirect = configured ? "../notcs.html" : "../noconfig.html";
                     if (savedRequest != null) {
                         URL requestUrl = new URL(savedRequest.getRequestURL());
                         if (!requestUrl.getPath().contains("login.html")) {
                             params = "?next=" + requestUrl.getPath();
                         }
                     }
-                    response.sendRedirect("../noconfig.html" + params);
+
+
+                    response.sendRedirect(redirect + params);
                     return;
                 }
             } catch (PortalServiceException e) {

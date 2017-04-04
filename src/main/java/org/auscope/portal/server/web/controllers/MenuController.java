@@ -187,18 +187,25 @@ public class MenuController {
 
        //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
        if (user != null) {
-           if (!user.hasMinimumConfiguration(nciDetailsDao, cloudComputeServices)) {
+           boolean tcs = user.acceptedTermsConditionsStatus();
+           boolean configured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServices);
+
+           if (!configured || !tcs) {
                String uri = request.getRequestURI();
                if (!uri.contains("login.html") &&
                    !uri.contains("gmap.html") &&
                    !uri.contains("user.html") &&
                    !uri.contains("noconfig.html") &&
+                   !uri.contains("notcs.html") &&
                    !uri.contains("admin.html")) {
                    String params = "";
                    if (!uri.contains("login.html")) {
                        params = "?next=" + new URI(uri).getPath();
                    }
-                   return new ModelAndView("redirect:/noconfig.html" + params);
+
+                   return new ModelAndView(configured ?
+                                           "redirect:/notcs.html" + params :
+                                           "redirect:/noconfig.html" + params);
                }
            }
        }

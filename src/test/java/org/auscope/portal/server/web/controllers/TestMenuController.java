@@ -60,7 +60,8 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).hasMinimumConfiguration(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
@@ -87,7 +88,8 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(null));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).hasMinimumConfiguration(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
@@ -134,7 +136,8 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).hasMinimumConfiguration(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
@@ -154,7 +157,8 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).hasMinimumConfiguration(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(false));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(false));
+            allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
 
         }});
 
@@ -162,6 +166,28 @@ public class TestMenuController extends PortalTestClass {
 
         Assert.assertNotNull(mav);
         Assert.assertEquals("redirect:/noconfig.html?next=/context/path/resource.html", mav.getViewName());
+    }
+
+    @Test
+    public void testUnacceptedTCsRedirect() throws Exception {
+        final String uri = "http://example.org/context/path/resource.html";
+
+        context.checking(new Expectations() {{
+            allowing(mockRequest).getRequestURI();will(returnValue(uri));
+
+            allowing(mockRequest).getSession();will(returnValue(mockSession));
+            oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
+            oneOf(mockSession).setAttribute("existingSession", true);
+
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(false));
+
+        }});
+
+        ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
+
+        Assert.assertNotNull(mav);
+        Assert.assertEquals("redirect:/notcs.html?next=/context/path/resource.html", mav.getViewName());
     }
 
     @Test
@@ -175,7 +201,8 @@ public class TestMenuController extends PortalTestClass {
             allowing(mockSession).getAttribute("existingSession");will(returnValue(true));
             allowing(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).hasMinimumConfiguration(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(false));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(false));
+            allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(false));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
