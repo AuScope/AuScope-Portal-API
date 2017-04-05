@@ -123,6 +123,7 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
                         serviceUrl:  data[i].url,
                         scope: this,
                         handler: function(btn) {
+                            this._initPagingParams();
                             this.searchServiceId = btn.serviceId;
                             this.refreshResults();
                             this.fireEvent('registrychange', this, this.searchServiceId);
@@ -176,19 +177,28 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
             target: this.down('#recordpanel'),
             text: 'Searching for records...'
         });
+
+        if (this.currentAjax) {
+            Ext.Ajax.abort(this.currentAjax);
+            this.currentAjax = null;
+        }
+
         mask.show();
-        portal.util.Ajax.request({
+        this.currentAjax = portal.util.Ajax.request({
             url: 'facetedCSWSearch.do',
             params: params,
             timeout: 300 * 1000, //5 minutes
             scope: this,
-            callback: function(success, data, msg, debugInfo) {
+            callback: function(success, data, msg, debugInfo, response) {
                 mask.hide();
                 mask.destroy();
+                this.currentAjax = null;
 
                 if (!success) {
                     this.store.removeAll();
-                    portal.widgets.window.ErrorWindow.showText('Error', 'Unable to complete search request', debugInfo);
+                    if (!response || !response.aborted) {
+                        portal.widgets.window.ErrorWindow.showText('Error', 'Unable to complete search request', debugInfo);
+                    }
                     return;
                 }
 
