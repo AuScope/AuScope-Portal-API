@@ -100,7 +100,6 @@
     <script type="text/javascript" src="js/vegl/widgets/JobStatusWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/SeriesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/FolderPanel.js"></script>
-    <script type="text/javascript" src="js/vegl/widgets/JobRegisterPanel.js"></script>
 
     <script type="text/javascript" src="js/vegl/jobwizard/forms/BaseJobWizardForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/DuplicateJobForm.js"></script>
