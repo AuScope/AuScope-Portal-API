@@ -325,7 +325,6 @@
         <property name="veglJobDao" ref="veglJobDao"/>
         <property name="veglSeriesDao" ref="veglSeriesDao"/>
         <property name="vglJobAuditLogDao" ref="vglJobAuditLogDao"/>
-        <property name="vglSignatureDao" ref="vglSignatureDao"/>
         <property name="nciDetailsDao" ref="nciDetailsDao"/>
     </bean>
 
@@ -338,10 +337,6 @@
     </bean>
 
     <bean id="vglJobAuditLogDao" class="org.auscope.portal.server.vegl.VGLJobAuditLogDao">
-        <property name="sessionFactory" ref="veglSessionFactory"/>
-    </bean>
-
-    <bean id="vglSignatureDao" class="org.auscope.portal.server.vegl.VGLSignatureDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
     
@@ -363,7 +358,6 @@
                 <value>vglparameter.hbm.xml</value>
                 <value>vgljobsauditlog.hbm.xml</value>
                 <value>vgldownload.hbm.xml</value>
-                <value>vglsignature.hbm.xml</value>
                 <value>anvgluser.hbm.xml</value>
                 <value>anvglauthority.hbm.xml</value>
                 <value>ncidetails.hbm.xml</value>

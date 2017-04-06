@@ -24,7 +24,6 @@ public class VEGLJobManager {
     private VEGLJobDao veglJobDao;
     private VEGLSeriesDao veglSeriesDao;
     private VGLJobAuditLogDao vglJobAuditLogDao;
-    private VGLSignatureDao vglSignatureDao;
     private NCIDetailsDao nciDetailsDao;
 
     public List<VEGLSeries> querySeries(String user, String name, String desc) {
@@ -64,10 +63,6 @@ public class VEGLJobManager {
 
     public VEGLSeries getSeriesById(int seriesId, String userEmail) {
         return veglSeriesDao.get(seriesId, userEmail);
-    }
-
-    public VGLSignature getSignatureByUser(String user) {
-        return vglSignatureDao.getSignatureOfUser(user);
     }
 
     public void saveJob(VEGLJob veglJob) {
@@ -136,10 +131,6 @@ public class VEGLJobManager {
         veglSeriesDao.save(series);
     }
 
-    public void saveSignature(VGLSignature vglSignature) {
-        vglSignatureDao.save(vglSignature);
-    }
-
     public void setVeglJobDao(VEGLJobDao veglJobDao) {
         this.veglJobDao = veglJobDao;
     }
@@ -150,10 +141,6 @@ public class VEGLJobManager {
 
     public void setVglJobAuditLogDao(VGLJobAuditLogDao vglJobAuditLogDao) {
         this.vglJobAuditLogDao = vglJobAuditLogDao;
-    }
-
-    public void setVglSignatureDao(VGLSignatureDao vglSignatureDao) {
-        this.vglSignatureDao = vglSignatureDao;
     }
 
     public NCIDetailsDao getNciDetailsDao() {

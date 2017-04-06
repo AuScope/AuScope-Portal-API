@@ -23,7 +23,6 @@ public class TestVEGLJobManager extends PortalTestClass {
     private VEGLJobDao mockJobDao;
     private VEGLSeriesDao mockSeriesDao;
     private VGLJobAuditLogDao mockJobAuditLogDao;
-    private VGLSignatureDao mockSignatureDao;
     private VEGLJobManager jobManager;
     private NCIDetailsDao mockNciDetailsDao;
     private final String TEST_ENC_KEY = "unit-testing-key";
@@ -37,14 +36,12 @@ public class TestVEGLJobManager extends PortalTestClass {
         mockJobDao = context.mock(VEGLJobDao.class);
         mockSeriesDao = context.mock(VEGLSeriesDao.class);
         mockJobAuditLogDao = context.mock(VGLJobAuditLogDao.class);
-        mockSignatureDao = context.mock(VGLSignatureDao.class);
         mockNciDetailsDao = context.mock(NCIDetailsDao.class);
         // Object Under Test
         jobManager = new VEGLJobManager();
         jobManager.setVeglJobDao(mockJobDao);
         jobManager.setVeglSeriesDao(mockSeriesDao);
         jobManager.setVglJobAuditLogDao(mockJobAuditLogDao);
-        jobManager.setVglSignatureDao(mockSignatureDao);
         jobManager.setNciDetailsDao(mockNciDetailsDao);
     }
 
@@ -69,7 +66,7 @@ public class TestVEGLJobManager extends PortalTestClass {
 
     /**
      * Tests that retrieving jobs of a given series succeeds.
-     * @throws PortalServiceException 
+     * @throws PortalServiceException
      */
     @Test
     public void testGetSeriesJobs() throws PortalServiceException {
@@ -155,29 +152,6 @@ public class TestVEGLJobManager extends PortalTestClass {
     }
 
     /**
-     * Tests that the retrieving of signature of a given user succeeds.
-     * null is returned when the user's signature cannot be found.
-     */
-    @Test
-    public void testGetSignatureByUser() {
-        final String user1 = "user1@email.com";
-        final String user2 = "user2@email.com";
-        final VGLSignature mockSignature = context.mock(VGLSignature.class);
-
-        context.checking(new Expectations() {{
-            oneOf(mockSignatureDao).getSignatureOfUser(user1);
-            will(returnValue(mockSignature));
-            oneOf(mockSignatureDao).getSignatureOfUser(user2);
-            will(returnValue(null));
-        }});
-
-        Assert.assertNotNull(jobManager.getSignatureByUser(user1));
-        // Test to ensure null is returned when user's signature
-        // cannot be found.
-        Assert.assertNull(jobManager.getSignatureByUser(user2));
-    }
-
-    /**
      * Tests that the storing of a given job succeeds.
      */
     @Test
@@ -258,19 +232,5 @@ public class TestVEGLJobManager extends PortalTestClass {
         }});
 
         jobManager.saveSeries(mockSeries);
-    }
-
-    /**
-     * Tests that storing a given user's signature succeeds.
-     */
-    @Test
-    public void testSaveSignature() {
-        final VGLSignature mockSignature = context.mock(VGLSignature.class);
-
-        context.checking(new Expectations() {{
-            oneOf(mockSignatureDao).save(mockSignature);
-        }});
-
-        jobManager.saveSignature(mockSignature);
     }
 }

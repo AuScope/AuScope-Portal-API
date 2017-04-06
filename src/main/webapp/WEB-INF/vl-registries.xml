@@ -9,8 +9,6 @@
         <constructor-arg name="title" value="SISS ANU Geonetwork"/>
         <constructor-arg name="serviceUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/csw"/>
         <constructor-arg name="recordInformationUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s"/>
-        <property name="userName" value="${env.outputgeonetwork.user}"/>
-        <property name="password" value="${env.outputgeonetwork.password}"/>
     </bean>
 
     <bean id="cswGAECat" class="org.auscope.portal.core.services.csw.CSWServiceItem">

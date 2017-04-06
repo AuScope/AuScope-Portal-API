@@ -5,7 +5,6 @@
  * Adds the following events
  * selectjob : function(vegl.widgets.SeriesPanel panel, vegl.models.Job selection) - fires whenever a new Job is selected
  * refreshDetailsPanel : function(vegl.widgets.SeriesPanel panel, vegl.models.Series series) - fires whenever a job successfully deleted
- * jobregistered : function(vegl.widgets.SeriesPanel panel, vegl.models.Job jobRegistered) - fires whenever a new Job is registered in a remote registry
  * error : function(vegl.widgets.SereisPanel panel, String message) - fires whenever a comms error occurs
  */
 Ext.define('vegl.widgets.JobsPanel', {
@@ -214,13 +213,6 @@ Ext.define('vegl.widgets.JobsPanel', {
                 }
             },
             buttons: [{
-                text: 'Register to GeoNetwork',
-                itemId : 'btnRegister',
-                disabled : true,
-                hidden : config.hideRegisterButton,
-                tooltip: 'Register the job result into GeoNetwork',
-                handler: Ext.bind(this._onRegisterToGeonetwork, this)
-            },{
                 text: 'Refresh',
                 itemId : 'btnRefresh',
                 tooltip : 'Refresh the list of jobs for the selected series',
@@ -289,36 +281,6 @@ Ext.define('vegl.widgets.JobsPanel', {
         }
     },
 
-    _onRegisterToGeonetwork : function(btn) {
-        var selectedJob = this.getSelectionModel().getSelection()[0];
-
-        var popup = Ext.create('Ext.window.Window', {
-            id : 'jobRegisterWin',
-            width : 800,
-            modal : true,
-            layout : 'anchor',
-            title : 'Register to GeoNetwork',
-            items :[{
-                xtype : 'jobregister',
-                id : 'jobRegisterPanel',
-                job : selectedJob,
-                jobId : selectedJob.get('id')
-            }]
-        });
-
-        popup.on('beforerender', function() {
-            //loads user contact/signature data into the form
-            popup.items.getAt(0).loadFormData();
-        }, this);
-
-        popup.on('close', function() {
-            //refresh selected job description
-            this.fireEvent('refreshJobDescription', selectedJob);
-        }, this);
-
-        popup.show();
-    },
-
 
     /**
      * Triggers a refresh of the current selected series (if a refresh is already running this will have no effect)
@@ -326,14 +288,10 @@ Ext.define('vegl.widgets.JobsPanel', {
     triggerRefresh : function() {
         if (this.currentSeries) {
             this.listJobsForSeries(this.currentSeries, true);
-            this.queryById('btnRegister').setDisabled(true);
         }
     },
 
     _onJobSelection : function(sm, job) {
-        var allowedToRegister = (job.get('status') === vegl.models.Job.STATUS_DONE) && Ext.isEmpty(job.get('registeredUrl'));
-        this.queryById('btnRegister').setDisabled(!allowedToRegister);
-
         this.fireEvent('selectjob', this, job);
     },
 
@@ -377,7 +335,6 @@ Ext.define('vegl.widgets.JobsPanel', {
      */
     refreshJobsForSeries : function() {
         this.getStore().load();
-        this.queryById('btnRegister').setDisabled(true);
     },
 
     /**
