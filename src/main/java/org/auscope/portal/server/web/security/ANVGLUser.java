@@ -201,13 +201,13 @@ public class ANVGLUser implements UserDetails {
     //                  type casting / mismatch issues.
     // https://jira.csiro.au/browse/VGL-208
     public boolean acceptedTermsConditionsStatus() {
-        // Carsten 
+        // Carsten
         return acceptedTermsConditions != null &&
                 acceptedTermsConditions > 0;
     }
 
     /**
-     * Returns true iff this ANVGLUser instance returns true for isAcceptedTermsConditions AND has at least 1 compute service
+     * Returns true iff this ANVGLUser instance has at least 1 compute service
      * which has been properly configured.
      *
      * @param nciDetailsDao
@@ -215,9 +215,8 @@ public class ANVGLUser implements UserDetails {
      * @return
      * @throws PortalServiceException
      */
-    public boolean hasMinimumConfiguration(NCIDetailsDao nciDetailsDao, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
-        return acceptedTermsConditionsStatus() &&
-               !BaseCloudController.getConfiguredComputeServices(this, nciDetailsDao, cloudComputeServices).isEmpty();
+    public boolean configuredServicesStatus(NCIDetailsDao nciDetailsDao, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
+        return !BaseCloudController.getConfiguredComputeServices(this, nciDetailsDao, cloudComputeServices).isEmpty();
     }
 
     @Override
