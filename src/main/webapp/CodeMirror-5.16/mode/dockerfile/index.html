@@ -35,16 +35,16 @@ WORKDIR /data/ghost
 
 # Install dependencies for nginx installation
 RUN apt-get update
-RUN apt-get install -y --force-yes python g++ make software-properties-common --force-yes
+RUN apt-get install -y python g++ make software-properties-common --force-yes
 RUN add-apt-repository ppa:chris-lea/node.js
 RUN apt-get update
 # Install unzip
-RUN apt-get install -y --force-yes unzip
+RUN apt-get install -y unzip
 # Install curl
-RUN apt-get install -y --force-yes curl
+RUN apt-get install -y curl
 # Install nodejs & npm
-RUN apt-get install -y --force-yes rlwrap
-RUN apt-get install -y --force-yes nodejs 
+RUN apt-get install -y rlwrap
+RUN apt-get install -y nodejs 
 # Download Ghost v0.4.1
 RUN curl -L https://ghost.org/zip/ghost-latest.zip -o /tmp/ghost.zip
 # Unzip Ghost zip to /data/ghost

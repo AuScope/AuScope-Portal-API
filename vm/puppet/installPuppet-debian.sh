@@ -25,7 +25,7 @@ pathSuffix="/vm/puppet/modules/"
 
 apt-get update
 apt-get upgrade
-apt-get install -y --force-yes puppet
+apt-get install -y puppet
 
 #/////////////////////////////
 #Install Additional Modules
@@ -57,7 +57,7 @@ fi
 # Clone specified git repository into $tmpModulesDir and install puppet modules.
 #/////////////////////////////
 
-apt-get install -y --force-yes wget git
+apt-get install -y wget git
 tmpModulesDir="/tmp/modules/"
 rm -rf "$tmpModulesDir"
 if [ "$1" !=  "" ]
