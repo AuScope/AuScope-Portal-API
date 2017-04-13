@@ -332,7 +332,7 @@ public class TestLocalCSWFilterService extends PortalTestClass {
                     with(equal(4)),
                     with(equal(1)));
             inSequence(serv1Sequence);
-            will(returnValue(mockServ1Res1));
+            will(delayReturnValue(1000, mockServ1Res1));
 
             allowing(mockServ1Res1).getNextRecord();will(returnValue(5));
             allowing(mockServ1Res1).getRecordsMatched();will(returnValue(88));
@@ -345,7 +345,7 @@ public class TestLocalCSWFilterService extends PortalTestClass {
                     with(equal(2)),
                     with(equal(5)));
             inSequence(serv1Sequence);
-            will(returnValue(mockServ1Res2));
+            will(delayReturnValue(500, mockServ1Res2));
             allowing(mockServ1Res2).getNextRecord();will(returnValue(7));
             allowing(mockServ1Res2).getRecordsMatched();will(returnValue(88));
             allowing(mockServ1Res2).getRecordsReturned();will(returnValue(2));
@@ -370,7 +370,7 @@ public class TestLocalCSWFilterService extends PortalTestClass {
                     with(equal(4)),
                     with(equal(100)));
             inSequence(serv2Sequence);
-            will(returnValue(mockServ2Res1));
+            will(delayReturnValue(250, mockServ2Res1));
             allowing(mockServ2Res1).getNextRecord();will(returnValue(0));
             allowing(mockServ2Res1).getRecordsMatched();will(returnValue(0));
             allowing(mockServ2Res1).getRecordsReturned();will(returnValue(0));
@@ -384,7 +384,7 @@ public class TestLocalCSWFilterService extends PortalTestClass {
                     with(equal(3)),
                     with(equal(10)));
             inSequence(serv3Sequence);
-            will(returnValue(mockServ3Res1));
+            will(delayReturnValue(500, mockServ3Res1));
             allowing(mockServ3Res1).getNextRecord();will(returnValue(14));
             allowing(mockServ3Res1).getRecordsMatched();will(returnValue(4));
             allowing(mockServ3Res1).getRecordsReturned();will(returnValue(3));
@@ -396,7 +396,7 @@ public class TestLocalCSWFilterService extends PortalTestClass {
                     with(equal(2)),
                     with(equal(13)));
             inSequence(serv3Sequence);
-            will(returnValue(mockServ3Res2));
+            will(delayReturnValue(1000, mockServ3Res2));
             allowing(mockServ3Res2).getNextRecord();will(returnValue(0));
             allowing(mockServ3Res2).getRecordsMatched();will(returnValue(1));
             allowing(mockServ3Res2).getRecordsReturned();will(returnValue(1));
@@ -426,6 +426,7 @@ public class TestLocalCSWFilterService extends PortalTestClass {
 
     /**
      * Tests that everything correctly shutsdown if we don't have enough records to fulfill the entire request
+     *
      * @throws Exception
      */
     @Test
@@ -451,7 +452,7 @@ public class TestLocalCSWFilterService extends PortalTestClass {
         final Sequence serv3Sequence = context.sequence("serv3Sequence");
 
         context.checking(new Expectations() {{
-            //Service 1 will make 2 requests. The first 4 records and then a redistributed 1 (of 2)
+            //Service 1 will make 2 requests. The first 4 records and then a redistribution of 4 from service 2 (as service 3 will have no more available to redistribute to)
             oneOf(mockFilterService).getFilteredRecords(
                     with(equal("service1")),
                     with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
@@ -485,21 +486,21 @@ public class TestLocalCSWFilterService extends PortalTestClass {
                     with(equal(4)),
                     with(equal(100)));
             inSequence(serv2Sequence);
-            will(returnValue(mockServ2Res1));
+            will(delayReturnValue(250, mockServ2Res1));
             allowing(mockServ2Res1).getNextRecord();will(returnValue(0));
             allowing(mockServ2Res1).getRecordsMatched();will(returnValue(0));
             allowing(mockServ2Res1).getRecordsReturned();will(returnValue(0));
             allowing(mockServ2Res1).getRecords();will(returnValue(new ArrayList<CSWRecord>()));
 
 
-            //Service 3 will make one requests. The first for 3 records will be fulfilled
+            //Service 3 will make one request. The first for 3 records will be fulfilled but there will be no more available.
             oneOf(mockFilterService).getFilteredRecords(
                     with(equal("service3")),
                     with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
                     with(equal(3)),
                     with(equal(10)));
             inSequence(serv3Sequence);
-            will(returnValue(mockServ3Res1));
+            will(delayReturnValue(500, mockServ3Res1));
             allowing(mockServ3Res1).getNextRecord();will(returnValue(0));
             allowing(mockServ3Res1).getRecordsMatched();will(returnValue(3));
             allowing(mockServ3Res1).getRecordsReturned();will(returnValue(3));

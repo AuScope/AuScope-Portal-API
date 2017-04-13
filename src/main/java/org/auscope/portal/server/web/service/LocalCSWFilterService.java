@@ -431,15 +431,12 @@ public class LocalCSWFilterService {
                             this.currentNextIndex =  response.getNextIndex();
 
                             if (response.getNextIndex() <= 0) {
-                                this.state = FilterRunnerState.Terminated;
+                                //Having no more records means it's pointless to continue hitting this CSW
+                                break;
                             } else {
                                 this.lock.notifyAll();
                             }
                         }
-                    }
-
-                    if (this.state == FilterRunnerState.Terminated) {
-                        break;
                     }
                 }
             } catch (Throwable e) {
