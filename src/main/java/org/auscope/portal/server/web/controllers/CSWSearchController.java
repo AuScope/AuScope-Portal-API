@@ -3,8 +3,10 @@ package org.auscope.portal.server.web.controllers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auscope.portal.core.server.controllers.BaseCSWController;
@@ -71,8 +73,17 @@ public class CSWSearchController extends BaseCSWController {
      * @return
      */
     @RequestMapping("facetedKeywords.do")
-    public ModelAndView facetedKeywords(@RequestParam("serviceId") String serviceId) {
-        return generateJSONResponseMAV(true, this.cacheService.getKeywordsForEndpoint(serviceId), "");
+    public ModelAndView facetedKeywords(@RequestParam("serviceId") String[] serviceIds) {
+        final Set<String> keywords = new HashSet<String>();
+
+        for (String serviceId : serviceIds) {
+            Set<String> kwCache = this.cacheService.getKeywordsForEndpoint(serviceId);
+            if (kwCache != null) {
+                keywords.addAll(kwCache);
+            }
+        }
+
+        return generateJSONResponseMAV(true, keywords, "");
     }
 
     /**

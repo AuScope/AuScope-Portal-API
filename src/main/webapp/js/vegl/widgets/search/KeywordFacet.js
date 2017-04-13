@@ -74,14 +74,16 @@ Ext.define('vegl.widgets.search.KeywordFacet', {
         this.callParent(arguments);
     },
 
-    onRegistryChange: function(cmp, newServiceId) {
-        this.setServiceId(newServiceId);
+    onRegistryChange: function(cmp, newServiceIds) {
+        this.setServiceIds(newServiceIds);
     },
 
-    setServiceId: function(serviceId) {
+    setServiceIds: function(serviceIds) {
         this.clearSearch(true);
-        this.keywordStore.getProxy().extraParams.serviceId = serviceId;
-        this.keywordStore.load();
+        if (!Ext.isEmpty(serviceIds)) {
+            this.keywordStore.getProxy().extraParams.serviceId = serviceIds;
+            this.keywordStore.load();
+        }
     },
 
     /**

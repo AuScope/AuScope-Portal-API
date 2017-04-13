@@ -143,6 +143,17 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
         this.down('#nextbutton').setDisabled(true);
         this.down('#previousbutton').setDisabled(true);
 
+        if (this.currentAjax) {
+            Ext.Ajax.abort(this.currentAjax);
+            this.currentAjax = null;
+        }
+
+        if (Ext.isEmpty(this.serviceIds)) {
+            this.store.removeAll();
+            this._initPagingParams();
+            return;
+        }
+
         var params = {
             field: [],
             value: [],
@@ -171,11 +182,6 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
             target: this.down('#recordpanel'),
             text: 'Searching for records...'
         });
-
-        if (this.currentAjax) {
-            Ext.Ajax.abort(this.currentAjax);
-            this.currentAjax = null;
-        }
 
         mask.show();
         this.currentAjax = portal.util.Ajax.request({

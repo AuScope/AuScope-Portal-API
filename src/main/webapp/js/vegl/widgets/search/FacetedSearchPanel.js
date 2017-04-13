@@ -50,7 +50,7 @@ Ext.define('vegl.widgets.search.FacetedSearchPanel', {
                 map: config.map,
                 collapsed: true,
                 listeners: listeners
-            },{
+            }/*,{
                 xtype: 'cellsizefacet',
                 map: config.map,
                 collapsed: true,
@@ -60,31 +60,49 @@ Ext.define('vegl.widgets.search.FacetedSearchPanel', {
                 map: config.map,
                 collapsed: true,
                 listeners: listeners
+            }*/,{
+                xtype: 'registryfacet',
+                collapsed: true,
+                map: config.map,
+                listeners: {
+                    registrychange: this.onRegistryChange,
+                    load: this.onRegistryLoadEnd,
+                    loadstart: this.onRegistryLoadStart,
+                    scope: this
+                }
             },{
                 xtype: 'facetedcswbrowserpanel',
                 collapsed: true,
                 map: config.map,
                 title: 'Search Results',
                 layerFactory: config.layerFactory,
-                height: 380,
-                listeners: {
-                    registrychange: this.onRegistryChange,
-                    scope: this
-                }
+                height: 380
             }]
         });
 
         this.callParent(arguments);
     },
 
-    onRegistryChange: function(cswBrowserPanel, newRegistryId) {
+    onRegistryLoadStart: function(registryFacet) {
+
+    },
+
+    onRegistryLoadEnd: function(registryFacet, success) {
+
+    },
+
+    onRegistryChange: function(registryFacet, registryIds) {
         this.items.each(function(cmp) {
             if (cmp instanceof vegl.widgets.search.BaseFacetWidget) {
                 if (cmp.onRegistryChange) {
-                    cmp.onRegistryChange(cmp, newRegistryId);
+                    cmp.onRegistryChange(cmp, registryIds);
                 }
             }
         });
+
+        var browser = this.down('facetedcswbrowserpanel').serviceIds = registryIds;
+
+        this.onChange(registryFacet);
     },
 
     onChange: function(cmp) {
