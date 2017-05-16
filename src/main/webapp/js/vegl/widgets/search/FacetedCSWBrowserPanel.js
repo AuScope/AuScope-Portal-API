@@ -210,7 +210,15 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
                 this.store.loadData(records);
                 this.store.fireEvent('load', this.store, records, true);
 
-                this.down('#nextbutton').setDisabled(this.searchNextIndex <= 0);
+                var hasMore = false;
+                for (var sid in this.searchNextIndexes) {
+                    if (this.searchNextIndexes[sid] > 0) {
+                        hasMore = true;
+                        break;
+                    }
+                }
+
+                this.down('#nextbutton').setDisabled(!hasMore);
                 this.down('#previousbutton').setDisabled(this.previousStartIndexes.length <= 0);
             }
         });
