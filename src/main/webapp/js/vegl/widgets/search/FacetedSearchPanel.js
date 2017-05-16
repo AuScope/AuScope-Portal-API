@@ -102,10 +102,15 @@ Ext.define('vegl.widgets.search.FacetedSearchPanel', {
 
         var browser = this.down('facetedcswbrowserpanel').serviceIds = registryIds;
 
-        this.onChange(registryFacet);
+        if (this._searched) {
+            this.onChange(registryFacet);
+        }
     },
 
     onChange: function(cmp) {
+
+        this._searched = true;
+
         this.fireEvent('change', this, cmp);
         var facets = this.extractSearchFacets();
 
