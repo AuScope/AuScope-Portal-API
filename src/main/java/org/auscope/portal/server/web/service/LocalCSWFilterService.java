@@ -224,7 +224,8 @@ public class LocalCSWFilterService {
         synchronized(lock) {
             for (FilterRunner runner : allRunners) {
                 if (runner.error != null) {
-                    throw new PortalServiceException("Error accessing CSW records from service " + runner.serviceId, runner.error);
+                    log.error("Error accessing CSW records from service " + runner.serviceId + " : " + runner.error.getMessage());
+                    log.debug("Exception", runner.error);
                 }
 
                 if (runner.state != FilterRunnerState.Terminated) {

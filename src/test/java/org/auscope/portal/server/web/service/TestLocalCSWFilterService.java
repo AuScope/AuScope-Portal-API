@@ -613,10 +613,10 @@ public class TestLocalCSWFilterService extends PortalTestClass {
     }
 
     /**
-     * Tests that the underlying implementation correctly redistributes fulfillment across services the remaining services
+     * Tests that the underlying implementation correctly redistributes fulfillment across services the remaining services, even when an exception is thrown
      * @throws Exception
      */
-    @Test(expected=PortalServiceException.class)
+    @Test
     public void testGetMultiFilteredRecords_HandleException() throws Exception {
         final int RECORD_REQUEST_COUNT = 11;
         final String[] serviceIds = new String[] {"service1", "service2", "service3"};
@@ -641,7 +641,7 @@ public class TestLocalCSWFilterService extends PortalTestClass {
         final Sequence serv3Sequence = context.sequence("serv3Sequence");
 
         context.checking(new Expectations() {{
-            //Service 1 will make three requests. The first 4 records and then a redistributed 2 and then a final redistributed 1
+            //Service 1 will make three requests. The first 4 records and then a redistributed 2 and then throw a exception
             oneOf(mockFilterService).getFilteredRecords(
                     with(equal("service1")),
                     with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
@@ -715,6 +715,21 @@ public class TestLocalCSWFilterService extends PortalTestClass {
             allowing(mockServ3Res2).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s3rec4"))));
         }});
 
-        localFilterService.getFilteredRecords(serviceIds, facets, startIndexes, RECORD_REQUEST_COUNT);
+        FacetedMultiSearchResponse response = localFilterService.getFilteredRecords(serviceIds, facets, startIndexes, RECORD_REQUEST_COUNT);
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getNextIndexes());
+        Assert.assertNotNull(response.getRecords());
+        Assert.assertNotNull(response.getStartIndexes());
+
+        Assert.assertEquals(new Integer(7), response.getNextIndexes().get("service1"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service2"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service3"));
+
+        Assert.assertEquals(new Integer(1), response.getStartIndexes().get("service1"));
+        Assert.assertEquals(new Integer(100), response.getStartIndexes().get("service2"));
+        Assert.assertEquals(new Integer(10), response.getStartIndexes().get("service3"));
+
+        Assert.assertEquals(10, response.getRecords().size());
+        Assert.assertEquals("s1rec1", response.getRecords().get(0).getFileIdentifier());
     }
 }
