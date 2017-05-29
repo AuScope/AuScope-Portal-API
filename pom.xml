@@ -291,6 +291,8 @@
             <id>cgsrv8.arrc.csiro.au Snapshots</id>
             <name>AuScope Nexus - PortalSnapshot</name>
             <url>http://cgsrv8.arrc.csiro.au/nexus/content/groups/PortalSnapshot/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
         </repository>
         <repository>
             <id>cgsrv8.arrc.csiro.au PROMS-java</id>
