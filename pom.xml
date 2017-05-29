@@ -288,7 +288,7 @@
             <url>http://cgsrv8.arrc.csiro.au/nexus/content/groups/PortalRepository/</url>
         </repository>
         <repository>
-            <id>cgsrv8.arrc.csiro.au</id>
+            <id>cgsrv8.arrc.csiro.au Snapshots</id>
             <name>AuScope Nexus - PortalSnapshot</name>
             <url>http://cgsrv8.arrc.csiro.au/nexus/content/groups/PortalSnapshot/</url>
         </repository>
