@@ -288,6 +288,11 @@
             <url>http://cgsrv8.arrc.csiro.au/nexus/content/groups/PortalRepository/</url>
         </repository>
         <repository>
+            <id>cgsrv8.arrc.csiro.au</id>
+            <name>AuScope Nexus - PortalSnapshot</name>
+            <url>http://cgsrv8.arrc.csiro.au/nexus/content/groups/PortalSnapshot/</url>
+        </repository>
+        <repository>
             <id>cgsrv8.arrc.csiro.au PROMS-java</id>
             <name>AuScope Nexus - PROMS-Java</name>
             <url>https://cgsrv8.arrc.csiro.au/nexus/content/repositories/PROMS-java-snapshot</url>
