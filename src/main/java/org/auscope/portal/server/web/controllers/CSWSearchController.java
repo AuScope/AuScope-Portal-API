@@ -267,7 +267,7 @@ public class CSWSearchController extends BaseCSWController {
      *
      * @return
      */
-    @RequestMapping("/getCSWServices.do")
+    @RequestMapping("/getFacetedCSWServices.do")
     public ModelAndView getCSWServices() {
         List<ModelMap> convertedServiceItems = new ArrayList<ModelMap>();
 

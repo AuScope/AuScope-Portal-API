@@ -110,7 +110,7 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
             msg: 'Loading Registries...'
         });
         portal.util.Ajax.request({
-            url: 'getCSWServices.do',
+            url: 'getFacetedCSWServices.do',
             scope: this,
             success: function(data, message, debugInfo) {
                 var configs = [];
