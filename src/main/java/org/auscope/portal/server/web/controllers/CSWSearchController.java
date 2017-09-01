@@ -1,11 +1,17 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auscope.portal.core.server.controllers.BaseCSWController;
 import org.auscope.portal.core.services.CSWCacheService;
+import org.auscope.portal.core.services.CSWFilterService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
@@ -19,7 +25,7 @@ import org.auscope.portal.core.services.responses.wms.GetCapabilitiesWMSLayerRec
 import org.auscope.portal.core.view.ViewCSWRecordFactory;
 import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.server.web.service.LocalCSWFilterService;
-import org.auscope.portal.server.web.service.csw.FacetedSearchResponse;
+import org.auscope.portal.server.web.service.csw.FacetedMultiSearchResponse;
 import org.auscope.portal.server.web.service.csw.SearchFacet;
 import org.auscope.portal.server.web.service.csw.SearchFacet.Comparison;
 import org.joda.time.DateTime;
@@ -44,14 +50,16 @@ public class CSWSearchController extends BaseCSWController {
 
     private LocalCSWFilterService filterService;
     private CSWCacheService cacheService;
+    private CSWFilterService cswFilterService;
     private WMSService wmsService;
 
     @Autowired
-    public CSWSearchController(ViewCSWRecordFactory viewCSWRecordFactory, ViewKnownLayerFactory viewKnownLayerFactory, LocalCSWFilterService filterService, CSWCacheService cacheService, WMSService wmsService) {
+    public CSWSearchController(ViewCSWRecordFactory viewCSWRecordFactory, ViewKnownLayerFactory viewKnownLayerFactory, LocalCSWFilterService filterService, CSWCacheService cacheService, WMSService wmsService, CSWFilterService cswFilterService) {
         super(viewCSWRecordFactory, viewKnownLayerFactory);
         this.filterService = filterService;
         this.cacheService = cacheService;
         this.wmsService = wmsService;
+        this.cswFilterService = cswFilterService;
     }
 
     @ResponseStatus(value =  org.springframework.http.HttpStatus.BAD_REQUEST)
@@ -65,8 +73,17 @@ public class CSWSearchController extends BaseCSWController {
      * @return
      */
     @RequestMapping("facetedKeywords.do")
-    public ModelAndView facetedKeywords(@RequestParam("serviceId") String serviceId) {
-        return generateJSONResponseMAV(true, this.cacheService.getKeywordsForEndpoint(serviceId), "");
+    public ModelAndView facetedKeywords(@RequestParam("serviceId") String[] serviceIds) {
+        final Set<String> keywords = new HashSet<String>();
+
+        for (String serviceId : serviceIds) {
+            Set<String> kwCache = this.cacheService.getKeywordsForEndpoint(serviceId);
+            if (kwCache != null) {
+                keywords.addAll(kwCache);
+            }
+        }
+
+        return generateJSONResponseMAV(true, keywords, "");
     }
 
     /**
@@ -82,9 +99,9 @@ public class CSWSearchController extends BaseCSWController {
      */
     @RequestMapping("facetedCSWSearch.do")
     public ModelAndView facetedCSWSearch(
-            @RequestParam(value="start", required=false, defaultValue="1") Integer start,
+            @RequestParam(value="start", required=false, defaultValue="1") Integer[] starts,
             @RequestParam(value="limit", required=false, defaultValue="10") Integer limit,
-            @RequestParam("serviceId") String serviceId,
+            @RequestParam("serviceId") String[] serviceIds,
             @RequestParam(value="field", required=false) String[] rawFields,
             @RequestParam(value="value", required=false) String[] rawValues,
             @RequestParam(value="type", required=false) String[] rawTypes,
@@ -113,6 +130,22 @@ public class CSWSearchController extends BaseCSWController {
         if (limit > 20) {
             throw new IllegalArgumentException("Limit too high (max 20)");
         }
+
+        //if start Id's are not specified, assume they are all 1
+        if (starts == null || starts.length == 0) {
+            starts = new Integer[serviceIds.length];
+            Arrays.fill(starts, 1);
+        }
+
+        //Build our mapping between service ids and start indexes
+        if (starts.length != serviceIds.length) {
+            throw new IllegalArgumentException("start/serviceId lengths mismatch");
+        }
+        Map<String, Integer> startIndexes = new HashMap<String, Integer>();
+        for (int i = 0; i < starts.length; i++) {
+            startIndexes.put(serviceIds[i], starts[i]);
+        }
+
 
         //Parse our raw request info into a list of search facets
         List<SearchFacet<? extends Object>> facets = new ArrayList<SearchFacet<? extends Object>>();
@@ -160,9 +193,9 @@ public class CSWSearchController extends BaseCSWController {
         }
 
         //Make our request and then convert the records for transport to the view
-        FacetedSearchResponse response;
+        FacetedMultiSearchResponse response;
         try {
-            response = filterService.getFilteredRecords(serviceId, facets, start, limit);
+            response = filterService.getFilteredRecords(serviceIds, facets, startIndexes, limit);
             workaroundMissingNCIMetadata(response.getRecords());
         } catch (Exception ex) {
             log.error("Unable to filter records from remote service", ex);
@@ -174,8 +207,8 @@ public class CSWSearchController extends BaseCSWController {
             viewRecords.add(viewCSWRecordFactory.toView(record));
         }
         ModelMap mm = new ModelMap();
-        mm.put("startIndex", response.getStartIndex());
-        mm.put("nextIndex", response.getNextIndex());
+        mm.put("startIndexes", response.getStartIndexes());
+        mm.put("nextIndexes", response.getNextIndexes());
         mm.put("records", viewRecords);
 
         return generateJSONResponseMAV(true, mm, "");

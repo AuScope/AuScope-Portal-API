@@ -1,10 +1,12 @@
 package org.auscope.portal.server.web.service;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-
-import junit.framework.Assert;
+import java.util.concurrent.TimeUnit;
 
 import org.auscope.portal.core.services.CSWFilterService;
 import org.auscope.portal.core.services.PortalServiceException;
@@ -15,15 +17,21 @@ import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource.
 import org.auscope.portal.core.services.responses.csw.CSWGetRecordResponse;
 import org.auscope.portal.core.services.responses.csw.CSWOnlineResourceImpl;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
+import org.auscope.portal.core.test.BasicThreadExecutor;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.test.jmock.CSWGetDataRecordsFilterMatcher;
+import org.auscope.portal.server.web.service.csw.FacetedMultiSearchResponse;
 import org.auscope.portal.server.web.service.csw.FacetedSearchResponse;
 import org.auscope.portal.server.web.service.csw.SearchFacet;
 import org.auscope.portal.server.web.service.csw.SearchFacet.Comparison;
 import org.jmock.Expectations;
+import org.jmock.Sequence;
 import org.joda.time.DateTime;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 /**
  * Unit tests for the filtering at LocalCSWFilterService
@@ -37,10 +45,18 @@ public class TestLocalCSWFilterService extends PortalTestClass {
     private CSWGetRecordResponse mockResponse2 = context.mock(CSWGetRecordResponse.class, "mockResponse2");
     private CSWGetRecordResponse mockResponse3 = context.mock(CSWGetRecordResponse.class, "mockResponse3");
     private LocalCSWFilterService localFilterService;
+    private BasicThreadExecutor executor;
 
     @Before
     public void setup() {
-        localFilterService = new LocalCSWFilterService(mockFilterService);
+        executor = new BasicThreadExecutor();
+        localFilterService = new LocalCSWFilterService(mockFilterService, executor);
+    }
+
+    @After
+    public void teardown() throws InterruptedException {
+        executor.getExecutorService().shutdown();
+        executor.getExecutorService().awaitTermination(5000, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -235,7 +251,6 @@ public class TestLocalCSWFilterService extends PortalTestClass {
         Assert.assertEquals("rec1", response.getRecords().get(0).getFileIdentifier());
     }
 
-
     /**
      * Ensures we handle service exceptions gracefully
      * @throws Exception
@@ -279,5 +294,442 @@ public class TestLocalCSWFilterService extends PortalTestClass {
         }});
 
         localFilterService.getFilteredRecords(serviceId, facets, startIndex, maxRecords);
+    }
+
+    /**
+     * Tests that the underlying implementation correctly redistributes fulfillment across services the remaining services
+     * @throws Exception
+     */
+    @Test
+    public void testGetMultiFilteredRecords_RedistributeFulfillment() throws Exception {
+        final int RECORD_REQUEST_COUNT = 11;
+        final String[] serviceIds = new String[] {"service1", "service2", "service3"};
+        final HashMap<String, Integer> startIndexes = new HashMap<String, Integer>();
+        startIndexes.put("service1", 1);
+        startIndexes.put("service2", 100);
+        startIndexes.put("service3", 10);
+
+        final List<SearchFacet<? extends Object>> facets = Arrays.asList(
+                new SearchFacet<String>("kw1", "keyword", Comparison.Equal),
+                new SearchFacet<String>("kw2", "keyword", Comparison.Equal));
+
+        final CSWGetRecordResponse mockServ1Res1 = context.mock(CSWGetRecordResponse.class, "mockServ1Res1");
+        final CSWGetRecordResponse mockServ1Res2 = context.mock(CSWGetRecordResponse.class, "mockServ1Res2");
+        final CSWGetRecordResponse mockServ1Res3 = context.mock(CSWGetRecordResponse.class, "mockServ1Res3");
+        final CSWGetRecordResponse mockServ2Res1 = context.mock(CSWGetRecordResponse.class, "mockServ2Res1");
+        final CSWGetRecordResponse mockServ3Res1 = context.mock(CSWGetRecordResponse.class, "mockServ3Res1");
+        final CSWGetRecordResponse mockServ3Res2 = context.mock(CSWGetRecordResponse.class, "mockServ3Res2");
+
+        final Sequence serv1Sequence = context.sequence("serv1Sequence");
+        final Sequence serv2Sequence = context.sequence("serv2Sequence");
+        final Sequence serv3Sequence = context.sequence("serv3Sequence");
+
+        context.checking(new Expectations() {{
+            //Service 1 will make three requests. The first 4 records and then a redistributed 2 and then a final redistributed 1
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service1")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(4)),
+                    with(equal(1)));
+            inSequence(serv1Sequence);
+            will(delayReturnValue(1000, mockServ1Res1));
+
+            allowing(mockServ1Res1).getNextRecord();will(returnValue(5));
+            allowing(mockServ1Res1).getRecordsMatched();will(returnValue(88));
+            allowing(mockServ1Res1).getRecordsReturned();will(returnValue(4));
+            allowing(mockServ1Res1).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s1rec1"), new CSWRecord("s1rec2"), new CSWRecord("s1rec3"), new CSWRecord("s1rec4"))));
+
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service1")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(2)),
+                    with(equal(5)));
+            inSequence(serv1Sequence);
+            will(delayReturnValue(500, mockServ1Res2));
+            allowing(mockServ1Res2).getNextRecord();will(returnValue(7));
+            allowing(mockServ1Res2).getRecordsMatched();will(returnValue(88));
+            allowing(mockServ1Res2).getRecordsReturned();will(returnValue(2));
+            allowing(mockServ1Res2).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s1rec5"), new CSWRecord("s1rec6"))));
+
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service1")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(1)),
+                    with(equal(7)));
+            inSequence(serv1Sequence);
+            will(returnValue(mockServ1Res3));
+            allowing(mockServ1Res3).getNextRecord();will(returnValue(8));
+            allowing(mockServ1Res3).getRecordsMatched();will(returnValue(88));
+            allowing(mockServ1Res3).getRecordsReturned();will(returnValue(1));
+            allowing(mockServ1Res3).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s1rec7"))));
+
+            //Service 2 will make one request for four records and then return 0
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service2")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(4)),
+                    with(equal(100)));
+            inSequence(serv2Sequence);
+            will(delayReturnValue(250, mockServ2Res1));
+            allowing(mockServ2Res1).getNextRecord();will(returnValue(0));
+            allowing(mockServ2Res1).getRecordsMatched();will(returnValue(0));
+            allowing(mockServ2Res1).getRecordsReturned();will(returnValue(0));
+            allowing(mockServ2Res1).getRecords();will(returnValue(new ArrayList<CSWRecord>()));
+
+
+            //Service 3 will make one two requests. The first for 3 records will be fulfilled, the second redistributed request for 2 will only be half fulfilled
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service3")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(3)),
+                    with(equal(10)));
+            inSequence(serv3Sequence);
+            will(delayReturnValue(500, mockServ3Res1));
+            allowing(mockServ3Res1).getNextRecord();will(returnValue(14));
+            allowing(mockServ3Res1).getRecordsMatched();will(returnValue(4));
+            allowing(mockServ3Res1).getRecordsReturned();will(returnValue(3));
+            allowing(mockServ3Res1).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s3rec1"), new CSWRecord("s3rec2"), new CSWRecord("s3rec3"))));
+
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service3")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(2)),
+                    with(equal(13)));
+            inSequence(serv3Sequence);
+            will(delayReturnValue(1000, mockServ3Res2));
+            allowing(mockServ3Res2).getNextRecord();will(returnValue(0));
+            allowing(mockServ3Res2).getRecordsMatched();will(returnValue(1));
+            allowing(mockServ3Res2).getRecordsReturned();will(returnValue(1));
+            allowing(mockServ3Res2).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s3rec4"))));
+        }});
+
+        FacetedMultiSearchResponse response = localFilterService.getFilteredRecords(serviceIds, facets, startIndexes, RECORD_REQUEST_COUNT);
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getNextIndexes());
+        Assert.assertNotNull(response.getRecords());
+        Assert.assertNotNull(response.getStartIndexes());
+
+        Assert.assertEquals(new Integer(8), response.getNextIndexes().get("service1"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service2"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service3"));
+
+        Assert.assertEquals(new Integer(1), response.getStartIndexes().get("service1"));
+        Assert.assertEquals(new Integer(100), response.getStartIndexes().get("service2"));
+        Assert.assertEquals(new Integer(10), response.getStartIndexes().get("service3"));
+
+        String[] expectedRecordOrdering = new String[] {"s1rec1","s3rec1","s1rec2","s3rec2","s1rec3","s3rec3","s1rec4","s3rec4","s1rec5","s1rec6","s1rec7"};
+        Assert.assertEquals(expectedRecordOrdering.length, response.getRecords().size());
+        for (int i = 0; i < expectedRecordOrdering.length; i++) {
+            Assert.assertEquals(expectedRecordOrdering[i], response.getRecords().get(i).getFileIdentifier());
+        }
+    }
+
+    /**
+     * Tests that everything correctly shutsdown if we don't have enough records to fulfill the entire request
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetMultiFilteredRecords_Unfulfillable() throws Exception {
+        final int RECORD_REQUEST_COUNT = 11;
+        final String[] serviceIds = new String[] {"service1", "service2", "service3"};
+        final HashMap<String, Integer> startIndexes = new HashMap<String, Integer>();
+        startIndexes.put("service1", 1);
+        startIndexes.put("service2", 100);
+        startIndexes.put("service3", 10);
+
+        final List<SearchFacet<? extends Object>> facets = Arrays.asList(
+                new SearchFacet<String>("kw1", "keyword", Comparison.Equal),
+                new SearchFacet<String>("kw2", "keyword", Comparison.Equal));
+
+        final CSWGetRecordResponse mockServ1Res1 = context.mock(CSWGetRecordResponse.class, "mockServ1Res1");
+        final CSWGetRecordResponse mockServ1Res2 = context.mock(CSWGetRecordResponse.class, "mockServ1Res2");
+        final CSWGetRecordResponse mockServ2Res1 = context.mock(CSWGetRecordResponse.class, "mockServ2Res1");
+        final CSWGetRecordResponse mockServ3Res1 = context.mock(CSWGetRecordResponse.class, "mockServ3Res1");
+
+        final Sequence serv1Sequence = context.sequence("serv1Sequence");
+        final Sequence serv2Sequence = context.sequence("serv2Sequence");
+        final Sequence serv3Sequence = context.sequence("serv3Sequence");
+
+        context.checking(new Expectations() {{
+            //Service 1 will make 2 requests. The first 4 records and then a redistribution of 4 from service 2 (as service 3 will have no more available to redistribute to)
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service1")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(4)),
+                    with(equal(1)));
+            inSequence(serv1Sequence);
+            will(delayReturnValue(1000, mockServ1Res1)); //We need a delay here so that we can be sure that service3 and service2 fulfillment redistributions have both occurred
+                                                         //(otherwise our mock object expectation definitions become silly complicated)
+
+            allowing(mockServ1Res1).getNextRecord();will(returnValue(5));
+            allowing(mockServ1Res1).getRecordsMatched();will(returnValue(5));
+            allowing(mockServ1Res1).getRecordsReturned();will(returnValue(4));
+            allowing(mockServ1Res1).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s1rec1"), new CSWRecord("s1rec2"), new CSWRecord("s1rec3"), new CSWRecord("s1rec4"))));
+
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service1")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(4)),
+                    with(equal(5)));
+            inSequence(serv1Sequence);
+            will(returnValue(mockServ1Res2));
+            allowing(mockServ1Res2).getNextRecord();will(returnValue(0));
+            allowing(mockServ1Res2).getRecordsMatched();will(returnValue(5));
+            allowing(mockServ1Res2).getRecordsReturned();will(returnValue(1));
+            allowing(mockServ1Res2).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s1rec5"))));
+
+            //Service 2 will make one request for four records and then return 0
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service2")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(4)),
+                    with(equal(100)));
+            inSequence(serv2Sequence);
+            will(delayReturnValue(250, mockServ2Res1));
+            allowing(mockServ2Res1).getNextRecord();will(returnValue(0));
+            allowing(mockServ2Res1).getRecordsMatched();will(returnValue(0));
+            allowing(mockServ2Res1).getRecordsReturned();will(returnValue(0));
+            allowing(mockServ2Res1).getRecords();will(returnValue(new ArrayList<CSWRecord>()));
+
+
+            //Service 3 will make one request. The first for 3 records will be fulfilled but there will be no more available.
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service3")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(3)),
+                    with(equal(10)));
+            inSequence(serv3Sequence);
+            will(delayReturnValue(500, mockServ3Res1));
+            allowing(mockServ3Res1).getNextRecord();will(returnValue(0));
+            allowing(mockServ3Res1).getRecordsMatched();will(returnValue(3));
+            allowing(mockServ3Res1).getRecordsReturned();will(returnValue(3));
+            allowing(mockServ3Res1).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s3rec1"), new CSWRecord("s3rec2"), new CSWRecord("s3rec3"))));
+        }});
+
+        FacetedMultiSearchResponse response = localFilterService.getFilteredRecords(serviceIds, facets, startIndexes, RECORD_REQUEST_COUNT);
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getNextIndexes());
+        Assert.assertNotNull(response.getRecords());
+        Assert.assertNotNull(response.getStartIndexes());
+
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service1"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service2"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service3"));
+
+        Assert.assertEquals(new Integer(1), response.getStartIndexes().get("service1"));
+        Assert.assertEquals(new Integer(100), response.getStartIndexes().get("service2"));
+        Assert.assertEquals(new Integer(10), response.getStartIndexes().get("service3"));
+
+        String[] expectedRecordOrdering = new String[] {"s1rec1","s3rec1","s1rec2","s3rec2","s1rec3","s3rec3","s1rec4","s1rec5"};
+        Assert.assertEquals(expectedRecordOrdering.length, response.getRecords().size());
+        for (int i = 0; i < expectedRecordOrdering.length; i++) {
+            Assert.assertEquals(expectedRecordOrdering[i], response.getRecords().get(i).getFileIdentifier());
+        }
+    }
+
+    /**
+     * Tests that everything works correctly when we get absolutely nothing back
+     * @throws Exception
+     */
+    @Test
+    public void testGetMultiFilteredRecords_NullSet() throws Exception {
+        final int RECORD_REQUEST_COUNT = 11;
+        final String[] serviceIds = new String[] {"service1", "service2", "service3"};
+        final HashMap<String, Integer> startIndexes = new HashMap<String, Integer>();
+        startIndexes.put("service1", 1);
+        startIndexes.put("service2", 100);
+        startIndexes.put("service3", 10);
+
+        final List<SearchFacet<? extends Object>> facets = Arrays.asList(
+                new SearchFacet<String>("kw1", "keyword", Comparison.Equal),
+                new SearchFacet<String>("kw2", "keyword", Comparison.Equal));
+
+        final CSWGetRecordResponse mockServ1Res1 = context.mock(CSWGetRecordResponse.class, "mockServ1Res1");
+        final CSWGetRecordResponse mockServ2Res1 = context.mock(CSWGetRecordResponse.class, "mockServ2Res1");
+        final CSWGetRecordResponse mockServ3Res1 = context.mock(CSWGetRecordResponse.class, "mockServ3Res1");
+
+        final Sequence serv1Sequence = context.sequence("serv1Sequence");
+        final Sequence serv2Sequence = context.sequence("serv2Sequence");
+        final Sequence serv3Sequence = context.sequence("serv3Sequence");
+
+        context.checking(new Expectations() {{
+            //Service 1 will make 2 requests. The first 4 records and then a redistributed 1 (of 2)
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service1")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(any(Integer.class)),
+                    with(equal(1)));
+            inSequence(serv1Sequence);
+            will(returnValue(mockServ1Res1));
+            allowing(mockServ1Res1).getNextRecord();will(returnValue(0));
+            allowing(mockServ1Res1).getRecordsMatched();will(returnValue(0));
+            allowing(mockServ1Res1).getRecordsReturned();will(returnValue(0));
+            allowing(mockServ1Res1).getRecords();will(returnValue(new ArrayList<CSWRecord>()));
+
+            //Service 2 will make one request for four records and then return 0
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service2")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(any(Integer.class)),
+                    with(equal(100)));
+            inSequence(serv2Sequence);
+            will(returnValue(mockServ2Res1));
+            allowing(mockServ2Res1).getNextRecord();will(returnValue(0));
+            allowing(mockServ2Res1).getRecordsMatched();will(returnValue(0));
+            allowing(mockServ2Res1).getRecordsReturned();will(returnValue(0));
+            allowing(mockServ2Res1).getRecords();will(returnValue(new ArrayList<CSWRecord>()));
+
+
+            //Service 3 will make one requests. The first for 3 records will be fulfilled
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service3")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(any(Integer.class)),
+                    with(equal(10)));
+            inSequence(serv3Sequence);
+            will(returnValue(mockServ3Res1));
+            allowing(mockServ3Res1).getNextRecord();will(returnValue(0));
+            allowing(mockServ3Res1).getRecordsMatched();will(returnValue(0));
+            allowing(mockServ3Res1).getRecordsReturned();will(returnValue(0));
+            allowing(mockServ3Res1).getRecords();will(returnValue(new ArrayList<CSWRecord>()));
+        }});
+
+        FacetedMultiSearchResponse response = localFilterService.getFilteredRecords(serviceIds, facets, startIndexes, RECORD_REQUEST_COUNT);
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getNextIndexes());
+        Assert.assertNotNull(response.getRecords());
+        Assert.assertNotNull(response.getStartIndexes());
+
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service1"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service2"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service3"));
+
+        Assert.assertEquals(new Integer(1), response.getStartIndexes().get("service1"));
+        Assert.assertEquals(new Integer(100), response.getStartIndexes().get("service2"));
+        Assert.assertEquals(new Integer(10), response.getStartIndexes().get("service3"));
+
+        Assert.assertEquals(0, response.getRecords().size());
+    }
+
+    /**
+     * Tests that the underlying implementation correctly redistributes fulfillment across services the remaining services, even when an exception is thrown
+     * @throws Exception
+     */
+    @Test
+    public void testGetMultiFilteredRecords_HandleException() throws Exception {
+        final int RECORD_REQUEST_COUNT = 11;
+        final String[] serviceIds = new String[] {"service1", "service2", "service3"};
+        final HashMap<String, Integer> startIndexes = new HashMap<String, Integer>();
+        startIndexes.put("service1", 1);
+        startIndexes.put("service2", 100);
+        startIndexes.put("service3", 10);
+
+        final List<SearchFacet<? extends Object>> facets = Arrays.asList(
+                new SearchFacet<String>("kw1", "keyword", Comparison.Equal),
+                new SearchFacet<String>("kw2", "keyword", Comparison.Equal));
+
+        final CSWGetRecordResponse mockServ1Res1 = context.mock(CSWGetRecordResponse.class, "mockServ1Res1");
+        final CSWGetRecordResponse mockServ1Res2 = context.mock(CSWGetRecordResponse.class, "mockServ1Res2");
+        final CSWGetRecordResponse mockServ1Res3 = context.mock(CSWGetRecordResponse.class, "mockServ1Res3");
+        final CSWGetRecordResponse mockServ2Res1 = context.mock(CSWGetRecordResponse.class, "mockServ2Res1");
+        final CSWGetRecordResponse mockServ3Res1 = context.mock(CSWGetRecordResponse.class, "mockServ3Res1");
+        final CSWGetRecordResponse mockServ3Res2 = context.mock(CSWGetRecordResponse.class, "mockServ3Res2");
+
+        final Sequence serv1Sequence = context.sequence("serv1Sequence");
+        final Sequence serv2Sequence = context.sequence("serv2Sequence");
+        final Sequence serv3Sequence = context.sequence("serv3Sequence");
+
+        context.checking(new Expectations() {{
+            //Service 1 will make three requests. The first 4 records and then a redistributed 2 and then throw a exception
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service1")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(4)),
+                    with(equal(1)));
+            inSequence(serv1Sequence);
+            will(returnValue(mockServ1Res1));
+
+            allowing(mockServ1Res1).getNextRecord();will(returnValue(5));
+            allowing(mockServ1Res1).getRecordsMatched();will(returnValue(88));
+            allowing(mockServ1Res1).getRecordsReturned();will(returnValue(4));
+            allowing(mockServ1Res1).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s1rec1"), new CSWRecord("s1rec2"), new CSWRecord("s1rec3"), new CSWRecord("s1rec4"))));
+
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service1")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(2)),
+                    with(equal(5)));
+            inSequence(serv1Sequence);
+            will(returnValue(mockServ1Res2));
+            allowing(mockServ1Res2).getNextRecord();will(returnValue(7));
+            allowing(mockServ1Res2).getRecordsMatched();will(returnValue(88));
+            allowing(mockServ1Res2).getRecordsReturned();will(returnValue(2));
+            allowing(mockServ1Res2).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s1rec5"), new CSWRecord("s1rec6"))));
+
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service1")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(1)),
+                    with(equal(7)));
+            inSequence(serv1Sequence);
+            will(throwException(new IOException("mock IO exception")));
+
+            //Service 2 will make one request for four records and then return 0
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service2")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(4)),
+                    with(equal(100)));
+            inSequence(serv2Sequence);
+            will(returnValue(mockServ2Res1));
+            allowing(mockServ2Res1).getNextRecord();will(returnValue(0));
+            allowing(mockServ2Res1).getRecordsMatched();will(returnValue(0));
+            allowing(mockServ2Res1).getRecordsReturned();will(returnValue(0));
+            allowing(mockServ2Res1).getRecords();will(returnValue(new ArrayList<CSWRecord>()));
+
+
+            //Service 3 will make one two requests. The first for 3 records will be fulfilled, the second redistributed request for 2 will only be half fulfilled
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service3")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(3)),
+                    with(equal(10)));
+            inSequence(serv3Sequence);
+            will(returnValue(mockServ3Res1));
+            allowing(mockServ3Res1).getNextRecord();will(returnValue(14));
+            allowing(mockServ3Res1).getRecordsMatched();will(returnValue(4));
+            allowing(mockServ3Res1).getRecordsReturned();will(returnValue(3));
+            allowing(mockServ3Res1).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s3rec1"), new CSWRecord("s3rec2"), new CSWRecord("s3rec3"))));
+
+            oneOf(mockFilterService).getFilteredRecords(
+                    with(equal("service3")),
+                    with(new CSWGetDataRecordsFilterMatcher(null,new String[] {"kw1", "kw2"}, null, null, KeywordMatchType.All, null, null, null, null)),
+                    with(equal(2)),
+                    with(equal(13)));
+            inSequence(serv3Sequence);
+            will(returnValue(mockServ3Res2));
+            allowing(mockServ3Res2).getNextRecord();will(returnValue(0));
+            allowing(mockServ3Res2).getRecordsMatched();will(returnValue(1));
+            allowing(mockServ3Res2).getRecordsReturned();will(returnValue(1));
+            allowing(mockServ3Res2).getRecords();will(returnValue(Arrays.asList(new CSWRecord("s3rec4"))));
+        }});
+
+        FacetedMultiSearchResponse response = localFilterService.getFilteredRecords(serviceIds, facets, startIndexes, RECORD_REQUEST_COUNT);
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getNextIndexes());
+        Assert.assertNotNull(response.getRecords());
+        Assert.assertNotNull(response.getStartIndexes());
+
+        Assert.assertEquals(new Integer(7), response.getNextIndexes().get("service1"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service2"));
+        Assert.assertEquals(new Integer(0), response.getNextIndexes().get("service3"));
+
+        Assert.assertEquals(new Integer(1), response.getStartIndexes().get("service1"));
+        Assert.assertEquals(new Integer(100), response.getStartIndexes().get("service2"));
+        Assert.assertEquals(new Integer(10), response.getStartIndexes().get("service3"));
+
+        Assert.assertEquals(10, response.getRecords().size());
+        Assert.assertEquals("s1rec1", response.getRecords().get(0).getFileIdentifier());
     }
 }

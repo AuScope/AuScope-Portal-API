@@ -12,6 +12,7 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
     },
 
     constructor : function(config) {
+        this.serviceIds = null;
 
         this.store = Ext.create('Ext.data.Store', {
             model : 'portal.csw.CSWRecord',
@@ -25,8 +26,6 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
                 pack: 'center'
             },
             items: [{
-                xtype: 'tabbar'
-            },{
                 xtype: 'vlcswrecordpanel',
                 itemId: 'recordpanel',
                 border: false,
@@ -80,14 +79,23 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
         this.callParent(arguments);
     },
 
+    _hasNextPage: function() {
+        for (var serviceId in this.searchNextIndexes) {
+            if (this.searchNextIndexes[serviceId] >= 1) {
+                return true;
+            }
+        }
+        return false;
+    },
+
     _handleNextPage: function() {
-        if (this.searchNextIndex < 1) {
+        if (!this._hasNextPage()) {
             return;
         }
 
-        this.previousStartIndexes.push(this.searchStartIndex);
-        this.searchStartIndex = this.searchNextIndex;
-        this.searchNextIndex = -1;
+        this.previousStartIndexes.push(this.searchStartIndexes);
+        this.searchStartIndexes = this.searchNextIndexes;
+        this.searchNextIndexes = null;
         this.refreshResults();
     },
 
@@ -96,8 +104,8 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
             return;
         }
 
-        this.searchNextIndex = this.searchStartIndex;
-        this.searchStartIndex = this.previousStartIndexes.pop();
+        this.searchNextIndexes = this.searchStartIndexes;
+        this.searchStartIndexes = this.previousStartIndexes.pop();
         this.refreshResults();
     },
 
@@ -114,33 +122,12 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
             scope: this,
             success: function(data, message, debugInfo) {
                 var configs = [];
+                this.serviceIds = [];
                 for (var i = 0; i < data.length; i++) {
-                    configs.push({
-                        xtype: 'tab',
-                        closable: false,
-                        text: data[i].title,
-                        serviceId:  data[i].id,
-                        serviceUrl:  data[i].url,
-                        scope: this,
-                        handler: function(btn) {
-                            this._initPagingParams();
-                            this.searchServiceId = btn.serviceId;
-                            this.refreshResults();
-                            this.fireEvent('registrychange', this, this.searchServiceId);
-                        }
-                    });
+                    this.serviceIds.push(data[i].id);
                 }
 
-                var tabBar = this.down('tabbar');
-                tabBar.add(configs);
-                var activeTab = tabBar.items.getAt(0);
-                tabBar.setActiveTab(activeTab);
-                this.searchServiceId = activeTab.serviceId;
-                if (data.length === 1) {
-                    tabBar.setHidden(true);
-                }
-
-                this.fireEvent('registrychange', this, this.searchServiceId);
+                this._initPagingParams();
             },
             failure: function(message, debugInfo) {
                 this.getEl().setHtml("Unable to load registries. Please try refreshing the page");
@@ -156,15 +143,33 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
         this.down('#nextbutton').setDisabled(true);
         this.down('#previousbutton').setDisabled(true);
 
+        if (this.currentAjax) {
+            Ext.Ajax.abort(this.currentAjax);
+            this.currentAjax = null;
+        }
+
+        if (Ext.isEmpty(this.serviceIds)) {
+            this.store.removeAll();
+            this._initPagingParams();
+            return;
+        }
+
         var params = {
             field: [],
             value: [],
             type: [],
             comparison: [],
-            start: this.searchStartIndex,
-            limit: vegl.widgets.search.FacetedCSWBrowserPanel.PAGE_SIZE,
-            serviceId: this.searchServiceId
+            start: [],
+            serviceId: [],
+            limit: vegl.widgets.search.FacetedCSWBrowserPanel.PAGE_SIZE
         };
+
+        Ext.each(this.serviceIds, function(serviceId) {
+            if (Ext.isNumber(this.searchStartIndexes[serviceId])) {
+                params.start.push(this.searchStartIndexes[serviceId]);
+                params.serviceId.push(serviceId);
+            }
+        }, this);
 
         Ext.each(this.searchFacets, function(facet) {
             params.field.push(facet.get('field'));
@@ -177,11 +182,6 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
             target: this.down('#recordpanel'),
             text: 'Searching for records...'
         });
-
-        if (this.currentAjax) {
-            Ext.Ajax.abort(this.currentAjax);
-            this.currentAjax = null;
-        }
 
         mask.show();
         this.currentAjax = portal.util.Ajax.request({
@@ -205,12 +205,20 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
                 var records = data.records.map(function(rawRec) {
                     return Ext.create('portal.csw.CSWRecord', rawRec);
                 });
-                this.searchStartIndex = data.startIndex;
-                this.searchNextIndex = data.nextIndex;
+                this.searchStartIndexes = data.startIndexes;
+                this.searchNextIndexes = data.nextIndexes;
                 this.store.loadData(records);
                 this.store.fireEvent('load', this.store, records, true);
 
-                this.down('#nextbutton').setDisabled(this.searchNextIndex <= 0);
+                var hasMore = false;
+                for (var sid in this.searchNextIndexes) {
+                    if (this.searchNextIndexes[sid] > 0) {
+                        hasMore = true;
+                        break;
+                    }
+                }
+
+                this.down('#nextbutton').setDisabled(!hasMore);
                 this.down('#previousbutton').setDisabled(this.previousStartIndexes.length <= 0);
             }
         });
@@ -222,8 +230,15 @@ Ext.define('vegl.widgets.search.FacetedCSWBrowserPanel', {
      */
     _initPagingParams: function() {
         this.previousStartIndexes = [];
-        this.searchStartIndex = 1;
-        this.searchNextIndex = -1;
+
+        this.searchStartIndexes = {};
+        this.searchNextIndexes = {};
+        if (!Ext.isEmpty(this.serviceIds)) {
+            Ext.each(this.serviceIds, function(serviceId) {
+                this.searchStartIndexes[serviceId] = 1;
+                this.searchNextIndexes[serviceId] = 1;
+            }, this);
+        }
     },
 
     /**

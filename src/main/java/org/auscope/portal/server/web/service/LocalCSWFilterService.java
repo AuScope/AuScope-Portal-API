@@ -1,7 +1,10 @@
 package org.auscope.portal.server.web.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
@@ -15,6 +18,7 @@ import org.auscope.portal.core.services.methodmakers.filter.csw.CSWGetDataRecord
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource.OnlineResourceType;
 import org.auscope.portal.core.services.responses.csw.CSWGetRecordResponse;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
+import org.auscope.portal.server.web.service.csw.FacetedMultiSearchResponse;
 import org.auscope.portal.server.web.service.csw.FacetedSearchResponse;
 import org.auscope.portal.server.web.service.csw.SearchFacet;
 import org.joda.time.DateTime;
@@ -36,10 +40,12 @@ public class LocalCSWFilterService {
     private CSWFilterService filterService;
     private final Log log = LogFactory.getLog(getClass());
     private int pageSize = DEFAULT_PAGE_SIZE;
+    private Executor executor;
 
     @Autowired
-    public LocalCSWFilterService(CSWFilterService filterService) {
+    public LocalCSWFilterService(CSWFilterService filterService, Executor executor) {
         this.filterService = filterService;
+        this.executor = executor;
     }
 
     /**
@@ -208,11 +214,242 @@ public class LocalCSWFilterService {
     }
 
     /**
+     * Notifies all runners to terminate if they haven't already. Returns the count of the runner with the MOST records
+     * @param allRunners
+     * @return
+     * @throws PortalServiceException
+     */
+    private int cleanupConcurrentFilteredRecords(ArrayList<FilterRunner> allRunners, Object lock) throws PortalServiceException {
+        int maxDepth = -1;
+        synchronized(lock) {
+            for (FilterRunner runner : allRunners) {
+                if (runner.error != null) {
+                    log.error("Error accessing CSW records from service " + runner.serviceId + " : " + runner.error.getMessage());
+                    log.debug("Exception", runner.error);
+                }
+
+                if (runner.state != FilterRunnerState.Terminated) {
+                    synchronized(runner) {
+                        runner.requestTerminate = true;
+                        runner.notifyAll();
+                    }
+                }
+
+                if (runner.records.size() > maxDepth) {
+                    maxDepth = runner.records.size();
+                }
+            }
+        }
+
+        return maxDepth;
+    }
+
+    /**
+     * Given a set of services to query with a set of local/remote search facets. Perform a full filter until maxRecords are received or the remote CSW runs out of records. This can result
+     * in many calls to the remote CSW if the local portion of the filter is quite specific and the remote portion of very permissive.
+     *
+     * In order to fulfill the multiple registries, maxRecords will be shared between the various serviceIds. If a registry is unable to fulfill their portion of the records then their portion
+     * will be handed off to the other services for fulfillment.
+     *
+     * The result set will be interleaved so that the records will be returned CSW1, CSW2, CS3, CS1, CSW2 etc..
+     *
+     * This method is synchronous but utilises the internal executor to concurrently call multiple services
+     *
+     * @param serviceIds
+     * @param facets
+     * @param startIndexes
+     * @param maxRecords
+     * @return
+     * @throws PortalServiceException
+     */
+    public FacetedMultiSearchResponse getFilteredRecords(String[] serviceIds, List<SearchFacet<? extends Object>> facets, Map<String, Integer> startIndexes, int maxRecords) throws PortalServiceException {
+        //Distribute our max records evenly across the service Ids (this will only be a suggested amount, we may need to redistribute)
+        HashMap<String, Integer> fulfillment = new HashMap<String, Integer>();
+        for (int i = 0; i < serviceIds.length; i++) {
+            int fulfillmentCount = maxRecords / serviceIds.length;
+            if (i < maxRecords % serviceIds.length) {
+                fulfillmentCount++;
+            }
+            fulfillment.put(serviceIds[i], fulfillmentCount);
+        }
+
+        //Fire off our requests concurrently
+        HashMap<String, FilterRunner> runners = new HashMap<String, FilterRunner>();
+        Object lock = runners; //this doubles as our lock object for this request
+        for (String serviceId : serviceIds) {
+            FilterRunner runner = new FilterRunner(this, serviceId, fulfillment.get(serviceId), facets, startIndexes.get(serviceId), lock);
+            runners.put(serviceId, runner);
+            this.executor.execute(runner);
+        }
+        ArrayList<FilterRunner> allRunners = new ArrayList<FilterRunner>(runners.values());
+
+
+        //Check our runner statuses repeatedly, waking up when they tell us to
+        while(true) {
+            //Check our state inside the lock so dont end up with the state changing underneath us
+            synchronized(lock) {
+                boolean stillWaiting = false;
+                for (FilterRunner runner : allRunners) {
+                    if (!runner.isFulfilled() &&
+                        runner.state != FilterRunnerState.Terminated) {
+                        //A running unfulfilled runner requires us to wait for it to finish
+                        stillWaiting = true;
+                    } else if (!runner.isFulfilled() &&
+                               runner.state == FilterRunnerState.Terminated) {
+                        //Redistribute remaining fulfillment to other runners/services if we have a
+                        //service run dry of records
+                        int remainingFulfillment = runner.currentFulfillment - runner.records.size();
+                        runner.currentFulfillment = runner.records.size();
+                        ArrayList<FilterRunner> availRunners = new ArrayList<FilterRunner>();
+                        for (FilterRunner availRunner : allRunners) {
+                            if (availRunner.state != FilterRunnerState.Terminated) {
+                                availRunners.add(availRunner);
+                            }
+                        }
+
+                        if (!availRunners.isEmpty()) {
+                            stillWaiting = true;
+                            for (int i = 0; i < availRunners.size(); i++) {
+                                int additionalFulfillment = remainingFulfillment / availRunners.size();
+                                if (i < remainingFulfillment % availRunners.size()) {
+                                    additionalFulfillment++;
+                                }
+
+                                FilterRunner availRunner = availRunners.get(i);
+                                synchronized(availRunner) {
+                                    availRunner.currentFulfillment += additionalFulfillment;
+                                    availRunner.notifyAll();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!stillWaiting) {
+                    break;
+                }
+
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    log.error("Interrupted:", e);
+                    cleanupConcurrentFilteredRecords(allRunners, lock);
+                    throw new PortalServiceException("Interrupted:", e);
+                }
+            }
+        }
+
+        //Cleanup runners, check for errors
+        int maxDepth = cleanupConcurrentFilteredRecords(allRunners, lock);
+
+        //Build our response object from the finished runner states (also cleanup our runners if some are paused)
+        //make sure we interleave the results "fairly"
+        FacetedMultiSearchResponse response = new FacetedMultiSearchResponse();
+        for (int depth = 0; depth < maxDepth && response.getRecords().size() < maxRecords; depth++) {
+            for (FilterRunner runner : allRunners) {
+                if (depth < runner.records.size()) {
+                    response.getRecords().add(runner.records.get(depth));
+                    if (response.getRecords().size() == maxRecords) {
+                        break;
+                    }
+                }
+            }
+        }
+        for (FilterRunner runner : allRunners) {
+            response.getNextIndexes().put(runner.serviceId, runner.currentNextIndex);
+            response.getStartIndexes().put(runner.serviceId, runner.currentStartIndex);
+        }
+
+        return response;
+    }
+
+    /**
      * Returns the list of internal CSWServiceItems that powers this service (passes straight through to underlying CSWFilterService
      *
      * @return
      */
     public CSWServiceItem[] getCSWServiceItems() {
         return filterService.getCSWServiceItems();
+    }
+
+    private enum FilterRunnerState {
+        Running,
+        Terminated
+    }
+
+    /**
+     * Handles calling getFilteredRecords on a seperate thread. If the underlying CSW runs out of records, this will terminate. If
+     * the request for records is fulfilled then this will instead pause using Object.wait(). Notify at the parent level
+     * to trigger an updated request for fulfillment.
+     * @author Josh Vote (CSIRO)
+     *
+     */
+    private class FilterRunner implements Runnable {
+
+        private final Log log = LogFactory.getLog(getClass());
+
+        public Object lock;
+        public LocalCSWFilterService parent;
+        public String serviceId;
+        public int currentFulfillment;
+        public List<SearchFacet<? extends Object>> facets;
+        public int currentStartIndex;
+        public int currentNextIndex;
+        public FilterRunnerState state;
+        public List<CSWRecord> records;
+        public volatile boolean requestTerminate = false;
+        public Throwable error;
+
+        public FilterRunner(LocalCSWFilterService parent, String serviceId, int currentFulfillment,
+                List<SearchFacet<? extends Object>> facets, int currentStartIndex, Object lock) {
+            super();
+            this.parent = parent;
+            this.serviceId = serviceId;
+            this.currentFulfillment = currentFulfillment;
+            this.facets = facets;
+            this.currentStartIndex = currentStartIndex;
+            this.currentNextIndex = currentStartIndex;
+            this.state = FilterRunnerState.Running;
+            this.records = new ArrayList<CSWRecord>();
+            this.lock = lock;
+        }
+
+        public boolean isFulfilled() {
+            return this.records.size() >= this.currentFulfillment;
+        }
+
+        public void run() {
+            try {
+                while(!requestTerminate) {
+                    if (isFulfilled()) {
+                        synchronized(this) {
+                            this.wait(); //wait for the parent to notify this to look for more due to an increase in fulfilment
+                        }
+                    } else {
+                        FacetedSearchResponse response = parent.getFilteredRecords(serviceId, facets, currentNextIndex, currentFulfillment - this.records.size());
+                        synchronized(this.lock) {
+                            this.records.addAll(response.getRecords());
+                            this.currentNextIndex =  response.getNextIndex();
+
+                            if (response.getNextIndex() <= 0) {
+                                //Having no more records means it's pointless to continue hitting this CSW
+                                break;
+                            } else {
+                                this.lock.notifyAll();
+                            }
+                        }
+                    }
+                }
+            } catch (Throwable e) {
+                log.error("Unable to access filtered records: " + e.getMessage());
+                log.debug("Exception", e);
+                this.error = e;
+            }
+
+            synchronized(this.lock) {
+                this.state = FilterRunnerState.Terminated;
+                this.lock.notifyAll(); //notify parent that we finished
+            }
+        }
     }
 }
