@@ -24,6 +24,9 @@ public class AAFAttributes implements UserDetails, Serializable {
 
     @JsonProperty("displayname")
     public String displayName;
+    
+    @JsonProperty("edupersonorcid")
+    public String orcID;
 
     @JsonProperty("edupersontargetedid")
     public String targetedID;
@@ -89,6 +92,7 @@ public class AAFAttributes implements UserDetails, Serializable {
                 "commonName='" + commonName + '\'' +
                 ", email='" + email + '\'' +
                 ", displayName='" + displayName + '\'' +
+                ", orcID='" + orcID + '\'' +
                 ", targetedID='" + targetedID + '\'' +
                 ", scopedAffiliation='" + scopedAffiliation + '\'' +
                 ", principalName='" + principalName + '\'' +
@@ -110,11 +114,11 @@ public class AAFAttributes implements UserDetails, Serializable {
         if (givenName != null ? !givenName.equals(that.givenName) : that.givenName != null) return false;
         if (principalName != null ? !principalName.equals(that.principalName) : that.principalName != null)
             return false;
+        if (orcID != null ? !orcID.equals(that.orcID) : that.orcID != null) return false;
         if (scopedAffiliation != null ? !scopedAffiliation.equals(that.scopedAffiliation) : that.scopedAffiliation != null)
             return false;
         if (surname != null ? !surname.equals(that.surname) : that.surname != null) return false;
         return !(targetedID != null ? !targetedID.equals(that.targetedID) : that.targetedID != null);
-
     }
 
     @Override
@@ -122,6 +126,7 @@ public class AAFAttributes implements UserDetails, Serializable {
         int result = commonName != null ? commonName.hashCode() : 0;
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (displayName != null ? displayName.hashCode() : 0);
+        result = 31 * result + (orcID != null ? orcID.hashCode() : 0);
         result = 31 * result + (targetedID != null ? targetedID.hashCode() : 0);
         result = 31 * result + (scopedAffiliation != null ? scopedAffiliation.hashCode() : 0);
         result = 31 * result + (principalName != null ? principalName.hashCode() : 0);
