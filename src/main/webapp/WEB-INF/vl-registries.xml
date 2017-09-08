@@ -14,7 +14,7 @@
     <bean id="cswGAECat" class="org.auscope.portal.core.services.csw.CSWServiceItem">
         <constructor-arg name="id" value="cswGAECat"/>
         <constructor-arg name="title" value="Geoscience Australia eCat"/>
-        <constructor-arg name="serviceUrl" value="http://ecat.ga.gov.au/geonetwork/srv/eng/csw"/>
+        <constructor-arg name="serviceUrl" value="https://ecat.ga.gov.au/geonetwork/srv/eng/csw"/>
         <constructor-arg name="recordInformationUrl" value="http://ecat.ga.gov.au/geonetwork/srv/eng/main.home?uuid=%1$s"/>
     </bean>
     
