@@ -182,7 +182,9 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
 
         CloudComputeService cloudComputeService = getComputeService(job);
         if (cloudComputeService == null) {
-            log.warn(String.format("No cloud storage service with id '%1$s' for job '%2$s'. cannot update job status", job.getComputeServiceId(), job.getId()));
+            if( ! "Saved".equalsIgnoreCase(job.getStatus())) { 
+                log.warn(String.format("No cloud storage service with id '%1$s' for job '%2$s'. cannot update job status", job.getComputeServiceId(), job.getId()));
+            }
             return job.getStatus();
         }
 
