@@ -3,19 +3,33 @@ package org.auscope.portal.server.web.service.scm;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.web.client.RestTemplate;
+import org.auscope.portal.core.services.PortalServiceException;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Solution extends Entry {
     private String template;
-    @JsonBackReference
+    private String templateHash;
+
+    @JsonSerialize(converter=ProblemURIConverver.class)
     private Problem problem;
-    private Toolbox toolbox;
-    private List<Map<String, String>> dependencies;
     private List<Map<String, Object>> variables;
+
+	  private static class ProblemURIConverver extends StdConverter<Problem, String> {
+
+        @Override
+        public String convert(Problem problem) {
+            return problem.getId();
+        }
+
+    }
+
+    public Solution() { super(); }
+    public Solution(String id) { super(id); }
 
     /**
      * @return the template
@@ -31,37 +45,18 @@ public class Solution extends Entry {
     }
 
     /**
-     * @return the toolbox
+     * @return the template hash
      */
-    public Toolbox getToolbox() {
-        return getToolbox(false);
+    @JsonProperty("template_hash")
+    public String getTemplateHash() {
+        return templateHash;
     }
 
     /**
-     * Return the Toolbox, ensuring full details if full is true.
-     *
-     * @param full Ensure full details are availble if true
-     * @return the toolbox
+     * @param templateHash the template hash to set
      */
-    public Toolbox getToolbox(boolean full) {
-        if (full) {
-            ensureToolbox();
-        }
-        return toolbox;
-    }
-
-    /**
-     * @param toolbox the toolbox to set
-     */
-    public void setToolbox(Toolbox toolbox) {
-        this.toolbox = toolbox;
-    }
-
-    /**
-     * @return the dependencies
-     */
-    public List<Map<String, String>> getDependencies() {
-        return dependencies;
+    public void setTemplateHash(String templateHash) {
+        this.templateHash = templateHash;
     }
 
     public List<Map<String, Object>> getVariables() {
@@ -73,30 +68,30 @@ public class Solution extends Entry {
     }
 
     /**
-     * @param dependencies the dependencies to set
+     * Return the problem that this solves.
+     *
+     * @return Problem
      */
-    public void setDependencies(List<Map<String, String>> dependencies) {
-        this.dependencies = dependencies;
-    }
-
-    /**
-     * Ensures full Toolbox details have been fetched.
-     */
-    public void ensureToolbox() {
-        // Only fetch the toolbox detail if we haven't already
-        if (this.toolbox.getSource() == null) {
-            RestTemplate rest = new RestTemplate();
-            Toolbox tb = rest.getForObject(this.toolbox.getUri(),
-                                                Toolbox.class);
-            setToolbox(tb);
-        }
-    }
-
     public Problem getProblem() {
         return problem;
     }
 
+    /**
+     * Sets the problem that this is a solution for.
+     *
+     * @param problem Problem instance that this is a Solution for.
+     */
     public void setProblem(Problem problem) {
         this.problem = problem;
+    }
+
+    @Override
+    public void copyMissingProperties(Entry entry) throws PortalServiceException {
+        super.copyMissingProperties(entry);
+        Solution that = (Solution)entry;
+        if (template == null) { setTemplate(that.getTemplate()); }
+        if (templateHash == null) { setTemplateHash(that.getTemplateHash()); }
+        if (problem == null) { setProblem(that.getProblem()); }
+        if (variables == null) { setVariables(that.getVariables()); }
     }
 }

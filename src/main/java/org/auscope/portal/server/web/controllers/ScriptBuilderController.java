@@ -298,10 +298,12 @@ public class ScriptBuilderController extends BaseCloudController {
         HashMap<String, Problem> unconfiguredProblems = new HashMap<>();
 
         for (Solution solution: solutions.getConfiguredSolutions()) {
+            logger.debug(String.format("Configured: %s", solution.getId()));
             String problemId = solution.getProblem().getId();
             Problem problem = configuredProblems.get(problemId);
 
             if (problem == null) {
+                logger.debug(String.format("First look at Problem(%s)", problemId));
                 problem = solution.getProblem();
                 problem.setSolutions(new ArrayList<Solution>());
                 configuredProblems.put(problem.getId(), problem);
@@ -310,10 +312,12 @@ public class ScriptBuilderController extends BaseCloudController {
         }
 
         for (Solution solution: solutions.getUnconfiguredSolutions()) {
+            logger.debug(String.format("Unconfigured: %s", solution.getId()));
             String problemId = solution.getProblem().getId();
             Problem problem = unconfiguredProblems.get(problemId);
 
             if (problem == null) {
+                logger.debug(String.format("First look at Problem(%s)", problemId));
                 problem = solution.getProblem();
                 problem.setSolutions(new ArrayList<Solution>());
                 unconfiguredProblems.put(problem.getId(), problem);
