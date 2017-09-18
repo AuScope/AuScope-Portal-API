@@ -367,7 +367,7 @@ public class ScmEntryService implements ScmLoader {
      * @returns Set of Solution Objects.
      */
     public Set<Toolbox> getJobToolboxes(VEGLJob job) throws PortalServiceException {
-        HashSet<Toolbox> toolboxes = new HashSet<>(null);
+        HashSet<Toolbox> toolboxes = new HashSet<>();
 
         for (Solution solution: getJobSolutions(job)) {
             toolboxes.addAll(entryToolboxes(solution));
