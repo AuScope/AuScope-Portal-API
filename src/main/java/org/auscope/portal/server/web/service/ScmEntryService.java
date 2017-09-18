@@ -577,7 +577,7 @@ public class ScmEntryService implements ScmLoader {
 
 	@Override
 	public <T> T loadEntry(String id, Class<T> cls) {
-      logger.debug(String.format("Loading %s from %s", cls.getName(), id));
+      logger.debug(String.format("Loading ref-only %s from %s", cls.getName(), id));
       T entry = restTemplate().getForObject(id, cls);
       return entry;
 	}

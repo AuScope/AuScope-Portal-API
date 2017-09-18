@@ -34,6 +34,8 @@ public class Problem extends Entry {
     @Override
     public void copyMissingProperties(Entry entry) throws PortalServiceException {
         super.copyMissingProperties(entry);
-        setSolutions(((Problem)entry).getSolutions());
+        if (solutions == null) {
+            setSolutions(((Problem)entry).getSolutions());
+        }
     }
 }
