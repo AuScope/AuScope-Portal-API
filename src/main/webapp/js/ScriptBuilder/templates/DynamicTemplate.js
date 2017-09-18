@@ -114,7 +114,7 @@ Ext.define('ScriptBuilder.templates.DynamicTemplate', {
 	                        break;
 	                    default:
 	                        item.xtype = 'textfield';
-	                    };
+	                    }
 	                }
 
 	                _setItemField(variable, 'default', item, 'value');
@@ -137,30 +137,56 @@ Ext.define('ScriptBuilder.templates.DynamicTemplate', {
 
 	                items.push(item);
 	            });
-        	}
+      	    }
         }
 
-        this._getTemplatedScriptGui(callback, this.entry.template, {
-            xtype : 'form',
-            width : 500,
-            height : 520,
-            autoScroll: true,
-            items : [{
-                xtype : 'tabpanel',
-                anchor : '100%',
-                plain : true,
-                margins : '10',
-                border : false,
-                defaults : {
-                    layout : 'form',
-                    padding : '20',
-                    border : false
-                },
-                items : [{
-                    title: 'Configuration',
-                    items: items
-                }]
-            }]
+        // Retrieve template script, then create the UI for variable substitution.
+        Ext.Ajax.request({
+            url : this.entry.template,
+            scope : this,
+            callback : function(options, success, response) {
+                if (success) {
+                    var templateScript = response.responseText;
+                    this._getTemplatedScriptGui(callback, templateScript, {
+                        xtype : 'form',
+                        width : 500,
+                        height : 520,
+                        autoScroll: true,
+                        items : [{
+                            xtype : 'tabpanel',
+                            anchor : '100%',
+                            plain : true,
+                            margins : '10',
+                            border : false,
+                            defaults : {
+                                layout : 'form',
+                                padding : '20',
+                                border : false
+                            },
+                            items : [{
+                                title: 'Configuration',
+                                items: items
+                            }]
+                        }]
+                    });
+
+                } else {
+                    var errorMsg = "There was an error fetching the script template for" + this.entry.template + ".";
+                    var errorInfo = "Please try again in a few minutes or report this error to cg_admin@csiro.au.";
+
+                    //Create an error object and pass it to custom error window
+                    var errorObj = {
+                        title : 'Script Loading Error',
+                        message : errorMsg,
+                        info : errorInfo
+                    };
+
+                    var errorWin = Ext.create('portal.widgets.window.ErrorWindow', {
+                        errorObj : errorObj
+                    });
+                    errorWin.show();
+                }
+            }
         });
     }
 });
