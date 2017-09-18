@@ -28,10 +28,9 @@ import org.jmock.Expectations;
 import org.jmock.Sequence;
 import org.joda.time.DateTime;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 /**
  * Unit tests for the filtering at LocalCSWFilterService
