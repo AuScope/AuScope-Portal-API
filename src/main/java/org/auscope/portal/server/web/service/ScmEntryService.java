@@ -2,6 +2,7 @@ package org.auscope.portal.server.web.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,15 +23,26 @@ import org.auscope.portal.server.vegl.VLScmSnapshotDao;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.csw.SearchFacet;
 import org.auscope.portal.server.web.service.csw.SearchFacet.Comparison;
+import org.auscope.portal.server.web.service.scm.Dependency;
+import org.auscope.portal.server.web.service.scm.Dependency.Type;
 import org.auscope.portal.server.web.service.scm.Entries;
+import org.auscope.portal.server.web.service.scm.Entry;
 import org.auscope.portal.server.web.service.scm.Problem;
+import org.auscope.portal.server.web.service.scm.ScmLoader;
+import org.auscope.portal.server.web.service.scm.ScmLoaderFactory;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.auscope.portal.server.web.service.scm.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.MapperFeature;
 
 /**
  * A service for handling Scientific Code Marketplace templates.
@@ -39,7 +51,7 @@ import org.springframework.web.client.RestTemplate;
  *
  */
 @Service
-public class ScmEntryService {
+public class ScmEntryService implements ScmLoader {
     private final Log logger = LogFactory.getLog(getClass());
 
     /** Puppet module template resource */
@@ -50,6 +62,8 @@ public class ScmEntryService {
     private VelocityEngine velocityEngine;
     private VEGLJobManager jobManager;
     private CloudComputeService[] cloudComputeServices;
+
+    private List<HttpMessageConverter<?>> converters;
 
     static String solutionsUrl;
 
@@ -66,6 +80,19 @@ public class ScmEntryService {
         this.jobManager = jobManager;
         this.setVelocityEngine(velocityEngine);
         this.cloudComputeServices = cloudComputeServices;
+
+        // Configure Jackson converters for use with RestTemplate
+        this.converters = new ArrayList<HttpMessageConverter<?>>();
+        this.converters.add(
+            new MappingJackson2HttpMessageConverter(
+                new Jackson2ObjectMapperBuilder()
+                .featuresToEnable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+                .build()
+            )
+        );
+
+        // Register this bean as the ScmLoader instance to use
+        ScmLoaderFactory.registerLoader(this);
     }
 
     /**
@@ -132,7 +159,7 @@ public class ScmEntryService {
      * @param solutionUrl String URL of the SCM solution
      * @return String contents of the puppet module
      */
-    public String createPuppetModule(String solutionUrl) {
+    public String createPuppetModule(String solutionUrl) throws PortalServiceException {
         // Fetch the solution entry from the SCM
         Solution solution = getScmSolution(solutionUrl);
 
@@ -155,7 +182,7 @@ public class ScmEntryService {
      */
     public Solution getScmSolution(String entryUrl) {
         Solution solution = null;
-        RestTemplate rest = new RestTemplate();
+        RestTemplate rest = this.restTemplate();
 
         try {
             solution = rest.getForObject(entryUrl, Solution.class);
@@ -171,7 +198,7 @@ public class ScmEntryService {
      * Retieve and return listing of all solutions available.
      *
      */
-    public SolutionResponse getSolutions() {
+    public SolutionResponse getSolutions() throws PortalServiceException {
         return getSolutions((List<SearchFacet<? extends Object>>) null);
     }
 
@@ -182,7 +209,7 @@ public class ScmEntryService {
      * @return List<Solution> list of Solutions if any.
      *
      */
-    public SolutionResponse getSolutions(Problem problem) {
+    public SolutionResponse getSolutions(Problem problem) throws PortalServiceException {
         return getSolutions(Arrays.asList(new SearchFacet<Problem>(problem, "problem", Comparison.Equal)));
     }
 
@@ -194,7 +221,8 @@ public class ScmEntryService {
      * @return List<Solution> list of Solutions if any.
      *
      */
-    public SolutionResponse getSolutions(List<SearchFacet<? extends Object>> facets) {
+    public SolutionResponse getSolutions(List<SearchFacet<? extends Object>> facets)
+        throws PortalServiceException {
         return getSolutions(facets, null);
     }
 
@@ -206,9 +234,10 @@ public class ScmEntryService {
      * @return List<Solution> list of Solutions if any.
      *
      */
-    public SolutionResponse getSolutions(List<SearchFacet<? extends Object>> facets, CloudComputeService[] providers) {
+    public SolutionResponse getSolutions(List<SearchFacet<? extends Object>> facets, CloudComputeService[] providers)
+        throws PortalServiceException {
         StringBuilder url = new StringBuilder();
-        RestTemplate rest = new RestTemplate();
+        RestTemplate rest = this.restTemplate();
         Entries solutions;
 
         url.append(solutionsUrl).append("/solutions");
@@ -259,7 +288,11 @@ public class ScmEntryService {
      * @return List<Solution> subset of solutions that are usable
      *
      */
-    private SolutionResponse usefulSolutions(List<Solution> solutions, String providerFilter, CloudComputeService[] configuredComputeServices) {
+    private SolutionResponse usefulSolutions(List<Solution> solutions,
+                                             String providerFilter,
+                                             CloudComputeService[] configuredComputeServices)
+        throws PortalServiceException {
+
         SolutionResponse useful = new SolutionResponse();
 
         Set<String> allProviders = new HashSet<String>();
@@ -273,18 +306,23 @@ public class ScmEntryService {
             // provider we can use is useful.
             boolean foundConfigured = false;
             boolean foundUnconfigured = false;
-            for (Map<String, String> image: solution.getToolbox(true).getImages()) {
-                String provider = image.get("provider");
+            for (Dependency dep: solution.getDependencies()) {
+                if (dep.type == Dependency.Type.TOOLBOX) {
+                    Toolbox toolbox = restTemplate().getForObject(dep.identifier, Toolbox.class);
+                    for (Map<String, String> image: toolbox.getImages()) {
+                        String provider = image.get("provider");
 
-                if (StringUtils.isNotEmpty(providerFilter) && !providerFilter.equals(provider)) {
-                    continue;
-                }
+                        if (StringUtils.isNotEmpty(providerFilter) && !providerFilter.equals(provider)) {
+                            continue;
+                        }
 
-                if (configuredProviders.contains(provider)) {
-                    foundConfigured = true;
-                    break;
-                } else if (allProviders.contains(provider)) {
-                    foundUnconfigured = true;
+                        if (configuredProviders.contains(provider)) {
+                            foundConfigured = true;
+                            break;
+                        } else if (allProviders.contains(provider)) {
+                            foundUnconfigured = true;
+                        }
+                    }
                 }
             }
 
@@ -328,11 +366,11 @@ public class ScmEntryService {
      * @param job VEGLJob object
      * @returns Set of Solution Objects.
      */
-    public Set<Toolbox> getJobToolboxes(VEGLJob job) {
+    public Set<Toolbox> getJobToolboxes(VEGLJob job) throws PortalServiceException {
         HashSet<Toolbox> toolboxes = new HashSet<>();
 
         for (Solution solution: getJobSolutions(job)) {
-            toolboxes.add(solution.getToolbox(true));
+            toolboxes.addAll(entryToolboxes(solution));
         }
 
         return toolboxes;
@@ -415,48 +453,68 @@ public class ScmEntryService {
         return null;
     }
 
-    private Map<String, Object> puppetTemplateVars(Solution solution) {
+    /**
+     * Return a list of the Toolbox dependencies for entry.
+     *
+     * @param entry Entry to check dependencies
+     * @return List<Toolbox> Toolbox dependencies for Entry
+     */
+    public List<Toolbox> entryToolboxes(Entry entry) throws PortalServiceException {
+        List<Toolbox> toolboxes = new ArrayList<Toolbox>();
+
+        for (Dependency dep: entry.getDependencies()) {
+            if (dep.type == Dependency.Type.TOOLBOX) {
+                toolboxes.add(restTemplate().getForObject(dep.identifier, Toolbox.class));
+            }
+        }
+
+        return toolboxes;
+    }
+
+    private Map<String, Object> puppetTemplateVars(Solution solution)
+        throws PortalServiceException {
         Map<String, Object> vars = new HashMap<>();
         // Make sure we have full Toolbox details.
-        Toolbox toolbox = solution.getToolbox(true);
+        List<Toolbox> toolboxes = entryToolboxes(solution);
+        if (toolboxes.size() > 0) {
+            Toolbox toolbox = toolboxes.get(0);
 
-        vars.put("sc_name", safeScName(toolbox));
-        vars.put("source", toolbox.getSource());
+            vars.put("sc_name", safeScName(toolbox));
+            vars.put("source", toolbox.getSource());
 
-        ArrayList<String> systemPackages = new ArrayList<>();
-        ArrayList<String> pythonPackages = new ArrayList<>();
-        ArrayList<String> requirements = new ArrayList<>();
-        // Merge dependencies from solution and toolbox
-        dependencies(toolbox.getDependencies(),
-                systemPackages,
-                pythonPackages,
-                requirements);
-        dependencies(solution.getDependencies(),
-                systemPackages,
-                pythonPackages,
-                requirements);
-        vars.put("system_packages", systemPackages);
-        vars.put("python_packages", pythonPackages);
-        vars.put("python_requirements", requirements);
+            ArrayList<String> puppetModules = new ArrayList<>();
+            ArrayList<String> pythonPackages = new ArrayList<>();
+            ArrayList<String> requirements = new ArrayList<>();
+            // Merge dependencies from solution and toolbox
+            dependencies(toolbox.getDependencies(),
+                         puppetModules,
+                         pythonPackages,
+                         requirements);
+            dependencies(solution.getDependencies(),
+                         puppetModules,
+                         pythonPackages,
+                         requirements);
+            vars.put("puppet_modules", puppetModules);
+            vars.put("python_packages", pythonPackages);
+            vars.put("python_requirements", requirements);
+        }
         return vars;
     }
 
-    private void dependencies(List<Map<String, String>> deps,
-            List<String> systemPackages,
+    private void dependencies(List<Dependency> deps,
+            List<String> puppetModules,
             List<String> pythonPackages,
             List<String> requirements) {
-        for (Map<String, String> dep: deps) {
-            switch (dep.get("type")) {
-            case "system":
-                systemPackages.add(dep.get("name"));
+        for (Dependency dep: deps) {
+            switch (dep.type) {
+            case PUPPET:
+                puppetModules.add(dep.identifier);
                 break;
-            case "python":
-                if (dep.containsKey("path")) {
-                    requirements.add(dep.get("path"));
-                }
-                else {
-                    pythonPackages.add(dep.get("name"));
-                }
+            case REQUIREMENTS:
+                requirements.add(dep.identifier);
+                break;
+            case PYTHON:
+                pythonPackages.add(dep.identifier);
                 break;
             default:
                 logger.warn("Unknown dependency type (" + dep + ")");
@@ -512,4 +570,30 @@ public class ScmEntryService {
     public static void setSolutionsUrl(String solutionsUrl) {
         ScmEntryService.solutionsUrl = solutionsUrl;
     }
+
+    private RestTemplate restTemplate() {
+        return new RestTemplate(this.converters);
+	}
+
+	@Override
+	public <T> T loadEntry(String id, Class<T> cls) {
+      logger.debug(String.format("Loading ref-only %s from %s", cls.getName(), id));
+      T entry = restTemplate().getForObject(id, cls);
+      return entry;
+	}
+
+	@Override
+	public Problem loadProblem(String id) {
+      return loadEntry(id, Problem.class);
+	}
+
+	@Override
+	public Toolbox loadToolbox(String id) {
+      return loadEntry(id, Toolbox.class);
+	}
+
+	@Override
+	public Solution loadSolution(String id) {
+      return loadEntry(id, Solution.class);
+	}
 }
