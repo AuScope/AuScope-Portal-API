@@ -373,4 +373,41 @@
      <bean id="vlScmSnapshotDao" class="org.auscope.portal.server.vegl.VLScmSnapshotDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
+    
+    <bean id="cswRegVeglProduction" class="org.auscope.portal.core.services.csw.custom.CustomRegistry">
+        <constructor-arg name="id" value="cswRegVeglProduction" />
+        <constructor-arg name="title" value="SISS ANU Geonetwork" />
+        <constructor-arg name="serviceUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/csw" />
+        <constructor-arg name="recordInformationUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s" />
+    </bean>
+
+    <bean id="NSWERML2_WFSTest" class="org.auscope.portal.core.configuration.ServiceConfigurationItem">
+        <constructor-arg name="id" value="NSWERML2Test"/>
+        <constructor-arg name="url" value="http://aus-test-worker2.arrc.csiro.au:8080/gsnsw-earthresource/wfs"/>
+        <constructor-arg name="paging" type="boolean" value="false"/>      
+        <constructor-arg name="isGml32" type="boolean" value="true"/>        
+    </bean>
+
+    <bean id="service-configuration2" class="org.auscope.portal.core.configuration.ServiceConfiguration">        
+        <constructor-arg name="serviceConfigurationItems">
+            <list>
+               <ref bean="NSWERML2_WFSTest"/>         
+            </list>
+        </constructor-arg>
+    </bean>
+
+     <bean id="service-configuration" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <ref bean="cswRegVeglProduction" />
+            </list>
+        </constructor-arg>
+    </bean>  
+    
+    <bean id="wfsMethodMaker" class="org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker">
+        <property name="namespaces">
+            <bean class="org.auscope.portal.core.services.namespaces.ErmlNamespaceContext"/>
+        </property>
+    </bean>
+    
 </beans>
