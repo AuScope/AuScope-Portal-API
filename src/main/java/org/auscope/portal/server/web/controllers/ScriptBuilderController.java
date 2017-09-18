@@ -298,7 +298,6 @@ public class ScriptBuilderController extends BaseCloudController {
         HashMap<String, Problem> unconfiguredProblems = new HashMap<>();
 
         for (Solution solution: solutions.getConfiguredSolutions()) {
-            logger.debug(String.format("Configured: %s", solution.getId()));
             String problemId = solution.getProblem().getId();
             Problem problem = configuredProblems.get(problemId);
 
