@@ -163,7 +163,10 @@ public class CloudComputeServiceNci extends CloudComputeService {
      * @throws IOException
      */
     private void initialiseWorkingDirectory(VEGLJob job) throws PortalServiceException, IOException {
-        String runCommand = StringUtils.isEmpty(job.getComputeVmRunCommand()) ? "python" : job.getComputeVmRunCommand();
+        String runCommand = job.getComputeVmRunCommand();
+        if (StringUtils.isBlank(runCommand)) {
+            runCommand = "python";
+        }
         String utilFileContents = getNamedResourceString("nci-util.sh");
         String wallTimeString = wallTimeToString(job.getWalltime());
         String hpcImageFragment = hpcImageToString(job.getComputeVmId());
@@ -185,7 +188,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
             extractParamFromComputeType("mem", job.getComputeInstanceType()),
             extractParamFromComputeType("jobfs", job.getComputeInstanceType()),
             hpcImageFragment,
-            runCommand + " -n $VL_TOTAL_NODES -p $VL_CPUS_PER_NODE" //TODO: Extract these from the solution centre
+            runCommand
         });
 
         //storageService.uploadJobFile(job, files);
