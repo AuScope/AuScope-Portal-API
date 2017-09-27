@@ -14,6 +14,7 @@ public class Toolbox extends Entry {
     private List<Map<String, String>> images;
     private String puppet;
     private String puppetHash;
+    private String command;
 
     public Toolbox() { super(); }
     public Toolbox(String id) { super(id); }
@@ -35,7 +36,21 @@ public class Toolbox extends Entry {
         this.puppetHash = puppetHash;
     }
 
-    /**
+	/**
+	 * @return the command
+	 */
+	public String getCommand() {
+		return command;
+	}
+
+	/**
+	 * @param command the command to set
+	 */
+	public void setCommand(String command) {
+		this.command = command;
+	}
+
+	/**
      * @return the source
      */
     public Map<String, String> getSource() {

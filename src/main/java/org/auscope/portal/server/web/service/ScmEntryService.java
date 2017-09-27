@@ -395,10 +395,20 @@ public class ScmEntryService implements ScmLoader {
             // the requested provider.
             for (Map<String, String> img: toolbox.getImages()) {
                 if (provider.equals(img.get("provider"))) {
+                    // Allow the image to override the run command, fall back to
+                    // the toolbox supplied command (if any). Test for isEmpty
+                    // rather than isBlank since we want to allow an image to
+                    // override a non-blank toolbox command with an empty
+                    // string.
+                    String runCommand = img.get("command");
+                    if (StringUtils.isEmpty(runCommand)) {
+                        runCommand = toolbox.getCommand();
+                    }
+
                     MachineImage image = new MachineImage(img.get("image_id"));
                     image.setName(toolbox.getName());
                     image.setDescription(toolbox.getDescription());
-                    image.setRunCommand(img.get("sc_path"));
+                    image.setRunCommand(runCommand);
                     return image;
                 }
             }

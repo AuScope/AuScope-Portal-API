@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
@@ -135,15 +137,39 @@ public class CloudComputeServiceNci extends CloudComputeService {
     }
 
     /**
+     * Retrieve the HPC qsub script fragment from URL stored as the "image" ID.
+     *
+     * @param hpcImageId String URL of the QSub fragment
+     * @return String QSub fragment to set up toolbox deps and environment
+     * @throws PortalServiceException
+     */
+    private String hpcImageToString(String hpcImageId) throws PortalServiceException {
+        try {
+            URL url = new URL(hpcImageId);
+            return IOUtils.toString(url, StandardCharsets.UTF_8);
+        }
+        catch (MalformedURLException mue) {
+            throw new PortalServiceException("Invalid URL used for HPC Toolbox ImageID: " + hpcImageId, mue);
+        }
+        catch (IOException ioe) {
+            throw new PortalServiceException("Failed to retrieve HPC dependencies fragment from ImageID URL: " + hpcImageId, ioe);
+        }
+    }
+
+    /**
      * Creates our bootstrap jobs/files templated for the specified job in the specified job's storage location
      * @param job
      * @throws PortalServiceException
      * @throws IOException
      */
     private void initialiseWorkingDirectory(VEGLJob job) throws PortalServiceException, IOException {
-        String runCommand = StringUtils.isEmpty(job.getComputeVmRunCommand()) ? "python" : job.getComputeVmRunCommand();
+        String runCommand = job.getComputeVmRunCommand();
+        if (StringUtils.isBlank(runCommand)) {
+            runCommand = "python";
+        }
         String utilFileContents = getNamedResourceString("nci-util.sh");
         String wallTimeString = wallTimeToString(job.getWalltime());
+        String hpcImageFragment = hpcImageToString(job.getComputeVmId());
         String downloadJobContents = MessageFormat.format(getNamedResourceString("nci-download.job.tpl"), new Object[] {
             job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT),
             job.getId(),
@@ -161,8 +187,8 @@ public class CloudComputeServiceNci extends CloudComputeService {
             extractParamFromComputeType("ncpus", job.getComputeInstanceType()),
             extractParamFromComputeType("mem", job.getComputeInstanceType()),
             extractParamFromComputeType("jobfs", job.getComputeInstanceType()),
-            "module load escript/5.0", //TODO: Extract these from the solution centre
-            runCommand + " -n $VL_TOTAL_NODES -p $VL_CPUS_PER_NODE" //TODO: Extract these from the solution centre
+            hpcImageFragment,
+            runCommand
         });
 
         //storageService.uploadJobFile(job, files);
