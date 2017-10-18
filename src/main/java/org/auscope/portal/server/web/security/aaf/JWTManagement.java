@@ -60,11 +60,18 @@ public class JWTManagement {
                 throw new AuthenticationServiceException("Unable to authenticate. The AAF URL does not match the expected " +
                         "value for the test or production AAF Rapid Connect services. Expected " + AAF_PRODUCTION +
                         " or " + AAF_TEST + " but got " + token.aafServiceUrl);
-
-            if (!(token.localServiceUrl.equals(rootServiceUrl)))
+            // Make sure a trailing slash on the end of portal URL or token URL doesn't trip us up
+            if (rootServiceUrl.endsWith("/")) {
+                rootServiceUrl = rootServiceUrl.substring(0, rootServiceUrl.length() - 1);
+            }
+            String tokenServiceUrl = token.localServiceUrl;
+            if (tokenServiceUrl.endsWith("/")) {
+                tokenServiceUrl = tokenServiceUrl.substring(0, tokenServiceUrl.length() - 1);
+            }
+            if (!(tokenServiceUrl.equals(rootServiceUrl)))
                 throw new AuthenticationServiceException("Unable to authenticate. The URL of this server, "
                         + rootServiceUrl +
-                        " does not match the URL registered with AAF " + token.localServiceUrl + " .");
+                        " does not match the URL registered with AAF " + tokenServiceUrl);
 
             Date now = new Date();
             if (now.before(token.notBefore))
