@@ -2,8 +2,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+      http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <mvc:interceptors>
@@ -59,6 +61,13 @@
         <property name="emailSubject" value="VGL Job (%s)" />
         <property name="portalUrl" value="${HOST.portalUrl}"/>
     </bean>
+
+    <util:list id="pylintCommand">
+      <value>pylint</value>
+      <value>-r</value> <value>n</value>
+      <value>-f</value> <value>json</value>
+      <value>--disable=R,C</value>
+    </util:list>
     
     <bean name="ANVGLProvenanceService" class="org.auscope.portal.server.web.service.ANVGLProvenanceService" autowire="constructor">
         <constructor-arg name="anvglFileStagingService" ref="fileStagingService"/>

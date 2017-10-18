@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.aopalliance.reflect.Code;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,6 +57,9 @@ public class TemplateLintService {
      * TODO: Make this configurable.
      */
     public static final long DEFAULT_TIMEOUT = 5l;
+
+    @Resource(name="pylintCommand")
+    private List<String> pylintCommand;
 
     /**
      * Create a new instance.
@@ -110,14 +115,11 @@ public class TemplateLintService {
         // Run pylint in the temp file's directory
         String results;
         String errors;
+        ArrayList<String> cmd = new ArrayList<String>(this.pylintCommand);
+        cmd.add(f.getFileName().toString());
         try {
             ProcessBuilder pb =
-                new ProcessBuilder("pylint",
-                                   "-r", "n",
-                                   "-f", "json",
-                                   "--disable=R,C",
-                                   f.getFileName().toString())
-                .directory(f.getParent().toFile());
+                new ProcessBuilder(cmd).directory(f.getParent().toFile());
 
             // Start the process, and consume the results immediately so Windows is happy.
             Process p = pb.start();
