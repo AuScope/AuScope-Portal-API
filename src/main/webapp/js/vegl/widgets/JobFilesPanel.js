@@ -237,8 +237,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                         jobId : this.currentJobId
                     },
                     scope : this,
-                    fileRecords : fileRecords,
-                    callback : Ext.bind(function(success, data, message, debugInfo, fileRecords) {
+                    callback : Ext.bind(function(success, data, message, debugInfo ) {
                         loadMask.hide();
                         if (!success) {
                             portal.widgets.window.ErrorWindow.showText('Error', 'Unable to request list of job downloads. Please try refreshing the page.', debugInfo);
