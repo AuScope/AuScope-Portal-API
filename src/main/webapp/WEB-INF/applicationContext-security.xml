@@ -22,7 +22,7 @@
         </headers>
         <intercept-url pattern="/oauth/google_login.html" access="isAuthenticated()"/>
         <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
-        <logout logout-url="/j_spring_security_logout" logout-success-url="/gmap.html"/>
+        <logout logout-url="/j_spring_security_logout" logout-success-url="${HOST.portalUrl}"/>
         <s:csrf disabled="true"/>
     </http>
     
@@ -44,7 +44,7 @@
         <!-- <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/> -->
         <custom-filter ref="oauth2AuthFilter" after="FORM_LOGIN_FILTER"/>
         <custom-filter ref="aafFilter" before="FORM_LOGIN_FILTER"/>
-        <logout logout-url="/j_spring_security_logout" logout-success-url="/gmap.html"/>
+        <logout logout-url="/j_spring_security_logout" logout-success-url="${HOST.portalUrl}"/>
         <s:csrf disabled="true"/>
     </http>
 
@@ -76,7 +76,7 @@
     </authentication-manager>
 
     <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2ServiceProperties">
-        <beans:constructor-arg name="redirectUri" value="/oauth/callback"/>
+        <beans:constructor-arg name="redirectUri" value="${HOST.portalUrl}/oauth/callback"/>
         <beans:constructor-arg name="clientId" value="${env.oauth2.google.clientid}"/>
         <beans:constructor-arg name="clientSecret" value="${env.oauth2.google.clientsecret}"/>
     </beans:bean>
