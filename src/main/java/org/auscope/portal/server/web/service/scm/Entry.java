@@ -62,7 +62,6 @@ public class Entry {
      *
      * @return List<Dependency> dependencies for this Entry.
      */
-    @JsonProperty("deps")
     public List<Dependency> getDependencies() {
         if (isReferenceOnly) {
             loadMissingProperties();
@@ -85,6 +84,15 @@ public class Entry {
         if (dependencies == null) {
             this.dependencies = new ArrayList<Dependency>();
         }
+    }
+
+    // Fallback to the old style "deps" property name for backwards compatibility
+    public List<Dependency> getDeps() {
+        return this.getDependencies();
+    }
+    
+    public void setDeps(List<Dependency> dependencies) {
+        this.setDependencies(dependencies);
     }
 
     /**
