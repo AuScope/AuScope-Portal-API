@@ -19,5 +19,11 @@
             <key column="userId" />
             <one-to-many class="org.auscope.portal.server.web.security.ANVGLAuthority" />
         </bag>
+        
+        <bag name="bookMarks" lazy="false" cascade="all-delete-orphan" inverse="true" >
+            <key column="userId" />
+            <one-to-many class="org.auscope.portal.server.vegl.VGLBookMark" />
+        </bag>
+        
     </class>
 </hibernate-mapping>

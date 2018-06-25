@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="org.auscope.portal.server.vegl.VGLBookMark" table="bookmarks">           
+        <composite-id>
+			<key-property name="fileIdentifier"/>
+			<key-property name="serviceId"/>			
+			<key-many-to-one name="parent" class="org.auscope.portal.server.web.security.ANVGLUser" column="userId"></key-many-to-one>
+		</composite-id>    
+    </class>
+</hibernate-mapping>
