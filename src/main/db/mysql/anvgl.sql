@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS `parameters`;
 DROP TABLE IF EXISTS `jobs`;
 DROP TABLE IF EXISTS `series`;
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `nci_details`;
+DROP TABLE IF EXISTS `bookmarks`;
 
 CREATE TABLE `users` (
   `id` varchar(128) NOT NULL,
@@ -142,3 +144,12 @@ CREATE TABLE `nci_details` (
      REFERENCES users(`id`)
      ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE `bookmarks` (
+  `fileIdentifier` varchar(50) NOT NULL,
+  `serviceId` varchar(25) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  PRIMARY KEY (`fileIdentifier`,`serviceId`,`userId`),
+  FOREIGN KEY (`userId`) REFERENCES `users` (`id`) 
+  ON DELETE CASCADE
+) ;
