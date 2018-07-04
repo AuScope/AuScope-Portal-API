@@ -7,6 +7,14 @@
 			<key-property name="fileIdentifier"/>
 			<key-property name="serviceId"/>			
 			<key-many-to-one name="parent" class="org.auscope.portal.server.web.security.ANVGLUser" column="userId"></key-many-to-one>
-		</composite-id>    
+		</composite-id> 		
+        <property name="url"/>
+        <property name="localPath"/>
+        <property name="name"/>
+        <property name="description"/>
+        <property name="northBoundLatitude"/>
+        <property name="southBoundLatitude"/>
+        <property name="eastBoundLongitude"/>
+        <property name="westBoundLongitude"/>   
     </class>
 </hibernate-mapping>

@@ -9,6 +9,11 @@ import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.security.NCIDetailsEnc;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
+/**
+ * A data access object for VGLBookMark
+ * @author Josh Vote
+ *
+ */
 public class VGLBookMarkDao extends HibernateDaoSupport {	
 
     /**
@@ -17,6 +22,7 @@ public class VGLBookMarkDao extends HibernateDaoSupport {
      */
 	//@SuppressWarnings("unchecked")
     public List<VGLBookMark> getByUser(final ANVGLUser user) throws PortalServiceException {
+    	@SuppressWarnings("unchecked")
     	List<VGLBookMark> resList = (List<VGLBookMark>) getHibernateTemplate().findByNamedParam("from VGLBookMark d where d.parent =:p", "p", user);    	
         return resList;
     }
