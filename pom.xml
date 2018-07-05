@@ -289,13 +289,6 @@
             <url>https://cgmaven.it.csiro.au/nexus/repository/PortalRepository/</url>
         </repository>
         <repository>
-            <id>CSIRO AuScope Repo Snapshots</id>
-            <name>AuScope Nexus - PortalSnapshot</name>
-            <url>https://cgmaven.it.csiro.au/nexus/repository/PortalSnapshot/</url>
-            <releases><enabled>false</enabled></releases>
-            <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-        <repository>
             <id>CSIRO AuScope Repo PROMS-java</id>
             <name>AuScope Nexus - PROMS-Java</name>
             <url>https://cgmaven.it.csiro.au/nexus/repository/PROMS-java-snapshot</url>
