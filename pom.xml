@@ -284,21 +284,16 @@
             <url>http://maven.geotoolkit.org/</url>
         </repository>
         <repository>
-            <id>cgsrv8.arrc.csiro.au</id>
+            <id>CSIRO AuScope Repo</id>
             <name>AuScope Nexus - PortalRepo</name>
-            <url>http://cgsrv8.arrc.csiro.au/nexus/content/groups/PortalRepository/</url>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/PortalRepository/</url>
         </repository>
         <repository>
-            <id>cgsrv8.arrc.csiro.au Snapshots</id>
-            <name>AuScope Nexus - PortalSnapshot</name>
-            <url>http://cgsrv8.arrc.csiro.au/nexus/content/groups/PortalSnapshot/</url>
+            <id>CSIRO AuScope Repo PROMS-java</id>
+            <name>AuScope Nexus - PROMS-Java</name>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/PROMS-java-snapshot</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-        <repository>
-            <id>cgsrv8.arrc.csiro.au PROMS-java</id>
-            <name>AuScope Nexus - PROMS-Java</name>
-            <url>https://cgsrv8.arrc.csiro.au/nexus/content/repositories/PROMS-java-snapshot</url>
         </repository>
     </repositories>
 
