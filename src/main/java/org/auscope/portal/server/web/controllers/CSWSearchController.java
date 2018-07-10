@@ -15,8 +15,11 @@ import org.auscope.portal.core.services.CSWFilterService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
+import org.auscope.portal.core.services.csw.custom.CustomRegistryInt;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
+import org.auscope.portal.core.services.methodmakers.filter.csw.CSWGetDataRecordsFilter;
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
+import org.auscope.portal.core.services.responses.csw.CSWGetRecordResponse;
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource.OnlineResourceType;
 import org.auscope.portal.core.services.responses.csw.CSWOnlineResourceImpl;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
@@ -213,6 +216,37 @@ public class CSWSearchController extends BaseCSWController {
 
         return generateJSONResponseMAV(true, mm, "");
     }
+    
+    /**
+     * gets csw record information based on file identifier and service id
+     * @param fileIdentifier
+     * @param serviceId
+     * @return
+     */
+    @RequestMapping("/getCSWRecord.do")
+    public ModelAndView getCSWRecord(
+            @RequestParam(value = "fileIdentifier") String fileIdentifier,
+            @RequestParam(value = "serviceId") String serviceId) {
+    	
+    	int startPosition = 1;
+    	int maxRecords = 100;    	
+    	CSWGetDataRecordsFilter filter = new CSWGetDataRecordsFilter();
+    	filter.setFileIdentifier(fileIdentifier);
+        List<CSWRecord> records = null;
+        int matchedResults = 0;
+        try {         
+                CSWGetRecordResponse response = null;
+                response = cswFilterService.getFilteredRecords(serviceId, filter, maxRecords, startPosition);
+                workaroundMissingNCIMetadata(response.getRecords());
+                records = response.getRecords();
+                matchedResults = response.getRecordsMatched();
+                return generateJSONResponseMAV(records.toArray(new CSWRecord[records.size()]), matchedResults);
+        } catch (Exception ex) {
+            log.warn(String.format("Error fetching filtered records for filter '%1$s'", filter), ex);
+            return generateJSONResponseMAV(false, null, "Error fetching filtered records");
+        }
+    }
+    
 
     private boolean nameIsRewriteCandidate(String name) {
         return name.equalsIgnoreCase("Link to Web Map Service") ||
