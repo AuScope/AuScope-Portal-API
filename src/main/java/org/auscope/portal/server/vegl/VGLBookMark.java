@@ -1,6 +1,8 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.auscope.portal.server.web.security.ANVGLUser;
 
@@ -14,6 +16,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class VGLBookMark  implements Serializable {	
    
 	private static final long serialVersionUID = 8620093753366974702L;
+	 /** The primary key for this book mark*/
+    private Integer id;
 	/** identifier of the dataset */
 	private String fileIdentifier;
 	/** service id of the dataset */
@@ -21,25 +25,13 @@ public class VGLBookMark  implements Serializable {
     /** The user owning the book mark */
     @JsonIgnore
     private ANVGLUser parent;
-    /** The actual URL that when accessed with a GET request will download data*/
-    private String url;
-    /** Where the downloaded data (on the job VM) will be downloaded to*/
-    private String localPath;
-    /** The descriptive name of this download*/
-    private String name;
-    /** The long description for this download*/
-    private String description;
-    /** If this download is for a spatial region this will represent the most northern bounds of the region in WGS:84*/
-    private Double northBoundLatitude;
-    /** If this download is for a spatial region this will represent the most southern bounds of the region in WGS:84*/
-    private Double southBoundLatitude;
-    /** If this download is for a spatial region this will represent the most eastern bounds of the region in WGS:84*/
-    private Double eastBoundLongitude;
-    /** If this download is for a spatial region this will represent the most western bounds of the region in WGS:84*/
-    private Double westBoundLongitude;
+    /** A List of download options associated with the bookmark */
+    private List<VGLBookMarkDownload> bookMarkDownloads;
     
+        
     public VGLBookMark() {
     	super();
+    	this.bookMarkDownloads =  new ArrayList<>();
     }
     
     public VGLBookMark(String fileIdentifier, String serviceId, ANVGLUser user) {
@@ -49,6 +41,32 @@ public class VGLBookMark  implements Serializable {
         this.parent = user;
     }
 
+    /**
+    *
+    * @param id The primary key for this book mark
+    */
+   public VGLBookMark(Integer id) {
+       super();
+       this.id = id;
+   }
+
+   /**
+    * The primary key for this book mark
+    * @return
+    */
+   public Integer getId() {
+       return id;
+   }
+
+   /**
+    * The primary key for this book mark
+    * @param id
+    */
+   public void setId(Integer id) {
+       this.id = id;
+   }
+
+    
     public String getFileIdentifier() {
 		return fileIdentifier;
 	}
@@ -81,136 +99,26 @@ public class VGLBookMark  implements Serializable {
     public void setParent(ANVGLUser parent) {
         this.parent = parent;
     }
-
+   
     /**
-     * The descriptive name of this download
+     * gets a list of book marked  download options
      * @return
      */
-    public String getName() {
-        return name;
-    }
 
-    /**
-     * The descriptive name of this download
-     * @param name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
+	public List<VGLBookMarkDownload> getBookMarkDownloads() {
+		return bookMarkDownloads;
+	}
+	/**
+	 * sets the list of download options for the book mark
+	 * @param bookMarks
+	 */
 
-    /**
-     *  The long description for this download
-     * @return
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     *  The long description for this download
-     * @param description
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * The actual URL that when accessed with a GET request will download data
-     * @return
-     */
-    public String getUrl() {
-        return url;
-    }
-
-    /**
-     * The actual URL that when accessed with a GET request will download data
-     * @param url
-     */
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    /**
-     * Where the downloaded data (on the job VM) will be downloaded to
-     * @return
-     */
-    public String getLocalPath() {
-        return localPath;
-    }
-
-    /**
-     * Where the downloaded data (on the job VM) will be downloaded to
-     * @param localPath
-     */
-    public void setLocalPath(String localPath) {
-        this.localPath = localPath;
-    }
-
-    /**
-     * If this download is for a spatial region this will represent the most northern bounds of the region in WGS:84
-     * @return
-     */
-    public Double getNorthBoundLatitude() {
-        return northBoundLatitude;
-    }
-
-    /**
-     * If this download is for a spatial region this will represent the most northern bounds of the region in WGS:84
-     * @param northBoundLatitude
-     */
-    public void setNorthBoundLatitude(Double northBoundLatitude) {
-        this.northBoundLatitude = northBoundLatitude;
-    }
-
-    /**
-     * If this download is for a spatial region this will represent the most southern bounds of the region in WGS:84
-     * @return
-     */
-    public Double getSouthBoundLatitude() {
-        return southBoundLatitude;
-    }
-
-    /**
-     * If this download is for a spatial region this will represent the most southern bounds of the region in WGS:84
-     * @param southBoundLatitude
-     */
-    public void setSouthBoundLatitude(Double southBoundLatitude) {
-        this.southBoundLatitude = southBoundLatitude;
-    }
-
-    /**
-     * If this download is for a spatial region this will represent the most eastern bounds of the region in WGS:84
-     * @return
-     */
-    public Double getEastBoundLongitude() {
-        return eastBoundLongitude;
-    }
-
-    /**
-     * If this download is for a spatial region this will represent the most eastern bounds of the region in WGS:84
-     * @param eastBoundLongitude
-     */
-    public void setEastBoundLongitude(Double eastBoundLongitude) {
-        this.eastBoundLongitude = eastBoundLongitude;
-    }
-
-    /**
-     * If this download is for a spatial region this will represent the most western bounds of the region in WGS:84
-     * @return
-     */
-    public Double getWestBoundLongitude() {
-        return westBoundLongitude;
-    }
-
-    /**
-     * If this download is for a spatial region this will represent the most western bounds of the region in WGS:84
-     * @param westBoundLongitude
-     */
-    public void setWestBoundLongitude(Double westBoundLongitude) {
-        this.westBoundLongitude = westBoundLongitude;
-    }
-
-	
+	public void setBookMarkDownloads(List<VGLBookMarkDownload> bookMarkDownloads) {
+		this.bookMarkDownloads = bookMarkDownloads;
+		for (VGLBookMarkDownload downloadOption : bookMarkDownloads) {
+			downloadOption.setParent(this);
+        }
+	}
 }
 
 

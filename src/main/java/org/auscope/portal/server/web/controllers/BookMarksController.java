@@ -12,6 +12,8 @@ import org.auscope.portal.core.view.ViewCSWRecordFactory;
 import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.server.vegl.VGLBookMark;
 import org.auscope.portal.server.vegl.VGLBookMarkDao;
+import org.auscope.portal.server.vegl.VGLBookMarkDownload;
+import org.auscope.portal.server.vegl.VGLBookMarkDownloadDao;
 import org.auscope.portal.server.web.security.ANVGLUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +34,13 @@ import org.springframework.web.servlet.ModelAndView;
 public class BookMarksController  extends BasePortalController {
 	
 	private VGLBookMarkDao vGLBookMarkDao;
+	private VGLBookMarkDownloadDao vGLBookMarkDownloadDao;
 	
 	@Autowired
-	public BookMarksController(VGLBookMarkDao vGLBookMarkDao) {
+	public BookMarksController(VGLBookMarkDao vGLBookMarkDao, VGLBookMarkDownloadDao vGLBookMarkDownloadDao) {
 		 super();
         this.vGLBookMarkDao = vGLBookMarkDao;
+        this.vGLBookMarkDownloadDao = vGLBookMarkDownloadDao;
     }
 
     @ResponseStatus(value =  org.springframework.http.HttpStatus.BAD_REQUEST)
@@ -71,9 +75,7 @@ public class BookMarksController  extends BasePortalController {
 	 */
 	
 	@RequestMapping("/getBookMarks.do")
-	public ModelAndView getbookMarks( @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {	
-		VGLBookMark bookMark = new VGLBookMark();
-		bookMark.setParent(user);
+	public ModelAndView getbookMarks( @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
 		List<VGLBookMark> bookMarks = vGLBookMarkDao.getByUser(user);
 		return generateJSONResponseMAV(true, bookMarks, "");
 	}
@@ -97,6 +99,23 @@ public class BookMarksController  extends BasePortalController {
 		vGLBookMarkDao.delete(bookMark);
 		return generateJSONResponseMAV(true);
 	}
+		
+	/**
+	 * updates or adds the download options stored in a book mark
+	 * @param bookMark
+	 * @param user
+	 * @return
+	 * @throws PortalServiceException
+	 */
+	@RequestMapping("/getDownloadOptions.do")
+    public ModelAndView getDownloadOptions(@RequestParam(value="bookmarkId") Integer bookmarkId,
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
+		VGLBookMark bookmark = new VGLBookMark();
+		bookmark.setId(bookmarkId);
+		List<VGLBookMarkDownload> bookMarkDownloads = vGLBookMarkDownloadDao.getByBookMark(bookmark);		 
+		return generateJSONResponseMAV(true, bookMarkDownloads, "");
+		
+    }
 	
 	/**
 	 * updates or adds the download options stored in a book mark
@@ -105,9 +124,9 @@ public class BookMarksController  extends BasePortalController {
 	 * @return
 	 * @throws PortalServiceException
 	 */
-	@RequestMapping("/updateDownloadOptions.do")
-    public ModelAndView updateDownloadOptions(@RequestParam(value="fileIdentifier") String fileIdentifier,
-            								@RequestParam(value="serviceId") String serviceId,    		
+	@RequestMapping("/saveDownloadOptions.do")
+    public ModelAndView saveDownloadOptions(@RequestParam(value="bookmarkId") Integer bookmarkId,
+            								@RequestParam(value="bookmarkOptionName") String bookmarkOptionName,    		
 								            @RequestParam(value="url") final String url,
 								            @RequestParam(value="localPath") final String localPath,            
 								            @RequestParam(value="name") final String name,
@@ -116,21 +135,38 @@ public class BookMarksController  extends BasePortalController {
 								            @RequestParam(value="eastBoundLongitude", required=false) final Double eastBoundLongitude,
 								            @RequestParam(value="southBoundLatitude", required=false) final Double southBoundLatitude,
 								            @RequestParam(value="westBoundLongitude", required=false) final Double westBoundLongitude,
-								            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
-		VGLBookMark bookMark = new VGLBookMark();
-		bookMark.setFileIdentifier(fileIdentifier);
-		bookMark.setServiceId(serviceId);
-		bookMark.setUrl(url);
-		bookMark.setLocalPath(localPath);
-		bookMark.setName(name);
-		bookMark.setDescription(description);
-		bookMark.setEastBoundLongitude(eastBoundLongitude);	
-		bookMark.setNorthBoundLatitude(northBoundLatitude);		
-		bookMark.setWestBoundLongitude(westBoundLongitude);		
-		bookMark.setSouthBoundLatitude(southBoundLatitude);
-		bookMark.setParent(user);
-		vGLBookMarkDao.save(bookMark);
-        return generateJSONResponseMAV(true);
+								            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {		
+		VGLBookMarkDownload bookMarkDownloads = new VGLBookMarkDownload();			
+		VGLBookMark bookmark = new VGLBookMark();
+		bookmark.setId(bookmarkId);
+		bookMarkDownloads.setParent(bookmark);
+		bookMarkDownloads.setBookmarkOptionName(bookmarkOptionName);
+		bookMarkDownloads.setUrl(url);
+		bookMarkDownloads.setLocalPath(localPath);
+		bookMarkDownloads.setName(name);
+		bookMarkDownloads.setDescription(description);
+		bookMarkDownloads.setEastBoundLongitude(eastBoundLongitude);	
+		bookMarkDownloads.setNorthBoundLatitude(northBoundLatitude);		
+		bookMarkDownloads.setWestBoundLongitude(westBoundLongitude);		
+		bookMarkDownloads.setSouthBoundLatitude(southBoundLatitude);		
+		Integer id = vGLBookMarkDownloadDao.save(bookMarkDownloads);
+        return generateJSONResponseMAV(true, id, "");
     }
-
+	
+	/**
+	 * removes a download option stored as a book mark for the user.  
+	 * @param fileIdentifier
+	 * @param serviceId
+	 * @param user
+	 * @return
+	 * @throws PortalServiceException
+	 */
+	@RequestMapping("/deleteDownloadOptions.do")
+	public ModelAndView deleteDownloadOptions(@RequestParam(value="id") Integer id,			
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {			
+		VGLBookMarkDownload bookMarkDownloads = new VGLBookMarkDownload();	
+		bookMarkDownloads.setId(id);
+		vGLBookMarkDownloadDao.delete(bookMarkDownloads);
+		return generateJSONResponseMAV(true);
+	}
 }
