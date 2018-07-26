@@ -30,10 +30,11 @@ public class VGLBookMarkDao extends HibernateDaoSupport {
     
 
     /**
-     * Saves or updates the given book marks.
+     * Saves a dataset as a bookmark.
      */
-    public void save(final VGLBookMark bookmark) throws PortalServiceException {
-        getHibernateTemplate().saveOrUpdate(bookmark);
+    public Integer save(final VGLBookMark bookmark) throws PortalServiceException {
+    	Integer bookmarkId = (Integer)getHibernateTemplate().save(bookmark);
+    	return  bookmarkId;
     }
 
     /**

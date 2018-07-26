@@ -64,8 +64,8 @@ public class BookMarksController  extends BasePortalController {
 		bookMark.setFileIdentifier(fileIdentifier);
 		bookMark.setServiceId(serviceId);
 		bookMark.setParent(user);
-		vGLBookMarkDao.save(bookMark);
-        return generateJSONResponseMAV(true);
+		Integer id = vGLBookMarkDao.save(bookMark);        
+        return generateJSONResponseMAV(true, id, "");
     }
 	/**
 	 * Retrieves book information for a user.
@@ -89,19 +89,17 @@ public class BookMarksController  extends BasePortalController {
 	 * @throws PortalServiceException
 	 */
 	@RequestMapping("/deleteBookMark.do")
-	public ModelAndView deleteBookMark(@RequestParam(value="fileIdentifier") String fileIdentifier,
-            @RequestParam(value="serviceId") String serviceId,           
+	public ModelAndView deleteBookMark(@RequestParam(value="id") Integer id,                       
             @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {	
 		VGLBookMark bookMark = new VGLBookMark();
-		bookMark.setFileIdentifier(fileIdentifier);
-		bookMark.setServiceId(serviceId);
+		bookMark.setId(id);
 		bookMark.setParent(user);		
 		vGLBookMarkDao.delete(bookMark);
 		return generateJSONResponseMAV(true);
 	}
 		
 	/**
-	 * updates or adds the download options stored in a book mark
+	 * Retrieves download options stored for a book mark
 	 * @param bookMark
 	 * @param user
 	 * @return
@@ -118,7 +116,7 @@ public class BookMarksController  extends BasePortalController {
     }
 	
 	/**
-	 * updates or adds the download options stored in a book mark
+	 * Adds the download options for a book mark
 	 * @param bookMark
 	 * @param user
 	 * @return
