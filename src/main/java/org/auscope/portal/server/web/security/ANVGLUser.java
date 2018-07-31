@@ -2,10 +2,13 @@ package org.auscope.portal.server.web.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.server.vegl.VGLBookMark;
 import org.auscope.portal.server.web.controllers.BaseCloudController;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,9 +34,13 @@ public class ANVGLUser implements UserDetails {
     private String awsKeyName;
     private Integer acceptedTermsConditions;
     private AuthenticationFramework authentication;
+    
+    /** A List of book marks associated with the user */
+    private List<VGLBookMark> bookMarks;
 
     public ANVGLUser() {
         this.authorities = new ArrayList<>();
+        this.bookMarks =  new ArrayList<>();
     }
 
     public ANVGLUser(String id, String fullName, String email, List<ANVGLAuthority> authorities) {
@@ -42,7 +49,8 @@ public class ANVGLUser implements UserDetails {
         this.fullName = fullName;
         this.email = email;
         this.authorities = authorities;
-    }
+    } 
+    
 
     /**
      * Gets the ID as reported by the remote authentication service (Probably google).
@@ -192,6 +200,26 @@ public class ANVGLUser implements UserDetails {
     public void setAuthentication(AuthenticationFramework authentication) {
         this.authentication = authentication;
     }
+        
+    /**
+     * gets a list of book marks
+     * @return
+     */
+
+	public List<VGLBookMark> getBookMarks() {
+		return bookMarks;
+	}
+	/**
+	 * sets the list of book marks
+	 * @param bookMarks
+	 */
+
+	public void setBookMarks(List<VGLBookMark> bookMarks) {
+		this.bookMarks = bookMarks;
+		for (VGLBookMark bookmark : bookMarks) {
+			bookmark.setParent(this);
+        }
+	}
 
     /**
      * Returns true iff this ANVGLUser instance has accepted the latest version of the terms and conditions.
@@ -248,4 +276,9 @@ public class ANVGLUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+    
+   
+
+	
+	
 }

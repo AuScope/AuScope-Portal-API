@@ -6,6 +6,9 @@ DROP TABLE IF EXISTS `parameters`;
 DROP TABLE IF EXISTS `jobs`;
 DROP TABLE IF EXISTS `series`;
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `nci_details`;
+DROP TABLE IF EXISTS `bookmarks`;
+DROP TABLE IF EXISTS `bookmark_download_options`;
 
 CREATE TABLE `users` (
   `id` varchar(128) NOT NULL,
@@ -113,7 +116,7 @@ CREATE TABLE `jobs_audit_log` (
   `transitionDate` datetime NOT NULL,
   `message` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY `jobId` (`jobId`)
+  FOREIGN KEY `jobId_audit` (`jobId`)
         REFERENCES jobs(`id`)
         ON DELETE CASCADE
 );
@@ -125,7 +128,7 @@ CREATE TABLE `parameters` (
   `value` varchar(4096) DEFAULT NULL,
   `type` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY `jobId` (`jobId`)
+  FOREIGN KEY `jobId_parameters` (`jobId`)
         REFERENCES jobs(`id`)
         ON DELETE CASCADE,
   KEY `jobIdName` (`jobId`,`name`)
@@ -142,3 +145,31 @@ CREATE TABLE `nci_details` (
      REFERENCES users(`id`)
      ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE `bookmarks` (
+  `fileIdentifier` varchar(50) NOT NULL,
+  `serviceId` varchar(25) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
+  KEY `USER_ID_BOOKMARKS` (`userId`),
+  CONSTRAINT `USER_ID_BOOKMARKS` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
+); 
+
+CREATE TABLE `bookmark_download_options` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `bookmarkId` int(11) NOT NULL,
+  `bookmarkOptionName` varchar(128) NOT NULL,
+  `url` varchar(4096) DEFAULT NULL,
+  `localPath` varchar(1024) DEFAULT NULL,
+  `name` varchar(128) DEFAULT NULL,
+  `description` varchar(1024) DEFAULT NULL,
+  `northBoundLatitude` double DEFAULT NULL,
+  `southBoundLatitude` double DEFAULT NULL,
+  `eastBoundLongitude` double DEFAULT NULL,
+  `westBoundLongitude` double DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ID_BOOKMARKS` (`bookmarkId`),
+  CONSTRAINT `ID_BOOKMARKS` FOREIGN KEY (`bookmarkId`) REFERENCES `bookmarks` (`id`) ON DELETE CASCADE
+);
+
