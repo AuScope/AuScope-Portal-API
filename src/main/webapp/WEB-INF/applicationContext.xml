@@ -334,7 +334,7 @@
         <property name="veglJobDao" ref="veglJobDao"/>
         <property name="veglSeriesDao" ref="veglSeriesDao"/>
         <property name="vglJobAuditLogDao" ref="vglJobAuditLogDao"/>
-        <property name="nciDetailsDao" ref="nciDetailsDao"/>
+        <property name="nciDetailsDao" ref="nciDetailsDao"/>        
     </bean>
 
     <bean id="veglJobDao" class="org.auscope.portal.server.vegl.VEGLJobDao">
@@ -349,6 +349,14 @@
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
     
+    <bean id="VGLBookMarkDao" class="org.auscope.portal.server.vegl.VGLBookMarkDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
+    </bean>
+    
+    <bean id="VGLBookMarkDownloadDao" class="org.auscope.portal.server.vegl.VGLBookMarkDownloadDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
+    </bean>
+    
     <bean id="anvglUserDao" class="org.auscope.portal.server.web.security.ANVGLUserDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
@@ -356,8 +364,8 @@
     <bean id="nciDetailsDao" class="org.auscope.portal.server.web.security.NCIDetailsDao">
         <constructor-arg name="encryptionService" ref="encryption-service"/>
         <property name="sessionFactory" ref="veglSessionFactory"/>
-    </bean>
-
+    </bean>    
+       
     <bean id="veglSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingResources">
@@ -369,8 +377,10 @@
                 <value>vgldownload.hbm.xml</value>
                 <value>anvgluser.hbm.xml</value>
                 <value>anvglauthority.hbm.xml</value>
+                <value>vglbookmark.hbm.xml</value>                
+                <value>vglbookmarkdownload.hbm.xml</value>
                 <value>ncidetails.hbm.xml</value>
-                <value>scmentrysnapshot.hbm.xml</value>
+                <value>scmentrysnapshot.hbm.xml</value>                
             </list>
         </property>
         <property name="hibernateProperties">
@@ -383,6 +393,7 @@
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
     
+        
     <bean id="cswRegVeglProduction" class="org.auscope.portal.core.services.csw.custom.CustomRegistry">
         <constructor-arg name="id" value="cswRegVeglProduction" />
         <constructor-arg name="title" value="SISS ANU Geonetwork" />

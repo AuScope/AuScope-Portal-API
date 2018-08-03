@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="org.auscope.portal.server.vegl.VGLBookMarkDownload" table="bookmark_download_options">
+        <id name="id" column="id">
+            <generator class="native"/>
+        </id>        
+		<property name="bookmarkOptionName" not-null="true" />
+        <property name="name"/>
+        <property name="description"/>
+        <property name="url"/>
+        <property name="localPath"/>
+        <property name="northBoundLatitude"/>
+        <property name="southBoundLatitude"/>
+        <property name="eastBoundLongitude"/>
+        <property name="westBoundLongitude"/>
+        <many-to-one name="parent" column="bookmarkId" not-null="true"></many-to-one>
+    </class>
+</hibernate-mapping>
+
