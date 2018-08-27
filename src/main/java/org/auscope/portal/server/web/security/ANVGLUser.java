@@ -277,8 +277,4 @@ public class ANVGLUser implements UserDetails {
         return true;
     }
     
-   
-
-	
-	
 }
