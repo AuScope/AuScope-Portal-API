@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUserDao;
 import org.auscope.portal.server.web.security.NCIDetails;
@@ -43,6 +44,7 @@ public class UserController extends BasePortalController {
     private ANVGLUserDao userDao;
     private NCIDetailsDao nciDetailsDao;
     private VelocityEngine velocityEngine;
+    private CloudComputeService[] cloudComputeServcies;
 
     private String awsAccount;
 
@@ -50,7 +52,7 @@ public class UserController extends BasePortalController {
     
     @Autowired
     public UserController(ANVGLUserDao userDao, NCIDetailsDao nciDetailsDao,
-            VelocityEngine velocityEngine,
+            VelocityEngine velocityEngine, CloudComputeService[] cloudComputeServices,
             @Value("${env.aws.account}") String awsAccount,
             @Value("${termsconditions.version}") String tacVersion) throws PortalServiceException {
         super();
@@ -58,6 +60,7 @@ public class UserController extends BasePortalController {
         this.userDao = userDao;
         this.nciDetailsDao = nciDetailsDao;
         this.velocityEngine = velocityEngine;
+        this.cloudComputeServcies = cloudComputeServices;
         this.awsAccount=awsAccount;
         this.tacVersion=tacVersion;
     }
@@ -236,6 +239,15 @@ public class UserController extends BasePortalController {
             nciDetailsDao.save(details);
         }
         return generateJSONResponseMAV(true);        
+    }
+    
+    @RequestMapping("/secure/getHasConfiguredComputeServices.do")
+    public ModelAndView getHasConfiguredComputeServices(@AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
+        if (user == null) {
+            return generateJSONResponseMAV(false);
+        }
+        boolean hasConfigured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServcies);
+        return generateJSONResponseMAV(hasConfigured);
     }
 
 }

@@ -69,7 +69,7 @@ public class Entry {
 
         return this.dependencies;
     }
-
+    
     // TODO: Map dependencies to 'dependencies' field in the json once it's
     // migrated in the SSSC.
 
@@ -84,6 +84,15 @@ public class Entry {
         if (dependencies == null) {
             this.dependencies = new ArrayList<Dependency>();
         }
+    }
+    
+    // Fallback to the old style "deps" property name for backwards compatibility
+    public List<Dependency> getDeps() {
+        return this.getDependencies();
+    }
+    
+    public void setDeps(List<Dependency> dependencies) {
+        this.setDependencies(dependencies);
     }
 
     // Fallback to the old style "deps" property name for backwards compatibility
