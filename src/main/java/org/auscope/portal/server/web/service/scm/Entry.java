@@ -3,7 +3,6 @@ package org.auscope.portal.server.web.service.scm;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -86,15 +85,6 @@ public class Entry {
         }
     }
     
-    // Fallback to the old style "deps" property name for backwards compatibility
-    public List<Dependency> getDeps() {
-        return this.getDependencies();
-    }
-    
-    public void setDeps(List<Dependency> dependencies) {
-        this.setDependencies(dependencies);
-    }
-
     // Fallback to the old style "deps" property name for backwards compatibility
     public List<Dependency> getDeps() {
         return this.getDependencies();
