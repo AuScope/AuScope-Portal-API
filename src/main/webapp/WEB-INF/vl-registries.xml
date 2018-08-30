@@ -25,4 +25,17 @@
         <constructor-arg name="recordInformationUrl" value="https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
     </bean>
 
+    <bean id="cswNciGSWA" class="org.auscope.portal.core.services.csw.CSWServiceItem">
+        <constructor-arg name="id" value="cswNciGswa"/>
+        <constructor-arg name="title" value="NCI GSWA Data Portal"/>
+        <constructor-arg name="serviceUrl" value="http://geonetworkrl1.nci.org.au/geonetwork/srv/eng/csw"/>
+        <constructor-arg name="recordInformationUrl" value="https://geonetworkrl1.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
+    </bean>
+
+    <bean id="cswNciMT" class="org.auscope.portal.core.services.csw.CSWServiceItem">
+        <constructor-arg name="id" value="cswNciMt"/>
+        <constructor-arg name="title" value="NCI MT Data Portal"/>
+        <constructor-arg name="serviceUrl" value="https://geonetworktest.nci.org.au/geonetwork/srv/eng/csw"/>
+        <constructor-arg name="recordInformationUrl" value="https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
+    </bean>
 </beans>

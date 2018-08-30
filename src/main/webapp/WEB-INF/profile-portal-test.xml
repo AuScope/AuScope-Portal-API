@@ -40,9 +40,11 @@
 
     <bean id="cswServiceList" class="java.util.ArrayList">
         <constructor-arg>
-            <list>
+            <list> <!-- -->
                 <ref bean="cswNCI" />
                 <ref bean="cswGAECat" />
+                <ref bean="cswNciGSWA" />  
+                <ref bean="cswNciMT" />
             </list>
         </constructor-arg>
     </bean>
