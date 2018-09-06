@@ -1084,7 +1084,7 @@ public class TestJobBuilderController {
     @Test
     public void testListImages() throws Exception {
         final String computeServiceId = "compute-service-id";
-        final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};        
 
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
@@ -1094,11 +1094,11 @@ public class TestJobBuilderController {
             allowing(mockRequest).isUserInRole("testRole2");will(returnValue(true));
         }});
 
-        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, new ANVGLUser());
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null, new ANVGLUser());
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
-        Assert.assertEquals(images.length, ((List) mav.getModel().get("data")).size());
+        Assert.assertEquals(images.length, ((Set) mav.getModel().get("data")).size());
     }
 
     /**
@@ -1110,7 +1110,7 @@ public class TestJobBuilderController {
     public void testListImages_NoRestrictions() throws Exception {
         final HashMap<String, Object> sessionVariables = new HashMap<String, Object>();
         final String computeServiceId = "compute-service-id";
-        final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};
+        final VglMachineImage[] images = new VglMachineImage[] {context.mock(VglMachineImage.class)};       
 
         sessionVariables.put("user-roles", new String[] {"testRole1", "testRole2"});
 
@@ -1124,11 +1124,11 @@ public class TestJobBuilderController {
             oneOf(images[0]).getPermissions();will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, new ANVGLUser());
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null, new ANVGLUser());
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
-        Assert.assertEquals(images.length, ((List) mav.getModel().get("data")).size());
+        Assert.assertEquals(images.length, ((Set) mav.getModel().get("data")).size());
     }
 
     /**
@@ -1661,7 +1661,7 @@ public class TestJobBuilderController {
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getName();will(returnValue(name));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(id));
-            allowing(mockScmEntryService).getJobProviders(null, user);will(returnValue(null));
+            allowing(mockScmEntryService).getJobProviders((Integer)null, user);will(returnValue(null));
             oneOf(mockNciDetailsDao).getByUser(mockPortalUser);will(returnValue(null));
         }});
 
