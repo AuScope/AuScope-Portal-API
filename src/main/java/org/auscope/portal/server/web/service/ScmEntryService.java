@@ -478,6 +478,7 @@ public class ScmEntryService implements ScmLoader {
                     MachineImage mi = new MachineImage(img.get("image_id"));
                     mi.setName(toolbox.getName());
                     mi.setDescription(toolbox.getDescription());
+                    mi.setRunCommand(img.get("command"));
                     vms.add(mi);
                 }
             }    		
