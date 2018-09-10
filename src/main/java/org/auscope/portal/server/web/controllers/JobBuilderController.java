@@ -13,6 +13,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -1038,6 +1039,12 @@ public class JobBuilderController extends BaseCloudController {
      *
      * If jobId is specified, limit the set to images that are
      * compatible with the solution selected for the job.
+     * 
+     * If a list of solution ids is provided, limit the set of images to the 
+     * ones that can run a job comprising the specified solutions.
+     * 
+     * If both jobId and solutions are specified, use the list of solutions to 
+     * determine which images to return.
      *
      * @param request
      * @param computeServiceId
@@ -1049,39 +1056,29 @@ public class JobBuilderController extends BaseCloudController {
             HttpServletRequest request,
             @RequestParam("computeServiceId") String computeServiceId,
             @RequestParam(value="jobId", required=false) Integer jobId,
+            @RequestParam(value="solutions", required=false) List<String> solutions,
             @AuthenticationPrincipal ANVGLUser user) {
         try {
-            // Assume all images are usable by the current user
-            List<MachineImage> images = new ArrayList<>();
+            Map<String, Set<MachineImage>> imageProviders = null;
 
-            if (jobId != null) {
+            if (solutions != null && solutions.size() > 0) {
+            	imageProviders = scmEntryService.getJobImages(solutions, user);
+            }
+            else if (jobId != null) {
                 VEGLJob job = attemptGetJob(jobId, user);
                 if (job == null) {
                     return generateJSONResponseMAV(false);
                 }
 
                 // Filter list to images suitable for job solutions, if specified.
-                Set<Toolbox> toolboxes = scmEntryService.getJobToolboxes(job);
+                imageProviders = scmEntryService.getJobImages(job, user);
+            }            
 
-                // With multiple solutions and multiple toolboxes, do
-                // not give the user the option of selecting the default
-                // portal toolbox for utility functions unless it's the
-                // only toolbox available.
-                int numToolboxes = toolboxes.size();
-                for (Toolbox toolbox: toolboxes) {
-                    if ((numToolboxes == 1) ||
-                            !toolbox.getUri().equals(this.defaultToolbox)) {
-                        MachineImage image = scmEntryService.getToolboxImage(toolbox, computeServiceId);
-                        if(image != null)
-                            images.add(image);
-                    }
-                }
-            }
-
+            Set<MachineImage> images = (imageProviders != null) ? imageProviders.get(computeServiceId) : new HashSet<MachineImage>();
             if (images.isEmpty()) {
                 // Fall back on old behaviour based on configured images for now
                 // Get images available to the current user
-                images = getImagesForJobAndUser(request, computeServiceId);
+                images.addAll(getImagesForJobAndUser(request, computeServiceId));
             }
 
             if (images.isEmpty()) {
