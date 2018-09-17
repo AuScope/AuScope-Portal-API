@@ -114,6 +114,11 @@
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
+                <configuration>
+                    <webApp>
+                        <contextPath>/VGL-Portal</contextPath>
+                    </webApp>
+                </configuration>
             </plugin>
             <!-- Powermock - Unit test work around... -->
             <plugin>
@@ -261,7 +266,7 @@
         <targetJdk>1.8</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>1.6.3</powermock.version>
-        <portal.core.version>2.0.0-SNAPSHOT</portal.core.version>
+        <portal.core.version>2.1.0-SNAPSHOT</portal.core.version>
         <httpclient.version>4.3.5</httpclient.version>
         <mysql.version>5.1.38</mysql.version>
         <jackson.version>2.9.0</jackson.version>
@@ -273,11 +278,11 @@
             <name>Open Source Geospatial Foundation Repository</name>
             <url>http://download.osgeo.org/webdav/geotools</url>
         </repository>
-        <repository>
-            <id>mygrid</id>
-            <name>MyGrid Repository</name>
-            <url>http://build.mygrid.org.uk/maven/repository/</url>
-        </repository>
+        <!-- <repository>
+             <id>mygrid</id>
+             <name>MyGrid Repository</name>
+             <url>http://build.mygrid.org.uk/maven/repository/</url>
+             </repository> -->
         <repository>
             <id>geotoolkit</id>
             <name>Geo Toolkit Repository</name>

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -427,24 +428,61 @@ public class ScmEntryService implements ScmLoader {
         if (jobId == null) {
             return null;
         }
+        
+        VEGLJob job = jobManager.getJobById(jobId, user);        
 
-        Map<String, Set<MachineImage>> images = new HashMap<>();
-        VEGLJob job = jobManager.getJobById(jobId, user);
+        return getJobImages(job, user);
+    }
+    
+    public Map<String, Set<MachineImage>> getJobImages(VEGLJob job, ANVGLUser user) throws PortalServiceException {
+        if (job == null) {
+            return null;
+        }               
 
-        for (Toolbox toolbox: getJobToolboxes(job)) {
-            for (Map<String, String> img: toolbox.getImages()) {
-                String providerId = img.get("provider");
-                Set<MachineImage> vms = images.get(providerId);
-                if (vms == null) {
-                    vms = new HashSet<>();
-                    images.put(providerId, vms);
+        return getJobImages(getJobSolutions(job), user);
+    }
+
+    public Map<String, Set<MachineImage>> getJobImages(Collection<String> solutionIds, ANVGLUser user) throws PortalServiceException {
+    	if (solutionIds == null) {
+    		return null;
+    	}
+    	
+    	Set<Solution> solutions = solutionIds.stream().map((String id) -> getScmSolution(id)).collect(Collectors.toSet());
+    	
+    	return getJobImages(solutions, user);
+    }
+    
+    /**
+     * Return a map from compute service ids to the set of images they can 
+     * provide for the solutions specified for the job.
+     *  
+     * @param solutions Set<Solution> solutions for the job in question
+     * @param user ANVGLUser currently logged in user
+     * @return Map<String, Set<MachineImage>> mapping from compute service id to set of image(s) they can provide
+     * @throws PortalServiceException
+     */
+    public Map<String, Set<MachineImage>> getJobImages(Set<Solution> solutions, 
+    												   ANVGLUser user) 
+    	throws PortalServiceException {
+    	Map<String, Set<MachineImage>> images = new HashMap<>();
+    	
+    	for (Solution solution: solutions) {
+            for (Toolbox toolbox: entryToolboxes(solution)) {
+                for (Map<String, String> img: toolbox.getImages()) {
+                    String providerId = img.get("provider");
+                    Set<MachineImage> vms = images.get(providerId);
+                    if (vms == null) {
+                        vms = new HashSet<>();
+                        images.put(providerId, vms);
+                    }
+                    MachineImage mi = new MachineImage(img.get("image_id"));
+                    mi.setName(toolbox.getName());
+                    mi.setDescription(toolbox.getDescription());
+                    mi.setRunCommand(img.get("command"));
+                    vms.add(mi);
                 }
-                MachineImage mi = new MachineImage(img.get("image_id"));
-                mi.setName(toolbox.getName());
-                mi.setDescription(toolbox.getDescription());
-                vms.add(mi);
-            }
-        }
+            }    		
+    	}
 
         return images;
     }
@@ -457,10 +495,36 @@ public class ScmEntryService implements ScmLoader {
      */
     public Set<String> getJobProviders(Integer jobId, ANVGLUser user) throws PortalServiceException {
         Map<String, Set<MachineImage>> images = getJobImages(jobId, user);
-        if (images != null) {
-            return images.keySet();
-        }
-        return null;
+        return (images != null) ? images.keySet() : null;
+    }
+    
+    /**
+     * Return a set of compute service ids that can provide a toolbox suitable 
+     * for running a job comprising the specified solutions.
+     * 
+     * @param solutionIds Collection<String> of ids for the job's solutions 
+     * @param user ANVGLUser with the current logged in user
+     * @return Set<String> of compute service id strings
+     * @throws PortalServiceException
+     */
+    public Set<String> getJobProviders(Collection<String> solutionIds, ANVGLUser user)
+    	throws PortalServiceException {
+        Map<String, Set<MachineImage>> images = getJobImages(solutionIds, user);
+        return (images != null) ? images.keySet() : null;
+    }
+    
+    /**
+     * Return a set of compute servivce ids that can provide a toolbox 
+     * suitable for running a job comprising the specified solutions.
+     * 
+     * @param solutions Set<Solution> of solutions for the job in question
+     * @param user ANVGLUser currently logged in user
+     * @return Set<String> of compute service ids
+     * @throws PortalServiceException
+     */
+    public Set<String> getJobProviders(Set<Solution> solutions, ANVGLUser user) throws PortalServiceException {
+        Map<String, Set<MachineImage>> images = getJobImages(solutions, user);
+        return (images != null) ? images.keySet() : null;
     }
 
     /**
