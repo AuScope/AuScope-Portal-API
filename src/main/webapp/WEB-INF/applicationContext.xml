@@ -332,12 +332,17 @@
 
     <bean id="veglJobManager" class="org.auscope.portal.server.vegl.VEGLJobManager">
         <property name="veglJobDao" ref="veglJobDao"/>
+        <property name="vglDownloadDao" ref="vglDownloadDao"/>
         <property name="veglSeriesDao" ref="veglSeriesDao"/>
         <property name="vglJobAuditLogDao" ref="vglJobAuditLogDao"/>
         <property name="nciDetailsDao" ref="nciDetailsDao"/>        
     </bean>
 
     <bean id="veglJobDao" class="org.auscope.portal.server.vegl.VEGLJobDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
+    </bean>
+
+    <bean id="vglDownloadDao" class="org.auscope.portal.server.vegl.VglDownloadDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
 
