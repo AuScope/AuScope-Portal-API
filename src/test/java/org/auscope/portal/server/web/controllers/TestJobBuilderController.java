@@ -1585,7 +1585,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);will(returnValue(job));
-
+            oneOf(mockJobManager).deleteJobDownloads(job);
             oneOf(mockJobManager).saveJob(job);
         }});
 
