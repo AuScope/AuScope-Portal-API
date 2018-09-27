@@ -186,7 +186,7 @@ public class SshCloudConnector {
     }
 
     public void createDirectory(Session session, String dirName) throws PortalServiceException {
-        String command = "mkdir -m 770 -p " + dirName;
+        String command = "umask 002; mkdir -m 770 -p " + dirName;
         ExecResult res = executeCommand(session, command);
         if (res.getExitStatus() > 0) {
             throw new PortalServiceException("command '" + command + "' returned status" + res.getExitStatus() + " : stderr: " + res.getErr());
