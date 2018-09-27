@@ -679,12 +679,13 @@ public class JobBuilderController extends BaseCloudController {
         if (job == null) {
             return generateJSONResponseMAV(false);
         }
-
-        List<VglDownload> existingDownloads = job.getJobDownloads();
+        
         if (append) {
+        	List<VglDownload> existingDownloads = job.getJobDownloads();
             existingDownloads.addAll(parsedDownloads);
             job.setJobDownloads(existingDownloads);
         } else {
+        	jobManager.deleteJobDownloads(job);
             job.setJobDownloads(parsedDownloads);
         }
 

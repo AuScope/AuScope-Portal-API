@@ -22,6 +22,7 @@ public class VEGLJobManager {
     protected final Log logger = LogFactory.getLog(getClass());
 
     private VEGLJobDao veglJobDao;
+    private VglDownloadDao vglDownloadDao;
     private VEGLSeriesDao veglSeriesDao;
     private VGLJobAuditLogDao vglJobAuditLogDao;
     private NCIDetailsDao nciDetailsDao;
@@ -150,6 +151,38 @@ public class VEGLJobManager {
     public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
         this.nciDetailsDao = nciDetailsDao;
     }
+    
+    /**
+     * Delete specified JobDownload objects associated with this VEGLJob. 
+     * 
+     * NB this does *not* save the job, you still need to call 
+     * VEGLJobManager.saveJob() on job after this.
+     * 
+     * @param job VEGLJob whose downloads to delete
+     * @param downloads List<VglDownload> of downloads to delete
+     */
+    public void deleteJobDownloads(VEGLJob job, List<VglDownload> downloads) {
+    	if (job != null && downloads != null) {
+    		int jobId = job.getId();
+    		for (VglDownload download: downloads) {
+    			if (download.getParent().getId() == jobId) {
+    				vglDownloadDao.deleteDownload(download);
+    			}
+    		}
+    	}
+    }
+    
+    /**
+     * Delete all downloads associated with job.
+     * 
+     * NB this does *not* save the job, you still need to call 
+     * VEGLJobManager.saveJob() on job after this.
+     * 
+     * @param job VEGLJob whose downloads will be deleted.
+     */
+    public void deleteJobDownloads(VEGLJob job) {    	
+    	this.deleteJobDownloads(job, job.getJobDownloads());
+    }
 
     private VEGLJob applyNCIDetails(VEGLJob job, NCIDetails nciDetails) {
         if (nciDetails != null) {
@@ -182,5 +215,13 @@ public class VEGLJobManager {
 
         return jobs;
     }
+
+	public VglDownloadDao getVglDownloadDao() {
+		return vglDownloadDao;
+	}
+
+	public void setVglDownloadDao(VglDownloadDao vglDownloadDao) {
+		this.vglDownloadDao = vglDownloadDao;
+	}   
 
 }
