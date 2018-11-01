@@ -16,22 +16,24 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
      */
     constructor : function(config) {
         tm = new Ext.util.TextMetrics(),
-        n = tm.getWidth("ANVGL Access ARN:");
-      
+        n = tm.getWidth("Job Instance ARN:");
+
         Ext.apply(config, {
             layout: 'fit',
+            padding: '10 20 20 5',
             items: [{
                 xtype: 'form',
                 border: false,
-                padding: '10 20 20 5',
-                layout: 'anchor',
+                defaults: {
+                    labelWidth: n,
+                    width: '100%',
+                    margin: '15 0 0 0'
+                },
                 items: [{
                     xtype: 'textfield',
                     itemId: 'arnExecution',
                     name: 'arnExecution',
-                    fieldLabel: 'ANVGL Access ARN',
-                    labelWidth: n,
-                    anchor: '100%',
+                    fieldLabel: 'VGL Access ARN',
                     allowBlank: false,
                     allowOnlyWhitespace: false,
                     plugins: [{
@@ -43,8 +45,6 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     itemId: 'arnStorage',
                     name: 'arnStorage',
                     fieldLabel: 'Job Instance ARN',
-                    labelWidth: n,
-                    anchor: '100%',
                     allowBlank: false,
                     allowOnlyWhitespace: false,
                     plugins: [{
@@ -56,12 +56,10 @@ Ext.define('vegl.widgets.ANVGLUserPanel', {
                     itemId: 'awsKeyName',
                     name: 'awsKeyName',
                     fieldLabel: 'AWS Key Name',
-                    labelWidth: n,
-                    anchor: '100%',
                     allowBlank: true,
                     plugins: [{
                         ptype: 'fieldhelptext',
-                        text: 'The (optional) name of the key to be applied to every VM started by ANVGL'
+                        text: 'The (optional) name of the key to be applied to every VM started by VGL'
                     }]
                 }]
             }],

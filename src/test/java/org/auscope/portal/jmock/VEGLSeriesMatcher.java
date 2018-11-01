@@ -2,7 +2,7 @@ package org.auscope.portal.jmock;
 
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.hamcrest.Description;
-import org.junit.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 
 /**
  * A JUnit Matcher for matching VEGLSeries objects
@@ -14,7 +14,7 @@ public class VEGLSeriesMatcher extends TypeSafeMatcher<VEGLSeries> {
     private String user;
     private String name;
     private String description;
-    
+
     /**
      * Creates a new matcher that will only match a VEGLSeries object with specified
      * name, user and description
@@ -31,36 +31,36 @@ public class VEGLSeriesMatcher extends TypeSafeMatcher<VEGLSeries> {
 
     @SuppressWarnings("null")
     private static boolean nullStringComparison(String s1, String s2) {
-        if ((s1 == null && s2 != null) || 
+        if ((s1 == null && s2 != null) ||
             (s1 != null && s2 == null)) {
             return false;
         }
-        
+
         if (s1 == s2) {
             return true;
         }
-        
-        return s1.equals(s2); 
+
+        return s1.equals(s2);
     }
-    
+
     @Override
     public boolean matchesSafely(VEGLSeries series) {
         if (series == null) {
             return false;
         }
-        
+
         if (!nullStringComparison(user, series.getUser())) {
             return false;
         }
-        
+
         if (!nullStringComparison(name, series.getName())) {
             return false;
         }
-        
+
         if (!nullStringComparison(description, series.getDescription())) {
             return false;
         }
-        
+
         return true;
     }
 

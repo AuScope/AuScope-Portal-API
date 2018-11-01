@@ -3,10 +3,12 @@ DROP TABLE IF EXISTS `job_solutions`;
 DROP TABLE IF EXISTS `downloads`;
 DROP TABLE IF EXISTS `jobs_audit_log`;
 DROP TABLE IF EXISTS `parameters`;
-DROP TABLE IF EXISTS `signatures`;
 DROP TABLE IF EXISTS `jobs`;
 DROP TABLE IF EXISTS `series`;
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `nci_details`;
+DROP TABLE IF EXISTS `bookmarks`;
+DROP TABLE IF EXISTS `bookmark_download_options`;
 
 CREATE TABLE `users` (
   `id` varchar(128) NOT NULL,
@@ -60,6 +62,7 @@ CREATE TABLE `jobs` (
   `folderId` int(11) DEFAULT NULL,
   `containsPersistentVolumes` char(1) DEFAULT 'N',
   `promsReportUrl` varchar(255) DEFAULT NULL,
+  `computeVmRunCommand` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY `SERIES` (`seriesId`)
      REFERENCES series(`id`)
@@ -113,7 +116,7 @@ CREATE TABLE `jobs_audit_log` (
   `transitionDate` datetime NOT NULL,
   `message` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY `jobId` (`jobId`)
+  FOREIGN KEY `jobId_audit` (`jobId`)
         REFERENCES jobs(`id`)
         ON DELETE CASCADE
 );
@@ -125,32 +128,48 @@ CREATE TABLE `parameters` (
   `value` varchar(4096) DEFAULT NULL,
   `type` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY `jobId` (`jobId`)
+  FOREIGN KEY `jobId_parameters` (`jobId`)
         REFERENCES jobs(`id`)
         ON DELETE CASCADE,
   KEY `jobIdName` (`jobId`,`name`)
 );
 
-CREATE TABLE `signatures` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` varchar(255) NOT NULL,
-  `individualName` varchar(255) DEFAULT NULL,
-  `organisationName` varchar(255) DEFAULT NULL,
-  `positionName` varchar(128) DEFAULT NULL,
-  `telephone` varchar(50) DEFAULT NULL,
-  `facsimile` varchar(50) DEFAULT NULL,
-  `deliveryPoint` varchar(255) DEFAULT NULL,
-  `city` varchar(50) DEFAULT NULL,
-  `administrativeArea` varchar(255) DEFAULT NULL,
-  `postalCode` varchar(10) DEFAULT NULL,
-  `country` varchar(128) DEFAULT NULL,
-  `onlineContactName` varchar(255) DEFAULT NULL,
-  `onlineContactDescription` varchar(255) DEFAULT NULL,
-  `onlineContactURL` varchar(255) DEFAULT NULL,
-  `keywords` varchar(255) DEFAULT NULL,
-  `constraints` varchar(1000) DEFAULT NULL,
+CREATE TABLE `nci_details` (
+  `id` int(11) NOT NULL,
+  `user` varchar(128) DEFAULT NULL,
+  `nci_username` blob DEFAULT NULL,
+  `nci_key` blob DEFAULT NULL,
+  `nci_project` blob DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user`)
-     REFERENCES users(`email`)
+     REFERENCES users(`id`)
      ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE `bookmarks` (
+  `fileIdentifier` varchar(50) NOT NULL,
+  `serviceId` varchar(25) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
+  KEY `USER_ID_BOOKMARKS` (`userId`),
+  CONSTRAINT `USER_ID_BOOKMARKS` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
+); 
+
+CREATE TABLE `bookmark_download_options` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `bookmarkId` int(11) NOT NULL,
+  `bookmarkOptionName` varchar(128) NOT NULL,
+  `url` varchar(4096) DEFAULT NULL,
+  `localPath` varchar(1024) DEFAULT NULL,
+  `name` varchar(128) DEFAULT NULL,
+  `description` varchar(1024) DEFAULT NULL,
+  `northBoundLatitude` double DEFAULT NULL,
+  `southBoundLatitude` double DEFAULT NULL,
+  `eastBoundLongitude` double DEFAULT NULL,
+  `westBoundLongitude` double DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ID_BOOKMARKS` (`bookmarkId`),
+  CONSTRAINT `ID_BOOKMARKS` FOREIGN KEY (`bookmarkId`) REFERENCES `bookmarks` (`id`) ON DELETE CASCADE
+);
+

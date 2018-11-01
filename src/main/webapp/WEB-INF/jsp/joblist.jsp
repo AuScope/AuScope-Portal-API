@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <title>ANVGL Portal - Monitor Jobs</title>
+    <title>VGL Portal - Monitor Jobs</title>
     
     <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     
@@ -48,9 +48,11 @@
 
     <%-- Code Mirror inclusions --%>
 	<link href="CodeMirror-5.16/lib/codemirror.css" type="text/css" rel="stylesheet" />    
+	<link href="CodeMirror-5.16/addon/lint/lint.css" type="text/css" rel="stylesheet" />
     <script type="text/javascript" src="CodeMirror-5.16/lib/codemirror.js"></script>
     <script type="text/javascript" src="CodeMirror-5.16/mode/python/python.js"></script>
     <script type="text/javascript" src="CodeMirror-5.16/mode/javascript/javascript.js"></script>
+    <script type="text/javascript" src="CodeMirror-5.16/addon/lint/lint.js"></script>
 	
     <!-- OpenLayers Includes -->
     <link rel="stylesheet" href="portal-core/js/OpenLayers-2.13.1/theme/default/style.css" type="text/css">
@@ -61,9 +63,12 @@
     <jsp:include page="../../portal-core/cssimports.jsp"/>
     <jsp:include page="../../cssimports.htm"/>
 
+    <!-- Linters for templates -->
+    <script type="text/javascript" src="js/vegl/lint/pylint.js"></script>
 
     <script type="text/javascript" src="js/vegl/widgets/CodeEditorField.js"></script>
     <script type="text/javascript" src="js/vegl/models/FileRecord.js"></script>
+    <script type="text/javascript" src="js/vegl/models/AuditLog.js"></script>
     <script type="text/javascript" src="js/vegl/models/Job.js"></script>
     <script type="text/javascript" src="js/vegl/models/Series.js"></script>
     <script type="text/javascript" src="js/vegl/models/MachineImage.js"></script>
@@ -71,6 +76,7 @@
     <script type="text/javascript" src="js/vegl/models/Download.js"></script>
     <script type="text/javascript" src="js/vegl/models/ComputeType.js"></script>
     <script type="text/javascript" src="js/vegl/models/SimpleFeatureProperty.js"></script>
+    <script type="text/javascript" src="js/vegl/models/SearchFacet.js"></script>
 
     <script type="text/javascript" src="js/vegl/preview/FilePreviewMixin.js"></script>
     <script type="text/javascript" src="js/vegl/preview/DataServicePreview.js"></script>
@@ -79,6 +85,9 @@
     <script type="text/javascript" src="js/vegl/preview/ImagePreview.js"></script>
     <script type="text/javascript" src="js/vegl/preview/FilePreviewPanel.js"></script>
     <script type="text/javascript" src="js/vegl/preview/TTLPreview.js"></script>
+    
+    <script type="text/javascript" src="js/vegl/widgets/search/BaseFacetWidget.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/search/FacetedSearchPanel.js"></script>
 
     <script type="text/javascript" src="js/vegl/widgets/JobDetailsPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
@@ -88,9 +97,9 @@
     <script type="text/javascript" src="js/vegl/widgets/MachineImageCombo.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsTree.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsPanel.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/JobStatusWindow.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/SeriesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/FolderPanel.js"></script>
-    <script type="text/javascript" src="js/vegl/widgets/JobRegisterPanel.js"></script>
 
     <script type="text/javascript" src="js/vegl/jobwizard/forms/BaseJobWizardForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/DuplicateJobForm.js"></script>
@@ -98,6 +107,9 @@
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobUploadForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobSubmitForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/ScriptBuilderForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/sssc/ProviderFacet.js"></script>
+	<script type="text/javascript" src="js/vegl/jobwizard/sssc/TextFacet.js"></script>
+	<script type="text/javascript" src="js/vegl/jobwizard/sssc/FacetedFilterPanel.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/JobWizard.js"></script>
 
     <script src="js/ScriptBuilder/templates/BaseTemplate.js" type="text/javascript"></script>

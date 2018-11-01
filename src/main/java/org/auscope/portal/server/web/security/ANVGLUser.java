@@ -2,9 +2,14 @@ package org.auscope.portal.server.web.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.server.vegl.VGLBookMark;
+import org.auscope.portal.server.web.controllers.BaseCloudController;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,6 +19,9 @@ import org.springframework.security.core.userdetails.UserDetails;
  *
  */
 public class ANVGLUser implements UserDetails {
+
+    // Authentication frameworks
+    public enum AuthenticationFramework { GOOGLE, AAF }
 
     private String id;
     private String fullName;
@@ -25,9 +33,14 @@ public class ANVGLUser implements UserDetails {
     private String awsSecret;
     private String awsKeyName;
     private Integer acceptedTermsConditions;
+    private AuthenticationFramework authentication;
+    
+    /** A List of book marks associated with the user */
+    private List<VGLBookMark> bookMarks;
 
     public ANVGLUser() {
         this.authorities = new ArrayList<>();
+        this.bookMarks =  new ArrayList<>();
     }
 
     public ANVGLUser(String id, String fullName, String email, List<ANVGLAuthority> authorities) {
@@ -36,10 +49,12 @@ public class ANVGLUser implements UserDetails {
         this.fullName = fullName;
         this.email = email;
         this.authorities = authorities;
-    }
+    } 
+    
 
     /**
-     * Gets the ID as reported by the remote authentication service (Probably google)
+     * Gets the ID as reported by the remote authentication service (Probably google).
+     * AAF doesn't return a unique ID so we use the user's email address in this case.
      * @return
      */
     public String getId() {
@@ -47,7 +62,8 @@ public class ANVGLUser implements UserDetails {
     }
 
     /**
-     * Sets the ID as reported by the remote authentication service (Probably google)
+     * Sets the ID as reported by the remote authentication service (Probably google).
+     * AAF doesn't return a unique ID so we use the user's email address in this case.
      * @return
      */
     public void setId(String id) {
@@ -177,17 +193,58 @@ public class ANVGLUser implements UserDetails {
         this.awsSecret = awsSecret;
     }
 
+    public AuthenticationFramework getAuthentication() {
+        return this.authentication;
+    }
+
+    public void setAuthentication(AuthenticationFramework authentication) {
+        this.authentication = authentication;
+    }
+        
     /**
-     * Returns true iff this ANVGLUser instance has all the relevant fields set that are required for
-     * submitting an AWS job. Returning false would indicate that the user has more data to enter before
-     * they can begin submitting jobs.
+     * gets a list of book marks
+     * @return
      */
-    public boolean isFullyConfigured() {
-        return StringUtils.isNotEmpty(arnStorage) &&
-                StringUtils.isNotEmpty(awsSecret) &&
-                StringUtils.isNotEmpty(arnExecution) &&
-                acceptedTermsConditions != null &&
+
+	public List<VGLBookMark> getBookMarks() {
+		return bookMarks;
+	}
+	/**
+	 * sets the list of book marks
+	 * @param bookMarks
+	 */
+
+	public void setBookMarks(List<VGLBookMark> bookMarks) {
+		this.bookMarks = bookMarks;
+		for (VGLBookMark bookmark : bookMarks) {
+			bookmark.setParent(this);
+        }
+	}
+
+    /**
+     * Returns true iff this ANVGLUser instance has accepted the latest version of the terms and conditions.
+     */
+    // Carsten VGL-208: this method can not be named isAcceptedTermsConditions() or hasAcceptedTermsConditions()
+    //                  as this can non-deterministicly cause hibernate to think it is a boolean - which causes all kinds of
+    //                  type casting / mismatch issues.
+    // https://jira.csiro.au/browse/VGL-208
+    public boolean acceptedTermsConditionsStatus() {
+        // Carsten
+        return acceptedTermsConditions != null &&
                 acceptedTermsConditions > 0;
+    }
+
+    /**
+     * Returns true iff this ANVGLUser instance has at least 1 compute service
+     * which has been properly configured.
+     *
+     * @param nciDetailsDao
+     * @param cloudComputeServices
+     * @return
+     * @throws PortalServiceException
+     */
+    public boolean configuredServicesStatus(NCIDetailsDao nciDetailsDao, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
+        return !BaseCloudController.getConfiguredComputeServices(this, nciDetailsDao, cloudComputeServices).isEmpty();
     }
 
     @Override
@@ -219,4 +276,5 @@ public class ANVGLUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+    
 }

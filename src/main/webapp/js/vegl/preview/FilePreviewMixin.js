@@ -32,26 +32,20 @@ Ext.define('vegl.preview.FilePreviewMixin', {
             return;
         }
 
-        Ext.Ajax.request({
+        portal.util.Ajax.request({
             url: 'secure/getCloudFileMetadata.do',
             params: {
                 jobId: this.job.get('id'),
                 fileName: this.fileName
             },
             scope: this,
-            callback: function(options, success, response) {
+            callback: function(success, data, message, debugInfo) {
                 if (!success) {
                     callback(false);
                     return;
                 }
 
-                var responseObj = Ext.JSON.decode(response.responseText);
-                if (!responseObj.success) {
-                    callback(false);
-                    return;
-                }
-
-                var newFileHash = responseObj.data[0].fileHash;
+                var newFileHash = data[0].fileHash;
                 var refreshRequired = newFileHash !== this.hash;
                 callback(refreshRequired, newFileHash);
             }

@@ -18,10 +18,13 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -41,7 +44,7 @@ public class MenuController {
 
     /**
      * !!! For Unit Testing Only !!!
-     * 
+     *
      * @param buildStamp
      *            the buildStamp to set
      */
@@ -49,16 +52,35 @@ public class MenuController {
         this.buildStamp = buildStamp;
     }
 
-private String googleMapKey;
+    private String googleMapKey;
+    private String googleAnalyticsKey;
+    private String aafLoginUrl;
+    private String adminEmail;
+    private CloudComputeService[] cloudComputeServices;
+    private NCIDetailsDao nciDetailsDao;
 
-   private String googleAnalyticsKey;
+    @Autowired
+    public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey,
+                         @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey,
+                         @Value("${HOST.portalAdminEmail}") String adminEmail,
+                         @Value("${HOST.aafLoginUrl}") String aafLoginUrl,
+                         CloudComputeService[] cloudComputeServices,
+                         NCIDetailsDao nciDetailsDao) {
+        this.buildStamp = null;
+        this.googleMapKey = googleMapKey;
+        this.googleAnalyticsKey = googleAnalyticsKey;
+        this.aafLoginUrl = aafLoginUrl;
+        this.adminEmail = adminEmail;
+        this.cloudComputeServices = cloudComputeServices;
+        this.nciDetailsDao = nciDetailsDao;
+    }
 
-   @Autowired
-   public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey, @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey) {
-       this.buildStamp = null;
-       this.googleMapKey = googleMapKey;
-       this.googleAnalyticsKey = googleAnalyticsKey;
-   }
+    /**
+     * Return configured admin email address.
+     */
+    public String getAdminEmail() {
+        return this.adminEmail;
+    }
 
    /**
     * Adds the google maps/analytics keys to the specified model
@@ -135,10 +157,13 @@ private String googleMapKey;
     * @param response
     * @return
     * @throws IOException
- * @throws URISyntaxException
+    * @throws URISyntaxException
+ * @throws PortalServiceException
     */
-   @RequestMapping("/*.html")
-   public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+   @RequestMapping("/**/*.html")
+   public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user,
+                                        HttpServletRequest request,
+                                        HttpServletResponse response) throws IOException, URISyntaxException, PortalServiceException {
        //Detect whether this is a new session or not...
        HttpSession session = request.getSession();
        boolean isNewSession = session.getAttribute("existingSession") == null;
@@ -153,25 +178,34 @@ private String googleMapKey;
            return null;
        }
        String requestedResource = requestComponents[requestComponents.length - 1];
+       // OAuth login requires a lower level url, check for this
+       if(requestComponents.length > 1 && requestUri.contains("oauth"))
+           requestedResource = "oauth/" + requestedResource;
        String resourceName = requestedResource.replace(".html", "");
 
        logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
 
        //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
        if (user != null) {
-           if (!user.isFullyConfigured()) {
+           boolean tcs = user.acceptedTermsConditionsStatus();
+           boolean configured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServices);
+
+           if (!configured || !tcs) {
                String uri = request.getRequestURI();
                if (!uri.contains("login.html") &&
                    !uri.contains("gmap.html") &&
                    !uri.contains("user.html") &&
+                   !uri.contains("noconfig.html") &&
+                   !uri.contains("notcs.html") &&
                    !uri.contains("admin.html")) {
-
                    String params = "";
                    if (!uri.contains("login.html")) {
                        params = "?next=" + new URI(uri).getPath();
                    }
 
-                   return new ModelAndView("redirect:/user.html" + params);
+                   return new ModelAndView(configured ?
+                                           "redirect:/notcs.html" + params :
+                                           "redirect:/noconfig.html" + params);
                }
            }
        }
@@ -180,6 +214,8 @@ private String googleMapKey;
        ModelAndView mav = new ModelAndView(resourceName);
 
        mav.addObject("isNewSession", isNewSession);
+       mav.addObject("aafLoginUrl", aafLoginUrl);
+       mav.addObject("adminEmail", this.adminEmail);
 
        //Customise the model as required
        addGoogleKeys(mav); //always add the google keys
@@ -190,4 +226,5 @@ private String googleMapKey;
 
        return mav;
    }
+
 }

@@ -1,11 +1,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
-      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+      http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <mvc:interceptors>
@@ -58,18 +58,32 @@
         <property name="maxLengthForJobNameInSubject" value="15" />
         <property name="maxLinesForTail" value="5" />
         <property name="emailSender" value="${HOST.portalAdminEmail}"/>
-        <property name="emailSubject" value="ANVGL Job (%s)" />
-        <property name="portalUrl" value="${HOST.portalUrl}"/>
+        <property name="emailSubject" value="VGL Job (%s)" />
+        <property name="portalUrl" value="${HOST.frontEndUrl}"/>
     </bean>
+
+    <util:list id="pylintCommand">
+      <value>pylint</value>
+      <value>-r</value> <value>n</value>
+      <value>-f</value> <value>json</value>
+      <value>--disable=R,C</value>
+    </util:list>
     
     <bean name="ANVGLProvenanceService" class="org.auscope.portal.server.web.service.ANVGLProvenanceService" autowire="constructor">
         <constructor-arg name="anvglFileStagingService" ref="fileStagingService"/>
-        <constructor-arg name="cloudStorageServices" ref="cloudStorageService-aws-sydney"/>
+        <constructor-arg name="cloudStorageServices"> 
+            <array>  
+                <ref bean="cloudStorageService-aws-sydney" /> 
+                <ref bean="cloudStorageService-nci" /> 
+                <ref bean="cloudStorageService-nectar-melb" /> 
+            </array> 
+        </constructor-arg>
         <constructor-arg name="promsUrl" value="${HOST.proms.report.url}"/>
         <constructor-arg name="promsReportingSystemUri" value="${HOST.proms.reportingsystem.uri}"/>
     </bean>
     
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
+    
     <bean name="VGLJobStatusChangeHandler" class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor">
         <constructor-arg name="anvglProvenanceService" ref="ANVGLProvenanceService"/>
     </bean>
@@ -90,12 +104,9 @@
                 <entry key="jobManager" value-ref="veglJobManager"/>
                 <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
                 <entry key="jobUserDao" value-ref="anvglUserDao"/>
+                <entry key="nciDetailsDao" value-ref="nciDetailsDao"/>
             </map>
         </property>
-    </bean>
-    
-    <bean name="vglPollingJobQueueManagerDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="org.auscope.portal.server.vegl.VGLPollingJobQueueManager" />       
     </bean>
 
     <!-- Simple Trigger for vglJobStatusMonitor task, run every 5 minutes -->
@@ -104,22 +115,12 @@
         <property name="repeatInterval" value="300000" />
         <property name="startDelay" value="10000" />
     </bean>
-    
-    <!-- Simple Trigger for vglPollingJobQueueManagerDetail task, run every 30 minutes -->
-    <bean id="quotaExceededTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-        <property name="jobDetail" ref="vglPollingJobQueueManagerDetail" />
-        <property name="repeatInterval" value="1800000" />
-        <property name="startDelay" value="1800000" />
-        <!--property name="repeatInterval" value="300000" />
-        <property name="startDelay" value="300000" /-->
-    </bean>
 
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="taskExecutor" ref="taskExecutor" />
         <property name="triggers">
             <list>
                 <ref bean="simpleTrigger" />
-                <ref bean="quotaExceededTrigger" />
             </list>
         </property>
     </bean>
@@ -151,6 +152,15 @@
             <bean class="org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory"/>
         </constructor-arg>
         <property name="forceGetMethods" value="true"/>
+    </bean>
+    
+    <bean id="cswFilterService" class="org.auscope.portal.core.services.CSWFilterService">
+        <constructor-arg name="executor" ref="taskExecutor"/>
+        <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
+        <constructor-arg name="cswServiceList" ref="cswServiceList"/> <!-- This is pulled from the profile xml -->
+        <constructor-arg name="transformerFactory">
+            <bean class="org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory"/>
+        </constructor-arg>
     </bean>
 
     <bean id="cswKnownLayerService" class="org.auscope.portal.core.services.KnownLayerService">
@@ -200,7 +210,11 @@
         </constructor-arg>
     </bean>
 
-    <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageService">
+    <bean id="encryption-service" class="org.auscope.portal.server.web.service.VGLCryptoService">
+        <constructor-arg name="encryptionPassword" value="${env.encryption.password}"/>
+    </bean>
+    
+    <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
         <constructor-arg name="provider" value="aws-s3"/>
         <constructor-arg name="endpoint"><null/></constructor-arg>
         <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
@@ -210,9 +224,31 @@
         <constructor-arg name="stripExpectHeader" value="true"/>
         <property name="name" value="Amazon Web Services - S3"/>
         <property name="id" value="amazon-aws-storage-sydney"/>
-        <property name="bucket" value="anvgl-csiro-"/>
+        <property name="bucket" value="vgl-csiro-"/>
         <property name="adminEmail" value="${HOST.portalAdminEmail}"/>
-        <property name="requireSts" value="${HOST.aws.stsonly}"/>
+        <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
+    </bean>
+    
+    <bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
+        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+        <constructor-arg name="provider" value="openstack-swift"/>
+        <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
+        <constructor-arg name="regionName" value="Melbourne"/>
+        <constructor-arg name="relaxHostName" value="false"/>
+        <constructor-arg name="stripExpectHeader" value="true"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources"/>
+        <property name="id" value="nectar-openstack-storage-melb"/>
+        <property name="bucket" value="vgl-portal"/>
+        <property name="authVersion" value="2.0"/>
+        <property name="stsRequirement" value="ForceNone"/>
+    </bean>
+    
+    <bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageServiceNci">
+        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
+        <constructor-arg name="provider" value="nci-raijin"/>
+        <property name="name" value="National Computing Infrastructure - Raijin"/>
+        <property name="id" value="nci-raijin-storage"/>
     </bean>
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
@@ -225,7 +261,7 @@
         
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
-        <property name="requireSts" value="${HOST.aws.stsonly}"/>
+        <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
         
         <property name="availableImages">
             <list>
@@ -255,6 +291,23 @@
         </property>
     </bean>
 
+    <bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNectar">
+        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+        <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
+        <property name="id" value="nectar-nova-compute"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources"/>
+        <property name="groupName" value ="vl-#{inetAddress.hostName.toLowerCase()}"/>
+        <property name="keypair" value="vgl-developers"/>
+    </bean>
+    
+    <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNci">
+        <constructor-arg name="storageService" ref="cloudStorageService-nci"/>
+        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
+        <property name="name" value="National Computing Infrastructure - Raijin"/>
+        <property name="id" value="nci-raijin-compute"/>
+    </bean>
+
     <bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">
         <constructor-arg name="stagingInformation">
             <bean class="org.auscope.portal.core.cloud.StagingInformation">
@@ -279,12 +332,17 @@
 
     <bean id="veglJobManager" class="org.auscope.portal.server.vegl.VEGLJobManager">
         <property name="veglJobDao" ref="veglJobDao"/>
+        <property name="vglDownloadDao" ref="vglDownloadDao"/>
         <property name="veglSeriesDao" ref="veglSeriesDao"/>
         <property name="vglJobAuditLogDao" ref="vglJobAuditLogDao"/>
-        <property name="vglSignatureDao" ref="vglSignatureDao"/>
+        <property name="nciDetailsDao" ref="nciDetailsDao"/>        
     </bean>
 
     <bean id="veglJobDao" class="org.auscope.portal.server.vegl.VEGLJobDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
+    </bean>
+
+    <bean id="vglDownloadDao" class="org.auscope.portal.server.vegl.VglDownloadDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
 
@@ -295,15 +353,24 @@
     <bean id="vglJobAuditLogDao" class="org.auscope.portal.server.vegl.VGLJobAuditLogDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
-
-    <bean id="vglSignatureDao" class="org.auscope.portal.server.vegl.VGLSignatureDao">
+    
+    <bean id="VGLBookMarkDao" class="org.auscope.portal.server.vegl.VGLBookMarkDao">
+        <property name="sessionFactory" ref="veglSessionFactory"/>
+    </bean>
+    
+    <bean id="VGLBookMarkDownloadDao" class="org.auscope.portal.server.vegl.VGLBookMarkDownloadDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
     
     <bean id="anvglUserDao" class="org.auscope.portal.server.web.security.ANVGLUserDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
-
+    
+    <bean id="nciDetailsDao" class="org.auscope.portal.server.web.security.NCIDetailsDao">
+        <constructor-arg name="encryptionService" ref="encryption-service"/>
+        <property name="sessionFactory" ref="veglSessionFactory"/>
+    </bean>    
+       
     <bean id="veglSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingResources">
@@ -313,10 +380,12 @@
                 <value>vglparameter.hbm.xml</value>
                 <value>vgljobsauditlog.hbm.xml</value>
                 <value>vgldownload.hbm.xml</value>
-                <value>vglsignature.hbm.xml</value>
                 <value>anvgluser.hbm.xml</value>
                 <value>anvglauthority.hbm.xml</value>
-                <value>scmentrysnapshot.hbm.xml</value>
+                <value>vglbookmark.hbm.xml</value>                
+                <value>vglbookmarkdownload.hbm.xml</value>
+                <value>ncidetails.hbm.xml</value>
+                <value>scmentrysnapshot.hbm.xml</value>                
             </list>
         </property>
         <property name="hibernateProperties">
@@ -328,4 +397,42 @@
      <bean id="vlScmSnapshotDao" class="org.auscope.portal.server.vegl.VLScmSnapshotDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
+    
+        
+    <bean id="cswRegVeglProduction" class="org.auscope.portal.core.services.csw.custom.CustomRegistry">
+        <constructor-arg name="id" value="cswRegVeglProduction" />
+        <constructor-arg name="title" value="SISS ANU Geonetwork" />
+        <constructor-arg name="serviceUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/csw" />
+        <constructor-arg name="recordInformationUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s" />
+    </bean>
+
+    <bean id="NSWERML2_WFSTest" class="org.auscope.portal.core.configuration.ServiceConfigurationItem">
+        <constructor-arg name="id" value="NSWERML2Test"/>
+        <constructor-arg name="url" value="http://aus-test-worker2.arrc.csiro.au:8080/gsnsw-earthresource/wfs"/>
+        <constructor-arg name="paging" type="boolean" value="false"/>      
+        <constructor-arg name="isGml32" type="boolean" value="true"/>        
+    </bean>
+
+    <bean id="service-configuration2" class="org.auscope.portal.core.configuration.ServiceConfiguration">        
+        <constructor-arg name="serviceConfigurationItems">
+            <list>
+               <ref bean="NSWERML2_WFSTest"/>         
+            </list>
+        </constructor-arg>
+    </bean>
+
+     <bean id="service-configuration" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <ref bean="cswRegVeglProduction" />
+            </list>
+        </constructor-arg>
+    </bean>  
+    
+    <bean id="wfsMethodMaker" class="org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker">
+        <property name="namespaces">
+            <bean class="org.auscope.portal.core.services.namespaces.ErmlNamespaceContext"/>
+        </property>
+    </bean>
+    
 </beans>

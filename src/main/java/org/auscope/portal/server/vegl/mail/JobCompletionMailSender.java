@@ -43,7 +43,7 @@ public class JobCompletionMailSender implements JobMailSender {
     private String emailSubject;
 
     private String portalUrl=null;
-    
+
     /**
      * @return the portalUrl
      */
@@ -203,7 +203,7 @@ public class JobCompletionMailSender implements JobMailSender {
 
     /**
      * Constructs job completion notification email content.
-     * @param seriesName 
+     * @param seriesName
      */
     @Override
     public String constructMailContent(String seriesName, VEGLJob job) {
@@ -220,7 +220,7 @@ public class JobCompletionMailSender implements JobMailSender {
         }else{
             processDate=new Date();
         }
-        
+
         // If execution date failed to set revert to submission date
         if(job.getExecuteDate()!=null){
             executeDate=job.getExecuteDate();
@@ -246,7 +246,7 @@ public class JobCompletionMailSender implements JobMailSender {
         model.put("jobExecLogSnippet", TextUtil.tail(jobStatLogReader.getSectionedLog(job, "Python"), maxLinesForTail));
         model.put("emailSender", getEmailSender());
         model.put("portalUrl", getPortalUrl());
-        
+
         return VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, template, model);
     }
 
@@ -258,8 +258,8 @@ public class JobCompletionMailSender implements JobMailSender {
     public void sendMail(VEGLJob job) {
         String jobName = job.getName();
         String seriesName = "";
-        
-        if (job.getSeriesId() != 0) { 
+
+        if (job.getSeriesId() != null && job.getSeriesId() != 0) {
             VEGLSeries jobSeries = jobManager.getSeriesById(job.getSeriesId(), job.getEmailAddress());
             if (jobSeries != null) {
                 seriesName = jobSeries.getName();

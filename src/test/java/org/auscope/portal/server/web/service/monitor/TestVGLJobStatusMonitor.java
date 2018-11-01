@@ -11,6 +11,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUserDao;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
     private VEGLJobManager mockJobManager;
     private JobStatusMonitor mockJobStatusMonitor;
     private ANVGLUserDao mockUserDAO;
+    private NCIDetailsDao mockNciDAO;
     
     @Before
     public void init() {
@@ -36,12 +38,14 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
         mockJobManager = context.mock(VEGLJobManager.class);
         mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
         mockUserDAO = context.mock(ANVGLUserDao.class);
+        mockNciDAO = context.mock(NCIDetailsDao.class);
         
         //Component under test
         monitor = new VGLJobStatusMonitor();
         monitor.setJobManager(mockJobManager);
         monitor.setJobStatusMonitor(mockJobStatusMonitor);
         monitor.setJobUserDao(mockUserDAO);
+        monitor.setNciDetailsDao(mockNciDAO);
     }
     
     /**
@@ -58,10 +62,12 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
         job2.setStatus(JobBuilderController.STATUS_ACTIVE);
         
         final List<VEGLJob> pendingActiveJobs = Arrays.asList(job1, job2);
+        final ANVGLUser user = new ANVGLUser();
         
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getPendingOrActiveJobs();will(returnValue(pendingActiveJobs));
-            allowing(mockUserDAO).getByEmail(null); will(returnValue(new ANVGLUser()));
+            allowing(mockUserDAO).getByEmail(null); will(returnValue(user));
+            allowing(mockNciDAO).getByUser(user); will(returnValue(null));
             oneOf(mockJobStatusMonitor).statusUpdate(pendingActiveJobs);
         }});
         
@@ -82,10 +88,12 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
         job2.setStatus(JobBuilderController.STATUS_ACTIVE);
         
         final List<VEGLJob> pendingActiveJobs = Arrays.asList(job1, job2);
+        final ANVGLUser user = new ANVGLUser();
         
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getPendingOrActiveJobs();will(returnValue(pendingActiveJobs));
-            allowing(mockUserDAO).getByEmail(null); will(returnValue(new ANVGLUser()));
+            allowing(mockJobManager).getPendingOrActiveJobs();will(returnValue(pendingActiveJobs));
+            allowing(mockUserDAO).getByEmail(null); will(returnValue(user));
+            allowing(mockNciDAO).getByUser(user); will(returnValue(null));
             oneOf(mockJobStatusMonitor).statusUpdate(pendingActiveJobs);will(throwException(new JobStatusException(new Exception(), job1)));
         }});
         

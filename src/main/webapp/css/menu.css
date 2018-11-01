@@ -7,9 +7,9 @@
 }
 
 .banner {
-	width:700px;
-	height: 60px;
-	background:url(../img/banner.png) 0 0px no-repeat;
+	width:372px;
+	height: 57px;
+	background:url(../img/img-auscope-banner.gif) 3px 3px/372px 52px no-repeat;
 	cursor: pointer;
 }
 
@@ -25,13 +25,12 @@
     width: 1px;
 }
 
-
 .menu {
 	position:fixed;
 	height:60px; /* trips haslayout, wrap floats IE */
 	top: 0px;
 	list-style:none;
-    right: 0px;
+    right: 30px;
 	font:bold 14px/40px sans-serif;
     float: right;
     
@@ -101,12 +100,100 @@
     padding: 12px 16px;
 }
 
+.sub-menu input {
+    background:none!important;
+    border:none; 
+    padding:12px 16px!important;
+    font:bold 14px/40px sans-serif;
+    cursor: pointer;
+}
+
 .sub-menu a:hover {
 	background-color: #f1f1f1
 }
 
+.sub-menu input:hover {
+    background-color: #f1f1f1
+}
+
 .login-widget:hover .sub-menu {
 	display:block;
+}
+
+.login-widget:hover .sub-menu-image {
+    display:block;
+}
+
+.login-message {
+	border: 1px solid #000000;
+	border-radius: 6px;
+	font: 18px/40px sans-serif;
+    color: black;
+    padding: 0px 12px 16px 12px;
+    position: relative;
+    width: 600px;
+    top: 90px;
+    left: 30px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.google-small-icon {
+    background-image: url("../img/btn_google_signin_light_normal_web.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    height: 26px;
+    width: 110px;
+    position: relative;
+    right: 4px;
+}
+
+.google-small-icon:hover {
+    border: 1px solid #1368ad;
+}
+
+.aaf-small-icon {
+    background-image: url("../img/aaf_service_110x26.png");
+    background-repeat: no-repeat;
+    cursor: pointer;
+    width: 110px;
+    height: 26px;
+    position: relative;
+    right: 4px;
+}
+
+.aaf-small-icon:hover {
+	border: 1px solid #1368ad;
+}
+
+.google-medium-icon {
+    background-image: url("../img/btn_google_signin_light_normal_web2x.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    height: 54px;
+    width: 223px;
+    margin-top: 20px;
+    float: left;
+}
+
+.aaf-medium-icon {
+    background-image: url("../img/aaf_service_223x54.png");
+    cursor: pointer;
+    width: 223px;
+    height: 54px;
+    margin-top: 20px;
+    margin-left: 250px;
+}
+
+.setup-medium-icon {
+    background-image: url("../img/btn_setup_vl.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    height: 54px;
+    width: 223px;
+    margin-top: 20px;
 }
 
 #latlng, #permalinkicon, #permalink {
@@ -130,7 +217,4 @@
 	vertical-align : middle;
 }
 
-#anvgl-footer li img {
-	width : 180px;
-}
 /* !ANVGL-12 updates */

@@ -26,6 +26,10 @@ Ext.define('vegl.preview.LogPreview', {
         this.clearLogs(true);
     },
 
+    _sectionNameToId: function(sectionName) {
+        return 'lp-' + sectionName.replace(/[^a-zA-Z0-9]/g, '_');
+    },
+
     /**
      * Reloads this store with all the jobs for the specified series
      */
@@ -84,7 +88,7 @@ Ext.define('vegl.preview.LogPreview', {
                 for (var sectionName in sections) {
                     components.push({
                         title : sectionName,
-                        itemId : sectionName,
+                        itemId : this._sectionNameToId(sectionName),
                         autoDestroy : true,
                         layout : 'fit',
                         items: [{

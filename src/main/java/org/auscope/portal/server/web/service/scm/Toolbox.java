@@ -2,15 +2,55 @@ package org.auscope.portal.server.web.service.scm;
 
 import java.util.List;
 import java.util.Map;
+
+import org.auscope.portal.core.services.PortalServiceException;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Toolbox extends Entry {
     private Map<String, String> source;
-    private List<Map<String, String>> dependencies;
     private List<Map<String, String>> images;
+    private String puppet;
+    private String puppetHash;
+    private String command;
 
-    /**
+    public Toolbox() { super(); }
+    public Toolbox(String id) { super(id); }
+
+    public String getPuppet() {
+        return this.puppet;
+    }
+
+    public void setPuppet(String puppet) {
+        this.puppet = puppet;
+    }
+
+    @JsonProperty("puppet_hash")
+    public String getPuppetHash() {
+        return this.puppetHash;
+    }
+
+    public void setPuppetHash(String puppetHash) {
+        this.puppetHash = puppetHash;
+    }
+
+	/**
+	 * @return the command
+	 */
+	public String getCommand() {
+		return command;
+	}
+
+	/**
+	 * @param command the command to set
+	 */
+	public void setCommand(String command) {
+		this.command = command;
+	}
+
+	/**
      * @return the source
      */
     public Map<String, String> getSource() {
@@ -22,18 +62,6 @@ public class Toolbox extends Entry {
     public void setSource(Map<String, String> source) {
         this.source = source;
     }
-    /**
-     * @return the dependencies
-     */
-    public List<Map<String, String>> getDependencies() {
-        return dependencies;
-    }
-    /**
-     * @param dependencies the dependencies to set
-     */
-    public void setDependencies(List<Map<String, String>> dependencies) {
-        this.dependencies = dependencies;
-    }
 
     public List<Map<String, String>> getImages() {
         return images;
@@ -41,5 +69,15 @@ public class Toolbox extends Entry {
 
     public void setImages(List<Map<String, String>> images) {
         this.images = images;
+    }
+
+    @Override
+    public void copyMissingProperties(Entry entry) throws PortalServiceException {
+        super.copyMissingProperties(entry);
+        Toolbox that = (Toolbox)entry;
+        if (puppet == null) { setPuppet(that.getPuppet()); }
+        if (puppetHash == null) { setPuppetHash(that.getPuppetHash()); }
+        if (source == null) { setSource(that.getSource()); }
+        if (images == null) { setImages(that.getImages()); }
     }
 }

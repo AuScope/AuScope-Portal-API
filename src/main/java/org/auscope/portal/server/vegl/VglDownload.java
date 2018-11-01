@@ -2,6 +2,8 @@ package org.auscope.portal.server.vegl;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Represents a remote file download step that occurs during a VL job startup
  * @author Josh Vote
@@ -30,6 +32,7 @@ public class VglDownload implements Serializable, Cloneable {
     /** If this download is for a spatial region this will represent the most western bounds of the region in WGS:84*/
     private Double westBoundLongitude;
     /** The job that owns this download*/
+    @JsonIgnore
     private VEGLJob parent;
 
     /** Organisation or person responsible for this data set */

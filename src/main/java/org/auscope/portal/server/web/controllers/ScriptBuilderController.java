@@ -17,18 +17,29 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.cloud.CloudComputeService;
+import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.service.LintResult;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
+import org.auscope.portal.server.web.service.SolutionResponse;
+import org.auscope.portal.server.web.service.TemplateLintService;
+import org.auscope.portal.server.web.service.TemplateLintService.TemplateLanguage;
+import org.auscope.portal.server.web.service.csw.SearchFacet;
+import org.auscope.portal.server.web.service.csw.SearchFacet.Comparison;
 import org.auscope.portal.server.web.service.scm.Problem;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,7 +55,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Richard Goh
  */
 @Controller
-public class ScriptBuilderController extends BaseModelController {
+public class ScriptBuilderController extends BaseCloudController {
 
     private final Log logger = LogFactory.getLog(getClass());
 
@@ -53,6 +64,11 @@ public class ScriptBuilderController extends BaseModelController {
 
     /** Handles SCM entries. */
     private ScmEntryService scmEntryService;
+
+    /** Script checking */
+    private TemplateLintService templateLintService;
+
+    private NCIDetailsDao nciDetailsDao;
 
     /**
      * Creates a new instance
@@ -63,10 +79,18 @@ public class ScriptBuilderController extends BaseModelController {
     @Autowired
     public ScriptBuilderController(ScriptBuilderService sbService,
                                    VEGLJobManager jobManager,
-                                   ScmEntryService scmEntryService) {
-        super(jobManager);
+                                   ScmEntryService scmEntryService,
+                                   TemplateLintService templateLintService,
+                                   CloudStorageService[] cloudStorageServices,
+                                   CloudComputeService[] cloudComputeServices,
+                                   @Value("${vm.sh}") String vmSh,
+                                   @Value("${vm-shutdown.sh}") String vmShutdownSh,
+                                   NCIDetailsDao nciDetailsDao) {
+        super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.sbService = sbService;
         this.scmEntryService = scmEntryService;
+        this.templateLintService = templateLintService;
+        this.nciDetailsDao = nciDetailsDao;
     }
 
     /**
@@ -140,6 +164,32 @@ public class ScriptBuilderController extends BaseModelController {
     }
 
     /**
+     * Gets a JSON list of id/name pairs for every available compute service
+     * that has been properly configured to run with the logged in user
+     *
+     * @return
+     * @throws PortalServiceException
+     */
+    @RequestMapping("/secure/getConfiguredComputeServices.do")
+    public ModelAndView getComputeServices(@AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
+        List<CloudComputeService> configuredServices = getConfiguredComputeServices(user, nciDetailsDao);
+
+        List<ModelMap> parsedItems = new ArrayList<ModelMap>();
+        for (CloudComputeService ccs : configuredServices) {
+            ModelMap mm = new ModelMap();
+            mm.put("providerId", ccs.getId());
+            mm.put("name", ccs.getName());
+            parsedItems.add(mm);
+        }
+        ModelMap mm = new ModelMap();
+        mm.put("providerId", "");
+        mm.put("name", "All Providers");
+        parsedItems.add(mm);
+
+        return generateJSONResponseMAV(true, parsedItems, "");
+    }
+
+    /**
      * Gets a named script template and fills in all named placeholders with the matching key/value pairs
      * @param templateName Script name
      * @param keys Keys to lookup (corresponds 1-1 with values)
@@ -172,8 +222,8 @@ public class ScriptBuilderController extends BaseModelController {
             logger.error("Unable to read template resource - " + templateResource + ":" + e.getMessage());
             logger.debug("Exception:", e);
             return generateJSONResponseMAV(false, null, "Internal server error when loading template.");
-        } 
-        
+        }
+
         String finalTemplate = sbService.populateTemplate(templateString,
                 kvpMapping);
         return generateJSONResponseMAV(true, finalTemplate, "");
@@ -181,29 +231,102 @@ public class ScriptBuilderController extends BaseModelController {
 
     /**
      * Return a JSON list of problems and their solutions.
+     * @throws PortalServiceException
      */
-    @RequestMapping("/getProblems.do")
-    public ModelAndView getProblems() {
+    @RequestMapping("/secure/getProblems.do")
+    public ModelAndView getProblems(@AuthenticationPrincipal ANVGLUser user,
+            @RequestParam(value="field", required=false) String[] rawFields,
+            @RequestParam(value="value", required=false) String[] rawValues,
+            @RequestParam(value="type", required=false) String[] rawTypes,
+            @RequestParam(value="comparison", required=false) String[] rawComparisons) throws PortalServiceException {
+
+        if (rawFields == null) {
+            rawFields = new String[0];
+        }
+
+        if (rawValues == null) {
+            rawValues = new String[0];
+        }
+
+        if (rawTypes == null) {
+            rawTypes = new String[0];
+        }
+
+        if (rawComparisons == null) {
+            rawComparisons = new String[0];
+        }
+
+        if (rawFields.length != rawValues.length || rawFields.length != rawTypes.length || rawFields.length != rawComparisons.length) {
+            throw new IllegalArgumentException("field/value/type/comparison lengths mismatch");
+        }
+
+        //Parse our raw request info into a list of search facets
+        List<SearchFacet<? extends Object>> facets = new ArrayList<SearchFacet<? extends Object>>();
+        for (int i = 0; i < rawFields.length; i++) {
+            Comparison cmp = null;
+            switch(rawComparisons[i]) {
+            case "gt":
+                cmp = Comparison.GreaterThan;
+                break;
+            case "lt":
+                cmp = Comparison.LessThan;
+                break;
+            case "eq":
+                cmp = Comparison.Equal;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown comparison type: " + rawComparisons[i]);
+            }
+
+            SearchFacet<? extends Object> newFacet = null;
+            switch(rawTypes[i]) {
+            case "string":
+                newFacet = new SearchFacet<String>(rawValues[i], rawFields[i], cmp);
+                break;
+            }
+
+            facets.add(newFacet);
+        }
+
+
         // Get the Solutions from the SSC
-        List<Solution> solutions = scmEntryService.getSolutions();
+        List<CloudComputeService> configuredServices = getConfiguredComputeServices(user, nciDetailsDao);
+        SolutionResponse solutions = scmEntryService.getSolutions(facets, configuredServices.toArray(new CloudComputeService[configuredServices.size()]));
 
         // Group solutions by the problem that they solve.
-        HashMap<String, Problem> problems = new HashMap<>();
+        HashMap<String, Problem> configuredProblems = new HashMap<>();
+        HashMap<String, Problem> unconfiguredProblems = new HashMap<>();
 
-        for (Solution solution: solutions) {
+        for (Solution solution: solutions.getConfiguredSolutions()) {
             String problemId = solution.getProblem().getId();
-            Problem problem = problems.get(problemId);
+            Problem problem = configuredProblems.get(problemId);
 
             if (problem == null) {
                 problem = solution.getProblem();
                 problem.setSolutions(new ArrayList<Solution>());
-                problems.put(problem.getId(), problem);
+                configuredProblems.put(problem.getId(), problem);
             }
             problem.getSolutions().add(solution);
         }
 
+        for (Solution solution: solutions.getUnconfiguredSolutions()) {
+            String problemId = solution.getProblem().getId();
+            Problem problem = unconfiguredProblems.get(problemId);
+
+            if (problem == null) {
+                problem = solution.getProblem();
+                problem.setSolutions(new ArrayList<Solution>());
+                unconfiguredProblems.put(problem.getId(), problem);
+            }
+            problem.getSolutions().add(solution);
+        }
+
+        ModelMap result = new ModelMap();
+        result.put("configuredProblems", configuredProblems.values());
+        result.put("unconfiguredProblems", unconfiguredProblems.values());
+
         // Return the result
-        return generateJSONResponseMAV(true, problems.values(), "");
+        return generateJSONResponseMAV(true, result, "");
     }
 
     /**
@@ -244,6 +367,58 @@ public class ScriptBuilderController extends BaseModelController {
         }
 
         return generateJSONResponseMAV(true, solutions, msg.toString());
+    }
+
+    /**
+     * Return a list of errors/warnings about a template.
+     *
+     * Passes the template string to pylint and turns the results into a list of
+     * error objects. Each entry contains a severity (error, warning etc),
+     * message string and the location in the code (from, to).
+     *
+     * The template language must be one of the following values:
+     * - python3
+     * - python2
+     *
+     * @param template String with template code
+     * @param lang String identifying template language (default=python3)
+     * @return List<LintResult> lint result objects
+     */
+    @RequestMapping("/lintTemplate.do")
+    public ModelAndView doLintTemplate(@RequestParam("template") String template,
+                                       @RequestParam(value="lang",
+                                                     required=false) String lang) {
+        TemplateLanguage templateLanguage = null;
+        String msg = "No errors or warnings found.";
+        List<LintResult> lints = null;
+
+        // Make sure it's a supported language
+        if (lang == null) {
+            templateLanguage = TemplateLanguage.PYTHON3;
+        }
+        else {
+            try {
+                templateLanguage = TemplateLanguage.valueOf(lang.toUpperCase());
+            }
+            catch (IllegalArgumentException ex) {
+                logger.error("Invalid template language for template linting", ex);
+                return generateJSONResponseMAV(false, null, "Unable to check unsupported template language.");
+            }
+        }
+
+        // Get the linter to do its thing
+        try {
+            lints = templateLintService.checkTemplate(template, templateLanguage);
+            if (lints != null && lints.size() > 0) {
+                msg = String.format("Found {} issues", lints.size());
+            }
+        }
+        catch (PortalServiceException ex) {
+            logger.warn("Template code check failed: " + ex.getMessage(), ex);
+            return generateJSONResponseMAV(false, null, "Template code check failed: " + ex.getMessage());
+        }
+
+        return generateJSONResponseMAV(true, lints, msg);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

@@ -5,10 +5,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auscope.portal.core.view.JSONView;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 /**
  * Interceptor for handling user session expiry. Please refer to
@@ -37,7 +37,7 @@ public class UserSessionInterceptor extends HandlerInterceptorAdapter {
             model.put("success", false);
             model.put("msg", "Your session has timed out or login credentails are no longer valid.");
             model.put("debugInfo", "Please refresh this page or go to <a href='/VGL-Portal'>VGL Home Page</a> to start again.");
-            JSONView view = new JSONView();
+            MappingJackson2JsonView view = new MappingJackson2JsonView();
             view.render(model, request, response);
             return false;
         }

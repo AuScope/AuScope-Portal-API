@@ -48,14 +48,39 @@ Ext.define('vegl.widgets.JobsTree', {
             scope : this,
             disabled : true,
             handler: function() {
-                var selection = this.getSelectionModel().getSelection();
-                if (selection.length > 0) {
-                    if (selection[0].get('leaf')) {
-                        this.deleteJob(selection[0]);
-                    } else {
-                        this.deleteSeries(selection[0]);
-                    }
-                }
+            	var selection = this.getSelectionModel().getSelection();
+            	if(selection.length > 0) {
+	                var confirmationTitle = 'Delete Jobs';
+	                var confirmationMessage = 'Are you sure you want to delete all selected jobs and folders?';
+	                if (selection.length === 1) {
+	                    if (selection[0].get('leaf')) {
+	                    	confirmationTitle = 'Delete Job';
+	                    	confirmationMessage = Ext.util.Format.format('Are you sure you want to delete the job <b>{0}</b>?', selection[0].get('name'));
+	                    } else {
+	                    	confirmationTitle = 'Delete Series';
+	                    	confirmationMessage = Ext.util.Format.format('Are you sure you want to delete the folder <b>{0}</b> and its jobs?<br><ul>', selection[0].get('name'));
+	                    }
+	                }
+	                Ext.Msg.show({
+	                    title: confirmationTitle,
+	                    msg: confirmationMessage,
+	                    buttons: Ext.Msg.YESNO,
+	                    icon: Ext.Msg.WARNING,
+	                    modal: true,
+	                    closable: false,
+	                    scope : this,
+	                    fn: function(btn) {
+	                        if (btn == 'yes') {
+	                        	for(i=0; i<selection.length; i++) {
+	        	                	if (selection[i].get('leaf'))
+	        	                    	this.deleteJob(selection[i]);
+	        	                    else
+	        	                    	this.deleteSeries(selection[i]);
+	        	                }
+	                        }
+	                    }
+	                });
+            	}
             }
         });
 
@@ -108,6 +133,26 @@ Ext.define('vegl.widgets.JobsTree', {
             }
         });
 
+        this.statusJobAction = new Ext.Action({
+            text: 'Status',
+            iconCls: 'status-icon',
+            scope : this,
+            disabled : true,
+            handler: function() {
+                var selection = this.getSelectionModel().getSelection();
+                if (selection.length > 0) {
+                    var popup = Ext.create('vegl.widgets.JobStatusWindow', {
+                        job: selection[0],
+                        modal: true,
+                        width: 700,
+                        height: 400
+                    });
+
+                    popup.show();
+                }
+            }
+        });
+
         Ext.apply(config, {
             rootVisible: false,
             store : Ext.create('Ext.data.TreeStore', {
@@ -119,7 +164,7 @@ Ext.define('vegl.widgets.JobsTree', {
                             if (!value) {
                                 return null;
                             } else {
-                                return new Date(value.time);
+                                return new Date(value);
                             }
                 }}],
                 sorters: [{
@@ -180,7 +225,10 @@ Ext.define('vegl.widgets.JobsTree', {
                     tooltip: 'Actions for this job / folder.',
                     scope: this,
                     handler: function(grid, rowIndex, colIndex, item, e, node, row) {
-                        grid.getSelectionModel().select(node);
+                    	// If more than 1 selection has been made, show menu without selecting row
+                    	if(grid.getSelectionModel().getCount()<2) {
+                    		grid.getSelectionModel().select(node);
+                    	}
 
                         var items = [this.deleteJobAction];
                         if (!this.submitJobAction.isDisabled()) {
@@ -193,6 +241,10 @@ Ext.define('vegl.widgets.JobsTree', {
 
                         if (!this.duplicateJobAction.isDisabled()) {
                             items.push(this.duplicateJobAction);
+                        }
+
+                        if (!this.statusJobAction.isDisabled()) {
+                            items.push(this.statusJobAction);
                         }
 
                         Ext.create('Ext.menu.Menu', {
@@ -228,12 +280,22 @@ Ext.define('vegl.widgets.JobsTree', {
             this.duplicateJobAction.setDisabled(true);
             this.submitJobAction.setDisabled(true);
             this.editJobAction.setDisabled(true);
+            this.statusJobAction.setDisabled(true);
+        } else if(selections.length > 1) {
+        	// Currently only allow deletion of multiple jobs if none are active
+        	this.cancelJobAction.setDisabled(true);
+            this.deleteJobAction.setDisabled(false);
+            this.duplicateJobAction.setDisabled(true);
+            this.submitJobAction.setDisabled(true);
+            this.editJobAction.setDisabled(true);
+            this.statusJobAction.setDisabled(true);
         } else if (!Ext.isNumber(Number(selections[0].get('id')))) {
             this.cancelJobAction.setDisabled(true);
             this.deleteJobAction.setDisabled(false);
             this.duplicateJobAction.setDisabled(true);
             this.submitJobAction.setDisabled(true);
             this.editJobAction.setDisabled(true);
+            this.statusJobAction.setDisabled(true);
         } else {
             // Change the job available options based on its actual status
             switch(selections[0].get('status')) {
@@ -243,6 +305,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
+                    this.statusJobAction.setDisabled(false);
                     break;
                 case vegl.models.Job.STATUS_UNSUBMITTED:
                     this.cancelJobAction.setDisabled(true);
@@ -250,6 +313,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     this.duplicateJobAction.setDisabled(true);
                     this.submitJobAction.setDisabled(false);
                     this.editJobAction.setDisabled(false);
+                    this.statusJobAction.setDisabled(true);
                     break;
                 case vegl.models.Job.STATUS_ERROR:
                 case vegl.models.Job.STATUS_WALLTIME_EXCEEDED:
@@ -259,6 +323,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
+                    this.statusJobAction.setDisabled(false);
                     break;
                 default:
                     // Job status is STATUS_PENDING
@@ -267,6 +332,7 @@ Ext.define('vegl.widgets.JobsTree', {
                     this.duplicateJobAction.setDisabled(false);
                     this.submitJobAction.setDisabled(true);
                     this.editJobAction.setDisabled(true);
+                    this.statusJobAction.setDisabled(false);
                     break;
             }
         }
@@ -339,104 +405,54 @@ Ext.define('vegl.widgets.JobsTree', {
     },
 
     deleteSeries : function(series) {
-        var seriesName = series.get('name');
-        var childrenNames = series.childNodes.map(function(childNode) {
-            return childNode.get('name');
-        });
+        Ext.getBody().mask('Deleting Folder...');
 
-        var message = Ext.util.Format.format('Are you sure you want to delete the folder <b>{0}</b> and its jobs?<br><ul>', seriesName);
-        Ext.each(childrenNames, function(name) {
-            message += Ext.util.Format.format('<li><i>{0}</i></li>', name);
-        });
-        message += '</ul>';
-
-        Ext.Msg.show({
-            title: 'Delete Folder',
-            msg: message,
-            buttons: Ext.Msg.YESNO,
-            icon: Ext.Msg.WARNING,
-            modal: true,
-            closable: false,
+        portal.util.Ajax.request({
+            url: 'secure/deleteSeriesJobs.do',
+            params: { 'seriesId': series.get('seriesId')},
+            timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
             scope : this,
-            fn: function(btn) {
-                if (btn == 'yes') {
-                    Ext.getBody().mask('Deleting Folder...');
+            callback : function(success, data, message, debugInfo) {
+                Ext.getBody().unmask();
 
-                    Ext.Ajax.request({
-                        url: 'secure/deleteSeriesJobs.do',
-                        params: { 'seriesId': series.get('seriesId')},
-                        timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
-                        scope : this,
-                        callback : function(options, success, response) {
-                            Ext.getBody().unmask();
-
-                            if (!success) {
-                                this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
-                                return;
-                            }
-
-                            var responseObj = Ext.JSON.decode(response.responseText);
-                            if (!responseObj.success) {
-                                this.fireEvent('error', this, Ext.util.Format.format('There was an error deleting this series. {0}', responseObj.msg));
-                                return;
-                            }
-
-                            Ext.each(series.childNodes, function(jobNode) {
-                                this.jobStore.remove(this.jobStore.getById(jobNode.get('id')));
-                                this.getStore().remove(jobNode);
-                            }, this);
-
-                            this.getStore().remove(series);
-                            this.fireEvent('refreshDetailsPanel', this, null);
-                        }
-                    });
+                if (!success) {
+                    this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
+                    return;
                 }
+
+                Ext.each(series.childNodes, function(jobNode) {
+                    this.jobStore.remove(this.jobStore.getById(jobNode.get('id')));
+                    this.getStore().remove(jobNode);
+                }, this);
+
+                this.getStore().remove(series);
+                this.fireEvent('refreshDetailsPanel', this, null);
             }
         });
     },
 
     deleteJob : function(job) {
-        Ext.Msg.show({
-            title: 'Delete Job',
-            msg: Ext.util.Format.format('Are you sure you want to delete the job <b>{0}</b>?', job.get('name')),
-            buttons: Ext.Msg.YESNO,
-            icon: Ext.Msg.WARNING,
-            modal: true,
-            closable: false,
+    	Ext.getBody().mask('Deleting Job...');
+
+    	portal.util.Ajax.request({
+            url: 'secure/deleteJob.do',
+            params: { 'jobId': job.get('id')},
+            timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
             scope : this,
-            fn: function(btn) {
-                if (btn == 'yes') {
+            callback : function(success, data, message, debugInfo) {
+                Ext.getBody().unmask();
 
-                    Ext.getBody().mask('Deleting Job...');
-
-                    Ext.Ajax.request({
-                        url: 'secure/deleteJob.do',
-                        params: { 'jobId': job.get('id')},
-                        timeout : 1000 * 60 * 5, //5 minutes defined in milli-seconds
-                        scope : this,
-                        callback : function(options, success, response) {
-                            Ext.getBody().unmask();
-
-                            if (!success) {
-                                this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
-                                return;
-                            }
-
-                            var responseObj = Ext.JSON.decode(response.responseText);
-                            if (!responseObj.success) {
-                                this.fireEvent('error', this, Ext.util.Format.format('There was an error deleting this job. {0}', responseObj.msg));
-                                return;
-                            }
-
-                            this.jobStore.remove(this.jobStore.getById(job.get('id')));
-                            this.getStore().remove(job);
-
-                            //refresh Details panel
-                            job.set('status', vegl.models.Job.STATUS_DELETED);
-                            this.fireEvent('refreshDetailsPanel', this, job);
-                        }
-                    });
+                if (!success) {
+                    this.fireEvent('error', this, 'There was an error communicating with the VL server. Please try again later.');
+                    return;
                 }
+
+                this.jobStore.remove(this.jobStore.getById(job.get('id')));
+                this.getStore().remove(job);
+
+                //refresh Details panel
+                job.set('status', vegl.models.Job.STATUS_DELETED);
+                this.fireEvent('refreshDetailsPanel', this, job);
             }
         });
     },
@@ -498,9 +514,9 @@ Ext.define('vegl.widgets.JobsTree', {
                     userAction : 'edit'
                 },
                 forms : [
-                         'vegl.jobwizard.forms.JobObjectForm',
                          'vegl.jobwizard.forms.JobUploadForm',
                          'vegl.jobwizard.forms.ScriptBuilderForm',
+                         'vegl.jobwizard.forms.JobObjectForm',
                          'vegl.jobwizard.forms.JobSubmitForm'
                  ]
             }]

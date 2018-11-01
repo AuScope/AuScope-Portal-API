@@ -66,7 +66,9 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
 
         this.editor = Ext.create('vegl.widgets.CodeEditorField',{
             mode      : 'python',
-            name      : 'scriptcodefield'
+            name      : 'scriptcodefield',
+            readOnly  : true,
+            lint      : { getAnnotations: lintPython, delay: 2000 }
         });
 
         var editorPanel =  Ext.create('Ext.form.FormPanel', {
@@ -79,10 +81,54 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
         this.componentsPanel = Ext.create('ScriptBuilder.ComponentTreePanel', {
             region : 'west',
             title : 'Available Templates',
+            plugins: [{
+                ptype:'headericons',
+                icons: [{
+                    location: 'text',
+                    tip: 'Click to filter the available templates.',
+                    src: 'img/filter.png',
+                    style: 'cursor: pointer;',
+                    width: 22,
+                    height: 22,
+                    handler: Ext.bind(function() {
+                        if (this.filterWindow) {
+                            if (this.filterWindow.isHidden()) {
+                                this.filterWindow.show();
+                            } else {
+                                this.filterWindow.hide();
+                            }
+                        }
+                    }, this)
+                }]
+            }],
             itemId : 'sb-templates-panel',
             width : 250,
             listeners : {
-                addcomponent : Ext.bind(this.onAddComponent, this)
+                scope: this,
+                addcomponent : this.onAddComponent,
+                afterrender: function(cmpPanel) {
+                    this.filterWindow = Ext.create('Ext.window.Window', {
+                        title: 'Filters',
+                        closeAction: 'hide',
+                        alignTarget: cmpPanel.getHeader(),
+                        draggable: false,
+                        defaultAlign: 'tl-tr',
+                        width: 300,
+                        height: 190,
+                        animateTarget: cmpPanel.getHeader(),
+                        layout: 'fit',
+                        items: [{
+                            xtype: 'facetedfilterpanel',
+                            listeners: {
+                                scope: this,
+                                change: function(filterPanel) {
+                                    this.filterFacets = filterPanel.extractSearchFacets();
+                                    this.buildComponentsPanel();
+                                }
+                            }
+                        }]
+                    });
+                }
             }
         });
 
@@ -141,6 +187,7 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
 
             //Once we have the script text - ask the user what they want to do with it
             if (status === ScriptBuilder.templates.BaseTemplate.TEMPLATE_RESULT_SUCCESS) {
+                me.editor.setReadOnly(false);
                 //If there's nothing in the window - just put text in there and
                 //reset solution set to the single solution.
                 if (me.getScript().length === 0) {
@@ -195,7 +242,8 @@ Ext.define('ScriptBuilder.ScriptBuilder', {
             function() {
                 // If a solution is currently active, select it
                 self.selectSolution();
-            });
+            },
+            this.filterFacets);
     },
 
 

@@ -6,7 +6,10 @@ import java.util.List;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetails;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 
 /**
  * Class that talks to the data objects to retrieve or save data
@@ -19,20 +22,24 @@ public class VEGLJobManager {
     protected final Log logger = LogFactory.getLog(getClass());
 
     private VEGLJobDao veglJobDao;
+    private VglDownloadDao vglDownloadDao;
     private VEGLSeriesDao veglSeriesDao;
     private VGLJobAuditLogDao vglJobAuditLogDao;
-    private VGLSignatureDao vglSignatureDao;
+    private NCIDetailsDao nciDetailsDao;
 
     public List<VEGLSeries> querySeries(String user, String name, String desc) {
         return veglSeriesDao.query(user, name, desc);
     }
 
-    public List<VEGLJob> getSeriesJobs(int seriesId, ANVGLUser user) {
-        return veglJobDao.getJobsOfSeries(seriesId, user);
+    public List<VEGLJob> getSeriesJobs(int seriesId, ANVGLUser user) throws PortalServiceException {
+        List<VEGLJob> jobs = veglJobDao.getJobsOfSeries(seriesId, user);
+        return applyNCIDetails(jobs, user);
     }
 
-    public List<VEGLJob> getUserJobs(ANVGLUser user) {
-        return veglJobDao.getJobsOfUser(user);
+    public List<VEGLJob> getUserJobs(ANVGLUser user) throws PortalServiceException {
+
+        List<VEGLJob> jobs = veglJobDao.getJobsOfUser(user);
+        return applyNCIDetails(jobs, user);
     }
 
     public List<VEGLJob> getPendingOrActiveJobs() {
@@ -43,12 +50,12 @@ public class VEGLJobManager {
         return veglJobDao.getInQueueJobs();
     }
 
-    public VEGLJob getJobById(int jobId, ANVGLUser user) {
-        return veglJobDao.get(jobId, user);
+    public VEGLJob getJobById(int jobId, ANVGLUser user) throws PortalServiceException {
+        return applyNCIDetails(veglJobDao.get(jobId, user), user);
     }
 
-    public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role, String userEmail) {
-        return veglJobDao.get(jobId, stsArn, clientSecret, s3Role, userEmail);
+    public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role, String userEmail, String nciUser, String nciProj, String nciKey) {
+        return veglJobDao.get(jobId, stsArn, clientSecret, s3Role, userEmail, nciUser, nciProj, nciKey);
     }
 
     public void deleteJob(VEGLJob job) {
@@ -57,10 +64,6 @@ public class VEGLJobManager {
 
     public VEGLSeries getSeriesById(int seriesId, String userEmail) {
         return veglSeriesDao.get(seriesId, userEmail);
-    }
-
-    public VGLSignature getSignatureByUser(String user) {
-        return vglSignatureDao.getSignatureOfUser(user);
     }
 
     public void saveJob(VEGLJob veglJob) {
@@ -99,7 +102,7 @@ public class VEGLJobManager {
      * @param curJob
      * @param message
      */
-    public void createJobAuditTrail(String oldJobStatus, VEGLJob curJob, Exception exception) {
+    public void createJobAuditTrail(String oldJobStatus, VEGLJob curJob, Throwable exception) {
         String message = ExceptionUtils.getStackTrace(exception);
         if(message.length() > 1000){
             message = message.substring(0,1000);
@@ -129,10 +132,6 @@ public class VEGLJobManager {
         veglSeriesDao.save(series);
     }
 
-    public void saveSignature(VGLSignature vglSignature) {
-        vglSignatureDao.save(vglSignature);
-    }
-
     public void setVeglJobDao(VEGLJobDao veglJobDao) {
         this.veglJobDao = veglJobDao;
     }
@@ -145,8 +144,84 @@ public class VEGLJobManager {
         this.vglJobAuditLogDao = vglJobAuditLogDao;
     }
 
-    public void setVglSignatureDao(VGLSignatureDao vglSignatureDao) {
-        this.vglSignatureDao = vglSignatureDao;
+    public NCIDetailsDao getNciDetailsDao() {
+        return nciDetailsDao;
     }
+
+    public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
+        this.nciDetailsDao = nciDetailsDao;
+    }
+    
+    /**
+     * Delete specified JobDownload objects associated with this VEGLJob. 
+     * 
+     * NB this does *not* save the job, you still need to call 
+     * VEGLJobManager.saveJob() on job after this.
+     * 
+     * @param job VEGLJob whose downloads to delete
+     * @param downloads List<VglDownload> of downloads to delete
+     */
+    public void deleteJobDownloads(VEGLJob job, List<VglDownload> downloads) {
+    	if (job != null && downloads != null) {
+    		int jobId = job.getId();
+    		for (VglDownload download: downloads) {
+    			if (download.getParent().getId() == jobId) {
+    				vglDownloadDao.deleteDownload(download);
+    			}
+    		}
+    	}
+    }
+    
+    /**
+     * Delete all downloads associated with job.
+     * 
+     * NB this does *not* save the job, you still need to call 
+     * VEGLJobManager.saveJob() on job after this.
+     * 
+     * @param job VEGLJob whose downloads will be deleted.
+     */
+    public void deleteJobDownloads(VEGLJob job) {    	
+    	this.deleteJobDownloads(job, job.getJobDownloads());
+    }
+
+    private VEGLJob applyNCIDetails(VEGLJob job, NCIDetails nciDetails) {
+        if (nciDetails != null) {
+            try {
+                nciDetails.applyToJobProperties(job);
+            } catch (Exception e) {
+                logger.error("Unable to apply nci details to job:", e);
+                throw new RuntimeException("Unable to decrypt NCI Details", e);
+            }
+        }
+
+        return job;
+    }
+
+    private VEGLJob applyNCIDetails(VEGLJob job, ANVGLUser user) throws PortalServiceException {
+        if (job == null) {
+            return null;
+        }
+        return applyNCIDetails(job, nciDetailsDao.getByUser(user));
+    }
+
+    private List<VEGLJob> applyNCIDetails(List<VEGLJob> jobs, ANVGLUser user) throws PortalServiceException {
+        NCIDetails nciDetails = nciDetailsDao.getByUser(user);
+
+        if (nciDetails != null) {
+            for (VEGLJob job: jobs) {
+                applyNCIDetails(job, nciDetails);
+            }
+        }
+
+        return jobs;
+    }
+
+	public VglDownloadDao getVglDownloadDao() {
+		return vglDownloadDao;
+	}
+
+	public void setVglDownloadDao(VglDownloadDao vglDownloadDao) {
+		this.vglDownloadDao = vglDownloadDao;
+	}   
 
 }

@@ -5,7 +5,7 @@
 <!-- Credits for icons from http://www.fatcow.com/free-icons/ under http://creativecommons.org/licenses/by/3.0/us/-->
 <html xmlns:v="urn:schemas-microsoft-com:vml">
    <head>
-      <title>ANVGL Portal</title>
+      <title>VGL Portal</title>
       <script type="text/javascript">
          var WEB_CONTEXT = '<%= request.getContextPath() %>';
          var NEW_SESSION = "${isNewSession}";
@@ -48,7 +48,9 @@
       <jsp:include page="../../cssimports.htm"/>
 
       <script src="js/vegl/models/ANVGLUser.js" type="text/javascript"></script>
+      <script src="js/vegl/models/NCIDetails.js" type="text/javascript"></script>
       <script src="js/vegl/widgets/ANVGLUserPanel.js" type="text/javascript"></script>
+      <script src="js/vegl/widgets/NCIDetailsPanel.js" type="text/javascript"></script>
       <script src="js/vegl/widgets/CloudFormationTemplateWindow.js" type="text/javascript"></script>
       <script src="js/vegl/widgets/TermsConditionsWindow.js" type="text/javascript"></script>
       <script src="js/vegl/User-UI.js" type="text/javascript"></script>

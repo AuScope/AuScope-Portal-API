@@ -42,16 +42,17 @@ import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.vegl.VGLJobAuditLog;
+import org.auscope.portal.server.vegl.VGLJobAuditLogDao;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
-import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
-import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -85,7 +86,8 @@ public class JobListController extends BaseCloudController  {
     private VGLJobStatusAndLogReader jobStatusLogReader;
     private JobStatusMonitor jobStatusMonitor;
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
-    private VGLPollingJobQueueManager vglPollingJobQueueManager;
+    private CloudSubmissionService cloudSubmissionService;
+    private VGLJobAuditLogDao vglAuditLogDao;
 
     private String adminEmail=null;
 
@@ -109,37 +111,17 @@ public class JobListController extends BaseCloudController  {
             VGLJobStatusAndLogReader jobStatusLogReader,
             JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
-            VGLPollingJobQueueManager vglPollingJobQueueManager,
-            @Value("${HOST.portalAdminEmail}") String adminEmail) {
+            @Value("${HOST.portalAdminEmail}") String adminEmail,
+            CloudSubmissionService cloudSubmissionService,
+            VGLJobAuditLogDao vglAuditLogDao) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
         this.jobStatusLogReader = jobStatusLogReader;
         this.jobStatusMonitor = jobStatusMonitor;
-        this.vglPollingJobQueueManager =  vglPollingJobQueueManager;
         this.adminEmail=adminEmail;
-        this.initializeQueue();
-    }
-
-    protected void initializeQueue() {
-        try{
-
-            if(vglPollingJobQueueManager.getQueue().hasJob()){
-                //a fail safe catch all
-                return;
-            }
-            List<VEGLJob> seriesJobs = jobManager.getInQueueJobs();
-            for(VEGLJob curJob:seriesJobs){
-                CloudComputeService cloudComputeService = getComputeService(curJob);
-                String userDataString = null;
-                userDataString = createBootstrapForJob(curJob);
-                vglPollingJobQueueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
-            }
-        }catch(Exception e){
-            logger.error("Error initializing job queue",e);
-            e.printStackTrace();
-        }
-
+        this.cloudSubmissionService = cloudSubmissionService;
+        this.vglAuditLogDao = vglAuditLogDao;
     }
 
 //    /**
@@ -211,12 +193,13 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a success attribute and an error attribute
      *         in case the series was not found in the job manager.
+     * @throws PortalServiceException
      */
     @RequestMapping("/secure/deleteSeriesJobs.do")
     public ModelAndView deleteSeriesJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
 
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
@@ -333,8 +316,7 @@ public class JobListController extends BaseCloudController  {
                 oldJobStatus.equals(JobBuilderController.STATUS_UNSUBMITTED)) {
             logger.debug("Skipping finished or unsubmitted job "+job.getId());
         }else if(oldJobStatus.equals(JobBuilderController.STATUS_INQUEUE)){
-            VGLQueueJob dummyQueueJobForRemoval = new VGLQueueJob(null,null,job,"",null);
-            vglPollingJobQueueManager.getQueue().remove(dummyQueueJobForRemoval);
+            cloudSubmissionService.dequeueSubmission(job, getComputeService(job));
 
             if (includeAuditTrail) {
                 job.setStatus(JobBuilderController.STATUS_UNSUBMITTED);
@@ -370,12 +352,13 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a success attribute and an error attribute
      *         in case the series was not found in the job manager.
+     * @throws PortalServiceException
      */
     @RequestMapping("/secure/killSeriesJobs.do")
     public ModelAndView killSeriesJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
 
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
@@ -460,7 +443,6 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @AuthenticationPrincipal ANVGLUser user) {
-        logger.info("Getting job files for job ID " + jobId);
 
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -471,14 +453,13 @@ public class JobListController extends BaseCloudController  {
         try {
             CloudStorageService cloudStorageService = getStorageService(job);
             if (cloudStorageService == null) {
-                logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud files cannot be listed", job.getStorageServiceId(), job.getId()));
-                return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+                return generateJSONResponseMAV(true, new CloudFileInformation[0], "No cloud storage service found for job");
             } else {
                 fileDetails = cloudStorageService.listJobFiles(job);
-                logger.info(fileDetails.length + " job files located");
             }
         } catch (Exception e) {
-            logger.warn("Error fetching output directory information.", e);
+            logger.warn("Error fetching output directory information."+e.getMessage());
+            logger.debug("Exception details:",e);
             return generateJSONResponseMAV(false, null, "Error fetching output directory information");
         }
 
@@ -693,13 +674,14 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VEGLJob</code> objects.
+     * @throws PortalServiceException
      */
     @RequestMapping("/secure/listJobs.do")
     public ModelAndView listJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
@@ -741,40 +723,43 @@ public class JobListController extends BaseCloudController  {
      */
     @RequestMapping("/secure/setJobFolder.do")
     public ModelAndView setJobFolder(HttpServletRequest request,
-            @RequestParam("jobId") Integer jobId,
+            @RequestParam("jobIds") Integer[] jobIds,
             @RequestParam(required=false, value="seriesId") Integer seriesId,
             @AuthenticationPrincipal ANVGLUser user) {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
 
-        VEGLJob job = attemptGetJob(jobId, user);
-        if (job == null) {
-            return generateJSONResponseMAV(false);
-        }
-
-        //We allow a null series ID
-        if (seriesId != null) {
-            VEGLSeries series = jobManager.getSeriesById(seriesId, user.getEmail());
-            if (!series.getUser().equals(user.getEmail())) {
+        for(Integer jobId : jobIds) {
+            VEGLJob job = attemptGetJob(jobId, user);
+            if (job == null) {
                 return generateJSONResponseMAV(false);
             }
-        }
 
-        job.setSeriesId(seriesId);
-        jobManager.saveJob(job);
+            //We allow a null series ID
+            if (seriesId != null) {
+                VEGLSeries series = jobManager.getSeriesById(seriesId, user.getEmail());
+                if (!series.getUser().equals(user.getEmail())) {
+                    return generateJSONResponseMAV(false);
+                }
+            }
+
+            job.setSeriesId(seriesId);
+            jobManager.saveJob(job);
+        }
         return generateJSONResponseMAV(true);
     }
 
     /**
      * Returns a JSON array of jobStatus and jobId tuples
+     * @throws PortalServiceException
      *
      */
     @RequestMapping("/secure/jobsStatuses.do")
     public ModelAndView jobStatuses(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -814,13 +799,14 @@ public class JobListController extends BaseCloudController  {
      *
      * @return A JSON object with a jobs attribute which is an array of
      *         <code>VEGLJob</code> objects.
+     * @throws PortalServiceException
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/secure/treeJobs.do")
     public ModelAndView treeJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
 
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -1040,7 +1026,7 @@ public class JobListController extends BaseCloudController  {
                          OutputStream os = fileStagingService.writeFile(newJob, cloudFile.getName())) {
 
                         FileIOUtil.writeInputToOutputStream(is, os, 1024 * 1024, false);
-                    } 
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -1085,6 +1071,39 @@ public class JobListController extends BaseCloudController  {
         }
 
         return generateJSONResponseMAV(true, Arrays.asList(namedSections), "");
+    }
+
+    /**
+     * Gets a raw dump of the instance logs (as reported by the cloud) for a particular job. This request
+     * will fail if the instance has been terminated.
+     *
+     *
+     * @param jobId
+     * @return
+     */
+    @RequestMapping("/secure/getRawInstanceLogs.do")
+    public ModelAndView getRawInstanceLogs(HttpServletRequest request,
+            @RequestParam("jobId") Integer jobId,
+            @AuthenticationPrincipal ANVGLUser user) {
+        //Lookup the job whose logs we are accessing
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The specified job does not exist.");
+        }
+
+        try {
+            CloudComputeService service = getComputeService(job);
+            if (service == null) {
+                return generateJSONResponseMAV(false, null, "The compute service exists for this job no longer exists.");
+            }
+            String rawLog = service.getConsoleLog(job, 5000);
+            if (StringUtils.isEmpty(rawLog)) {
+                return generateJSONResponseMAV(false, null, "No compute logs were accessible for this job.");
+            }
+            return generateJSONResponseMAV(true, rawLog, "");
+        } catch (PortalServiceException ex) {
+            return generateJSONResponseMAV(false, null, ex.getMessage());
+        }
     }
 
     @RequestMapping("/secure/getPlaintextPreview.do")
@@ -1159,6 +1178,29 @@ public class JobListController extends BaseCloudController  {
         } finally {
             IOUtils.closeQuietly(is);
             IOUtils.closeQuietly(os);
+        }
+    }
+
+    /**
+     * Gets all AuditLog entries for the specified jobId. If the authenticated user doesn't own the specified job an error will be returned.
+     * @param jobId
+     * @param user
+     * @return
+     */
+    @RequestMapping("/secure/getAuditLogsForJob.do")
+    public ModelAndView getAuditLogsForJob(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false,  null, "The specified job does not exist.");
+        }
+
+        try {
+            List<VGLJobAuditLog> auditLogs = vglAuditLogDao.getAuditLogsOfJob(jobId);
+            return generateJSONResponseMAV(true, auditLogs, "");
+        } catch (Exception ex) {
+            log.error("Unable to access job audit logs for " + jobId + ": " + ex.getMessage());
+            log.debug("Exception:", ex);
+            return generateJSONResponseMAV(false,  null, "Unable to access audit logs for this job due to an internal error. Please try refreshing the page.");
         }
     }
 

@@ -15,10 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.auscope.portal.core.cloud.CloudFileInformation;
-import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
-import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -28,11 +27,11 @@ import org.auscope.portal.jmock.VEGLSeriesMatcher;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
+import org.auscope.portal.server.vegl.VGLJobAuditLogDao;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
-import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.jmock.Expectations;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,16 +47,17 @@ public class TestJobListController extends PortalTestClass {
     private final String computeServiceId = "comp-service-id";
     private final String storageServiceId = "storage-service-id";
     private VEGLJobManager mockJobManager;
-    private CloudStorageService[] mockCloudStorageServices;
+    private CloudStorageServiceJClouds[] mockCloudStorageServices;
     private FileStagingService mockFileStagingService;
     private CloudComputeService[] mockCloudComputeServices;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
+    private VGLJobAuditLogDao mockJobAuditLogDao;
     private ANVGLUser mockPortalUser;
     private JobStatusMonitor mockJobStatusMonitor;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
     private JobListController controller;
-    private VGLPollingJobQueueManager vglPollingJobQueueManager;
+    private CloudSubmissionService mockCloudSubmissionService;
 
     /**
      * Load our mock objects
@@ -65,16 +65,17 @@ public class TestJobListController extends PortalTestClass {
     @Before
     public void init() {
         mockJobManager = context.mock(VEGLJobManager.class);
-        mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
+        mockCloudStorageServices = new CloudStorageServiceJClouds[] {context.mock(CloudStorageServiceJClouds.class)};
         mockFileStagingService = context.mock(FileStagingService.class);
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
         mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockRequest = context.mock(HttpServletRequest.class);
+        mockJobAuditLogDao = context.mock(VGLJobAuditLogDao.class);
         mockPortalUser = context.mock(ANVGLUser.class);
+        mockCloudSubmissionService = context.mock(CloudSubmissionService.class);
         final List<VEGLJob> mockJobs=new ArrayList<>();
-        vglPollingJobQueueManager = new VGLPollingJobQueueManager();
 
         context.checking(new Expectations() {{
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
@@ -84,12 +85,7 @@ public class TestJobListController extends PortalTestClass {
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
-    }
-
-    @After
-    public void destroy(){
-        vglPollingJobQueueManager.getQueue().clear();
+                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,"dummy@dummy.com", mockCloudSubmissionService, mockJobAuditLogDao);
     }
 
 
@@ -100,94 +96,6 @@ public class TestJobListController extends PortalTestClass {
 
     public static VEGLJobMatcher aNonMatchingVeglJob(Integer id) {
         return new VEGLJobMatcher(id, true);
-    }
-
-    @Test
-    public void testInitizeQueueNDelete() {
-        final String storageBucket = "storage-bucket";
-        final String storageAccess = "213-asd-54";
-        final String storageSecret = "tops3cret";
-        final String storageEndpoint = "http://example.org";
-        final String storageProvider = "provider";
-        final String storageAuthVersion = "1.2.3";
-        final String regionName = null;
-
-        final String userEmail = "exampleuser@email.com";
-        final int jobId = 1234;
-
-        final List<VEGLJob> queueMockJobs = Arrays.asList(
-                context.mock(VEGLJob.class, "queueMockJob1"),
-                context.mock(VEGLJob.class, "queueMockJob2"));
-
-        final VEGLJobManager queueMockJobManager = context.mock(VEGLJobManager.class,"queueMockJobManager");
-
-        context.checking(new Expectations() {{
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
-            allowing(queueMockJobManager).getInQueueJobs();will(returnValue(queueMockJobs));
-
-            allowing(queueMockJobs.get(0)).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(queueMockJobs.get(0)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(queueMockJobs.get(0)).getStorageBaseKey();will(returnValue(""));
-            allowing(queueMockJobs.get(0)).getStorageBucket();will(returnValue(storageBucket));
-            allowing(queueMockJobs.get(1)).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(queueMockJobs.get(1)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(queueMockJobs.get(1)).getStorageBaseKey();will(returnValue(""));
-            allowing(queueMockJobs.get(1)).getStorageBucket();will(returnValue(storageBucket));
-
-            allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-            allowing(mockCloudStorageServices[0]).getAccessKey();will(returnValue(storageAccess));
-            allowing(mockCloudStorageServices[0]).getSecretKey();will(returnValue(storageSecret));
-            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
-            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
-            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
-            allowing(mockCloudStorageServices[0]).getEndpoint();will(returnValue(storageEndpoint));
-            allowing(mockCloudStorageServices[0]).getProvider();will(returnValue(storageProvider));
-            allowing(mockCloudStorageServices[0]).getAuthVersion();will(returnValue(storageAuthVersion));
-            allowing(mockCloudStorageServices[0]).getRegionName();will(returnValue(regionName));
-
-            //Here on start is the delete mock
-            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
-
-            allowing(queueMockJobs.get(1)).getUser();will(returnValue(userEmail));
-            //allowing(queueMockJobs.get(0)).getUser();will(returnValue(userEmail));
-
-            oneOf(queueMockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(queueMockJobs.get(1)));
-
-            allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
-            allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
-            allowing(queueMockJobs.get(0)).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
-
-            allowing(queueMockJobs.get(1)).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
-            allowing(queueMockJobs.get(1)).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
-            allowing(queueMockJobs.get(1)).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
-
-            allowing(queueMockJobs.get(1)).getStorageServiceId();will(returnValue(storageServiceId));
-            allowing(queueMockJobs.get(1)).getComputeServiceId();will(returnValue(computeServiceId));
-            allowing(queueMockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_INQUEUE));
-            allowing(queueMockJobs.get(0)).getId();will(returnValue(5555));
-            allowing(queueMockJobs.get(1)).getId();will(returnValue(jobId));
-
-            allowing(queueMockJobs.get(0)).isWalltimeSet(); will(returnValue(false));
-            allowing(queueMockJobs.get(1)).isWalltimeSet(); will(returnValue(false));
-
-            allowing(queueMockJobs.get(0)).getWalltime();will(returnValue(null));
-            allowing(queueMockJobs.get(1)).getWalltime();will(returnValue(null));
-
-            oneOf(queueMockJobs.get(1)).setStatus(JobBuilderController.STATUS_UNSUBMITTED);
-            oneOf(queueMockJobManager).saveJob(queueMockJobs.get(1));
-            oneOf(queueMockJobManager).createJobAuditTrail(JobBuilderController.STATUS_INQUEUE, queueMockJobs.get(1), "Job cancelled by user.");
-        }});
-
-        JobListController myController = new JobListController(queueMockJobManager,
-                mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,vglPollingJobQueueManager, "dummy@dummy.com");
-
-        Assert.assertEquals(2, vglPollingJobQueueManager.getQueue().size());
-
-        myController.killJob(mockRequest, mockResponse, jobId, mockPortalUser);
-
-        Assert.assertEquals(1, vglPollingJobQueueManager.getQueue().size());
     }
 
 //    /**
@@ -237,9 +145,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a job successfully
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteJob() {
+    public void testDeleteJob() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
@@ -343,10 +252,47 @@ public class TestJobListController extends PortalTestClass {
     }
 
     /**
+     * Tests deleting a queued job successfully
+     */
+    @Test
+    public void testDeleteJob_InQueue() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String initialStatus = JobBuilderController.STATUS_INQUEUE;
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+
+            //Make sure the job marked as deleted and its transition audit trial record is created
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).getStatus();will(returnValue(initialStatus));
+            oneOf(mockJob).setStatus(JobBuilderController.STATUS_DELETED);
+            oneOf(mockJobManager).saveJob(mockJob);
+            oneOf(mockJobManager).createJobAuditTrail(initialStatus, mockJob, "Job deleted.");
+
+            oneOf(mockFileStagingService).deleteStageInDirectory(mockJob);
+            oneOf(mockJob).getRegisteredUrl();will(returnValue("geonetwork url"));
+
+            oneOf(mockCloudSubmissionService).dequeueSubmission(mockJob, mockCloudComputeServices[0]);
+        }});
+
+        ModelAndView mav = controller.deleteJob(mockRequest, mockResponse, jobId, mockPortalUser);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
      * Tests deleting a job fails when its another users job
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testDeleteJobNoPermission() {
+    public void testDeleteJobNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "adifferentuser@email.com";
         final int jobId = 1234;
@@ -365,9 +311,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a job fails when the jobID DNE
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteJobDNE() {
+    public void testDeleteJobDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
 
@@ -383,9 +330,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a series successfully
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteSeries() {
+    public void testDeleteSeries() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final List<VEGLJob> mockJobs = Arrays.asList(
@@ -425,9 +373,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a series fails when the user doesn't have permission
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testDeleteSeriesNoPermission() {
+    public void testDeleteSeriesNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
         final int seriesId = 1234;
@@ -445,9 +394,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests deleting a series fails when series DNE
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteSeriesDNE() {
+    public void testDeleteSeriesDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
 
@@ -464,9 +414,10 @@ public class TestJobListController extends PortalTestClass {
     /**
      * Tests that deleting a series fails when job
      * list is null.
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDeleteSeries_JobListIsNull() {
+    public void testDeleteSeries_JobListIsNull() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
@@ -514,9 +465,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing or cancelling job get aborted when the job is processed
+     * @throws PortalServiceException 
      */
     @Test
-    public void testKillJobAborted() {
+    public void testKillJobAborted() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
@@ -534,9 +486,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing a job fails when its not the user's job
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testKillJobNoPermission() {
+    public void testKillJobNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -555,9 +508,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing a job fails when the job cannot be found
+     * @throws PortalServiceException 
      */
     @Test
-    public void testKillJobDNE() {
+    public void testKillJobDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
 
@@ -627,9 +581,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing all jobs of a series fails when the user lacks permission
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testKillSeriesJobsNoPermission() {
+    public void testKillSeriesJobsNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
         final int seriesId = 1234;
@@ -647,9 +602,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that killing all jobs of a series fails when the user lacks permission
+     * @throws PortalServiceException 
      */
     @Test
-    public void testKillSeriesJobsDNE() {
+    public void testKillSeriesJobsDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
 
@@ -695,9 +651,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * tests listing job files fails if the user doesnt have permission
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testListJobFilesNoPermission() {
+    public void testListJobFilesNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -716,9 +673,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * tests listing job files fails if the user doesnt have permission
+     * @throws PortalServiceException 
      */
     @Test
-    public void testListJobFilesDNE() {
+    public void testListJobFilesDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
 
@@ -806,9 +764,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that downloading a single job file fails when the user doesnt own the job
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testDownloadJobFileNoPermission() {
+    public void testDownloadJobFileNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -828,9 +787,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that downloading a single job file fails when the job DNE
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDownloadJobFileDNE() {
+    public void testDownloadJobFileDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final String key = "my/file/key";
@@ -947,9 +907,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that downloading multiple job files fails if user doesn't own job
+     * @throws PortalServiceException 
      */
     @Test(expected=AccessDeniedException.class)
-    public void testDownloadJobFilesNoPermission() {
+    public void testDownloadJobFilesNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String jobEmail = "anotheruser@email.com";
         final int jobId = 1234;
@@ -968,9 +929,10 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that downloading multiple job files fails if job DNE
+     * @throws PortalServiceException 
      */
     @Test
-    public void testDownloadJobFilesDNE() {
+    public void testDownloadJobFilesDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int jobId = 1234;
         final String files = "filekey1,filekey2";
@@ -1062,11 +1024,12 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that listing a job succeeds
+     * @throws PortalServiceException 
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void testListJobs() {
+    public void testListJobs() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
@@ -1126,10 +1089,11 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that listing a job fails when its the incorrect user
+     * @throws PortalServiceException 
      * @throws Exception
      */
     @Test(expected=AccessDeniedException.class)
-    public void testListJobsNoPermission() {
+    public void testListJobsNoPermission() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final String seriesEmail = "anotheruser@email.com";
         final int seriesId = 1234;
@@ -1147,10 +1111,11 @@ public class TestJobListController extends PortalTestClass {
 
     /**
      * Tests that listing a job fails when its the incorrect user
+     * @throws PortalServiceException 
      * @throws Exception
      */
     @Test
-    public void testListJobsDNE() {
+    public void testListJobsDNE() throws PortalServiceException {
         final String userEmail = "exampleuser@email.com";
         final int seriesId = 1234;
 
@@ -1216,7 +1181,7 @@ public class TestJobListController extends PortalTestClass {
 
                     // We should have 1 call to our job manager to create a job
                     // audit trail record
-                    oneOf(mockJobManager).createJobAuditTrail(with(any(String.class)), with(any(VEGLJob.class)),
+                    oneOf(mockJobManager).createJobAuditTrail(with(aNull(String.class)), with(any(VEGLJob.class)),
                             with(any(String.class)));
                 }
             });
@@ -1230,5 +1195,109 @@ public class TestJobListController extends PortalTestClass {
             Assert.assertArrayEquals(data1, fis1Data);
             Assert.assertArrayEquals(data2, fis2Data);
         }
+    }
+
+    /**
+     * Tests requesting instance logs in the best case scenario
+     */
+    @Test
+    public void testGetRawInstanceLogs() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+        final String consoleData = "console\ndata\n";
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+
+            oneOf(mockCloudComputeServices[0]).getConsoleLog(with(mockJob), with(any(Integer.class)));
+            will(returnValue(consoleData));
+        }});
+
+        ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
+        Assert.assertTrue((Boolean)mav.getModel().get("success"));
+        Assert.assertEquals(consoleData, mav.getModel().get("data"));
+    }
+
+    /**
+     * Tests getting instance logs fails with bad service ID
+     */
+    @Test
+    public void testGetRawInstanceLogs_BadService() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getComputeServiceId();will(returnValue("SERVICE-DNE"));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+
+        }});
+
+        ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests requesting instance logs fails gracefully when the underlying service throws an exception
+     */
+    @Test
+    public void testGetRawInstanceLogs_UnableToRequest() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+
+            oneOf(mockCloudComputeServices[0]).getConsoleLog(with(mockJob), with(any(Integer.class)));
+            will(throwException(new PortalServiceException("error")));
+        }});
+
+        ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
+    }
+
+    /**
+     * Tests requesting instance logs fails gracefully when the underlying service returns null
+     */
+    @Test
+    public void testGetRawInstanceLogs_NullLogs() throws Exception {
+        final String userEmail = "exampleuser@email.com";
+        final int jobId = 1234;
+        final VEGLJob mockJob = context.mock(VEGLJob.class);
+
+        context.checking(new Expectations() {{
+            allowing(mockPortalUser).getEmail();will(returnValue(userEmail));
+
+            oneOf(mockJobManager).getJobById(jobId, mockPortalUser);will(returnValue(mockJob));
+            allowing(mockJob).getUser();will(returnValue(userEmail));
+            allowing(mockJob).getComputeServiceId();will(returnValue(computeServiceId));
+            allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));
+            allowing(mockJob).getId();will(returnValue(jobId));
+
+            oneOf(mockCloudComputeServices[0]).getConsoleLog(with(mockJob), with(any(Integer.class)));
+            will(returnValue(null));
+        }});
+
+        ModelAndView mav = controller.getRawInstanceLogs(mockRequest, jobId, mockPortalUser);
+        Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 }

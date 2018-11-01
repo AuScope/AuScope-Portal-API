@@ -86,6 +86,6 @@ Ext.define('vegl.preview.PlainTextPreview', {
         this.fileName = null;
         this.size = null;
         this.hash = null;
-        this.writeText('');
+        this.writeText(Ext.isEmpty(emptyTabMsg) ? '' : emptyTabMsg);
     }
 });

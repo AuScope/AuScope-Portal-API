@@ -10,16 +10,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.cloud.CloudJob;
@@ -29,20 +30,23 @@ import org.auscope.portal.core.cloud.StagedFile;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
+import org.auscope.portal.core.services.cloud.CloudComputeServiceNci;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.FileStagingService;
+import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
-import org.auscope.portal.server.vegl.VGLPollingJobQueueManager;
-import org.auscope.portal.server.vegl.VGLQueueJob;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
+import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.auscope.portal.server.web.service.scm.Toolbox;
@@ -51,7 +55,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -79,11 +83,12 @@ public class JobBuilderController extends BaseCloudController {
     private final Log logger = LogFactory.getLog(getClass());
 
     private FileStagingService fileStagingService;
-    private VGLPollingJobQueueManager vglPollingJobQueueManager;
     private ScmEntryService scmEntryService;
     private ANVGLProvenanceService anvglProvenanceService;
     private String adminEmail = null;
     private String defaultToolbox = null;
+    private CloudSubmissionService cloudSubmissionService;
+    private NCIDetailsDao nciDetailsDao;
 
     /**
      * @return the adminEmail
@@ -121,19 +126,21 @@ public class JobBuilderController extends BaseCloudController {
             VEGLJobManager jobManager, FileStagingService fileStagingService,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
             CloudStorageService[] cloudStorageServices,
-            CloudComputeService[] cloudComputeServices,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
-            VGLPollingJobQueueManager vglPollingJobQueueManager, ScmEntryService scmEntryService,
-            ANVGLProvenanceService anvglProvenanceService) {
+            CloudComputeService[] cloudComputeServices, VGLJobStatusChangeHandler vglJobStatusChangeHandler,
+            ScmEntryService scmEntryService, ANVGLProvenanceService anvglProvenanceService,
+            CloudSubmissionService cloudSubmissionService,
+            NCIDetailsDao nciDetailsDao) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
         this.cloudComputeServices = cloudComputeServices;
         this.vglJobStatusChangeHandler=vglJobStatusChangeHandler;
-        this.vglPollingJobQueueManager = vglPollingJobQueueManager;
         this.scmEntryService = scmEntryService;
         this.anvglProvenanceService = anvglProvenanceService;
         this.adminEmail=adminEmail;
         this.defaultToolbox = defaultToolbox;
+        this.cloudSubmissionService = cloudSubmissionService;
+        this.nciDetailsDao = nciDetailsDao;
     }
 
 
@@ -451,8 +458,11 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="seriesId", required=false) Integer seriesId,
             @RequestParam(value="computeServiceId", required=false) String computeServiceId,
             @RequestParam(value="computeVmId", required=false) String computeVmId,
+            @RequestParam(value="computeVmRunCommand", required=false) String computeVmRunCommand,
             @RequestParam(value="computeTypeId", required=false) String computeTypeId,
-            @RequestParam(value="storageServiceId", required=false) String storageServiceId,
+            @RequestParam(value="ncpus", required=false) Integer ncpus,
+            @RequestParam(value="jobfs", required=false) Integer jobFs,
+            @RequestParam(value="mem", required=false) Integer mem,
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
             @RequestParam(value="walltime", required=false) Integer walltime,
@@ -481,32 +491,30 @@ public class JobBuilderController extends BaseCloudController {
             return generateJSONResponseMAV(false, null, "Error fetching job with id " + id);
         }
 
+        //JSON encoding of series ID can sometimes turn a null into a 0. We will also never have a seriesId of 0
+        if (seriesId != null && seriesId == 0) {
+            seriesId = null;
+        }
+
         //Update our job from the request parameters
         job.setSeriesId(seriesId);
         job.setName(name);
         job.setDescription(description);
         job.setComputeVmId(computeVmId);
-        job.setComputeInstanceType(computeTypeId);
+        job.setComputeVmRunCommand(computeVmRunCommand);
         job.setEmailNotification(emailNotification);
         job.setWalltime(walltime);
 
-        //Updating the storage service means changing the base key
-        if (storageServiceId != null) {
-            CloudStorageService css = getStorageService(storageServiceId);
-            if (css == null) {
-                logger.error(String.format("Error fetching storage service with id %1$s", storageServiceId));
-                return generateJSONResponseMAV(false, null, "Storage service does not exist");
-            }
-
-            job.setStorageServiceId(storageServiceId);
-            job.setStorageBaseKey(css.generateBaseKey(job));
+        //HPC doesn't support compute types - for this case we munge our parameters into a the compute instance type string
+        if (StringUtils.isEmpty(computeTypeId)) {
+            job.setComputeInstanceType(String.format("ncpus=%1$d&jobfs=%2$dgb&mem=%3$dgb", ncpus, jobFs, mem));
         } else {
-            job.setStorageServiceId(null);
-            job.setStorageBaseKey(null);
+            job.setComputeInstanceType(computeTypeId);
         }
 
         //Dont allow the user to specify a cloud compute service that DNE
         // Updating the compute service means updating the dev keypair
+        // We also auto choose storage service based on compute service selection
         if (computeServiceId != null) {
             CloudComputeService ccs = getComputeService(computeServiceId);
             if (ccs == null) {
@@ -514,9 +522,48 @@ public class JobBuilderController extends BaseCloudController {
                 return generateJSONResponseMAV(false, null, "No compute/storage service with those ID's");
             }
 
+            //Choose a storage service appropriate for the compute service (we could also make this configurable)
+            CloudStorageService css = null;
+            if (ccs instanceof CloudComputeServiceAws) {
+                css = getStorageService("amazon-aws-storage-sydney");
+            } else if (ccs instanceof CloudComputeServiceNci) {
+                css = getStorageService("nci-raijin-storage");
+            } else {
+                css = getStorageService("nectar-openstack-storage-melb");
+            }
+            if (css == null) {
+                logger.error(String.format("Error fetching storage service linked to compute service id %1$s", computeServiceId));
+                return generateJSONResponseMAV(false, null, "No linked storage service exists for your compute service selection");
+            }
+
+            //We may need to specify ARN details depending on the service we are using
+            STSRequirement stsReq = STSRequirement.ForceNone;
+            if (css instanceof CloudStorageServiceJClouds) {
+                stsReq = ((CloudStorageServiceJClouds) css).getStsRequirement();
+            }
+            switch (stsReq) {
+            case Permissable:
+                if (StringUtils.isEmpty(user.getArnStorage())) {
+                    job.setStorageBucket(css.getBucket());
+                } else {
+                    job.setStorageBucket(user.getS3Bucket());
+                }
+                break;
+            case Mandatory:
+                job.setStorageBucket(user.getS3Bucket());
+                break;
+            case ForceNone:
+                job.setStorageBucket(css.getBucket());
+                break;
+            }
+
             job.setComputeServiceId(computeServiceId);
+            job.setStorageServiceId(css.getId());
+            job.setStorageBaseKey(css.generateBaseKey(job));
         } else {
             job.setComputeServiceId(null);
+            job.setStorageServiceId(null);
+            job.setStorageBaseKey(null);
         }
 
         //Save the VEGL job
@@ -632,12 +679,13 @@ public class JobBuilderController extends BaseCloudController {
         if (job == null) {
             return generateJSONResponseMAV(false);
         }
-
-        List<VglDownload> existingDownloads = job.getJobDownloads();
+        
         if (append) {
+        	List<VglDownload> existingDownloads = job.getJobDownloads();
             existingDownloads.addAll(parsedDownloads);
             job.setJobDownloads(existingDownloads);
         } else {
+        	jobManager.deleteJobDownloads(job);
             job.setJobDownloads(parsedDownloads);
         }
 
@@ -827,10 +875,9 @@ public class JobBuilderController extends BaseCloudController {
                             oldJobStatus = curJob.getStatus();
                             curJob.setStatus(JobBuilderController.STATUS_PROVISION);
                             jobManager.saveJob(curJob);
-                            jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to provisioning");
+                            jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to provisioning at " + cloudComputeService.getId());
 
-                            ExecutorService es = Executors.newSingleThreadExecutor();
-                            es.execute(new CloudThreadedExecuteService(cloudComputeService,curJob,userDataString));
+                            cloudSubmissionService.queueSubmission(cloudComputeService, curJob, userDataString);
                             succeeded = true;
                         }
                     }
@@ -880,50 +927,6 @@ public class JobBuilderController extends BaseCloudController {
         }
     }
 
-    private class CloudThreadedExecuteService implements Runnable{
-        CloudComputeService cloudComputeService;
-        VEGLJob curJob;
-        String userDataString;
-
-        public CloudThreadedExecuteService(CloudComputeService cloudComputeService,VEGLJob curJob,String userDataString){
-            this.cloudComputeService = cloudComputeService;
-            this.curJob = curJob;
-            this.userDataString = userDataString;
-        }
-
-        @Override
-        public void run() {
-            String instanceId = null;
-            try{
-                instanceId = cloudComputeService.executeJob(curJob, userDataString);
-                logger.info("Launched instance: " + instanceId);
-                // set reference as instanceId for use when killing a job
-                curJob.setComputeInstanceId(instanceId);
-                String oldJobStatus = curJob.getStatus();
-                curJob.setStatus(STATUS_PENDING);
-                jobManager.createJobAuditTrail(oldJobStatus, curJob, "Set job to Pending");
-                curJob.setSubmitDate(new Date());
-                jobManager.saveJob(curJob);
-
-            }catch(PortalServiceException e){
-                //only for this specific error we wanna queue the job
-                if(e.getErrorCorrection()!= null && e.getErrorCorrection().contains("Quota exceeded")){
-                    vglPollingJobQueueManager.addJobToQueue(new VGLQueueJob(jobManager,cloudComputeService,curJob,userDataString,vglJobStatusChangeHandler));
-                    String oldJobStatus = curJob.getStatus();
-                    curJob.setStatus(JobBuilderController.STATUS_INQUEUE);
-                    jobManager.saveJob(curJob);
-                    jobManager.createJobAuditTrail(oldJobStatus, curJob, "Job Placed in Queue");
-                }else{
-                    String oldJobStatus = curJob.getStatus();
-                    curJob.setStatus(JobBuilderController.STATUS_ERROR);
-                    jobManager.saveJob(curJob);
-                    jobManager.createJobAuditTrail(oldJobStatus, curJob, e);
-                    vglJobStatusChangeHandler.handleStatusChange(curJob,curJob.getStatus(),oldJobStatus);
-                }
-            }
-        }
-    }
-
     /**
      * Creates a new VEGL job initialised with the default configuration values. The job will be persisted into the database.
      *
@@ -939,9 +942,6 @@ public class JobBuilderController extends BaseCloudController {
         jobManager.saveJob(job);
         log.debug(String.format("Created a new job row id=%1$s", job.getId()));
 
-        job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
-        job.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
-        job.setProperty(CloudJob.PROPERTY_S3_ROLE, user.getArnStorage());
         job.setComputeInstanceKey(user.getAwsKeyName());
         job.setStorageBucket(user.getS3Bucket());
 
@@ -1023,7 +1023,7 @@ public class JobBuilderController extends BaseCloudController {
             logger.error("Error creating download script" +  e.getMessage());
             logger.debug("Error:", e);
             return false;
-        } 
+        }
     }
 
     /**
@@ -1040,6 +1040,12 @@ public class JobBuilderController extends BaseCloudController {
      *
      * If jobId is specified, limit the set to images that are
      * compatible with the solution selected for the job.
+     * 
+     * If a list of solution ids is provided, limit the set of images to the 
+     * ones that can run a job comprising the specified solutions.
+     * 
+     * If both jobId and solutions are specified, use the list of solutions to 
+     * determine which images to return.
      *
      * @param request
      * @param computeServiceId
@@ -1051,39 +1057,29 @@ public class JobBuilderController extends BaseCloudController {
             HttpServletRequest request,
             @RequestParam("computeServiceId") String computeServiceId,
             @RequestParam(value="jobId", required=false) Integer jobId,
+            @RequestParam(value="solutions", required=false) List<String> solutions,
             @AuthenticationPrincipal ANVGLUser user) {
         try {
-            // Assume all images are usable by the current user
-            List<MachineImage> images = new ArrayList<>();
+            Map<String, Set<MachineImage>> imageProviders = null;
 
-            if (jobId != null) {
+            if (solutions != null && solutions.size() > 0) {
+            	imageProviders = scmEntryService.getJobImages(solutions, user);
+            }
+            else if (jobId != null) {
                 VEGLJob job = attemptGetJob(jobId, user);
                 if (job == null) {
                     return generateJSONResponseMAV(false);
                 }
 
                 // Filter list to images suitable for job solutions, if specified.
-                Set<Toolbox> toolboxes = scmEntryService.getJobToolboxes(job);
+                imageProviders = scmEntryService.getJobImages(job, user);
+            }            
 
-                // With multiple solutions and multiple toolboxes, do
-                // not give the user the option of selecting the default
-                // portal toolbox for utility functions unless it's the
-                // only toolbox available.
-                int numToolboxes = toolboxes.size();
-                for (Toolbox toolbox: toolboxes) {
-                    if ((numToolboxes == 1) ||
-                            !toolbox.getUri().equals(this.defaultToolbox)) {
-                        images.add(scmEntryService
-                                .getToolboxImage(toolbox,
-                                        computeServiceId));
-                    }
-                }
-            }
-
+            Set<MachineImage> images = (imageProviders != null) ? imageProviders.get(computeServiceId) : new HashSet<MachineImage>();
             if (images.isEmpty()) {
                 // Fall back on old behaviour based on configured images for now
                 // Get images available to the current user
-                images = getImagesForJobAndUser(request, computeServiceId);
+                images.addAll(getImagesForJobAndUser(request, computeServiceId));
             }
 
             if (images.isEmpty()) {
@@ -1111,30 +1107,11 @@ public class JobBuilderController extends BaseCloudController {
         try {
             CloudComputeService ccs = getComputeService(computeServiceId);
             if (ccs == null) {
-                return generateJSONResponseMAV(false, null, "Unknown compute service");
+                return generateJSONResponseMAV(false, null, "Unknown compute service: "+computeServiceId);
             }
 
-            List<MachineImage> images = getImagesForJobAndUser(request, computeServiceId);
-            MachineImage selectedImage = null;
-            for (MachineImage image : images) {
-                if (image.getImageId().equals(machineImageId)) {
-                    selectedImage = image;
-                    break;
-                }
-            }
-
-            ComputeType[] allTypes = null;
-            if (selectedImage == null) {
-                // Unknown image, presumably from the SSSC, so start with all
-                // compute types for the selected compute service.
-                allTypes = ccs.getAvailableComputeTypes();
-            }
-            else {
-                //Grab the compute types that are compatible with our disk
-                //requirements
-                allTypes = ccs.getAvailableComputeTypes(null, null, selectedImage.getMinimumDiskGB());
-            }
-
+            ComputeType[] allTypes = ccs.getAvailableComputeTypes(machineImageId);
+            
             return generateJSONResponseMAV(true, allTypes, "");
         } catch (Exception ex) {
             log.error("Unable to access compute type list:" + ex.getMessage(), ex);
@@ -1149,14 +1126,17 @@ public class JobBuilderController extends BaseCloudController {
      * compatible with that job. Currently that is only those services
      * that have images available for the solution used for the job.
      *
+     * Compute services that haven't been configured by the user will be ignored
+     *
      * @param jobId (optional) job id to limit acceptable services
      * @return
+     * @throws PortalServiceException
      */
     @RequestMapping("/secure/getComputeServices.do")
     public ModelAndView getComputeServices(@RequestParam(value="jobId",
     required=false) final
             Integer jobId,
-            @AuthenticationPrincipal ANVGLUser user) {
+            @AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
         Set<String> jobCCSIds;
         try {
             jobCCSIds = scmEntryService.getJobProviders(jobId, user);
@@ -1164,15 +1144,20 @@ public class JobBuilderController extends BaseCloudController {
             throw e;
         }
 
+        Set<String> configuredServiceIds = new HashSet<String>();
+        getConfiguredComputeServices(user, nciDetailsDao).stream().forEach(x -> configuredServiceIds.add(x.getId()));
+
         List<ModelMap> simpleComputeServices = new ArrayList<>();
 
         for (CloudComputeService ccs : cloudComputeServices) {
             // Add the ccs to the list if it's valid for job or we have no job
             if (jobCCSIds == null || jobCCSIds.contains(ccs.getId())) {
-                ModelMap map = new ModelMap();
-                map.put("id", ccs.getId());
-                map.put("name", ccs.getName());
-                simpleComputeServices.add(map);
+                if (configuredServiceIds.contains(ccs.getId())) {
+                    ModelMap map = new ModelMap();
+                    map.put("id", ccs.getId());
+                    map.put("name", ccs.getName());
+                    simpleComputeServices.add(map);
+                }
             }
         }
 

@@ -18,6 +18,12 @@ Ext.define('ScriptBuilder.ComponentTreePanel', {
 
         this.callParent(arguments);
         this.on('itemdblclick', this._onDblClick, this);
+        this.on('beforeitemdblclick', function(treeview, record, item, index, e, eOpts) {
+            if (record.raw && record.raw.disabled == true) {
+                return false;
+            }
+            return true;
+        });
     },
 
     _onDblClick : function(view, node, el, index, e, eOpts) {
@@ -25,7 +31,7 @@ Ext.define('ScriptBuilder.ComponentTreePanel', {
 
         var name = node.get('text');
         var description = node.get('qtip');
-        
+
         if (!Ext.isEmpty(componentName)) {
         	Ext.Ajax.request({
                 url: 'getSolution.do',

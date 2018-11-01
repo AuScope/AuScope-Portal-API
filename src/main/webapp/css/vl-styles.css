@@ -29,6 +29,21 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
 .jobdesc-content {
 }
 
+.filter-icon {
+	background-image: url("../img/search.png") !important;
+    background-position: 0 center !important;
+}
+
+.eye-icon {
+    background-image: url("../portal-core/img/eye.png") !important;
+    background-position: 0 center !important;
+}
+
+.draw-icon {
+    background-image: url("../img/select.png") !important;
+    background-position: 0 center !important;
+}
+
 .disk-icon {
     background-image: url("../portal-core/img/disk.png") !important
 }
@@ -47,6 +62,10 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
 
 .grid-icon {
     background-image: url("../portal-core/img/grid.png") !important
+}
+
+.status-icon {
+    background-image: url("../portal-core/img/information.png") !important
 }
 
 .refresh-icon {
@@ -83,7 +102,7 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
 
 .world-add-icon {
     background-image:url(../img/world_add.png) !important;
-    background-size: 16px 16px;'
+    background-size: 16px 16px;
 }
 
 .download-cloud-icon {
@@ -119,3 +138,25 @@ body.ext-chrome table.x-btn .x-btn-small td.x-btn-mc em a {
     padding-left: 25px !important;
 }
 
+#activeLayersPanel {
+    top: 60px !important;
+}
+
+.olControlPanel {
+    left: 13px !important; 
+    top: 353px !important;
+}
+
+.olControlPanel button {
+	margin-left:0px !important;
+	float: left !important;
+}
+
+.vl-disabled-treenode {
+	color: #AAA;
+}
+
+.vl-disabled-treenode-icon {
+	background-image:url(../img/clear.png) !important;
+    background-size: 16px 16px;
+}

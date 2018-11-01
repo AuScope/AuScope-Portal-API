@@ -4,7 +4,7 @@
 <html>
 
 <head>
-    <title>ANVGL Portal - Build Job</title>
+    <title>VGL Portal - Build Job</title>
     
     <link rel="stylesheet" type="text/css" href="css/vl-styles.css">
     
@@ -15,16 +15,21 @@
     </style>
 
     <%-- Code Mirror inclusions --%>
-    <link href="CodeMirror-5.16/lib/codemirror.css" type="text/css" rel="stylesheet" />    
+    <link href="CodeMirror-5.16/lib/codemirror.css" type="text/css" rel="stylesheet" />
+    <link href="CodeMirror-5.16/addon/lint/lint.css" type="text/css" rel="stylesheet" />
     <script type="text/javascript" src="CodeMirror-5.16/lib/codemirror.js"></script>
     <script type="text/javascript" src="CodeMirror-5.16/mode/python/python.js"></script>
     <script type="text/javascript" src="CodeMirror-5.16/mode/javascript/javascript.js"></script>
+    <script type="text/javascript" src="CodeMirror-5.16/addon/lint/lint.js"></script>
 
 
     <!-- Portal Core Includes -->    
     <jsp:include page="../../portal-core/jsimports.jsp"/>
     <jsp:include page="../../portal-core/cssimports.jsp"/>
     <jsp:include page="../../cssimports.htm"/>
+
+    <!-- Linters for templates -->
+    <script type="text/javascript" src="js/vegl/lint/pylint.js"></script>
 
     <!-- component includes -->
     <script type="text/javascript" src="js/vegl/widgets/CodeEditorField.js"></script>  
@@ -37,6 +42,7 @@
     <script type="text/javascript" src="js/vegl/models/MachineImage.js"></script>
     <script type="text/javascript" src="js/vegl/models/ComputeType.js"></script>
     <script type="text/javascript" src="js/vegl/models/SimpleFeatureProperty.js"></script>
+    <script type="text/javascript" src="js/vegl/models/SearchFacet.js"></script>
 
     <script src="js/ScriptBuilder/templates/BaseTemplate.js" type="text/javascript"></script>
     <script src="js/ScriptBuilder/templates/UbcGravityTemplate.js" type="text/javascript"></script>
@@ -52,12 +58,18 @@
     <script src="js/ScriptBuilder/InsertionPromptWindow.js" type="text/javascript"></script>
     <script src="js/ScriptBuilder/ScriptBuilder.js" type="text/javascript"></script>
 
+    <script type="text/javascript" src="js/vegl/widgets/search/BaseFacetWidget.js"></script>
+    <script type="text/javascript" src="js/vegl/widgets/search/FacetedSearchPanel.js"></script>
+
     <script type="text/javascript" src="js/vegl/jobwizard/forms/BaseJobWizardForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobObjectForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobUploadForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/ScriptBuilderForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/JobSubmitForm.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/forms/DuplicateJobForm.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/sssc/ProviderFacet.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/sssc/TextFacet.js"></script>
+    <script type="text/javascript" src="js/vegl/jobwizard/sssc/FacetedFilterPanel.js"></script>
     <script type="text/javascript" src="js/vegl/jobwizard/JobWizard.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobFilesPanel.js"></script>
     <script type="text/javascript" src="js/vegl/widgets/JobsTree.js"></script>
@@ -70,12 +82,17 @@
 
     <script type="text/javascript" src="js/vegl/JobBuilder.js"></script>
     <script type="text/javascript" src="js/vegl/HelpHandler.js"></script>
+
 </head>
 
 <body>
     <%@ include file="page_header.jsp" %>
     <div id="body"></div>
     <%@ include file="page_footer.jsp" %>
+
+    <script type="text/javascript">
+     var adminEmail = "${adminEmail}";
+    </script>
 </body>
 
 </html>

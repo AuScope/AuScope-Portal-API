@@ -7,7 +7,7 @@
 # pathSuffix - Will be appended to svnUrl to form the base url that will be recursively downloaded for modules. Defaults to "vm/puppet/modules/"
 
 # /////////////////////////////
-# ANVGL Portal Custom Modules - download from user specified GIT (or default)
+# VGL Portal Custom Modules - download from user specified GIT (or default)
 #
 # Edit these variables if you need to download from a different git
 # repo/branch.

@@ -5,8 +5,13 @@
 # cloud list
 
 #wrapper for swift upload. Swift tool uses the file name as key
-if [[ $STORAGE_TYPE == swift* ]]
+if [[ $STORAGE_TYPE == *swift* ]]
 then
+        export OS_AUTH_URL="$STORAGE_ENDPOINT"
+        export OS_USERNAME="${STORAGE_ACCESS_KEY#*:}"
+        export OS_TENANT_NAME="${STORAGE_ACCESS_KEY%:*}"
+        export OS_PASSWORD="$STORAGE_SECRET_KEY"
+
         #There may be some flags that get set depending on env
         additionalFlags=""
         if [[ -n $STORAGE_AUTH_VERSION ]]

@@ -35,6 +35,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
 
         this.fileLookupUrl = !!config.cloudFiles ? 'secure/jobCloudFiles.do' : 'secure/stagedJobFiles.do';
         this.fileDownloadUrl = !!config.cloudFiles ? 'secure/downloadFile.do' : 'secure/downloadInputFile.do';
+        this.fileMultiDownloadUrl = !!config.cloudFiles ? 'secure/downloadAsZip.do' : null;
 
         this.fileGroupName = config.fileGroupName ? config.fileGroupName : 'Your Uploaded Files';
         this.remoteGroupName = config.remoteGroupName ? config.remoteGroupName : 'Remote Web Service Downloads';
@@ -50,14 +51,30 @@ Ext.define('vegl.widgets.JobFilesPanel', {
 
         //Action for downloading a single file
         this.downloadAction = new Ext.Action({
-            text: 'Download this file to your machine.',
+            text: 'Download file(s) to your machine.',
             disabled: true,
             iconCls: 'disk-icon',
             scope : this,
             handler: function() {
-                var item = jobFilesGrid.getSelectionModel().getSelection()[0];
-                var source = item.get('source');
-                if (source instanceof vegl.models.FileRecord) {
+                var items = jobFilesGrid.getSelectionModel().getSelection();
+                var downloadCount = 0;
+                var fileRecordCount = 0;
+
+                Ext.each(items, function(item) {
+                    var source = item.get('source');
+                    if (source instanceof vegl.models.FileRecord) {
+                        fileRecordCount++;
+                    } else if (source instanceof vegl.models.Download) {
+                        downloadCount++;
+                    }
+                });
+
+                if (downloadCount > 0 && fileRecordCount > 0) {
+                    portal.widgets.window.ErrorWindow.showText('Invalid Selection', 'Sorry, but combining multiple file categories isn\'t supported. Please only select files from the same category and try again.');
+                } else if (downloadCount > 1) {
+                    portal.widgets.window.ErrorWindow.showText('Invalid Selection', 'Sorry, you will need to download data service calls individually. Please only select a single data service download and try again.');
+                } else if (downloadCount == 0 && fileRecordCount == 1) {
+                    var source = items[0].get('source');
                     var params = {
                         jobId : this.currentJobId,
                         filename : source.get('name'),
@@ -65,8 +82,25 @@ Ext.define('vegl.widgets.JobFilesPanel', {
                     };
 
                     portal.util.FileDownloader.downloadFile(this.fileDownloadUrl, params);
-                } else if (source instanceof vegl.models.Download) {
+                } else if (downloadCount == 1 && fileRecordCount == 0) {
+                    var source = items[0].get('source');
                     portal.util.FileDownloader.downloadFile(source.get('url'));
+                } else if (fileRecordCount > 1) {
+                    if (!this.fileMultiDownloadUrl) {
+                        portal.widgets.window.ErrorWindow.showText('Invalid Selection', 'Sorry, but these files must be downloaded individually. Please select a single file and try again.');
+                        return;
+                    }
+
+                    var params = {
+                        jobId : this.currentJobId,
+                        files : []
+                    };
+
+                    Ext.each(items, function(item) {
+                        params.files.push(item.get('source').get('name'));
+                    });
+
+                    portal.util.FileDownloader.downloadFile(this.fileMultiDownloadUrl, params);
                 }
             }
         });
@@ -178,55 +212,45 @@ Ext.define('vegl.widgets.JobFilesPanel', {
         });
         loadMask.show();
 
-        Ext.Ajax.request({
+        portal.util.Ajax.request({
             url : this.fileLookupUrl,
             params : {
                 jobId : this.currentJobId
             },
             scope : this,
-            callback : function(options, success, response) {
+            callback : function(success, data, message, debugInfo) {
                 if (!success) {
                     loadMask.hide();
-                    return;
-                }
-
-                var responseObj = Ext.JSON.decode(response.responseText);
-                if (!responseObj.success || !responseObj.data) {
-                    loadMask.hide();
+                    portal.widgets.window.ErrorWindow.showText('Error', 'Unable to request list of files: ' + message + ' Please try refreshing the page.', debugInfo);
                     return;
                 }
 
                 var fileRecords = [];
-                for (var i = 0; i < responseObj.data.length; i++) {
-                    fileRecords.push(Ext.create('vegl.models.FileRecord', responseObj.data[i]));
+                for (var i = 0; i < data.length; i++) {
+                    fileRecords.push(Ext.create('vegl.models.FileRecord', data[i]));
                 }
 
                 //Fire off a second request for the downloads
-                Ext.Ajax.request({
+                portal.util.Ajax.request({
                     url : 'secure/getJobDownloads.do',
                     params : {
                         jobId : this.currentJobId
                     },
                     scope : this,
-                    fileRecords : fileRecords,
-                    callback : function(options, success, response) {
+                    callback : Ext.bind(function(success, data, message, debugInfo ) {
                         loadMask.hide();
                         if (!success) {
-                            return;
-                        }
-
-                        var responseObj = Ext.JSON.decode(response.responseText);
-                        if (!responseObj.success || !responseObj.data) {
+                            portal.widgets.window.ErrorWindow.showText('Error', 'Unable to request list of job downloads. Please try refreshing the page.', debugInfo);
                             return;
                         }
 
                         var downloads = [];
-                        for (var i = 0; i < responseObj.data.length; i++) {
-                            downloads.push(Ext.create('vegl.models.Download', responseObj.data[i]));
+                        for (var i = 0; i < data.length; i++) {
+                            downloads.push(Ext.create('vegl.models.Download', data[i]));
                         }
 
-                        this._setStoreData(options.fileRecords, downloads);
-                    }
+                        this._setStoreData(fileRecords, downloads);
+                    }, this, [fileRecords], true)
                 });
             }
         });
@@ -319,6 +343,7 @@ Ext.define('vegl.widgets.JobFilesPanel', {
     listFilesForJob : function(job) {
         this.currentJobId = job.get('id');
         this.updateFileStore();
+        this.getSelectionModel().clearSelections();
     }
 });
 

@@ -7,7 +7,6 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -16,8 +15,6 @@ import java.util.Set;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseFactory;
 import org.apache.http.HttpVersion;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.message.BasicStatusLine;
 import org.auscope.portal.core.cloud.CloudFileInformation;
@@ -43,7 +40,7 @@ import junit.framework.Assert;
 
 public class ANVGLProvenanceServiceTest extends PortalTestClass {
     VEGLJob preparedJob;
-    final String serverURL = "http://portal-fake.anvgl.org";
+    final String serverURL = "http://portal-fake.vgl.org";
     final Model plainModel = ModelFactory.createDefaultModel();
     final CloudFileInformation fileInformation = context.mock(CloudFileInformation.class);
     final int jobID = 1;
@@ -60,7 +57,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     List<VglDownload> downloads = new ArrayList<>();
     VEGLJob turtleJob;
 
-    final String initialTurtle = "<http://portal-fake.anvgl.org/secure/getJobObject.do?jobId=1>" + System.lineSeparator() +
+    final String initialTurtle = "<http://portal-fake.vgl.org/secure/getJobObject.do?jobId=1>" + System.lineSeparator() +
             "      a       <http://www.w3.org/ns/prov#Activity> ;" + System.lineSeparator();
 
     final String intermediateTurtle =
@@ -68,7 +65,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             "      <http://www.w3.org/2000/01/rdf-schema#label>" + System.lineSeparator() +
             "              \"activity.ttl\"^^<http://www.w3.org/2001/XMLSchema#string> ;" + System.lineSeparator() +
             "      <http://www.w3.org/ns/dcat#downloadURL>" + System.lineSeparator() +
-            "              \"http://portal-fake.anvgl.org/secure/jobFile.do?jobId=1&key=activity.ttl\"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;" + System.lineSeparator() +
+            "              \"http://portal-fake.vgl.org/secure/jobFile.do?jobId=1&key=activity.ttl\"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;" + System.lineSeparator() +
             "      <http://www.w3.org/ns/prov#wasAttributedTo>" + System.lineSeparator() +
             "              <https://plus.google.com/1> .";
 
@@ -78,7 +75,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     final String file1Turtle =
             "      a       <http://www.w3.org/ns/prov#Entity> ;" + System.lineSeparator() +
             "      <http://www.w3.org/ns/dcat#downloadURL>" + System.lineSeparator() +
-            "              \"http://portal-fake.anvgl.org/secure/jobFile.do?jobId=1&key=cloudKey\"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;" + System.lineSeparator() +
+            "              \"http://portal-fake.vgl.org/secure/jobFile.do?jobId=1&key=cloudKey\"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;" + System.lineSeparator() +
             "      <http://www.w3.org/ns/prov#wasAttributedTo>" + System.lineSeparator() +
             "              <https://plus.google.com/1> .";
 
@@ -98,7 +95,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
         mockProfileUrl = new URI("https://plus.google.com/1");
 
         VglDownload download = new VglDownload(1);
-        download.setUrl("http://portal-uploads.anvgl.org/file1?download=true");
+        download.setUrl("http://portal-uploads.vgl.org/file1?download=true");
         //download.setParentUrl("http://portal-uploads.vhirl.org/");
         download.setName("file1");
         downloads.add(download);

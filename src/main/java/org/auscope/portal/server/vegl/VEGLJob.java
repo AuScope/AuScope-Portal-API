@@ -31,13 +31,14 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private String processTimeLog;
     private String storageBucket;
     private String promsReportUrl;
+    private String computeVmRunCommand;
 
     /**
      * max walltime for the job. 0 or null indicate that no walltime applies to the job
      */
     private Integer walltime;
     private boolean containsPersistentVolumes;
-    
+
     /** Time when the job executes as opposed to when the job was submitted **/
     private Date executeDate;
 
@@ -262,6 +263,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setComputeInstanceType(this.getComputeInstanceType());
         newJob.setComputeServiceId(this.getComputeServiceId());
         newJob.setComputeVmId(this.getComputeVmId());
+        newJob.setComputeVmRunCommand(this.getComputeVmRunCommand());
         newJob.setDescription(this.getDescription());
         newJob.setEmailAddress(this.getEmailAddress());
         newJob.setName(this.getName());
@@ -349,7 +351,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     public void setExecuteDate(Date executeDate) {
         this.executeDate = executeDate;
     }
-    
+
     /**
      * @return The URL of the associated PROMS Report
      */
@@ -359,6 +361,22 @@ public class VEGLJob extends CloudJob implements Cloneable {
 
     public void setPromsReportUrl(String promsReportUrl) {
         this.promsReportUrl = promsReportUrl;
+    }
+
+    /**
+     * The command that will be used to run the python run script. If null, most providers will use 'python'
+     * @return
+     */
+    public String getComputeVmRunCommand() {
+        return computeVmRunCommand;
+    }
+
+    /**
+     * The command that will be used to run the python run script. If null, most providers will use 'python'
+     * @param computeVmRunCommand
+     */
+    public void setComputeVmRunCommand(String computeVmRunCommand) {
+        this.computeVmRunCommand = computeVmRunCommand;
     }
 
     @Override

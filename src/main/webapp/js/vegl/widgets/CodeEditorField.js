@@ -25,11 +25,17 @@ Ext.define('vegl.widgets.CodeEditorField', {
                     this.editor = CodeMirror.fromTextArea(element,{
                         lineNumbers: true,
                         scrollbarStyle: 'null',
-                        mode: config.mode
+                        mode: config.mode,
+                        gutters: ["CodeMirror-lint-markers"],
+                        lint: config.lint || false
                     });
 
                     if (config.value) {
                         obj.setValue(config.value);
+                    }
+
+                    if (!Ext.isEmpty(config.readOnly)) {
+                        this.setReadOnly(config.readOnly);
                     }
                 },
                 resize: function() {
@@ -39,8 +45,20 @@ Ext.define('vegl.widgets.CodeEditorField', {
         });
 
         this.callParent(arguments);
+    },
 
+    setReadOnly: function(readOnly) {
+        if (this.editor) {
+            this.editor.setOption('readOnly', readOnly);
+        }
+    },
 
+    getReadOnly: function(readOnly) {
+        if (this.editor) {
+            return this.editor.getOption('readOnly');
+        } else {
+            return null;
+        }
     },
 
     setValue : function(script){
