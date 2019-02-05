@@ -2,14 +2,8 @@ package org.auscope.portal.server.web.controllers;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.auscope.portal.core.server.controllers.BasePortalController;
-import org.auscope.portal.core.services.CSWCacheService;
-import org.auscope.portal.core.services.CSWFilterService;
 import org.auscope.portal.core.services.PortalServiceException;
-import org.auscope.portal.core.services.WMSService;
-import org.auscope.portal.core.view.ViewCSWRecordFactory;
-import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.server.vegl.VGLBookMark;
 import org.auscope.portal.server.vegl.VGLBookMarkDao;
 import org.auscope.portal.server.vegl.VGLBookMarkDownload;

@@ -49,7 +49,6 @@ import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
-import org.auscope.portal.server.web.service.scm.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -121,8 +120,8 @@ public class JobBuilderController extends BaseCloudController {
     VGLJobStatusChangeHandler vglJobStatusChangeHandler;
 
     @Autowired
-    public JobBuilderController(@Value("${HOST.portalAdminEmail}") String adminEmail,
-            @Value("${HOST.defaultToolbox}") String defaultToolbox,
+    public JobBuilderController(@Value("${portalAdminEmail}") String adminEmail,
+            @Value("${defaultToolbox}") String defaultToolbox,
             VEGLJobManager jobManager, FileStagingService fileStagingService,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
             CloudStorageService[] cloudStorageServices,

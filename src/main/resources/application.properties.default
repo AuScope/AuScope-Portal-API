@@ -1,0 +1,71 @@
+# Properties that do not change across machines
+###########################################################
+jdbc.driverClass=com.mysql.jdbc.Driver
+jdbc.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
+termsconditions.version=1
+
+# Timeouts in seconds
+wait-for-body-content.timeout=90
+socket.timeout=90
+connection-establish.timeout=90
+
+# Cloud Compute Properties
+###########################################################
+vm.sh=https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl.sh
+vm-shutdown.sh=https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl-shutdown.sh
+
+# Machine / environment specific properties
+###########################################################
+
+#----------------------------------------------------------
+# Windows development machines:
+#----------------------------------------------------------
+
+# Local Dev
+googlemap.key=GOOGLE_KEY
+jdbc.url=jdbc:mysql://SERVER:3306/DB?autoReconnect=true&useSSL=false
+erddapservice.url=http://siss2.anu.edu.au/erddap/griddap/
+smtp.server=smtp-relay.csiro.au
+localStageInDir=C:\\VGL\\vegl-portal-temp
+solutions.url=https://sssc-vgl.geoanalytics.csiro.au/
+proms.report.url=http://proms-dev1-vc.it.csiro.au/id/report/
+proms.reportingsystem.uri=http://proms-dev1-vc.it.csiro.au/rs
+aws.stsrequirement=Mandatory
+portalUrl=http://localhost:8080/VGL-Portal
+frontEndUrl=http://localhost:4200
+portalAdminEmail=ANVGL Admin <anvgl-admin@csiro.au>
+defaultToolbox=http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
+aafLoginUrl=https://rapid.test.aaf.edu.au/jwt/authnrequest/research/lhYa2CSVdzM5TRoV9YaLYg
+
+
+
+
+# Gives us separation from real DB passwords.
+# Production deployment will copy env.properties file over
+# this one as passwords should not be in version control.
+
+# For deployments - you can now override the location of this file...
+#   <param-name>envPropertiesLocation</param-name>
+#   <param-value>file:///c:/env.properties</param-value>
+# made possible via Spring3 SpEL in the config.
+
+env.jdbc.user=DB_USER
+env.jdbc.password=DB_PASSWORD
+env.nectar.ec2.accesskey=NECTAR_EC2_ACCESS_KEY
+env.nectar.ec2.secretkey=NECTAR_EC2_SECRET_KEY
+env.nectar.storage.accesskey=NECTAR_STORAGE_ACCESS_KEY
+env.nectar.storage.secretkey=NECTAR_STORAGE_SECRET_KEY
+
+env.encryption.password=ABC123
+
+#
+# Aws keys to be used for dev only. Production system to use AWS roles for authorization
+#
+env.aws.account=AWS_ACCOUNT
+env.aws.accesskey=AWS_ACCESS_KEY
+env.aws.secretkey=AWS_SECRET_KEY
+
+env.oauth2.google.clientid=GOOGLE_OAUTH2_CLIENTID
+env.oauth2.google.clientsecret=GOOGLE_OAUTH2_CLIENTSECRET
+
+env.aaf.jwtsecret=AAF_CLIENTSECRET

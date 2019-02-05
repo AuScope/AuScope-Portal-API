@@ -60,10 +60,10 @@ public class MenuController {
     private NCIDetailsDao nciDetailsDao;
 
     @Autowired
-    public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey,
-                         @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey,
-                         @Value("${HOST.portalAdminEmail}") String adminEmail,
-                         @Value("${HOST.aafLoginUrl}") String aafLoginUrl,
+    public MenuController(@Value("${googlemap.key}") String googleMapKey,
+                         @Value("${google.analytics.key:}") String googleAnalyticsKey,
+                         @Value("${portalAdminEmail}") String adminEmail,
+                         @Value("${aafLoginUrl}") String aafLoginUrl,
                          CloudComputeService[] cloudComputeServices,
                          NCIDetailsDao nciDetailsDao) {
         this.buildStamp = null;
@@ -158,7 +158,7 @@ public class MenuController {
     * @return
     * @throws IOException
     * @throws URISyntaxException
- * @throws PortalServiceException
+    * @throws PortalServiceException
     */
    @RequestMapping("/**/*.html")
    public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user,
@@ -186,7 +186,7 @@ public class MenuController {
        logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
 
        //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
-       if (user != null) {
+       if (user != null && user.getUsername() != null) {
            boolean tcs = user.acceptedTermsConditionsStatus();
            boolean configured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServices);
 

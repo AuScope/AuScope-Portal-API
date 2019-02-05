@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.service.VGLCryptoService;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 public class NCIDetailsDao extends HibernateDaoSupport {
 

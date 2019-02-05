@@ -17,19 +17,23 @@
 
     <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
     <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->
+    <!--
     <bean id="propertyConfigurer" class="org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:config.properties</value>
+    -->
                 <!--  Spring SpEL magic - use context parameter or the default war env.properties -->
+    <!--
                 <value>#{contextParameters['envPropertiesLocation'] ?: 'classpath:env.properties'}</value>
             </list>
         </property>
     </bean>
+    -->
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${jdbc.driverClass}"/>
-        <property name="url" value="${HOST.jdbc.url}"/>
+        <property name="url" value="${jdbc.url}"/>
         <property name="username" value="${env.jdbc.user}"/>
         <property name="password" value="${env.jdbc.password}"/>
     </bean>
@@ -39,9 +43,10 @@
     </bean>
 
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="${HOST.smtp.server}" />
+        <property name="host" value="${smtp.server}" />
     </bean>
 
+    <!--
     <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
         <property name="velocityProperties">
             <value>
@@ -50,6 +55,7 @@
             </value>
         </property>
     </bean>
+    -->
 
     <bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">
         <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
@@ -57,9 +63,9 @@
         <property name="maxLengthForSeriesNameInSubject" value="15" />
         <property name="maxLengthForJobNameInSubject" value="15" />
         <property name="maxLinesForTail" value="5" />
-        <property name="emailSender" value="${HOST.portalAdminEmail}"/>
+        <property name="emailSender" value="${portalAdminEmail}"/>
         <property name="emailSubject" value="VGL Job (%s)" />
-        <property name="portalUrl" value="${HOST.frontEndUrl}"/>
+        <property name="portalUrl" value="${frontEndUrl}"/>
     </bean>
 
     <util:list id="pylintCommand">
@@ -75,11 +81,11 @@
             <array>  
                 <ref bean="cloudStorageService-aws-sydney" /> 
                 <ref bean="cloudStorageService-nci" /> 
-                <ref bean="cloudStorageService-nectar-melb" /> 
+                <!--<ref bean="cloudStorageService-nectar-melb" />--> 
             </array> 
         </constructor-arg>
-        <constructor-arg name="promsUrl" value="${HOST.proms.report.url}"/>
-        <constructor-arg name="promsReportingSystemUri" value="${HOST.proms.reportingsystem.uri}"/>
+        <constructor-arg name="promsUrl" value="${proms.report.url}"/>
+        <constructor-arg name="promsReportingSystemUri" value="${proms.reportingsystem.uri}"/>
     </bean>
     
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
@@ -225,10 +231,11 @@
         <property name="name" value="Amazon Web Services - S3"/>
         <property name="id" value="amazon-aws-storage-sydney"/>
         <property name="bucket" value="vgl-csiro-"/>
-        <property name="adminEmail" value="${HOST.portalAdminEmail}"/>
-        <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
+        <property name="adminEmail" value="${portalAdminEmail}"/>
+        <property name="stsRequirement" value="${aws.stsrequirement}"/>
     </bean>
     
+    <!--
     <bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
         <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
         <constructor-arg name="provider" value="openstack-swift"/>
@@ -243,6 +250,7 @@
         <property name="authVersion" value="2.0"/>
         <property name="stsRequirement" value="ForceNone"/>
     </bean>
+    -->
     
     <bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageServiceNci">
         <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
@@ -261,7 +269,7 @@
         
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
-        <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
+        <property name="stsRequirement" value="${aws.stsrequirement}"/>
         
         <property name="availableImages">
             <list>
@@ -291,6 +299,7 @@
         </property>
     </bean>
 
+	<!--
     <bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNectar">
         <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
         <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
@@ -300,6 +309,7 @@
         <property name="groupName" value ="vl-#{inetAddress.hostName.toLowerCase()}"/>
         <property name="keypair" value="vgl-developers"/>
     </bean>
+    -->
     
     <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNci">
         <constructor-arg name="storageService" ref="cloudStorageService-nci"/>
@@ -311,7 +321,7 @@
     <bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">
         <constructor-arg name="stagingInformation">
             <bean class="org.auscope.portal.core.cloud.StagingInformation">
-                <constructor-arg name="stageInDirectory" value="${HOST.localStageInDir}"/>
+                <constructor-arg name="stageInDirectory" value="${localStageInDir}"/>
             </bean>
         </constructor-arg>
     </bean>
@@ -322,7 +332,7 @@
                 value="org.auscope.portal.server.web.service.ScmEntryService.setSolutionsUrl"/>
       <property name="arguments">
         <list>
-          <value>${HOST.solutions.url}</value>
+          <value>${solutions.url}</value>
         </list>
       </property>
     </bean>
@@ -366,7 +376,7 @@
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>    
        
-    <bean id="veglSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <bean id="veglSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingResources">
             <list>
@@ -384,7 +394,8 @@
             </list>
         </property>
         <property name="hibernateProperties">
-            <value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>
+            <!--<value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>-->
+            <value>hibernate.dialect=${jdbc.dialect}</value>
         </property>
     </bean>
     

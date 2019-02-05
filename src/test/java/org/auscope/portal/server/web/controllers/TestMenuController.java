@@ -62,6 +62,7 @@ public class TestMenuController extends PortalTestClass {
 
             allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
+            allowing(mockUser).getUsername();will(returnValue("TestUsername"));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
@@ -90,6 +91,7 @@ public class TestMenuController extends PortalTestClass {
 
             allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
+            allowing(mockUser).getUsername();will(returnValue("TestUsername"));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
@@ -114,6 +116,7 @@ public class TestMenuController extends PortalTestClass {
             allowing(mockRequest).getSession();will(returnValue(mockSession));
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(null));
             oneOf(mockSession).setAttribute("existingSession", true);
+            allowing(mockUser).getUsername();will(returnValue("TestUsername"));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(null, mockRequest, mockResponse);
@@ -138,6 +141,7 @@ public class TestMenuController extends PortalTestClass {
 
             allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
+            allowing(mockUser).getUsername();will(returnValue("TestUsername"));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);
@@ -159,6 +163,7 @@ public class TestMenuController extends PortalTestClass {
 
             allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(false));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
+            allowing(mockUser).getUsername();will(returnValue("TestUsername"));
 
         }});
 
@@ -181,6 +186,7 @@ public class TestMenuController extends PortalTestClass {
 
             allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(true));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(false));
+            allowing(mockUser).getUsername();will(returnValue("TestUsername"));
 
         }});
 
@@ -203,6 +209,7 @@ public class TestMenuController extends PortalTestClass {
 
             allowing(mockUser).configuredServicesStatus(mockNciDetailsDao, mockCloudComputeServices);will(returnValue(false));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(false));
+            allowing(mockUser).getUsername();will(returnValue("TestUsername"));
         }});
 
         ModelAndView mav = mc.handleHtmlToView(mockUser, mockRequest, mockResponse);

@@ -1,7 +1,5 @@
 package org.auscope.portal.server.vegl;
 
-import org.auscope.portal.server.web.security.ANVGLUser;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class VGLBookMarkDownload {

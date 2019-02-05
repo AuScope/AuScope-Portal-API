@@ -26,8 +26,11 @@
    <!-- TO DO: Check if we need this  -->
    <util:properties id="configProperties" location="classpath:config.properties"/>
 
+    <!-- XXX These are causing issues Spring Boot post-migration -->
+    <!--
    <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
+   -->
 
    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
       <property name="prefix" value="/WEB-INF/jsp/"/>

@@ -2,7 +2,7 @@ package org.auscope.portal.server.web.security;
 
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 /**
  * A data access object for VEGLJob

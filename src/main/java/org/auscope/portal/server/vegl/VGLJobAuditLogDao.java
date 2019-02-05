@@ -2,7 +2,7 @@ package org.auscope.portal.server.vegl;
 
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 /**
  * A hibernate-backed VGLJobAuditLog data access object.

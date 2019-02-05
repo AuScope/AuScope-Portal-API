@@ -111,7 +111,7 @@ public class JobListController extends BaseCloudController  {
             VGLJobStatusAndLogReader jobStatusLogReader,
             JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
-            @Value("${HOST.portalAdminEmail}") String adminEmail,
+            @Value("${portalAdminEmail}") String adminEmail,
             CloudSubmissionService cloudSubmissionService,
             VGLJobAuditLogDao vglAuditLogDao) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);

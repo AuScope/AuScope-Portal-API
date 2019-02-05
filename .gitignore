@@ -4,6 +4,7 @@
 target/
 src/main/webapp/META-INF/
 src/main/resources/env.properties
+src/main/resources/application.properties
 .pydevproject
 /build/
 **/.tern-port
