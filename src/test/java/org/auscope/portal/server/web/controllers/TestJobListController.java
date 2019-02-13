@@ -1145,7 +1145,8 @@ public class TestJobListController extends PortalTestClass {
         };
 
         final String baseKey = "base-key";
-        final VEGLJob existingJob = new VEGLJob(jobId);
+        VEGLJob existingJob = new VEGLJob();
+        existingJob.setId(jobId);
         existingJob.setUser(userEmail);
         existingJob.setComputeServiceId(computeServiceId);
         existingJob.setStorageServiceId(storageServiceId);

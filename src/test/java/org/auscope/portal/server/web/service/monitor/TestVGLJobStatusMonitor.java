@@ -55,10 +55,12 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
      */
     @Test
     public void testExecuteInternal() throws Exception {
-        final VEGLJob job1 = new VEGLJob(1);
+        final VEGLJob job1 = new VEGLJob();
+        job1.setId(1);
         job1.setStatus(JobBuilderController.STATUS_PENDING);
         
-        final VEGLJob job2 = new VEGLJob(2);
+        final VEGLJob job2 = new VEGLJob();
+        job2.setId(2);
         job2.setStatus(JobBuilderController.STATUS_ACTIVE);
         
         final List<VEGLJob> pendingActiveJobs = Arrays.asList(job1, job2);
@@ -81,10 +83,12 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
      */
     @Test(expected=JobExecutionException.class)
     public void testExecuteInternal_Exception() throws Exception {
-        final VEGLJob job1 = new VEGLJob(1);
+        final VEGLJob job1 = new VEGLJob();
+        job1.setId(1);
         job1.setStatus(JobBuilderController.STATUS_PENDING);
         
-        final VEGLJob job2 = new VEGLJob(2);
+        final VEGLJob job2 = new VEGLJob();
+        job2.setId(2);
         job2.setStatus(JobBuilderController.STATUS_ACTIVE);
         
         final List<VEGLJob> pendingActiveJobs = Arrays.asList(job1, job2);

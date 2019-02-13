@@ -89,34 +89,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
 
 
     /**
-     * Creates a fully initialised VEGLJob
-     * @param id ID for this job
-     * @param description Description of this job
-     * @param submitDate The date of submission for this job
-     * @param processDate The date when this job was processed
-     * @param user The username of whoever is running this job
-     * @param emailAddress The contact email for whoever is running this job
-     * @param emailNotification The email notification flag for this job
-     * @param status The descriptive status of this job
-     * @param ec2InstanceId The ID of the running AMI instance (not the actual AMI ID).
-     * @param ec2Endpoint The endpoint for the elastic compute cloud
-     * @param ec2AMI The Amazon Machine Instance ID of the VM type that will run this job
-     * @param cloudOutputAccessKey the access key used to connect to amazon cloud for storing output
-     * @param cloudOutputSecretKey the secret key used to connect to amazon cloud for storing output
-     * @param cloudOutputBucket the cloud bucket name where output will be stored
-     * @param cloudOutputBaseKey the base key path (folder name) for all cloud output
-     * @param registeredUrl Where this job has been registered for future reference
-     * @param fileStorageId The ID of this job that is used for storing input/output files
-     * @param vmSubsetFilePath The File path (on the VM) where the job should look for its input subset file
-     * @param vmSubsetUrl The URL of the actual input subset file
-     * @param walltime The walltime (in minutes) for the job
-     * @param executeDate The date of execution for this job
-     */
-    public VEGLJob(Integer id) {
-        super(id);
-    }
-
-    /**
      * 
      */
     public Integer getId() {
@@ -291,7 +263,8 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @return
      */
     public VEGLJob safeClone() {
-        VEGLJob newJob = new VEGLJob(null);
+        VEGLJob newJob = new VEGLJob();
+        newJob.setId(this.getId());
         newJob.setComputeInstanceId(this.getComputeInstanceId());
         newJob.setComputeInstanceKey(this.getComputeInstanceKey());
         newJob.setComputeInstanceType(this.getComputeInstanceType());

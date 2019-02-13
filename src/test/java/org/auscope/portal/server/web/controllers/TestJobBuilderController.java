@@ -145,7 +145,8 @@ public class TestJobBuilderController {
         user = new ANVGLUser();
         user.setEmail("user@example.com");
         user.setId(userId);
-        job = new VEGLJob(Integer.parseInt(jobId));
+        job = new VEGLJob();
+        job.setId(Integer.parseInt(jobId));
         job.setEmailAddress("user@example.com");
         job.setUser("user@example.com");
         context.checking(new Expectations() {{
