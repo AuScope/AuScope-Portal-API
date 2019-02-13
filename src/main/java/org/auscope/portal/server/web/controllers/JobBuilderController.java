@@ -44,7 +44,7 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.ScmEntryService;
@@ -87,7 +87,9 @@ public class JobBuilderController extends BaseCloudController {
     private String adminEmail = null;
     private String defaultToolbox = null;
     private CloudSubmissionService cloudSubmissionService;
-    private NCIDetailsDao nciDetailsDao;
+    
+    @Autowired
+    NCIDetailsService nciDetailsService;
 
     /**
      * @return the adminEmail
@@ -127,8 +129,7 @@ public class JobBuilderController extends BaseCloudController {
             CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices, VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             ScmEntryService scmEntryService, ANVGLProvenanceService anvglProvenanceService,
-            CloudSubmissionService cloudSubmissionService,
-            NCIDetailsDao nciDetailsDao) {
+            CloudSubmissionService cloudSubmissionService) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.fileStagingService = fileStagingService;
         this.cloudStorageServices = cloudStorageServices;
@@ -139,7 +140,6 @@ public class JobBuilderController extends BaseCloudController {
         this.adminEmail=adminEmail;
         this.defaultToolbox = defaultToolbox;
         this.cloudSubmissionService = cloudSubmissionService;
-        this.nciDetailsDao = nciDetailsDao;
     }
 
 
@@ -1143,7 +1143,7 @@ public class JobBuilderController extends BaseCloudController {
         }
 
         Set<String> configuredServiceIds = new HashSet<String>();
-        getConfiguredComputeServices(user, nciDetailsDao).stream().forEach(x -> configuredServiceIds.add(x.getId()));
+        getConfiguredComputeServices(user, nciDetailsService).stream().forEach(x -> configuredServiceIds.add(x.getId()));
 
         List<ModelMap> simpleComputeServices = new ArrayList<>();
 

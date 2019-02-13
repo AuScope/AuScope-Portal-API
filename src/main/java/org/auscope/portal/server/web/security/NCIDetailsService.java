@@ -1,15 +1,44 @@
 package org.auscope.portal.server.web.security;
 
-import java.util.List;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.service.VGLCryptoService;
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@Transactional
-public class NCIDetailsDao extends HibernateDaoSupport {
+@Service
+public class NCIDetailsService {
+	
+	@Autowired
+	NCIDetailsEncRepository nciEncRepository;
 
-    private VGLCryptoService encryptionService;
+	@Autowired
+	private VGLCryptoService encryptionService;
+	
+	public NCIDetails getByUser(ANVGLUser user) throws PortalServiceException {
+		NCIDetailsEnc encRes = nciEncRepository.findByUser(user);
+        NCIDetails res = new NCIDetails();
+        if(encRes != null) {
+	        res.setId(encRes.getId());
+	        res.setKey(encryptionService.decrypt(encRes.getKey()));
+	        res.setProject(encryptionService.decrypt(encRes.getProject()));
+	        res.setUser(encRes.getUser());
+	        res.setUsername(encryptionService.decrypt(encRes.getUsername()));
+        }
+        return res;
+	}
+	
+	public void saveNCIDetails(NCIDetails details) throws PortalServiceException {
+		NCIDetailsEnc detailsEnc = new NCIDetailsEnc();
+        detailsEnc.setId(details.getId());
+        detailsEnc.setKey(encryptionService.encrypt(details.getKey()));
+        detailsEnc.setProject(encryptionService.encrypt(details.getProject()));
+        detailsEnc.setUser(details.getUser());
+        detailsEnc.setUsername(encryptionService.encrypt(details.getUsername()));
+		nciEncRepository.save(detailsEnc);
+	}
+	
+	/*
+	 private VGLCryptoService encryptionService;
     
     public NCIDetailsDao(VGLCryptoService encryptionService) {
         this.encryptionService=encryptionService;
@@ -38,4 +67,5 @@ public class NCIDetailsDao extends HibernateDaoSupport {
         
         getHibernateTemplate().saveOrUpdate(detailsEnc);
     }
+	 */
 }

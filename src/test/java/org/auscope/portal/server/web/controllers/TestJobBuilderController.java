@@ -39,6 +39,7 @@ import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
@@ -77,7 +78,9 @@ public class TestJobBuilderController {
     private CloudSubmissionService mockCloudSubmissionService;
     private ANVGLProvenanceService mockAnvglProvenanceService;
     private ANVGLFileStagingService mockFileStagingService;
-    private NCIDetailsDao mockNciDetailsDao;
+    
+    //private NCIDetailsDao mockNciDetailsDao;
+    private NCIDetailsService mockNciDetailsService;
 
     private JobMailSender mockJobMailSender;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
@@ -106,7 +109,9 @@ public class TestJobBuilderController {
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockSession = context.mock(HttpSession.class);
-        mockNciDetailsDao = context.mock(NCIDetailsDao.class);
+        
+        //mockNciDetailsDao = context.mock(NCIDetailsDao.class);
+        mockNciDetailsService = context.mock(NCIDetailsService.class);
 
         mockJobMailSender = context.mock(JobMailSender.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
@@ -134,8 +139,8 @@ public class TestJobBuilderController {
                                      vglJobStatusChangeHandler,
                                      mockScmEntryService,
                                      mockAnvglProvenanceService,
-                                     mockCloudSubmissionService,
-                                     mockNciDetailsDao);
+                                     mockCloudSubmissionService);
+                                     //mockNciDetailsDao);
 
         user = new ANVGLUser();
         user.setEmail("user@example.com");
@@ -1662,7 +1667,8 @@ public class TestJobBuilderController {
             allowing(mockCloudComputeServices[0]).getName();will(returnValue(name));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(id));
             allowing(mockScmEntryService).getJobProviders((Integer)null, user);will(returnValue(null));
-            oneOf(mockNciDetailsDao).getByUser(mockPortalUser);will(returnValue(null));
+            //oneOf(mockNciDetailsDao).getByUser(mockPortalUser);will(returnValue(null));
+            oneOf(mockNciDetailsService).getByUser(mockPortalUser);will(returnValue(null));
         }});
 
 		ModelAndView mav = controller.getComputeServices(null, user);

@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -57,22 +57,22 @@ public class MenuController {
     private String aafLoginUrl;
     private String adminEmail;
     private CloudComputeService[] cloudComputeServices;
-    private NCIDetailsDao nciDetailsDao;
+    
+    @Autowired
+    private NCIDetailsService nciDetailsService;
 
     @Autowired
     public MenuController(@Value("${googlemap.key}") String googleMapKey,
                          @Value("${google.analytics.key:}") String googleAnalyticsKey,
                          @Value("${portalAdminEmail}") String adminEmail,
                          @Value("${aafLoginUrl}") String aafLoginUrl,
-                         CloudComputeService[] cloudComputeServices,
-                         NCIDetailsDao nciDetailsDao) {
+                         CloudComputeService[] cloudComputeServices) {
         this.buildStamp = null;
         this.googleMapKey = googleMapKey;
         this.googleAnalyticsKey = googleAnalyticsKey;
         this.aafLoginUrl = aafLoginUrl;
         this.adminEmail = adminEmail;
         this.cloudComputeServices = cloudComputeServices;
-        this.nciDetailsDao = nciDetailsDao;
     }
 
     /**
@@ -188,7 +188,7 @@ public class MenuController {
        //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
        if (user != null && user.getUsername() != null) {
            boolean tcs = user.acceptedTermsConditionsStatus();
-           boolean configured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServices);
+           boolean configured = user.configuredServicesStatus(nciDetailsService, cloudComputeServices);
 
            if (!configured || !tcs) {
                String uri = request.getRequestURI();

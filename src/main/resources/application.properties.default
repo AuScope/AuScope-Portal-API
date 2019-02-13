@@ -1,6 +1,6 @@
 # Properties that do not change across machines
 ###########################################################
-jdbc.driverClass=com.mysql.jdbc.Driver
+jdbc.driverClass=com.mysql.cj.dbc.Driver
 jdbc.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
 termsconditions.version=1
 

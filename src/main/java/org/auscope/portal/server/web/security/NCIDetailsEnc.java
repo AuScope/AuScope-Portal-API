@@ -2,12 +2,30 @@ package org.auscope.portal.server.web.security;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "nci_details")
 public class NCIDetailsEnc implements Serializable {
-    public final static String PROPERTY_NCI_USER = "nci_user";
+
+	private static final long serialVersionUID = -1617534178282032823L;
+	
+	public final static String PROPERTY_NCI_USER = "nci_user";
     public final static String PROPERTY_NCI_KEY = "nci_key";
     public final static String PROPERTY_NCI_PROJECT = "nci_project";
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user")
     private ANVGLUser user;
     private byte[] username;
     private byte[] project;

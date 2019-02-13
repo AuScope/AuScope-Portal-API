@@ -3,6 +3,7 @@ package org.auscope.portal.server.vegl;
 import java.util.List;
 
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A data access object for VLSCMSnapshot
@@ -10,6 +11,7 @@ import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
  * @author Geoff Squire
  *
  */
+@Transactional
 public class VLScmSnapshotDao extends HibernateDaoSupport {
     @SuppressWarnings("unchecked")
     public List<VLScmSnapshot> getSnapshotsForEntry(String scmEntryId) {

@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A Hibernate-backed VEGLSeries data object
@@ -13,6 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
  * @author Cihan Altinay
  * @author Josh Vote  -- Modified for VEGL
  */
+@Transactional
 public class VEGLSeriesDao extends HibernateDaoSupport {
 
     /**

@@ -38,9 +38,11 @@
         <property name="password" value="${env.jdbc.password}"/>
     </bean>
     
+    <!--
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
+    -->
 
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="${smtp.server}" />
@@ -109,8 +111,11 @@
             <map>
                 <entry key="jobManager" value-ref="veglJobManager"/>
                 <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
+                <!-- XXX Replace with services? -->
+                <!--
                 <entry key="jobUserDao" value-ref="anvglUserDao"/>
                 <entry key="nciDetailsDao" value-ref="nciDetailsDao"/>
+                -->
             </map>
         </property>
     </bean>
@@ -341,12 +346,16 @@
     </bean>
 
     <bean id="veglJobManager" class="org.auscope.portal.server.vegl.VEGLJobManager">
+        <!-- XXX Replace with services? -->
+        <!--
         <property name="veglJobDao" ref="veglJobDao"/>
         <property name="veglSeriesDao" ref="veglSeriesDao"/>
         <property name="vglJobAuditLogDao" ref="vglJobAuditLogDao"/>
-        <property name="nciDetailsDao" ref="nciDetailsDao"/>        
+        <property name="nciDetailsDao" ref="nciDetailsDao"/>
+        -->        
     </bean>
 
+    <!--
     <bean id="veglJobDao" class="org.auscope.portal.server.vegl.VEGLJobDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
@@ -394,17 +403,36 @@
             </list>
         </property>
         <property name="hibernateProperties">
+    -->
             <!--<value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>-->
+   <!--
             <value>hibernate.dialect=${jdbc.dialect}</value>
         </property>
     </bean>
     
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager"> 
+        <property name="sessionFactory" ref="veglSessionFactory"/> 
+        
+        <property name="dataSource" ref="dataSource"/>
+        
+    </bean>
+   -->
+    
+    <!--
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+        <property name="sessionFactory" ref="veglSessionFactory"></property>
+    </bean>
+    -->
+    
+    
     <!-- vegl.VLScmSnapshotDao -->
+    <!--
      <bean id="vlScmSnapshotDao" class="org.auscope.portal.server.vegl.VLScmSnapshotDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
+    -->
     
-        
+    
     <bean id="cswRegVeglProduction" class="org.auscope.portal.core.services.csw.custom.CustomRegistry">
         <constructor-arg name="id" value="cswRegVeglProduction" />
         <constructor-arg name="title" value="SISS ANU Geonetwork" />

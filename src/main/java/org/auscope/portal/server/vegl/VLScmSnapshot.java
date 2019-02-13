@@ -2,10 +2,19 @@ package org.auscope.portal.server.vegl;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+//@Table()   WHAT TABLE?
 public class VLScmSnapshot implements Serializable {
 
     private static final long serialVersionUID = -6638880820028925202L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     private String scmEntryId;

@@ -5,12 +5,14 @@ import java.util.List;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A data access object for VGLBookMark
  * @author Josh Vote
  *
  */
+@Transactional
 public class VGLBookMarkDao extends HibernateDaoSupport {	
 
     /**

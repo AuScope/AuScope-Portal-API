@@ -18,9 +18,9 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUserDao;
+import org.auscope.portal.server.web.security.ANVGLUserService;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -42,8 +42,12 @@ public class UserController extends BasePortalController {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private ANVGLUserDao userDao;
-    private NCIDetailsDao nciDetailsDao;
+    @Autowired
+    private ANVGLUserService userService;
+    
+    @Autowired
+    private NCIDetailsService nciDetailsService;
+    
     @Autowired
     private VelocityEngine velocityEngine;
     private CloudComputeService[] cloudComputeServcies;
@@ -53,14 +57,11 @@ public class UserController extends BasePortalController {
     private String tacVersion;
     
     @Autowired
-    public UserController(ANVGLUserDao userDao, NCIDetailsDao nciDetailsDao,
-            VelocityEngine velocityEngine, CloudComputeService[] cloudComputeServices,
+    public UserController(VelocityEngine velocityEngine,
+    		CloudComputeService[] cloudComputeServices,
             @Value("${env.aws.account}") String awsAccount,
             @Value("${termsconditions.version}") String tacVersion) throws PortalServiceException {
-        super();
-        
-        this.userDao = userDao;
-        this.nciDetailsDao = nciDetailsDao;
+        super();        
         this.velocityEngine = velocityEngine;
         this.cloudComputeServcies = cloudComputeServices;
         this.awsAccount=awsAccount;
@@ -132,7 +133,7 @@ public class UserController extends BasePortalController {
         }
 
         if (modified) {
-            userDao.save(user);
+        	userService.saveUser(user);
         }
 
         return generateJSONResponseMAV(true);
@@ -191,7 +192,7 @@ public class UserController extends BasePortalController {
             return generateJSONResponseMAV(false);
         }
         ModelMap detailsObj = new ModelMap();
-        NCIDetails details = nciDetailsDao.getByUser(user);
+        NCIDetails details = nciDetailsService.getByUser(user);
         if(details != null) {
             try {
                 detailsObj.put("nciUsername", details.getUsername());
@@ -214,7 +215,7 @@ public class UserController extends BasePortalController {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-        NCIDetails details = nciDetailsDao.getByUser(user);
+        NCIDetails details = nciDetailsService.getByUser(user);
         if(details == null) {
             details = new NCIDetails();
             details.setUser(user);
@@ -241,7 +242,7 @@ public class UserController extends BasePortalController {
         }
             
         if (modified) {
-            nciDetailsDao.save(details);
+        	nciDetailsService.saveNCIDetails(details);
         }
         return generateJSONResponseMAV(true);        
     }
@@ -251,7 +252,7 @@ public class UserController extends BasePortalController {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-        boolean hasConfigured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServcies);
+        boolean hasConfigured = user.configuredServicesStatus(nciDetailsService, cloudComputeServcies);
         return generateJSONResponseMAV(hasConfigured);
     }
 

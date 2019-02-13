@@ -13,7 +13,7 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.auscope.portal.server.web.service.TemplateLintService;
@@ -35,7 +35,9 @@ public class TestScriptBuilderController extends PortalTestClass {
     private VEGLJob mockJob = context.mock(VEGLJob.class);
     private CloudStorageService[] mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
     private CloudComputeService[] mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
-    private NCIDetailsDao nciDetailsDao = context.mock(NCIDetailsDao.class);
+    
+    //private NCIDetailsDao nciDetailsDao = context.mock(NCIDetailsDao.class);
+    private NCIDetailsService nciDetailsService = context.mock(NCIDetailsService.class);
 
     private ANVGLUser user;
 
@@ -45,7 +47,7 @@ public class TestScriptBuilderController extends PortalTestClass {
     @Before
     public void setup() {
         // Object Under Test
-        controller = new ScriptBuilderController(mockSbService, mockJobManager, mockScmEntryService, mockTemplateLintService, mockCloudStorageServices, mockCloudComputeServices, VM_SH, VM_SHUTDOWN_SH, nciDetailsDao);
+        controller = new ScriptBuilderController(mockSbService, mockJobManager, mockScmEntryService, mockTemplateLintService, mockCloudStorageServices, mockCloudComputeServices, VM_SH, VM_SHUTDOWN_SH/*, nciDetailsDao*/);
         user = new ANVGLUser();
         user.setId("456");
         user.setEmail("user@example.com");

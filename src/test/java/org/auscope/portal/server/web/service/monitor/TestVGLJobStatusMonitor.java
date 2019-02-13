@@ -10,8 +10,8 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUserDao;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.security.ANVGLUserService;
+import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +28,8 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
     private JobExecutionContext mockJobExecCtx;
     private VEGLJobManager mockJobManager;
     private JobStatusMonitor mockJobStatusMonitor;
-    private ANVGLUserDao mockUserDAO;
-    private NCIDetailsDao mockNciDAO;
+    private ANVGLUserService mockUserService;
+    private NCIDetailsService mockNciService;
     
     @Before
     public void init() {
@@ -37,15 +37,15 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
         mockJobExecCtx = context.mock(JobExecutionContext.class);
         mockJobManager = context.mock(VEGLJobManager.class);
         mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
-        mockUserDAO = context.mock(ANVGLUserDao.class);
-        mockNciDAO = context.mock(NCIDetailsDao.class);
+        mockUserService = context.mock(ANVGLUserService.class);
+        mockNciService = context.mock(NCIDetailsService.class);
         
         //Component under test
         monitor = new VGLJobStatusMonitor();
         monitor.setJobManager(mockJobManager);
         monitor.setJobStatusMonitor(mockJobStatusMonitor);
-        monitor.setJobUserDao(mockUserDAO);
-        monitor.setNciDetailsDao(mockNciDAO);
+        monitor.setJobUserService(mockUserService);
+        monitor.setNciDetailsService(mockNciService);
     }
     
     /**
@@ -66,8 +66,8 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
         
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getPendingOrActiveJobs();will(returnValue(pendingActiveJobs));
-            allowing(mockUserDAO).getByEmail(null); will(returnValue(user));
-            allowing(mockNciDAO).getByUser(user); will(returnValue(null));
+            allowing(mockUserService).getByEmail(null); will(returnValue(user));
+            allowing(mockNciService).getByUser(user); will(returnValue(null));
             oneOf(mockJobStatusMonitor).statusUpdate(pendingActiveJobs);
         }});
         
@@ -92,8 +92,8 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
         
         context.checking(new Expectations() {{
             allowing(mockJobManager).getPendingOrActiveJobs();will(returnValue(pendingActiveJobs));
-            allowing(mockUserDAO).getByEmail(null); will(returnValue(user));
-            allowing(mockNciDAO).getByUser(user); will(returnValue(null));
+            allowing(mockUserService).getByEmail(null); will(returnValue(user));
+            allowing(mockNciService).getByUser(user); will(returnValue(null));
             oneOf(mockJobStatusMonitor).statusUpdate(pendingActiveJobs);will(throwException(new JobStatusException(new Exception(), job1)));
         }});
         

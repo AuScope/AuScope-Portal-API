@@ -43,11 +43,11 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobAuditLog;
-import org.auscope.portal.server.vegl.VGLJobAuditLogDao;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
+import org.auscope.portal.server.web.service.VGLJobAuditLogService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,9 +85,9 @@ public class JobListController extends BaseCloudController  {
     private FileStagingService fileStagingService;
     private VGLJobStatusAndLogReader jobStatusLogReader;
     private JobStatusMonitor jobStatusMonitor;
-    private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
+    //private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
     private CloudSubmissionService cloudSubmissionService;
-    private VGLJobAuditLogDao vglAuditLogDao;
+    private VGLJobAuditLogService jobAuditLogService;
 
     private String adminEmail=null;
 
@@ -113,7 +113,7 @@ public class JobListController extends BaseCloudController  {
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
             @Value("${portalAdminEmail}") String adminEmail,
             CloudSubmissionService cloudSubmissionService,
-            VGLJobAuditLogDao vglAuditLogDao) {
+            VGLJobAuditLogService jobAuditLogService) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.jobManager = jobManager;
         this.fileStagingService = fileStagingService;
@@ -121,9 +121,9 @@ public class JobListController extends BaseCloudController  {
         this.jobStatusMonitor = jobStatusMonitor;
         this.adminEmail=adminEmail;
         this.cloudSubmissionService = cloudSubmissionService;
-        this.vglAuditLogDao = vglAuditLogDao;
+        this.jobAuditLogService = jobAuditLogService;
     }
-
+    
 //    /**
 //     * Returns a JSON object containing a list of the current user's series.
 //     *
@@ -1195,7 +1195,7 @@ public class JobListController extends BaseCloudController  {
         }
 
         try {
-            List<VGLJobAuditLog> auditLogs = vglAuditLogDao.getAuditLogsOfJob(jobId);
+            List<VGLJobAuditLog> auditLogs = jobAuditLogService.getAuditLogsOfJob(jobId);
             return generateJSONResponseMAV(true, auditLogs, "");
         } catch (Exception ex) {
             log.error("Unable to access job audit logs for " + jobId + ": " + ex.getMessage());

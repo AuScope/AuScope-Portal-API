@@ -253,52 +253,18 @@
     
 
     <!-- Project properties -->
-    <properties>
-        <!--<jetty.version>9.3.7.v20160115</jetty.version>-->
-        <!--<hibernate.version>3.6.7.Final</hibernate.version>-->
-        
-        <hibernate.version>5.4.1.Final</hibernate.version>
-        <hibernate.validator.version>6.0.14.Final</hibernate.validator.version>
-        
-        
+    <properties>       
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>1.8</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>1.6.3</powermock.version>
         <portal.core.version>2.1.0-SNAPSHOT</portal.core.version>
         <httpclient.version>4.3.5</httpclient.version>
-        <!--<mysql.version>5.1.38</mysql.version>-->
         <mysql.version>8.0.14</mysql.version>
-        <jackson.version>2.9.0</jackson.version>
-        
-        <!--
-        <spring.version>Cairo-RELEASE</spring.version>
-        <spring.security.version>5.1.3.RELEASE</spring.security.version>
-        
-        <spring.boot.version>2.1.2.RELEASE</spring.boot.version>
-        -->
-        
+        <jackson.version>2.9.0</jackson.version>        
     </properties>
     
-    
-    <!-- XXX Migration -->
-    <!--
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.spring.platform</groupId>
-                <artifactId>platform-bom</artifactId>
-                <version>2.0.8.RELEASE</version>
-                <version>${spring.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    -->
-    
-    
-    <!-- XXX Migrate -->
+    <!--  Spring Boot -->    
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -306,27 +272,7 @@
     </parent>
     
 
-    <repositories>
-        <!--
-        <repository>
-            <id>osgeo</id>
-            <name>Open Source Geospatial Foundation Repository</name>
-            <url>http://download.osgeo.org/webdav/geotools</url>
-        </repository>
-        -->
-        <!-- <repository>
-             <id>mygrid</id>
-             <name>MyGrid Repository</name>
-             <url>http://build.mygrid.org.uk/maven/repository/</url>
-             </repository> -->
-         <!--
-        <repository>
-            <id>geotoolkit</id>
-            <name>Geo Toolkit Repository</name>
-            <url>http://maven.geotoolkit.org/</url>
-        </repository>
-        -->
-        
+    <repositories>        
         <repository>
             <id>CSIRO AuScope Repo</id>
             <name>AuScope Nexus - PortalRepo</name>
@@ -343,47 +289,15 @@
 
     <!-- Dependencies -->
 	<dependencies>
-
-	
-	   <!-- XXX Migration -->
 	   <!-- Check if we need this if we use spring-boot-starter-web -->
 	   <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <!--
-            <exclusions>
-			    <exclusion>
-			        <groupId>org.springframework.boot</groupId>
-			        <artifactId>spring-boot-starter-logging</artifactId>
-			    </exclusion>
-			</exclusions>
-			-->
         </dependency>
         
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            
-            <!--
-             org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'methodValidationPostProcessor' defined in class path resource [org/springframework/boot/autoconfigure/validation/ValidationAutoConfiguration.class]
-             Note: exclusion didn't help
-             -->
-             <!--
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                </exclusion>
-            </exclusions>
-            -->
-            <!--
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-            -->
         </dependency>
         
         <!--
@@ -415,12 +329,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        -->
         
         <!-- Security (Spring Boot) -->
         <!--
@@ -437,7 +345,6 @@
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
         -->
-
 	
 		<dependency>
 			<groupId>com.jcraft</groupId>
@@ -478,6 +385,7 @@
             <version>${jackson.version}</version>
         </dependency>
         
+        <!--
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -499,6 +407,7 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
         </dependency>
+        -->
         
         <dependency>
             <groupId>org.auscope.portal</groupId>
@@ -523,18 +432,19 @@
             <artifactId>standard</artifactId>
             <version>1.1.2</version>
         </dependency>
+
+        <!--         
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.7</version>
         </dependency>
         <dependency>
-            <!--<groupId>commons-dbcp</groupId>-->
             <groupId>org.apache.commons</groupId>
-            <!--<artifactId>commons-dbcp</artifactId>-->
             <artifactId>commons-dbcp2</artifactId>
             <version>2.5.0</version>
         </dependency>
+        -->
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
@@ -551,17 +461,6 @@
             <version>3.2.2</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.4.1.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator-annotation-processor</artifactId>
-            <!--<version>4.1.0.Final</version>-->
-            <version>6.0.14.Final</version>
-        </dependency>
-        <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.24.1-GA</version>
@@ -572,16 +471,7 @@
             <version>1.0</version>
         </dependency>
         
-        
-        <!-- For VelocityEngineFactoryBean -->
         <!--
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-        </dependency>
-        -->
-        
-        
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
@@ -601,6 +491,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        -->
 
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -626,12 +517,14 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-taglibs</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>5.1.4.RELEASE</version>
             <scope>compile</scope>
         </dependency>
+        -->
         
         
         <!-- Added for job monitoring -->
@@ -736,7 +629,6 @@
     </dependencies>
     
     
-    <!-- XXX Migration -->
     <!--
     <build>
         <plugins>

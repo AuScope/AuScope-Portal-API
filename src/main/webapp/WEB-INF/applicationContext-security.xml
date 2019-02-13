@@ -101,7 +101,7 @@
                 </beans:entry>
             </beans:map>
         </beans:constructor-arg>
-        <beans:property name="userDao" ref="anvglUserDao"/>
+        <!--<beans:property name="userDao" ref="anvglUserDao"/>-->
     </beans:bean>
 
     <beans:bean id="oAuth2DefaultUserInfoProvider" class="com.racquettrack.security.oauth.DefaultOAuth2UserInfoProvider">
@@ -131,7 +131,7 @@
                 </beans:entry>
             </beans:map>
         </beans:constructor-arg>
-        <beans:property name="userDao" ref="anvglUserDao"/>
+        <!--<beans:property name="userDao" ref="anvglUserDao"/>-->
     </beans:bean>
     
     <beans:bean id="aafFilter" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter">

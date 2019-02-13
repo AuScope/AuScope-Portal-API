@@ -4,6 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.vegl.VGLBookMark;
@@ -16,14 +24,20 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author Josh Vote (CSIRO)
  *
  */
+@Entity
+@Table(name = "users")
 public class ANVGLUser implements UserDetails {
 
-    // Authentication frameworks
+	private static final long serialVersionUID = -8923427161200232245L;
+
+	// Authentication frameworks
     public enum AuthenticationFramework { GOOGLE, AAF }
 
+    @Id
     private String id;
     private String fullName;
     private String email;
+    @OneToMany(mappedBy = "parent", orphanRemoval = true)
     private List<ANVGLAuthority> authorities;
     private String arnExecution;
     private String arnStorage;
@@ -31,9 +45,12 @@ public class ANVGLUser implements UserDetails {
     private String awsSecret;
     private String awsKeyName;
     private Integer acceptedTermsConditions;
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private NCIDetails nciDetails;
     private AuthenticationFramework authentication;
     
     /** A List of book marks associated with the user */
+    @OneToMany(mappedBy = "parent",	orphanRemoval = true)
     private List<VGLBookMark> bookMarks;
 
     public ANVGLUser() {
@@ -41,12 +58,14 @@ public class ANVGLUser implements UserDetails {
         this.bookMarks =  new ArrayList<>();
     }
 
-    public ANVGLUser(String id, String fullName, String email, List<ANVGLAuthority> authorities) {
+    public ANVGLUser(String id, String fullName, String email,
+    		List<ANVGLAuthority> authorities, List<VGLBookMark> bookMarks) {
         super();
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.authorities = authorities;
+        this.bookMarks = bookMarks;
     } 
     
 
@@ -150,7 +169,23 @@ public class ANVGLUser implements UserDetails {
         this.acceptedTermsConditions = acceptedTermsConditions;
     }
 
-    @Override
+    /**
+     * 
+     * @return
+     */
+    public NCIDetails getNciDetails() {
+		return nciDetails;
+	}
+
+    /**
+     * 
+     * @param nciDetails
+     */
+	public void setNciDetails(NCIDetails nciDetails) {
+		this.nciDetails = nciDetails;
+	}
+
+	@Override
     public String toString() {
         return "ANVGLUser [id=" + id + ", fullName=" + fullName + ", authorities=" + authorities + "]";
     }
@@ -162,9 +197,13 @@ public class ANVGLUser implements UserDetails {
 
     public void setAuthorities(List<ANVGLAuthority> authorities) {
         this.authorities = authorities;
+        // TODO: I don't think this is needed, check everywhere used.
+        // XXX Was killing save User
+        /*
         for (ANVGLAuthority auth : authorities) {
             auth.setParent(this);
         }
+        */
     }
 
     public String getArnExecution() {
@@ -236,13 +275,13 @@ public class ANVGLUser implements UserDetails {
      * Returns true iff this ANVGLUser instance has at least 1 compute service
      * which has been properly configured.
      *
-     * @param nciDetailsDao
+     * @param nciDetailsService
      * @param cloudComputeServices
      * @return
      * @throws PortalServiceException
      */
-    public boolean configuredServicesStatus(NCIDetailsDao nciDetailsDao, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
-        return !BaseCloudController.getConfiguredComputeServices(this, nciDetailsDao, cloudComputeServices).isEmpty();
+    public boolean configuredServicesStatus(NCIDetailsService nciDetailsService, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
+        return !BaseCloudController.getConfiguredComputeServices(this, nciDetailsService, cloudComputeServices).isEmpty();
     }
 
     @Override

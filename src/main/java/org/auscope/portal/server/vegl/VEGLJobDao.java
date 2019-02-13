@@ -8,12 +8,14 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetails;
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A data access object for VEGLJob
  * @author Josh Vote
  *
  */
+//@Transactional
 public class VEGLJobDao extends HibernateDaoSupport {
     /**
      * Retrieves jobs that are grouped under given series.

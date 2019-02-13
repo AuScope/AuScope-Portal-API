@@ -28,7 +28,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     protected SecureRandom random;
     protected String defaultRole;
     protected Map<String, List<String>> rolesByUser;
-    private ANVGLUserDao userDao;
+    private ANVGLUserService userService;
 
     /**
      * Creates a new GoogleOAuth2UserDetailsLoader that will assign defaultRole to every user as a granted authority.
@@ -62,17 +62,21 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
      * The DAO that will be used to fetch/set users
      * @return
      */
+    /*
     public ANVGLUserDao getUserDao() {
         return userDao;
     }
+    */
 
     /**
      * The DAO that will be used to fetch/set users
      * @param userDao
      */
+    /*
     public void setUserDao(ANVGLUserDao userDao) {
         this.userDao = userDao;
     }
+    */
 
     /**
      * Extracts keys from userInfo and applies them to appropriate properties in user
@@ -92,7 +96,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
 
     @Override
     public ANVGLUser getUserByUserId(String id) {
-        return userDao.getById(id);
+    	return userService.getById(id);
     }
 
     @Override
@@ -116,7 +120,8 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
         ANVGLUser newUser = new ANVGLUser();
         applyInfoToUser(newUser, userInfo);
         newUser.setAuthentication(AuthenticationFramework.GOOGLE);
-        userDao.save(newUser); //create our new user
+        userService.saveUser(newUser); //create our new user
+        
 
         synchronized(this.random) {
             //Create an AWS secret for this user
@@ -128,7 +133,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
             newUser.setS3Bucket(bucketName);
         }
         newUser.setAuthorities(authorities);
-        userDao.save(newUser); //apply authorities (so they inherit the ID)
+        userService.saveUser(newUser); //apply authorities (so they inherit the ID)
 
         return newUser;
     }
@@ -139,7 +144,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
 
         if (userDetails instanceof ANVGLUser) {
             applyInfoToUser((ANVGLUser) userDetails, userInfo);
-            userDao.save((ANVGLUser) userDetails);
+            userService.saveUser((ANVGLUser) userDetails);
         }
 
         return userDetails;

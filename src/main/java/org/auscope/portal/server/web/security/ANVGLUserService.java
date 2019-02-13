@@ -1,32 +1,38 @@
 package org.auscope.portal.server.web.security;
 
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
-import org.springframework.transaction.annotation.Transactional;
 
-/**
- * A data access object for VEGLJob
- * @author Josh Vote
- *
- */
-//@Transactional
-public class ANVGLUserDao extends HibernateDaoSupport {
-    /**
-     * Retrieves ANVGLUser that has the specified UD
-     *
-     * @param id the ID of the user
-     */
+@Service
+public class ANVGLUserService {
+
+	@Autowired
+	private ANVGLUserRepository userRepository;
+	
+	public ANVGLUser getById(String id) {
+		ANVGLUser user = userRepository.findById(id).orElse(null);
+		return user;
+	}
+	
+	public ANVGLUser getByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
+	
+	public void saveUser(ANVGLUser user) {
+		userRepository.save(user);
+	}
+
+	public void deleteUser(ANVGLUser user) {
+		userRepository.delete(user);
+	}
+
+	/*
 	@Transactional
     public ANVGLUser getById(String id) {
         return getHibernateTemplate().get(ANVGLUser.class, id);
     }
 
-    /**
-     * Retrieves ANVGLUser that has the specified UD
-     *
-     * @param id the ID of the user
-     */
 	@Transactional
     public ANVGLUser getByEmail(String email) {
         List<?> resList = getHibernateTemplate().findByNamedParam("from ANVGLUser u where u.email =:p", "p", email);
@@ -34,19 +40,14 @@ public class ANVGLUserDao extends HibernateDaoSupport {
         return (ANVGLUser) resList.get(0);
     }
     
-    /**
-     * Deletes the given user.
-     */
 	@Transactional
     public void deleteUser(ANVGLUser user) {
         getHibernateTemplate().delete(user);
     }
 
-    /**
-     * Saves or updates the given user.
-     */
 	@Transactional
     public void save(ANVGLUser user) {
         getHibernateTemplate().saveOrUpdate(user);
     }
+	*/
 }

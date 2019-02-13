@@ -3,12 +3,14 @@ package org.auscope.portal.server.vegl;
 import java.util.List;
 
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A hibernate-backed VGLJobAuditLog data access object.
  *
  * @author Richard Goh
  */
+@Transactional
 public class VGLJobAuditLogDao extends HibernateDaoSupport {
     public VGLJobAuditLogDao() {
         super();

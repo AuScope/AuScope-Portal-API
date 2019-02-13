@@ -9,9 +9,9 @@ import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUserDao;
+import org.auscope.portal.server.web.security.ANVGLUserService;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -35,21 +35,25 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
 
     private VEGLJobManager jobManager;
     private JobStatusMonitor jobStatusMonitor;
-    private ANVGLUserDao jobUserDao;
+    private ANVGLUserService jobUserService;
     
-    private NCIDetailsDao nciDetailsDao;
+    private NCIDetailsService nciDetailsService;
     
     
-    /**
-     * @return the nciDetailsDao
-     */
+    // Solely for testing
+    public void setNciDetailsService(NCIDetailsService nciDetailsService) {
+        this.nciDetailsService = nciDetailsService;
+    }
+
+    public void setJobUserService(ANVGLUserService jobUserService) {
+        this.jobUserService = jobUserService;
+    }
+    
+    /*
     public NCIDetailsDao getNciDetailsDao() {
         return nciDetailsDao;
     }
 
-    /**
-     * @param nciDetailsDao the nciDetailsDao to set
-     */
     public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
         this.nciDetailsDao = nciDetailsDao;
     }
@@ -61,6 +65,7 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     public void setJobUserDao(ANVGLUserDao jobUserDao) {
         this.jobUserDao = jobUserDao;
     }
+    */
 
     /**
      * Sets the job manager to be used for querying
@@ -85,10 +90,10 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
         try {
             List<VEGLJob> jobs = jobManager.getPendingOrActiveJobs();
             for (VEGLJob veglJob : jobs) {
-                ANVGLUser user = jobUserDao.getByEmail(veglJob.getEmailAddress());
+                ANVGLUser user = jobUserService.getByEmail(veglJob.getEmailAddress());
                 veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
                 veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
-                NCIDetails nciDetails = nciDetailsDao.getByUser(user);
+                NCIDetails nciDetails = nciDetailsService.getByUser(user);
                 if (nciDetails != null) {
                     veglJob.setProperty(NCIDetails.PROPERTY_NCI_USER, nciDetails.getUsername());
                     veglJob.setProperty(NCIDetails.PROPERTY_NCI_PROJECT, nciDetails.getProject());
