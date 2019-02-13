@@ -66,13 +66,15 @@ public class MenuController {
                          @Value("${google.analytics.key:}") String googleAnalyticsKey,
                          @Value("${portalAdminEmail}") String adminEmail,
                          @Value("${aafLoginUrl}") String aafLoginUrl,
-                         CloudComputeService[] cloudComputeServices) {
+                         CloudComputeService[] cloudComputeServices,
+                         NCIDetailsService nciDetailsService) {
         this.buildStamp = null;
         this.googleMapKey = googleMapKey;
         this.googleAnalyticsKey = googleAnalyticsKey;
         this.aafLoginUrl = aafLoginUrl;
         this.adminEmail = adminEmail;
         this.cloudComputeServices = cloudComputeServices;
+        this.nciDetailsService = nciDetailsService;
     }
 
     /**

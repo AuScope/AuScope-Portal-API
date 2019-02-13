@@ -264,7 +264,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
      */
     public VEGLJob safeClone() {
         VEGLJob newJob = new VEGLJob();
-        newJob.setId(this.getId());
         newJob.setComputeInstanceId(this.getComputeInstanceId());
         newJob.setComputeInstanceKey(this.getComputeInstanceKey());
         newJob.setComputeInstanceType(this.getComputeInstanceType());

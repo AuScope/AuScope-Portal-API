@@ -9,7 +9,6 @@ import javax.servlet.http.HttpSession;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -38,7 +37,7 @@ public class TestMenuController extends PortalTestClass {
 
     @Before
     public void setup() {
-        mc = new MenuController(gMapKey, gAnalyticsKey, adminEmail, "aaf_login_url.html", mockCloudComputeServices/*, mockNciDetailsDao*/);
+        mc = new MenuController(gMapKey, gAnalyticsKey, adminEmail, "aaf_login_url.html", mockCloudComputeServices, mockNciDetailsService/*, mockNciDetailsDao*/);
         mc.setBuildStamp("FFFF");
 
         //Global expectations for setting build stamp id
