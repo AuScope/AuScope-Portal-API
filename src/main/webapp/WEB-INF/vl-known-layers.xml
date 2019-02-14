@@ -55,6 +55,25 @@
         <property name="group" value="Geological Survey of Western Australia"/>
          <property name="order" value="1_Geological Survey of Western Australia_1"/>
     </bean>
+    
+    <bean id="knownTypeUrbanMonitor" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
+        <constructor-arg name="id" value="2135_gem_raw_1211"/>
+        <constructor-arg name="knownLayerSelector">
+            <bean class="org.auscope.portal.core.view.knownlayer.WMSSelector">
+                <constructor-arg name="layerName" value="2135gem_raw_1211"/>
+                <constructor-arg name="serviceEndpoints">
+                    <array>
+                        <value>http://yaud.it.csiro.au:8180/geoserver/ows?service=wms</value>
+                    </array>
+                </constructor-arg>
+                <constructor-arg name="includeEndpoints" value="true"/>
+            </bean>
+        </constructor-arg>
+        <property name="name" value="Urban Monitor 2135gem raw_1211"/>
+        <property name="description" value="Urban Monitor 2135gem "/>
+        <property name="group" value="Urban Monitor"/>
+         <property name="order" value="1_Urban Monitor_1"/>
+    </bean>
 
     <bean id="knownTypeGswa40mMagMerge" class="org.auscope.portal.core.view.knownlayer.KnownLayer">
         <constructor-arg name="id" value="gswa-40mmagmerge"/>

@@ -32,7 +32,7 @@
                 <ref bean="knownTypeGswa80mTCmerge"/>
                 <ref bean="knownTypeGswa80mThmerge"/>
                 <ref bean="knownTypeGswa80mUmerge"/>
-                
+                <ref bean="knownTypeUrbanMonitor"/>
                 <!-- <ref bean="knownTypeCunyuAem" />  -->
             </list>
         </constructor-arg>
@@ -42,7 +42,7 @@
         <constructor-arg>
             <list>
                 <ref bean="cswNCI" />
-                <ref bean="cswGAECat" />
+                <ref bean="cswUrbanGeoserver" />
             </list>
         </constructor-arg>
     </bean>
