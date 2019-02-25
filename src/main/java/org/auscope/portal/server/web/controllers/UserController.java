@@ -24,7 +24,6 @@ import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,10 +74,14 @@ public class UserController extends BasePortalController {
      * @return
      */
     @RequestMapping("/secure/getUser.do")
-    public ModelAndView getUser(@AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getUser(/*@AuthenticationPrincipal ANVGLUser user*/) {
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
+        	System.out.println("getUser.do: Didn't find user");
             return generateJSONResponseMAV(false);
         }
+        
+        System.out.println("getUser.do: Found user");
 
         ModelMap userObj = new ModelMap();
         userObj.put("id", user.getId());
@@ -101,12 +104,12 @@ public class UserController extends BasePortalController {
      * @return
      */
     @RequestMapping("/secure/setUser.do")
-    public ModelAndView setUser(@AuthenticationPrincipal ANVGLUser user,
+    public ModelAndView setUser(/*@AuthenticationPrincipal ANVGLUser user,*/
             @RequestParam(required=false, value="arnExecution") String arnExecution,
             @RequestParam(required=false, value="arnStorage") String arnStorage,
             @RequestParam(required=false, value="acceptedTermsConditions") Integer acceptedTermsConditions,
             @RequestParam(required=false, value="awsKeyName") String awsKeyName) {
-
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -140,8 +143,8 @@ public class UserController extends BasePortalController {
     }
 
     @RequestMapping("/getTermsConditions.do")
-    public ModelAndView getTermsConditions(@AuthenticationPrincipal ANVGLUser user) {
-
+    public ModelAndView getTermsConditions(/*@AuthenticationPrincipal ANVGLUser user*/) {
+    	ANVGLUser user = userService.getLoggedInUser();
         try {
             String tcs = IOUtils.toString(this.getClass().getResourceAsStream("vl-termsconditions.html"));
 
@@ -160,7 +163,8 @@ public class UserController extends BasePortalController {
     }
 
     @RequestMapping("/secure/getCloudFormationScript.do")
-    public void getCloudFormationScript(@AuthenticationPrincipal ANVGLUser user, HttpServletResponse response) throws IOException {
+    public void getCloudFormationScript(/*@AuthenticationPrincipal ANVGLUser user, */HttpServletResponse response) throws IOException {
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             response.sendError(HttpStatus.UNAUTHORIZED.value());
             return;
@@ -187,7 +191,8 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/getNCIDetails.do")
-    public ModelAndView getNCIDetails(@AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
+    public ModelAndView getNCIDetails(/*@AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -207,11 +212,11 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/setNCIDetails.do")
-    public ModelAndView setNCIDetails(@AuthenticationPrincipal ANVGLUser user,
+    public ModelAndView setNCIDetails(/*@AuthenticationPrincipal ANVGLUser user,*/
             @RequestParam(required=false, value="nciUsername") String username,
             @RequestParam(required=false, value="nciProject") String project,
             @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) throws PortalServiceException {
-
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -248,7 +253,8 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/getHasConfiguredComputeServices.do")
-    public ModelAndView getHasConfiguredComputeServices(@AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
+    public ModelAndView getHasConfiguredComputeServices(/*@AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }

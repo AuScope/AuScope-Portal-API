@@ -31,12 +31,14 @@
     </bean>
     -->
 
+    <!--
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${jdbc.driverClass}"/>
         <property name="url" value="${jdbc.url}"/>
         <property name="username" value="${env.jdbc.user}"/>
         <property name="password" value="${env.jdbc.password}"/>
     </bean>
+    -->
     
     <!--
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
@@ -82,7 +84,7 @@
         <constructor-arg name="cloudStorageServices"> 
             <array>  
                 <ref bean="cloudStorageService-aws-sydney" /> 
-                <ref bean="cloudStorageService-nci" /> 
+                <!--<ref bean="cloudStorageService-nci" />--> 
                 <!--<ref bean="cloudStorageService-nectar-melb" />--> 
             </array> 
         </constructor-arg>
@@ -257,12 +259,14 @@
     </bean>
     -->
     
+    <!--
     <bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageServiceNci">
         <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
         <constructor-arg name="provider" value="nci-raijin"/>
         <property name="name" value="National Computing Infrastructure - Raijin"/>
         <property name="id" value="nci-raijin-storage"/>
     </bean>
+    -->
 
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
 
@@ -316,12 +320,14 @@
     </bean>
     -->
     
+    <!--
     <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNci">
         <constructor-arg name="storageService" ref="cloudStorageService-nci"/>
         <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
         <property name="name" value="National Computing Infrastructure - Raijin"/>
         <property name="id" value="nci-raijin-compute"/>
     </bean>
+    -->
 
     <bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">
         <constructor-arg name="stagingInformation">

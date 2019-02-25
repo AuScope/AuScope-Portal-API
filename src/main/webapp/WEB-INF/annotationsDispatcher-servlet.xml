@@ -55,7 +55,8 @@
 
     <!-- creates a java.util.Properties instance with values loaded from the supplied location -->
     <!-- TO DO: Check if we need this  -->
-    <util:properties id="configProperties" location="classpath:config.properties"/>
+    <!--<util:properties id="configProperties" location="classpath:config.properties"/>-->
+    <util:properties id="configProperties" location="classpath:application.yaml"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
       <property name="prefix" value="/WEB-INF/jsp/"/>

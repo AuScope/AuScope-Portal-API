@@ -24,7 +24,6 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -162,7 +161,8 @@ public class MenuController {
     * @throws URISyntaxException
     * @throws PortalServiceException
     */
-   @RequestMapping("/**/*.html")
+   /*
+   @RequestMapping("/XX/*.html")
    public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user,
                                         HttpServletRequest request,
                                         HttpServletResponse response) throws IOException, URISyntaxException, PortalServiceException {
@@ -228,5 +228,6 @@ public class MenuController {
 
        return mav;
    }
+   */
 
 }

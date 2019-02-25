@@ -58,6 +58,9 @@
     <beans:bean id="redirectUnconfigUserHandler" class="org.auscope.portal.server.web.security.RedirectUnconfiguredUserHandler" autowire="byType">
     	<beans:property name="frontEndUrl" value="${frontEndUrl}" />
     </beans:bean>
+    
+    <beans:bean id="googleAuthFailureHandler" class="org.auscope.portal.server.web.security.GoogleAuthenticationFailureHandler" autowire="byType">
+    </beans:bean>
 
     <!-- Google OAuth2 -->
     <beans:bean id="oAuth2EntryPoint" class="com.racquettrack.security.oauth.OAuth2AuthenticationEntryPoint">
@@ -68,8 +71,8 @@
         <beans:constructor-arg name="defaultFilterProcessesUrl" value="/oauth/callback"/>
         <beans:property name="authenticationManager" ref="authenticationManager"/>
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
-        <beans:property name="authenticationSuccessHandler" ref="redirectUnconfigUserHandler">
-        </beans:property>
+        <beans:property name="authenticationSuccessHandler" ref="redirectUnconfigUserHandler"/>
+        <beans:property name="authenticationFailureHandler" ref="googleAuthFailureHandler"/>
     </beans:bean>
 
     <beans:bean id="oauth2AuthenticationProvider" class="com.racquettrack.security.oauth.OAuth2AuthenticationProvider">
@@ -84,8 +87,8 @@
 
     <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2ServiceProperties">
         <beans:constructor-arg name="redirectUri" value="${portalUrl}/oauth/callback"/>
-        <beans:constructor-arg name="clientId" value="${env.oauth2.google.clientid}"/>
-        <beans:constructor-arg name="clientSecret" value="${env.oauth2.google.clientsecret}"/>
+        <beans:constructor-arg name="clientId" value="${spring.security.oauth2.client.registration.google.client-id}"/>
+        <beans:constructor-arg name="clientSecret" value="${spring.security.oauth2.client.registration.google.client-secret}"/>
     </beans:bean>
 
     <beans:bean id="simpleUserLoader" class="org.auscope.portal.server.web.security.PersistedGoogleUserDetailsLoader">

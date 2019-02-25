@@ -1,6 +1,7 @@
 package org.auscope.portal.server.web.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
@@ -10,6 +11,12 @@ public class ANVGLUserService {
 	@Autowired
 	private ANVGLUserRepository userRepository;
 	
+	public ANVGLUser getLoggedInUser() {
+		String authUser = SecurityContextHolder.getContext().getAuthentication().getName();
+		// TODO: Always email?
+    	return getByEmail(authUser);
+	}
+	
 	public ANVGLUser getById(String id) {
 		ANVGLUser user = userRepository.findById(id).orElse(null);
 		return user;
@@ -17,6 +24,10 @@ public class ANVGLUserService {
 	
 	public ANVGLUser getByEmail(String email) {
 		return userRepository.findByEmail(email);
+	}
+	
+	public ANVGLUser getByFullName(String fullName) {
+		return userRepository.findByFullName(fullName);
 	}
 	
 	public void saveUser(ANVGLUser user) {

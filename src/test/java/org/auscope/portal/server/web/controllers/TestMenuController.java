@@ -50,6 +50,7 @@ public class TestMenuController extends PortalTestClass {
      * Tests the existence of certain critical API keys + the correct view name being extracted
      * @throws Exception
      */
+    /*
     @Test
     public void testHandleHtmlToView_FullyQualified() throws Exception {
         final String uri = "http://example.org/context/path/resource.html";
@@ -61,7 +62,7 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).configuredServicesStatus(/*mockNciDetailsDao*/mockNciDetailsService, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsService, mockCloudComputeServices);will(returnValue(true));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
             allowing(mockUser).getUsername();will(returnValue("TestUsername"));
         }});
@@ -73,12 +74,14 @@ public class TestMenuController extends PortalTestClass {
         Assert.assertEquals(mav.getModel().get("googleKey"), gMapKey);
         Assert.assertEquals(mav.getModel().get("analyticKey"), gAnalyticsKey);
     }
+    */
 
 
     /**
      * Tests the existence of certain critical API keys + the correct view name being extracted
      * @throws Exception
      */
+    /*
     @Test
     public void testHandleHtmlToView_Relative() throws Exception {
         final String uri = "/context/path/resource.html";
@@ -90,7 +93,7 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(null));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).configuredServicesStatus(/*mockNciDetailsDao*/mockNciDetailsService, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsService, mockCloudComputeServices);will(returnValue(true));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
             allowing(mockUser).getUsername();will(returnValue("TestUsername"));
         }});
@@ -102,11 +105,13 @@ public class TestMenuController extends PortalTestClass {
         Assert.assertEquals(mav.getModel().get("googleKey"), gMapKey);
         Assert.assertEquals(mav.getModel().get("analyticKey"), gAnalyticsKey);
     }
+    */
 
     /**
      * Tests that creating a new session will trigger the isNewSession variable
      * @throws Exception
      */
+    /*
     @Test
     public void testHandleHtmlToView_NewSession() throws Exception {
         final String uri = "http://example.org/context/path/resource.html";
@@ -125,11 +130,13 @@ public class TestMenuController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertEquals(mav.getModel().get("isNewSession"), true);
     }
+    */
 
     /**
      * Tests that reusing an existing session will trigger the isNewSession variable
      * @throws Exception
      */
+    /*
     @Test
     public void testHandleHtmlToView_ExistingSession() throws Exception {
         final String uri = "http://example.org/context/path/resource.html";
@@ -140,7 +147,7 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).configuredServicesStatus(/*mockNciDetailsDao*/mockNciDetailsService, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsService, mockCloudComputeServices);will(returnValue(true));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
             allowing(mockUser).getUsername();will(returnValue("TestUsername"));
         }});
@@ -150,7 +157,9 @@ public class TestMenuController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertEquals(mav.getModel().get("isNewSession"), false);
     }
+    */
 
+    /*
     @Test
     public void testUnconfiguredRedirect() throws Exception {
         final String uri = "http://example.org/context/path/resource.html";
@@ -162,7 +171,7 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).configuredServicesStatus(/*mockNciDetailsDao*/mockNciDetailsService, mockCloudComputeServices);will(returnValue(false));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsService, mockCloudComputeServices);will(returnValue(false));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(true));
             allowing(mockUser).getUsername();will(returnValue("TestUsername"));
 
@@ -173,7 +182,9 @@ public class TestMenuController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertEquals("redirect:/noconfig.html?next=/context/path/resource.html", mav.getViewName());
     }
+    */
 
+    /*
     @Test
     public void testUnacceptedTCsRedirect() throws Exception {
         final String uri = "http://example.org/context/path/resource.html";
@@ -185,7 +196,7 @@ public class TestMenuController extends PortalTestClass {
             oneOf(mockSession).getAttribute("existingSession");will(returnValue(true));
             oneOf(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).configuredServicesStatus(/*mockNciDetailsDao*/mockNciDetailsService, mockCloudComputeServices);will(returnValue(true));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsService, mockCloudComputeServices);will(returnValue(true));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(false));
             allowing(mockUser).getUsername();will(returnValue("TestUsername"));
 
@@ -196,7 +207,9 @@ public class TestMenuController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertEquals("redirect:/notcs.html?next=/context/path/resource.html", mav.getViewName());
     }
+    */
 
+    /*
     @Test
     public void testUnconfiguredRedirect_AbortOnUser() throws Exception {
         final String uri = "http://example.org/context/path/user.html?a=b";
@@ -208,7 +221,7 @@ public class TestMenuController extends PortalTestClass {
             allowing(mockSession).getAttribute("existingSession");will(returnValue(true));
             allowing(mockSession).setAttribute("existingSession", true);
 
-            allowing(mockUser).configuredServicesStatus(/*mockNciDetailsDao*/mockNciDetailsService, mockCloudComputeServices);will(returnValue(false));
+            allowing(mockUser).configuredServicesStatus(mockNciDetailsService, mockCloudComputeServices);will(returnValue(false));
             allowing(mockUser).acceptedTermsConditionsStatus();will(returnValue(false));
             allowing(mockUser).getUsername();will(returnValue("TestUsername"));
         }});
@@ -219,4 +232,5 @@ public class TestMenuController extends PortalTestClass {
         Assert.assertEquals("user?a=b", mav.getViewName());
 
     }
+    */
 }

@@ -173,7 +173,7 @@ public class TestJobBuilderController {
             will(returnValue(job));
         }});
 
-        ModelAndView mav = controller.getJobObject(jobId, user);
+        ModelAndView mav = controller.getJobObject(jobId);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -191,7 +191,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.getJobObject(jobId, user);
+        ModelAndView mav = controller.getJobObject(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -222,7 +222,7 @@ public class TestJobBuilderController {
             oneOf(mockFile2).length();will(returnValue(512L));
         }});
 
-        ModelAndView mav = controller.stagedJobFiles(jobId, user);
+        ModelAndView mav = controller.stagedJobFiles(jobId);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -240,7 +240,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.stagedJobFiles(jobId, user);
+        ModelAndView mav = controller.stagedJobFiles(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -261,7 +261,7 @@ public class TestJobBuilderController {
             will(throwException(new PortalServiceException("test exception","test exception")));
         }});
 
-        ModelAndView mav = controller.stagedJobFiles(jobId, user);
+        ModelAndView mav = controller.stagedJobFiles(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -282,7 +282,7 @@ public class TestJobBuilderController {
             oneOf(mockFileStagingService).handleFileDownload(job, filename, mockResponse);
         }});
 
-        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, filename, user);
+        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, filename);
         Assert.assertNull(mav);
     }
 
@@ -308,7 +308,7 @@ public class TestJobBuilderController {
             will(returnValue(true));
         }});
 
-        ModelAndView mav = controller.deleteFiles(jobId, filenames, user);
+        ModelAndView mav = controller.deleteFiles(jobId, filenames);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -330,7 +330,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.deleteFiles(jobId, filenames, user);
+        ModelAndView mav = controller.deleteFiles(jobId, filenames);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -359,7 +359,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(job);
         }});
 
-        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -390,7 +390,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -413,7 +413,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -443,7 +443,7 @@ public class TestJobBuilderController {
             will(returnValue(1024L));
         }});
 
-        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString(), user);
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString());
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -468,7 +468,7 @@ public class TestJobBuilderController {
             will(throwException(new PortalServiceException("Test Exception","Test Exception")));
         }});
 
-        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString(), user);
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString());
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -489,7 +489,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString(), user);
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString());
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -513,7 +513,7 @@ public class TestJobBuilderController {
             will(returnValue(downloadList));
         }});
 
-        ModelAndView mav = controller.getJobDownloads(Integer.parseInt(jobId), user);
+        ModelAndView mav = controller.getJobDownloads(Integer.parseInt(jobId));
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -531,7 +531,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.getJobDownloads(Integer.parseInt(jobId), user);
+        ModelAndView mav = controller.getJobDownloads(Integer.parseInt(jobId));
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -556,7 +556,7 @@ public class TestJobBuilderController {
             will(returnValue(job.getEmailAddress()));
         }});
 
-        ModelAndView mav = controller.getJobStatus(jobId, user);
+        ModelAndView mav = controller.getJobStatus(jobId);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         String jobStatus = (String)mav.getModel().get("data");
         Assert.assertEquals(expectedStatus, jobStatus);
@@ -575,7 +575,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.getJobStatus(jobId, user);
+        ModelAndView mav = controller.getJobStatus(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -595,7 +595,7 @@ public class TestJobBuilderController {
             will(returnValue(true));
         }});
 
-        ModelAndView mav = controller.cancelSubmission(jobId, user);
+        ModelAndView mav = controller.cancelSubmission(jobId);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -614,7 +614,7 @@ public class TestJobBuilderController {
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.cancelSubmission(jobId, user);
+        ModelAndView mav = controller.cancelSubmission(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -733,7 +733,7 @@ public class TestJobBuilderController {
             allowing(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
@@ -793,7 +793,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, job, "");
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, job.getStatus());
@@ -810,7 +810,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobId);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
@@ -864,7 +864,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, job, "");
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, job.getStatus());
@@ -905,7 +905,7 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, job.getStatus());
@@ -946,7 +946,7 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, job.getStatus());
@@ -1100,7 +1100,7 @@ public class TestJobBuilderController {
             allowing(mockRequest).isUserInRole("testRole2");will(returnValue(true));
         }});
 
-        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null, new ANVGLUser());
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
@@ -1130,7 +1130,7 @@ public class TestJobBuilderController {
             oneOf(images[0]).getPermissions();will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null, new ANVGLUser());
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
@@ -1209,8 +1209,7 @@ public class TestJobBuilderController {
                 null,
                 emailNotification,
                 null,
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
@@ -1304,8 +1303,7 @@ public class TestJobBuilderController {
                 "registeredUrl",
                 emailNotification,
                 Integer.valueOf(walltime),
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1371,8 +1369,7 @@ public class TestJobBuilderController {
                 "registeredUrl",
                 emailNotification,
                 Integer.valueOf(walltime),
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1398,7 +1395,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(mockJob);
         }});
 
-        ModelAndView mav = controller.updateJobSeries(Integer.parseInt(jobId),folderName,mockRequest,mockPortalUser);
+        ModelAndView mav = controller.updateJobSeries(Integer.parseInt(jobId),folderName, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1420,7 +1417,7 @@ public class TestJobBuilderController {
 
         }});
 
-        ModelAndView mav = controller.updateJobSeries(Integer.parseInt(jobId),folderName,mockRequest,mockPortalUser);
+        ModelAndView mav = controller.updateJobSeries(Integer.parseInt(jobId),folderName, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1473,8 +1470,7 @@ public class TestJobBuilderController {
                 "registeredUrl",
                 emailNotification,
                 walltime,
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1526,8 +1522,7 @@ public class TestJobBuilderController {
                 "registeredUrl",
                 emailNotification,
                 walltime,
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1555,7 +1550,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(job);
         }});
 
-        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths, user);
+        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
@@ -1595,7 +1590,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(job);
         }});
 
-        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths, user);
+        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
@@ -1640,7 +1635,7 @@ public class TestJobBuilderController {
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stagedFiles));
         }});
 
-        ModelAndView mav = controller.getAllJobInputs(Integer.parseInt(jobId), user);
+        ModelAndView mav = controller.getAllJobInputs(Integer.parseInt(jobId));
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
@@ -1672,7 +1667,7 @@ public class TestJobBuilderController {
             oneOf(mockNciDetailsService).getByUser(mockPortalUser);will(returnValue(null));
         }});
 
-		ModelAndView mav = controller.getComputeServices(null, user);
+		ModelAndView mav = controller.getComputeServices(null);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));

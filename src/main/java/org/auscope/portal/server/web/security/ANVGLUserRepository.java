@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ANVGLUserRepository extends JpaRepository<ANVGLUser, String> {
 
-    ANVGLUser findByEmail(String email);    
+    ANVGLUser findByEmail(String email);   
+    ANVGLUser findByFullName(String fullName);
 }
