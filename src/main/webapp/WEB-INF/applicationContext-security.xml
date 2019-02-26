@@ -82,7 +82,7 @@
         </authentication-provider>
     </authentication-manager>
 
-    <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2ServiceProperties">
+    <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.server.web.security.ANVGLGoogleOAuth2ServiceProperties">
         <beans:constructor-arg name="redirectUri" value="${HOST.portalUrl}/oauth/callback"/>
         <beans:constructor-arg name="clientId" value="${env.oauth2.google.clientid}"/>
         <beans:constructor-arg name="clientSecret" value="${env.oauth2.google.clientsecret}"/>
