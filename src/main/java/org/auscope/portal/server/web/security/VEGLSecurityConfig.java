@@ -1,35 +1,36 @@
 package org.auscope.portal.server.web.security;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.servlet.Filter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter;
+import org.auscope.portal.server.web.security.aaf.AAFAuthenticationProvider;
+import org.auscope.portal.server.web.security.aaf.AAFAuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
-import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
@@ -43,23 +44,34 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	GoogleAuthenticationSuccessHandler googleSuccessHandler;
 	
 	@Autowired
+	AAFAuthenticationSuccessHandler aafSuccessHandler;
+	
+	@Autowired
 	@Qualifier("userDetailsService")
 	ANVGLUserDetailsService userDetailsService;
 	 
-	
 	@Value("${frontEndUrl}")
 	private String frontEndUrl;
 	
 	
-	/*
-	@Autowired
-	DataSource dataSource;
+	
 	
 	@Autowired
-	public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-		auth.jdbcAuthentication().dataSource(dataSource);
+	private AAFAuthenticationProvider aafAuthenticationProvider;
+	
+	
+	
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
 	}
-	*/
+	
+	
+	@Override
+	public void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.authenticationProvider(aafAuthenticationProvider);
+	}
 	
 	
 
@@ -82,34 +94,14 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 			//.and()
 			//	.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 			.and()
-				//.userDetailsService(createUserDetailsService())
-				.addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class)
+				.addFilterBefore(ssoFilterAAF(), BasicAuthenticationFilter.class)
+				.addFilterBefore(ssoFilterGoogle(), BasicAuthenticationFilter.class)
+				
 				// Couldn't get insecure root URLs to work without this, may need to change 
 				.csrf().disable();
-		/*
-		http
-			.antMatcher("/**")
-			.authorizeRequests()
-				.antMatchers("/login**", "/error**") // TODO: Do we need error?
-				.permitAll()
-			.anyRequest()
-				.authenticated()
-				//.and()
-				//	.formLogin()
-				//		.loginPage("/login").permitAll()
-				//		//.defaultSuccessUrl("http://localhost:4200/login/loggedIn")
-				.and()
-					.logout()
-						.logoutSuccessUrl(frontEndUrl)
-						.permitAll()
-				.and()
-					.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-				.and()
-					.addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class);
-		*/
 	}
 	
-	private Filter ssoFilter() {
+	private Filter ssoFilterGoogle() {
 		OAuth2ClientAuthenticationProcessingFilter googleFilter = new OAuth2ClientAuthenticationProcessingFilter(
 				"/login/google");
 		OAuth2RestTemplate googleTemplate = new OAuth2RestTemplate(google(), oauth2ClientContext);
@@ -119,29 +111,42 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 		tokenServices.setRestTemplate(googleTemplate);
 		googleFilter.setTokenServices(tokenServices);
 		
-		//googleFilter.setAuthenticationManager(authenticationManager);
-		
 		// Success handler used for redirecting to front end
 		googleFilter.setAuthenticationSuccessHandler(googleSuccessHandler);
-		
-		/*
-		googleFilter.setAuthenticationSuccessHandler(new SimpleUrlAuthenticationSuccessHandler() {
-			@Override
-			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-		        response.sendRedirect(frontEndUrl + "/login/loggedIn");
-		    }
-		});
-		*/
 		
 		// Failure handler used only for testing at the moment
 		googleFilter.setAuthenticationFailureHandler(new AuthenticationFailureHandler() {
 			@Override
 			public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 					AuthenticationException exception) throws IOException, ServletException {
-				System.out.println("Authentication failed: " + exception.getLocalizedMessage());
+				System.out.println("Google authentication failed: " + exception.getLocalizedMessage());
 			}
 		});		
 		return googleFilter;
+	}
+	
+	
+	// Necessary for AAF Authentication
+	@Bean
+	public AuthenticationManager authenticationManager() {
+		return new ProviderManager(Arrays.asList(aafAuthenticationProvider));
+	}
+	
+	private Filter ssoFilterAAF() {
+		AAFAuthenticationFilter aafFilter = new AAFAuthenticationFilter(this.authenticationManager());
+		aafFilter.setAuthenticationSuccessHandler(aafSuccessHandler);
+		
+		// Failure handler used only for testing at the moment
+		aafFilter.setAuthenticationFailureHandler(new AuthenticationFailureHandler() {
+			@Override
+			public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+					AuthenticationException exception) throws IOException, ServletException {
+				System.out.println("AAF Authentication failed: " + exception.getLocalizedMessage());
+				
+			}
+		});
+		
+		return aafFilter;
 	}
 	
 	@Bean
@@ -155,7 +160,9 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	public ResourceServerProperties googleResource() {
 		return new ResourceServerProperties();
 	}
+
 	
+	/* NEEDED ?
 	@Bean
 	public FilterRegistrationBean<OAuth2ClientContextFilter> oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter) {
 		FilterRegistrationBean<OAuth2ClientContextFilter> registration = new FilterRegistrationBean<OAuth2ClientContextFilter>();
@@ -163,6 +170,7 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 		registration.setOrder(-100);
 		return registration;
 	}
+	*/
 	
 	/*
 	// IS THIS ATTACHED TO ANYTHING?
