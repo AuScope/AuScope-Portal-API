@@ -1,5 +1,7 @@
 package org.auscope.portal.server;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -333,6 +335,17 @@ public class VglBeanDefinitions {
     </bean> 
 	*/
 	
+	// XXX Used by cloudComputeServiceNectar, currently unused
+	@Bean
+	public InetAddress inetAddress() throws UnknownHostException {
+		return InetAddress.getLocalHost();
+	}
+	
+	// TODO: Re-implement Necatr and NCI services
+	/*
+	<!-- Used in cloudComputeService-nectar -->
+    <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/> 
+	*/
 	
 	/*
 	@Bean
@@ -913,6 +926,27 @@ public class VglBeanDefinitions {
             <bean class="org.auscope.portal.core.services.namespaces.ErmlNamespaceContext"/>
         </property>
     </bean>
+    */
+    
+    @Bean(name="pylintCommand")
+    public List<String> pylintCommand() {
+    	List<String> command = new ArrayList<String>();
+    	command.add("pylint");
+    	command.add("-r");
+    	command.add("n");
+    	command.add("-f");
+    	command.add("json");
+    	command.add("--disable=R,C");
+    	return command;
+    }
+    
+    /*
+    <util:list id="pylintCommand">
+      <value>pylint</value>
+      <value>-r</value> <value>n</value>
+      <value>-f</value> <value>json</value>
+      <value>--disable=R,C</value>
+    </util:list> 
     */
 
 }

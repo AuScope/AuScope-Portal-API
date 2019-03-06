@@ -31,7 +31,6 @@ public class AAFAuthenticationSuccessHandler implements AuthenticationSuccessHan
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
-		System.out.println("AAFSuccess: Looking for user: " + authentication.getName());
 		
 		// See if user already in DB, persist if not
 		ANVGLUser user = userService.getByFullName(  ((AAFAuthentication)authentication).getDetails().displayName  );
@@ -56,9 +55,6 @@ public class AAFAuthenticationSuccessHandler implements AuthenticationSuccessHan
 			userService.saveUser(newUser);
 			*/
 			
-		} else {
-			// TODO: Remove, just testing
-			System.out.println("AAFSuccess: User FOUND");
 		}
 		
 		//authentication.setAuthenticated(true);

@@ -8,12 +8,15 @@
       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
+    <!--  Just getting rid of this, not migrating -->
+    <!--
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**/secure/*.do" />
             <bean class="org.auscope.portal.server.web.interceptors.UserSessionInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>
+    -->
 
     <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
     <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->
@@ -79,13 +82,14 @@
     </bean>
     -->
     
-
+    <!--
     <util:list id="pylintCommand">
       <value>pylint</value>
       <value>-r</value> <value>n</value>
       <value>-f</value> <value>json</value>
       <value>--disable=R,C</value>
     </util:list>
+    -->
     
     
     <!--
@@ -333,7 +337,9 @@
 
 
     <!-- Used in cloudComputeService-nectar -->
+    <!--
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
+    -->
     
 
     <!--
