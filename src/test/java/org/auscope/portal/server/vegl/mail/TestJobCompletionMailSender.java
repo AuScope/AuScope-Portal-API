@@ -59,7 +59,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         dateProcessed = cal3.getTime();
 
         //Create object under test with mock objects and set its required property fields.
-        jobCompMailSender = new JobCompletionMailSender(mockJobManager, mockJobStatLogReader, mockMailSender, velocityEngine);
+        jobCompMailSender = new JobCompletionMailSender(mockJobManager, mockJobStatLogReader, mockMailSender/*, velocityEngine*/);
         jobCompMailSender.setTemplate("org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl");
         jobCompMailSender.setDateFormat("EEE, d MMM yyyy HH:mm:ss");
         jobCompMailSender.setMaxLengthForSeriesNameInSubject(15);

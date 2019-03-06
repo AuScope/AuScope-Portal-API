@@ -8,9 +8,9 @@ import org.springframework.context.annotation.ImportResource;
 
 // Disable security auto-configuration as it's currently still being pulled from XML
 @SpringBootApplication//(exclude = { SecurityAutoConfiguration.class })
-@ImportResource({"WEB-INF/profile-portal-production.xml",	// PortalProfileXmlWebApplicationContext (portal-core) 
-				 "WEB-INF/vl-known-layers.xml", 			// VLWebAppContext
-				 "WEB-INF/vl-registries.xml",				// VLWebAppContext 
+@ImportResource({//"WEB-INF/profile-portal-production.xml",	// PortalProfileXmlWebApplicationContext (portal-core) 
+				 //"WEB-INF/vl-known-layers.xml", 			// VLWebAppContext
+				 //"WEB-INF/vl-registries.xml",				// VLWebAppContext 
 				 //"WEB-INF/applicationContext-security.xml", // VLWebAppContext
 				 "WEB-INF/applicationContext.xml"})			// VglApplication
 //@Import(VLWebAppContext.class)

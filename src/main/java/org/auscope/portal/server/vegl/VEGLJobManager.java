@@ -14,6 +14,7 @@ import org.auscope.portal.server.web.service.VEGLJobService;
 import org.auscope.portal.server.web.service.VEGLSeriesService;
 import org.auscope.portal.server.web.service.VGLJobAuditLogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Class that talks to the data objects to retrieve or save data
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Josh Vote
  * @author Richard Goh
  */
+@Component
 public class VEGLJobManager {
     protected final Log logger = LogFactory.getLog(getClass());
 

@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auscope.portal.server.web.security.aaf.AAFAuthenticationEntryPoint;
 import org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter;
 import org.auscope.portal.server.web.security.aaf.AAFAuthenticationProvider;
 import org.auscope.portal.server.web.security.aaf.AAFAuthenticationSuccessHandler;
@@ -32,6 +33,7 @@ import org.springframework.security.oauth2.client.token.grant.code.Authorization
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableOAuth2Client
@@ -50,15 +52,17 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Qualifier("userDetailsService")
 	ANVGLUserDetailsService userDetailsService;
 	 
-	@Value("${frontEndUrl}")
-	private String frontEndUrl;
-	
-	
-	
-	
 	@Autowired
 	private AAFAuthenticationProvider aafAuthenticationProvider;
 	
+	
+	@Autowired
+	private AAFAuthenticationEntryPoint aafAuthenticationEntryPoint;
+	
+	
+	
+	@Value("${frontEndUrl}")
+	private String frontEndUrl;
 	
 	
 	@Bean
@@ -73,8 +77,6 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.authenticationProvider(aafAuthenticationProvider);
 	}
 	
-	
-
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
@@ -91,6 +93,12 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 				.logout()
 					.logoutSuccessUrl(frontEndUrl)
 					.permitAll()
+					
+					
+			.and()
+				.exceptionHandling()
+				.defaultAuthenticationEntryPointFor(aafAuthenticationEntryPoint, new AntPathRequestMatcher("/login/aafredirect"))
+					
 			//.and()
 			//	.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 			.and()
@@ -160,24 +168,5 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	public ResourceServerProperties googleResource() {
 		return new ResourceServerProperties();
 	}
-
 	
-	/* NEEDED ?
-	@Bean
-	public FilterRegistrationBean<OAuth2ClientContextFilter> oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter) {
-		FilterRegistrationBean<OAuth2ClientContextFilter> registration = new FilterRegistrationBean<OAuth2ClientContextFilter>();
-		registration.setFilter(filter);
-		registration.setOrder(-100);
-		return registration;
-	}
-	*/
-	
-	/*
-	// IS THIS ATTACHED TO ANYTHING?
-	@Bean
-	public UserDetailsService createUserDetailsService() {
-		return new ANVGLUserDetailsService();
-	}
-	*/
-
 }
