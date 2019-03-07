@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.security.NCIDetailsService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.VEGLJobService;
 import org.auscope.portal.server.web.service.VEGLSeriesService;
 import org.auscope.portal.server.web.service.VGLJobAuditLogService;

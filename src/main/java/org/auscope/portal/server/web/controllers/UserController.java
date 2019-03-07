@@ -18,9 +18,9 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUserService;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.security.NCIDetailsService;
+import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -77,12 +77,8 @@ public class UserController extends BasePortalController {
     public ModelAndView getUser(/*@AuthenticationPrincipal ANVGLUser user*/) {
     	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
-        	System.out.println("getUser.do: Didn't find user");
             return generateJSONResponseMAV(false);
         }
-        
-        System.out.println("getUser.do: Found user");
-
         ModelMap userObj = new ModelMap();
         userObj.put("id", user.getId());
         userObj.put("email", user.getEmail());

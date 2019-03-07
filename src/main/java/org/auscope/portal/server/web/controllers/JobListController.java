@@ -46,7 +46,7 @@ import org.auscope.portal.server.vegl.VGLJobAuditLog;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUserService;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.VGLJobAuditLogService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;

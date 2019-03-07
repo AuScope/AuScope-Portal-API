@@ -8,7 +8,7 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.security.NCIDetailsService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.VEGLJobService;
 import org.auscope.portal.server.web.service.VEGLSeriesService;
 import org.auscope.portal.server.web.service.VGLJobAuditLogService;

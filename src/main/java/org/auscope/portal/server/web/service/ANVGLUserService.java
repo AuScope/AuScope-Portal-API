@@ -1,5 +1,7 @@
-package org.auscope.portal.server.web.security;
+package org.auscope.portal.server.web.service;
 
+import org.auscope.portal.server.web.repositories.ANVGLUserRepository;
+import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

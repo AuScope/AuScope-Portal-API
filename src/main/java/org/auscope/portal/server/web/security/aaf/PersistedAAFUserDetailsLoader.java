@@ -4,10 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUserService;
 import org.auscope.portal.server.web.security.PersistedGoogleUserDetailsLoader;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * User details loader, almost identical in functionality to
@@ -17,17 +16,11 @@ import org.springframework.stereotype.Component;
  * @author woo392
  *
  */
-@Component
 public class PersistedAAFUserDetailsLoader extends PersistedGoogleUserDetailsLoader {
 	
 	@Autowired
 	private ANVGLUserService userService;
 	
-	public PersistedAAFUserDetailsLoader() {
-		// TODO: Deal with this properly
-		super("ROLE_USER");
-	}
-
     public PersistedAAFUserDetailsLoader(String defaultRole) {
         super(defaultRole);
     }

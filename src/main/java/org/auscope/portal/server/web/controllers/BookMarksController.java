@@ -7,7 +7,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.vegl.VGLBookMark;
 import org.auscope.portal.server.vegl.VGLBookMarkDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUserService;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.VGLBookMarkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -59,6 +59,7 @@ public class BookMarksController extends BasePortalController {
             @AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
 		ANVGLUser user = userService.getLoggedInUser();
 		VGLBookMark bookMark = new VGLBookMark();
+		bookMark.setParent(userService.getLoggedInUser());
 		bookMark.setFileIdentifier(fileIdentifier);
 		bookMark.setServiceId(serviceId);
 		bookMark.setParent(user);
@@ -109,7 +110,7 @@ public class BookMarksController extends BasePortalController {
 	@RequestMapping("/getDownloadOptions.do")
     public ModelAndView getDownloadOptions(@RequestParam(value="bookmarkId") Integer bookmarkId/*,
             @AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
-		ANVGLUser user = userService.getLoggedInUser();
+		//ANVGLUser user = userService.getLoggedInUser();
 		VGLBookMark bookmark = new VGLBookMark();
 		bookmark.setId(bookmarkId);
 		List<VGLBookMarkDownload> bookMarkDownloads = bookmarkService.getBookmarkDownloadsByBookMark(bookmark);		 
@@ -140,6 +141,7 @@ public class BookMarksController extends BasePortalController {
 		VGLBookMarkDownload bookMarkDownload = new VGLBookMarkDownload();			
 		VGLBookMark bookmark = new VGLBookMark();
 		bookmark.setId(bookmarkId);
+		bookmark.setParent(user);
 		bookMarkDownload.setParent(bookmark);
 		bookMarkDownload.setBookmarkOptionName(bookmarkOptionName);
 		bookMarkDownload.setUrl(url);
@@ -165,7 +167,7 @@ public class BookMarksController extends BasePortalController {
 	@RequestMapping("/deleteDownloadOptions.do")
 	public ModelAndView deleteDownloadOptions(@RequestParam(value="id") Integer id/*,			
             @AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
-		ANVGLUser user = userService.getLoggedInUser();
+		//ANVGLUser user = userService.getLoggedInUser();
 		VGLBookMarkDownload bookMarkDownload = new VGLBookMarkDownload();	
 		bookMarkDownload.setId(id);
 		bookmarkService.deleteBookmarkDownload(bookMarkDownload);

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;

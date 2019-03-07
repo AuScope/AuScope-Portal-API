@@ -28,7 +28,8 @@ public class ANVGLAuthority implements GrantedAuthority {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String authority;
-    // TODO: Is this ManyToOne or ManyToMany... i.e. can a user have multiple authorities?
+    
+    // TODO: Is this ManyToOne or ManyToMany... i.e. will a user have multiple authorities?
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")

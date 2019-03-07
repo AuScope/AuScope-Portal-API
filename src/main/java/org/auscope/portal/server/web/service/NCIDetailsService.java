@@ -1,7 +1,10 @@
-package org.auscope.portal.server.web.security;
+package org.auscope.portal.server.web.service;
 
 import org.auscope.portal.core.services.PortalServiceException;
-import org.auscope.portal.server.web.service.VGLCryptoService;
+import org.auscope.portal.server.web.repositories.NCIDetailsEncRepository;
+import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.NCIDetails;
+import org.auscope.portal.server.web.security.NCIDetailsEnc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +13,9 @@ public class NCIDetailsService {
 	
 	@Autowired
 	NCIDetailsEncRepository nciEncRepository;
+	
+	@Autowired
+	ANVGLUserService userService;
 
 	@Autowired
 	private VGLCryptoService encryptionService;
@@ -32,7 +38,8 @@ public class NCIDetailsService {
         detailsEnc.setId(details.getId());
         detailsEnc.setKey(encryptionService.encrypt(details.getKey()));
         detailsEnc.setProject(encryptionService.encrypt(details.getProject()));
-        detailsEnc.setUser(details.getUser());
+        //detailsEnc.setUser(details.getUser());
+        detailsEnc.setUser(userService.getLoggedInUser());
         detailsEnc.setUsername(encryptionService.encrypt(details.getUsername()));
 		nciEncRepository.save(detailsEnc);
 	}

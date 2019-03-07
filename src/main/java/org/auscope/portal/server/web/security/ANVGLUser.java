@@ -17,6 +17,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.vegl.VGLBookMark;
 import org.auscope.portal.server.web.controllers.BaseCloudController;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -38,8 +39,10 @@ public class ANVGLUser implements UserDetails, Serializable {
     private String id;
     private String fullName;
     private String email;
+    
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
     private List<ANVGLAuthority> authorities;
+    
     private String arnExecution;
     private String arnStorage;
     private String s3Bucket;

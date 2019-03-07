@@ -89,7 +89,7 @@ public class JWTManagement {
                 throw new AuthenticationServiceException("Unable to authenticate. The authentication has expired. " +
                         "Now: " + now.toString() + " expired: " + token.expires.toString() );
 
-            // XXX We're not currently storing tokens to be in order to check for replay attacks 
+            // XXX We're not currently storing tokens in order to check for replay attacks 
             /*
             try {
                 this.jdbcTemplate.update(INSERT, token.replayPreventionToken);

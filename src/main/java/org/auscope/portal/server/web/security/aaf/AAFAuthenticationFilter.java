@@ -17,9 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 public class AAFAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     
 	public AAFAuthenticationFilter(AuthenticationManager authenticationManager) {
-    	super(new AntPathRequestMatcher("/login/aaf", "POST"));
+    	super(new AntPathRequestMatcher("/login/aaf/callback", "POST"));
     	// TODO: Confirm we still need this, maybe change super constructor to string
-    	this.setFilterProcessesUrl("/login/aaf");
+    	this.setFilterProcessesUrl("/login/aaf/callback");
     	this.setAuthenticationManager(authenticationManager);
     }
 

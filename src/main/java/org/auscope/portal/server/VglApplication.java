@@ -5,20 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-/*
-@ImportResource({"WEB-INF/profile-portal-production.xml",	// PortalProfileXmlWebApplicationContext (portal-core) 
-				 "WEB-INF/vl-known-layers.xml", 			// VLWebAppContext
-				 "WEB-INF/vl-registries.xml",				// VLWebAppContext 
-				 "WEB-INF/applicationContext-security.xml", // VLWebAppContext
-				 "WEB-INF/applicationContext.xml"})			// VglApplication
-*/
-//@Import(VLWebAppContext.class)
-@SpringBootApplication//(exclude = { SecurityAutoConfiguration.class })
+
+@SpringBootApplication
 public class VglApplication extends SpringBootServletInitializer {
 	
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		//return application.sources(VglApplication.class);
 		return application;
 	}
 

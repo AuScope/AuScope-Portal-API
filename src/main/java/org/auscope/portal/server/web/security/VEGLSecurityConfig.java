@@ -1,19 +1,22 @@
 package org.auscope.portal.server.web.security;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auscope.portal.server.web.security.aaf.AAFAuthenticationEntryPoint;
 import org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter;
 import org.auscope.portal.server.web.security.aaf.AAFAuthenticationProvider;
 import org.auscope.portal.server.web.security.aaf.AAFAuthenticationSuccessHandler;
+import org.auscope.portal.server.web.security.aaf.PersistedAAFUserDetailsLoader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
@@ -33,7 +36,6 @@ import org.springframework.security.oauth2.client.token.grant.code.Authorization
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableOAuth2Client
@@ -48,17 +50,20 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	AAFAuthenticationSuccessHandler aafSuccessHandler;
 	
+	/*
 	@Autowired
 	@Qualifier("userDetailsService")
 	ANVGLUserDetailsService userDetailsService;
+	*/
 	 
 	@Autowired
 	private AAFAuthenticationProvider aafAuthenticationProvider;
 	
 	
+	/*
 	@Autowired
 	private AAFAuthenticationEntryPoint aafAuthenticationEntryPoint;
-	
+	*/
 	
 	
 	@Value("${frontEndUrl}")
@@ -93,11 +98,12 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 				.logout()
 					.logoutSuccessUrl(frontEndUrl)
 					.permitAll()
-					
-					
+				
+			/*
 			.and()
 				.exceptionHandling()
 				.defaultAuthenticationEntryPointFor(aafAuthenticationEntryPoint, new AntPathRequestMatcher("/login/aafredirect"))
+			*/
 					
 			//.and()
 			//	.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -155,6 +161,28 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 		});
 		
 		return aafFilter;
+	}
+	
+	@Bean(name="persistedUserGoogleDetailsLoader")
+	public PersistedGoogleUserDetailsLoader persistedUserGoogleDetailsLoader() {
+		Map<String, List<String>> rolesByUser = new HashMap<String, List<String>>();
+		List<String> roles = new ArrayList<String>();
+		roles.add("ROLE_ADMINISTRATOR");
+		roles.add("ROLE_UBC");
+		rolesByUser.put("105810302719127403909", roles);
+		PersistedGoogleUserDetailsLoader detailsLoader = new PersistedGoogleUserDetailsLoader("ROLE_USER", rolesByUser);
+		return detailsLoader;
+	}
+	
+	@Bean(name = "persistedAAFUserDetailsLoader")
+	public PersistedAAFUserDetailsLoader persistedAAFUserDetailsLoader() {
+		Map<String, List<String>> rolesByUser = new HashMap<String, List<String>>();
+		List<String> roles = new ArrayList<String>();
+		roles.add("ROLE_ADMINISTRATOR");
+		roles.add("ROLE_UBC");
+		rolesByUser.put("105810302719127403909", roles);
+		PersistedAAFUserDetailsLoader detailsLoader = new PersistedAAFUserDetailsLoader("ROLE_USER", rolesByUser);
+		return detailsLoader;
 	}
 	
 	@Bean
