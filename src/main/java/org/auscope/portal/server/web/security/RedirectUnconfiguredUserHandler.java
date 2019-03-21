@@ -63,39 +63,6 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth)
             throws IOException, ServletException {
-    	/*
-        Object principal = auth.getPrincipal();
-        DefaultSavedRequest savedRequest = (DefaultSavedRequest) request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST");
-
-        if (principal instanceof ANVGLUser) {
-            ANVGLUser user = (ANVGLUser) principal;
-            try {
-                boolean tcs = user.acceptedTermsConditionsStatus();
-                boolean configured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServices);
-
-                //Redirect if the user needs to accept T&Cs OR if they don't have any config services setup
-                if (!configured || !tcs) {
-                    String params = "";
-                    String redirect = configured ? "../notcs.html" : "../noconfig.html";
-                    if (savedRequest != null) {
-                        URL requestUrl = new URL(savedRequest.getRequestURL());
-                        if (!requestUrl.getPath().contains("login.html")) {
-                            params = "?next=" + requestUrl.getPath();
-                        }
-                    }
-                    response.sendRedirect(redirect + params);
-                    return;
-                }
-            } catch (PortalServiceException e) {
-                log.error("Unable to verify if user is fully configured:", e);
-            }
-        }
-
-        if (savedRequest != null) {
-            response.sendRedirect(savedRequest.getRequestURL());
-            return;
-        }
-        */
         response.sendRedirect(frontEndUrl + "/login/loggedIn");
     }
 }
