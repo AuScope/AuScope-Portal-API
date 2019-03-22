@@ -2,6 +2,15 @@ package org.auscope.portal.server.vegl;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -15,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Josh Vote
  *
  */
+@Entity
+@Table(name="parameters")
 public class VglParameter implements Serializable, Cloneable {
 
     private static final long serialVersionUID = -7474027234400180238L;
@@ -29,15 +40,23 @@ public class VglParameter implements Serializable, Cloneable {
     }
 
     /** The primary key for this parameter*/
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    
     /** The name of this parameter*/
     private String name;
+    
     /** The value (as a string) of this parameter*/
     private String value;
+    
     /** The 'type' of this parameter. Can be 'number' or 'string'*/
     private String type;
     /** The job that owns this parameter*/
+    
     @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jobId")
     private VEGLJob parent;
 
 

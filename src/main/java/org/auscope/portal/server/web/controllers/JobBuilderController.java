@@ -519,7 +519,7 @@ public class JobBuilderController extends BaseCloudController {
             job.setComputeInstanceType(computeTypeId);
         }
 
-        //Dont allow the user to specify a cloud compute service that DNE
+        // Don't allow the user to specify a cloud compute service that DNE
         // Updating the compute service means updating the dev keypair
         // We also auto choose storage service based on compute service selection
         if (computeServiceId != null) {

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -15,6 +16,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.logging.Log;
@@ -61,7 +64,10 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private Date executeDate;
 
     /** A map of VglParameter objects keyed by their parameter names*/
+    @OneToMany(mappedBy = "parent", cascade=CascadeType.ALL)
+    @MapKey(name="name")
     private Map<String, VglParameter> jobParameters = new HashMap<>();
+    
     /** A list of VglDownload objects associated with this job*/
     private List<VglDownload> jobDownloads = new ArrayList<>();
 
