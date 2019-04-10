@@ -68,7 +68,6 @@ public class ScriptBuilderController extends BaseCloudController {
     /** Script checking */
     private TemplateLintService templateLintService;
     
-    @Autowired
     private ANVGLUserService userService;
 
     @Autowired
@@ -82,6 +81,7 @@ public class ScriptBuilderController extends BaseCloudController {
      */
     @Autowired
     public ScriptBuilderController(ScriptBuilderService sbService,
+    							   ANVGLUserService userService,
                                    VEGLJobManager jobManager,
                                    ScmEntryService scmEntryService,
                                    TemplateLintService templateLintService,
@@ -91,6 +91,7 @@ public class ScriptBuilderController extends BaseCloudController {
                                    @Value("${vm-shutdown.sh}") String vmShutdownSh) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.sbService = sbService;
+        this.userService= userService;
         this.scmEntryService = scmEntryService;
         this.templateLintService = templateLintService;
     }

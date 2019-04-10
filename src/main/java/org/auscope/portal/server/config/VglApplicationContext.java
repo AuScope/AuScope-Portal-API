@@ -1,4 +1,4 @@
-package org.auscope.portal.server;
+package org.auscope.portal.server.config;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
 import org.auscope.portal.core.configuration.ServiceConfiguration;
@@ -76,8 +78,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
  *
  */
 @Configuration
-public class VglBeanDefinitions {
-	
+public class VglApplicationContext {
+
 	@Value("${env.aws.accesskey}")
 	private String awsAccessKey;
 	
@@ -94,7 +96,8 @@ public class VglBeanDefinitions {
 	private String adminEmail;
 	
 	@Value("${aws.stsrequirement}")
-	private STSRequirement awsStsRequirement;
+	private String awsStsRequirement;
+	//private STSRequirement awsStsRequirement;
 	
 	@Value("${localStageInDir}")
 	private String stageInDirectory;
@@ -138,7 +141,11 @@ public class VglBeanDefinitions {
 		storageService.setId("amazon-aws-storage-sydney");
 		storageService.setBucket("vgl-csiro-");
 		storageService.setAdminEmail(adminEmail);
-		storageService.setStsRequirement(awsStsRequirement);
+		
+		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
+		
+		//storageService.setStsRequirement(awsStsRequirement);
+		storageService.setStsRequirement(req);
 		return storageService;
 	}
 	
@@ -290,7 +297,11 @@ public class VglBeanDefinitions {
 				awsAccessKey, awsSecretKey, null);
 		computeService.setId("aws-ec2-compute");
 		computeService.setName("Amazon Web Services - EC2");
-		computeService.setStsRequirement(awsStsRequirement);
+		
+		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
+		computeService.setStsRequirement(req);
+		
+		//computeService.setStsRequirement(awsStsRequirement);
 		computeService.setAvailableImages(vglMachineImages());
 		return computeService;
 	}
@@ -408,6 +419,19 @@ public class VglBeanDefinitions {
 	/*
 	<bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
 	*/
+	
+	// VelocityEngine not originally found in applicationContext
+	@Bean
+	public VelocityEngine velocityEngine() throws Exception {
+	    Properties properties = new Properties();
+	    properties.setProperty("input.encoding", "UTF-8");
+	    properties.setProperty("output.encoding", "UTF-8");
+	    properties.setProperty("resource.loader", "class");
+	    properties.setProperty("class.resource.loader.class",
+	    					   "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+	    VelocityEngine velocityEngine = new VelocityEngine(properties);
+	    return velocityEngine;
+	}
 
 	@Bean
 	public MailSender mailSender() {
@@ -423,9 +447,9 @@ public class VglBeanDefinitions {
     */
 
     @Bean
-	public JobCompletionMailSender jobCompletionMailSender() {
+	public JobCompletionMailSender jobCompletionMailSender() throws Exception {
     	// XXX VelocityEngine now hooked up internally, untested
-		JobCompletionMailSender sender = new JobCompletionMailSender(jobManager, jobStatusLogReader(), mailSender()/*, velocityEngine*/);
+		JobCompletionMailSender sender = new JobCompletionMailSender(jobManager, jobStatusLogReader(), mailSender(), velocityEngine());
 		sender.setTemplate("org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl");
 		sender.setDateFormat("EEE, d MMM yyyy HH:mm:ss");
 		sender.setMaxLengthForSeriesNameInSubject(15);
@@ -450,7 +474,7 @@ public class VglBeanDefinitions {
 	*/
 	
 	@Bean
-	public VGLJobStatusChangeHandler vglJobStatusChangeHandler() {
+	public VGLJobStatusChangeHandler vglJobStatusChangeHandler() throws Exception {
 		return new VGLJobStatusChangeHandler(jobManager, jobCompletionMailSender(), jobStatusLogReader(), anvglProvenanceService());
 	}
 	
@@ -461,8 +485,7 @@ public class VglBeanDefinitions {
     */
 	
 	@Bean
-	public JobStatusMonitor jobStatusMonitor() {
-		// XXX does this need to be a bean?
+	public JobStatusMonitor jobStatusMonitor() throws Exception {
 		JobStatusChangeListener[] changeListeners = new JobStatusChangeListener[1];
 		changeListeners[0] = vglJobStatusChangeHandler();
 		return new JobStatusMonitor(jobStatusLogReader(), changeListeners);
@@ -479,7 +502,7 @@ public class VglBeanDefinitions {
 	*/
 	
 	@Bean
-	public JobDetailFactoryBean vglJobStatusMonitorDetail() {
+	public JobDetailFactoryBean vglJobStatusMonitorDetail() throws Exception {
 		JobDetailFactoryBean jobDetail = new JobDetailFactoryBean();
 		jobDetail.setJobClass(VGLJobStatusMonitor.class);
 		
@@ -501,6 +524,7 @@ public class VglBeanDefinitions {
             <map>
                 <entry key="jobManager" value-ref="veglJobManager"/>
                 <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
+                
                 <!-- XXX Replace with services? -->
                 <!--
                 <entry key="jobUserDao" value-ref="anvglUserDao"/>
@@ -547,14 +571,14 @@ public class VglBeanDefinitions {
 	*/
     
     @Bean
-    public SimpleTriggerFactoryBean simpleTriggerFactoryBean() {
+    public SimpleTriggerFactoryBean simpleTriggerFactoryBean() throws Exception {
     	SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
-    	
-    	
-    	trigger.setJobDetail( vglJobStatusMonitorDetail().getObject() );	// XXX
-    	
-    	
+    	trigger.setJobDetail(vglJobStatusMonitorDetail().getObject());
+    	/*
     	trigger.setRepeatInterval(300000);
+    	trigger.setStartDelay(10000);
+    	*/
+    	trigger.setRepeatInterval(30000);
     	trigger.setStartDelay(10000);
     	return trigger;
     }
@@ -586,13 +610,15 @@ public class VglBeanDefinitions {
     */
     
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean() {
+    public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
     	SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
+    	
     	schedulerFactory.setTaskExecutor(taskExecutor());
+    	//ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean(ThreadPoolTaskExecutor.class);
+    	//schedulerFactory.setTaskExecutor(taskExecutor);
+    	
     	Trigger[] triggers = new Trigger[1];
-    	
-    	triggers[0] = simpleTriggerFactoryBean().getObject();	// XXX
-    	
+    	triggers[0] = simpleTriggerFactoryBean().getObject();
     	schedulerFactory.setTriggers(triggers);
     	return schedulerFactory;
     }
@@ -653,8 +679,23 @@ public class VglBeanDefinitions {
     
     @Bean
     public CSWCacheService cswCacheService() {
+    	/*
+    	AbstractApplicationContext context = new AnnotationConfigApplicationContext(VglApplication.class);
+        ThreadPoolTaskExecutor taskExecutor = (ThreadPoolTaskExecutor) context.getBean("taskExecutor");
+        cotext.close();
+        */
+    	
+    	//ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean(ThreadPoolTaskExecutor.class);
+    	
+    	
     	CSWCacheService cacheService = new CSWCacheService(
     			taskExecutor(), httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
+    	
+    	/*
+        CSWCacheService cacheService = new CSWCacheService(
+    			taskExecutor, httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
+    	*/
+    	
     	cacheService.setForceGetMethods(true);
     	return cacheService;
     }
@@ -679,7 +720,11 @@ public class VglBeanDefinitions {
     @Bean
     public CSWFilterService cswFilterService() {
     	// XXX We're re-using a transformer factory previously defined here
+    	
+    	//ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean(ThreadPoolTaskExecutor.class);
+    	
     	return new CSWFilterService(taskExecutor(), httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
+    	//return new CSWFilterService(taskExecutor, httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
     }
     
     /*
@@ -783,8 +828,6 @@ public class VglBeanDefinitions {
     </bean>
     */
     
-    
-    
     @Bean
     public WMSMethodMaker wmsMethodMaker() {
     	return new WMSMethodMaker(httpServiceCaller());
@@ -829,6 +872,10 @@ public class VglBeanDefinitions {
 
     @Bean
     public VGLCryptoService encryptionService() throws PortalServiceException {
+    	
+    	// XXX TESTING DUPLICATE INTIALISATION --- REMOVE!!!
+    	System.out.println("*** Instantiating VGLCrypto ***");
+    	
     	return new VGLCryptoService(encryptionPassword);
     }
     
@@ -948,5 +995,5 @@ public class VglBeanDefinitions {
       <value>--disable=R,C</value>
     </util:list> 
     */
-
+	
 }

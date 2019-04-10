@@ -1,4 +1,4 @@
-package org.auscope.portal.server;
+package org.auscope.portal.server.config;
 
 import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.springframework.context.annotation.Bean;

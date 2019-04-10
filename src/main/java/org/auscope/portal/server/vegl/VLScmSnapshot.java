@@ -8,7 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-//@Table()   WHAT TABLE?
+//@Table()   No table currently - legacy
 public class VLScmSnapshot implements Serializable {
 
     private static final long serialVersionUID = -6638880820028925202L;

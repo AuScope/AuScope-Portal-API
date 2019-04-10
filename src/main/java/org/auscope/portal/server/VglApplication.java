@@ -17,4 +17,5 @@ public class VglApplication extends SpringBootServletInitializer {
 	public static void main(String[] args) {
 		SpringApplication.run(VglApplication.class, args);
 	}
+
 }

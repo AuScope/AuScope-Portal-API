@@ -17,12 +17,14 @@
    <display-name>VGL Portal</display-name>
 
     <!-- This is so our our profile 'magic' context is utilised -->
+    <!--
     <context-param>
         <param-name>contextClass</param-name>
         <param-value>
             org.auscope.portal.server.VLWebAppContext
         </param-value>
     </context-param>
+    -->
 
    <filter>
       <filter-name>springSecurityFilterChain</filter-name>
@@ -43,7 +45,7 @@
    <servlet>
       <servlet-name>annotationsDispatcher</servlet-name>
       <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-      <load-on-startup>1</load-on-startup>
+      <!--<load-on-startup>1</load-on-startup>-->
    </servlet>
 
     <servlet-mapping>
@@ -61,10 +63,10 @@
       <url-pattern>*.diag</url-pattern>
    </servlet-mapping>
 
-    <!-- servlet-mapping>
+    <!--<servlet-mapping>
       <servlet-name>annotationsDispatcher</servlet-name>
       <url-pattern>*.json</url-pattern>
-   </servlet-mapping -->
+   </servlet-mapping>-->
 
     <servlet-mapping>
       <servlet-name>annotationsDispatcher</servlet-name>

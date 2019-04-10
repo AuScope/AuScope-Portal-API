@@ -31,8 +31,6 @@ public class JobCompletionMailSender implements JobMailSender {
     private VEGLJobManager jobManager;
     private VGLJobStatusAndLogReader jobStatLogReader;
     private MailSender mailSender;
-    
-    @Autowired
     private VelocityEngine velocityEngine;
 
     //Properties that get injected thru setter methods
@@ -60,13 +58,14 @@ public class JobCompletionMailSender implements JobMailSender {
         this.portalUrl = portalUrl;
     }
 
+    @Autowired
     public JobCompletionMailSender(VEGLJobManager jobManager,
-            VGLJobStatusAndLogReader jobStatLogReader, MailSender mailSender/*,
-            VelocityEngine velocityEngine*/) {
+            VGLJobStatusAndLogReader jobStatLogReader, MailSender mailSender,
+            VelocityEngine velocityEngine) {
         this.jobManager = jobManager;
         this.jobStatLogReader = jobStatLogReader;
         this.mailSender = mailSender;
-        //this.velocityEngine = velocityEngine;
+        this.velocityEngine = velocityEngine;
     }
 
     /**

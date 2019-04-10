@@ -3,6 +3,7 @@ package org.auscope.portal.server.vegl.mail;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Properties;
 
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -32,6 +33,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
     private JobCompletionMailSender jobCompMailSender;
     private VEGLSeries mockSeries;
     private VEGLJob mockJob;
+    private VelocityEngine velocityEngine;
     private Date dateSubmitted = null;
     private Date dateProcessed = null;
     private Date dateExecuted = null;
@@ -44,11 +46,15 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         mockMailSender = context.mock(JavaMailSenderImpl.class);
         mockSeries = context.mock(VEGLSeries.class);
         mockJob = context.mock(VEGLJob.class);
-
-        //Create VelocityEngine object to be used for constructing mail content.
-        VelocityEngine velocityEngine = new VelocityEngine();
-        velocityEngine.setProperty("resource.loader", "class");
-        velocityEngine.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        
+        // Create actual Velocity engine needed for proper testing
+        Properties properties = new Properties();
+	    properties.setProperty("input.encoding", "UTF-8");
+	    properties.setProperty("output.encoding", "UTF-8");
+	    properties.setProperty("resource.loader", "class");
+	    properties.setProperty("class.resource.loader.class",
+	    					   "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+	    velocityEngine = new VelocityEngine(properties);
 
         //Global test variables to be used in all unit tests.
         Calendar cal1 = new GregorianCalendar(2013, 2, 5, 12, 00, 00);
@@ -59,7 +65,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         dateProcessed = cal3.getTime();
 
         //Create object under test with mock objects and set its required property fields.
-        jobCompMailSender = new JobCompletionMailSender(mockJobManager, mockJobStatLogReader, mockMailSender/*, velocityEngine*/);
+        jobCompMailSender = new JobCompletionMailSender(mockJobManager, mockJobStatLogReader, mockMailSender, velocityEngine);
         jobCompMailSender.setTemplate("org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl");
         jobCompMailSender.setDateFormat("EEE, d MMM yyyy HH:mm:ss");
         jobCompMailSender.setMaxLengthForSeriesNameInSubject(15);
@@ -99,7 +105,6 @@ public class TestJobCompletionMailSender extends PortalTestClass {
             allowing(mockJob).getStatus();will(returnValue(jobStatus));
             allowing(mockJob).getUser();will(returnValue(user));
             oneOf(mockSeries).getName();will(returnValue(seriesName));
-
             oneOf(mockJob).getId();will(returnValue(jobId));
             oneOf(mockJob).getName();will(returnValue(jobName));
             oneOf(mockJob).getDescription();will(returnValue(jobDescription));

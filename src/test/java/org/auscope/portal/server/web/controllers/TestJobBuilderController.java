@@ -41,6 +41,7 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.ScmEntryService;
@@ -76,6 +77,7 @@ public class TestJobBuilderController {
     private ANVGLUser mockPortalUser;
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
     private CloudSubmissionService mockCloudSubmissionService;
+    private ANVGLUserService mockUserService;
     private ANVGLProvenanceService mockAnvglProvenanceService;
     private ANVGLFileStagingService mockFileStagingService;
     
@@ -115,6 +117,8 @@ public class TestJobBuilderController {
 
         mockJobMailSender = context.mock(JobMailSender.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
+        
+        mockUserService = context.mock(ANVGLUserService.class);
 
         mockAnvglProvenanceService = context.mock(ANVGLProvenanceService.class);
         mockScmEntryService = context.mock(ScmEntryService.class);
@@ -136,6 +140,7 @@ public class TestJobBuilderController {
                                      vmShutdownSh,
                                      mockCloudStorageServices,
                                      mockCloudComputeServices,
+                                     mockUserService,
                                      vglJobStatusChangeHandler,
                                      mockScmEntryService,
                                      mockAnvglProvenanceService,
@@ -155,6 +160,7 @@ public class TestJobBuilderController {
             allowing(mockJob).getEmailAddress();will(returnValue(job.getEmailAddress()));
             allowing(mockPortalUser).getId();will(returnValue(userId));
             allowing(mockPortalUser).getEmail();will(returnValue(user.getEmail()));
+            allowing(mockUserService).getLoggedInUser();will(returnValue(mockPortalUser));
             allowing(mockSeries).getUser();will(returnValue(job.getEmailAddress()));
             allowing(mockSeries).getId();will(returnValue(Integer.parseInt(seriesId)));
         }});
@@ -169,7 +175,7 @@ public class TestJobBuilderController {
     public void testGetJobObject() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(job));
         }});
 
@@ -187,7 +193,7 @@ public class TestJobBuilderController {
     public void testGetJobObject_Exception() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
@@ -211,7 +217,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(job));
 
             //We should have a call to file staging service to get our files
@@ -236,7 +242,7 @@ public class TestJobBuilderController {
     public void testListStagedJobFiles_JobNotFound() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
@@ -254,7 +260,7 @@ public class TestJobBuilderController {
     public void testListStagedJobFiles_Exception() throws Exception {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(job));
             //We should have a call to file staging service to get our files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);
@@ -276,7 +282,7 @@ public class TestJobBuilderController {
         final String filename = "test.py";
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(with(equal(job.getId())), with(same(user)));
+            oneOf(mockJobManager).getJobById(with(equal(job.getId())), with(same(mockPortalUser)));
             will(returnValue(job));
             //We should have a call to file staging service to download a file
             oneOf(mockFileStagingService).handleFileDownload(job, filename, mockResponse);
@@ -299,7 +305,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(with(equal(job.getId())), with(same(user)));
+            oneOf(mockJobManager).getJobById(with(equal(job.getId())), with(same(mockPortalUser)));
             will(returnValue(job));
             //We should have calls to file staging service to delete files in staging dir
             oneOf(mockFileStagingService).deleteStageInFile(job, file1);
@@ -326,7 +332,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
@@ -353,7 +359,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(returnValue(job));
             //We should have a call to our job manager to save our job object
             oneOf(mockJobManager).saveJob(job);
@@ -383,7 +389,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(returnValue(job));
             //We should have a call to our job manager to save our job object
             oneOf(mockJobManager).saveJob(job);
@@ -409,7 +415,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
@@ -432,7 +438,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(returnValue(job));
 
             //We should have a call to file staging service to update a file
@@ -460,7 +466,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(returnValue(job));
 
             //We should have a call to file staging service to update a file
@@ -485,7 +491,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
@@ -506,7 +512,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(mockJob));
             //We should have a call to job object to get a list of download objects
             oneOf(mockJob).getJobDownloads();
@@ -527,7 +533,7 @@ public class TestJobBuilderController {
     public void testGetJobDownloads_Exception() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
@@ -546,7 +552,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(mockJob));
 
             oneOf(mockJob).getStatus();
@@ -571,7 +577,7 @@ public class TestJobBuilderController {
     public void testGetJobStatus_JobNotFound() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
@@ -588,7 +594,7 @@ public class TestJobBuilderController {
     public void testCancelSubmission() throws Exception {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(job));
             //We should have a call to file staging service to get our files
             oneOf(mockFileStagingService).deleteStageInDirectory(job);
@@ -610,7 +616,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
@@ -1545,7 +1551,7 @@ public class TestJobBuilderController {
 
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);will(returnValue(job));
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(job));
 
             oneOf(mockJobManager).saveJob(job);
         }});
@@ -1585,7 +1591,7 @@ public class TestJobBuilderController {
 
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);will(returnValue(job));
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(job));
 
             oneOf(mockJobManager).saveJob(job);
         }});
@@ -1630,7 +1636,7 @@ public class TestJobBuilderController {
 
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);will(returnValue(job));
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(job));
             oneOf(mockFile).length();will(returnValue(mockFileLength));
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stagedFiles));
         }});
@@ -1662,8 +1668,7 @@ public class TestJobBuilderController {
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getName();will(returnValue(name));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(id));
-            allowing(mockScmEntryService).getJobProviders((Integer)null, user);will(returnValue(null));
-            //oneOf(mockNciDetailsDao).getByUser(mockPortalUser);will(returnValue(null));
+            allowing(mockScmEntryService).getJobProviders((Integer)null, mockPortalUser);will(returnValue(null));
             oneOf(mockNciDetailsService).getByUser(mockPortalUser);will(returnValue(null));
         }});
 

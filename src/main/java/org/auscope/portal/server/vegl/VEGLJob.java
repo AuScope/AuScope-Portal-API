@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -64,17 +67,21 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private Date executeDate;
 
     /** A map of VglParameter objects keyed by their parameter names*/
-    @OneToMany(mappedBy = "parent", cascade=CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
     @MapKey(name="name")
-    private Map<String, VglParameter> jobParameters = new HashMap<>();
+    private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
     
     /** A list of VglDownload objects associated with this job*/
+    @OneToMany(mappedBy="parent", fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
     private List<VglDownload> jobDownloads = new ArrayList<>();
 
     /** A list of FileInformation objects associated with this job*/
     private List<FileInformation> jobFiles = new ArrayList<>();
 
     /** A set of Solutions associated with this job */
+    @ElementCollection
+    @CollectionTable(name="job_solutions", joinColumns=@JoinColumn(name="job_id"))
+    @Column(name="solution_id")
     private Set<String> jobSolutions = new HashSet<>();
 
     public boolean isContainsPersistentVolumes() {
@@ -185,9 +192,13 @@ public class VEGLJob extends CloudJob implements Cloneable {
     /** A set of VglJobParameter objects*/
     public void setJobParameters(Map<String, VglParameter> jobParameters) {
         this.jobParameters = jobParameters;
-        for (VglParameter params : jobParameters.values()) {
-            params.setParent(this);
+        /*
+        if(jobParameters != null && jobParameters.values() != null) {
+	        for (VglParameter params : jobParameters.values()) {
+	            params.setParent(this);
+	        }
         }
+        */
     }
 
     /**

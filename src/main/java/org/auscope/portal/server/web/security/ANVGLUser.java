@@ -40,7 +40,7 @@ public class ANVGLUser implements UserDetails, Serializable {
     private String fullName;
     private String email;
     
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval = true)
     private List<ANVGLAuthority> authorities;
     
     private String arnExecution;
@@ -54,7 +54,7 @@ public class ANVGLUser implements UserDetails, Serializable {
     private AuthenticationFramework authentication;
     
     /** A List of book marks associated with the user */
-    @OneToMany(mappedBy = "parent",	orphanRemoval = true)
+    @OneToMany(mappedBy = "parent",	fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval = true)
     private List<VGLBookMark> bookMarks;
 
     public ANVGLUser() {

@@ -1,4 +1,4 @@
-package org.auscope.portal.server;
+package org.auscope.portal.server.config;
 
 import java.awt.Dimension;
 import java.awt.Point;

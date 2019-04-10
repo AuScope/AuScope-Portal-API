@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.security;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,6 +32,7 @@ public class ANVGLAuthority implements GrantedAuthority {
     
     // TODO: Is this ManyToOne or ManyToMany... i.e. will a user have multiple authorities?
     @JsonIgnore
+    @Column(nullable=false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private ANVGLUser parent;

@@ -3,6 +3,7 @@ package org.auscope.portal.server.vegl;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,7 +30,7 @@ public class VEGLSeries implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     /** The user owning this series */
-	@OneToMany(mappedBy = "seriesId", orphanRemoval = true)
+	@OneToMany(mappedBy = "seriesId", fetch=FetchType.EAGER, orphanRemoval = true)
     private String user;
     /** A short name for this series */
     private String name;

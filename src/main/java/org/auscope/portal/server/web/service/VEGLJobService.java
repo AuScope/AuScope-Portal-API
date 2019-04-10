@@ -99,7 +99,6 @@ public class VEGLJobService {
      * Saves or updates the given job.
      */
     public void saveJob(final VEGLJob job) {
-        //getHibernateTemplate().saveOrUpdate(job);
     	jobRepository.save(job);
     }
 

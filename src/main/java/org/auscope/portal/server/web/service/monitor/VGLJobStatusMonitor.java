@@ -49,24 +49,6 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
         this.jobUserService = jobUserService;
     }
     
-    /*
-    public NCIDetailsDao getNciDetailsDao() {
-        return nciDetailsDao;
-    }
-
-    public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
-        this.nciDetailsDao = nciDetailsDao;
-    }
-
-    public ANVGLUserDao getJobUserDao() {
-        return jobUserDao;
-    }
-
-    public void setJobUserDao(ANVGLUserDao jobUserDao) {
-        this.jobUserDao = jobUserDao;
-    }
-    */
-
     /**
      * Sets the job manager to be used for querying
      * pending or active jobs from VL DB.

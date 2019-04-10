@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -34,16 +36,19 @@ public class VGLBookMark  implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 	/** identifier of the dataset */
+	@Column(nullable=false)
 	private String fileIdentifier;
 	/** service id of the dataset */
+	@Column(nullable=false)
     private String serviceId;
     /** The user owning the book mark */
     @JsonIgnore
+    @Column(nullable=false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private ANVGLUser parent;
     /** A List of download options associated with the bookmark */
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", cascade=CascadeType.ALL, orphanRemoval=true)
     private List<VGLBookMarkDownload> bookMarkDownloads;
     
     

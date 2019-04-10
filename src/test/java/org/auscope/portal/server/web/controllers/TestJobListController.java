@@ -29,6 +29,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.VGLJobAuditLogService;
 import org.jmock.Expectations;
@@ -47,6 +48,7 @@ public class TestJobListController extends PortalTestClass {
     private final String computeServiceId = "comp-service-id";
     private final String storageServiceId = "storage-service-id";
     private VEGLJobManager mockJobManager;
+    private ANVGLUserService mockUserService;
     private CloudStorageServiceJClouds[] mockCloudStorageServices;
     private FileStagingService mockFileStagingService;
     private CloudComputeService[] mockCloudComputeServices;
@@ -68,6 +70,7 @@ public class TestJobListController extends PortalTestClass {
         mockCloudStorageServices = new CloudStorageServiceJClouds[] {context.mock(CloudStorageServiceJClouds.class)};
         mockFileStagingService = context.mock(FileStagingService.class);
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
+        mockUserService = context.mock(ANVGLUserService.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
         mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
         mockResponse = context.mock(HttpServletResponse.class);
@@ -76,16 +79,18 @@ public class TestJobListController extends PortalTestClass {
         mockPortalUser = context.mock(ANVGLUser.class);
         mockCloudSubmissionService = context.mock(CloudSubmissionService.class);
         final List<VEGLJob> mockJobs=new ArrayList<>();
-
+        
         context.checking(new Expectations() {{
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
             allowing(mockJobManager).getInQueueJobs();will(returnValue(mockJobs));
+            allowing(mockUserService).getLoggedInUser();will(returnValue(mockPortalUser));
         }});
 
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
-                mockCloudComputeServices, mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,"dummy@dummy.com", mockCloudSubmissionService, mockJobAuditLogService);
+                mockCloudComputeServices, mockUserService,
+                mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,"dummy@dummy.com", mockCloudSubmissionService, mockJobAuditLogService);
     }
 
 

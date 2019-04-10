@@ -2,6 +2,16 @@ package org.auscope.portal.server.vegl;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -9,11 +19,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Josh Vote
  *
  */
+@Entity
+@Table(name="downloads")
 public class VglDownload implements Serializable, Cloneable {
     private static final long serialVersionUID = 5436097345907506395L;
 
-
     /** The primary key for this download*/
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     /** The descriptive name of this download*/
     private String name;
@@ -33,6 +46,9 @@ public class VglDownload implements Serializable, Cloneable {
     private Double westBoundLongitude;
     /** The job that owns this download*/
     @JsonIgnore
+    @Column(nullable=false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jobId")
     private VEGLJob parent;
 
     /** Organisation or person responsible for this data set */
