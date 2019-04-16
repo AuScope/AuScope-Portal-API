@@ -28,8 +28,8 @@
     <bean id="cswUrbanGeoserver" class="org.auscope.portal.core.services.csw.CSWServiceItem">
         <constructor-arg name="id" value="cswUrbanGeoserver"/>
         <constructor-arg name="title" value="Urban Geoserver"/>
-        <constructor-arg name="serviceUrl" value="http://yaud.it.csiro.au:8180/geoserver/csw"/>
-        <constructor-arg name="recordInformationUrl" value="http://yaud.it.csiro.au:8180/geoserver/ows?&amp;request=DescribeRecord&amp;typeName=gmd:MD_Metadata"/>
+        <constructor-arg name="serviceUrl" value="http://veal-demo.it.csiro.au:8080/api"/>
+        <constructor-arg name="recordInformationUrl" value="http://veal-demo.it.csiro.au:8080/api"/>
     </bean>
 
 </beans>
