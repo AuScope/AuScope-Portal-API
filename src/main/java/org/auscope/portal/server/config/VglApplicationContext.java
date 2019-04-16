@@ -541,9 +541,10 @@ public class VglApplicationContext {
 	public MethodInvokingBean injectSsscUrl() {
 		MethodInvokingBean ssscUrlBean = new MethodInvokingBean();
 		ssscUrlBean.setStaticMethod("org.auscope.portal.server.web.service.ScmEntryService.setSolutionsUrl");
-		List<String> arguments = new ArrayList<String>();
-		arguments.add(solutionsUrl);
-		ssscUrlBean.setArguments(arguments);
+		//List<String> arguments = new ArrayList<String>();
+		//arguments.add(solutionsUrl);
+		//ssscUrlBean.setArguments(arguments);
+		ssscUrlBean.setArguments(solutionsUrl);
 		return ssscUrlBean;
 	}
 	
@@ -574,11 +575,7 @@ public class VglApplicationContext {
     public SimpleTriggerFactoryBean simpleTriggerFactoryBean() throws Exception {
     	SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
     	trigger.setJobDetail(vglJobStatusMonitorDetail().getObject());
-    	/*
     	trigger.setRepeatInterval(300000);
-    	trigger.setStartDelay(10000);
-    	*/
-    	trigger.setRepeatInterval(30000);
     	trigger.setStartDelay(10000);
     	return trigger;
     }
@@ -872,10 +869,6 @@ public class VglApplicationContext {
 
     @Bean
     public VGLCryptoService encryptionService() throws PortalServiceException {
-    	
-    	// XXX TESTING DUPLICATE INTIALISATION --- REMOVE!!!
-    	System.out.println("*** Instantiating VGLCrypto ***");
-    	
     	return new VGLCryptoService(encryptionPassword);
     }
     

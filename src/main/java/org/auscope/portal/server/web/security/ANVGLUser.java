@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
@@ -40,7 +41,8 @@ public class ANVGLUser implements UserDetails, Serializable {
     private String fullName;
     private String email;
     
-    @OneToMany(mappedBy = "parent", fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval = true)
+    //@OneToMany(mappedBy = "parent", fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", cascade=CascadeType.ALL, orphanRemoval = true)
     private List<ANVGLAuthority> authorities;
     
     private String arnExecution;
@@ -50,11 +52,14 @@ public class ANVGLUser implements UserDetails, Serializable {
     private String awsKeyName;
     private Integer acceptedTermsConditions;
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private NCIDetails nciDetails;
+    private NCIDetailsEnc nciDetailsEnc;
+    
+    @Transient
     private AuthenticationFramework authentication;
     
     /** A List of book marks associated with the user */
-    @OneToMany(mappedBy = "parent",	fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval = true)
+    //@OneToMany(mappedBy = "parent",	fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent",	cascade=CascadeType.ALL, orphanRemoval = true)
     private List<VGLBookMark> bookMarks;
 
     public ANVGLUser() {
@@ -177,16 +182,16 @@ public class ANVGLUser implements UserDetails, Serializable {
      * 
      * @return
      */
-    public NCIDetails getNciDetails() {
-		return nciDetails;
+    public NCIDetailsEnc getNciDetailsEnc() {
+		return nciDetailsEnc;
 	}
 
     /**
      * 
      * @param nciDetails
      */
-	public void setNciDetails(NCIDetails nciDetails) {
-		this.nciDetails = nciDetails;
+	public void setNciDetailsEnc(NCIDetailsEnc nciDetails) {
+		this.nciDetailsEnc = nciDetailsEnc;
 	}
 
 	@Override

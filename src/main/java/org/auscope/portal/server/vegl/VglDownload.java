@@ -46,17 +46,20 @@ public class VglDownload implements Serializable, Cloneable {
     private Double westBoundLongitude;
     /** The job that owns this download*/
     @JsonIgnore
-    @Column(nullable=false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "jobId")
     private VEGLJob parent;
 
+    /*
+     * Removing these as can't see they're used and not defined in database,
+     * also affects JobDownloadController, TestJobDownloadController
+     */
     /** Organisation or person responsible for this data set */
-    private String owner;
+    //private String owner;
     /** Url of the data this is a subset of (if applicable) */
-    private String parentUrl;
+    //private String parentUrl;
     /** Name of the data this is a subset of (if applicable) */
-    private String parentName;
+    //private String parentName;
 
 
     /**
@@ -219,6 +222,7 @@ public class VglDownload implements Serializable, Cloneable {
         this.westBoundLongitude = westBoundLongitude;
     }
 
+    /*
     public String getOwner() {
         return owner;
     }
@@ -242,6 +246,7 @@ public class VglDownload implements Serializable, Cloneable {
     public void setParentName(String parentName) {
         this.parentName = parentName;
     }
+    */
 
     /**
      * The job that owns this download

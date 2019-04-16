@@ -11,17 +11,18 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VEGLJobRepository extends JpaRepository<VEGLJob, Integer> {
 	
-	@Query("SELECT j FROM VEGLJob j WHERE j.seriesId= ?1 AND j.emailAddress = ?2 AND lower(j.status) != 'deleted'")
+	
+	@Query("SELECT j FROM VEGLJob j WHERE j.seriesId= ?1 AND j.emailAddress = ?2 AND LOWER(j.status) <> 'deleted'")
 	List<VEGLJob> findBySeriesIdAndEmail(Integer seriesId, String email);
 	
-	@Query("SELECT j FROM VEGLJob j where j.emailAddress = ?1 AND lower(j.status) != 'deleted'")
+	@Query("SELECT j FROM VEGLJob j WHERE j.emailAddress = ?1 AND LOWER(j.status) <> 'deleted'")
 	List<VEGLJob> findByEmail(String email);
 	
-	@Query("SELECT j FROM VEGLJob j WHERE lower(j.status)='" + JobBuilderController.STATUS_PENDING +
-			"' or lower(j.status)='" + JobBuilderController.STATUS_ACTIVE + "'")
+	@Query("SELECT j FROM VEGLJob j WHERE LOWER(j.status)='" + JobBuilderController.STATUS_PENDING +
+			"' OR LOWER(j.status)='" + JobBuilderController.STATUS_ACTIVE + "'")
 	List<VEGLJob> findPendingOrActiveJobs();
 	
-	@Query("SELECT j FROM VEGLJob j WHERE lower(j.status)='" + JobBuilderController.STATUS_INQUEUE + "'")
+	@Query("SELECT j FROM VEGLJob j WHERE LOWER(j.status)='" + JobBuilderController.STATUS_INQUEUE + "'")
 	List<VEGLJob> findInqueueJobs();
-
+	
 }

@@ -43,7 +43,6 @@ public class VGLBookMark  implements Serializable {
     private String serviceId;
     /** The user owning the book mark */
     @JsonIgnore
-    @Column(nullable=false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private ANVGLUser parent;

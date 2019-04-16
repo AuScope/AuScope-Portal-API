@@ -58,9 +58,7 @@ public class ScmEntryService implements ScmLoader {
     protected static final String PUPPET_TEMPLATE =
             "org/auscope/portal/server/web/service/template.pp";
 
-    @Autowired
     private VLScmSnapshotRepository vlScmSnapshotRepository;
-    @Autowired
     private VelocityEngine velocityEngine;
     private VEGLJobManager jobManager;
     private CloudComputeService[] cloudComputeServices;

@@ -39,6 +39,7 @@
 <!--         <property name="ignoreUnresolvablePlaceholders" value="true" />
  -->    <!--</bean>-->
 
+    <!--
 	 <mvc:annotation-driven conversion-service="conversionService">
     	<mvc:argument-resolvers>
            <bean class="org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver" />      
@@ -52,15 +53,20 @@
             </list>
         </property>
     </bean>
+    -->
 
     <!-- creates a java.util.Properties instance with values loaded from the supplied location -->
     <!-- TO DO: Check if we need this  -->
     <!--<util:properties id="configProperties" location="classpath:config.properties"/>-->
+    <!--
     <util:properties id="configProperties" location="classpath:application.yaml"/>
+    -->
 
+    <!--
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
       <property name="prefix" value="/WEB-INF/jsp/"/>
       <property name="suffix" value=".jsp"/>
    </bean>
+   -->
 
 </beans>

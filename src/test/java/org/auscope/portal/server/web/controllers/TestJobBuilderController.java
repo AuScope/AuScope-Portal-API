@@ -38,7 +38,6 @@ import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.ANVGLUserService;

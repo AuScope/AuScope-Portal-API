@@ -2,6 +2,7 @@ package org.auscope.portal.server.web.security;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -27,8 +28,11 @@ public class NCIDetailsEnc implements Serializable {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user")
     private ANVGLUser user;
+    @Column(name="nci_username")
     private byte[] username;
+    @Column(name="nci_project")
     private byte[] project;
+    @Column(name="nci_key")
     private byte[] key;
 
     public NCIDetailsEnc() {

@@ -30,7 +30,7 @@ public class VEGLSeries implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     /** The user owning this series */
-	@OneToMany(mappedBy = "seriesId", fetch=FetchType.EAGER, orphanRemoval = true)
+	//@OneToMany(mappedBy = "seriesId", fetch=FetchType.EAGER, orphanRemoval = true)
     private String user;
     /** A short name for this series */
     private String name;

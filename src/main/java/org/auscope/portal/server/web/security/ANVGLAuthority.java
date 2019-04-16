@@ -32,7 +32,6 @@ public class ANVGLAuthority implements GrantedAuthority {
     
     // TODO: Is this ManyToOne or ManyToMany... i.e. will a user have multiple authorities?
     @JsonIgnore
-    @Column(nullable=false)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private ANVGLUser parent;

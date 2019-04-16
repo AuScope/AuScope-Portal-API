@@ -10,11 +10,14 @@
 
 
     <!-- Default entry point ref to redirect to login page on unauthorised attempts to access secure pages -->
+    <!--
     <beans:bean id="defaultEntryPoint" class="org.auscope.portal.server.web.security.DefaultEntryPoint">
         <beans:property name="realmName" value="VGL-Portal" />
     </beans:bean>
+    -->
     
     <!-- Google OAuth2 endpoint required now that login.html doesn't send users to their Google account -->
+    <!--
     <http pattern="/oauth/**" entry-point-ref="oAuth2EntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
@@ -24,8 +27,10 @@
         <logout logout-url="/j_spring_security_logout" logout-success-url="${frontEndUrl}"/>
         <s:csrf disabled="true"/>
     </http>
+    -->
     
     <!-- AAF Entry point will redirect to defined AAF login URL -->
+    <!--
     <http pattern="/jwt/**" entry-point-ref="aafEntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
@@ -35,8 +40,10 @@
         <logout logout-url="/j_spring_security_logout" logout-success-url="${frontEndUrl}"/>
         <s:csrf disabled="true"/>
     </http>
+    -->
 
     <!-- Common entry point -->
+    <!--
     <http entry-point-ref="defaultEntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
@@ -61,8 +68,10 @@
     
     <beans:bean id="googleAuthFailureHandler" class="org.auscope.portal.server.web.security.GoogleAuthenticationFailureHandler" autowire="byType">
     </beans:bean>
+    -->
 
     <!-- Google OAuth2 -->
+    <!--
     <beans:bean id="oAuth2EntryPoint" class="com.racquettrack.security.oauth.OAuth2AuthenticationEntryPoint">
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
     </beans:bean>
@@ -95,7 +104,6 @@
         <beans:constructor-arg name="defaultRole" value="ROLE_USER"/>
         <beans:constructor-arg name="rolesByUser">
             <beans:map>
-                <!-- Joshua Vote -->
                 <beans:entry key="105810302719127403909">
                     <beans:list>
                         <beans:value>ROLE_ADMINISTRATOR</beans:value>
@@ -104,7 +112,7 @@
                 </beans:entry>
             </beans:map>
         </beans:constructor-arg>
-        <!--<beans:property name="userDao" ref="anvglUserDao"/>-->
+        <!XX<beans:property name="userDao" ref="anvglUserDao"/>XX>
     </beans:bean>
 
     <beans:bean id="oAuth2DefaultUserInfoProvider" class="com.racquettrack.security.oauth.DefaultOAuth2UserInfoProvider">
@@ -116,8 +124,10 @@
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
         <beans:property name="oAuth2UserInfoProvider" ref="oAuth2DefaultUserInfoProvider"/>
     </beans:bean>
+    -->
     
     <!-- AAF -->
+    <!--
     <beans:bean id="aafEntryPoint" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationEntryPoint">
     	<beans:property name="aafLoginUrl" value="${aafLoginUrl}" />
     </beans:bean>
@@ -134,7 +144,7 @@
                 </beans:entry>
             </beans:map>
         </beans:constructor-arg>
-        <!--<beans:property name="userDao" ref="anvglUserDao"/>-->
+        <!XX<beans:property name="userDao" ref="anvglUserDao"/>XX>
     </beans:bean>
     
     <beans:bean id="aafFilter" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter">
@@ -155,5 +165,6 @@
    <authentication-manager id="aafAuthenticationManager">
         <authentication-provider ref="aafProvider" />
    </authentication-manager>
+   -->
 
 </beans:beans>

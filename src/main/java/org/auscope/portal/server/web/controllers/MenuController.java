@@ -30,6 +30,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Controller that handles all {@link Menu}-related requests,
+ * 
+ * TODO: Check how necessary thi sis post Spring Boot migration
  *
  * @author Jarek Sanders
  * @author Josh Vote
