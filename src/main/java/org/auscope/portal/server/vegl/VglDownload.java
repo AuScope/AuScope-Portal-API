@@ -26,7 +26,7 @@ public class VglDownload implements Serializable, Cloneable {
 
     /** The primary key for this download*/
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     /** The descriptive name of this download*/
     private String name;

@@ -14,7 +14,7 @@ public class VLScmSnapshot implements Serializable {
     private static final long serialVersionUID = -6638880820028925202L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String scmEntryId;

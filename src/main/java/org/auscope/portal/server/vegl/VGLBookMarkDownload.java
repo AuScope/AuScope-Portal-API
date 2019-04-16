@@ -18,7 +18,7 @@ public class VGLBookMarkDownload {
 	
 	 /** The primary key for this bookmark download*/
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
    
 	/** The descriptive name of the bookmark for this download*/

@@ -27,7 +27,7 @@ public class VEGLSeries implements Serializable {
 	
 	/** A unique identifier for this series */
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     /** The user owning this series */
 	//@OneToMany(mappedBy = "seriesId", fetch=FetchType.EAGER, orphanRemoval = true)

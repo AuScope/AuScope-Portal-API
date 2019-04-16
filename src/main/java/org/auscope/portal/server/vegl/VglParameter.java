@@ -41,7 +41,7 @@ public class VglParameter implements Serializable, Cloneable {
 
     /** The primary key for this parameter*/
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
     /** The name of this parameter*/

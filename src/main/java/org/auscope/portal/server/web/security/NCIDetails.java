@@ -16,7 +16,7 @@ public class NCIDetails implements Serializable {
     public final static String PROPERTY_NCI_PROJECT = "nci_project";
 
     //@Id
-    //@GeneratedValue(strategy = GenerationType.AUTO)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     //@OneToOne(fetch = FetchType.LAZY)
     //@JoinColumn(name = "user")

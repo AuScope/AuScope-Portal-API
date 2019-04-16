@@ -33,7 +33,7 @@ public class VGLBookMark  implements Serializable {
 	 /** The primary key for this book mark*/
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	/** identifier of the dataset */
 	@Column(nullable=false)

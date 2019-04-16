@@ -29,7 +29,7 @@ public class VGLJobAuditLog implements Serializable {
 
     /** The primary key for this parameter*/
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     /** The id of the job that owns this parameter*/
     //@ManyToOne(fetch = FetchType.LAZY)

@@ -26,7 +26,7 @@ public class ANVGLAuthority implements GrantedAuthority {
 	private static final long serialVersionUID = 5567656603347809418L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String authority;
     

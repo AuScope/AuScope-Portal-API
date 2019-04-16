@@ -47,7 +47,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     private final Log logger = LogFactory.getLog(this.getClass());
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String registeredUrl;
     //@ManyToOne(fetch = FetchType.LAZY)
