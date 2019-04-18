@@ -23,12 +23,20 @@ public class VEGLSeriesService {
     public List<VEGLSeries> query(final String user, final String name,
                                  final String desc) {
     	VEGLSeries series = new VEGLSeries();
-    	series.setUser(user);
+    	if (StringUtils.isNotEmpty(user)) {
+        	series.setUser(user);
+        } else {
+        	series.setUser(null);
+        }
         if (StringUtils.isNotEmpty(name)) {
         	series.setName(name);
-        }   
+        } else {
+        	series.setName(null);
+        }
         if (StringUtils.isNotEmpty(desc)) {
         	series.setDescription(desc);
+        } else {
+        	series.setDescription(null);
         }
         Example<VEGLSeries> example = Example.of(series);
         return seriesRepository.findAll(example);

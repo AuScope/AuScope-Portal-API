@@ -88,9 +88,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
     @Column(name="solution_id")
     private Set<String> jobSolutions = new HashSet<>();
     
-    
-    
-    
     /*
      * CloudJob parameters
      */
