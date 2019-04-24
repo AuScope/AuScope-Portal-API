@@ -43,6 +43,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.mail.JobCompletionMailSender;
+import org.auscope.portal.server.web.SearchHttpServiceCaller;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
@@ -57,6 +58,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.MethodInvokingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -632,6 +634,7 @@ public class VglApplicationContext {
     */
     
     @Bean
+    @Primary
     public HttpServiceCaller httpServiceCaller() {
     	return new HttpServiceCaller(900000);
     }
@@ -643,6 +646,12 @@ public class VglApplicationContext {
     </constructor-arg>
     </bean>
     */
+    
+    // Second HttpServiceCaller to reduce CSW record search timeout
+    @Bean
+    public SearchHttpServiceCaller searchHttpServiceCaller() {
+    	return new SearchHttpServiceCaller(10000);
+    }
     
     @Bean
     public ViewGriddedCSWRecordFactory viewGriddedResourceFactory() {
@@ -716,12 +725,8 @@ public class VglApplicationContext {
     
     @Bean
     public CSWFilterService cswFilterService() {
-    	// XXX We're re-using a transformer factory previously defined here
-    	
-    	//ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean(ThreadPoolTaskExecutor.class);
-    	
-    	return new CSWFilterService(taskExecutor(), httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
-    	//return new CSWFilterService(taskExecutor, httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
+    	//return new CSWFilterService(taskExecutor(), httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
+    	return new CSWFilterService(taskExecutor(), searchHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
     }
     
     /*
