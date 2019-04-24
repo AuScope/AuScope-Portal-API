@@ -7,6 +7,7 @@ import org.auscope.portal.server.web.StringToArrayConversionBlocker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.ConversionServiceFactoryBean;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
@@ -28,6 +29,7 @@ public class ConversionConfig {
 	private StringToArrayConversionBlocker cBlocker;
 	
 	@Bean
+	@Primary
 	public ConversionService getConversionService() {
 		ConversionServiceFactoryBean bean = new ConversionServiceFactoryBean();
         bean.setConverters(getConverters());
