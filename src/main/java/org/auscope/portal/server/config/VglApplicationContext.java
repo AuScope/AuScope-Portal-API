@@ -611,11 +611,7 @@ public class VglApplicationContext {
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
     	SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
-    	
     	schedulerFactory.setTaskExecutor(taskExecutor());
-    	//ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean(ThreadPoolTaskExecutor.class);
-    	//schedulerFactory.setTaskExecutor(taskExecutor);
-    	
     	Trigger[] triggers = new Trigger[1];
     	triggers[0] = simpleTriggerFactoryBean().getObject();
     	schedulerFactory.setTriggers(triggers);
@@ -685,23 +681,8 @@ public class VglApplicationContext {
     
     @Bean
     public CSWCacheService cswCacheService() {
-    	/*
-    	AbstractApplicationContext context = new AnnotationConfigApplicationContext(VglApplication.class);
-        ThreadPoolTaskExecutor taskExecutor = (ThreadPoolTaskExecutor) context.getBean("taskExecutor");
-        cotext.close();
-        */
-    	
-    	//ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean(ThreadPoolTaskExecutor.class);
-    	
-    	
     	CSWCacheService cacheService = new CSWCacheService(
     			taskExecutor(), httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
-    	
-    	/*
-        CSWCacheService cacheService = new CSWCacheService(
-    			taskExecutor, httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
-    	*/
-    	
     	cacheService.setForceGetMethods(true);
     	return cacheService;
     }
@@ -725,7 +706,6 @@ public class VglApplicationContext {
     
     @Bean
     public CSWFilterService cswFilterService() {
-    	//return new CSWFilterService(taskExecutor(), httpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
     	return new CSWFilterService(taskExecutor(), searchHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory());
     }
     

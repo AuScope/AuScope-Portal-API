@@ -148,7 +148,6 @@ public class CSWSearchController extends BaseCSWController {
             startIndexes.put(serviceIds[i], starts[i]);
         }
 
-
         //Parse our raw request info into a list of search facets
         List<SearchFacet<? extends Object>> facets = new ArrayList<SearchFacet<? extends Object>>();
         for (int i = 0; i < rawFields.length; i++) {
@@ -208,10 +207,15 @@ public class CSWSearchController extends BaseCSWController {
         for (CSWRecord record : response.getRecords()) {
             viewRecords.add(viewCSWRecordFactory.toView(record));
         }
+        int recordsMatched = 0;
+        for(int serviceCount : response.getRecordsMatched().values()) {
+        	recordsMatched += serviceCount;
+        }
         ModelMap mm = new ModelMap();
         mm.put("startIndexes", response.getStartIndexes());
         mm.put("nextIndexes", response.getNextIndexes());
         mm.put("records", viewRecords);
+        mm.put("recordsMatched", recordsMatched);
 
         return generateJSONResponseMAV(true, mm, "");
     }

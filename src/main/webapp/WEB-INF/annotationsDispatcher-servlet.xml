@@ -13,7 +13,7 @@
            http://www.springframework.org/schema/mvc 
            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="org.auscope.portal"/>
+    <!--<context:component-scan base-package="org.auscope.portal"/>-->
 
     <!-- XXX These are causing issues Spring Boot post-migration -->
     <!--
