@@ -50,25 +50,12 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	AAFAuthenticationSuccessHandler aafSuccessHandler;
 	
-	/*
-	@Autowired
-	@Qualifier("userDetailsService")
-	ANVGLUserDetailsService userDetailsService;
-	*/
-	 
 	@Autowired
 	private AAFAuthenticationProvider aafAuthenticationProvider;
 	
-	
-	/*
-	@Autowired
-	private AAFAuthenticationEntryPoint aafAuthenticationEntryPoint;
-	*/
-	
-	
 	@Value("${frontEndUrl}")
 	private String frontEndUrl;
-	
+
 	
 	@Bean
 	@Override
@@ -90,23 +77,10 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 					.authenticated()
 				.antMatchers("/**")
 					.permitAll()
-			//.and()
-			//	.formLogin()
-			//		.loginPage("/login").permitAll()
-			//		//.defaultSuccessUrl("http://localhost:4200/login/loggedIn")
 			.and()
 				.logout()
 					.logoutSuccessUrl(frontEndUrl)
 					.permitAll()
-				
-			/*
-			.and()
-				.exceptionHandling()
-				.defaultAuthenticationEntryPointFor(aafAuthenticationEntryPoint, new AntPathRequestMatcher("/login/aafredirect"))
-			*/
-					
-			//.and()
-			//	.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 			.and()
 				.addFilterBefore(ssoFilterAAF(), BasicAuthenticationFilter.class)
 				.addFilterBefore(ssoFilterGoogle(), BasicAuthenticationFilter.class)
