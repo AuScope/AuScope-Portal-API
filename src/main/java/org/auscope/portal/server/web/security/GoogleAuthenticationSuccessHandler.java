@@ -38,20 +38,16 @@ public class GoogleAuthenticationSuccessHandler implements AuthenticationSuccess
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
 		// See if user already in DB, persist if not
-		ANVGLUser user = userService.getByFullName(authentication.getName());
+		OAuth2Authentication oauth = (OAuth2Authentication) authentication;
+		Authentication userAuth = oauth.getUserAuthentication();
+		@SuppressWarnings("unchecked")
+		LinkedHashMap<String, Object> userDetails = (LinkedHashMap<String, Object>) userAuth.getDetails();
+		ANVGLUser user = userService.getById(userDetails.get("sub").toString());
 		if (user == null) {
-			
-			OAuth2Authentication oauth = (OAuth2Authentication) authentication;
-			Authentication userAuth = oauth.getUserAuthentication();
-			@SuppressWarnings("unchecked")
-			LinkedHashMap<String, Object> userDetails = (LinkedHashMap<String, Object>) userAuth.getDetails();
 			String id = userDetails.get("sub").toString();
 			userDetails.put("id", id);
 			detailsLoader.createUser(id, userDetails);
 		}
-
-		// XXX Needed?
-		authentication.setAuthenticated(true);
 
 		// Redirect to front end
 		response.sendRedirect(frontEndUrl + "/login/loggedIn");
