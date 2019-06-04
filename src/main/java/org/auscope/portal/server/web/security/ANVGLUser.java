@@ -191,12 +191,16 @@ public class ANVGLUser implements UserDetails, Serializable {
      * @param nciDetails
      */
 	public void setNciDetailsEnc(NCIDetailsEnc nciDetails) {
-		this.nciDetailsEnc = nciDetailsEnc;
+		this.nciDetailsEnc = nciDetails;
 	}
 
 	@Override
     public String toString() {
-        return "ANVGLUser [id=" + id + ", fullName=" + fullName + ", authorities=" + authorities + "]";
+		String strId = id == null ? "null" : id;
+		String fnStr = fullName == null ? "null" : fullName;
+		String authStr = authorities == null ? "null" : authorities.toString();
+		
+        return "ANVGLUser [id=" + strId + ", fullName=" + fnStr + ", authorities=" + authStr + "]";
     }
 
     @Override

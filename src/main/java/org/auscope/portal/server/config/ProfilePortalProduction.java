@@ -71,6 +71,9 @@ public class ProfilePortalProduction {
 	@Qualifier("cswNCI")
 	CSWServiceItem cswNci;
 	
+	@Autowired
+	@Qualifier("cswNigel")
+	CSWServiceItem cswNigel;
 	
 	@Bean
 	public ArrayList<KnownLayer> knownTypes() {
@@ -139,7 +142,7 @@ public class ProfilePortalProduction {
 	@Bean
 	public ArrayList<CSWServiceItem> cswServiceList() {
 		ArrayList<CSWServiceItem> serviceList = new ArrayList<CSWServiceItem>();
-		serviceList.add(cswNci);
+		serviceList.add(cswNigel);
 		return serviceList;
 		
 	}
