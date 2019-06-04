@@ -1,9 +1,15 @@
 package org.auscope.portal.server.web.service;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import org.auscope.portal.server.web.repositories.ANVGLUserRepository;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.aaf.AAFAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 
 
@@ -14,9 +20,20 @@ public class ANVGLUserService {
 	private ANVGLUserRepository userRepository;
 	
 	public ANVGLUser getLoggedInUser() {
-		String authUser = SecurityContextHolder.getContext().getAuthentication().getName();
-		// TODO: Always email?
-    	return getByEmail(authUser);
+		Authentication userAuth = SecurityContextHolder.getContext().getAuthentication();
+		String userEmail = "";
+		// Google OAuth2
+		if(userAuth instanceof OAuth2Authentication) {
+			@SuppressWarnings("unchecked")
+			HashMap<String, String> userDetails = (LinkedHashMap<String, String>)((OAuth2Authentication)userAuth).getUserAuthentication().getDetails();
+			userEmail = (String)userDetails.get("email");
+		}
+		// Only other supported Authentication is AAFAuthentication, where
+		// unique name has been set to user's email
+		else {
+			userEmail = userAuth.getName();
+		}
+		return getByEmail(userEmail);
 	}
 	
 	public ANVGLUser getById(String id) {

@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.security.aaf;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
@@ -15,11 +16,12 @@ import javax.servlet.http.HttpServletResponse;
  * Modified by woo392.
  */
 public class AAFAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+	
+	@Value("${aafCallbackUrl}")
+	private String aafCallbackUrl;
     
-	public AAFAuthenticationFilter(AuthenticationManager authenticationManager) {
-    	super(new AntPathRequestMatcher("/login/aaf/callback", "POST"));
-    	// TODO: Confirm we still need this, maybe change super constructor to string
-    	this.setFilterProcessesUrl("/login/aaf/callback");
+	public AAFAuthenticationFilter(AuthenticationManager authenticationManager, String aafCallbackUrl) {
+    	super(new AntPathRequestMatcher(aafCallbackUrl, "POST"));
     	this.setAuthenticationManager(authenticationManager);
     }
 
