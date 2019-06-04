@@ -23,8 +23,11 @@ import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
+import org.auscope.portal.core.services.cloud.CloudComputeServiceNci;
+import org.auscope.portal.core.services.cloud.CloudComputeServiceNectar;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
+import org.auscope.portal.core.services.cloud.CloudStorageServiceNci;
 import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusChangeListener;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
@@ -274,14 +277,12 @@ public class VglApplicationContext {
 	}
 	
 	
-	/*
 	@Bean CloudStorageServiceNci cloudStorageServiceNci() {
 		CloudStorageServiceNci cloudStorageService = new CloudStorageServiceNci("raijin.nci.org.au", "nci-raijin");
 		cloudStorageService.setId("nci-raijin-storage");
 		cloudStorageService.setName("National Computing Infrastructure - Raijin");
 		return cloudStorageService;
 	}
-	*/
 	
 	/*
 	<bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageServiceNci">
@@ -299,11 +300,8 @@ public class VglApplicationContext {
 				awsAccessKey, awsSecretKey, null);
 		computeService.setId("aws-ec2-compute");
 		computeService.setName("Amazon Web Services - EC2");
-		
 		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
 		computeService.setStsRequirement(req);
-		
-		//computeService.setStsRequirement(awsStsRequirement);
 		computeService.setAvailableImages(vglMachineImages());
 		return computeService;
 	}
@@ -354,25 +352,26 @@ public class VglApplicationContext {
 		return InetAddress.getLocalHost();
 	}
 	
-	// TODO: Re-implement Necatr and NCI services
+	// TODO: Re-implement Nectar and NCI services
 	/*
 	<!-- Used in cloudComputeService-nectar -->
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/> 
 	*/
 	
-	/*
 	@Bean
-	public CloudComputeServiceNectar cloudComputeServiceNectar() {
+	public CloudComputeServiceNectar cloudComputeServiceNectar() throws UnknownHostException {
 		CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
 				"https://keystone.rc.nectar.org.au:5000/v2.0", nectarAccessKey, nectarSecretKey);
 		computeService.setId("nectar-nova-compute");
 		computeService.setName("National eResearch Collaboration Tools and Resources");
-		computeService.setGroupName("vl-#{inetAddress.hostName.toLowerCase()}");
+		//computeService.setGroupName("vl-#{inetAddress().hostName.toLowerCase()}");
+		String groupName = "vl-";
+		groupName += inetAddress().getHostName().toLowerCase();
+		computeService.setGroupName(groupName);
 		computeService.setKeypair("vgl-developers");
 		return computeService;
 		
 	}
-	*/
 	
 	/*
 	<bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNectar">
@@ -387,14 +386,12 @@ public class VglApplicationContext {
 	*/
 	
 	
-	/*
 	@Bean CloudComputeServiceNci cloudComputeServiceNci() {
 		CloudComputeServiceNci computeService = new CloudComputeServiceNci(cloudStorageServiceNci(), "raijin.nci.org.au");
 		computeService.setId("nci-raijin-compute");
 		computeService.setName("National Computing Infrastructure - Raijin");
 		return computeService;
 	}
-	*/
 	
 	/*
 	<bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNci">
@@ -407,9 +404,16 @@ public class VglApplicationContext {
 	
 	
 	@Bean
-	public CloudComputeService[] cloudComputeServices() {
-		CloudComputeService computeServices[] = new CloudComputeService[1];
-		computeServices[0] = cloudComputeServiceAws();
+	public CloudComputeService[] cloudComputeServices()  {
+		ArrayList<CloudComputeService> computeServicesList = new ArrayList<CloudComputeService>();
+		computeServicesList.add(cloudComputeServiceAws());
+		computeServicesList.add(cloudComputeServiceNci());
+		try {
+			computeServicesList.add(cloudComputeServiceNectar());
+		} catch(UnknownHostException e) {
+			System.out.println("Unable to create Nectar cloud compute service");
+		}
+		CloudComputeService computeServices[] = (CloudComputeService[])computeServicesList.toArray();
 		return computeServices;
 	}
 	
