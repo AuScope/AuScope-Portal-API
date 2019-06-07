@@ -135,7 +135,7 @@ CREATE TABLE `parameters` (
 );
 
 CREATE TABLE `nci_details` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` varchar(128) DEFAULT NULL,
   `nci_username` blob DEFAULT NULL,
   `nci_key` blob DEFAULT NULL,

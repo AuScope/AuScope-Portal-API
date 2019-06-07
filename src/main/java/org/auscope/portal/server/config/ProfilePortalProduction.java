@@ -66,14 +66,31 @@ public class ProfilePortalProduction {
 	KnownLayer knownTypeGswa80mUmerge;
 	//@Autowired
 	//KnownLayer knownTypeCunyuAem;
+
+	@Autowired
+	@Qualifier("cswVeglProduction")
+	CSWServiceItem cswVeglProduction;
+	
+	@Autowired
+	@Qualifier("cswGAECat")
+	CSWServiceItem cswGAECat;
+	
+	@Autowired
+	@Qualifier("cswNciRR2")
+	CSWServiceItem cswNciRR2;
 	
 	@Autowired
 	@Qualifier("cswNCI")
 	CSWServiceItem cswNci;
 	
 	@Autowired
-	@Qualifier("cswNigel")
-	CSWServiceItem cswNigel;
+	@Qualifier("cswNciGSWA")
+	CSWServiceItem cswNciGswa;
+	
+	@Autowired
+	@Qualifier("cswNciMT")
+	CSWServiceItem cswNciMt;
+	
 	
 	@Bean
 	public ArrayList<KnownLayer> knownTypes() {
@@ -142,9 +159,13 @@ public class ProfilePortalProduction {
 	@Bean
 	public ArrayList<CSWServiceItem> cswServiceList() {
 		ArrayList<CSWServiceItem> serviceList = new ArrayList<CSWServiceItem>();
-		serviceList.add(cswNigel);
+		serviceList.add(cswVeglProduction);
+		serviceList.add(cswGAECat);
+		serviceList.add(cswNciRR2);
+		serviceList.add(cswNci);
+		serviceList.add(cswNciGswa);
+		serviceList.add(cswNciMt);
 		return serviceList;
-		
 	}
 	
 	/*

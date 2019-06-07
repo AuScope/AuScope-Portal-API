@@ -36,6 +36,7 @@ import org.springframework.security.oauth2.client.token.grant.code.Authorization
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableOAuth2Client
@@ -55,6 +56,12 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Value("${frontEndUrl}")
 	private String frontEndUrl;
+	
+	@Value("${portalUrl}")
+	private String portalUrl;
+	
+	@Value("${aafCallbackUrl}")
+	private String aafCallbackUrl;
 
 	
 	@Bean
@@ -72,6 +79,7 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
+			.csrf().disable()
 			.authorizeRequests()			
 				.antMatchers("/secure/**")
 					.authenticated()
@@ -79,14 +87,12 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 					.permitAll()
 			.and()
 				.logout()
+					.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 					.logoutSuccessUrl(frontEndUrl)
 					.permitAll()
 			.and()
 				.addFilterBefore(ssoFilterAAF(), BasicAuthenticationFilter.class)
-				.addFilterBefore(ssoFilterGoogle(), BasicAuthenticationFilter.class)
-				
-				// Couldn't get insecure root URLs to work without this, may need to change 
-				.csrf().disable();
+				.addFilterBefore(ssoFilterGoogle(), BasicAuthenticationFilter.class);
 	}
 	
 	private Filter ssoFilterGoogle() {
@@ -121,7 +127,7 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	private Filter ssoFilterAAF() {
-		AAFAuthenticationFilter aafFilter = new AAFAuthenticationFilter(this.authenticationManager());
+		AAFAuthenticationFilter aafFilter = new AAFAuthenticationFilter(this.authenticationManager(), aafCallbackUrl);
 		aafFilter.setAuthenticationSuccessHandler(aafSuccessHandler);
 		
 		// Failure handler used only for testing at the moment
@@ -162,7 +168,10 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	@ConfigurationProperties("google.client")
 	public AuthorizationCodeResourceDetails google() {
-		return new AuthorizationCodeResourceDetails();
+		AuthorizationCodeResourceDetails resourceDetails = new AuthorizationCodeResourceDetails();
+		resourceDetails.setPreEstablishedRedirectUri(portalUrl + "/login/google");
+		resourceDetails.setUseCurrentUri(false);
+		return resourceDetails;
 	}
 	
 	@Bean

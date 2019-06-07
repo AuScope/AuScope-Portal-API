@@ -40,14 +40,30 @@ public class VlRegistries {
         <constructor-arg name="recordInformationUrl" value="https://ecat.ga.gov.au/geonetwork/srv/eng/main.home?uuid=%1$s"/>
     </bean>
     */
+
+	@Bean
+	CSWServiceItem cswNciRR2() {
+		return new CSWServiceItem("cswNciRR2",
+				"http://geonetworkrr2.nci.org.au/geonetwork/srv/eng/csw",
+				"https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
+				"NCI Geophysics Data Portal");
+	}
+	/*
+	<bean id="cswNciRR2" class="org.auscope.portal.core.services.csw.CSWServiceItem">
+	    <constructor-arg name="id" value="cswNciRR2"/>
+	    <constructor-arg name="title" value="NCI Geophysics Data Portal"/>
+	    <constructor-arg name="serviceUrl" value="http://geonetworkrr2.nci.org.au/geonetwork/srv/eng/csw"/>
+	    <constructor-arg name="recordInformationUrl" value="https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
+    </bean>
+    */
 	
 	@Bean
 	CSWServiceItem cswNCI() {
 		return new CSWServiceItem("cswNCI",
-				"http://geonetworkrr2.nci.org.au/geonetwork/srv/eng/csw",
-				"https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
+				"https://geonetwork.nci.org.au/geonetwork/srv/eng/csw",
+				"https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
 				"NCI Data Portal");
-	}
+	}	
 	
 	@Bean
 	CSWServiceItem cswNigel() {
@@ -64,4 +80,38 @@ public class VlRegistries {
         <constructor-arg name="recordInformationUrl" value="https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
     </bean>
 	*/
+	
+	@Bean
+	CSWServiceItem cswNciGSWA() {
+		return new CSWServiceItem("cswNciGswa",
+				"http://geonetworkrl1.nci.org.au/geonetwork/srv/eng/csw",
+				"https://geonetworkrl1.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
+				"NCI GSWA Data Portal");
+	}
+	
+	/*
+	<bean id="cswNciGSWA" class="org.auscope.portal.core.services.csw.CSWServiceItem">
+	    <constructor-arg name="id" value="cswNciGswa"/>
+	    <constructor-arg name="title" value="NCI GSWA Data Portal"/>
+	    <constructor-arg name="serviceUrl" value="http://geonetworkrl1.nci.org.au/geonetwork/srv/eng/csw"/>
+	    <constructor-arg name="recordInformationUrl" value="https://geonetworkrl1.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
+    </bean>
+    */
+	
+	@Bean
+	CSWServiceItem cswNciMT() {
+		return new CSWServiceItem("cswNciMt",
+				"https://geonetworktest.nci.org.au/geonetwork/srv/eng/csw",
+				"https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
+				"NCI MT Data Portal");
+	}
+
+	/*
+	<bean id="cswNciMT" class="org.auscope.portal.core.services.csw.CSWServiceItem">
+	    <constructor-arg name="id" value="cswNciMt"/>
+	    <constructor-arg name="title" value="NCI MT Data Portal"/>
+	    <constructor-arg name="serviceUrl" value="https://geonetworktest.nci.org.au/geonetwork/srv/eng/csw"/>
+	    <constructor-arg name="recordInformationUrl" value="https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
+    </bean>
+    */
 }
