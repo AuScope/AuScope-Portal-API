@@ -10,3 +10,4 @@ src/main/resources/env.properties
 anvgl
 anvgl.pub
 src/local/
+.meghanada/

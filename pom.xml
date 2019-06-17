@@ -551,4 +551,11 @@
         -->
         
     </dependencies>
+
+  <distributionManagement>
+      <snapshotRepository>
+          <id>dcdp-snapshots</id>
+          <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-snapshots/</url>
+      </snapshotRepository>
+  </distributionManagement>
 </project>
