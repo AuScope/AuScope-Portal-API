@@ -9,14 +9,9 @@ import org.springframework.stereotype.Service;
  */
 package org.auscope.portal.server.web.service;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,16 +21,13 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import org.aopalliance.reflect.Code;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mchange.v2.codegen.bean.CompleteConstructorGeneratorExtension;
 
 /**
  * Checks a template script for errors or other issues.

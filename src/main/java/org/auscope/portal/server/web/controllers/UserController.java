@@ -1,6 +1,7 @@
 package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,21 +12,20 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUserDao;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -41,8 +41,13 @@ public class UserController extends BasePortalController {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private ANVGLUserDao userDao;
-    private NCIDetailsDao nciDetailsDao;
+    @Autowired
+    private ANVGLUserService userService;
+    
+    @Autowired
+    private NCIDetailsService nciDetailsService;
+    
+    @Autowired
     private VelocityEngine velocityEngine;
     private CloudComputeService[] cloudComputeServcies;
 
@@ -51,14 +56,11 @@ public class UserController extends BasePortalController {
     private String tacVersion;
     
     @Autowired
-    public UserController(ANVGLUserDao userDao, NCIDetailsDao nciDetailsDao,
-            VelocityEngine velocityEngine, CloudComputeService[] cloudComputeServices,
+    public UserController(VelocityEngine velocityEngine,
+    		CloudComputeService[] cloudComputeServices,
             @Value("${env.aws.account}") String awsAccount,
             @Value("${termsconditions.version}") String tacVersion) throws PortalServiceException {
-        super();
-        
-        this.userDao = userDao;
-        this.nciDetailsDao = nciDetailsDao;
+        super();        
         this.velocityEngine = velocityEngine;
         this.cloudComputeServcies = cloudComputeServices;
         this.awsAccount=awsAccount;
@@ -72,11 +74,11 @@ public class UserController extends BasePortalController {
      * @return
      */
     @RequestMapping("/secure/getUser.do")
-    public ModelAndView getUser(@AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getUser(/*@AuthenticationPrincipal ANVGLUser user*/) {
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-
         ModelMap userObj = new ModelMap();
         userObj.put("id", user.getId());
         userObj.put("email", user.getEmail());
@@ -98,12 +100,12 @@ public class UserController extends BasePortalController {
      * @return
      */
     @RequestMapping("/secure/setUser.do")
-    public ModelAndView setUser(@AuthenticationPrincipal ANVGLUser user,
+    public ModelAndView setUser(/*@AuthenticationPrincipal ANVGLUser user,*/
             @RequestParam(required=false, value="arnExecution") String arnExecution,
             @RequestParam(required=false, value="arnStorage") String arnStorage,
             @RequestParam(required=false, value="acceptedTermsConditions") Integer acceptedTermsConditions,
             @RequestParam(required=false, value="awsKeyName") String awsKeyName) {
-
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -130,15 +132,15 @@ public class UserController extends BasePortalController {
         }
 
         if (modified) {
-            userDao.save(user);
+        	userService.saveUser(user);
         }
 
         return generateJSONResponseMAV(true);
     }
 
     @RequestMapping("/getTermsConditions.do")
-    public ModelAndView getTermsConditions(@AuthenticationPrincipal ANVGLUser user) {
-
+    public ModelAndView getTermsConditions(/*@AuthenticationPrincipal ANVGLUser user*/) {
+    	ANVGLUser user = userService.getLoggedInUser();
         try {
             String tcs = IOUtils.toString(this.getClass().getResourceAsStream("vl-termsconditions.html"));
 
@@ -157,7 +159,8 @@ public class UserController extends BasePortalController {
     }
 
     @RequestMapping("/secure/getCloudFormationScript.do")
-    public void getCloudFormationScript(@AuthenticationPrincipal ANVGLUser user, HttpServletResponse response) throws IOException {
+    public void getCloudFormationScript(/*@AuthenticationPrincipal ANVGLUser user, */HttpServletResponse response) throws IOException {
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             response.sendError(HttpStatus.UNAUTHORIZED.value());
             return;
@@ -167,8 +170,11 @@ public class UserController extends BasePortalController {
         model.put("s3Bucket", user.getS3Bucket());
         model.put("awsSecret", user.getAwsSecret());
         model.put("awsAccount", awsAccount);
+        VelocityContext velocityContext = new VelocityContext(model);
+        StringWriter stringWriter = new StringWriter();
+        velocityEngine.mergeTemplate(CLOUD_FORMATION_RESOURCE, "UTF-8", velocityContext, stringWriter);
 
-        String cloudFormationScript = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, CLOUD_FORMATION_RESOURCE, "UTF-8", model);
+        String cloudFormationScript = stringWriter.toString();
 
         response.setContentType("application/octet");
         response.setHeader("Content-Disposition", "inline; filename=vgl-cloudformation.json;");
@@ -181,12 +187,13 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/getNCIDetails.do")
-    public ModelAndView getNCIDetails(@AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
+    public ModelAndView getNCIDetails(/*@AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
         ModelMap detailsObj = new ModelMap();
-        NCIDetails details = nciDetailsDao.getByUser(user);
+        NCIDetails details = nciDetailsService.getByUser(user);
         if(details != null) {
             try {
                 detailsObj.put("nciUsername", details.getUsername());
@@ -201,15 +208,15 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/setNCIDetails.do")
-    public ModelAndView setNCIDetails(@AuthenticationPrincipal ANVGLUser user,
+    public ModelAndView setNCIDetails(/*@AuthenticationPrincipal ANVGLUser user,*/
             @RequestParam(required=false, value="nciUsername") String username,
             @RequestParam(required=false, value="nciProject") String project,
             @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) throws PortalServiceException {
-
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-        NCIDetails details = nciDetailsDao.getByUser(user);
+        NCIDetails details = nciDetailsService.getByUser(user);
         if(details == null) {
             details = new NCIDetails();
             details.setUser(user);
@@ -236,17 +243,18 @@ public class UserController extends BasePortalController {
         }
             
         if (modified) {
-            nciDetailsDao.save(details);
+        	nciDetailsService.saveNCIDetails(details);
         }
         return generateJSONResponseMAV(true);        
     }
     
     @RequestMapping("/secure/getHasConfiguredComputeServices.do")
-    public ModelAndView getHasConfiguredComputeServices(@AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
+    public ModelAndView getHasConfiguredComputeServices(/*@AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
+    	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-        boolean hasConfigured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServcies);
+        boolean hasConfigured = user.configuredServicesStatus(nciDetailsService, cloudComputeServcies);
         return generateJSONResponseMAV(hasConfigured);
     }
 

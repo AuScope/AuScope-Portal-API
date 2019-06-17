@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
+import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.racquettrack.security.oauth.OAuth2UserDetailsLoader;
@@ -28,7 +30,9 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     protected SecureRandom random;
     protected String defaultRole;
     protected Map<String, List<String>> rolesByUser;
-    private ANVGLUserDao userDao;
+    
+    @Autowired
+    private ANVGLUserService userService;
 
     /**
      * Creates a new GoogleOAuth2UserDetailsLoader that will assign defaultRole to every user as a granted authority.
@@ -59,22 +63,6 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
     }
 
     /**
-     * The DAO that will be used to fetch/set users
-     * @return
-     */
-    public ANVGLUserDao getUserDao() {
-        return userDao;
-    }
-
-    /**
-     * The DAO that will be used to fetch/set users
-     * @param userDao
-     */
-    public void setUserDao(ANVGLUserDao userDao) {
-        this.userDao = userDao;
-    }
-
-    /**
      * Extracts keys from userInfo and applies them to appropriate properties in user
      *
      * @param user
@@ -92,7 +80,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
 
     @Override
     public ANVGLUser getUserByUserId(String id) {
-        return userDao.getById(id);
+    	return userService.getById(id);
     }
 
     @Override
@@ -102,22 +90,11 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
 
     @Override
     public UserDetails createUser(String id, Map<String, Object> userInfo) {
-        List<ANVGLAuthority> authorities = new ArrayList<>();
-        authorities.add(new ANVGLAuthority(defaultRole));
-        if (rolesByUser != null) {
-            List<String> additionalAuthorities = rolesByUser.get(id);
-            if (additionalAuthorities != null) {
-                for (String authority : additionalAuthorities) {
-                    authorities.add(new ANVGLAuthority(authority));
-                }
-            }
-        }
-
         ANVGLUser newUser = new ANVGLUser();
         applyInfoToUser(newUser, userInfo);
         newUser.setAuthentication(AuthenticationFramework.GOOGLE);
-        userDao.save(newUser); //create our new user
-
+        userService.saveUser(newUser); //create our new user
+        
         synchronized(this.random) {
             //Create an AWS secret for this user
             String randomSecret = RandomStringUtils.random(SECRET_LENGTH, 0, 0, true, true, null, this.random);
@@ -127,8 +104,24 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
             String bucketName = generateRandomBucketName();
             newUser.setS3Bucket(bucketName);
         }
+        
+        List<ANVGLAuthority> authorities = new ArrayList<>();
+        ANVGLAuthority defaultAuth = new ANVGLAuthority(defaultRole);
+        defaultAuth.setParent(newUser);
+        authorities.add(defaultAuth);
+        if (rolesByUser != null) {
+            List<String> additionalAuthorities = rolesByUser.get(id);
+            if (additionalAuthorities != null) {
+                for (String authority : additionalAuthorities) {
+                	ANVGLAuthority auth = new ANVGLAuthority(authority);
+                	auth.setParent(newUser);
+                    authorities.add(auth);
+                }
+            }
+        }
+        
         newUser.setAuthorities(authorities);
-        userDao.save(newUser); //apply authorities (so they inherit the ID)
+        userService.saveUser(newUser); //apply authorities (so they inherit the ID)
 
         return newUser;
     }
@@ -139,7 +132,7 @@ public class PersistedGoogleUserDetailsLoader implements OAuth2UserDetailsLoader
 
         if (userDetails instanceof ANVGLUser) {
             applyInfoToUser((ANVGLUser) userDetails, userInfo);
-            userDao.save((ANVGLUser) userDetails);
+            userService.saveUser((ANVGLUser) userDetails);
         }
 
         return userDetails;

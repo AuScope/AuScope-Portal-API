@@ -9,7 +9,12 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.service.NCIDetailsService;
+import org.auscope.portal.server.web.service.VEGLJobService;
+import org.auscope.portal.server.web.service.VEGLSeriesService;
+import org.auscope.portal.server.web.service.VGLJobAuditLogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Class that talks to the data objects to retrieve or save data
@@ -18,56 +23,64 @@ import org.auscope.portal.server.web.security.NCIDetailsDao;
  * @author Josh Vote
  * @author Richard Goh
  */
+@Component
 public class VEGLJobManager {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private VEGLJobDao veglJobDao;
-    private VglDownloadDao vglDownloadDao;
-    private VEGLSeriesDao veglSeriesDao;
-    private VGLJobAuditLogDao vglJobAuditLogDao;
-    private NCIDetailsDao nciDetailsDao;
+    @Autowired
+    private VEGLJobService jobService;
+    
+    @Autowired
+    private VEGLSeriesService seriesService;
+    
+    @Autowired
+    private VGLJobAuditLogService jobAuditLogService;
+    
+    @Autowired
+    private NCIDetailsService nciDetailsService;
+    
+    
 
     public List<VEGLSeries> querySeries(String user, String name, String desc) {
-        return veglSeriesDao.query(user, name, desc);
+    	return seriesService.query(user, name, desc);
     }
 
     public List<VEGLJob> getSeriesJobs(int seriesId, ANVGLUser user) throws PortalServiceException {
-        List<VEGLJob> jobs = veglJobDao.getJobsOfSeries(seriesId, user);
+    	List<VEGLJob> jobs = jobService.getJobsOfSeries(seriesId, user);
         return applyNCIDetails(jobs, user);
     }
 
     public List<VEGLJob> getUserJobs(ANVGLUser user) throws PortalServiceException {
-
-        List<VEGLJob> jobs = veglJobDao.getJobsOfUser(user);
+    	List<VEGLJob> jobs = jobService.getJobsOfUser(user);
         return applyNCIDetails(jobs, user);
     }
 
     public List<VEGLJob> getPendingOrActiveJobs() {
-        return veglJobDao.getPendingOrActiveJobs();
+    	return jobService.getPendingOrActiveJobs();
     }
 
     public List<VEGLJob> getInQueueJobs() {
-        return veglJobDao.getInQueueJobs();
+    	return jobService.getInQueueJobs();
     }
 
     public VEGLJob getJobById(int jobId, ANVGLUser user) throws PortalServiceException {
-        return applyNCIDetails(veglJobDao.get(jobId, user), user);
+    	return applyNCIDetails(jobService.get(jobId, user), user);
     }
 
     public VEGLJob getJobById(int jobId, String stsArn, String clientSecret, String s3Role, String userEmail, String nciUser, String nciProj, String nciKey) {
-        return veglJobDao.get(jobId, stsArn, clientSecret, s3Role, userEmail, nciUser, nciProj, nciKey);
+    	return jobService.get(jobId, stsArn, clientSecret, s3Role, userEmail, nciUser, nciProj, nciKey);
     }
 
     public void deleteJob(VEGLJob job) {
-        veglJobDao.deleteJob(job);
+    	jobService.deleteJob(job);
     }
 
     public VEGLSeries getSeriesById(int seriesId, String userEmail) {
-        return veglSeriesDao.get(seriesId, userEmail);
+    	return seriesService.get(seriesId, userEmail);
     }
 
     public void saveJob(VEGLJob veglJob) {
-        veglJobDao.save(veglJob);
+    	jobService.saveJob(veglJob);
     }
 
     /**
@@ -89,7 +102,7 @@ public class VEGLJobManager {
 
             // Failure in the creation of the job life cycle audit trail is
             // not critical hence we allow it to fail silently and log it.
-            vglJobAuditLogDao.save(vglJobAuditLog);
+            jobAuditLogService.save(vglJobAuditLog);
         } catch (Exception ex) {
             logger.warn("Error creating audit trail for job: " + vglJobAuditLog, ex);
         }
@@ -118,71 +131,43 @@ public class VEGLJobManager {
 
             // Failure in the creation of the job life cycle audit trail is
             // not critical hence we allow it to fail silently and log it.
-            vglJobAuditLogDao.save(vglJobAuditLog);
+            jobAuditLogService.save(vglJobAuditLog);
         } catch (Exception ex) {
             logger.warn("Error creating audit trail for job: " + vglJobAuditLog, ex);
         }
     }
 
     public void deleteSeries(VEGLSeries series) {
-        veglSeriesDao.delete(series);
+    	seriesService.delete(series);
     }
 
     public void saveSeries(VEGLSeries series) {
-        veglSeriesDao.save(series);
+    	seriesService.save(series);
     }
 
-    public void setVeglJobDao(VEGLJobDao veglJobDao) {
-        this.veglJobDao = veglJobDao;
+    // These are solely for tests
+    public void setVeglJobService(VEGLJobService jobService) {
+        this.jobService = jobService;
     }
 
-    public void setVeglSeriesDao(VEGLSeriesDao veglSeriesDao) {
-        this.veglSeriesDao = veglSeriesDao;
+    public void setVeglSeriesService(VEGLSeriesService seriesService) {
+        this.seriesService = seriesService;
     }
 
-    public void setVglJobAuditLogDao(VGLJobAuditLogDao vglJobAuditLogDao) {
-        this.vglJobAuditLogDao = vglJobAuditLogDao;
+    public void setVglJobAuditLogService(VGLJobAuditLogService jobAuditLogService) {
+        this.jobAuditLogService = jobAuditLogService;
     }
 
-    public NCIDetailsDao getNciDetailsDao() {
-        return nciDetailsDao;
+    /*
+    public NCIDetailsService getNciDetailsService() {
+        return nciDetailsService;
     }
+    */
 
-    public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
-        this.nciDetailsDao = nciDetailsDao;
+    public void setNciDetailsService(NCIDetailsService nciDetailsService) {
+        this.nciDetailsService = nciDetailsService;
     }
     
-    /**
-     * Delete specified JobDownload objects associated with this VEGLJob. 
-     * 
-     * NB this does *not* save the job, you still need to call 
-     * VEGLJobManager.saveJob() on job after this.
-     * 
-     * @param job VEGLJob whose downloads to delete
-     * @param downloads List<VglDownload> of downloads to delete
-     */
-    public void deleteJobDownloads(VEGLJob job, List<VglDownload> downloads) {
-    	if (job != null && downloads != null) {
-    		int jobId = job.getId();
-    		for (VglDownload download: downloads) {
-    			if (download.getParent().getId() == jobId) {
-    				vglDownloadDao.deleteDownload(download);
-    			}
-    		}
-    	}
-    }
-    
-    /**
-     * Delete all downloads associated with job.
-     * 
-     * NB this does *not* save the job, you still need to call 
-     * VEGLJobManager.saveJob() on job after this.
-     * 
-     * @param job VEGLJob whose downloads will be deleted.
-     */
-    public void deleteJobDownloads(VEGLJob job) {    	
-    	this.deleteJobDownloads(job, job.getJobDownloads());
-    }
 
     private VEGLJob applyNCIDetails(VEGLJob job, NCIDetails nciDetails) {
         if (nciDetails != null) {
@@ -201,11 +186,11 @@ public class VEGLJobManager {
         if (job == null) {
             return null;
         }
-        return applyNCIDetails(job, nciDetailsDao.getByUser(user));
+        return applyNCIDetails(job, nciDetailsService.getByUser(user));
     }
 
     private List<VEGLJob> applyNCIDetails(List<VEGLJob> jobs, ANVGLUser user) throws PortalServiceException {
-        NCIDetails nciDetails = nciDetailsDao.getByUser(user);
+    	NCIDetails nciDetails = nciDetailsService.getByUser(user);
 
         if (nciDetails != null) {
             for (VEGLJob job: jobs) {
@@ -215,13 +200,5 @@ public class VEGLJobManager {
 
         return jobs;
     }
-
-	public VglDownloadDao getVglDownloadDao() {
-		return vglDownloadDao;
-	}
-
-	public void setVglDownloadDao(VglDownloadDao vglDownloadDao) {
-		this.vglDownloadDao = vglDownloadDao;
-	}   
 
 }

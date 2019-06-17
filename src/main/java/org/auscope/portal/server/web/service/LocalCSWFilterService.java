@@ -174,6 +174,7 @@ public class LocalCSWFilterService {
         result.setStartIndex(startIndex);
         result.setRecords(new ArrayList<CSWRecord>(maxRecords));
         int recordsRemaining, currentStartIndex = startIndex;
+        int recordsMatched = 0;
         while((recordsRemaining = (maxRecords - result.getRecords().size())) > 0) {
 
             //If we are dealing with a purely remote filter we can just request the exact number of records
@@ -184,6 +185,9 @@ public class LocalCSWFilterService {
 
             //If this starts spamming requests we can always look at upping the page size every iteration.
             CSWGetRecordResponse cswResponse = filterService.getFilteredRecords(serviceId, remoteFilter, recsToRequest, currentStartIndex);
+            
+            // Update macthed record count
+            recordsMatched = cswResponse.getRecordsMatched();
 
             //Filter our response and copy passing records to our result list
             int lastIndex;
@@ -209,7 +213,7 @@ public class LocalCSWFilterService {
                 break;
             }
         }
-
+        result.setRecordsMatched(recordsMatched);
         return result;
     }
 
@@ -283,10 +287,9 @@ public class LocalCSWFilterService {
         }
         ArrayList<FilterRunner> allRunners = new ArrayList<FilterRunner>(runners.values());
 
-
         //Check our runner statuses repeatedly, waking up when they tell us to
         while(true) {
-            //Check our state inside the lock so dont end up with the state changing underneath us
+            //Check our state inside the lock so don't end up with the state changing underneath us
             synchronized(lock) {
                 boolean stillWaiting = false;
                 for (FilterRunner runner : allRunners) {
@@ -349,6 +352,7 @@ public class LocalCSWFilterService {
             for (FilterRunner runner : allRunners) {
                 if (depth < runner.records.size()) {
                     response.getRecords().add(runner.records.get(depth));
+                    response.getRecordsMatched().put(runner.serviceId, runner.recordsMatched);
                     if (response.getRecords().size() == maxRecords) {
                         break;
                     }
@@ -395,6 +399,7 @@ public class LocalCSWFilterService {
         public List<SearchFacet<? extends Object>> facets;
         public int currentStartIndex;
         public int currentNextIndex;
+        public int recordsMatched;
         public FilterRunnerState state;
         public List<CSWRecord> records;
         public volatile boolean requestTerminate = false;
@@ -409,6 +414,7 @@ public class LocalCSWFilterService {
             this.facets = facets;
             this.currentStartIndex = currentStartIndex;
             this.currentNextIndex = currentStartIndex;
+            this.recordsMatched = 0;
             this.state = FilterRunnerState.Running;
             this.records = new ArrayList<CSWRecord>();
             this.lock = lock;
@@ -423,13 +429,14 @@ public class LocalCSWFilterService {
                 while(!requestTerminate) {
                     if (isFulfilled()) {
                         synchronized(this) {
-                            this.wait(); //wait for the parent to notify this to look for more due to an increase in fulfilment
+                            this.wait(); //wait for the parent to notify this to look for more due to an increase in fulfillment
                         }
                     } else {
                         FacetedSearchResponse response = parent.getFilteredRecords(serviceId, facets, currentNextIndex, currentFulfillment - this.records.size());
                         synchronized(this.lock) {
                             this.records.addAll(response.getRecords());
                             this.currentNextIndex =  response.getNextIndex();
+                            this.recordsMatched = response.getRecordsMatched();
 
                             if (response.getNextIndex() <= 0) {
                                 //Having no more records means it's pointless to continue hitting this CSW

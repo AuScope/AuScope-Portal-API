@@ -48,7 +48,7 @@ import au.csiro.promsclient.ServiceEntity;
  * A Service for reporting provenance information for storage in a PROMS
  * instance and also included in downloads.
  */
-@Service
+//@Service
 public class ANVGLProvenanceService {
     /** Logger for this class. */
     private static final Log LOGGER = LogFactory.getLog(ANVGLProvenanceService.class);
@@ -91,8 +91,8 @@ public class ANVGLProvenanceService {
     @Autowired
     public ANVGLProvenanceService(final ANVGLFileStagingService anvglFileStagingService,
             final CloudStorageService[] cloudStorageServices,
-            @Value("${HOST.proms.report.url}") String promsUrl,
-            @Value("${HOST.proms.reportingsystem.uri}") String promsReportingSystemUri) {
+            @Value("${proms.report.url}") String promsUrl,
+            @Value("${proms.reportingsystem.uri}") String promsReportingSystemUri) {
         this.anvglFileStagingService = anvglFileStagingService;
         this.cloudStorageServices = cloudStorageServices;
         this.PROMSReportingSystem = promsReportingSystemUri;

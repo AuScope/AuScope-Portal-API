@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 import org.auscope.portal.core.cloud.CloudJob;
 
+
+//@Entity
+//@Table(name = "nci_details")
 public class NCIDetails implements Serializable {
 
     private static final long serialVersionUID = -7219385540898450290L;
@@ -12,7 +15,11 @@ public class NCIDetails implements Serializable {
     public final static String PROPERTY_NCI_KEY = "nci_key";
     public final static String PROPERTY_NCI_PROJECT = "nci_project";
 
+    //@Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    //@OneToOne(fetch = FetchType.LAZY)
+    //@JoinColumn(name = "user")
     private ANVGLUser user;
     private String username;
     private String project;

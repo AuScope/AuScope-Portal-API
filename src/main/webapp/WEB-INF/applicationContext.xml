@@ -8,40 +8,56 @@
       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
+    <!--  Just getting rid of this, not migrating -->
+    <!--
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**/secure/*.do" />
             <bean class="org.auscope.portal.server.web.interceptors.UserSessionInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>
+    -->
 
     <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
     <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->
+    <!--
     <bean id="propertyConfigurer" class="org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:config.properties</value>
+    -->
                 <!--  Spring SpEL magic - use context parameter or the default war env.properties -->
+    <!--
                 <value>#{contextParameters['envPropertiesLocation'] ?: 'classpath:env.properties'}</value>
             </list>
         </property>
     </bean>
+    -->
 
+    <!--
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${jdbc.driverClass}"/>
-        <property name="url" value="${HOST.jdbc.url}"/>
+        <property name="url" value="${jdbc.url}"/>
         <property name="username" value="${env.jdbc.user}"/>
         <property name="password" value="${env.jdbc.password}"/>
     </bean>
+    -->
     
+    <!--
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
+    -->
 
+
+    <!--
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="${HOST.smtp.server}" />
+        <property name="host" value="${smtp.server}" />
     </bean>
+    -->
+    
 
+    <!--
     <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
         <property name="velocityProperties">
             <value>
@@ -50,44 +66,65 @@
             </value>
         </property>
     </bean>
+    -->
 
+
+    <!-- 
     <bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">
         <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
         <property name="dateFormat" value="EEE, d MMM yyyy HH:mm:ss" />
         <property name="maxLengthForSeriesNameInSubject" value="15" />
         <property name="maxLengthForJobNameInSubject" value="15" />
         <property name="maxLinesForTail" value="5" />
-        <property name="emailSender" value="${HOST.portalAdminEmail}"/>
+        <property name="emailSender" value="${portalAdminEmail}"/>
         <property name="emailSubject" value="VGL Job (%s)" />
-        <property name="portalUrl" value="${HOST.frontEndUrl}"/>
+        <property name="portalUrl" value="${frontEndUrl}"/>
     </bean>
-
+    -->
+    
+    <!--
     <util:list id="pylintCommand">
       <value>pylint</value>
       <value>-r</value> <value>n</value>
       <value>-f</value> <value>json</value>
       <value>--disable=R,C</value>
     </util:list>
+    -->
     
+    
+    <!--
     <bean name="ANVGLProvenanceService" class="org.auscope.portal.server.web.service.ANVGLProvenanceService" autowire="constructor">
         <constructor-arg name="anvglFileStagingService" ref="fileStagingService"/>
         <constructor-arg name="cloudStorageServices"> 
             <array>  
-                <ref bean="cloudStorageService-aws-sydney" /> 
-                <ref bean="cloudStorageService-nci" /> 
-                <ref bean="cloudStorageService-nectar-melb" /> 
+                <ref bean="cloudStorageService-aws-sydney" />
+    --> 
+                <!--<ref bean="cloudStorageService-nci" />--> 
+                <!--<ref bean="cloudStorageService-nectar-melb" />-->
+    <!-- 
             </array> 
         </constructor-arg>
-        <constructor-arg name="promsUrl" value="${HOST.proms.report.url}"/>
-        <constructor-arg name="promsReportingSystemUri" value="${HOST.proms.reportingsystem.uri}"/>
+        <constructor-arg name="promsUrl" value="${proms.report.url}"/>
+        <constructor-arg name="promsReportingSystemUri" value="${proms.reportingsystem.uri}"/>
     </bean>
+    -->
     
+    
+    
+    <!--
     <bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
+    -->
     
+    
+    <!--
     <bean name="VGLJobStatusChangeHandler" class="org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler" autowire="constructor">
         <constructor-arg name="anvglProvenanceService" ref="ANVGLProvenanceService"/>
     </bean>
+    -->
 
+
+
+    <!--
     <bean name="jobStatusMonitor" class="org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor">
         <constructor-arg name="jobStatusReader" ref="jobStatusLogReader"/>
         <constructor-arg name="jobStatusChangeListeners">
@@ -96,26 +133,40 @@
             </array>
         </constructor-arg>
     </bean>
+    -->
 
+
+    <!--
     <bean name="vglJobStatusMonitorDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor" />
         <property name="jobDataAsMap">
             <map>
                 <entry key="jobManager" value-ref="veglJobManager"/>
                 <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
+    -->
+                <!-- XXX Replace with services? -->
+                <!--
                 <entry key="jobUserDao" value-ref="anvglUserDao"/>
                 <entry key="nciDetailsDao" value-ref="nciDetailsDao"/>
+                -->
+    <!--
             </map>
         </property>
     </bean>
+    -->
+
 
     <!-- Simple Trigger for vglJobStatusMonitor task, run every 5 minutes -->
+    <!--
     <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="vglJobStatusMonitorDetail" />
         <property name="repeatInterval" value="300000" />
         <property name="startDelay" value="10000" />
     </bean>
-
+    -->
+    
+    
+    <!--
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="taskExecutor" ref="taskExecutor" />
         <property name="triggers">
@@ -124,50 +175,68 @@
             </list>
         </property>
     </bean>
+    -->
 
     <!-- This is the core threadpool shared by object instances throughout the portal -->
+    <!--
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="corePoolSize" value="5" />
         <property name="maxPoolSize" value="5" />
         <property name="queueCapacity" value="25" />
     </bean>
+    -->
 
+
+    <!--
     <bean id="httpServiceCaller" class="org.auscope.portal.core.server.http.HttpServiceCaller">
         <constructor-arg type="int" name="connectionTimeOut">
             <value>900000</value>
         </constructor-arg>
     </bean>
-
+    -->
+    
+    <!--
     <bean id="viewCswRecordFactory" class="org.auscope.portal.server.web.service.csw.ViewGriddedCSWRecordFactory">
     </bean>
+    -->
 
+    <!--
     <bean id="viewKnownLayerFactory" class="org.auscope.portal.core.view.ViewKnownLayerFactory">
     </bean>
+    -->
 
+    <!--
     <bean id="cswCacheService" class="org.auscope.portal.core.services.CSWCacheService">
         <constructor-arg name="executor" ref="taskExecutor"/>
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
-        <constructor-arg name="cswServiceList" ref="cswServiceList"/> <!-- This is pulled from the profile xml -->
+        <constructor-arg name="cswServiceList" ref="cswServiceList"/> --><!-- This is pulled from the profile xml -->
+        <!--
         <constructor-arg name="transformerFactory">
             <bean class="org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory"/>
         </constructor-arg>
         <property name="forceGetMethods" value="true"/>
     </bean>
+    -->
     
+    <!--
     <bean id="cswFilterService" class="org.auscope.portal.core.services.CSWFilterService">
         <constructor-arg name="executor" ref="taskExecutor"/>
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
-        <constructor-arg name="cswServiceList" ref="cswServiceList"/> <!-- This is pulled from the profile xml -->
-        <constructor-arg name="transformerFactory">
+        <constructor-arg name="cswServiceList" ref="cswServiceList"/> --><!-- This is pulled from the profile xml -->
+     <!-- <constructor-arg name="transformerFactory">
             <bean class="org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory"/>
         </constructor-arg>
     </bean>
+    -->
 
+    <!--
     <bean id="cswKnownLayerService" class="org.auscope.portal.core.services.KnownLayerService">
-        <constructor-arg name="knownTypes" ref="knownTypes"/> <!-- This is pulled from the profile xml -->
-        <constructor-arg name="cswCacheService" ref="cswCacheService"/>
+        <constructor-arg name="knownTypes" ref="knownTypes"/> --><!-- This is pulled from the profile xml -->
+    <!--  <constructor-arg name="cswCacheService" ref="cswCacheService"/>
     </bean>
+    -->
 
+    <!--
     <bean id="wcsService" class="org.auscope.portal.core.services.WCSService">
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
         <constructor-arg name="methodMaker">
@@ -175,7 +244,9 @@
             </bean>
         </constructor-arg>
     </bean>
+    -->
 
+    <!--
     <bean id="wfsService" class="org.auscope.portal.server.web.service.SimpleWfsService">
         <constructor-arg name="httpServiceCaller" ref="httpServiceCaller"/>
         <constructor-arg name="wfsMethodMaker">
@@ -183,7 +254,9 @@
             </bean>
         </constructor-arg>
     </bean>
+    -->
 
+    <!--
     <bean id="opendapService" class="org.auscope.portal.core.services.OpendapService" >
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
         <constructor-arg name="getDataMethodMaker">
@@ -191,7 +264,9 @@
             </bean>
         </constructor-arg>
     </bean>
+    -->
 
+    <!--
     <bean id= "WMSMethodMaker" class="org.auscope.portal.core.services.methodmakers.WMSMethodMaker">
         <constructor-arg name="serviceCaller" ref="httpServiceCaller"/>
     </bean>
@@ -213,7 +288,10 @@
     <bean id="encryption-service" class="org.auscope.portal.server.web.service.VGLCryptoService">
         <constructor-arg name="encryptionPassword" value="${env.encryption.password}"/>
     </bean>
+    -->
     
+    
+    <!--
     <bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
         <constructor-arg name="provider" value="aws-s3"/>
         <constructor-arg name="endpoint"><null/></constructor-arg>
@@ -225,10 +303,13 @@
         <property name="name" value="Amazon Web Services - S3"/>
         <property name="id" value="amazon-aws-storage-sydney"/>
         <property name="bucket" value="vgl-csiro-"/>
-        <property name="adminEmail" value="${HOST.portalAdminEmail}"/>
-        <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
+        <property name="adminEmail" value="${portalAdminEmail}"/>
+        <property name="stsRequirement" value="${aws.stsrequirement}"/>
     </bean>
+    -->
     
+    
+    <!--
     <bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
         <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
         <constructor-arg name="provider" value="openstack-swift"/>
@@ -243,16 +324,25 @@
         <property name="authVersion" value="2.0"/>
         <property name="stsRequirement" value="ForceNone"/>
     </bean>
+    -->
     
+    <!--
     <bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageServiceNci">
         <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
         <constructor-arg name="provider" value="nci-raijin"/>
         <property name="name" value="National Computing Infrastructure - Raijin"/>
         <property name="id" value="nci-raijin-storage"/>
     </bean>
+    -->
 
+
+    <!-- Used in cloudComputeService-nectar -->
+    <!--
     <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/>
+    -->
+    
 
+    <!--
     <bean id="cloudComputeService-aws" class="org.auscope.portal.core.services.cloud.CloudComputeServiceAws">
         <constructor-arg name="endpoint" value="ec2.ap-southeast-2.amazonaws.com"/>
         <constructor-arg name="apiVersion"><null/></constructor-arg>
@@ -261,7 +351,7 @@
         
         <property name="id" value="aws-ec2-compute"/>
         <property name="name" value="Amazon Web Services - EC2"/>
-        <property name="stsRequirement" value="${HOST.aws.stsrequirement}"/>
+        <property name="stsRequirement" value="${aws.stsrequirement}"/>
         
         <property name="availableImages">
             <list>
@@ -290,7 +380,9 @@
             </list>
         </property>
     </bean>
+    -->
 
+	<!--
     <bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNectar">
         <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
         <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
@@ -300,44 +392,65 @@
         <property name="groupName" value ="vl-#{inetAddress.hostName.toLowerCase()}"/>
         <property name="keypair" value="vgl-developers"/>
     </bean>
+    -->
     
+    <!--
     <bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNci">
         <constructor-arg name="storageService" ref="cloudStorageService-nci"/>
         <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
         <property name="name" value="National Computing Infrastructure - Raijin"/>
         <property name="id" value="nci-raijin-compute"/>
     </bean>
+    -->
 
+
+    <!--
     <bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">
         <constructor-arg name="stagingInformation">
             <bean class="org.auscope.portal.core.cloud.StagingInformation">
-                <constructor-arg name="stageInDirectory" value="${HOST.localStageInDir}"/>
+                <constructor-arg name="stageInDirectory" value="${localStageInDir}"/>
             </bean>
         </constructor-arg>
     </bean>
+    -->
+    
+    
 
     <!-- Inject the configured solutions centre URL -->
+    <!--
     <bean class="org.springframework.beans.factory.config.MethodInvokingBean">
       <property name="staticMethod"
                 value="org.auscope.portal.server.web.service.ScmEntryService.setSolutionsUrl"/>
       <property name="arguments">
         <list>
-          <value>${HOST.solutions.url}</value>
+          <value>${solutions.url}</value>
         </list>
       </property>
     </bean>
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
     </bean>
+    -->
 
+
+    <!--
     <bean id="veglJobManager" class="org.auscope.portal.server.vegl.VEGLJobManager">
+    -->
+        <!-- XXX Replace with services? -->
+        <!--
         <property name="veglJobDao" ref="veglJobDao"/>
         <property name="vglDownloadDao" ref="vglDownloadDao"/>
         <property name="veglSeriesDao" ref="veglSeriesDao"/>
         <property name="vglJobAuditLogDao" ref="vglJobAuditLogDao"/>
-        <property name="nciDetailsDao" ref="nciDetailsDao"/>        
+        <property name="nciDetailsDao" ref="nciDetailsDao"/>
+        -->
+    <!--        
     </bean>
+    -->
+    
+    
 
+    <!--
     <bean id="veglJobDao" class="org.auscope.portal.server.vegl.VEGLJobDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
@@ -371,7 +484,7 @@
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>    
        
-    <bean id="veglSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <bean id="veglSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingResources">
             <list>
@@ -389,16 +502,36 @@
             </list>
         </property>
         <property name="hibernateProperties">
-            <value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>
+    -->
+            <!--<value>hibernate.dialect=org.hibernate.dialect.HSQLDialect</value>-->
+   <!--
+            <value>hibernate.dialect=${jdbc.dialect}</value>
         </property>
     </bean>
     
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager"> 
+        <property name="sessionFactory" ref="veglSessionFactory"/> 
+        
+        <property name="dataSource" ref="dataSource"/>
+        
+    </bean>
+   -->
+    
+    <!--
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+        <property name="sessionFactory" ref="veglSessionFactory"></property>
+    </bean>
+    -->
+    
+    
     <!-- vegl.VLScmSnapshotDao -->
+    <!--
      <bean id="vlScmSnapshotDao" class="org.auscope.portal.server.vegl.VLScmSnapshotDao">
         <property name="sessionFactory" ref="veglSessionFactory"/>
     </bean>
+    -->
     
-        
+    <!-- 
     <bean id="cswRegVeglProduction" class="org.auscope.portal.core.services.csw.custom.CustomRegistry">
         <constructor-arg name="id" value="cswRegVeglProduction" />
         <constructor-arg name="title" value="SISS ANU Geonetwork" />
@@ -416,7 +549,7 @@
     <bean id="service-configuration2" class="org.auscope.portal.core.configuration.ServiceConfiguration">        
         <constructor-arg name="serviceConfigurationItems">
             <list>
-               <ref bean="NSWERML2_WFSTest"/>         
+               <ref bean="NSWERML2_WFSTest"/>
             </list>
         </constructor-arg>
     </bean>
@@ -427,12 +560,13 @@
                 <ref bean="cswRegVeglProduction" />
             </list>
         </constructor-arg>
-    </bean>  
+    </bean>
     
     <bean id="wfsMethodMaker" class="org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker">
         <property name="namespaces">
             <bean class="org.auscope.portal.core.services.namespaces.ErmlNamespaceContext"/>
         </property>
     </bean>
+    -->
     
 </beans>

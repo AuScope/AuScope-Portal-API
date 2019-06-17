@@ -2,6 +2,7 @@ package org.auscope.portal.server.web.security.aaf;
 
 import org.auscope.portal.server.web.security.aaf.JWTManagement;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -9,14 +10,18 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.SpringSecurityMessageSource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 /**
  * Created by wis056 on 8/04/2015.
  */
+@Component
 public class AAFAuthenticationProvider implements AuthenticationProvider, InitializingBean, MessageSourceAware {
 
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
+    
+    @Autowired
     private JWTManagement jwtManagement;
 
 

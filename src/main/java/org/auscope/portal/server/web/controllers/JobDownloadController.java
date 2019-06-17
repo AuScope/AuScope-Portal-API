@@ -42,7 +42,7 @@ public class JobDownloadController extends BasePortalController {
     private String erddapServiceUrl;
 
     @Autowired
-    public JobDownloadController(SimpleWfsService wfsService, @Value("${HOST.erddapservice.url}") String erddapServiceUrl) {
+    public JobDownloadController(SimpleWfsService wfsService, @Value("${erddapservice.url}") String erddapServiceUrl) {
         this.wfsService = wfsService;
         this.erddapServiceUrl=erddapServiceUrl;
     }
@@ -95,9 +95,9 @@ public class JobDownloadController extends BasePortalController {
             @RequestParam("eastBoundLongitude") final Double eastBoundLongitude,
             @RequestParam("southBoundLatitude") final Double southBoundLatitude,
             @RequestParam("westBoundLongitude") final Double westBoundLongitude,
-            @RequestParam(required = false, value = "parentName") String parentName,
-            @RequestParam(required = false, value = "parentUrl") String parentUrl,
-            @RequestParam(required = false, value = "owner") String owner,
+            //@RequestParam(required = false, value = "parentName") String parentName,
+            //@RequestParam(required = false, value = "parentUrl") String parentUrl,
+            //@RequestParam(required = false, value = "owner") String owner,
             @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
             HttpServletRequest request) {
 
@@ -110,9 +110,11 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setEastBoundLongitude(eastBoundLongitude);
         newDownload.setSouthBoundLatitude(southBoundLatitude);
         newDownload.setWestBoundLongitude(westBoundLongitude);
+        /*
         newDownload.setOwner(owner);
         newDownload.setParentName(parentName);
         newDownload.setParentUrl(parentUrl);
+        */
 
         if (saveSession) {
             addDownloadToSession(request, newDownload);
@@ -138,9 +140,9 @@ public class JobDownloadController extends BasePortalController {
                                 @RequestParam("description") final String description,
                                 @RequestParam(required = false, value = "fullDescription") final String fullDescription,
                                 @RequestParam("localPath") final String localPath,
-                                @RequestParam(required = false, value = "parentName") String parentName,
-                                @RequestParam(required = false, value = "parentUrl") String parentUrl,
-                                @RequestParam(required = false, value = "owner") String owner,
+                                //@RequestParam(required = false, value = "parentName") String parentName,
+                                //@RequestParam(required = false, value = "parentUrl") String parentUrl,
+                                //@RequestParam(required = false, value = "owner") String owner,
                                 @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                 HttpServletRequest request,
                                 HttpServletResponse response) {
@@ -159,9 +161,11 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setEastBoundLongitude(eastBoundLongitude);
         newDownload.setSouthBoundLatitude(southBoundLatitude);
         newDownload.setWestBoundLongitude(westBoundLongitude);
+        /*
         newDownload.setOwner(owner);
         newDownload.setParentName(parentName);
         newDownload.setParentUrl(parentUrl);
+        */
 
         if (saveSession) {
             addDownloadToSession(request, newDownload);
@@ -187,9 +191,9 @@ public class JobDownloadController extends BasePortalController {
                                 @RequestParam("description") final String description,
                                 @RequestParam(required = false, value = "fullDescription") final String fullDescription,
                                 @RequestParam("localPath") final String localPath,
-                                @RequestParam(required = false, value = "parentName") String parentName,
-                                @RequestParam(required = false, value = "parentUrl") String parentUrl,
-                                @RequestParam(required = false, value = "owner") String owner,
+                                //@RequestParam(required = false, value = "parentName") String parentName,
+                                //@RequestParam(required = false, value = "parentUrl") String parentUrl,
+                                //@RequestParam(required = false, value = "owner") String owner,
                                 @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                 HttpServletRequest request,
                                 HttpServletResponse response) {
@@ -208,10 +212,11 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setEastBoundLongitude(eastBoundLongitude);
         newDownload.setSouthBoundLatitude(southBoundLatitude);
         newDownload.setWestBoundLongitude(westBoundLongitude);
+        /*
         newDownload.setOwner(owner);
         newDownload.setParentName(parentName);
         newDownload.setParentUrl(parentUrl);
-
+		*/
 
         if (saveSession) {
             addDownloadToSession(request, newDownload);
@@ -244,9 +249,9 @@ public class JobDownloadController extends BasePortalController {
                                            @RequestParam("description") final String description,
                                            @RequestParam(required = false, value = "fullDescription") final String fullDescription,
                                            @RequestParam("localPath") final String localPath,
-                                           @RequestParam(required = false, value = "parentName") String parentName,
-                                           @RequestParam(required = false, value = "parentUrl") String parentUrl,
-                                           @RequestParam(required = false, value = "owner") String owner,
+                                           //@RequestParam(required = false, value = "parentName") String parentName,
+                                           //@RequestParam(required = false, value = "parentUrl") String parentUrl,
+                                           //@RequestParam(required = false, value = "owner") String owner,
                                            @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                            HttpServletRequest request) {
 
@@ -274,10 +279,11 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setEastBoundLongitude(eastBoundLongitude);
         newDownload.setSouthBoundLatitude(southBoundLatitude);
         newDownload.setWestBoundLongitude(westBoundLongitude);
+        /*
         newDownload.setOwner(owner);
         newDownload.setParentName(parentName);
         newDownload.setParentUrl(parentUrl);
-
+		*/
 
         if (saveSession) {
             addDownloadToSession(request, newDownload);
