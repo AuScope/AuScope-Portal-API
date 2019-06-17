@@ -75,7 +75,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     
     /** A list of VglDownload objects associated with this job*/
     @OneToMany(mappedBy="parent", fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
-    private List<VglDownload> jobDownloads = new ArrayList<>();
+    private List<VglDownload> jobDownloads;
 
     /** A list of FileInformation objects associated with this job*/
     /*
@@ -287,10 +287,11 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param jobDownloads
      */
     public void setJobDownloads(List<VglDownload> jobDownloads) {
-        this.jobDownloads = jobDownloads;
         for (VglDownload dl : jobDownloads) {
             dl.setParent(this);
         }
+        this.jobDownloads.clear();
+        this.jobDownloads.addAll(jobDownloads);
     }
 
 
