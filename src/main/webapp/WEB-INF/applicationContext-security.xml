@@ -94,10 +94,10 @@
         </authentication-provider>
     </authentication-manager>
 
-    <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2ServiceProperties">
-        <beans:constructor-arg name="redirectUri" value="${portalUrl}/oauth/callback"/>
-        <beans:constructor-arg name="clientId" value="${spring.security.oauth2.client.registration.google.client-id}"/>
-        <beans:constructor-arg name="clientSecret" value="${spring.security.oauth2.client.registration.google.client-secret}"/>
+    <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.server.web.security.ANVGLGoogleOAuth2ServiceProperties">
+        <beans:constructor-arg name="redirectUri" value="${HOST.portalUrl}/oauth/callback"/>
+        <beans:constructor-arg name="clientId" value="${env.oauth2.google.clientid}"/>
+        <beans:constructor-arg name="clientSecret" value="${env.oauth2.google.clientsecret}"/>
     </beans:bean>
 
     <beans:bean id="simpleUserLoader" class="org.auscope.portal.server.web.security.PersistedGoogleUserDetailsLoader">

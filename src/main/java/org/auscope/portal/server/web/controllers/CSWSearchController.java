@@ -237,7 +237,7 @@ public class CSWSearchController extends BaseCSWController {
     	filter.setFileIdentifier(fileIdentifier);
         List<CSWRecord> records = null;
         int matchedResults = 0;
-        try {         
+        try {
                 CSWGetRecordResponse response = null;
                 response = cswFilterService.getFilteredRecords(serviceId, filter, maxRecords, startPosition);
                 workaroundMissingNCIMetadata(response.getRecords());
