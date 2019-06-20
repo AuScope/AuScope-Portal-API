@@ -36,7 +36,6 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
     private VEGLJobManager jobManager;
     private JobStatusMonitor jobStatusMonitor;
     private ANVGLUserService jobUserService;
-    
     private NCIDetailsService nciDetailsService;
     
     

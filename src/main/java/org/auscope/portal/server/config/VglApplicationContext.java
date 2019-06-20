@@ -49,6 +49,8 @@ import org.auscope.portal.server.vegl.mail.JobCompletionMailSender;
 import org.auscope.portal.server.web.SearchHttpServiceCaller;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
+import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.VGLCryptoService;
 import org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory;
@@ -131,6 +133,12 @@ public class VglApplicationContext {
 	
 	@Autowired
 	private VEGLJobManager jobManager;
+	
+	@Autowired
+	private ANVGLUserService userService;
+	
+	@Autowired
+	private NCIDetailsService nciDetailsService;
 	
 	@Autowired
 	private ArrayList<CSWServiceItem> cswServiceList;
@@ -301,6 +309,8 @@ public class VglApplicationContext {
 		Map<String, Object> jobData = new HashMap<String, Object>();
 		jobData.put("jobManager", jobManager);
 		jobData.put("jobStatusMonitor", jobStatusMonitor());
+		jobData.put("jobUserService", userService);
+		jobData.put("nciDetailsService", nciDetailsService);
 		jobDetail.setJobDataAsMap(jobData);		
 		return jobDetail;
 	}
@@ -312,12 +322,8 @@ public class VglApplicationContext {
             <map>
                 <entry key="jobManager" value-ref="veglJobManager"/>
                 <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
-                
-                <!-- XXX Replace with services? -->
-                <!--
                 <entry key="jobUserDao" value-ref="anvglUserDao"/>
                 <entry key="nciDetailsDao" value-ref="nciDetailsDao"/>
-                -->
             </map>
         </property>
     </bean>
