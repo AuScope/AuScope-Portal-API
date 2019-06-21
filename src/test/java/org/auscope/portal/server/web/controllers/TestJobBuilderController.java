@@ -355,7 +355,6 @@ public class TestJobBuilderController {
         final List<VglDownload> downloadList = new ArrayList<VglDownload>(Arrays.asList(vglDownloads));
         job.setJobDownloads(downloadList);
 
-
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
             oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
@@ -840,6 +839,7 @@ public class TestJobBuilderController {
         job.setStatus(jobInSavedState); // by default, the job is in SAVED state
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);
+        job.setJobDownloads(new ArrayList<VglDownload>());
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object
@@ -852,13 +852,12 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"testRole1"}));
             allowing(mockRequest).isUserInRole("testRole1");will(returnValue(true));
 
-
             oneOf(mockFileStagingService).writeFile(job, JobBuilderController.DOWNLOAD_SCRIPT);
             will(returnValue(bos));
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-
+            
             //We should have 1 call to get our stage in files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stageInFiles));
 
@@ -1545,10 +1544,7 @@ public class TestJobBuilderController {
         final String[] localPaths = new String[] {"p1", "p2"};
         final VglDownload[] existingDownloads = new VglDownload[] {new VglDownload(12356)};
 
-
         job.setJobDownloads(new ArrayList<VglDownload>(Arrays.asList(existingDownloads)));
-
-
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(job));
 
@@ -1562,7 +1558,7 @@ public class TestJobBuilderController {
         //The resulting job should have 3 elements in its list (due to appending)
         List<VglDownload> dls = job.getJobDownloads();
         Assert.assertEquals(existingDownloads.length + names.length, dls.size());
-        Assert.assertSame(existingDownloads[0], dls.get(0));
+        Assert.assertEquals(existingDownloads[0], dls.get(0));
         for (int i = 0; i < names.length; i++) {
             VglDownload dlToTest = dls.get(existingDownloads.length + i);
             Assert.assertEquals(names[i], dlToTest.getName());
