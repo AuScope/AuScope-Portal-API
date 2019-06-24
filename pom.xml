@@ -400,8 +400,8 @@
 			<version>0.1.54</version>
 		</dependency>
         <dependency>
-            <groupId>proms-clients-java</groupId>
-            <artifactId>proms-clients-java</artifactId>
+            <groupId>proms-client-java</groupId>
+            <artifactId>proms-client-java</artifactId>
             <version>0.0.2-SNAPSHOT</version>
         </dependency>
         
