@@ -81,6 +81,7 @@ frontEndUrl: http://localhost:4200
 portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
 defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
 aafLoginUrl: <aaf_login_url>
+aafCallbackUrl: <aaf_callback_url>
 
 
 # Gives us separation from real DB passwords.

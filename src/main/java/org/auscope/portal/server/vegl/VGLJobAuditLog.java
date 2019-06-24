@@ -4,12 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -32,8 +29,6 @@ public class VGLJobAuditLog implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     /** The id of the job that owns this parameter*/
-    //@ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "jobId")
     private Integer jobId;
     /** The descriptive status of the job before its status change */
     private String fromStatus;

@@ -128,7 +128,7 @@ public class VGLBookMark  implements Serializable {
      */
 
 	public List<VGLBookMarkDownload> getBookMarkDownloads() {
-		return bookMarkDownloads;
+		return (bookMarkDownloads != null) ? bookMarkDownloads : new ArrayList<VGLBookMarkDownload>();
 	}
 	/**
 	 * sets the list of download options for the book mark
@@ -136,10 +136,17 @@ public class VGLBookMark  implements Serializable {
 	 */
 
 	public void setBookMarkDownloads(List<VGLBookMarkDownload> bookMarkDownloads) {
-		this.bookMarkDownloads = bookMarkDownloads;
-		for (VGLBookMarkDownload downloadOption : bookMarkDownloads) {
-			downloadOption.setParent(this);
-        }
+		if(this.bookMarkDownloads == null) {
+			this.bookMarkDownloads = bookMarkDownloads;
+		} else {
+			this.bookMarkDownloads.clear();
+			if(bookMarkDownloads != null) {
+				for (VGLBookMarkDownload downloadOption : bookMarkDownloads) {
+					downloadOption.setParent(this);
+					this.bookMarkDownloads.add(downloadOption);
+		        }
+			}
+		}
 	}
 }
 

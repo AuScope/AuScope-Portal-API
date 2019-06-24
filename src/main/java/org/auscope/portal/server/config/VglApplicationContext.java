@@ -49,6 +49,8 @@ import org.auscope.portal.server.vegl.mail.JobCompletionMailSender;
 import org.auscope.portal.server.web.SearchHttpServiceCaller;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
+import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.VGLCryptoService;
 import org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory;
@@ -90,9 +92,6 @@ public class VglApplicationContext {
 	
 	@Value("${env.aws.secretkey}")
 	private String awsSecretKey;
-
-	@Value("${env.aws.sessionkey}")
-	private String awsSessionKey;
 	
 	@Value("${env.nectar.ec2.accesskey}")
 	private String nectarAccessKey;
@@ -136,6 +135,12 @@ public class VglApplicationContext {
 	private VEGLJobManager jobManager;
 	
 	@Autowired
+	private ANVGLUserService userService;
+	
+	@Autowired
+	private NCIDetailsService nciDetailsService;
+	
+	@Autowired
 	private ArrayList<CSWServiceItem> cswServiceList;
 	
 	@Autowired
@@ -143,63 +148,86 @@ public class VglApplicationContext {
 	
 	
 	@Bean
-	public CloudStorageServiceJClouds cloudStorageServiceAwsSydney() {
-		CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds(null, "aws-s3", awsAccessKey, awsSecretKey, awsSessionKey, "ap-southeast-2", false, true);
-		storageService.setName("Amazon Web Services - S3");
-		storageService.setId("amazon-aws-storage-sydney");
-		storageService.setBucket("vgl-csiro-");
-		storageService.setAdminEmail(adminEmail);
-		
-		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
-		
-		//storageService.setStsRequirement(awsStsRequirement);
-		storageService.setStsRequirement(req);
-		return storageService;
-	}
-	
-	@Bean
-	public CloudStorageService[] cloudStorageServices() {
-		CloudStorageService[] storageServices = new CloudStorageService[1];
-		storageServices[0] = cloudStorageServiceAwsSydney();
-		return storageServices;
+	public MailSender mailSender() {
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost(smtpServer);
+		return mailSender;
 	}
 	
 	/*
-	<bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
-        <constructor-arg name="provider" value="aws-s3"/>
-        <constructor-arg name="endpoint"><null/></constructor-arg>
-        <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.aws.secretkey}"/>
-        <constructor-arg name="regionName" value="ap-southeast-2"/>
-        <constructor-arg name="relaxHostName" value="false"/>
-        <constructor-arg name="stripExpectHeader" value="true"/>
-        <property name="name" value="Amazon Web Services - S3"/>
-        <property name="id" value="amazon-aws-storage-sydney"/>
-        <property name="bucket" value="vgl-csiro-"/>
-        <property name="adminEmail" value="${portalAdminEmail}"/>
-        <property name="stsRequirement" value="${aws.stsrequirement}"/>
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${smtp.server}" />
+    </bean>
+    */
+	
+	@Bean
+	public VelocityEngine velocityEngine() throws Exception {
+	    Properties properties = new Properties();
+	    properties.setProperty("input.encoding", "UTF-8");
+	    properties.setProperty("output.encoding", "UTF-8");
+	    properties.setProperty("resource.loader", "class");
+	    properties.setProperty("class.resource.loader.class",
+	    					   "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+	    VelocityEngine velocityEngine = new VelocityEngine(properties);
+	    return velocityEngine;
+	}
+	
+	@Bean
+	public JobCompletionMailSender jobCompletionMailSender() throws Exception {
+		JobCompletionMailSender sender = new JobCompletionMailSender(jobManager, jobStatusLogReader(), mailSender(), velocityEngine());
+		sender.setTemplate("org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl");
+		sender.setDateFormat("EEE, d MMM yyyy HH:mm:ss");
+		sender.setMaxLengthForSeriesNameInSubject(15);
+		sender.setMaxLengthForJobNameInSubject(15);
+		sender.setMaxLinesForTail(5);
+		sender.setEmailSender(portalAdminEmail);
+		sender.setEmailSubject("VGL Job (%s");
+		sender.setPortalUrl(frontEndUrl);
+		return sender;
+	}
+	
+	/*
+	<bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">
+        <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
+        <property name="dateFormat" value="EEE, d MMM yyyy HH:mm:ss" />
+        <property name="maxLengthForSeriesNameInSubject" value="15" />
+        <property name="maxLengthForJobNameInSubject" value="15" />
+        <property name="maxLinesForTail" value="5" />
+        <property name="emailSender" value="${portalAdminEmail}"/>
+        <property name="emailSubject" value="VGL Job (%s)" />
+        <property name="portalUrl" value="${frontEndUrl}"/>
     </bean>
 	*/
 	
-	@Bean
-	public StagingInformation stagingInformation() {
-		return new StagingInformation(stageInDirectory);
-	}
+	@Bean(name="pylintCommand")
+    public List<String> pylintCommand() {
+    	List<String> command = new ArrayList<String>();
+    	command.add("pylint");
+    	command.add("-r");
+    	command.add("n");
+    	command.add("-f");
+    	command.add("json");
+    	command.add("--disable=R,C");
+    	return command;
+    }
+    
+    /*
+    <util:list id="pylintCommand">
+      <value>pylint</value>
+      <value>-r</value> <value>n</value>
+      <value>-f</value> <value>json</value>
+      <value>--disable=R,C</value>
+    </util:list> 
+    */
 	
 	@Bean
-	public ANVGLFileStagingService anvglFileStagingService() {
-		return new ANVGLFileStagingService(stagingInformation());
+	public CloudStorageService[] cloudStorageServices() {
+		CloudStorageService[] storageServices = new CloudStorageService[3];
+		storageServices[0] = cloudStorageServiceAwsSydney();
+		storageServices[1] = cloudStorageServiceNectarMelb();
+		storageServices[2] = cloudStorageServiceNci();
+		return storageServices;
 	}
-	
-	/*
-	<bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">
-        <constructor-arg name="stagingInformation">
-            <bean class="org.auscope.portal.core.cloud.StagingInformation">
-                <constructor-arg name="stageInDirectory" value="${localStageInDir}"/>
-            </bean>
-        </constructor-arg>
-    </bean> 
-	*/
 	
 	@Bean
 	public ANVGLProvenanceService anvglProvenanceService() {
@@ -224,189 +252,6 @@ public class VglApplicationContext {
 	*/
 	
 	@Bean
-	public VglMachineImage machineImageEscript() {
-		VglMachineImage machineImage = new VglMachineImage("ap-southeast-2/ami-0487de67");
-		machineImage.setName("escript");
-		machineImage.setDescription("A Debian (Jessie) machine with escript already installed.");
-		machineImage.setKeywords(new String[] {"escript", "debian"});
-		return machineImage;
-	}
-	
-	/*
-	<!-- from cloudComputeService-aws def -->
-	<bean class="org.auscope.portal.server.vegl.VglMachineImage">
-        <constructor-arg name="imageId" value="ap-southeast-2/ami-0487de67"/>
-        <property name="name" value="escript"/>
-        <property name="description"><value>A Debian (Jessie) machine with escript already installed.</value></property>
-        <property name="keywords">
-            <array>
-                <value>escript</value>
-                <value>debian</value>
-            </array>
-        </property>
-    </bean>
-	*/
-	
-	@Bean
-	public VglMachineImage machineImageAemInversion() {
-		VglMachineImage machineImage = new VglMachineImage("ap-southeast-2/ami-736b3010");
-		machineImage.setName("AEM-Inversion");
-		machineImage.setDescription("A Debian (Jessie) machine with aem already installed.");
-		machineImage.setKeywords(new String[] {"AEM-Inversion", "debian"});
-		return machineImage;
-	}
-	
-	/*
-	<!-- from cloudComputeService-aws def -->
-	<bean class="org.auscope.portal.server.vegl.VglMachineImage">
-        <constructor-arg name="imageId" value="ap-southeast-2/ami-736b3010"/>
-        <property name="name" value="AEM-Inversion"/>
-        <property name="description"><value>A Debian (Jessie) machine with aem already installed.</value></property>
-        <property name="keywords">
-            <array>
-                <value>AEM-Inversion</value>
-                <value>debian</value>
-            </array>
-        </property>
-    </bean>
-	*/
-	
-	@Bean
-	public MachineImage[] vglMachineImages() {
-		MachineImage[] machineImages = new MachineImage[2];
-		machineImages[0] = machineImageEscript();
-		machineImages[1] = machineImageAemInversion();
-		return machineImages;
-	}
-	
-	
-	@Bean CloudStorageServiceNci cloudStorageServiceNci() {
-		CloudStorageServiceNci cloudStorageService = new CloudStorageServiceNci("raijin.nci.org.au", "nci-raijin");
-		cloudStorageService.setId("nci-raijin-storage");
-		cloudStorageService.setName("National Computing Infrastructure - Raijin");
-		return cloudStorageService;
-	}
-	
-	/*
-	<bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageServiceNci">
-        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
-        <constructor-arg name="provider" value="nci-raijin"/>
-        <property name="name" value="National Computing Infrastructure - Raijin"/>
-        <property name="id" value="nci-raijin-storage"/>
-    </bean>
-	*/
-	
-	
-	@Bean
-	public CloudComputeServiceAws cloudComputeServiceAws() {
-		CloudComputeServiceAws computeService = new CloudComputeServiceAws("ec2.ap-southeast-2.amazonaws.com",
-				awsAccessKey, awsSecretKey, null, awsSessionKey);
-		computeService.setId("aws-ec2-compute");
-		computeService.setName("Amazon Web Services - EC2");
-		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
-		computeService.setStsRequirement(req);
-		computeService.setAvailableImages(vglMachineImages());
-		return computeService;
-	}
-	
-	/*
-	<bean id="cloudComputeService-aws" class="org.auscope.portal.core.services.cloud.CloudComputeServiceAws">
-        <constructor-arg name="endpoint" value="ec2.ap-southeast-2.amazonaws.com"/>
-        <constructor-arg name="apiVersion"><null/></constructor-arg>
-        <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.aws.secretkey}"/>
-        
-        <property name="id" value="aws-ec2-compute"/>
-        <property name="name" value="Amazon Web Services - EC2"/>
-        <property name="stsRequirement" value="${aws.stsrequirement}"/>
-        
-        <property name="availableImages">
-            <list>
-                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ap-southeast-2/ami-0487de67"/>
-                    <property name="name" value="escript"/>
-                    <property name="description"><value>A Debian (Jessie) machine with escript already installed.</value></property>
-                    <property name="keywords">
-                        <array>
-                            <value>escript</value>
-                            <value>debian</value>
-                        </array>
-                    </property>
-                </bean>
-                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
-                    <constructor-arg name="imageId" value="ap-southeast-2/ami-736b3010"/>
-                    <property name="name" value="AEM-Inversion"/>
-                    <property name="description"><value>A Debian (Jessie) machine with aem already installed.</value></property>
-                    <property name="keywords">
-                        <array>
-                            <value>AEM-Inversion</value>
-                            <value>debian</value>
-                        </array>
-                    </property>
-                </bean>
-            </list>
-        </property>
-    </bean> 
-	*/
-	
-	// XXX Used by cloudComputeServiceNectar, currently unused
-	@Bean
-	public InetAddress inetAddress() throws UnknownHostException {
-		return InetAddress.getLocalHost();
-	}
-	
-	// TODO: Re-implement Nectar and NCI services
-	/*
-	<!-- Used in cloudComputeService-nectar -->
-    <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/> 
-	*/
-	
-	@Bean
-	public CloudComputeServiceNectar cloudComputeServiceNectar() throws UnknownHostException {
-		CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
-				"https://keystone.rc.nectar.org.au:5000/v2.0", nectarAccessKey, nectarSecretKey);
-		computeService.setId("nectar-nova-compute");
-		computeService.setName("National eResearch Collaboration Tools and Resources");
-		//computeService.setGroupName("vl-#{inetAddress().hostName.toLowerCase()}");
-		String groupName = "vl-";
-		groupName += inetAddress().getHostName().toLowerCase();
-		computeService.setGroupName(groupName);
-		computeService.setKeypair("vgl-developers");
-		return computeService;
-		
-	}
-	
-	/*
-	<bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNectar">
-        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
-        <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
-        <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
-        <property name="id" value="nectar-nova-compute"/>
-        <property name="name" value="National eResearch Collaboration Tools and Resources"/>
-        <property name="groupName" value ="vl-#{inetAddress.hostName.toLowerCase()}"/>
-        <property name="keypair" value="vgl-developers"/>
-    </bean>
-	*/
-	
-	
-	@Bean CloudComputeServiceNci cloudComputeServiceNci() {
-		CloudComputeServiceNci computeService = new CloudComputeServiceNci(cloudStorageServiceNci(), "raijin.nci.org.au");
-		computeService.setId("nci-raijin-compute");
-		computeService.setName("National Computing Infrastructure - Raijin");
-		return computeService;
-	}
-	
-	/*
-	<bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNci">
-        <constructor-arg name="storageService" ref="cloudStorageService-nci"/>
-        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
-        <property name="name" value="National Computing Infrastructure - Raijin"/>
-        <property name="id" value="nci-raijin-compute"/>
-    </bean> 
-	*/
-	
-	
-	@Bean
 	public CloudComputeService[] cloudComputeServices()  {
 		ArrayList<CloudComputeService> computeServicesList = new ArrayList<CloudComputeService>();
 		computeServicesList.add(cloudComputeServiceAws());
@@ -416,8 +261,7 @@ public class VglApplicationContext {
 		} catch(UnknownHostException e) {
 			System.out.println("Unable to create Nectar cloud compute service");
 		}
-		CloudComputeService computeServices[] = 
-				(CloudComputeService[])computeServicesList.toArray(new CloudComputeService[computeServicesList.size()]);
+		CloudComputeService computeServices[] = computeServicesList.toArray(new CloudComputeService[computeServicesList.size()]);
 		return computeServices;
 	}
 	
@@ -428,59 +272,6 @@ public class VglApplicationContext {
 	
 	/*
 	<bean name="jobStatusLogReader" class="org.auscope.portal.server.vegl.VGLJobStatusAndLogReader" autowire="constructor"/>
-	*/
-	
-	// VelocityEngine not originally found in applicationContext
-	@Bean
-	public VelocityEngine velocityEngine() throws Exception {
-	    Properties properties = new Properties();
-	    properties.setProperty("input.encoding", "UTF-8");
-	    properties.setProperty("output.encoding", "UTF-8");
-	    properties.setProperty("resource.loader", "class");
-	    properties.setProperty("class.resource.loader.class",
-	    					   "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-	    VelocityEngine velocityEngine = new VelocityEngine(properties);
-	    return velocityEngine;
-	}
-
-	@Bean
-	public MailSender mailSender() {
-		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-		mailSender.setHost(smtpServer);
-		return mailSender;
-	}
-	
-	/*
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="${smtp.server}" />
-    </bean>
-    */
-
-    @Bean
-	public JobCompletionMailSender jobCompletionMailSender() throws Exception {
-    	// XXX VelocityEngine now hooked up internally, untested
-		JobCompletionMailSender sender = new JobCompletionMailSender(jobManager, jobStatusLogReader(), mailSender(), velocityEngine());
-		sender.setTemplate("org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl");
-		sender.setDateFormat("EEE, d MMM yyyy HH:mm:ss");
-		sender.setMaxLengthForSeriesNameInSubject(15);
-		sender.setMaxLengthForJobNameInSubject(15);
-		sender.setMaxLinesForTail(5);
-		sender.setEmailSender(portalAdminEmail);
-		sender.setPortalUrl(frontEndUrl);
-		return sender;
-	}
-	
-	/*
-	<bean name="jobCompletionMailSender" class="org.auscope.portal.server.vegl.mail.JobCompletionMailSender" autowire="constructor">
-        <property name="template" value="org/auscope/portal/server/web/service/monitor/templates/job-completion.tpl" />
-        <property name="dateFormat" value="EEE, d MMM yyyy HH:mm:ss" />
-        <property name="maxLengthForSeriesNameInSubject" value="15" />
-        <property name="maxLengthForJobNameInSubject" value="15" />
-        <property name="maxLinesForTail" value="5" />
-        <property name="emailSender" value="${portalAdminEmail}"/>
-        <property name="emailSubject" value="VGL Job (%s)" />
-        <property name="portalUrl" value="${frontEndUrl}"/>
-    </bean>
 	*/
 	
 	@Bean
@@ -515,15 +306,12 @@ public class VglApplicationContext {
 	public JobDetailFactoryBean vglJobStatusMonitorDetail() throws Exception {
 		JobDetailFactoryBean jobDetail = new JobDetailFactoryBean();
 		jobDetail.setJobClass(VGLJobStatusMonitor.class);
-		
-		// XXX Does this work? Do we need Services (DAO replacements)?
 		Map<String, Object> jobData = new HashMap<String, Object>();
 		jobData.put("jobManager", jobManager);
 		jobData.put("jobStatusMonitor", jobStatusMonitor());
-		//jobData.put("jobUserDao", );
-		//jobData.put("nciDetailsDao", );
-		jobDetail.setJobDataAsMap(jobData);
-		
+		jobData.put("jobUserService", userService);
+		jobData.put("nciDetailsService", nciDetailsService);
+		jobDetail.setJobDataAsMap(jobData);		
 		return jobDetail;
 	}
 	
@@ -534,52 +322,14 @@ public class VglApplicationContext {
             <map>
                 <entry key="jobManager" value-ref="veglJobManager"/>
                 <entry key="jobStatusMonitor" value-ref="jobStatusMonitor"/>
-                
-                <!-- XXX Replace with services? -->
-                <!--
                 <entry key="jobUserDao" value-ref="anvglUserDao"/>
                 <entry key="nciDetailsDao" value-ref="nciDetailsDao"/>
-                -->
             </map>
         </property>
     </bean>
 	*/
 	
 	
-	// Inject the configured solutions centre URL
-	@Bean
-	public MethodInvokingBean injectSsscUrl() {
-		MethodInvokingBean ssscUrlBean = new MethodInvokingBean();
-		ssscUrlBean.setStaticMethod("org.auscope.portal.server.web.service.ScmEntryService.setSolutionsUrl");
-		//List<String> arguments = new ArrayList<String>();
-		//arguments.add(solutionsUrl);
-		//ssscUrlBean.setArguments(arguments);
-		ssscUrlBean.setArguments(solutionsUrl);
-		return ssscUrlBean;
-	}
-	
-	/*
-	<!-- Inject the configured solutions centre URL -->
-    <bean class="org.springframework.beans.factory.config.MethodInvokingBean">
-      <property name="staticMethod"
-                value="org.auscope.portal.server.web.service.ScmEntryService.setSolutionsUrl"/>
-      <property name="arguments">
-        <list>
-          <value>${solutions.url}</value>
-        </list>
-      </property>
-    </bean>
-    */
-	
-	@Bean
-	public CommonsMultipartResolver multipartResolver() {
-		return new CommonsMultipartResolver();
-	}
-	
-	/*
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-    </bean> 
-	*/
     
     @Bean
     public SimpleTriggerFactoryBean simpleTriggerFactoryBean() throws Exception {
@@ -595,24 +345,6 @@ public class VglApplicationContext {
     <property name="jobDetail" ref="vglJobStatusMonitorDetail" />
     <property name="repeatInterval" value="300000" />
     <property name="startDelay" value="10000" />
-    </bean>
-    */
-    
-    @Bean
-    public ThreadPoolTaskExecutor taskExecutor() {
-    	ThreadPoolTaskExecutor taskExec = new ThreadPoolTaskExecutor();
-    	taskExec.setCorePoolSize(5);
-    	taskExec.setMaxPoolSize(5);
-    	taskExec.setQueueCapacity(25);
-    	return taskExec;
-    }
-    
-    /*
-    <!-- This is the core threadpool shared by object instances throughout the portal -->
-    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="5" />
-        <property name="maxPoolSize" value="5" />
-        <property name="queueCapacity" value="25" />
     </bean>
     */
     
@@ -634,6 +366,24 @@ public class VglApplicationContext {
             <ref bean="simpleTrigger" />
         </list>
     </property>
+    </bean>
+    */
+    
+    @Bean
+    public ThreadPoolTaskExecutor taskExecutor() {
+    	ThreadPoolTaskExecutor taskExec = new ThreadPoolTaskExecutor();
+    	taskExec.setCorePoolSize(5);
+    	taskExec.setMaxPoolSize(5);
+    	taskExec.setQueueCapacity(25);
+    	return taskExec;
+    }
+    
+    /*
+    <!-- This is the core threadpool shared by object instances throughout the portal -->
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="5" />
+        <property name="maxPoolSize" value="5" />
+        <property name="queueCapacity" value="25" />
     </bean>
     */
     
@@ -872,6 +622,297 @@ public class VglApplicationContext {
     */
     
     @Bean
+	public CloudStorageServiceJClouds cloudStorageServiceAwsSydney() {
+		CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds(null, "aws-s3", awsAccessKey, awsSecretKey, null, "ap-southeast-2", false, true);
+		storageService.setName("Amazon Web Services - S3");
+		storageService.setId("amazon-aws-storage-sydney");
+		storageService.setBucket("vgl-csiro-");
+		storageService.setAdminEmail(adminEmail);
+		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
+		storageService.setStsRequirement(req);
+		return storageService;
+	}
+	
+	/*
+	<bean id="cloudStorageService-aws-sydney" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
+        <constructor-arg name="provider" value="aws-s3"/>
+        <constructor-arg name="endpoint"><null/></constructor-arg>
+        <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.aws.secretkey}"/>
+        <constructor-arg name="regionName" value="ap-southeast-2"/>
+        <constructor-arg name="relaxHostName" value="false"/>
+        <constructor-arg name="stripExpectHeader" value="true"/>
+        <property name="name" value="Amazon Web Services - S3"/>
+        <property name="id" value="amazon-aws-storage-sydney"/>
+        <property name="bucket" value="vgl-csiro-"/>
+        <property name="adminEmail" value="${portalAdminEmail}"/>
+        <property name="stsRequirement" value="${aws.stsrequirement}"/>
+    </bean>
+	*/
+    
+    @Bean
+	public CloudStorageServiceJClouds cloudStorageServiceNectarMelb() {
+    	CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds("https://keystone.rc.nectar.org.au:5000/v2.0",
+    			"openstack-swift", nectarAccessKey, nectarSecretKey, null, "Melbourne", false, true);
+    	storageService.setName("National eResearch Collaboration Tools and Resources");
+    	storageService.setId("nectar-openstack-storage-melb");
+    	storageService.setBucket("vgl-portal");
+    	storageService.setAuthVersion("2.0");
+    	STSRequirement req = STSRequirement.ForceNone;
+		storageService.setStsRequirement(req);
+		return storageService;
+    }
+	/*
+	<bean id="cloudStorageService-nectar-melb" class="org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds">
+	    <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+	    <constructor-arg name="provider" value="openstack-swift"/>
+	    <constructor-arg name="accessKey" value="${env.nectar.storage.accesskey}"/>
+	    <constructor-arg name="secretKey" value="${env.nectar.storage.secretkey}"/>
+	    <constructor-arg name="regionName" value="Melbourne"/>
+	    <constructor-arg name="relaxHostName" value="false"/>
+	    <constructor-arg name="stripExpectHeader" value="true"/>
+	    <property name="name" value="National eResearch Collaboration Tools and Resources"/>
+	    <property name="id" value="nectar-openstack-storage-melb"/>
+	    <property name="bucket" value="vgl-portal"/>
+	    <property name="authVersion" value="2.0"/>
+	    <property name="stsRequirement" value="ForceNone"/>
+	</bean>
+	*/
+	
+	@Bean
+	public CloudStorageServiceNci cloudStorageServiceNci() {
+		CloudStorageServiceNci cloudStorageService = new CloudStorageServiceNci("raijin.nci.org.au", "nci-raijin");
+		cloudStorageService.setId("nci-raijin-storage");
+		cloudStorageService.setName("National Computing Infrastructure - Raijin");
+		return cloudStorageService;
+	}
+	
+	/*
+	<bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageServiceNci">
+        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
+        <constructor-arg name="provider" value="nci-raijin"/>
+        <property name="name" value="National Computing Infrastructure - Raijin"/>
+        <property name="id" value="nci-raijin-storage"/>
+    </bean>
+	*/
+	
+	@Bean
+	public InetAddress inetAddress() throws UnknownHostException {
+		return InetAddress.getLocalHost();
+	}
+	
+	/*
+	<!-- Used in cloudComputeService-nectar -->
+    <bean id="inetAddress" class="java.net.InetAddress" factory-method="getLocalHost"/> 
+	*/
+	
+	@Bean
+	public VglMachineImage machineImageEscript() {
+		VglMachineImage machineImage = new VglMachineImage("ap-southeast-2/ami-0487de67");
+		machineImage.setName("escript");
+		machineImage.setDescription("A Debian (Jessie) machine with escript already installed.");
+		machineImage.setKeywords(new String[] {"escript", "debian"});
+		return machineImage;
+	}
+	
+	/*
+	<!-- from cloudComputeService-aws def -->
+	<bean class="org.auscope.portal.server.vegl.VglMachineImage">
+        <constructor-arg name="imageId" value="ap-southeast-2/ami-0487de67"/>
+        <property name="name" value="escript"/>
+        <property name="description"><value>A Debian (Jessie) machine with escript already installed.</value></property>
+        <property name="keywords">
+            <array>
+                <value>escript</value>
+                <value>debian</value>
+            </array>
+        </property>
+    </bean>
+	*/
+	
+	@Bean
+	public VglMachineImage machineImageAemInversion() {
+		VglMachineImage machineImage = new VglMachineImage("ap-southeast-2/ami-736b3010");
+		machineImage.setName("AEM-Inversion");
+		machineImage.setDescription("A Debian (Jessie) machine with aem already installed.");
+		machineImage.setKeywords(new String[] {"AEM-Inversion", "debian"});
+		return machineImage;
+	}
+	
+	/*
+	<!-- from cloudComputeService-aws def -->
+	<bean class="org.auscope.portal.server.vegl.VglMachineImage">
+        <constructor-arg name="imageId" value="ap-southeast-2/ami-736b3010"/>
+        <property name="name" value="AEM-Inversion"/>
+        <property name="description"><value>A Debian (Jessie) machine with aem already installed.</value></property>
+        <property name="keywords">
+            <array>
+                <value>AEM-Inversion</value>
+                <value>debian</value>
+            </array>
+        </property>
+    </bean>
+	*/
+	
+	@Bean
+	public MachineImage[] vglMachineImages() {
+		MachineImage[] machineImages = new MachineImage[2];
+		machineImages[0] = machineImageEscript();
+		machineImages[1] = machineImageAemInversion();
+		return machineImages;
+	}
+	
+	
+	@Bean
+	public CloudComputeServiceAws cloudComputeServiceAws() {
+		CloudComputeServiceAws computeService = new CloudComputeServiceAws("ec2.ap-southeast-2.amazonaws.com",
+				awsAccessKey, awsSecretKey, null, null);
+		computeService.setId("aws-ec2-compute");
+		computeService.setName("Amazon Web Services - EC2");
+		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
+		computeService.setStsRequirement(req);
+		computeService.setAvailableImages(vglMachineImages());
+		return computeService;
+	}
+	
+	/*
+	<bean id="cloudComputeService-aws" class="org.auscope.portal.core.services.cloud.CloudComputeServiceAws">
+        <constructor-arg name="endpoint" value="ec2.ap-southeast-2.amazonaws.com"/>
+        <constructor-arg name="apiVersion"><null/></constructor-arg>
+        <constructor-arg name="accessKey" value="${env.aws.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.aws.secretkey}"/>
+        
+        <property name="id" value="aws-ec2-compute"/>
+        <property name="name" value="Amazon Web Services - EC2"/>
+        <property name="stsRequirement" value="${aws.stsrequirement}"/>
+        
+        <property name="availableImages">
+            <list>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ap-southeast-2/ami-0487de67"/>
+                    <property name="name" value="escript"/>
+                    <property name="description"><value>A Debian (Jessie) machine with escript already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>escript</value>
+                            <value>debian</value>
+                        </array>
+                    </property>
+                </bean>
+                <bean class="org.auscope.portal.server.vegl.VglMachineImage">
+                    <constructor-arg name="imageId" value="ap-southeast-2/ami-736b3010"/>
+                    <property name="name" value="AEM-Inversion"/>
+                    <property name="description"><value>A Debian (Jessie) machine with aem already installed.</value></property>
+                    <property name="keywords">
+                        <array>
+                            <value>AEM-Inversion</value>
+                            <value>debian</value>
+                        </array>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean> 
+	*/
+	
+	@Bean
+	public CloudComputeServiceNectar cloudComputeServiceNectar() throws UnknownHostException {
+		CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
+				"https://keystone.rc.nectar.org.au:5000/v2.0", nectarAccessKey, nectarSecretKey);
+		computeService.setId("nectar-nova-compute");
+		computeService.setName("National eResearch Collaboration Tools and Resources");
+		//computeService.setGroupName("vl-#{inetAddress().hostName.toLowerCase()}");
+		String groupName = "vl-";
+		groupName += inetAddress().getHostName().toLowerCase();
+		computeService.setGroupName(groupName);
+		computeService.setKeypair("vgl-developers");
+		return computeService;
+		
+	}
+	
+	/*
+	<bean id="cloudComputeService-nectar" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNectar">
+        <constructor-arg name="endpoint" value="https://keystone.rc.nectar.org.au:5000/v2.0"/>
+        <constructor-arg name="accessKey" value="${env.nectar.ec2.accesskey}"/>
+        <constructor-arg name="secretKey" value="${env.nectar.ec2.secretkey}"/>
+        <property name="id" value="nectar-nova-compute"/>
+        <property name="name" value="National eResearch Collaboration Tools and Resources"/>
+        <property name="groupName" value ="vl-#{inetAddress.hostName.toLowerCase()}"/>
+        <property name="keypair" value="vgl-developers"/>
+    </bean>
+	*/
+	
+	
+	@Bean
+	public CloudComputeServiceNci cloudComputeServiceNci() {
+		CloudComputeServiceNci computeService = new CloudComputeServiceNci(cloudStorageServiceNci(), "raijin.nci.org.au");
+		computeService.setId("nci-raijin-compute");
+		computeService.setName("National Computing Infrastructure - Raijin");
+		return computeService;
+	}
+	
+	/*
+	<bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNci">
+        <constructor-arg name="storageService" ref="cloudStorageService-nci"/>
+        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
+        <property name="name" value="National Computing Infrastructure - Raijin"/>
+        <property name="id" value="nci-raijin-compute"/>
+    </bean> 
+	*/
+	
+	@Bean
+	public StagingInformation stagingInformation() {
+		return new StagingInformation(stageInDirectory);
+	}
+	
+	@Bean
+	public ANVGLFileStagingService anvglFileStagingService() {
+		return new ANVGLFileStagingService(stagingInformation());
+	}
+	
+	/*
+	<bean id="fileStagingService" class="org.auscope.portal.server.web.service.ANVGLFileStagingService">
+        <constructor-arg name="stagingInformation">
+            <bean class="org.auscope.portal.core.cloud.StagingInformation">
+                <constructor-arg name="stageInDirectory" value="${localStageInDir}"/>
+            </bean>
+        </constructor-arg>
+    </bean> 
+	*/
+	
+	// Inject the configured solutions centre URL
+	@Bean
+	public MethodInvokingBean injectSsscUrl() {
+		MethodInvokingBean ssscUrlBean = new MethodInvokingBean();
+		ssscUrlBean.setStaticMethod("org.auscope.portal.server.web.service.ScmEntryService.setSolutionsUrl");
+		ssscUrlBean.setArguments(solutionsUrl);
+		return ssscUrlBean;
+	}
+	
+	/*
+	<!-- Inject the configured solutions centre URL -->
+    <bean class="org.springframework.beans.factory.config.MethodInvokingBean">
+      <property name="staticMethod"
+                value="org.auscope.portal.server.web.service.ScmEntryService.setSolutionsUrl"/>
+      <property name="arguments">
+        <list>
+          <value>${solutions.url}</value>
+        </list>
+      </property>
+    </bean>
+    */
+	
+	@Bean
+	public CommonsMultipartResolver multipartResolver() {
+		return new CommonsMultipartResolver();
+	}
+	
+	/*
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    </bean> 
+	*/
+    
+    @Bean
     public CustomRegistry cswRegVeglProduction() {
     	return new CustomRegistry("cswRegVeglProduction", "SISS ANU Geonetwork",
     			"http://vgl-reg.auscope.org/geonetwork/srv/eng/csw",
@@ -946,6 +987,7 @@ public class VglApplicationContext {
     <bean class="org.auscope.portal.core.services.namespaces.ErmlNamespaceContext"/>
     */
 
+    // Needed? wfsService() creates a new WFSGetFEatureMethodMaker, not sure if this is referenced anywhere
     @Bean
     public WFSGetFeatureMethodMaker wfsMethodMakerErmlNamespace() {
     	WFSGetFeatureMethodMaker methodMaker = new WFSGetFeatureMethodMaker();
@@ -960,26 +1002,4 @@ public class VglApplicationContext {
         </property>
     </bean>
     */
-    
-    @Bean(name="pylintCommand")
-    public List<String> pylintCommand() {
-    	List<String> command = new ArrayList<String>();
-    	command.add("pylint");
-    	command.add("-r");
-    	command.add("n");
-    	command.add("-f");
-    	command.add("json");
-    	command.add("--disable=R,C");
-    	return command;
-    }
-    
-    /*
-    <util:list id="pylintCommand">
-      <value>pylint</value>
-      <value>-r</value> <value>n</value>
-      <value>-f</value> <value>json</value>
-      <value>--disable=R,C</value>
-    </util:list> 
-    */
-	
 }

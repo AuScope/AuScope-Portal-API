@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
+import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
@@ -681,11 +683,21 @@ public class JobBuilderController extends BaseCloudController {
         if (job == null) {
             return generateJSONResponseMAV(false);
         }
-
-        List<VglDownload> existingDownloads = job.getJobDownloads();
+        
         if (append) {
+        	List<VglDownload> existingDownloads = new ArrayList<VglDownload>();
+        	for(VglDownload dl: job.getJobDownloads()) {
+        		VglDownload dlClone = (VglDownload)dl.clone();
+        		//dlClone.setId(null);
+        		existingDownloads.add(dlClone);
+        	}
+        	existingDownloads.addAll(parsedDownloads);
+        	job.setJobDownloads(existingDownloads);
+        	/*
+        	List<VglDownload> existingDownloads = job.getJobDownloads();
             existingDownloads.addAll(parsedDownloads);
             job.setJobDownloads(existingDownloads);
+            */
         } else {
             job.setJobDownloads(parsedDownloads);
         }
@@ -709,7 +721,6 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      */
     @RequestMapping("/secure/getJobDownloads.do")
-    //public ModelAndView getJobDownloads(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
     public ModelAndView getJobDownloads(@RequestParam("jobId") Integer jobId) {
     	ANVGLUser user = userService.getLoggedInUser();
         //Lookup the job
@@ -953,6 +964,7 @@ public class JobBuilderController extends BaseCloudController {
         @SuppressWarnings("rawtypes")
         final
         Enumeration sessionVariables = session.getAttributeNames();
+        Map<String, VglParameter> jobParams = new HashMap<String, VglParameter>();
         while (sessionVariables.hasMoreElements()) {
             String variableName = sessionVariables.nextElement().toString();
             Object variableValue = session.getAttribute(variableName);
@@ -970,8 +982,13 @@ public class JobBuilderController extends BaseCloudController {
                 continue;//Don't bother with other types
             }
 
-            job.setJobParameter(variableName, variableStringValue, variableType);
+            VglParameter param = new VglParameter();
+            param.setName(variableName);
+            param.setValue(variableStringValue);
+            param.setType(variableType.name());
+            jobParams.put(variableName, param);
         }
+        job.setJobParameters(jobParams);
 
         //Load details from
         job.setUser(user.getEmail());

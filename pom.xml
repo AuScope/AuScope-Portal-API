@@ -282,7 +282,7 @@
         <portal.core.version>2.1.0-SNAPSHOT</portal.core.version>
         <httpclient.version>4.3.5</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
-        <jackson.version>2.9.0</jackson.version>        
+        <jackson.version>2.9.0</jackson.version>
     </properties>
     
     <!--  Spring Boot -->    
@@ -292,8 +292,8 @@
         <version>2.1.3.RELEASE</version>
     </parent>
     
-
     <repositories>
+        <!--
         <repository>
             <id>CSIRO AuScope Repo</id>
             <name>AuScope Nexus - PortalRepo</name>
@@ -302,16 +302,23 @@
         <repository>
             <id>CSIRO AuScope Repo PROMS-java</id>
             <name>AuScope Nexus - PROMS-Java</name>
-            <url>https://cgmaven.it.csiro.au/nexus/repository/PROMS-java-snapshot</url>
+            //<url>https://cgmaven.it.csiro.au/nexus/repository/PROMS-java-snapshot</url>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/proms-client-java</url>
+        </repository>
+        <repository>
+            <id>CSIRO JClouds Shaded</id>
+            <name>AuScope Nexus - JClouds-Shaded</name>
+            //<url>https://cgmaven.it.csiro.au/nexus/repository/PROMS-java-snapshot</url>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/jclouds-all</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled></snapshots>
         </repository>
-        
+        -->
         <repository>
-            <id>lib</id>
-            <url>file://${project.basedir}/src/main/resources/lib</url>
+            <id>dcdp-deps</id>
+            <name>AuScope Nexus - New PortalRepo</name>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
         </repository>
-        
     </repositories>
 
     <!-- Dependencies -->
@@ -350,13 +357,11 @@
             -->
         </dependency>
         
-        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <scope>provided</scope>
         </dependency>
-        -->
         
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -397,7 +402,7 @@
         <dependency>
             <groupId>proms-clients-java</groupId>
             <artifactId>proms-clients-java</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
         
         <dependency>
@@ -552,11 +557,25 @@
         </dependency>
         
         <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-core</artifactId>
+            <version>3.12.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.jclouds</groupId>
+            <artifactId>jclouds-all</artifactId>
+            <version>2.0.3-SHADED</version>
+            <classifier>SHADED</classifier>
+        </dependency>
+        <!--
+        <dependency>
 		   <groupId>org.apache.jclouds</groupId>
 		   <artifactId>jclouds-all</artifactId>
-		   <!--<version>2.1.2</version>-->
+		   //<version>2.1.2</version>
 		   <version>2.0.3-SHADED</version>
         </dependency>
+        -->
     </dependencies>
     
     <build>
