@@ -114,4 +114,22 @@ public class VlRegistries {
 	    <constructor-arg name="recordInformationUrl" value="https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
     </bean>
     */
+	
+	@Bean
+	CSWServiceItem cswUrbanMonitor() {
+	    return new CSWServiceItem("cswUrbanMonitor",
+	            "http://dcdpgeo.data61.csiro.au:8080/api",
+	            "http://dcdpgeo.data61.csiro.au:8080/api/catalog.search#/metadata/%1$s",
+	            "Urban Monitor");
+	}
+	
+	/*
+	<bean id="cswUrbanMonitor" class="org.auscope.portal.core.services.csw.CSWServiceItem">
+        <constructor-arg name="id" value="cswUrbanMonitor"/>
+        <constructor-arg name="title" value="Urban Monitor"/>
+        <constructor-arg name="serviceUrl" value="http://dcdpgeo.data61.csiro.au:8080/api"/>
+        <constructor-arg name="recordInformationUrl" value="http://dcdpgeo.data61.csiro.au:8080/api/catalog.search#/metadata/%1$s"/>
+    </bean>
+	 */
+
 }

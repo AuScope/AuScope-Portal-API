@@ -91,6 +91,9 @@ public class ProfilePortalProduction {
 	@Qualifier("cswNciMT")
 	CSWServiceItem cswNciMt;
 	
+	@Autowired
+    @Qualifier("cswUrbanMonitor")
+    CSWServiceItem cswUrbanMonitor;
 	
 	@Bean
 	public ArrayList<KnownLayer> knownTypes() {
@@ -159,12 +162,13 @@ public class ProfilePortalProduction {
 	@Bean
 	public ArrayList<CSWServiceItem> cswServiceList() {
 		ArrayList<CSWServiceItem> serviceList = new ArrayList<CSWServiceItem>();
-		serviceList.add(cswVeglProduction);
+		//serviceList.add(cswVeglProduction);
 		serviceList.add(cswGAECat);
 		serviceList.add(cswNciRR2);
-		serviceList.add(cswNci);
-		serviceList.add(cswNciGswa);
-		serviceList.add(cswNciMt);
+		//serviceList.add(cswNci);
+		//serviceList.add(cswNciGswa);
+		//serviceList.add(cswNciMt);
+		serviceList.add(cswUrbanMonitor);
 		return serviceList;
 	}
 	
