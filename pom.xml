@@ -411,15 +411,6 @@
             <version>${portal.core.version}</version>
         </dependency>
         
-        <!-- m2e overlay workaround (see above) -->
-        <dependency>
-            <groupId>org.auscope.portal</groupId>
-            <artifactId>portal-core</artifactId>
-            <version>${portal.core.version}</version>
-            <classifier>sources</classifier>
-            <scope>provided</scope>
-        </dependency>
-        
         <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
