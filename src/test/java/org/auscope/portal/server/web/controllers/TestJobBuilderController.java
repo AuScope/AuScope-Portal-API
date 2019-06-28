@@ -38,10 +38,11 @@ import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.auscope.portal.server.web.service.scm.Solution;
@@ -75,9 +76,12 @@ public class TestJobBuilderController {
     private ANVGLUser mockPortalUser;
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
     private CloudSubmissionService mockCloudSubmissionService;
+    private ANVGLUserService mockUserService;
     private ANVGLProvenanceService mockAnvglProvenanceService;
     private ANVGLFileStagingService mockFileStagingService;
-    private NCIDetailsDao mockNciDetailsDao;
+    
+    //private NCIDetailsDao mockNciDetailsDao;
+    private NCIDetailsService mockNciDetailsService;
 
     private JobMailSender mockJobMailSender;
     private VGLJobStatusAndLogReader mockVGLJobStatusAndLogReader;
@@ -106,10 +110,14 @@ public class TestJobBuilderController {
         mockRequest = context.mock(HttpServletRequest.class);
         mockResponse = context.mock(HttpServletResponse.class);
         mockSession = context.mock(HttpSession.class);
-        mockNciDetailsDao = context.mock(NCIDetailsDao.class);
+        
+        //mockNciDetailsDao = context.mock(NCIDetailsDao.class);
+        mockNciDetailsService = context.mock(NCIDetailsService.class);
 
         mockJobMailSender = context.mock(JobMailSender.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
+        
+        mockUserService = context.mock(ANVGLUserService.class);
 
         mockAnvglProvenanceService = context.mock(ANVGLProvenanceService.class);
         mockScmEntryService = context.mock(ScmEntryService.class);
@@ -131,16 +139,18 @@ public class TestJobBuilderController {
                                      vmShutdownSh,
                                      mockCloudStorageServices,
                                      mockCloudComputeServices,
+                                     mockUserService,
                                      vglJobStatusChangeHandler,
                                      mockScmEntryService,
                                      mockAnvglProvenanceService,
-                                     mockCloudSubmissionService,
-                                     mockNciDetailsDao);
+                                     mockCloudSubmissionService);
+                                     //mockNciDetailsDao);
 
         user = new ANVGLUser();
         user.setEmail("user@example.com");
         user.setId(userId);
-        job = new VEGLJob(Integer.parseInt(jobId));
+        job = new VEGLJob();
+        job.setId(Integer.parseInt(jobId));
         job.setEmailAddress("user@example.com");
         job.setUser("user@example.com");
         context.checking(new Expectations() {{
@@ -149,6 +159,7 @@ public class TestJobBuilderController {
             allowing(mockJob).getEmailAddress();will(returnValue(job.getEmailAddress()));
             allowing(mockPortalUser).getId();will(returnValue(userId));
             allowing(mockPortalUser).getEmail();will(returnValue(user.getEmail()));
+            allowing(mockUserService).getLoggedInUser();will(returnValue(mockPortalUser));
             allowing(mockSeries).getUser();will(returnValue(job.getEmailAddress()));
             allowing(mockSeries).getId();will(returnValue(Integer.parseInt(seriesId)));
         }});
@@ -163,11 +174,11 @@ public class TestJobBuilderController {
     public void testGetJobObject() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(job));
         }});
 
-        ModelAndView mav = controller.getJobObject(jobId, user);
+        ModelAndView mav = controller.getJobObject(jobId);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -181,11 +192,11 @@ public class TestJobBuilderController {
     public void testGetJobObject_Exception() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.getJobObject(jobId, user);
+        ModelAndView mav = controller.getJobObject(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -205,7 +216,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(job));
 
             //We should have a call to file staging service to get our files
@@ -216,7 +227,7 @@ public class TestJobBuilderController {
             oneOf(mockFile2).length();will(returnValue(512L));
         }});
 
-        ModelAndView mav = controller.stagedJobFiles(jobId, user);
+        ModelAndView mav = controller.stagedJobFiles(jobId);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -230,11 +241,11 @@ public class TestJobBuilderController {
     public void testListStagedJobFiles_JobNotFound() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.stagedJobFiles(jobId, user);
+        ModelAndView mav = controller.stagedJobFiles(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -248,14 +259,14 @@ public class TestJobBuilderController {
     public void testListStagedJobFiles_Exception() throws Exception {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(job));
             //We should have a call to file staging service to get our files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);
             will(throwException(new PortalServiceException("test exception","test exception")));
         }});
 
-        ModelAndView mav = controller.stagedJobFiles(jobId, user);
+        ModelAndView mav = controller.stagedJobFiles(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -270,13 +281,13 @@ public class TestJobBuilderController {
         final String filename = "test.py";
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(with(equal(job.getId())), with(same(user)));
+            oneOf(mockJobManager).getJobById(with(equal(job.getId())), with(same(mockPortalUser)));
             will(returnValue(job));
             //We should have a call to file staging service to download a file
             oneOf(mockFileStagingService).handleFileDownload(job, filename, mockResponse);
         }});
 
-        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, filename, user);
+        ModelAndView mav = controller.downloadFile(mockRequest, mockResponse, jobId, filename);
         Assert.assertNull(mav);
     }
 
@@ -293,7 +304,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(with(equal(job.getId())), with(same(user)));
+            oneOf(mockJobManager).getJobById(with(equal(job.getId())), with(same(mockPortalUser)));
             will(returnValue(job));
             //We should have calls to file staging service to delete files in staging dir
             oneOf(mockFileStagingService).deleteStageInFile(job, file1);
@@ -302,7 +313,7 @@ public class TestJobBuilderController {
             will(returnValue(true));
         }});
 
-        ModelAndView mav = controller.deleteFiles(jobId, filenames, user);
+        ModelAndView mav = controller.deleteFiles(jobId, filenames);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -320,11 +331,11 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.deleteFiles(jobId, filenames, user);
+        ModelAndView mav = controller.deleteFiles(jobId, filenames);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -344,16 +355,15 @@ public class TestJobBuilderController {
         final List<VglDownload> downloadList = new ArrayList<VglDownload>(Arrays.asList(vglDownloads));
         job.setJobDownloads(downloadList);
 
-
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(returnValue(job));
             //We should have a call to our job manager to save our job object
             oneOf(mockJobManager).saveJob(job);
         }});
 
-        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -377,14 +387,14 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(returnValue(job));
             //We should have a call to our job manager to save our job object
             oneOf(mockJobManager).saveJob(job);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -403,11 +413,11 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds, user);
+        ModelAndView mav = controller.deleteDownloads(jobId, downloadIds);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -426,7 +436,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(returnValue(job));
 
             //We should have a call to file staging service to update a file
@@ -437,7 +447,7 @@ public class TestJobBuilderController {
             will(returnValue(1024L));
         }});
 
-        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString(), user);
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString());
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -454,7 +464,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(returnValue(job));
 
             //We should have a call to file staging service to update a file
@@ -462,7 +472,7 @@ public class TestJobBuilderController {
             will(throwException(new PortalServiceException("Test Exception","Test Exception")));
         }});
 
-        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString(), user);
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString());
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -479,11 +489,11 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(job.getId(), user);
+            oneOf(mockJobManager).getJobById(job.getId(), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString(), user);
+        ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString());
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -500,14 +510,14 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(mockJob));
             //We should have a call to job object to get a list of download objects
             oneOf(mockJob).getJobDownloads();
             will(returnValue(downloadList));
         }});
 
-        ModelAndView mav = controller.getJobDownloads(Integer.parseInt(jobId), user);
+        ModelAndView mav = controller.getJobDownloads(Integer.parseInt(jobId));
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
     }
@@ -521,11 +531,11 @@ public class TestJobBuilderController {
     public void testGetJobDownloads_Exception() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.getJobDownloads(Integer.parseInt(jobId), user);
+        ModelAndView mav = controller.getJobDownloads(Integer.parseInt(jobId));
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -540,7 +550,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(mockJob));
 
             oneOf(mockJob).getStatus();
@@ -550,7 +560,7 @@ public class TestJobBuilderController {
             will(returnValue(job.getEmailAddress()));
         }});
 
-        ModelAndView mav = controller.getJobStatus(jobId, user);
+        ModelAndView mav = controller.getJobStatus(jobId);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         String jobStatus = (String)mav.getModel().get("data");
         Assert.assertEquals(expectedStatus, jobStatus);
@@ -565,11 +575,11 @@ public class TestJobBuilderController {
     public void testGetJobStatus_JobNotFound() throws PortalServiceException {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.getJobStatus(jobId, user);
+        ModelAndView mav = controller.getJobStatus(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -582,14 +592,14 @@ public class TestJobBuilderController {
     public void testCancelSubmission() throws Exception {
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(returnValue(job));
             //We should have a call to file staging service to get our files
             oneOf(mockFileStagingService).deleteStageInDirectory(job);
             will(returnValue(true));
         }});
 
-        ModelAndView mav = controller.cancelSubmission(jobId, user);
+        ModelAndView mav = controller.cancelSubmission(jobId);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -604,11 +614,11 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             //We should have a call to our job manager to get our job object
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);
             will(throwException(new Exception()));
         }});
 
-        ModelAndView mav = controller.cancelSubmission(jobId, user);
+        ModelAndView mav = controller.cancelSubmission(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertNull(mav.getModel().get("data"));
     }
@@ -727,7 +737,7 @@ public class TestJobBuilderController {
             allowing(mockAnvglProvenanceService).setServerURL("http://mock.fake/secure/something");
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
@@ -787,7 +797,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, job, "");
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, job.getStatus());
@@ -804,7 +814,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobId, mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, jobId);
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
@@ -829,6 +839,7 @@ public class TestJobBuilderController {
         job.setStatus(jobInSavedState); // by default, the job is in SAVED state
         job.setComputeServiceId(computeServiceId);
         job.setStorageServiceId(storageServiceId);
+        job.setJobDownloads(new ArrayList<VglDownload>());
 
         context.checking(new Expectations() {{
             //We should have 1 call to our job manager to get our job object
@@ -841,13 +852,12 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getPermissions();will(returnValue(new String[] {"testRole1"}));
             allowing(mockRequest).isUserInRole("testRole1");will(returnValue(true));
 
-
             oneOf(mockFileStagingService).writeFile(job, JobBuilderController.DOWNLOAD_SCRIPT);
             will(returnValue(bos));
 
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
-
+            
             //We should have 1 call to get our stage in files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stageInFiles));
 
@@ -858,7 +868,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).createJobAuditTrail(jobInSavedState, job, "");
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, job.getStatus());
@@ -899,7 +909,7 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, job.getStatus());
@@ -940,7 +950,7 @@ public class TestJobBuilderController {
             oneOf(mockImages[0]).getImageId();will(returnValue("compute-vmi-id"));
         }});
 
-        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString(), mockPortalUser);
+        ModelAndView mav = controller.submitJob(mockRequest, mockResponse, job.getId().toString());
 
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
         Assert.assertEquals(JobBuilderController.STATUS_UNSUBMITTED, job.getStatus());
@@ -1094,7 +1104,7 @@ public class TestJobBuilderController {
             allowing(mockRequest).isUserInRole("testRole2");will(returnValue(true));
         }});
 
-        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null, new ANVGLUser());
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
@@ -1124,7 +1134,7 @@ public class TestJobBuilderController {
             oneOf(images[0]).getPermissions();will(returnValue(null));
         }});
 
-        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null, new ANVGLUser());
+        ModelAndView mav = controller.getImagesForComputeService(mockRequest, computeServiceId, null, null);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         Assert.assertNotNull(mav.getModel().get("data"));
@@ -1203,8 +1213,7 @@ public class TestJobBuilderController {
                 null,
                 emailNotification,
                 null,
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
@@ -1298,8 +1307,7 @@ public class TestJobBuilderController {
                 "registeredUrl",
                 emailNotification,
                 Integer.valueOf(walltime),
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1365,8 +1373,7 @@ public class TestJobBuilderController {
                 "registeredUrl",
                 emailNotification,
                 Integer.valueOf(walltime),
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1392,7 +1399,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(mockJob);
         }});
 
-        ModelAndView mav = controller.updateJobSeries(Integer.parseInt(jobId),folderName,mockRequest,mockPortalUser);
+        ModelAndView mav = controller.updateJobSeries(Integer.parseInt(jobId),folderName, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
     }
@@ -1414,7 +1421,7 @@ public class TestJobBuilderController {
 
         }});
 
-        ModelAndView mav = controller.updateJobSeries(Integer.parseInt(jobId),folderName,mockRequest,mockPortalUser);
+        ModelAndView mav = controller.updateJobSeries(Integer.parseInt(jobId),folderName, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1467,8 +1474,7 @@ public class TestJobBuilderController {
                 "registeredUrl",
                 emailNotification,
                 walltime,
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1520,8 +1526,7 @@ public class TestJobBuilderController {
                 "registeredUrl",
                 emailNotification,
                 walltime,
-                mockRequest,
-                mockPortalUser);
+                mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertFalse((Boolean) mav.getModel().get("success"));
     }
@@ -1539,24 +1544,21 @@ public class TestJobBuilderController {
         final String[] localPaths = new String[] {"p1", "p2"};
         final VglDownload[] existingDownloads = new VglDownload[] {new VglDownload(12356)};
 
-
         job.setJobDownloads(new ArrayList<VglDownload>(Arrays.asList(existingDownloads)));
-
-
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);will(returnValue(job));
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(job));
 
             oneOf(mockJobManager).saveJob(job);
         }});
 
-        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths, user);
+        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
         //The resulting job should have 3 elements in its list (due to appending)
         List<VglDownload> dls = job.getJobDownloads();
         Assert.assertEquals(existingDownloads.length + names.length, dls.size());
-        Assert.assertSame(existingDownloads[0], dls.get(0));
+        Assert.assertEquals(existingDownloads[0], dls.get(0));
         for (int i = 0; i < names.length; i++) {
             VglDownload dlToTest = dls.get(existingDownloads.length + i);
             Assert.assertEquals(names[i], dlToTest.getName());
@@ -1584,12 +1586,12 @@ public class TestJobBuilderController {
 
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);will(returnValue(job));
-            oneOf(mockJobManager).deleteJobDownloads(job);
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(job));
+
             oneOf(mockJobManager).saveJob(job);
         }});
 
-        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths, user);
+        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
@@ -1629,12 +1631,12 @@ public class TestJobBuilderController {
 
 
         context.checking(new Expectations() {{
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);will(returnValue(job));
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(job));
             oneOf(mockFile).length();will(returnValue(mockFileLength));
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stagedFiles));
         }});
 
-        ModelAndView mav = controller.getAllJobInputs(Integer.parseInt(jobId), user);
+        ModelAndView mav = controller.getAllJobInputs(Integer.parseInt(jobId));
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
@@ -1661,11 +1663,11 @@ public class TestJobBuilderController {
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getName();will(returnValue(name));
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(id));
-            allowing(mockScmEntryService).getJobProviders((Integer)null, user);will(returnValue(null));
-            oneOf(mockNciDetailsDao).getByUser(mockPortalUser);will(returnValue(null));
+            allowing(mockScmEntryService).getJobProviders((Integer)null, mockPortalUser);will(returnValue(null));
+            oneOf(mockNciDetailsService).getByUser(mockPortalUser);will(returnValue(null));
         }});
 
-		ModelAndView mav = controller.getComputeServices(null, user);
+		ModelAndView mav = controller.getComputeServices(null);
 
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));

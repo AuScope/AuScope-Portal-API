@@ -6,8 +6,6 @@
  */
 package org.auscope.portal.server.web.service;
 
-import java.util.Arrays;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

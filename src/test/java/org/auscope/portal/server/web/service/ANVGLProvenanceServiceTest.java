@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseFactory;
 import org.apache.http.HttpVersion;
@@ -20,7 +21,6 @@ import org.apache.http.message.BasicStatusLine;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
-import org.auscope.portal.server.gridjob.FileInformation;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.security.ANVGLUser;
@@ -29,8 +29,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
 import au.csiro.promsclient.Activity;
 import au.csiro.promsclient.Entity;
@@ -57,26 +57,26 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     List<VglDownload> downloads = new ArrayList<>();
     VEGLJob turtleJob;
 
-    final String initialTurtle = "<http://portal-fake.vgl.org/secure/getJobObject.do?jobId=1>" + System.lineSeparator() +
-            "      a       <http://www.w3.org/ns/prov#Activity> ;" + System.lineSeparator();
+    final String initialTurtle = "<http://portal-fake.vgl.org/secure/getJobObject.do?jobId=1>" + "\n" +
+            "        a       <http://www.w3.org/ns/prov#Activity> ;" + "\n";
 
     final String intermediateTurtle =
-            "      a       <http://www.w3.org/ns/prov#Entity> ;" + System.lineSeparator() +
-            "      <http://www.w3.org/2000/01/rdf-schema#label>" + System.lineSeparator() +
+            "        a       <http://www.w3.org/ns/prov#Entity> ;" + System.lineSeparator() +
+            "        <http://www.w3.org/2000/01/rdf-schema#label>" + System.lineSeparator() +
             "              \"activity.ttl\"^^<http://www.w3.org/2001/XMLSchema#string> ;" + System.lineSeparator() +
-            "      <http://www.w3.org/ns/dcat#downloadURL>" + System.lineSeparator() +
+            "        <http://www.w3.org/ns/dcat#downloadURL>" + System.lineSeparator() +
             "              \"http://portal-fake.vgl.org/secure/jobFile.do?jobId=1&key=activity.ttl\"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;" + System.lineSeparator() +
-            "      <http://www.w3.org/ns/prov#wasAttributedTo>" + System.lineSeparator() +
+            "        <http://www.w3.org/ns/prov#wasAttributedTo>" + System.lineSeparator() +
             "              <https://plus.google.com/1> .";
 
     final String endedTurtle = "<http://www.w3.org/ns/prov#endedAtTime>";
     final String serviceTurtle = "<http://promsns.org/def/proms#ServiceEntity>";
 
     final String file1Turtle =
-            "      a       <http://www.w3.org/ns/prov#Entity> ;" + System.lineSeparator() +
-            "      <http://www.w3.org/ns/dcat#downloadURL>" + System.lineSeparator() +
+            "        a       <http://www.w3.org/ns/prov#Entity> ;" + System.lineSeparator() +
+            "        <http://www.w3.org/ns/dcat#downloadURL>" + System.lineSeparator() +
             "              \"http://portal-fake.vgl.org/secure/jobFile.do?jobId=1&key=cloudKey\"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;" + System.lineSeparator() +
-            "      <http://www.w3.org/ns/prov#wasAttributedTo>" + System.lineSeparator() +
+            "        <http://www.w3.org/ns/prov#wasAttributedTo>" + System.lineSeparator() +
             "              <https://plus.google.com/1> .";
 
     ANVGLProvenanceService anvglProvenanceService;
@@ -96,29 +96,15 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
 
         VglDownload download = new VglDownload(1);
         download.setUrl("http://portal-uploads.vgl.org/file1?download=true");
-        //download.setParentUrl("http://portal-uploads.vhirl.org/");
         download.setName("file1");
         downloads.add(download);
         CloudFileInformation cloudFileInformation = new CloudFileInformation(cloudKey, 0, "");
         CloudFileInformation cloudFileModel = new CloudFileInformation(activityFileName, 0, "");
         final CloudFileInformation[] cloudList = {cloudFileInformation, cloudFileModel};
 
-        FileInformation input = new FileInformation(cloudKey, 0, false, "");
-
         turtleJob = context.mock(VEGLJob.class, "Turtle Mock Job");
 
         context.checking(new Expectations() {{
-        	/*
-            allowing(solution).getUri();
-            will(returnValue("http://sssc.vhirl.org/solution1"));
-            allowing(solution).getDescription();
-            will(returnValue("A Fake Solution"));
-            allowing(solution).getName();
-            will(returnValue("FakeSol"));
-            allowing(solution).getCreatedAt();
-            will(returnValue(new Date()));
-            */
-
             allowing(preparedJob).getId();
             will(returnValue(jobID));
             allowing(preparedJob).getStorageServiceId();
@@ -138,11 +124,6 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             allowing(preparedJob).getExecuteDate();
             will(returnValue(new Date()));
             
-            /*
-            allowing(preparedJob).getJobFiles();
-            will(returnValue(fileInfos));
-            */
-
             allowing(fileInformation).getCloudKey();
             will(returnValue(cloudKey));
 
@@ -180,6 +161,15 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     @Test
     public void testCreateActivity() throws Exception {
         String graph = anvglProvenanceService.createActivity(preparedJob, null, mockPortalUser);
+        
+        System.out.println("testCreateActivity");
+        System.out.println("GRAPH");
+        System.out.println(graph.toString());
+        System.out.println("INITIALTURTLE");
+        System.out.println(initialTurtle);
+        
+        System.out.println("DIFF: " + StringUtils.difference(graph, initialTurtle));
+        
         Assert.assertTrue(graph.contains(initialTurtle));
         Assert.assertTrue(graph.contains(serviceTurtle));
         //Assert.assertTrue(graph.contains(intermediateTurtle));
@@ -264,6 +254,10 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             StringWriter out = new StringWriter();
             activity.getGraph().write(out, "TURTLE", serverURL);
             String turtle = out.toString();
+            
+            System.out.println(turtle);
+            
+            //Assert.assertTrue(turtle.contains(initialTurtle));
             Assert.assertTrue(turtle.contains(initialTurtle));
             Assert.assertTrue(turtle.contains(endedTurtle));
             //Assert.assertTrue(turtle.contains(file1Turtle));

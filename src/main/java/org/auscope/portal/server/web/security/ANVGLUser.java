@@ -1,15 +1,24 @@
 package org.auscope.portal.server.web.security;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.vegl.VGLBookMark;
 import org.auscope.portal.server.web.controllers.BaseCloudController;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -18,24 +27,37 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author Josh Vote (CSIRO)
  *
  */
-public class ANVGLUser implements UserDetails {
+@Entity
+@Table(name = "users")
+public class ANVGLUser implements UserDetails, Serializable {
 
-    // Authentication frameworks
+	private static final long serialVersionUID = -8923427161200232245L;
+
+	// Authentication frameworks
     public enum AuthenticationFramework { GOOGLE, AAF }
 
+    @Id
     private String id;
     private String fullName;
     private String email;
+    
+    @OneToMany(mappedBy = "parent", cascade=CascadeType.ALL, orphanRemoval = true)
     private List<ANVGLAuthority> authorities;
+    
     private String arnExecution;
     private String arnStorage;
     private String s3Bucket;
     private String awsSecret;
     private String awsKeyName;
     private Integer acceptedTermsConditions;
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private NCIDetailsEnc nciDetailsEnc;
+    
+    @Transient
     private AuthenticationFramework authentication;
     
     /** A List of book marks associated with the user */
+    @OneToMany(mappedBy = "parent",	cascade=CascadeType.ALL, orphanRemoval = true)
     private List<VGLBookMark> bookMarks;
 
     public ANVGLUser() {
@@ -43,12 +65,14 @@ public class ANVGLUser implements UserDetails {
         this.bookMarks =  new ArrayList<>();
     }
 
-    public ANVGLUser(String id, String fullName, String email, List<ANVGLAuthority> authorities) {
+    public ANVGLUser(String id, String fullName, String email,
+    		List<ANVGLAuthority> authorities, List<VGLBookMark> bookMarks) {
         super();
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.authorities = authorities;
+        this.bookMarks = bookMarks;
     } 
     
 
@@ -152,21 +176,44 @@ public class ANVGLUser implements UserDetails {
         this.acceptedTermsConditions = acceptedTermsConditions;
     }
 
-    @Override
+    /**
+     * 
+     * @return
+     */
+    public NCIDetailsEnc getNciDetailsEnc() {
+		return nciDetailsEnc;
+	}
+
+    /**
+     * 
+     * @param nciDetails
+     */
+	public void setNciDetailsEnc(NCIDetailsEnc nciDetails) {
+		this.nciDetailsEnc = nciDetails;
+	}
+
+	@Override
     public String toString() {
         return "ANVGLUser [id=" + id + ", fullName=" + fullName + ", authorities=" + authorities + "]";
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return (authorities != null) ? authorities : new ArrayList<ANVGLAuthority>();
     }
 
     public void setAuthorities(List<ANVGLAuthority> authorities) {
-        this.authorities = authorities;
-        for (ANVGLAuthority auth : authorities) {
-            auth.setParent(this);
-        }
+    	if(this.authorities == null) {
+    		this.authorities = authorities;
+    	} else {
+	        this.authorities.clear();
+	        if(authorities != null) {
+		        for (ANVGLAuthority auth : authorities) {
+		            auth.setParent(this);
+		            this.authorities.add(auth);
+		        }
+	        }
+    	}
     }
 
     public String getArnExecution() {
@@ -207,18 +254,24 @@ public class ANVGLUser implements UserDetails {
      */
 
 	public List<VGLBookMark> getBookMarks() {
-		return bookMarks;
+		return (bookMarks != null) ? bookMarks : new ArrayList<VGLBookMark>();
 	}
+	
 	/**
 	 * sets the list of book marks
 	 * @param bookMarks
 	 */
 
 	public void setBookMarks(List<VGLBookMark> bookMarks) {
-		this.bookMarks = bookMarks;
-		for (VGLBookMark bookmark : bookMarks) {
-			bookmark.setParent(this);
-        }
+		if(this.bookMarks == null) {
+			this.bookMarks = bookMarks;
+		} else {
+			this.bookMarks.clear();
+			for (VGLBookMark bookmark : bookMarks) {
+				bookmark.setParent(this);
+				this.bookMarks.add(bookmark);
+	        }
+		}
 	}
 
     /**
@@ -238,13 +291,13 @@ public class ANVGLUser implements UserDetails {
      * Returns true iff this ANVGLUser instance has at least 1 compute service
      * which has been properly configured.
      *
-     * @param nciDetailsDao
+     * @param nciDetailsService
      * @param cloudComputeServices
      * @return
      * @throws PortalServiceException
      */
-    public boolean configuredServicesStatus(NCIDetailsDao nciDetailsDao, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
-        return !BaseCloudController.getConfiguredComputeServices(this, nciDetailsDao, cloudComputeServices).isEmpty();
+    public boolean configuredServicesStatus(NCIDetailsService nciDetailsService, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
+        return !BaseCloudController.getConfiguredComputeServices(this, nciDetailsService, cloudComputeServices).isEmpty();
     }
 
     @Override

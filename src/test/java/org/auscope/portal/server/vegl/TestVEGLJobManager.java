@@ -8,7 +8,10 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.service.NCIDetailsService;
+import org.auscope.portal.server.web.service.VEGLJobService;
+import org.auscope.portal.server.web.service.VEGLSeriesService;
+import org.auscope.portal.server.web.service.VGLJobAuditLogService;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,11 +23,20 @@ import org.springframework.dao.DataRetrievalFailureException;
  * @author Richard Goh
  */
 public class TestVEGLJobManager extends PortalTestClass {
+	
+	private VEGLJobManager jobManager;
+	
+	/*
     private VEGLJobDao mockJobDao;
     private VEGLSeriesDao mockSeriesDao;
     private VGLJobAuditLogDao mockJobAuditLogDao;
-    private VEGLJobManager jobManager;
     private NCIDetailsDao mockNciDetailsDao;
+    */
+	private VEGLJobService mockJobService;
+	private VEGLSeriesService mockSeriesService;
+	private VGLJobAuditLogService mockJobAuditLogService;
+	private NCIDetailsService mockNciDetailsService;
+	
     private final String TEST_ENC_KEY = "unit-testing-key";
 
     /**
@@ -33,16 +45,16 @@ public class TestVEGLJobManager extends PortalTestClass {
     @Before
     public void init() {
         // Setting up mock objects needed for Object Under Test (OUT)
-        mockJobDao = context.mock(VEGLJobDao.class);
-        mockSeriesDao = context.mock(VEGLSeriesDao.class);
-        mockJobAuditLogDao = context.mock(VGLJobAuditLogDao.class);
-        mockNciDetailsDao = context.mock(NCIDetailsDao.class);
+    	mockJobService = context.mock(VEGLJobService.class);
+        mockSeriesService = context.mock(VEGLSeriesService.class);
+        mockJobAuditLogService = context.mock(VGLJobAuditLogService.class);
+        mockNciDetailsService = context.mock(NCIDetailsService.class);
         // Object Under Test
         jobManager = new VEGLJobManager();
-        jobManager.setVeglJobDao(mockJobDao);
-        jobManager.setVeglSeriesDao(mockSeriesDao);
-        jobManager.setVglJobAuditLogDao(mockJobAuditLogDao);
-        jobManager.setNciDetailsDao(mockNciDetailsDao);
+        jobManager.setVeglJobService(mockJobService);
+        jobManager.setVeglSeriesService(mockSeriesService);
+        jobManager.setVglJobAuditLogService(mockJobAuditLogService);
+        jobManager.setNciDetailsService(mockNciDetailsService);
     }
 
     /**
@@ -57,7 +69,7 @@ public class TestVEGLJobManager extends PortalTestClass {
         final List<VEGLSeries> seriesList = Arrays.asList(mockSeries);
 
         context.checking(new Expectations() {{
-            oneOf(mockSeriesDao).query(user, name, desc);
+            oneOf(mockSeriesService).query(user, name, desc);
             will(returnValue(seriesList));
         }});
 
@@ -76,8 +88,8 @@ public class TestVEGLJobManager extends PortalTestClass {
         final ANVGLUser user = new ANVGLUser();
 
         context.checking(new Expectations() {{
-            oneOf(mockJobDao).getJobsOfSeries(seriesId, user);will(returnValue(jobList));
-            oneOf(mockNciDetailsDao).getByUser(user);will(returnValue(null));
+            oneOf(mockJobService).getJobsOfSeries(seriesId, user);will(returnValue(jobList));
+            oneOf(mockNciDetailsService).getByUser(user);will(returnValue(null));
         }});
 
         Assert.assertNotNull(jobManager.getSeriesJobs(seriesId, user));
@@ -100,9 +112,9 @@ public class TestVEGLJobManager extends PortalTestClass {
         nciDetails.setUsername("myuser");
 
         context.checking(new Expectations() {{
-            oneOf(mockJobDao).get(jobId1, user);will(returnValue(mockJob));
-            oneOf(mockJobDao).get(jobId2, user);will(returnValue(null));
-            oneOf(mockNciDetailsDao).getByUser(user);will(returnValue(nciDetails));
+            oneOf(mockJobService).get(jobId1, user);will(returnValue(mockJob));
+            oneOf(mockJobService).get(jobId2, user);will(returnValue(null));
+            oneOf(mockNciDetailsService).getByUser(user);will(returnValue(nciDetails));
 
             oneOf(mockJob).setProperty(NCIDetails.PROPERTY_NCI_KEY, "mykey");
             oneOf(mockJob).setProperty(NCIDetails.PROPERTY_NCI_PROJECT, "myproj");
@@ -121,7 +133,7 @@ public class TestVEGLJobManager extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobDao).deleteJob(mockJob);
+            oneOf(mockJobService).deleteJob(mockJob);
         }});
 
         jobManager.deleteJob(mockJob);
@@ -139,9 +151,9 @@ public class TestVEGLJobManager extends PortalTestClass {
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockSeriesDao).get(series1, userEmail);
+            oneOf(mockSeriesService).get(series1, userEmail);
             will(returnValue(mockSeries));
-            oneOf(mockSeriesDao).get(series2, userEmail);
+            oneOf(mockSeriesService).get(series2, userEmail);
             will(returnValue(null));
         }});
 
@@ -159,7 +171,7 @@ public class TestVEGLJobManager extends PortalTestClass {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockJobDao).save(mockJob);
+            oneOf(mockJobService).saveJob(mockJob);
         }});
 
         jobManager.saveJob(mockJob);
@@ -179,7 +191,7 @@ public class TestVEGLJobManager extends PortalTestClass {
             will(returnValue(1));
             oneOf(mockCurJob).getStatus();
             will(returnValue(JobBuilderController.STATUS_PENDING));
-            oneOf(mockJobAuditLogDao).save(with(any(VGLJobAuditLog.class)));
+            oneOf(mockJobAuditLogService).save(with(any(VGLJobAuditLog.class)));
         }});
 
         jobManager.createJobAuditTrail(oldJobStatus, mockCurJob, message);
@@ -199,7 +211,7 @@ public class TestVEGLJobManager extends PortalTestClass {
             will(returnValue(1));
             oneOf(mockCurJob).getStatus();
             will(returnValue(JobBuilderController.STATUS_PENDING));
-            oneOf(mockJobAuditLogDao).save(with(any(VGLJobAuditLog.class)));
+            oneOf(mockJobAuditLogService).save(with(any(VGLJobAuditLog.class)));
             will(throwException(new DataRetrievalFailureException("")));
         }});
 
@@ -214,7 +226,7 @@ public class TestVEGLJobManager extends PortalTestClass {
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockSeriesDao).delete(mockSeries);
+            oneOf(mockSeriesService).delete(mockSeries);
         }});
 
         jobManager.deleteSeries(mockSeries);
@@ -228,7 +240,7 @@ public class TestVEGLJobManager extends PortalTestClass {
         final VEGLSeries mockSeries = context.mock(VEGLSeries.class);
 
         context.checking(new Expectations() {{
-            oneOf(mockSeriesDao).save(mockSeries);
+            oneOf(mockSeriesService).save(mockSeries);
         }});
 
         jobManager.saveSeries(mockSeries);

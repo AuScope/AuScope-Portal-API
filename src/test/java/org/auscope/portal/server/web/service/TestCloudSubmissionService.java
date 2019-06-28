@@ -54,7 +54,8 @@ public class TestCloudSubmissionService extends PortalTestClass {
         //Instantiate our job object
         final String userDataString = "user-data";
         final String instanceId = "instance-id";
-        final VEGLJob job = new VEGLJob(213);
+        final VEGLJob job = new VEGLJob();
+        job.setId(213);
 
         job.setStatus(JobBuilderController.STATUS_PROVISION);
 
@@ -90,7 +91,8 @@ public class TestCloudSubmissionService extends PortalTestClass {
         //Instantiate our job object
         final String userDataString = "user-data";
         final String instanceId = "instance-id";
-        final VEGLJob job = new VEGLJob(213);
+        final VEGLJob job = new VEGLJob();
+        job.setId(213);
 
         job.setStatus(JobBuilderController.STATUS_PROVISION);
 
@@ -127,7 +129,8 @@ public class TestCloudSubmissionService extends PortalTestClass {
     public void testJobSubmissionError() throws Exception {
         //Instantiate our job object
         final String userDataString = "user-data";
-        final VEGLJob job = new VEGLJob(213);
+        final VEGLJob job = new VEGLJob();
+        job.setId(213);
 
         job.setStatus(JobBuilderController.STATUS_PROVISION);
 
@@ -161,7 +164,8 @@ public class TestCloudSubmissionService extends PortalTestClass {
     public void testJobSubmission_NoInstanceId() throws Exception {
         //Instantiate our job object
         final String userDataString = "user-data";
-        final VEGLJob job = new VEGLJob(213);
+        final VEGLJob job = new VEGLJob();
+        job.setId(213);
 
         job.setStatus(JobBuilderController.STATUS_PROVISION);
 
@@ -196,7 +200,8 @@ public class TestCloudSubmissionService extends PortalTestClass {
         //Instantiate our job object
         final String userDataString = "user-data";
         final String instanceId = "instance-id";
-        final VEGLJob job = new VEGLJob(213);
+        final VEGLJob job = new VEGLJob();
+        job.setId(213);
 
         job.setStatus(JobBuilderController.STATUS_PROVISION);
 
@@ -241,7 +246,8 @@ public class TestCloudSubmissionService extends PortalTestClass {
     public void testJobSubmissionWithQueueError() throws Exception {
         //Instantiate our job object
         final String userDataString = "user-data";
-        final VEGLJob job = new VEGLJob(213);
+        final VEGLJob job = new VEGLJob();
+        job.setId(213);
 
         job.setStatus(JobBuilderController.STATUS_PROVISION);
 

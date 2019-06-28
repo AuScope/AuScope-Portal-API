@@ -78,7 +78,8 @@ public class TestBaseCloudController extends PortalTestClass {
         String nonExistingId = "DNE";
         String nullId = null;
 
-        VEGLJob job = new VEGLJob(123);
+        VEGLJob job = new VEGLJob();
+        job.setId(123);
 
         job.setStorageServiceId(existingId);
         CloudStorageService result = controller.getStorageService(job);
@@ -122,7 +123,8 @@ public class TestBaseCloudController extends PortalTestClass {
         String nonExistingId = "DNE";
         String nullId = null;
 
-        VEGLJob job = new VEGLJob(123);
+        VEGLJob job = new VEGLJob();
+        job.setId(123);
 
         job.setComputeServiceId(existingId);
         CloudComputeService result = controller.getComputeService(job);

@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.auscope.portal.core.cloud.CloudJob;
 
+
 public class NCIDetails implements Serializable {
 
     private static final long serialVersionUID = -7219385540898450290L;
