@@ -23,8 +23,9 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.LintResult;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.auscope.portal.server.web.service.SolutionResponse;
@@ -37,7 +38,6 @@ import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -67,8 +67,11 @@ public class ScriptBuilderController extends BaseCloudController {
 
     /** Script checking */
     private TemplateLintService templateLintService;
+    
+    private ANVGLUserService userService;
 
-    private NCIDetailsDao nciDetailsDao;
+    @Autowired
+    private NCIDetailsService nciDetailsService;
 
     /**
      * Creates a new instance
@@ -78,19 +81,19 @@ public class ScriptBuilderController extends BaseCloudController {
      */
     @Autowired
     public ScriptBuilderController(ScriptBuilderService sbService,
+    							   ANVGLUserService userService,
                                    VEGLJobManager jobManager,
                                    ScmEntryService scmEntryService,
                                    TemplateLintService templateLintService,
                                    CloudStorageService[] cloudStorageServices,
                                    CloudComputeService[] cloudComputeServices,
                                    @Value("${vm.sh}") String vmSh,
-                                   @Value("${vm-shutdown.sh}") String vmShutdownSh,
-                                   NCIDetailsDao nciDetailsDao) {
+                                   @Value("${vm-shutdown.sh}") String vmShutdownSh) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.sbService = sbService;
+        this.userService= userService;
         this.scmEntryService = scmEntryService;
         this.templateLintService = templateLintService;
-        this.nciDetailsDao = nciDetailsDao;
     }
 
     /**
@@ -104,9 +107,9 @@ public class ScriptBuilderController extends BaseCloudController {
     @RequestMapping("/secure/saveScript.do")
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
                                    @RequestParam("sourceText") String sourceText,
-                                   @RequestParam("solutions") Set<String> solutions,
-                                   @AuthenticationPrincipal ANVGLUser user) {
-
+                                   @RequestParam("solutions") Set<String> solutions/*,
+                                   @AuthenticationPrincipal ANVGLUser user*/) {
+    	ANVGLUser user = userService.getLoggedInUser();
         if (sourceText == null || sourceText.trim().isEmpty()) {
             return generateJSONResponseMAV(false, null, "No source text specified");
         }
@@ -144,8 +147,9 @@ public class ScriptBuilderController extends BaseCloudController {
      * @return A JSON encoded response which contains the contents of a saved job's script file
      */
     @RequestMapping("/getSavedScript.do")
-    public ModelAndView getSavedScript(@RequestParam("jobId") String jobId, @AuthenticationPrincipal ANVGLUser user) {
+    public ModelAndView getSavedScript(@RequestParam("jobId") String jobId/*, @AuthenticationPrincipal ANVGLUser user*/) {
         logger.debug("getSavedScript with jobId: " + jobId);
+        ANVGLUser user = userService.getLoggedInUser();
         String script = null;
 
         VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
@@ -171,9 +175,9 @@ public class ScriptBuilderController extends BaseCloudController {
      * @throws PortalServiceException
      */
     @RequestMapping("/secure/getConfiguredComputeServices.do")
-    public ModelAndView getComputeServices(@AuthenticationPrincipal ANVGLUser user) throws PortalServiceException {
-        List<CloudComputeService> configuredServices = getConfiguredComputeServices(user, nciDetailsDao);
-
+    public ModelAndView getComputeServices(/*@AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
+    	ANVGLUser user = userService.getLoggedInUser();
+        List<CloudComputeService> configuredServices = getConfiguredComputeServices(user, nciDetailsService);
         List<ModelMap> parsedItems = new ArrayList<ModelMap>();
         for (CloudComputeService ccs : configuredServices) {
             ModelMap mm = new ModelMap();
@@ -234,12 +238,12 @@ public class ScriptBuilderController extends BaseCloudController {
      * @throws PortalServiceException
      */
     @RequestMapping("/secure/getProblems.do")
-    public ModelAndView getProblems(@AuthenticationPrincipal ANVGLUser user,
+    public ModelAndView getProblems(/*@AuthenticationPrincipal ANVGLUser user,*/
             @RequestParam(value="field", required=false) String[] rawFields,
             @RequestParam(value="value", required=false) String[] rawValues,
             @RequestParam(value="type", required=false) String[] rawTypes,
             @RequestParam(value="comparison", required=false) String[] rawComparisons) throws PortalServiceException {
-
+    	ANVGLUser user = userService.getLoggedInUser();
         if (rawFields == null) {
             rawFields = new String[0];
         }
@@ -290,7 +294,7 @@ public class ScriptBuilderController extends BaseCloudController {
 
 
         // Get the Solutions from the SSC
-        List<CloudComputeService> configuredServices = getConfiguredComputeServices(user, nciDetailsDao);
+        List<CloudComputeService> configuredServices = getConfiguredComputeServices(user, nciDetailsService);
         SolutionResponse solutions = scmEntryService.getSolutions(facets, configuredServices.toArray(new CloudComputeService[configuredServices.size()]));
 
         // Group solutions by the problem that they solve.

@@ -5,6 +5,7 @@
        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
     <!-- All elements must be of type org.auscope.portal.server.web.KnownLayer -->
+    <!--
     <bean id="knownTypes" class="java.util.ArrayList">
         <constructor-arg>
             <list>
@@ -31,7 +32,7 @@
                 <ref bean="knownTypeGswa80mTCmerge"/>
                 <ref bean="knownTypeGswa80mThmerge"/>
                 <ref bean="knownTypeGswa80mUmerge"/>
-                <!-- <ref bean="knownTypeCunyuAem" />  -->
+                <!XX <ref bean="knownTypeCunyuAem" />  XX>
             </list>
         </constructor-arg>
     </bean>
@@ -43,4 +44,5 @@
             </list>
         </constructor-arg>
     </bean>
+    -->
 </beans>

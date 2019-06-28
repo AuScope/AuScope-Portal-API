@@ -4,6 +4,7 @@
        xsi:schemaLocation="
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
+    <!--
     <bean id="cswVeglProduction" class="org.auscope.portal.core.services.csw.CSWServiceItem">
         <constructor-arg name="id" value="cswVeglProduction"/>
         <constructor-arg name="title" value="SISS ANU Geonetwork"/>
@@ -24,5 +25,6 @@
         <constructor-arg name="serviceUrl" value="http://geonetworkrr2.nci.org.au/geonetwork/srv/eng/csw"/>
         <constructor-arg name="recordInformationUrl" value="https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
     </bean>
+    -->
 
 </beans>

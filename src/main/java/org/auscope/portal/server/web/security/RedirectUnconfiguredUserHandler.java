@@ -10,6 +10,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -22,16 +24,19 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
 
     protected CloudStorageService[] cloudStorageServices;
     protected CloudComputeService[] cloudComputeServices;
-    protected NCIDetailsDao nciDetailsDao;
+    @Autowired
+    protected NCIDetailsService nciDetailsService;
     private String frontEndUrl;
 
-    public NCIDetailsDao getNciDetailsDao() {
-        return nciDetailsDao;
+    /*
+    public NCIDetailsService getNciDetailsService() {
+        return nciDetailsService;
     }
 
-    public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
-        this.nciDetailsDao = nciDetailsDao;
+    public void setNciDetailsService(NCIDetailsService nciDetailsServcie) {
+        this.nciDetailsService = nciDetailsServcie;
     }
+    */
 
     public CloudStorageService[] getCloudStorageServices() {
         return cloudStorageServices;
