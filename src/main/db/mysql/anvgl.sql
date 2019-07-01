@@ -7,8 +7,8 @@ DROP TABLE IF EXISTS `jobs`;
 DROP TABLE IF EXISTS `series`;
 DROP TABLE IF EXISTS `users`;
 DROP TABLE IF EXISTS `nci_details`;
-DROP TABLE IF EXISTS `bookmarks`;
 DROP TABLE IF EXISTS `bookmark_download_options`;
+DROP TABLE IF EXISTS `bookmarks`;
 DROP TABLE IF EXISTS `purchases`;
 
 CREATE TABLE `users` (
@@ -148,7 +148,7 @@ CREATE TABLE `nci_details` (
 );
 
 CREATE TABLE `bookmarks` (
-  `fileIdentifier` varchar(50) NOT NULL,
+  `fileIdentifier` varchar(128) NOT NULL,
   `serviceId` varchar(25) NOT NULL,
   `userId` varchar(128) NOT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
