@@ -13,13 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BasePortalController;
-import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.vegl.VGLPurchase;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.VGLPurchaseService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,8 +38,8 @@ public class PurchaseController extends BasePortalController {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    //@Value("${stripeApiKey}")  // This doesn't seem to work!!!
-    private String stripeApiKey = "sk_test_DdY2TrDpcont7TpdmsnLhA2L00qt2UDN2I";
+    @Value("${stripeApiKey}")
+    private String stripeApiKey;
     
     @Autowired
     private ANVGLUserService userService;
@@ -50,8 +50,6 @@ public class PurchaseController extends BasePortalController {
     // @Autowired
     public PurchaseController() {
         super();
-        Stripe.apiKey = this.stripeApiKey;
-        logger.info("constructor setting stripe api key to: " + this.stripeApiKey);
     }
 
     @ResponseStatus(value = org.springframework.http.HttpStatus.BAD_REQUEST)
@@ -63,6 +61,9 @@ public class PurchaseController extends BasePortalController {
     public void purchase(HttpServletRequest request,
             HttpServletResponse response)
             throws Exception {
+        
+        Stripe.apiKey = this.stripeApiKey;
+        logger.info("purchase method setting stripe api key to: " + this.stripeApiKey);
         
         String result = null;
         
@@ -105,18 +106,18 @@ public class PurchaseController extends BasePortalController {
         }
         
         // confirm that user is logged in
-//        ANVGLUser user = userService.getLoggedInUser();
-//        if (user == null) {
-//            JsonObject err = new JsonObject();
-//            err.addProperty("message",
-//                    "Unable to process payment for anonymous user. Please log in to proceed with purchase.");
-//            result = err.toString();
-//        } else {
-//            log.info("user: " + user.getId());
-//        }
+        ANVGLUser user = userService.getLoggedInUser();
+        if (user == null) {
+            JsonObject err = new JsonObject();
+            err.addProperty("message",
+                    "Unable to process payment for anonymous user. Please log in to proceed with purchase.");
+            result = err.toString();
+        } else {
+            log.info("user: " + user.getId());
+        }
 
         if (tokenId != null 
-                //&& user != null
+                && user != null
                 && dataToPurchase != null && dataToPurchase.size() > 0) {
 
             Map<String, Object> chargeParams = new HashMap<String, Object>();
@@ -167,11 +168,11 @@ public class PurchaseController extends BasePortalController {
                                 +  eastBoundLongitude + "," +  westBoundLongitude);
                         
                         // TODO uncomment the following when ready to test out database code
-                        //VGLPurchase vglPurchase = new VGLPurchase(cswRecordId, onlineResourceType, url, localPath, name, description, 
-                        //        northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, result, 
-                        //        user);
-                        //Integer id = purchaseService.savePurchase(vglPurchase);
-                        //log.info("saved user purchase to database, purchase id is: " + id);
+                        VGLPurchase vglPurchase = new VGLPurchase(cswRecordId, onlineResourceType, url, localPath, name, description, 
+                                northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, result, 
+                                user);
+                        Integer id = purchaseService.savePurchase(vglPurchase);
+                        log.info("saved user purchase to database, purchase id is: " + id);
                         
                         // TODO: should construct the download url here and append it to the json response
                         
