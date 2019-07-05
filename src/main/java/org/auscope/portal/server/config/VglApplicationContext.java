@@ -11,7 +11,6 @@ import java.util.Properties;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
-import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
@@ -177,6 +176,10 @@ public class VglApplicationContext {
 	    properties.setProperty("resource.loader", "class");
 	    properties.setProperty("class.resource.loader.class",
 	    					   "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+	    // Stop logging to velocity.log and use standard logging
+	    properties.setProperty("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.SimpleLog4JLogSystem");
+	    properties.setProperty("runtime.log.logsystem.log4j.category", "velocity");
+	    properties.setProperty("runtime.log.logsystem.log4j.logger", "velocity");
 	    VelocityEngine velocityEngine = new VelocityEngine(properties);
 	    return velocityEngine;
 	}
