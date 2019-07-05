@@ -112,5 +112,6 @@ env:
       account: AWS_ACCOUNT
       accesskey: AWS_ACCESS_KEY
       secretkey: AWS_SECRET_KEY
+      sessionkey: AWS_SESSION_KEY
    aaf:
       jwtsecret: <aaf_secret>
