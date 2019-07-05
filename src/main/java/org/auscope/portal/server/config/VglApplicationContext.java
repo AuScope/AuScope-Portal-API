@@ -93,6 +93,9 @@ public class VglApplicationContext {
 	@Value("${env.aws.secretkey}")
 	private String awsSecretKey;
 	
+	@Value("${env.aws.sessionkey}")
+	private String awsSessionKey;
+
 	@Value("${env.nectar.ec2.accesskey}")
 	private String nectarAccessKey;
 	
@@ -623,7 +626,7 @@ public class VglApplicationContext {
     
     @Bean
 	public CloudStorageServiceJClouds cloudStorageServiceAwsSydney() {
-		CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds(null, "aws-s3", awsAccessKey, awsSecretKey, null, "ap-southeast-2", false, true);
+		CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds(null, "aws-s3", awsAccessKey, awsSecretKey, awsSessionKey, "ap-southeast-2", false, true);
 		storageService.setName("Amazon Web Services - S3");
 		storageService.setId("amazon-aws-storage-sydney");
 		storageService.setBucket("vgl-csiro-");
@@ -766,7 +769,7 @@ public class VglApplicationContext {
 	@Bean
 	public CloudComputeServiceAws cloudComputeServiceAws() {
 		CloudComputeServiceAws computeService = new CloudComputeServiceAws("ec2.ap-southeast-2.amazonaws.com",
-				awsAccessKey, awsSecretKey, null, null);
+				awsAccessKey, awsSecretKey, null, awsSessionKey);
 		computeService.setId("aws-ec2-compute");
 		computeService.setName("Amazon Web Services - EC2");
 		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
@@ -912,12 +915,12 @@ public class VglApplicationContext {
     </bean> 
 	*/
     
-    @Bean
-    public CustomRegistry cswRegVeglProduction() {
-    	return new CustomRegistry("cswRegVeglProduction", "SISS ANU Geonetwork",
-    			"http://vgl-reg.auscope.org/geonetwork/srv/eng/csw",
-    			"http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s");
-    }
+//    @Bean
+//    public CustomRegistry cswRegVeglProduction() {
+//    	return new CustomRegistry("cswRegVeglProduction", "SISS ANU Geonetwork",
+//    			"http://vgl-reg.auscope.org/geonetwork/srv/eng/csw",
+//    			"http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s");
+//    }
     
     /*
     <bean id="cswRegVeglProduction" class="org.auscope.portal.core.services.csw.custom.CustomRegistry">
@@ -943,12 +946,12 @@ public class VglApplicationContext {
     </bean>
     */
 
-    @Bean
-    public ServiceConfiguration serviceConfiguration2() {
-    	List<ServiceConfigurationItem> serviceItems = new ArrayList<ServiceConfigurationItem>();
-    	serviceItems.add(nswerml2WFSTest());
-    	return new ServiceConfiguration(serviceItems);
-    }
+//    @Bean
+//    public ServiceConfiguration serviceConfiguration2() {
+//    	List<ServiceConfigurationItem> serviceItems = new ArrayList<ServiceConfigurationItem>();
+//    	serviceItems.add(nswerml2WFSTest());
+//    	return new ServiceConfiguration(serviceItems);
+//    }
     
     /*
     <bean id="service-configuration2" class="org.auscope.portal.core.configuration.ServiceConfiguration">        
@@ -960,12 +963,12 @@ public class VglApplicationContext {
     </bean>
     */
 
-    @Bean
-    public ArrayList<CustomRegistry> serviceConfiguration() {
-    	ArrayList<CustomRegistry> servConf = new ArrayList<CustomRegistry>();
-    	servConf.add(cswRegVeglProduction());
-    	return servConf;
-    }
+//    @Bean
+//    public ArrayList<CustomRegistry> serviceConfiguration() {
+//    	ArrayList<CustomRegistry> servConf = new ArrayList<CustomRegistry>();
+//    	servConf.add(cswRegVeglProduction());
+//    	return servConf;
+//    }
     
     /*
     <bean id="service-configuration" class="java.util.ArrayList">

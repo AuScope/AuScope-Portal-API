@@ -65,6 +65,13 @@ public class VlRegistries {
 				"NCI Data Portal");
 	}	
 	
+	@Bean
+	CSWServiceItem cswNigel() {
+		return new CSWServiceItem("cswNigel",
+				"http://130.56.244.85/geonetwork/srv/eng/csw",
+				"http://130.56.244.85/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
+				"Nigel's test Data Portal");
+	}
 	/*
     <bean id="cswNCI" class="org.auscope.portal.core.services.csw.CSWServiceItem">
         <constructor-arg name="id" value="cswNCI"/>
