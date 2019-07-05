@@ -41,7 +41,6 @@ public class ANVGLUser implements UserDetails, Serializable {
     private String fullName;
     private String email;
     
-    //@OneToMany(mappedBy = "parent", fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "parent", cascade=CascadeType.ALL, orphanRemoval = true)
     private List<ANVGLAuthority> authorities;
     
@@ -58,7 +57,6 @@ public class ANVGLUser implements UserDetails, Serializable {
     private AuthenticationFramework authentication;
     
     /** A List of book marks associated with the user */
-    //@OneToMany(mappedBy = "parent",	fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "parent",	cascade=CascadeType.ALL, orphanRemoval = true)
     private List<VGLBookMark> bookMarks;
 
@@ -205,18 +203,21 @@ public class ANVGLUser implements UserDetails, Serializable {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return (authorities != null) ? authorities : new ArrayList<ANVGLAuthority>();
     }
 
     public void setAuthorities(List<ANVGLAuthority> authorities) {
-        this.authorities = authorities;
-        // TODO: I don't think this is needed, check everywhere used.
-        // XXX Was killing save User
-        /*
-        for (ANVGLAuthority auth : authorities) {
-            auth.setParent(this);
-        }
-        */
+    	if(this.authorities == null) {
+    		this.authorities = authorities;
+    	} else {
+	        this.authorities.clear();
+	        if(authorities != null) {
+		        for (ANVGLAuthority auth : authorities) {
+		            auth.setParent(this);
+		            this.authorities.add(auth);
+		        }
+	        }
+    	}
     }
 
     public String getArnExecution() {
@@ -257,18 +258,24 @@ public class ANVGLUser implements UserDetails, Serializable {
      */
 
 	public List<VGLBookMark> getBookMarks() {
-		return bookMarks;
+		return (bookMarks != null) ? bookMarks : new ArrayList<VGLBookMark>();
 	}
+	
 	/**
 	 * sets the list of book marks
 	 * @param bookMarks
 	 */
 
 	public void setBookMarks(List<VGLBookMark> bookMarks) {
-		this.bookMarks = bookMarks;
-		for (VGLBookMark bookmark : bookMarks) {
-			bookmark.setParent(this);
-        }
+		if(this.bookMarks == null) {
+			this.bookMarks = bookMarks;
+		} else {
+			this.bookMarks.clear();
+			for (VGLBookMark bookmark : bookMarks) {
+				bookmark.setParent(this);
+				this.bookMarks.add(bookmark);
+	        }
+		}
 	}
 
     /**

@@ -29,11 +29,8 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import au.csiro.promsclient.Activity;
 import au.csiro.promsclient.Entity;
 import au.csiro.promsclient.ExternalReport;
@@ -48,7 +45,6 @@ import au.csiro.promsclient.ServiceEntity;
  * A Service for reporting provenance information for storage in a PROMS
  * instance and also included in downloads.
  */
-//@Service
 public class ANVGLProvenanceService {
     /** Logger for this class. */
     private static final Log LOGGER = LogFactory.getLog(ANVGLProvenanceService.class);

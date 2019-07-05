@@ -50,8 +50,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String registeredUrl;
-    //@ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "seriesId")
     private Integer seriesId;
     private boolean emailNotification;
     private String processTimeLog;
@@ -71,7 +69,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     /** A map of VglParameter objects keyed by their parameter names*/
     @OneToMany(mappedBy = "parent", fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
     @MapKey(name="name")
-    private Map<String, VglParameter> jobParameters = new HashMap<String, VglParameter>();
+    private Map<String, VglParameter> jobParameters;
     
     /** A list of VglDownload objects associated with this job*/
     @OneToMany(mappedBy="parent", fetch=FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
@@ -86,7 +84,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     @ElementCollection
     @CollectionTable(name="job_solutions", joinColumns=@JoinColumn(name="job_id"))
     @Column(name="solution_id")
-    private Set<String> jobSolutions = new HashSet<>();
+    private Set<String> jobSolutions;
     
     /*
      * CloudJob parameters
@@ -122,7 +120,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
     /** The unique ID of the storage service this job has been using */
     protected String storageServiceId;
 
-    transient protected Map<String, String> properties = new HashMap<>();
+    transient protected Map<String, String> properties = new HashMap<String, String>();
     
     
     
@@ -229,19 +227,22 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @return
      */
     public Map<String, VglParameter> getJobParameters() {
-        return jobParameters;
+        return (jobParameters != null) ? jobParameters : new HashMap<String, VglParameter>();
     }
 
     /** A set of VglJobParameter objects*/
     public void setJobParameters(Map<String, VglParameter> jobParameters) {
-        this.jobParameters = jobParameters;
-        /*
-        if(jobParameters != null && jobParameters.values() != null) {
-	        for (VglParameter params : jobParameters.values()) {
-	            params.setParent(this);
-	        }
-        }
-        */
+    	if(this.jobParameters == null) {
+    		this.jobParameters = jobParameters;
+    	} else {
+	    	this.jobParameters.clear();
+	    	if(jobParameters != null) {
+	    		for (String key : jobParameters.keySet()) {
+		            jobParameters.get(key).setParent(this);
+		            this.jobParameters.put(key, jobParameters.get(key));
+		        }
+	    	}
+    	}
     }
 
     /**
@@ -279,7 +280,7 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @return
      */
     public List<VglDownload> getJobDownloads() {
-        return jobDownloads;
+        return (jobDownloads != null) ? jobDownloads : new ArrayList<VglDownload>();
     }
 
     /**
@@ -287,29 +288,21 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param jobDownloads
      */
     public void setJobDownloads(List<VglDownload> jobDownloads) {
-        for (VglDownload dl : jobDownloads) {
-            dl.setParent(this);
-        }
-        this.jobDownloads.clear();
-        this.jobDownloads.addAll(jobDownloads);
+    	if(this.jobDownloads == null) {
+    		this.jobDownloads = jobDownloads;
+    	} else {
+	    	this.jobDownloads.clear();
+	    	if(jobDownloads != null) {
+		        for (VglDownload dl : jobDownloads) {
+		            dl.setParent(this);
+		            this.jobDownloads.add(dl);
+		        }
+	    	}
+    	}
     }
-
-
-    /*
-    public List<FileInformation> getJobFiles() {
-        return jobFiles;
-    }
-    */
-
-    //    public void setJobFiles(List<FileInformation> jobFiles) {
-    //        this.jobFiles = jobFiles;
-    //        for (FileInformation fi : jobFiles) {
-    //            fi.setParent(this);
-    //        }
-    //    }
 
     public Set<String> getJobSolutions() {
-        return this.jobSolutions;
+        return (jobSolutions != null) ? jobSolutions : new HashSet<String>();
     }
 
     public void addJobSolution(String solutionId) {
@@ -317,7 +310,14 @@ public class VEGLJob extends CloudJob implements Cloneable {
     }
 
     public void setJobSolutions(Set<String> solutions) {
-        this.jobSolutions = solutions;
+    	if(this.jobSolutions == null) {
+    		this.jobSolutions = solutions;
+    	} else {
+	        this.jobSolutions.clear();
+	        if(solutions != null) {
+	        	this.jobSolutions.addAll(solutions);
+	        }
+    	}
     }
 
     /**
@@ -358,10 +358,12 @@ public class VEGLJob extends CloudJob implements Cloneable {
         newJob.setJobDownloads(newDownloads);
 
         Map<String, VglParameter> newParams = new HashMap<>();
-        for (String key : this.jobParameters.keySet()) {
-            VglParameter paramClone = (VglParameter)this.jobParameters.get(key).clone();
-            paramClone.setId(null);
-            newParams.put(key, paramClone);
+        if(this.jobParameters != null) { 
+	        for (String key : this.jobParameters.keySet()) {
+	            VglParameter paramClone = (VglParameter)this.jobParameters.get(key).clone();
+	            paramClone.setId(null);
+	            newParams.put(key, paramClone);
+	        }
         }
         newJob.setJobParameters(newParams);
 
@@ -454,11 +456,6 @@ public class VEGLJob extends CloudJob implements Cloneable {
                 + seriesId + ", id=" + id + ", name=" + name + ", description="
                 + description + "]";
     }
-    
-    
-    
-    
-    
     
     public String setProperty(String key, String value) {
         if (value == null) {
@@ -731,6 +728,5 @@ public class VEGLJob extends CloudJob implements Cloneable {
     public void setStorageBaseKey(String storageBaseKey) {
         this.storageBaseKey = storageBaseKey;
     }
-
 
 }
