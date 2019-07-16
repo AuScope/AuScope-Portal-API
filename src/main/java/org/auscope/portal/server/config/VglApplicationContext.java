@@ -31,7 +31,6 @@ import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusChangeListener;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
-import org.auscope.portal.core.services.csw.custom.CustomRegistry;
 import org.auscope.portal.core.services.methodmakers.OPeNDAPGetDataMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WCSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
@@ -86,25 +85,25 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @Configuration
 public class VglApplicationContext {
 
-	@Value("${env.aws.accesskey}")
+	@Value("${aws.accesskey}")
 	private String awsAccessKey;
 	
-	@Value("${env.aws.secretkey}")
+	@Value("${aws.secretkey}")
 	private String awsSecretKey;
 	
-	@Value("${env.aws.sessionkey}")
+	@Value("${aws.sessionkey}")
 	private String awsSessionKey;
 
-	@Value("${env.nectar.ec2.accesskey}")
+	@Value("${nectar.ec2.accesskey}")
 	private String nectarEc2AccessKey;
 	
-	@Value("${env.nectar.ec2.secretkey}")
+	@Value("${nectar.ec2.secretkey}")
 	private String nectarEc2SecretKey;
 	
-	@Value("${env.nectar.storage.accesskey}")
+	@Value("${nectar.storage.accesskey}")
 	private String nectarStorageAccessKey;
 	
-	@Value("${env.nectar.storage.secretkey}")
+	@Value("${nectar.storage.secretkey}")
 	private String nectarStorageSecretKey;
 	
 	@Value("${portalAdminEmail}")
@@ -112,7 +111,6 @@ public class VglApplicationContext {
 	
 	@Value("${aws.stsrequirement}")
 	private String awsStsRequirement;
-	//private STSRequirement awsStsRequirement;
 	
 	@Value("${localStageInDir}")
 	private String stageInDirectory;
@@ -132,7 +130,7 @@ public class VglApplicationContext {
 	@Value("${portalAdminEmail}")
 	private String portalAdminEmail;
 	
-	@Value("${env.encryption.password}")
+	@Value("${encryption.password}")
 	private String encryptionPassword;
 	
 	@Value("${solutions.url}")
@@ -638,7 +636,7 @@ public class VglApplicationContext {
 		CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds(null, "aws-s3", awsAccessKey, awsSecretKey, awsSessionKey, "ap-southeast-2", false, true);
 		storageService.setName("Amazon Web Services - S3");
 		storageService.setId("amazon-aws-storage-sydney");
-		storageService.setBucket("vgl-csiro-");
+		storageService.setBucket("vgl-csiro");
 		storageService.setAdminEmail(adminEmail);
 		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
 		storageService.setStsRequirement(req);

@@ -1215,7 +1215,6 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      */
     @RequestMapping("/secure/getAllJobInputs.do")
-    //public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId, @AuthenticationPrincipal ANVGLUser user) {
     public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId) {
     	ANVGLUser user = userService.getLoggedInUser();
         VEGLJob job = null;

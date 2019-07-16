@@ -57,7 +57,7 @@ public class UserController extends BasePortalController {
     @Autowired
     public UserController(VelocityEngine velocityEngine,
     		CloudComputeService[] cloudComputeServices,
-            @Value("${env.aws.account}") String awsAccount,
+            @Value("${aws.account}") String awsAccount,
             @Value("${termsconditions.version}") String tacVersion) throws PortalServiceException {
         super();        
         this.velocityEngine = velocityEngine;

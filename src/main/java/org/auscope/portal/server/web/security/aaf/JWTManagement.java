@@ -36,7 +36,7 @@ public class JWTManagement {
     @Autowired
     private PersistedAAFUserDetailsLoader userDetailsLoader;
     
-    @Value("${env.aaf.jwtsecret}")
+    @Value("${aaf.jwtsecret}")
     private String jwtSecret;
     
     @Value("${portalUrl}")
