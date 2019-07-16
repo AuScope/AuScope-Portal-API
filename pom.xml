@@ -297,6 +297,11 @@
             <name>AuScope Nexus - New PortalRepo</name>
             <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
         </repository>
+		<repository>
+            <id>cgmaven.it.csiro.au</id>
+            <name>AuScope Nexus - New PortalRepo</name>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/PortalRepository/</url>
+        </repository>
     </repositories>
 
     <!-- Dependencies -->

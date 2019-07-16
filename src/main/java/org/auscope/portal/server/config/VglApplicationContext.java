@@ -660,7 +660,7 @@ public class VglApplicationContext {
     </bean>
 	*/
     
-    @Bean
+	@Bean
 	public CloudStorageServiceJClouds cloudStorageServiceNectarMelb() {
     	CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds("https://keystone.rc.nectar.org.au:5000/v2.0",
     			"openstack-swift", nectarStorageAccessKey, nectarStorageSecretKey, null, "Melbourne", false, true);
