@@ -120,7 +120,8 @@ public class VlRegistries {
 	    return new CSWServiceItem("cswUrbanMonitor",
 	            "http://dcdpgeo.data61.csiro.au:8080/api",
 	            "http://dcdpgeo.data61.csiro.au:8080/api/catalog.search#/metadata/%1$s",
-	            "Urban Monitor");
+	            "Urban Monitor",
+	            CSWServiceItem.ServerType.PYCSW);
 	}
 	
 	/*
