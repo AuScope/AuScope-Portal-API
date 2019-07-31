@@ -9,6 +9,7 @@ package org.auscope.portal.server.gridjob;
 import java.io.File;
 import java.io.Serializable;
 
+
 /**
  * Simple bean class that stores basic information about a file. Designed to be passed between GUI and backend
  *

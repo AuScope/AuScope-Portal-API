@@ -1,6 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auscope.portal</groupId>
     <artifactId>VGL-Portal</artifactId>
@@ -23,13 +25,18 @@
         <name>CSIRO</name>
         <url>http://csiro.au</url>
     </organization>
+    
+    <!-- XXX Migration -->
+<!--
     <build>
         <finalName>VGL-Portal</finalName>
         <plugins>
         
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+-->
+                <!--<version>3.1</version>-->
+<!--
                 <configuration>
                     <source>${targetJdk}</source>
                     <target>${targetJdk}</target>
@@ -58,9 +65,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
+-->
+                <!--<version>2.4</version>-->
+<!--
+                <version>2.6</version>
                 <configuration>
                     <overlays>
+-->
                         <!--
                             m2e consumes overlay dependencies causing the
                             portal-core jar to be omitted when running in
@@ -68,6 +79,7 @@
                             for the overlay; this then has to be a provided
                             dependency to prevent inclusion in the war.
                         -->
+<!--
                         <overlay>
                                <groupId>org.auscope.portal</groupId>
                                <artifactId>portal-core</artifactId>
@@ -100,7 +112,9 @@
                         <goal>manifest</goal>
                     </goals>
                 </configuration>
+-->
                 <!-- This is needed to create ${basedir}/src/main/webapp/META-INF/MANIFEST.MF file -->
+<!--
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -113,14 +127,20 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
+-->
+                <!--<version>${jetty.version}</version>-->
+<!--
+                <version>9.4.14.v20181114</version>
                 <configuration>
                     <webApp>
                         <contextPath>/VGL-Portal</contextPath>
                     </webApp>
                 </configuration>
             </plugin>
+-->
+
             <!-- Powermock - Unit test work around... -->
+<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -145,6 +165,7 @@
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>yuicompressor-maven-plugin</artifactId>
                 <configuration>
+-->
                     <!--
                     <excludes>
                         Exclude Ext JS
@@ -152,6 +173,7 @@
                         <exclude>external/**</exclude>
                     </excludes>
                     -->
+<!--
                     <includes>
                         <include>js/**</include>
                     </includes>
@@ -159,12 +181,13 @@
                 </configuration>
                 <version>1.4.0</version>
             </plugin>
-             
+-->
             <!--
                 This is needed for Emma Coverage to work with unit tests
                 that use PowerMock's JMock library. The latest alpha
                 version i.e. 1.0-alpha-3 will fail those unit tests.
             -->
+<!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>emma-maven-plugin</artifactId>
@@ -213,7 +236,9 @@
         </plugins>
         <pluginManagement>
             <plugins>
+-->
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+<!--
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -245,48 +270,33 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.spring.platform</groupId>
-                <artifactId>platform-bom</artifactId>
-                <version>2.0.8.RELEASE</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+-->
+    
 
     <!-- Project properties -->
-    <properties>
-        <jetty.version>9.3.7.v20160115</jetty.version>
-        <hibernate.version>3.6.7.Final</hibernate.version>
+    <properties>       
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>1.8</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>1.6.3</powermock.version>
-        <portal.core.version>2.1.0-SNAPSHOT</portal.core.version>
+        <portal.core.version>2.2.0-DCDP-SNAPSHOT</portal.core.version>
         <httpclient.version>4.3.5</httpclient.version>
-        <mysql.version>8.0.12</mysql.version>
-        <jackson.version>2.9.0</jackson.version>
+        <mysql.version>8.0.14</mysql.version>
+        <jackson.version>2.9.0</jackson.version>        
     </properties>
-
+    
+    <!--  Spring Boot -->    
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.3.RELEASE</version>
+    </parent>
+    
     <repositories>
         <repository>
-            <id>osgeo</id>
-            <name>Open Source Geospatial Foundation Repository</name>
-            <url>http://download.osgeo.org/webdav/geotools</url>
-        </repository>
-        <!-- <repository>
-             <id>mygrid</id>
-             <name>MyGrid Repository</name>
-             <url>http://build.mygrid.org.uk/maven/repository/</url>
-             </repository> -->
-        <repository>
-            <id>geotoolkit</id>
-            <name>Geo Toolkit Repository</name>
-            <url>http://maven.geotoolkit.org/</url>
+            <id>dcdp-deps</id>
+            <name>AuScope Nexus - New PortalRepo</name>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
         </repository>
         <repository>
             <id>CSIRO AuScope Repo</id>
@@ -304,139 +314,121 @@
 
     <!-- Dependencies -->
 	<dependencies>
+	   <!-- Check if we need this if we use spring-boot-starter-web -->
+	   <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+
+            <!--
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+                
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+            -->
+            
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- JPA (Spring Boot) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        
+        <!-- Security (Spring Boot) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+            <version>2.1.3.RELEASE</version>
+        </dependency>
+
 		<dependency>
 			<groupId>com.jcraft</groupId>
 			<artifactId>jsch</artifactId>
 			<version>0.1.54</version>
 		</dependency>
         <dependency>
-            <groupId>proms-clients-java</groupId>
-            <artifactId>proms-clients-java</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>proms-client-java</groupId>
+            <artifactId>proms-client-java</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
+        
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-joda</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
+            <groupId>org.auscope.portal</groupId>
+            <artifactId>portal-core</artifactId>
+            <version>${portal.core.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
+        
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.5</version>
+            <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.auscope.portal</groupId>
-            <artifactId>portal-core</artifactId>
-            <version>${portal.core.version}</version>
-        </dependency>
-        <!-- m2e overlay workaround (see above) -->
-        <dependency>
-            <groupId>org.auscope.portal</groupId>
-            <artifactId>portal-core</artifactId>
-            <version>${portal.core.version}</version>
-            <classifier>sources</classifier>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
             <version>1.1.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${hibernate.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator-annotation-processor</artifactId>
-            <version>4.1.0.Final</version>
+            <version>3.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
+            <version>3.24.1-GA</version>
         </dependency>
         <dependency>
             <groupId>com.jhlabs</groupId>
             <artifactId>javaproj</artifactId>
             <version>1.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-expression</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-aop</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        
         
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-jwt</artifactId>
+            <version>1.0.10.RELEASE</version>
             <exclusions>
                 <exclusion>
                     <artifactId>bcprov-jdk15on</artifactId>
@@ -445,24 +437,6 @@
             </exclusions>
         </dependency>
         
-        
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-taglibs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <scope>compile</scope>
-        </dependency>
         <!-- Added for job monitoring -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -475,11 +449,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <!-- Added for email templating -->
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
+            <version>1.7</version>
         </dependency>
+        
+        <!--
         <dependency>
             <groupId>edu.ucar</groupId>
             <artifactId>netcdf</artifactId>
@@ -496,6 +474,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        -->
+        <dependency>
+		    <groupId>edu.ucar</groupId>
+		    <artifactId>netcdf</artifactId>
+		    <version>4.2.20</version>
+        </dependency>
+        
         <!-- Added for using PowerMock with JMock -->
         <dependency>
             <groupId>org.powermock</groupId>
@@ -509,6 +494,7 @@
             <version>${powermock.version}</version>
             <scope>test</scope>
         </dependency>
+        
         <!--
             We depend on the EasyMock API but exclude the EasyMock dependency. The reason
             is that PowerMock Whitebox needs a "org.powermock.reflect.spi.ProxyFramework"
@@ -536,26 +522,45 @@
             <artifactId>mail</artifactId>
             <version>1.4</version>
         </dependency>
+        
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
+            <version>8.0.14</version>
         </dependency>
         
-        <!--
         <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>0.7.0</version>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-core</artifactId>
+            <version>3.12.0</version>
         </dependency>
-        -->
         
+        <dependency>
+            <groupId>org.apache.jclouds</groupId>
+            <artifactId>jclouds-all</artifactId>
+            <version>2.0.3-SHADED</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>10.0.2</version>
+        </dependency>
     </dependencies>
-
-  <distributionManagement>
-      <snapshotRepository>
-          <id>dcdp-snapshots</id>
-          <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-snapshots/</url>
-      </snapshotRepository>
-  </distributionManagement>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
 </project>

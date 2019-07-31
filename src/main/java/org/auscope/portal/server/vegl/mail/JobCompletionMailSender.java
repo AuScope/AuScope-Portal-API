@@ -1,11 +1,11 @@
 package org.auscope.portal.server.vegl.mail;
 
+import java.io.StringWriter;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.util.DateUtil;
 import org.auscope.portal.core.util.TextUtil;
@@ -13,9 +13,9 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.ui.velocity.VelocityEngineUtils;
 
 /**
  * A concrete implementation of JobMailServer interface
@@ -58,6 +58,7 @@ public class JobCompletionMailSender implements JobMailSender {
         this.portalUrl = portalUrl;
     }
 
+    @Autowired
     public JobCompletionMailSender(VEGLJobManager jobManager,
             VGLJobStatusAndLogReader jobStatLogReader, MailSender mailSender,
             VelocityEngine velocityEngine) {
@@ -232,22 +233,23 @@ public class JobCompletionMailSender implements JobMailSender {
         String timeElapsed = diff[0] + " day(s) " + diff[1] + " hour(s) "
                 + diff[2] + " minute(s) " + diff[3] + " second(s)";
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("userName", job.getUser().substring(0,job.getUser().indexOf("@")));
-        model.put("status", job.getStatus());
-        model.put("jobId", job.getId().toString());
-        model.put("seriesName", seriesName);
-        model.put("jobName", job.getName());
-        model.put("jobDescription", job.getDescription());
-        model.put("dateSubmitted", DateUtil.formatDate(submitDate, dateFormat));
-        model.put("dateExecuted", DateUtil.formatDate(executeDate, dateFormat));
-        model.put("dateProcessed", DateUtil.formatDate(processDate, dateFormat));
-        model.put("timeElapsed", timeElapsed);
-        model.put("jobExecLogSnippet", TextUtil.tail(jobStatLogReader.getSectionedLog(job, "Python"), maxLinesForTail));
-        model.put("emailSender", getEmailSender());
-        model.put("portalUrl", getPortalUrl());
-
-        return VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, template, model);
+        VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put("userName", job.getUser().substring(0,job.getUser().indexOf("@")));
+        velocityContext.put("status", job.getStatus());
+        velocityContext.put("jobId", job.getId().toString());
+        velocityContext.put("seriesName", seriesName);
+        velocityContext.put("jobName", job.getName());
+        velocityContext.put("jobDescription", job.getDescription());
+        velocityContext.put("dateSubmitted", DateUtil.formatDate(submitDate, dateFormat));
+        velocityContext.put("dateExecuted", DateUtil.formatDate(executeDate, dateFormat));
+        velocityContext.put("dateProcessed", DateUtil.formatDate(processDate, dateFormat));
+        velocityContext.put("timeElapsed", timeElapsed);
+        velocityContext.put("jobExecLogSnippet", TextUtil.tail(jobStatLogReader.getSectionedLog(job, "Python"), maxLinesForTail));
+        velocityContext.put("emailSender", getEmailSender());
+        velocityContext.put("portalUrl", getPortalUrl());
+        StringWriter stringWriter = new StringWriter();
+        velocityEngine.mergeTemplate(template, "UTF-8", velocityContext, stringWriter);
+        return stringWriter.toString();
     }
 
     /**

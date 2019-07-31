@@ -7,6 +7,8 @@ import org.auscope.portal.server.web.security.aaf.AAFJWT;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
 import org.auscope.portal.server.web.security.aaf.AAFAttributes;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -31,8 +33,13 @@ public class JWTManagement {
     static private String AAF_PRODUCTION = "https://rapid.aaf.edu.au";
     static private String AAF_TEST = "https://rapid.test.aaf.edu.au";
 
+    @Autowired
     private PersistedAAFUserDetailsLoader userDetailsLoader;
+    
+    @Value("${env.aaf.jwtsecret}")
     private String jwtSecret;
+    
+    @Value("${portalUrl}")
     private String rootServiceUrl;
 
     public void setUserDetailsLoader(PersistedAAFUserDetailsLoader userDetailsLoader) {
@@ -82,7 +89,7 @@ public class JWTManagement {
                 throw new AuthenticationServiceException("Unable to authenticate. The authentication has expired. " +
                         "Now: " + now.toString() + " expired: " + token.expires.toString() );
 
-            // XXX We're not currently storing tokens to be in order to check for replay attacks 
+            // XXX We're not currently storing tokens in order to check for replay attacks 
             /*
             try {
                 this.jdbcTemplate.update(INSERT, token.replayPreventionToken);

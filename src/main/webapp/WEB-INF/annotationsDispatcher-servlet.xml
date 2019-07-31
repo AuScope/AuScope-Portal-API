@@ -13,46 +13,60 @@
            http://www.springframework.org/schema/mvc 
            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="org.auscope.portal"/>
+    <!--<context:component-scan base-package="org.auscope.portal"/>-->
 
+    <!-- XXX These are causing issues Spring Boot post-migration -->
+    <!--
     <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"/>
+    -->
     
     <!-- Turn on HostPrecedingPropertyPlaceholderConfigurer -->
     <!-- http://jdwyah.blogspot.com/2006/12/updated-spring-configuration.html -->
+    <!--
     <bean id="propertyConfigurer" class="org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:config.properties</value>
+    -->
                 <!--  Spring SpEL magic - use context parameter or the default war env.properties -->
+    <!--
                 <value>#{contextParameters['envPropertiesLocation'] ?: 'classpath:env.properties'}</value>
             </list>
         </property>
+    -->
 <!--         <property name="ignoreUnresolvablePlaceholders" value="true" />
- -->    </bean>
+ -->    <!--</bean>-->
 
+    <!--
 	 <mvc:annotation-driven conversion-service="conversionService">
     	<mvc:argument-resolvers>
            <bean class="org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver" />      
       	</mvc:argument-resolvers>
     </mvc:annotation-driven>
     
-    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+    <bean id="conversionService" primary="true" class="org.springframework.context.support.ConversionServiceFactoryBean">
         <property name="converters">
             <list>
                 <bean class="org.auscope.portal.server.web.StringToArrayConversionBlocker" />
             </list>
         </property>
     </bean>
+    -->
 
     <!-- creates a java.util.Properties instance with values loaded from the supplied location -->
     <!-- TO DO: Check if we need this  -->
-    <util:properties id="configProperties" location="classpath:config.properties"/>
+    <!--<util:properties id="configProperties" location="classpath:config.properties"/>-->
+    <!--
+    <util:properties id="configProperties" location="classpath:application.yaml"/>
+    -->
 
+    <!--
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
       <property name="prefix" value="/WEB-INF/jsp/"/>
       <property name="suffix" value=".jsp"/>
    </bean>
+   -->
 
 </beans>
