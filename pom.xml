@@ -293,13 +293,11 @@
     </parent>
     
     <repositories>
-    
         <repository>
             <id>dcdp-deps</id>
             <name>AuScope Nexus - New PortalRepo</name>
             <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
         </repository>
-        
         <repository>
             <id>CSIRO AuScope Repo</id>
             <name>AuScope Nexus - PortalRepo</name>
@@ -311,11 +309,6 @@
             <url>https://cgmaven.it.csiro.au/nexus/repository/PROMS-java-snapshot</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-        <repository>
-            <id>dcdp-deps</id>
-            <name>AuScope Nexus - New PortalRepo</name>
-            <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
         </repository>
     </repositories>
 
