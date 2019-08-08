@@ -1,5 +1,6 @@
 package org.auscope.portal.server.config;
 
+import org.auscope.portal.core.server.OgcServiceProviderType;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -121,7 +122,7 @@ public class VlRegistries {
 	            "http://dcdpgeo.data61.csiro.au:8080/api",
 	            "http://dcdpgeo.data61.csiro.au:8080/api/catalog.search#/metadata/%1$s",
 	            "Urban Monitor",
-	            CSWServiceItem.ServerType.PYCSW);
+	            OgcServiceProviderType.PyCSW);
 	}
 	
 	/*
