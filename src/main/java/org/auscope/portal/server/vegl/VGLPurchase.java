@@ -1,6 +1,7 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,7 +33,13 @@ public class VGLPurchase implements Serializable {
     private Integer id;
     
     @Column(nullable=false)
-    private String cswRecordId;
+    private Date date;
+    
+    @Column(nullable=false)
+    private Float amount;
+    
+    @Column(nullable=false)
+    private String cswRecord;
     
     @Column(nullable=false)
     private String onlineResourceType;
@@ -74,11 +81,13 @@ public class VGLPurchase implements Serializable {
         super();
     }
     
-    public VGLPurchase(String cswRecordId, String onlineResourceType, String url, String localPath, String name, String description, 
+    public VGLPurchase(Date date, Float amount, String cswRecord, String onlineResourceType, String url, String localPath, String name, String description, 
             Double northBoundLatitude, Double southBoundLatitude, Double eastBoundLongitude, Double westBoundLongitude, String paymentRecord, 
             ANVGLUser user) {
         super();
-        this.cswRecordId = cswRecordId;
+        this.date = date;
+        this.amount = amount;
+        this.cswRecord = cswRecord;
         this.onlineResourceType = onlineResourceType;
         this.url = url;
         this.localPath = localPath;
@@ -100,14 +109,30 @@ public class VGLPurchase implements Serializable {
         this.id = id;
     }
 
-    public String getCswRecordId() {
-        return cswRecordId;
+    public Date getDate() {
+        return date;
     }
 
-    public void setCswRecordId(String cswRecordId) {
-        this.cswRecordId = cswRecordId;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
+    public Float getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Float amount) {
+        this.amount = amount;
+    }
+    
+    public String getCswRecord() {
+        return cswRecord;
+    }
+
+    public void setCswRecord(String cswRecord) {
+        this.cswRecord = cswRecord;
+    }
+    
     public String getOnlineResourceType() {
         return onlineResourceType;
     }

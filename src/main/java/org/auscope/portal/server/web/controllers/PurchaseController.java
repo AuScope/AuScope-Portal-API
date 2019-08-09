@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.vegl.VGLPurchase;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLUserService;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -147,7 +151,6 @@ public class PurchaseController extends BasePortalController {
                         JsonObject dataset = dataToPurchase.get(i).getAsJsonObject();
 
                         JsonObject cswRecord = dataset.getAsJsonObject("cswRecord");
-                        String cswRecordId = getAsString(cswRecord,"id");
                         
                         JsonObject onlineResource =  dataset.getAsJsonObject("onlineResource");
                         String onlineResourceType = getAsString(onlineResource,"type");
@@ -162,13 +165,13 @@ public class PurchaseController extends BasePortalController {
                         Double eastBoundLongitude = getAsDouble(downloadOptions, "eastBoundLongitude");
                         Double westBoundLongitude = getAsDouble(downloadOptions, "westBoundLongitude");
                         
-                        logger.info("to store in the purchases table: " + cswRecordId + "," +  onlineResourceType + "," 
+                        logger.info("to store in the purchases table: " + cswRecord + "," + onlineResourceType + "," 
                                 +  url + "," +  localPath + "," +  name + "," +  description + "," 
                                 +  northBoundLatitude + "," +  southBoundLatitude + "," 
                                 +  eastBoundLongitude + "," +  westBoundLongitude);
                         
-                        // TODO uncomment the following when ready to test out database code
-                        VGLPurchase vglPurchase = new VGLPurchase(cswRecordId, onlineResourceType, url, localPath, name, description, 
+                        // TODO: should probably extract the timestamp from the strip result json
+                        VGLPurchase vglPurchase = new VGLPurchase(new Date(), amount, cswRecord.toString(), onlineResourceType, url, localPath, name, description, 
                                 northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude, result, 
                                 user);
                         Integer id = purchaseService.savePurchase(vglPurchase);
@@ -204,9 +207,21 @@ public class PurchaseController extends BasePortalController {
         PrintWriter writer = response.getWriter();
         writer.println(result);
         writer.close();
-
     }
     
+    /**
+     * Retrieves all purchase made by user.
+     * @param user
+     * @return
+     * @throws PortalServiceException
+     */
+    @RequestMapping("/getPurchases.do")
+    public ModelAndView getPurchases() throws PortalServiceException {
+        ANVGLUser user = userService.getLoggedInUser();
+        List<VGLPurchase> purchases = purchaseService.getPurchasesByUser(user);
+        return generateJSONResponseMAV(true, purchases, "");
+    }
+
     private String getAsString(JsonObject parent, String name) {
         if (parent != null && parent.has(name)) {
             return parent.getAsJsonPrimitive(name).getAsString();
