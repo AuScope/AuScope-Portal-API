@@ -121,8 +121,17 @@ public class VlRegistries {
 	    return new CSWServiceItem("cswUrbanMonitor",
 	            "http://dcdpgeo.data61.csiro.au:8080/api",
 	            "http://dcdpgeo.data61.csiro.au:8080/api/catalog.search#/metadata/%1$s",
-	            "Urban Monitor",
+	            "Urban Monitor PyCSW",
 	            OgcServiceProviderType.PyCSW);
+	}
+	
+	@Bean
+	CSWServiceItem cswUrbanGeoServer() {
+	    return new CSWServiceItem("cswUrbanGeoServer",
+	            "http://dcdpgeo.data61.csiro.au/geoserver/ows?service=csw&amp;version=2.0.2",
+	            "http://dcdpgeo.data61.csiro.au/geoserver/ows?service=csw&amp;version=2.0.2&amp;request=DescribeRecord&amp;typeName=gmd:MD_Metadata",
+	            "Urban GeoServer",
+	            OgcServiceProviderType.GeoServer);
 	}
 	
 	/*
