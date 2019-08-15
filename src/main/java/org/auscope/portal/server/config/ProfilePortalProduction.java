@@ -95,6 +95,10 @@ public class ProfilePortalProduction {
     @Qualifier("cswUrbanMonitor")
     CSWServiceItem cswUrbanMonitor;
 	
+	@Autowired
+    @Qualifier("cswUrbanGeoServer")
+    CSWServiceItem cswUrbanGeoServer;	
+	
 	@Bean
 	public ArrayList<KnownLayer> knownTypes() {
 		ArrayList<KnownLayer> knownLayers = new ArrayList<KnownLayer>();
@@ -169,6 +173,7 @@ public class ProfilePortalProduction {
 		//serviceList.add(cswNciGswa);
 		//serviceList.add(cswNciMt);
 		serviceList.add(cswUrbanMonitor);
+		serviceList.add(cswUrbanGeoServer);
 		return serviceList;
 	}
 	
