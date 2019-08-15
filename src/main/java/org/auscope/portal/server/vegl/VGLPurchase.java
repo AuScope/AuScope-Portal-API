@@ -39,6 +39,9 @@ public class VGLPurchase implements Serializable {
     private Float amount;
     
     @Column(nullable=false)
+    private String downloadUrl;
+    
+    @Column(nullable=false)
     private String cswRecord;
     
     @Column(nullable=false)
@@ -81,12 +84,13 @@ public class VGLPurchase implements Serializable {
         super();
     }
     
-    public VGLPurchase(Date date, Float amount, String cswRecord, String onlineResourceType, String url, String localPath, String name, String description, 
+    public VGLPurchase(Date date, Float amount, String downloadUrl, String cswRecord, String onlineResourceType, String url, String localPath, String name, String description, 
             Double northBoundLatitude, Double southBoundLatitude, Double eastBoundLongitude, Double westBoundLongitude, String paymentRecord, 
             ANVGLUser user) {
         super();
         this.date = date;
         this.amount = amount;
+        this.downloadUrl = downloadUrl;
         this.cswRecord = cswRecord;
         this.onlineResourceType = onlineResourceType;
         this.url = url;
@@ -115,6 +119,14 @@ public class VGLPurchase implements Serializable {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+    
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
     }
 
     public Float getAmount() {

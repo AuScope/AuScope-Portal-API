@@ -178,6 +178,7 @@ CREATE TABLE `purchases` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` datetime NOT NULL,
   `amount` float NOT NULL,
+  `downloadUrl` varchar(4096) NOT NULL,
   `cswRecord` text NOT NULL,
   `onlineResourceType` varchar(25) NOT NULL,
   `url` varchar(4096) NOT NULL,
