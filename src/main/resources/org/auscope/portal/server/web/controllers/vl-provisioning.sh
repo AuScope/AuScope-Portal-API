@@ -42,6 +42,32 @@ else
     fi
 fi
 
+# Pip
+if hash pip 2>/dev/null; then
+    echo "Pip already installed."
+else
+    # Determine what OS we're using so we install appropriately
+    # Checks for a debian based system, or assumes rpm based
+    if [ -f /etc/debian_version ]; then
+        sudo apt-get install -y python-pip
+    else
+        yum install -y python-pip
+    fi
+fi
+
+# Swift
+if hash swift 2>/dev/null; then
+    echo "Swift already installed."
+else
+    # Determine what OS we're using so we install appropriately
+    # Checks for a debian based system, or assumes rpm based
+    if [ -f /etc/debian_version ]; then
+        sudo apt-get install -y python-swiftclient
+    else
+        yum install -y python-swiftclient
+    fi
+fi
+
 #sudo sh -c 'echo "    server = master.local" >> /etc/puppet/puppet.conf'
 #sudo service puppet restart
 #sudo chkconfig puppet on
@@ -139,7 +165,5 @@ cd; cd -
 # TODO: template this so the portal can pass in provisioning from SSC
 puppet apply <<EOF
 include epel
-include puppi
-include python_pip
 include vl_common
 EOF
