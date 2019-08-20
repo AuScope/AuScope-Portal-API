@@ -662,12 +662,12 @@ public class VglApplicationContext {
     
 	@Bean
 	public CloudStorageServiceJClouds cloudStorageServiceNectarMelb() {
-    	CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds("https://keystone.rc.nectar.org.au:5000/v2.0",
+		CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds("https://keystone.rc.nectar.org.au:5000/v3",
     			"openstack-swift", nectarStorageAccessKey, nectarStorageSecretKey, null, "Melbourne", false, true);
     	storageService.setName("National eResearch Collaboration Tools and Resources");
     	storageService.setId("nectar-openstack-storage-melb");
     	storageService.setBucket("vgl-portal");
-    	storageService.setAuthVersion("2.0");
+    	storageService.setAuthVersion("3");
     	STSRequirement req = STSRequirement.ForceNone;
 		storageService.setStsRequirement(req);
 		return storageService;
@@ -828,7 +828,7 @@ public class VglApplicationContext {
 	@Bean
 	public CloudComputeServiceNectar cloudComputeServiceNectar() throws UnknownHostException {
 		CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
-				"https://keystone.rc.nectar.org.au:5000/v2.0", nectarEc2AccessKey, nectarEc2SecretKey);
+				"https://keystone.rc.nectar.org.au:5000/v3", nectarEc2AccessKey, nectarEc2SecretKey);
 		computeService.setId("nectar-nova-compute");
 		computeService.setName("National eResearch Collaboration Tools and Resources");
 		//computeService.setGroupName("vl-#{inetAddress().hostName.toLowerCase()}");
@@ -836,8 +836,8 @@ public class VglApplicationContext {
 		groupName += inetAddress().getHostName().toLowerCase();
 		computeService.setGroupName(groupName);
 		computeService.setKeypair("vgl-developers");
+		computeService.setApiVersion("3");
 		return computeService;
-		
 	}
 	
 	/*

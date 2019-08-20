@@ -800,8 +800,7 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/secure/submitJob.do")
     public ModelAndView submitJob(HttpServletRequest request,
             HttpServletResponse response,
-            @RequestParam("jobId") String jobId/*,
-            @AuthenticationPrincipal ANVGLUser user*/) {
+            @RequestParam("jobId") String jobId) {
     	ANVGLUser user = userService.getLoggedInUser();
         boolean succeeded = false;
         String oldJobStatus = null, errorDescription = null, errorCorrection = null;
