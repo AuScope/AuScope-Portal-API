@@ -176,7 +176,10 @@ CREATE TABLE `bookmark_download_options` (
 
 CREATE TABLE `purchases` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `cswRecordId` varchar(128) NOT NULL,
+  `date` datetime NOT NULL,
+  `amount` float NOT NULL,
+  `downloadUrl` varchar(4096) NOT NULL,
+  `cswRecord` text NOT NULL,
   `onlineResourceType` varchar(25) NOT NULL,
   `url` varchar(4096) NOT NULL,
   `localPath` varchar(1024) DEFAULT NULL,

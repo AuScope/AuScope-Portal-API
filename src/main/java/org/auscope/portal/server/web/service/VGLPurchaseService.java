@@ -20,7 +20,7 @@ public class VGLPurchaseService {
 	
 	
 	/**
-     * Retrieves the pourchases for a user
+     * Retrieves the purchases for a user
      * @param user 
      */
     public List<VGLPurchase> getPurchasesByUser(final ANVGLUser user) {
