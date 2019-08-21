@@ -49,7 +49,6 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.VGLJobAuditLogService;
-import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
@@ -85,7 +84,6 @@ public class JobListController extends BaseCloudController  {
     private FileStagingService fileStagingService;
     private VGLJobStatusAndLogReader jobStatusLogReader;
     private JobStatusMonitor jobStatusMonitor;
-    //private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
     private CloudSubmissionService cloudSubmissionService;
     private VGLJobAuditLogService jobAuditLogService;
     private ANVGLUserService userService;
@@ -110,9 +108,8 @@ public class JobListController extends BaseCloudController  {
     @Autowired
     public JobListController(VEGLJobManager jobManager, CloudStorageService[] cloudStorageServices,
             FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
-            ANVGLUserService userService,
-            VGLJobStatusAndLogReader jobStatusLogReader,
-            JobStatusMonitor jobStatusMonitor,VGLJobStatusChangeHandler vglJobStatusChangeHandler,
+            ANVGLUserService userService, VGLJobStatusAndLogReader jobStatusLogReader,
+            JobStatusMonitor jobStatusMonitor,
             @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
             @Value("${portalAdminEmail}") String adminEmail,
             CloudSubmissionService cloudSubmissionService,

@@ -272,14 +272,13 @@
     </build>
 -->
     
-
     <!-- Project properties -->
     <properties>       
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>1.8</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>1.6.3</powermock.version>
-        <portal.core.version>2.1.0-VGL-SNAPSHOT</portal.core.version>
+        <portal.core.version>2.1.0-SNAPSHOT</portal.core.version>
         <httpclient.version>4.3.5</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
         <jackson.version>2.9.0</jackson.version>
@@ -297,6 +296,11 @@
             <id>dcdp-deps</id>
             <name>AuScope Nexus - New PortalRepo</name>
             <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
+        </repository>
+		<repository>
+            <id>cgmaven.it.csiro.au</id>
+            <name>AuScope Nexus - New PortalRepo</name>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/PortalRepository/</url>
         </repository>
     </repositories>
 

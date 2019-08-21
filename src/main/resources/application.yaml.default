@@ -2,6 +2,10 @@ termsconditions:
    version: 1
 
 spring:
+   # Include the registry definitions from application-registries.yaml
+   profiles:
+      include:
+         'registries'
    datasource:
       url: jdbc:mysql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
       username: <db_user>
@@ -23,22 +27,6 @@ spring:
       servlet:
          load-on-startup: 1
             
-#   oauth2:
-google:
-   client:
-      clientId: <google_client_id>
-      clientSecret: <google_client_secret>
-      accessTokenUri: https://www.googleapis.com/oauth2/v4/token
-      userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
-      clientAuthenticationScheme: form
-      scope:
-         - openid
-         - email
-         - profile
-   resource:
-      userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
-      preferTokenInfo: true
-
 # Timeouts in seconds
 wait-for-body-content:
    timeout: 90
@@ -74,15 +62,10 @@ proms:
       url: http://proms-dev1-vc.it.csiro.au/id/report/
    reportingsystem:
       uri: http://proms-dev1-vc.it.csiro.au/rs
-aws:
-   stsrequirement: Mandatory
 portalUrl: http://localhost:8080/VGL-Portal
 frontEndUrl: http://localhost:4200
 portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
 defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
-aafLoginUrl: <aaf_login_url>
-aafCallbackUrl: <aaf_callback_url>
-
 
 # Gives us separation from real DB passwords.
 # Production deployment will copy env.properties file over
@@ -93,24 +76,39 @@ aafCallbackUrl: <aaf_callback_url>
 #   <param-value>file:///c:/env.properties</param-value>
 # made possible via Spring3 SpEL in the config.
 
-env:
-   nectar:
-      ec2:
-         accesskey: NECTAR_EC2_ACCESS_KEY
-         secretkey: NECTAR_EC2_SECRET_KEY
-      storage:
-         accesskey: NECTAR_STORAGE_ACCESS_KEY
-         secretkey: NECTAR_STORAGE_SECRET_KEY
-
-   encryption:
-      password: ABCdefGHI
-
 #
 # Aws keys to be used for dev only. Production system to use AWS roles for authorization
 #
-   aws:
-      account: AWS_ACCOUNT
-      accesskey: AWS_ACCESS_KEY
-      secretkey: AWS_SECRET_KEY
-   aaf:
-      jwtsecret: <aaf_secret>
+aws:
+   account: AWS_ACCOUNT
+   accesskey: AWS_ACCESS_KEY
+   secretkey: AWS_SECRET_KEY
+   sessionkey: AWS_SESSION_KEY
+   stsrequirement: Mandatory
+nectar:
+   ec2:
+      accesskey: NECTAR_EC2_ACCESS_KEY
+      secretkey: NECTAR_EC2_SECRET_KEY
+   storage:
+      accesskey: NECTAR_STORAGE_ACCESS_KEY
+      secretkey: NECTAR_STORAGE_SECRET_KEY
+google:
+   client:
+      clientId: GOOGLE_CLIENT_ID
+      clientSecret: GOOGLE_CLIENT_SECRET
+      accessTokenUri: https://www.googleapis.com/oauth2/v4/token
+      userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+      clientAuthenticationScheme: form
+      scope:
+         - openid
+         - email
+         - profile
+   resource:
+      userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
+      preferTokenInfo: true
+aaf:
+   loginUrl: AAF_LOGIN_URL
+   callbackUrl: AAF_CALLBACK_URL
+   jwtsecret: AAF_SECRET
+encryption:
+   password: ABCdefGHI

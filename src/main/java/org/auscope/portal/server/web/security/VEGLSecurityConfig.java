@@ -60,7 +60,7 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${portalUrl}")
 	private String portalUrl;
 	
-	@Value("${aafCallbackUrl}")
+	@Value("${aaf.callbackUrl}")
 	private String aafCallbackUrl;
 
 	
