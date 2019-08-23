@@ -9,7 +9,8 @@ DROP TABLE IF EXISTS `users`;
 DROP TABLE IF EXISTS `nci_details`;
 DROP TABLE IF EXISTS `bookmark_download_options`;
 DROP TABLE IF EXISTS `bookmarks`;
-DROP TABLE IF EXISTS `purchases`;
+DROP TABLE IF EXISTS `data_purchases`;
+DROP TABLE IF EXISTS `job_purchases`;
 
 CREATE TABLE `users` (
   `id` varchar(128) NOT NULL,
@@ -174,7 +175,7 @@ CREATE TABLE `bookmark_download_options` (
   CONSTRAINT `ID_BOOKMARKS` FOREIGN KEY (`bookmarkId`) REFERENCES `bookmarks` (`id`) ON DELETE CASCADE
 );
 
-CREATE TABLE `purchases` (
+CREATE TABLE `data_purchases` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` datetime NOT NULL,
   `amount` float NOT NULL,
@@ -192,7 +193,19 @@ CREATE TABLE `purchases` (
   `paymentRecord` varchar(4096) NOT NULL,
   `userId` varchar(128) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `USER_ID_PURCHASES` (`userId`),
-  CONSTRAINT `USER_ID_PURCHASES` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  KEY `USER_ID_DATA_PURCHASES` (`userId`),
+  CONSTRAINT `USER_ID_DATA_PURCHASES` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ); 
 
+CREATE TABLE `job_purchases` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` datetime NOT NULL,
+  `amount` float NOT NULL,
+  `jobId` int(11) NOT NULL,
+  `jobName` varchar(128) DEFAULT NULL,
+  `paymentRecord` varchar(4096) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `USER_ID_JOB_PURCHASES` (`userId`),
+  CONSTRAINT `USER_ID_JOB_PURCHASES` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
+); 

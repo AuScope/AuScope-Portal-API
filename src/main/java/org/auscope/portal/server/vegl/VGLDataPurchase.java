@@ -23,8 +23,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 @Entity
-@Table(name = "purchases")
-public class VGLPurchase implements Serializable {
+@Table(name = "data_purchases")
+public class VGLDataPurchase implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
@@ -80,11 +80,11 @@ public class VGLPurchase implements Serializable {
     @JoinColumn(name = "userId")
     private ANVGLUser parent;
     
-    public VGLPurchase() {
+    public VGLDataPurchase() {
         super();
     }
     
-    public VGLPurchase(Date date, Float amount, String downloadUrl, String cswRecord, String onlineResourceType, String url, String localPath, String name, String description, 
+    public VGLDataPurchase(Date date, Float amount, String downloadUrl, String cswRecord, String onlineResourceType, String url, String localPath, String name, String description, 
             Double northBoundLatitude, Double southBoundLatitude, Double eastBoundLongitude, Double westBoundLongitude, String paymentRecord, 
             ANVGLUser user) {
         super();
