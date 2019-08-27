@@ -15,7 +15,7 @@
 # /////////////////////////////
 
 # baseUrl -- git repository url
-baseUrl=baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
+baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
 
 # branch -- branch in the git repo
 branch="master"
