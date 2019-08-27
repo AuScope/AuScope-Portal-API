@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+
+# NOTE: This seems to be a convenience script and not used anywhere. If it's
+# needed, the v2 Keystone code below will need to be upgraded to v3
+
 from novaclient.client import Client
 import logging
 import smtplib

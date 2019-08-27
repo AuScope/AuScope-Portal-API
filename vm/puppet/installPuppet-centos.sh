@@ -15,10 +15,10 @@
 # /////////////////////////////
 
 # baseUrl -- git repository url
-baseUrl="https://github.com/stuartwoodman/ANVGL-Portal.git"
+baseUrl=baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
 
 # branch -- branch in the git repo
-branch="new-vl-provisioning"
+branch="master"
 
 # pathSuffix -- path to puppet modules in the repo
 pathSuffix="/vm/puppet/modules/"
