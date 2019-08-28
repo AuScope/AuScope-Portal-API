@@ -2,12 +2,11 @@ package org.auscope.portal.server.web.service;
 
 import java.util.List;
 
-import org.auscope.portal.server.vegl.VGLBookMark;
-import org.auscope.portal.server.vegl.VGLBookMarkDownload;
-import org.auscope.portal.server.vegl.VGLPurchase;
-import org.auscope.portal.server.web.repositories.VGLBookMarkDownloadRepository;
-import org.auscope.portal.server.web.repositories.VGLBookMarkRepository;
-import org.auscope.portal.server.web.repositories.VGLPurchaseRepository;
+
+import org.auscope.portal.server.vegl.VGLDataPurchase;
+import org.auscope.portal.server.vegl.VGLJobPurchase;
+import org.auscope.portal.server.web.repositories.VGLDataPurchaseRepository;
+import org.auscope.portal.server.web.repositories.VGLJobPurchaseRepository;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,24 +15,44 @@ import org.springframework.stereotype.Service;
 public class VGLPurchaseService {
 
 	@Autowired
-	private VGLPurchaseRepository purchaseRepository;
+	private VGLDataPurchaseRepository dataPurchaseRepository;
+	
+	@Autowired
+	private VGLJobPurchaseRepository jobPurchaseRepository;
 	
 	
 	/**
-     * Retrieves the purchases for a user
+     * Retrieves the data purchases for a user
      * @param user 
      */
-    public List<VGLPurchase> getPurchasesByUser(final ANVGLUser user) {
-    	return purchaseRepository.findByParent(user);
+    public List<VGLDataPurchase> getDataPurchasesByUser(final ANVGLUser user) {
+    	return dataPurchaseRepository.findByParent(user);
     }
     
     
     /**
-     * Saves a purchase.
+     * Saves a data purchase.
      */
-    public Integer savePurchase(final VGLPurchase purchase) {
-    	VGLPurchase savedPurchase = purchaseRepository.saveAndFlush(purchase);
+    public Integer saveDataPurchase(final VGLDataPurchase purchase) {
+    	VGLDataPurchase savedPurchase = dataPurchaseRepository.saveAndFlush(purchase);
     	return savedPurchase.getId();
+    }
+    
+    /**
+     * Retrieves the data purchases for a user
+     * @param user 
+     */
+    public List<VGLJobPurchase> getJobPurchasesByUser(final ANVGLUser user) {
+        return jobPurchaseRepository.findByParent(user);
+    }
+    
+    
+    /**
+     * Saves a data purchase.
+     */
+    public Integer saveJobPurchase(final VGLJobPurchase purchase) {
+        VGLJobPurchase savedPurchase = jobPurchaseRepository.saveAndFlush(purchase);
+        return savedPurchase.getId();
     }
 
 }
