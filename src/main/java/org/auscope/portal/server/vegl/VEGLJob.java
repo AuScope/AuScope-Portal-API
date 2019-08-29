@@ -288,17 +288,16 @@ public class VEGLJob extends CloudJob implements Cloneable {
      * @param jobDownloads
      */
     public void setJobDownloads(List<VglDownload> jobDownloads) {
-    	if(this.jobDownloads == null) {
-    		this.jobDownloads = jobDownloads;
-    	} else {
-	    	this.jobDownloads.clear();
-	    	if(jobDownloads != null) {
-		        for (VglDownload dl : jobDownloads) {
-		            dl.setParent(this);
-		            this.jobDownloads.add(dl);
-		        }
-	    	}
-    	}
+        if (this.jobDownloads == null) {
+            this.jobDownloads = new ArrayList<VglDownload>();
+        } 
+        this.jobDownloads.clear();
+        if (jobDownloads != null) {
+            for (VglDownload dl : jobDownloads) {
+                dl.setParent(this);
+                this.jobDownloads.add(dl);
+            }
+        }
     }
 
     public Set<String> getJobSolutions() {
