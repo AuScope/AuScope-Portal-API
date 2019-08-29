@@ -468,7 +468,7 @@ public class PurchaseController extends BasePortalController {
                 String featureType = getAsString(downloadOptions,"featureType");
                 String srsName = getAsString(downloadOptions,"srsName");
                 String outputFormat = getAsString(downloadOptions,"outputFormat");
-                int maxFeatures = getAsInt(downloadOptions,"maxFeatures");
+                Integer maxFeatures = getAsInt(downloadOptions,"maxFeatures");
                 String bboxCrs = getAsString(downloadOptions,"crs"); 
                 
                 FilterBoundingBox bbox = FilterBoundingBox.parseFromValues(bboxCrs, northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude);
