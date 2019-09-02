@@ -20,12 +20,21 @@ branch="master"
 # pathSuffix -- path to puppet modules in the repo
 pathSuffix="/vm/puppet/modules/"
 
+function apt-wait-for-lock () {
+    while fuser /var/lib/apt/lists/lock >/dev/null 2>&1 ; do
+        echo Waiting for apt lock...
+        sleep 5
+    done
+
+    sudo apt-get "$@"
+}
+
 # Install puppet itself if not already available
 if hash puppet 2>/dev/null; then
     echo "Puppet version $(puppet --version ) already installed."
     if [ -f /etc/debian_version ]; then
-        sudo apt-get update
-        sudo apt-get install -y --force-yes at
+        apt-wait-for-lock update
+        apt-wait-for-lock install -y --force-yes at
     else
         sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
         sudo yum install -y at
@@ -34,8 +43,8 @@ else
     # Determine what OS we're using so we install appropriately
     # Checks for a debian based system, or assumes rpm based
     if [ -f /etc/debian_version ]; then
-        sudo apt-get update
-        sudo apt-get install -y --force-yes puppet at
+        apt-wait-for-lock update
+        apt-wait-for-lock install -y --force-yes puppet at
     else
         sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
         yum install -y puppet at
@@ -84,7 +93,7 @@ moduleDir="/etc/puppet/modules"
 if [ ! -d "$moduleDir/vl_common" ]; then
     echo "Installing vl common modules into $moduleDir/vl_common"
     if [ -f /etc/debian_version ]; then
-        sudo apt-get install -y --force-yes wget git
+        apt-wait-for-lock install -y --force-yes wget git
     else
         sudo yum install -y wget git
     fi
