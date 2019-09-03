@@ -21,7 +21,7 @@ branch="master"
 pathSuffix="/vm/puppet/modules/"
 
 function apt-wait-for-lock () {
-    while fuser /var/lib/apt/lists/lock >/dev/null 2>&1 ; do
+    while sudo fuser /var/lib/dpkg/lock /var/lib/apt/lists/lock >/dev/null 2>&1 ; do
         echo Waiting for apt lock...
         sleep 5
     done
