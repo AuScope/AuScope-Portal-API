@@ -1534,6 +1534,10 @@ public class TestJobBuilderController {
         final String[] descriptions = new String[] {"d1", "d2"};
         final String[] urls = new String[] {"http://example.org/1", "http://example.org/2"};
         final String[] localPaths = new String[] {"p1", "p2"};
+        final Double[] northBoundLatitudes = new Double[] {-20.123, -21.456};
+        final Double[] eastBoundLongitudes = new Double[] {120.123, 121.456};
+        final Double[] southBoundLatitudes = new Double[] {-30.789, -31.0};
+        final Double[] westBoundLongitudes = new Double[] {130.789, 141.0};
         final VglDownload[] existingDownloads = new VglDownload[] {new VglDownload(12356)};
 
         job.setJobDownloads(new ArrayList<VglDownload>(Arrays.asList(existingDownloads)));
@@ -1543,7 +1547,8 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(job);
         }});
 
-        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths);
+        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths,
+        		northBoundLatitudes, eastBoundLongitudes, southBoundLatitudes, westBoundLongitudes);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
@@ -1571,6 +1576,10 @@ public class TestJobBuilderController {
         final String[] descriptions = new String[] {"d1", "d2"};
         final String[] urls = new String[] {"http://example.org/1", "http://example.org/2"};
         final String[] localPaths = new String[] {"p1", "p2"};
+        final Double[] northBoundLatitudes = new Double[] {-20.123, -21.456};
+        final Double[] eastBoundLongitudes = new Double[] {120.123, 121.456};
+        final Double[] southBoundLatitudes = new Double[] {-30.789, -31.0};
+        final Double[] westBoundLongitudes = new Double[] {130.789, 141.0};
         final VglDownload[] existingDownloads = new VglDownload[] {new VglDownload(12356)};
 
 
@@ -1583,7 +1592,8 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(job);
         }});
 
-        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths);
+        ModelAndView mav = controller.updateJobDownloads(Integer.parseInt(jobId), append, names, descriptions, urls, localPaths,
+        		northBoundLatitudes, eastBoundLongitudes, southBoundLatitudes, westBoundLongitudes);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
 
