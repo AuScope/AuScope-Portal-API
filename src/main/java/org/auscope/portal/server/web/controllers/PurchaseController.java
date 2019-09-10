@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.controllers;
 
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,9 +16,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.auscope.portal.core.server.OgcServiceProviderType;
 import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.CSWFilterService;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.csw.CSWServiceItem;
+import org.auscope.portal.core.services.methodmakers.WCSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
+import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
+import org.auscope.portal.core.services.responses.wcs.Resolution;
 import org.auscope.portal.server.vegl.VGLDataPurchase;
 import org.auscope.portal.server.vegl.VGLJobPurchase;
 import org.auscope.portal.server.vegl.VglDownload;
@@ -63,9 +71,12 @@ public class PurchaseController extends BasePortalController {
     
     private SimpleWfsService wfsService;
     
+    private CSWFilterService cswFilterService;
+    
     // @Autowired
-    public PurchaseController(SimpleWfsService wfsService) {
+    public PurchaseController(SimpleWfsService wfsService,  CSWFilterService cswFilterService) {
         this.wfsService = wfsService;
+        this.cswFilterService = cswFilterService;
     }
 
     @ResponseStatus(value = org.springframework.http.HttpStatus.BAD_REQUEST)
@@ -438,29 +449,60 @@ public class PurchaseController extends BasePortalController {
         
         switch (onlineResourceType) {
             case "WCS": {
-                // Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
-                // will fail. To workaround this, we need to crop our selection to the dataset bounds
-                Double dsNorthBoundLatitude = getAsDouble(downloadOptions, "dsNorthBoundLatitude");
-                Double dsSouthBoundLatitude = getAsDouble(downloadOptions, "dsSouthBoundLatitude");
-                Double dsEastBoundLongitude = getAsDouble(downloadOptions, "dsEastBoundLongitude");
-                Double dsWestBoundLongitude = getAsDouble(downloadOptions, "dsWestBoundLongitude");
+                // need to check if this is geoserver or not
+                CSWServiceItem[] serviceItems = this.cswFilterService.getCSWServiceItems();
+                boolean geoserver = false;
+                for (CSWServiceItem item: serviceItems) {
+                    if (item.getServiceUrl().contains(url.substring(0, url.lastIndexOf("/")))) {
+                        geoserver = item.getServerType() == OgcServiceProviderType.GeoServer;
+                        break;
+                    }
+                }
                 
-                if (dsEastBoundLongitude != null && (dsEastBoundLongitude < eastBoundLongitude))
-                    eastBoundLongitude = dsEastBoundLongitude;
-                if (dsWestBoundLongitude != null && (dsWestBoundLongitude > westBoundLongitude))
-                    westBoundLongitude = dsWestBoundLongitude;
-                if (dsNorthBoundLatitude != null && (dsNorthBoundLatitude < northBoundLatitude))
-                    northBoundLatitude = dsNorthBoundLatitude;
-                if (dsSouthBoundLatitude != null && (dsSouthBoundLatitude > southBoundLatitude))
-                    southBoundLatitude = dsSouthBoundLatitude;
+                if (geoserver) {
+                    //http://localhost:8090/geoserver/wcs?service=WCS&request=GetCoverage&coverageId=tasmax_djf&format=geotiff&srsName=EPSG%3A4326&bbox=-34.68404023638139%2C150.83192110061643%2C-34.66371104796619%2C150.86144685745234%2Curn%3Aogc%3Adef%3Acrs%3AEPSG%3A4326&&version=2.0.0
                 
-                String layerName = getAsString(downloadOptions, "layerName");
-                String format = getAsString(downloadOptions, "format");
+                    String layerName = getAsString(downloadOptions, "layerName");
+                    String bboxCrs = "EPSG:4326";//getAsString(downloadOptions,"crs"); 
+
+                    CSWGeographicBoundingBox bbox = new CSWGeographicBoundingBox(westBoundLongitude, eastBoundLongitude, southBoundLatitude, northBoundLatitude);
+                    HttpRequestBase downloadUrl = null;
+                    try {
+                        WCSMethodMaker wcsMethodMaker = new WCSMethodMaker();
+                        downloadUrl = wcsMethodMaker.getCoverageMethod(url, layerName, "geotiff", bboxCrs, new Dimension(1000,1000), 
+                                null, bboxCrs, bbox, null, null);
+                    } catch (Exception ex) {
+                        log.warn(String.format("Exception generating service request for '%2$s' from '%1$s': %3$s", url, layerName, ex));
+                        ex.printStackTrace();
+                        return null;
+                    }
+                    return downloadUrl.getRequestLine().getUri();
+                } else {
                 
-               // convert bbox co-ordinates to ERDDAP an ERDDAP dimension string
-                String erddapDimensions = "%5B("+ southBoundLatitude +"):1:("+ northBoundLatitude 
+                    // Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
+                    // will fail. To workaround this, we need to crop our selection to the dataset bounds
+                    Double dsNorthBoundLatitude = getAsDouble(downloadOptions, "dsNorthBoundLatitude");
+                    Double dsSouthBoundLatitude = getAsDouble(downloadOptions, "dsSouthBoundLatitude");
+                    Double dsEastBoundLongitude = getAsDouble(downloadOptions, "dsEastBoundLongitude");
+                    Double dsWestBoundLongitude = getAsDouble(downloadOptions, "dsWestBoundLongitude");
+                
+                    if (dsEastBoundLongitude != null && (dsEastBoundLongitude < eastBoundLongitude))
+                        eastBoundLongitude = dsEastBoundLongitude;
+                    if (dsWestBoundLongitude != null && (dsWestBoundLongitude > westBoundLongitude))
+                        westBoundLongitude = dsWestBoundLongitude;
+                    if (dsNorthBoundLatitude != null && (dsNorthBoundLatitude < northBoundLatitude))
+                        northBoundLatitude = dsNorthBoundLatitude;
+                    if (dsSouthBoundLatitude != null && (dsSouthBoundLatitude > southBoundLatitude))
+                        southBoundLatitude = dsSouthBoundLatitude;
+                
+                    String layerName = getAsString(downloadOptions, "layerName");
+                    String format = getAsString(downloadOptions, "format");
+                
+                    // convert bbox co-ordinates to ERDDAP an ERDDAP dimension string
+                    String erddapDimensions = "%5B("+ southBoundLatitude +"):1:("+ northBoundLatitude 
                         + ")%5D%5B("+ westBoundLongitude +"):1:("+ eastBoundLongitude +")%5D";
-                return this.erddapServiceUrl + layerName + "." + format + "?" + layerName + erddapDimensions;
+                    return this.erddapServiceUrl + layerName + "." + format + "?" + layerName + erddapDimensions;
+                }
             }
                
             case "WFS": {
