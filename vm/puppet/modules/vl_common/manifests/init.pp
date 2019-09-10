@@ -31,13 +31,12 @@ class vl_common {
 
   package {  ["numpy", "boto", "pyproj"]:
     ensure => installed,
-    provider => "pip",
-    require => Class["python_pip"],
+    provider => "pip3",
   }
 
   package {["scipy"]:
     ensure => installed,
-    provider => "pip",
-    require => [Class["python_pip"], Package["numpy"]],
+    provider => "pip3",
+    require => [Package["numpy"]],
   }
 }
