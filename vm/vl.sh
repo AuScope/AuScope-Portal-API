@@ -124,7 +124,7 @@ chmod +x "$VL_SCRIPT_PATH"
 echo "About to execute ${VL_SCRIPT_PATH} as a python script"
 echo "#### Python start ####"
 computeStartTime=`date +%s`
-python $VL_SCRIPT_PATH
+python3 $VL_SCRIPT_PATH
 computeEndTime=`date +%s`
 echo "#### Python end ####"
 
