@@ -22,7 +22,7 @@ class vl_common {
       }
     }
     default: {
-      package { ["openssh-server", "openssh-client", "libffi-dev", "libbz2-dev"]:
+      package { ["openssh-server", "openssh-client", "libffi-dev", "libbz2-dev", "python3-pip"]:
         ensure => installed,
         require => Class["epel"],
       }
@@ -32,11 +32,12 @@ class vl_common {
   package {  ["numpy", "boto", "pyproj"]:
     ensure => installed,
     provider => "pip3",
+    require => Package["python3-pip"],
   }
 
   package {["scipy"]:
     ensure => installed,
     provider => "pip3",
-    require => [Package["numpy"]],
+    require => [Package["numpy"], Package["python3-pip"]],
   }
 }
