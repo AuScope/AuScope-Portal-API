@@ -22,7 +22,7 @@ class vl_common {
       }
     }
     default: {
-      package { ["openssh-server", "openssh-client", "libffi-dev", "libbz2-dev", "python3-pip"]:
+      package { ["openssh-server", "openssh-client", "libffi-dev", "libbz2-dev", "python3-pip", "awscli"]:
         ensure => installed,
         require => Class["epel"],
       }
