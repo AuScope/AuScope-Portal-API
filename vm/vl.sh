@@ -124,7 +124,8 @@ chmod +x "$VL_SCRIPT_PATH"
 echo "About to execute ${VL_SCRIPT_PATH} as a python script"
 echo "#### Python start ####"
 computeStartTime=`date +%s`
-python3 $VL_SCRIPT_PATH
+# Ensure HOME is set, defaulting to WORKING_DIR if not.
+env HOME="${HOME:-${WORKING_DIR}}" python3 $VL_SCRIPT_PATH
 computeEndTime=`date +%s`
 echo "#### Python end ####"
 
