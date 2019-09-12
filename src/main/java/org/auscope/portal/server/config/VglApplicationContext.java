@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
@@ -87,6 +89,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @Configuration
 public class VglApplicationContext {
 
+    protected final Log logger = LogFactory.getLog(getClass());
+    
 	@Value("${env.aws.accesskey}")
 	private String awsAccessKey;
 	
@@ -260,9 +264,12 @@ public class VglApplicationContext {
 		computeServicesList.add(cloudComputeServiceAws());
 		computeServicesList.add(cloudComputeServiceNci());
 		try {
-			computeServicesList.add(cloudComputeServiceNectar());
+		    CloudComputeService nectarService = cloudComputeServiceNectar();
+		    if (nectarService != null) {
+		        computeServicesList.add(nectarService);
+		    }
 		} catch(UnknownHostException e) {
-			System.out.println("Unable to create Nectar cloud compute service");
+			logger.warn("Unable to create Nectar cloud compute service");
 		}
 		CloudComputeService computeServices[] = computeServicesList.toArray(new CloudComputeService[computeServicesList.size()]);
 		return computeServices;
@@ -820,17 +827,21 @@ public class VglApplicationContext {
 	
 	@Bean
 	public CloudComputeServiceNectar cloudComputeServiceNectar() throws UnknownHostException {
-		CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
-				"https://keystone.rc.nectar.org.au:5000/v2.0", nectarAccessKey, nectarSecretKey);
-		computeService.setId("nectar-nova-compute");
-		computeService.setName("National eResearch Collaboration Tools and Resources");
-		//computeService.setGroupName("vl-#{inetAddress().hostName.toLowerCase()}");
-		String groupName = "vl-";
-		groupName += inetAddress().getHostName().toLowerCase();
-		computeService.setGroupName(groupName);
-		computeService.setKeypair("vgl-developers");
-		return computeService;
-		
+	    try {
+    		CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
+    				"https://keystone.rc.nectar.org.au:5000/v2.0", nectarAccessKey, nectarSecretKey);
+    		computeService.setId("nectar-nova-compute");
+    		computeService.setName("National eResearch Collaboration Tools and Resources");
+    		//computeService.setGroupName("vl-#{inetAddress().hostName.toLowerCase()}");
+    		String groupName = "vl-";
+    		groupName += inetAddress().getHostName().toLowerCase();
+    		computeService.setGroupName(groupName);
+    		computeService.setKeypair("vgl-developers");
+    		return computeService;
+	    } catch (Exception e) {
+	        logger.warn("Failed to construct CloudComputeServiceNectar object! Error message: " + e.getMessage());
+	        return null;
+	    }
 	}
 	
 	/*
