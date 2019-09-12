@@ -1,4 +1,4 @@
-FROM tomcat:8.5
+FROM tomcat:9-jdk8
 
 MAINTAINER geoffrey.squire@data61.csiro.au
 
