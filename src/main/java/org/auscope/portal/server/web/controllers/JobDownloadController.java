@@ -306,7 +306,7 @@ public class JobDownloadController extends BasePortalController {
                                    @RequestParam(required = false, value = "southBoundLatitude") final Double southBoundLatitude,
                                    @RequestParam(required = false, value = "eastBoundLongitude") final Double eastBoundLongitude,
                                    @RequestParam(required = false, value = "westBoundLongitude") final Double westBoundLongitude,
-                                   @RequestParam(required = false, value = "outputFormat") final String outputFormat,
+                                   @RequestParam(required = false, value = "format") final String outputFormat,
                                    @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                    HttpServletRequest request) {
 
