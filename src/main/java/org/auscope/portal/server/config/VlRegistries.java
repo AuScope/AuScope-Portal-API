@@ -126,6 +126,15 @@ public class VlRegistries {
 	}
 	
 	@Bean
+	CSWServiceItem pycswSydneyUrbanMonitor() {
+	    return new CSWServiceItem("pycswSydneyUrbanMonitor",
+	            "http://d61-50-cdc.it.csiro.au:8180/api",
+	            "http://d61-50-cdc.it.csiro.au:8180/api/catalog.search#/metadata/%1$s",
+	            "Sydney Urban Monitor",
+	            OgcServiceProviderType.PyCSW);
+	}
+	
+	@Bean
 	CSWServiceItem cswUrbanGeoServer() {
 	    return new CSWServiceItem("cswUrbanGeoServer",
 	            "http://dcdpgeo.data61.csiro.au/geoserver/ows?service=csw&amp;version=2.0.2",

@@ -99,6 +99,10 @@ public class ProfilePortalProduction {
     @Qualifier("cswUrbanGeoServer")
     CSWServiceItem cswUrbanGeoServer;	
 	
+	@Autowired
+    @Qualifier("pycswSydneyUrbanMonitor")
+    CSWServiceItem pycswSydneyUrbanMonitor;	
+	
 	@Bean
 	public ArrayList<KnownLayer> knownTypes() {
 		ArrayList<KnownLayer> knownLayers = new ArrayList<KnownLayer>();
@@ -174,6 +178,7 @@ public class ProfilePortalProduction {
 		//serviceList.add(cswNciMt);
 		serviceList.add(cswUrbanMonitor);
 		serviceList.add(cswUrbanGeoServer);
+		serviceList.add(pycswSydneyUrbanMonitor);
 		return serviceList;
 	}
 	
