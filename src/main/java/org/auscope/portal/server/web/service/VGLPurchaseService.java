@@ -26,7 +26,7 @@ public class VGLPurchaseService {
      * @param user 
      */
     public List<VGLDataPurchase> getDataPurchasesByUser(final ANVGLUser user) {
-    	return dataPurchaseRepository.findByParent(user);
+    	return dataPurchaseRepository.findByParentOrderByDateDesc(user);
     }
     
     

@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VGLDataPurchaseRepository extends JpaRepository<VGLDataPurchase, Integer> {
 
-	List<VGLDataPurchase> findByParent(ANVGLUser user);
+	List<VGLDataPurchase> findByParentOrderByDateDesc(ANVGLUser user);
 }
