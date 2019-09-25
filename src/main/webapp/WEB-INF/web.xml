@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
 <web-app
     xmlns="http://java.sun.com/xml/ns/j2ee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
                         http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
     version="2.4">
-
+-->
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+          http://java.sun.com/xml/ns/javaee/web-app_4_0.xsd"
+    version="4.0">
+    
    <display-name>VGL Portal</display-name>
 
     <!-- This is so our our profile 'magic' context is utilised -->
+    <!--
     <context-param>
         <param-name>contextClass</param-name>
         <param-value>
             org.auscope.portal.server.VLWebAppContext
         </param-value>
     </context-param>
+    -->
 
    <filter>
       <filter-name>springSecurityFilterChain</filter-name>
@@ -27,28 +36,17 @@
       <url-pattern>/*</url-pattern>
    </filter-mapping>
 
-	<filter>
-	  <filter-name>CorsFilter</filter-name>
-	  <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
-	  <init-param>
-	    <param-name>cors.allowed.origins</param-name>
-	    <param-value>*</param-value>
-	  </init-param>
-	</filter>
-	
-	<filter-mapping>
-	  <filter-name>CorsFilter</filter-name>
-	  <url-pattern>/*</url-pattern>
-	</filter-mapping>
-
+    <!-- 
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
+   -->
 
+    <!-- 
    <servlet>
       <servlet-name>annotationsDispatcher</servlet-name>
       <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-      <load-on-startup>1</load-on-startup>
+      <!XX<load-on-startup>1</load-on-startup>XX>
    </servlet>
 
     <servlet-mapping>
@@ -65,12 +63,14 @@
       <servlet-name>annotationsDispatcher</servlet-name>
       <url-pattern>*.diag</url-pattern>
    </servlet-mapping>
+   -->
 
-    <!-- servlet-mapping>
+    <!--<servlet-mapping>
       <servlet-name>annotationsDispatcher</servlet-name>
       <url-pattern>*.json</url-pattern>
-   </servlet-mapping -->
+   </servlet-mapping>-->
 
+    <!--
     <servlet-mapping>
       <servlet-name>annotationsDispatcher</servlet-name>
       <url-pattern>*.kml</url-pattern>
@@ -84,4 +84,5 @@
       <error-code>403</error-code>
       <location>/access_error.html</location>
    </error-page>
+   -->
 </web-app>
