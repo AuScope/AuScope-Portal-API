@@ -4,9 +4,14 @@
 target/
 src/main/webapp/META-INF/
 src/main/resources/env.properties
+src/main/resources/application.properties
+src/main/resources/application.yaml
 .pydevproject
 /build/
 **/.tern-port
 anvgl
 anvgl.pub
 src/local/
+.meghanada/
+/make.bat
+velocity.log

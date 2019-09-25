@@ -12,20 +12,30 @@
 # /////////////////////////////
 
 # baseUrl -- git repository url
-baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
+# baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
+baseUrl="https://github.com/squireg/ANVGL-Portal.git"
 
 # branch -- branch in the git repo
-branch="master"
+branch="provisioning-fix"
 
 # pathSuffix -- path to puppet modules in the repo
 pathSuffix="/vm/puppet/modules/"
+
+function apt-wait-for-lock () {
+    while sudo fuser /var/lib/dpkg/lock /var/lib/apt/lists/lock >/dev/null 2>&1 ; do
+        echo Waiting for apt lock...
+        sleep 5
+    done
+
+    sudo apt-get "$@"
+}
 
 # Install puppet itself if not already available
 if hash puppet 2>/dev/null; then
     echo "Puppet version $(puppet --version ) already installed."
     if [ -f /etc/debian_version ]; then
-        sudo apt-get update
-        sudo apt-get install -y --force-yes at
+        apt-wait-for-lock update
+        apt-wait-for-lock install -y --force-yes at
     else
         sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
         sudo yum install -y at
@@ -34,8 +44,8 @@ else
     # Determine what OS we're using so we install appropriately
     # Checks for a debian based system, or assumes rpm based
     if [ -f /etc/debian_version ]; then
-        sudo apt-get update
-        sudo apt-get install -y --force-yes puppet at
+        apt-wait-for-lock update
+        apt-wait-for-lock install -y --force-yes puppet at
     else
         sudo rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
         yum install -y puppet at
@@ -79,12 +89,12 @@ fi
 #/////////////////////////////
 
 # Directory where vl modules will be installed
-moduleDir="/etc/puppet/modules"
+moduleDir="/etc/puppet/code/modules"
 
 if [ ! -d "$moduleDir/vl_common" ]; then
     echo "Installing vl common modules into $moduleDir/vl_common"
     if [ -f /etc/debian_version ]; then
-        sudo apt-get install -y --force-yes wget git
+        apt-wait-for-lock install -y --force-yes wget git
     else
         sudo yum install -y wget git
     fi
@@ -114,7 +124,7 @@ if [ ! -d "$moduleDir/vl_common" ]; then
     git checkout "$branch"
 
     #Now copy the modules to the puppet module install directory
-    find "$tmpModulesDir/$pathSuffix" -maxdepth 1 -mindepth 1 -type d -exec cp {} -r "$moduleDir" \;
+    cp -r "$tmpModulesDir/$pathSuffix/vl_common" "$moduleDir"
     if [ $? -ne 0 ]
     then
         echo "Failed copying to puppet module directory - aborting"
@@ -133,13 +143,11 @@ fi
 # /////////////////////////////
 
 # cd back out of the deleted directory to avoid issues with puppet application
-cd; cd -
+cd "${WORKING_DIR}"
 
 # Apply puppet modules
 # TODO: template this so the portal can pass in provisioning from SSC
 puppet apply <<EOF
 include epel
-include puppi
-include python_pip
 include vl_common
 EOF

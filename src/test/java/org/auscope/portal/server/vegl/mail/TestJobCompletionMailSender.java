@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.jmock.Expectations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.ui.velocity.VelocityEngineFactoryBean;
 
 /**
  * Unit tests for JobCompletionMailSender.
@@ -34,6 +33,7 @@ public class TestJobCompletionMailSender extends PortalTestClass {
     private JobCompletionMailSender jobCompMailSender;
     private VEGLSeries mockSeries;
     private VEGLJob mockJob;
+    private VelocityEngine velocityEngine;
     private Date dateSubmitted = null;
     private Date dateProcessed = null;
     private Date dateExecuted = null;
@@ -46,14 +46,15 @@ public class TestJobCompletionMailSender extends PortalTestClass {
         mockMailSender = context.mock(JavaMailSenderImpl.class);
         mockSeries = context.mock(VEGLSeries.class);
         mockJob = context.mock(VEGLJob.class);
-
-        //Create VelocityEngine object to be used for constructing mail content.
-        VelocityEngineFactoryBean vecEngFBean = new VelocityEngineFactoryBean();
-        Properties p = new Properties();
-        p.put("resource.loader", "class");
-        p.put("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-        vecEngFBean.setVelocityProperties(p);
-        VelocityEngine velocityEngine = vecEngFBean.createVelocityEngine();
+        
+        // Create actual Velocity engine needed for proper testing
+        Properties properties = new Properties();
+	    properties.setProperty("input.encoding", "UTF-8");
+	    properties.setProperty("output.encoding", "UTF-8");
+	    properties.setProperty("resource.loader", "class");
+	    properties.setProperty("class.resource.loader.class",
+	    					   "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+	    velocityEngine = new VelocityEngine(properties);
 
         //Global test variables to be used in all unit tests.
         Calendar cal1 = new GregorianCalendar(2013, 2, 5, 12, 00, 00);
@@ -104,7 +105,6 @@ public class TestJobCompletionMailSender extends PortalTestClass {
             allowing(mockJob).getStatus();will(returnValue(jobStatus));
             allowing(mockJob).getUser();will(returnValue(user));
             oneOf(mockSeries).getName();will(returnValue(seriesName));
-
             oneOf(mockJob).getId();will(returnValue(jobId));
             oneOf(mockJob).getName();will(returnValue(jobName));
             oneOf(mockJob).getDescription();will(returnValue(jobDescription));

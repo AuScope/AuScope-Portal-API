@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.service;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.services.PortalServiceException;
@@ -20,12 +22,11 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VLScmSnapshot;
-import org.auscope.portal.server.vegl.VLScmSnapshotDao;
+import org.auscope.portal.server.web.repositories.VLScmSnapshotRepository;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.csw.SearchFacet;
 import org.auscope.portal.server.web.service.csw.SearchFacet.Comparison;
 import org.auscope.portal.server.web.service.scm.Dependency;
-import org.auscope.portal.server.web.service.scm.Dependency.Type;
 import org.auscope.portal.server.web.service.scm.Entries;
 import org.auscope.portal.server.web.service.scm.Entry;
 import org.auscope.portal.server.web.service.scm.Problem;
@@ -34,12 +35,10 @@ import org.auscope.portal.server.web.service.scm.ScmLoaderFactory;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.auscope.portal.server.web.service.scm.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -59,7 +58,7 @@ public class ScmEntryService implements ScmLoader {
     protected static final String PUPPET_TEMPLATE =
             "org/auscope/portal/server/web/service/template.pp";
 
-    private VLScmSnapshotDao vlScmSnapshotDao;
+    private VLScmSnapshotRepository vlScmSnapshotRepository;
     private VelocityEngine velocityEngine;
     private VEGLJobManager jobManager;
     private CloudComputeService[] cloudComputeServices;
@@ -72,12 +71,12 @@ public class ScmEntryService implements ScmLoader {
      * Create a new instance.
      */
     @Autowired
-    public ScmEntryService(VLScmSnapshotDao vlScmSnapshotDao,
+    public ScmEntryService(VLScmSnapshotRepository vlScmSnapshotRepository,
             VEGLJobManager jobManager,
             VelocityEngine velocityEngine,
             CloudComputeService[] cloudComputeServices) {
         super();
-        this.vlScmSnapshotDao = vlScmSnapshotDao;
+        this.vlScmSnapshotRepository = vlScmSnapshotRepository;
         this.jobManager = jobManager;
         this.setVelocityEngine(velocityEngine);
         this.cloudComputeServices = cloudComputeServices;
@@ -106,8 +105,8 @@ public class ScmEntryService implements ScmLoader {
     public String getScmEntrySnapshotId(String entryId,
             String computeServiceId) {
         String vmId = null;
-        VLScmSnapshot snapshot = vlScmSnapshotDao
-                .getSnapshotForEntryAndProvider(entryId, computeServiceId);
+        VLScmSnapshot snapshot = vlScmSnapshotRepository
+                .findByScmEntryIdAndComputeServiceId(entryId, computeServiceId);
         if (snapshot != null) {
             vmId = snapshot.getComputeVmId();
         }
@@ -166,12 +165,10 @@ public class ScmEntryService implements ScmLoader {
 
         // Create a velocity template vars map from the entry
         Map<String, Object> vars = puppetTemplateVars(solution);
-
-        // Create the puppet module
-        return VelocityEngineUtils.mergeTemplateIntoString(velocityEngine,
-                PUPPET_TEMPLATE,
-                "UTF-8",
-                vars);
+        VelocityContext velocityContext = new VelocityContext(vars);
+        StringWriter stringWriter = new StringWriter();
+        velocityEngine.mergeTemplate(PUPPET_TEMPLATE, "UTF-8", velocityContext, stringWriter);
+        return stringWriter.toString();
     }
 
     /**
@@ -613,16 +610,20 @@ public class ScmEntryService implements ScmLoader {
     /**
      * @return the vlScmSnapshotDao
      */
+    /*
     public VLScmSnapshotDao getVlScmSnapshotDao() {
         return vlScmSnapshotDao;
     }
+    */
 
     /**
      * @param vlScmSnapshotDao the vlScmSnapshotDao to set
      */
+    /*
     public void setVlScmSnapshotDao(VLScmSnapshotDao vlScmSnapshotDao) {
         this.vlScmSnapshotDao = vlScmSnapshotDao;
     }
+    */
 
     /**
      * @return the velocityEngine

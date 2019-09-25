@@ -1,15 +1,28 @@
 package org.auscope.portal.server.vegl;
 
-import org.auscope.portal.server.web.security.ANVGLUser;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@Entity
+@Table(name = "bookmark_download_options")
 public class VGLBookMarkDownload {
 	
 	 /** The primary key for this bookmark download*/
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
    
 	/** The descriptive name of the bookmark for this download*/
+	@Column(nullable=false)
     private String bookmarkOptionName;
 	/** The actual URL that when accessed with a GET request will download data*/
     private String url;
@@ -28,10 +41,11 @@ public class VGLBookMarkDownload {
     /** If this download is for a spatial region this will represent the most western bounds of the region in WGS:84*/
     private Double westBoundLongitude;
     @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bookmarkId")
     private VGLBookMark parent;
-        
     
-
+    
     public VGLBookMarkDownload() {
     	super();
     }

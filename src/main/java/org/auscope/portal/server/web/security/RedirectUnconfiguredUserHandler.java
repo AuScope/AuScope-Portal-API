@@ -10,6 +10,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
+import org.auscope.portal.server.web.service.NCIDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -22,16 +24,19 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
 
     protected CloudStorageService[] cloudStorageServices;
     protected CloudComputeService[] cloudComputeServices;
-    protected NCIDetailsDao nciDetailsDao;
+    @Autowired
+    protected NCIDetailsService nciDetailsService;
     private String frontEndUrl;
 
-    public NCIDetailsDao getNciDetailsDao() {
-        return nciDetailsDao;
+    /*
+    public NCIDetailsService getNciDetailsService() {
+        return nciDetailsService;
     }
 
-    public void setNciDetailsDao(NCIDetailsDao nciDetailsDao) {
-        this.nciDetailsDao = nciDetailsDao;
+    public void setNciDetailsService(NCIDetailsService nciDetailsServcie) {
+        this.nciDetailsService = nciDetailsServcie;
     }
+    */
 
     public CloudStorageService[] getCloudStorageServices() {
         return cloudStorageServices;
@@ -63,39 +68,6 @@ public class RedirectUnconfiguredUserHandler implements AuthenticationSuccessHan
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth)
             throws IOException, ServletException {
-    	/*
-        Object principal = auth.getPrincipal();
-        DefaultSavedRequest savedRequest = (DefaultSavedRequest) request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST");
-
-        if (principal instanceof ANVGLUser) {
-            ANVGLUser user = (ANVGLUser) principal;
-            try {
-                boolean tcs = user.acceptedTermsConditionsStatus();
-                boolean configured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServices);
-
-                //Redirect if the user needs to accept T&Cs OR if they don't have any config services setup
-                if (!configured || !tcs) {
-                    String params = "";
-                    String redirect = configured ? "../notcs.html" : "../noconfig.html";
-                    if (savedRequest != null) {
-                        URL requestUrl = new URL(savedRequest.getRequestURL());
-                        if (!requestUrl.getPath().contains("login.html")) {
-                            params = "?next=" + requestUrl.getPath();
-                        }
-                    }
-                    response.sendRedirect(redirect + params);
-                    return;
-                }
-            } catch (PortalServiceException e) {
-                log.error("Unable to verify if user is fully configured:", e);
-            }
-        }
-
-        if (savedRequest != null) {
-            response.sendRedirect(savedRequest.getRequestURL());
-            return;
-        }
-        */
         response.sendRedirect(frontEndUrl + "/login/loggedIn");
     }
 }

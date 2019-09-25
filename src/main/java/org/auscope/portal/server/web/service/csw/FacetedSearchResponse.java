@@ -11,9 +11,12 @@ import org.auscope.portal.core.services.responses.csw.CSWRecord;
  *
  */
 public class FacetedSearchResponse implements Serializable {
-    private List<CSWRecord> records;
+	private static final long serialVersionUID = 3321276637339015960L;
+	
+	private List<CSWRecord> records;
     private int startIndex;
     private int nextIndex;
+    private int recordsMatched;
 
     /**
      * The CSWRecords parsed from the CSW response
@@ -58,6 +61,22 @@ public class FacetedSearchResponse implements Serializable {
     public void setNextIndex(int nextIndex) {
         this.nextIndex = nextIndex;
     }
+    
+    /**
+     * The total number of records matched by the faceted search
+     * @return
+     */
+	public int getRecordsMatched() {
+		return recordsMatched;
+	}
+	
+	/**
+	 * The total number of records matched by the faceted search
+	 * @param recordsMatched
+	 */
+	public void setRecordsMatched(int recordsMatched) {
+		this.recordsMatched = recordsMatched;
+	}
 
 
 }
