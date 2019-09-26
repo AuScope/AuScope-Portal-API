@@ -225,7 +225,7 @@ public class PurchaseController extends BasePortalController {
                                 +  northBoundLatitude + "," +  southBoundLatitude + "," 
                                 +  eastBoundLongitude + "," +  westBoundLongitude);
                         
-                        String downloadUrl = getDownloadUrl(onlineResourceType, downloadOptions);
+                        String downloadUrl = getDownloadUrl(onlineResourceType, downloadOptions, getAsString(cswRecord, "recordInfoUrl"));
                         
                         // TODO: should probably extract the timestamp from the strip result json
                         VGLDataPurchase vglPurchase = new VGLDataPurchase(new Date(), amount, downloadUrl, cswRecord.toString(), 
@@ -438,28 +438,64 @@ public class PurchaseController extends BasePortalController {
         return null;
     }
     
-    private String getDownloadUrl(String onlineResourceType, JsonObject downloadOptions) {
+    // returns substring of the url in the form http(s)://server:port/endpoint (port may be missing)
+    private String getBaseUrl(String url) {
+        int startIndex = 7;
+        if (url.startsWith("https")) {
+            startIndex = 8;
+        }
+        int firstSlashIndex = url.indexOf("/", startIndex);
+        if (firstSlashIndex != -1) {
+            int end = url.indexOf("/", firstSlashIndex + 1);
+            if (end == -1) {
+                end = url.length();
+            }
+            return url.substring(0, end);
+        }
+        // if get here, then just return the url as is
+        return url;
+    }
+    
+    public OgcServiceProviderType getServiceType(String serviceUrl) {
+        
+        OgcServiceProviderType serviceType = null;
+        String serviceBaseUrl = getBaseUrl(serviceUrl);
+        log.info("service base url = " + serviceBaseUrl);
+        CSWServiceItem[] serviceItems = this.cswFilterService.getCSWServiceItems();
+        for (CSWServiceItem item: serviceItems) {
+            String itemBaseUrl = getBaseUrl(item.getRecordInformationUrl());
+            log.info("item base url = " + itemBaseUrl);
+            if (itemBaseUrl.contentEquals(serviceBaseUrl)) {
+                serviceType = item.getServerType();
+                break;
+            }
+        }
+        return serviceType;
+    }
+    
+    
+    private String getDownloadUrl(String onlineResourceType, JsonObject downloadOptions, String cswRecordInfoUrl) {
         
         String name = getAsString(downloadOptions, "name");
         String url = getAsString(downloadOptions, "url");
+
+        log.info("downloadOptions url = " + url);
         Double northBoundLatitude = getAsDouble(downloadOptions, "northBoundLatitude");
         Double southBoundLatitude = getAsDouble(downloadOptions, "southBoundLatitude");
         Double eastBoundLongitude = getAsDouble(downloadOptions, "eastBoundLongitude");
         Double westBoundLongitude = getAsDouble(downloadOptions, "westBoundLongitude");
         
         switch (onlineResourceType) {
+        
             case "WCS": {
-                // need to check if this is geoserver or not
-                CSWServiceItem[] serviceItems = this.cswFilterService.getCSWServiceItems();
-                boolean geoserver = false;
-                for (CSWServiceItem item: serviceItems) {
-                    if (item.getServiceUrl().contains(url.substring(0, url.lastIndexOf("/")))) {
-                        geoserver = item.getServerType() == OgcServiceProviderType.GeoServer;
-                        break;
-                    }
-                }
                 
-                if (geoserver) {
+                OgcServiceProviderType serviceType = getServiceType(cswRecordInfoUrl);
+                log.info("WCS service type = " + serviceType);
+                
+                // The service type check only works if the csw service is hosted on the same server as the wcs service, which isn't always the case
+                // Disable erddap for now and just use the download url as is
+                
+                if (serviceType != null && (serviceType == OgcServiceProviderType.GeoServer || serviceType == OgcServiceProviderType.PyCSW)) {
                     //http://localhost:8090/geoserver/wcs?service=WCS&request=GetCoverage&coverageId=tasmax_djf&format=geotiff&srsName=EPSG%3A4326&bbox=-34.68404023638139%2C150.83192110061643%2C-34.66371104796619%2C150.86144685745234%2Curn%3Aogc%3Adef%3Acrs%3AEPSG%3A4326&&version=2.0.0
                 
                     String layerName = getAsString(downloadOptions, "layerName");
@@ -477,7 +513,8 @@ public class PurchaseController extends BasePortalController {
                         return null;
                     }
                     return downloadUrl.getRequestLine().getUri();
-                } else {
+                    
+                } else {  // assume ERDDAP???
                 
                     // Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
                     // will fail. To workaround this, we need to crop our selection to the dataset bounds
