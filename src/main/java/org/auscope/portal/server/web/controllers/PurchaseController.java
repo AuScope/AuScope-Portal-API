@@ -492,9 +492,6 @@ public class PurchaseController extends BasePortalController {
                 OgcServiceProviderType serviceType = getServiceType(cswRecordInfoUrl);
                 log.info("WCS service type = " + serviceType);
                 
-                // The service type check only works if the csw service is hosted on the same server as the wcs service, which isn't always the case
-                // Disable erddap for now and just use the download url as is
-                
                 if (serviceType != null && (serviceType == OgcServiceProviderType.GeoServer || serviceType == OgcServiceProviderType.PyCSW)) {
                     //http://localhost:8090/geoserver/wcs?service=WCS&request=GetCoverage&coverageId=tasmax_djf&format=geotiff&srsName=EPSG%3A4326&bbox=-34.68404023638139%2C150.83192110061643%2C-34.66371104796619%2C150.86144685745234%2Curn%3Aogc%3Adef%3Acrs%3AEPSG%3A4326&&version=2.0.0
                 
