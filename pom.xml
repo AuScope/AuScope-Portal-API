@@ -25,263 +25,16 @@
         <name>CSIRO</name>
         <url>http://csiro.au</url>
     </organization>
-    
-    <!-- XXX Migration -->
-<!--
-    <build>
-        <finalName>VGL-Portal</finalName>
-        <plugins>
         
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
--->
-                <!--<version>3.1</version>-->
-<!--
-                <configuration>
-                    <source>${targetJdk}</source>
-                    <target>${targetJdk}</target>
-                    <compilerVersion>${targetJdk}</compilerVersion>
-                    <verbose>true</verbose>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.3</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>create</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <doCheck>false</doCheck>
-                    <doUpdate>false</doUpdate>
-                    <timestampFormat>{0,date,dd-MM-yyyy HH:mm}</timestampFormat>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
--->
-                <!--<version>2.4</version>-->
-<!--
-                <version>2.6</version>
-                <configuration>
-                    <overlays>
--->
-                        <!--
-                            m2e consumes overlay dependencies causing the
-                            portal-core jar to be omitted when running in
-                            tomcat. Workaround is to use the sources jar
-                            for the overlay; this then has to be a provided
-                            dependency to prevent inclusion in the war.
-                        -->
-<!--
-                        <overlay>
-                               <groupId>org.auscope.portal</groupId>
-                               <artifactId>portal-core</artifactId>
-                               <classifier>sources</classifier>
-                               <type>jar</type>
-                               <includes>
-                                    <include>portal-core/**/*</include>
-                               </includes>
-                        </overlay>
-                    </overlays>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                        <manifestEntries>
-                            <Implementation-Build>${buildNumber}</Implementation-Build>
-                            <projectName>${project.name}</projectName>
-                            <version>${project.version}</version>
-                            <buildDate>${timestamp}</buildDate>
-                            <osName>${os.name}</osName>
-                            <osVersion>${os.version}</osVersion>
-                            <javaVendor>${java.vendor}</javaVendor>
-                            <javaVersion>${java.version}</javaVersion>
-                            <javaVmVersion>${java.vm.version}</javaVmVersion>
-                            <javaVmVendor>${java.vm.vendor}</javaVmVendor>
-                        </manifestEntries>
-                    </archive>
-                    <goals>
-                        <goal>manifest</goal>
-                    </goals>
-                </configuration>
--->
-                <!-- This is needed to create ${basedir}/src/main/webapp/META-INF/MANIFEST.MF file -->
-<!--
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
--->
-                <!--<version>${jetty.version}</version>-->
-<!--
-                <version>9.4.14.v20181114</version>
-                <configuration>
-                    <webApp>
-                        <contextPath>/VGL-Portal</contextPath>
-                    </webApp>
-                </configuration>
-            </plugin>
--->
-
-            <!-- Powermock - Unit test work around... -->
-<!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.10</version>
-                <configuration>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER</classpathContainer>
-                    </classpathContainers>
-                    <wtpversion>2.0</wtpversion>
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>yuicompressor-maven-plugin</artifactId>
-                <configuration>
--->
-                    <!--
-                    <excludes>
-                        Exclude Ext JS
-                        <exclude>portal-core/**</exclude>
-                        <exclude>external/**</exclude>
-                    </excludes>
-                    -->
-<!--
-                    <includes>
-                        <include>js/**</include>
-                    </includes>
-                    <nosuffix>true</nosuffix>
-                </configuration>
-                <version>1.4.0</version>
-            </plugin>
--->
-            <!--
-                This is needed for Emma Coverage to work with unit tests
-                that use PowerMock's JMock library. The latest alpha
-                version i.e. 1.0-alpha-3 will fail those unit tests.
-            -->
-<!--
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>emma-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.1.201405082137</version>
-                <executions>
-                    <execution>
-                        <id>default-prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-check</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <rule implementation="org.jacoco.maven.RuleConfiguration">
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit implementation="org.jacoco.report.check.Limit">
-                                            <counter>COMPLEXITY</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.50</minimum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <pluginManagement>
-            <plugins>
--->
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-<!--
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.jacoco</groupId>
-                                        <artifactId>
-                                            jacoco-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [0.7.1.201405082137,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>prepare-agent</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore></ignore>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
--->
-    
     <!-- Project properties -->
     <properties>       
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>1.8</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>1.6.3</powermock.version>
-        <portal.core.version>2.1.0-SNAPSHOT</portal.core.version>
-        <httpclient.version>4.3.5</httpclient.version>
+        <portal.core.version>2.2.0-SNAPSHOT</portal.core.version>
+        <httpclient.version>4.5.9</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
-        <jackson.version>2.9.0</jackson.version>
     </properties>
     
     <!--  Spring Boot -->    
@@ -310,21 +63,6 @@
 	   <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-
-            <!--
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
-                
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-            -->
-            
         </dependency>
         
         <dependency>
@@ -443,24 +181,6 @@
             <version>1.7</version>
         </dependency>
         
-        <!--
-        <dependency>
-            <groupId>edu.ucar</groupId>
-            <artifactId>netcdf</artifactId>
-            <version>4.1</version>
-            <optional>false</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-jdk14</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        -->
         <dependency>
 		    <groupId>edu.ucar</groupId>
 		    <artifactId>netcdf</artifactId>
@@ -524,7 +244,7 @@
         <dependency>
             <groupId>org.apache.jclouds</groupId>
             <artifactId>jclouds-all</artifactId>
-            <version>2.0.3-SHADED</version>
+            <version>2.1.2-SHADED</version>
         </dependency>
         
     </dependencies>
