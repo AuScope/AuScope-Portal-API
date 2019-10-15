@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.wfs.WFSGetCapabilitiesResponse;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -29,12 +30,13 @@ public class TestJobDownloadController extends PortalTestClass {
     private HttpServletResponse mockResponse = context.mock(HttpServletResponse.class);
     private HttpSession mockSession = context.mock(HttpSession.class);
     private SimpleWfsService mockWfsService = context.mock(SimpleWfsService.class);
+    private WCSService mockWcsService = context.mock(WCSService.class);
     private JobDownloadController controller;
     final String serviceUrl = "http://example.org/service";
 
     @Before
     public void setup() {
-        controller = new JobDownloadController(mockWfsService, serviceUrl);
+        controller = new JobDownloadController(mockWfsService, mockWcsService, serviceUrl);
     }
 
     @Test

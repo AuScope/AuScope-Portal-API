@@ -1012,6 +1012,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setStatus(STATUS_UNSUBMITTED);
         job.setSubmitDate(new Date());
 
+        // TODO: No longer using session vars
         //Transfer the 'session downloads' into actual download objects associated with a job
         @SuppressWarnings("unchecked")
         final
