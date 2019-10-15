@@ -1050,6 +1050,18 @@ public class VglApplicationContext {
     public WFSController wfsController() {
     	WFSController wfsController = new WFSController(wfsBaseService());
     	return wfsController;
+	}
+	
+	@Bean
+    public WMSController wmsController() {
+    	WMSController wmsController = new WMSController(wmsService(), viewCSWRecordFactory(), viewKnownLayerFactory(), httpServiceCaller());
+    	return wmsController;
+    }
+    
+    @Bean
+    public WCSController wcsController() {
+    	WCSController wcsController = new WCSController(wcsService());
+    	return wcsController;
     }
     
     @Bean
