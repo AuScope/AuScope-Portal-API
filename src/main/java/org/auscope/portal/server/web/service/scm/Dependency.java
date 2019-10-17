@@ -1,7 +1,6 @@
 package org.auscope.portal.server.web.service.scm;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Dependency {

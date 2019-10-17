@@ -15,7 +15,6 @@ import org.auscope.portal.core.services.CSWFilterService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
-import org.auscope.portal.core.services.csw.custom.CustomRegistryInt;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.methodmakers.filter.csw.CSWGetDataRecordsFilter;
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
@@ -149,7 +148,6 @@ public class CSWSearchController extends BaseCSWController {
             startIndexes.put(serviceIds[i], starts[i]);
         }
 
-
         //Parse our raw request info into a list of search facets
         List<SearchFacet<? extends Object>> facets = new ArrayList<SearchFacet<? extends Object>>();
         for (int i = 0; i < rawFields.length; i++) {
@@ -209,10 +207,15 @@ public class CSWSearchController extends BaseCSWController {
         for (CSWRecord record : response.getRecords()) {
             viewRecords.add(viewCSWRecordFactory.toView(record));
         }
+        int recordsMatched = 0;
+        for(int serviceCount : response.getRecordsMatched().values()) {
+        	recordsMatched += serviceCount;
+        }
         ModelMap mm = new ModelMap();
         mm.put("startIndexes", response.getStartIndexes());
         mm.put("nextIndexes", response.getNextIndexes());
         mm.put("records", viewRecords);
+        mm.put("recordsMatched", recordsMatched);
 
         return generateJSONResponseMAV(true, mm, "");
     }
@@ -234,7 +237,7 @@ public class CSWSearchController extends BaseCSWController {
     	filter.setFileIdentifier(fileIdentifier);
         List<CSWRecord> records = null;
         int matchedResults = 0;
-        try {         
+        try {
                 CSWGetRecordResponse response = null;
                 response = cswFilterService.getFilteredRecords(serviceId, filter, maxRecords, startPosition);
                 workaroundMissingNCIMetadata(response.getRecords());

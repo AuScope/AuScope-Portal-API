@@ -11,6 +11,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 	<!-- Dispatch servlet mapping. Navigation routing path starts here -->
+	<!--
 	<bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
 		<property name="mappings">
 			<props>
@@ -18,8 +19,10 @@
            </props>
 		</property>
 	</bean>
+	-->
 
 	<!-- default settings for navigation routing parameters -->
+	<!--
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="viewClass">
 			<value>
@@ -33,12 +36,15 @@
 			<value>.jsp</value>
 		</property>
 	</bean>
+	-->
 
     <!-- resource bundle location -->
+    <!--
 	<bean id="messageSource"
 		class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename">
 			<value>messages</value>
 		</property>
 	</bean>
+	-->
 </beans>

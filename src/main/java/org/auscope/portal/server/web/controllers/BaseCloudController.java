@@ -18,7 +18,7 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -34,7 +34,7 @@ public abstract class BaseCloudController extends BaseModelController {
     /** All cloud compute services that are available to this controller */
     protected CloudComputeService[] cloudComputeServices;
     private String vmSh, vmShutdownSh;
-
+    
 
     /**
      * @param cloudStorageServices All cloud storage services that are available to this controller
@@ -101,22 +101,22 @@ public abstract class BaseCloudController extends BaseModelController {
     /**
      * Gets the subset of cloudComputeServices that the specified user has successfully configured in their setup page.
      * @param user
-     * @param nciDetailsDao
+     * @param nciDetailsService
      * @return
      * @throws PortalServiceException
      */
-    protected List<CloudComputeService> getConfiguredComputeServices(ANVGLUser user, NCIDetailsDao nciDetailsDao) throws PortalServiceException {
-        return getConfiguredComputeServices(user, nciDetailsDao, cloudComputeServices);
+    protected List<CloudComputeService> getConfiguredComputeServices(ANVGLUser user, NCIDetailsService nciDetailsService) throws PortalServiceException {
+        return getConfiguredComputeServices(user, nciDetailsService, cloudComputeServices);
     }
 
     /**
      * Gets the subset of cloudComputeServices that the specified user has successfully configured in their setup page.
      * @param user
-     * @param nciDetailsDao
+     * @param nciDetailsService
      * @return
      * @throws PortalServiceException
      */
-    public static List<CloudComputeService> getConfiguredComputeServices(ANVGLUser user, NCIDetailsDao nciDetailsDao, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
+    public static List<CloudComputeService> getConfiguredComputeServices(ANVGLUser user, NCIDetailsService nciDetailsService, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
         List<CloudComputeService> configuredServices = new ArrayList<CloudComputeService>(cloudComputeServices.length);
         for (CloudComputeService ccs : cloudComputeServices) {
 
@@ -127,7 +127,7 @@ public abstract class BaseCloudController extends BaseModelController {
                 }
                 break;
             case "nci-raijin-compute":
-                NCIDetails details = nciDetailsDao.getByUser(user);
+                NCIDetails details = nciDetailsService.getByUser(user);
                 if (details != null && StringUtils.isNotEmpty(details.getKey())) {
                     configuredServices.add(ccs);
                 }

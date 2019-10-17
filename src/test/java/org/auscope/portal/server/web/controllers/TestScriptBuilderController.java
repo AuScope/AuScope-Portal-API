@@ -13,7 +13,7 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.auscope.portal.server.web.service.TemplateLintService;
@@ -35,8 +35,9 @@ public class TestScriptBuilderController extends PortalTestClass {
     private VEGLJob mockJob = context.mock(VEGLJob.class);
     private CloudStorageService[] mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
     private CloudComputeService[] mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
-    private NCIDetailsDao nciDetailsDao = context.mock(NCIDetailsDao.class);
-
+    
+    private ANVGLUserService mockUserService = context.mock(ANVGLUserService.class);
+    
     private ANVGLUser user;
 
     private static final String VM_SH = "vm.sh";
@@ -45,13 +46,14 @@ public class TestScriptBuilderController extends PortalTestClass {
     @Before
     public void setup() {
         // Object Under Test
-        controller = new ScriptBuilderController(mockSbService, mockJobManager, mockScmEntryService, mockTemplateLintService, mockCloudStorageServices, mockCloudComputeServices, VM_SH, VM_SHUTDOWN_SH, nciDetailsDao);
+        controller = new ScriptBuilderController(mockSbService, mockUserService, mockJobManager, mockScmEntryService, mockTemplateLintService, mockCloudStorageServices, mockCloudComputeServices, VM_SH, VM_SHUTDOWN_SH/*, nciDetailsDao*/);
         user = new ANVGLUser();
         user.setId("456");
         user.setEmail("user@example.com");
         context.checking(new Expectations() {{
             allowing(mockJob).getEmailAddress();will(returnValue("user@example.com"));
             allowing(mockJob).getUser();will(returnValue("user@example.com"));
+            allowing(mockUserService).getLoggedInUser();will(returnValue(user));
         }});
     }
 
@@ -72,7 +74,7 @@ public class TestScriptBuilderController extends PortalTestClass {
             oneOf(mockScmEntryService).updateJobForSolution(mockJob, solutions, user);
         }});
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions, user);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
     }
 
@@ -86,8 +88,7 @@ public class TestScriptBuilderController extends PortalTestClass {
         Set<String> solutions = new HashSet<>();
         solutions.add("http://vhirl-dev.csiro.au/scm/solutions/1");
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions,
-                new ANVGLUser());
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -109,7 +110,7 @@ public class TestScriptBuilderController extends PortalTestClass {
             will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions, user);
+        ModelAndView mav = controller.saveScript(jobId, sourceText, solutions);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -128,7 +129,7 @@ public class TestScriptBuilderController extends PortalTestClass {
             will(returnValue(expectedScriptText));
         }});
 
-        ModelAndView mav = controller.getSavedScript(jobId, user);
+        ModelAndView mav = controller.getSavedScript(jobId);
         Assert.assertTrue((Boolean)mav.getModel().get("success"));
         String script = (String)mav.getModel().get("data");
         Assert.assertEquals(expectedScriptText, script);
@@ -149,7 +150,7 @@ public class TestScriptBuilderController extends PortalTestClass {
             will(throwException(new PortalServiceException("")));
         }});
 
-        ModelAndView mav = controller.getSavedScript(jobId, user);
+        ModelAndView mav = controller.getSavedScript(jobId);
         Assert.assertFalse((Boolean)mav.getModel().get("success"));
     }
 
@@ -166,7 +167,7 @@ public class TestScriptBuilderController extends PortalTestClass {
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), user);will(throwException(new AccessDeniedException("error")));
         }});
 
-        controller.getSavedScript(jobId, user);
+        controller.getSavedScript(jobId);
     }
 
     /**

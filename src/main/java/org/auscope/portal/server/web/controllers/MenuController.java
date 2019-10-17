@@ -21,16 +21,17 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.NCIDetailsDao;
+import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Controller that handles all {@link Menu}-related requests,
+ * 
+ * TODO: Check how necessary thi sis post Spring Boot migration
  *
  * @author Jarek Sanders
  * @author Josh Vote
@@ -57,22 +58,24 @@ public class MenuController {
     private String aafLoginUrl;
     private String adminEmail;
     private CloudComputeService[] cloudComputeServices;
-    private NCIDetailsDao nciDetailsDao;
+    
+    @Autowired
+    private NCIDetailsService nciDetailsService;
 
     @Autowired
-    public MenuController(@Value("${HOST.googlemap.key}") String googleMapKey,
-                         @Value("${HOST.google.analytics.key:}") String googleAnalyticsKey,
-                         @Value("${HOST.portalAdminEmail}") String adminEmail,
-                         @Value("${HOST.aafLoginUrl}") String aafLoginUrl,
+    public MenuController(@Value("${googlemap.key}") String googleMapKey,
+                         @Value("${google.analytics.key:}") String googleAnalyticsKey,
+                         @Value("${portalAdminEmail}") String adminEmail,
+                         @Value("${aaf.loginUrl}") String aafLoginUrl,
                          CloudComputeService[] cloudComputeServices,
-                         NCIDetailsDao nciDetailsDao) {
+                         NCIDetailsService nciDetailsService) {
         this.buildStamp = null;
         this.googleMapKey = googleMapKey;
         this.googleAnalyticsKey = googleAnalyticsKey;
         this.aafLoginUrl = aafLoginUrl;
         this.adminEmail = adminEmail;
         this.cloudComputeServices = cloudComputeServices;
-        this.nciDetailsDao = nciDetailsDao;
+        this.nciDetailsService = nciDetailsService;
     }
 
     /**
@@ -158,9 +161,10 @@ public class MenuController {
     * @return
     * @throws IOException
     * @throws URISyntaxException
- * @throws PortalServiceException
+    * @throws PortalServiceException
     */
-   @RequestMapping("/**/*.html")
+   /*
+   @RequestMapping("/XX/*.html")
    public ModelAndView handleHtmlToView(@AuthenticationPrincipal ANVGLUser user,
                                         HttpServletRequest request,
                                         HttpServletResponse response) throws IOException, URISyntaxException, PortalServiceException {
@@ -186,9 +190,9 @@ public class MenuController {
        logger.trace(String.format("view name '%1$s' extracted from request '%2$s'", resourceName, requestUri));
 
        //If we have a request come in and the user isn't fully configured, shove them back to the user setup page
-       if (user != null) {
+       if (user != null && user.getUsername() != null) {
            boolean tcs = user.acceptedTermsConditionsStatus();
-           boolean configured = user.configuredServicesStatus(nciDetailsDao, cloudComputeServices);
+           boolean configured = user.configuredServicesStatus(nciDetailsService, cloudComputeServices);
 
            if (!configured || !tcs) {
                String uri = request.getRequestURI();
@@ -226,5 +230,6 @@ public class MenuController {
 
        return mav;
    }
+   */
 
 }

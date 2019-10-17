@@ -6,37 +6,44 @@
          xsi:schemaLocation="http://www.springframework.org/schema/beans
                              http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
                              http://www.springframework.org/schema/security
-                             http://www.springframework.org/schema/security/spring-security-4.0.xsd">
+                             http://www.springframework.org/schema/security/spring-security-4.2.xsd">
 
 
     <!-- Default entry point ref to redirect to login page on unauthorised attempts to access secure pages -->
+    <!--
     <beans:bean id="defaultEntryPoint" class="org.auscope.portal.server.web.security.DefaultEntryPoint">
         <beans:property name="realmName" value="VGL-Portal" />
     </beans:bean>
+    -->
     
     <!-- Google OAuth2 endpoint required now that login.html doesn't send users to their Google account -->
+    <!--
     <http pattern="/oauth/**" entry-point-ref="oAuth2EntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
         </headers>
         <intercept-url pattern="/oauth/google_login.html" access="isAuthenticated()"/>
         <custom-filter ref="oauth2AuthFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
-        <logout logout-url="/j_spring_security_logout" logout-success-url="${HOST.frontEndUrl}"/>
+        <logout logout-url="/j_spring_security_logout" logout-success-url="${frontEndUrl}"/>
         <s:csrf disabled="true"/>
     </http>
+    -->
     
     <!-- AAF Entry point will redirect to defined AAF login URL -->
+    <!--
     <http pattern="/jwt/**" entry-point-ref="aafEntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
         </headers>
         <intercept-url pattern="/jwt/aaf_login.html" access="isAuthenticated()"/>
         <custom-filter ref="aafFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
-        <logout logout-url="/j_spring_security_logout" logout-success-url="${HOST.frontEndUrl}"/>
+        <logout logout-url="/j_spring_security_logout" logout-success-url="${frontEndUrl}"/>
         <s:csrf disabled="true"/>
     </http>
+    -->
 
     <!-- Common entry point -->
+    <!--
     <http entry-point-ref="defaultEntryPoint">
         <headers>
             <frame-options policy="SAMEORIGIN"/>
@@ -51,15 +58,20 @@
         <intercept-url pattern="/*.diag" access="hasRole('ROLE_ADMINISTRATOR')"/>        
         <custom-filter ref="oauth2AuthFilter" after="FORM_LOGIN_FILTER"/>
         <custom-filter ref="aafFilter" before="FORM_LOGIN_FILTER"/>
-        <logout logout-url="/j_spring_security_logout" logout-success-url="${HOST.frontEndUrl}"/>
+        <logout logout-url="/j_spring_security_logout" logout-success-url="${frontEndUrl}"/>
         <s:csrf disabled="true"/>
     </http>
 
     <beans:bean id="redirectUnconfigUserHandler" class="org.auscope.portal.server.web.security.RedirectUnconfiguredUserHandler" autowire="byType">
-    	<beans:property name="frontEndUrl" value="${HOST.frontEndUrl}" />
+    	<beans:property name="frontEndUrl" value="${frontEndUrl}" />
     </beans:bean>
+    
+    <beans:bean id="googleAuthFailureHandler" class="org.auscope.portal.server.web.security.GoogleAuthenticationFailureHandler" autowire="byType">
+    </beans:bean>
+    -->
 
     <!-- Google OAuth2 -->
+    <!--
     <beans:bean id="oAuth2EntryPoint" class="com.racquettrack.security.oauth.OAuth2AuthenticationEntryPoint">
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
     </beans:bean>
@@ -68,8 +80,8 @@
         <beans:constructor-arg name="defaultFilterProcessesUrl" value="/oauth/callback"/>
         <beans:property name="authenticationManager" ref="authenticationManager"/>
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
-        <beans:property name="authenticationSuccessHandler" ref="redirectUnconfigUserHandler">
-        </beans:property>
+        <beans:property name="authenticationSuccessHandler" ref="redirectUnconfigUserHandler"/>
+        <beans:property name="authenticationFailureHandler" ref="googleAuthFailureHandler"/>
     </beans:bean>
 
     <beans:bean id="oauth2AuthenticationProvider" class="com.racquettrack.security.oauth.OAuth2AuthenticationProvider">
@@ -82,7 +94,7 @@
         </authentication-provider>
     </authentication-manager>
 
-    <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.core.server.security.oauth2.GoogleOAuth2ServiceProperties">
+    <beans:bean id="oauth2ServiceProperties" class="org.auscope.portal.server.web.security.ANVGLGoogleOAuth2ServiceProperties">
         <beans:constructor-arg name="redirectUri" value="${HOST.portalUrl}/oauth/callback"/>
         <beans:constructor-arg name="clientId" value="${env.oauth2.google.clientid}"/>
         <beans:constructor-arg name="clientSecret" value="${env.oauth2.google.clientsecret}"/>
@@ -92,7 +104,6 @@
         <beans:constructor-arg name="defaultRole" value="ROLE_USER"/>
         <beans:constructor-arg name="rolesByUser">
             <beans:map>
-                <!-- Joshua Vote -->
                 <beans:entry key="105810302719127403909">
                     <beans:list>
                         <beans:value>ROLE_ADMINISTRATOR</beans:value>
@@ -101,7 +112,7 @@
                 </beans:entry>
             </beans:map>
         </beans:constructor-arg>
-        <beans:property name="userDao" ref="anvglUserDao"/>
+        <!XX<beans:property name="userDao" ref="anvglUserDao"/>XX>
     </beans:bean>
 
     <beans:bean id="oAuth2DefaultUserInfoProvider" class="com.racquettrack.security.oauth.DefaultOAuth2UserInfoProvider">
@@ -113,10 +124,12 @@
         <beans:property name="oAuth2ServiceProperties" ref="oauth2ServiceProperties"/>
         <beans:property name="oAuth2UserInfoProvider" ref="oAuth2DefaultUserInfoProvider"/>
     </beans:bean>
+    -->
     
     <!-- AAF -->
+    <!--
     <beans:bean id="aafEntryPoint" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationEntryPoint">
-    	<beans:property name="aafLoginUrl" value="${HOST.aafLoginUrl}" />
+    	<beans:property name="aafLoginUrl" value="${aafLoginUrl}" />
     </beans:bean>
     
     <beans:bean id="simpleAafUserLoader" class="org.auscope.portal.server.web.security.aaf.PersistedAAFUserDetailsLoader">
@@ -131,7 +144,7 @@
                 </beans:entry>
             </beans:map>
         </beans:constructor-arg>
-        <beans:property name="userDao" ref="anvglUserDao"/>
+        <!XX<beans:property name="userDao" ref="anvglUserDao"/>XX>
     </beans:bean>
     
     <beans:bean id="aafFilter" class="org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter">
@@ -146,11 +159,12 @@
    <beans:bean id="jwtManagement" class="org.auscope.portal.server.web.security.aaf.JWTManagement">
        <beans:property name="userDetailsLoader" ref="simpleAafUserLoader" />
        <beans:property name="jwtSecret" value="${env.aaf.jwtsecret}" />
-       <beans:property name="rootServiceUrl" value="${HOST.portalUrl}" />
+       <beans:property name="rootServiceUrl" value="${portalUrl}" />
    </beans:bean>
 
    <authentication-manager id="aafAuthenticationManager">
         <authentication-provider ref="aafProvider" />
    </authentication-manager>
+   -->
 
 </beans:beans>
