@@ -12,3 +12,6 @@ src/main/resources/application.yaml
 anvgl
 anvgl.pub
 src/local/
+.meghanada/
+/make.bat
+velocity.log

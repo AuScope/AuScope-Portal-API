@@ -1,5 +1,6 @@
 package org.auscope.portal.server.config;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,5 +38,5 @@ public class VlRegistries {
 	public ArrayList<CSWServiceItem> cswServiceList() {
 		return new ArrayList<CSWServiceItem>(registries);
 	}
-	
+
 }

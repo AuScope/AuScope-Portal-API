@@ -39,7 +39,6 @@ public class VEGLJobManager {
     @Autowired
     private NCIDetailsService nciDetailsService;
     
-
     public List<VEGLSeries> querySeries(String user, String name, String desc) {
     	return seriesService.query(user, name, desc);
     }

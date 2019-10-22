@@ -108,6 +108,12 @@
             <groupId>org.auscope.portal</groupId>
             <artifactId>portal-core</artifactId>
             <version>${portal.core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <dependency>
@@ -246,7 +252,11 @@
             <artifactId>jclouds-all</artifactId>
             <version>2.1.2-SHADED</version>
         </dependency>
-        
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>10.0.2</version>
+        </dependency>
     </dependencies>
     
     <build>
@@ -264,5 +274,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>dcdp-snapshots</id>
+            <name>cgmaven release</name>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-snapshots/</url>
+        </repository>
+    </distributionManagement>
     
 </project>
