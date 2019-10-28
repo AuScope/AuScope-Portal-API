@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix="csw")
 public class VlRegistries {
 	
-	private List<CSWServiceItem> registries;
+	private List<CSWServiceItem> registries= new ArrayList<CSWServiceItem>();
 	
 	
 	public List<CSWServiceItem> getRegistries() {
