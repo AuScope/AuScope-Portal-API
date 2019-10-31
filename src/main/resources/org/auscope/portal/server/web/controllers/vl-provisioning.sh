@@ -12,11 +12,10 @@
 # /////////////////////////////
 
 # baseUrl -- git repository url
-# baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
-baseUrl="https://github.com/squireg/ANVGL-Portal.git"
+baseUrl="https://github.com/AuScope/ANVGL-Portal.git"
 
 # branch -- branch in the git repo
-branch="provisioning-fix"
+branch="master"
 
 # pathSuffix -- path to puppet modules in the repo
 pathSuffix="/vm/puppet/modules/"
