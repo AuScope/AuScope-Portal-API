@@ -1,155 +1,42 @@
 package org.auscope.portal.server.config;
 
-import org.auscope.portal.core.server.OgcServiceProviderType;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.auscope.portal.core.services.csw.CSWServiceItem;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
+/**
+ * Bind the registries defined in application-registries.yaml to a list of
+ * CSWServiceItems
+ * 
+ * @author woo392
+ *
+ */
 @Configuration
+@EnableConfigurationProperties
+@ConfigurationProperties(prefix="csw")
 public class VlRegistries {
-
-	@Bean
-	CSWServiceItem cswVeglProduction() {
-		return new CSWServiceItem("cswVeglProduction",
-				"http://vgl-reg.auscope.org/geonetwork/srv/eng/csw",
-				"http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s",
-				"SISS ANU Geonetwork");
-	}
-	/*
-	<bean id="cswVeglProduction" class="org.auscope.portal.core.services.csw.CSWServiceItem">
-        <constructor-arg name="id" value="cswVeglProduction"/>
-        <constructor-arg name="title" value="SISS ANU Geonetwork"/>
-        <constructor-arg name="serviceUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/csw"/>
-        <constructor-arg name="recordInformationUrl" value="http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s"/>
-    </bean>
-    */
-
-	@Bean
-	CSWServiceItem cswGAECat() {
-		return new CSWServiceItem("cswGAECat",
-				"https://ecat.ga.gov.au/geonetwork/srv/eng/csw",
-				"https://ecat.ga.gov.au/geonetwork/srv/eng/main.home?uuid=%1$s",
-				"Geoscience Australia eCat");
-	}
 	
-	/*
-    <bean id="cswGAECat" class="org.auscope.portal.core.services.csw.CSWServiceItem">
-        <constructor-arg name="id" value="cswGAECat"/>
-        <constructor-arg name="title" value="Geoscience Australia eCat"/>
-        <constructor-arg name="serviceUrl" value="https://ecat.ga.gov.au/geonetwork/srv/eng/csw"/>
-        <constructor-arg name="recordInformationUrl" value="https://ecat.ga.gov.au/geonetwork/srv/eng/main.home?uuid=%1$s"/>
-    </bean>
-    */
-
-	@Bean
-	CSWServiceItem cswNciRR2() {
-		return new CSWServiceItem("cswNciRR2",
-				"http://geonetworkrr2.nci.org.au/geonetwork/srv/eng/csw",
-				"https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
-				"NCI Geophysics Data Portal");
-	}
-	/*
-	<bean id="cswNciRR2" class="org.auscope.portal.core.services.csw.CSWServiceItem">
-	    <constructor-arg name="id" value="cswNciRR2"/>
-	    <constructor-arg name="title" value="NCI Geophysics Data Portal"/>
-	    <constructor-arg name="serviceUrl" value="http://geonetworkrr2.nci.org.au/geonetwork/srv/eng/csw"/>
-	    <constructor-arg name="recordInformationUrl" value="https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
-    </bean>
-    */
+	private List<CSWServiceItem> registries= new ArrayList<CSWServiceItem>();
 	
-	@Bean
-	CSWServiceItem cswNCI() {
-		return new CSWServiceItem("cswNCI",
-				"https://geonetwork.nci.org.au/geonetwork/srv/eng/csw",
-				"https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
-				"NCI Data Portal");
-	}	
 	
-	@Bean
-	CSWServiceItem cswNigel() {
-		return new CSWServiceItem("cswNigel",
-				"http://130.56.244.85/geonetwork/srv/eng/csw",
-				"http://130.56.244.85/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
-				"Nigel's test Data Portal");
-	}
-	/*
-    <bean id="cswNCI" class="org.auscope.portal.core.services.csw.CSWServiceItem">
-        <constructor-arg name="id" value="cswNCI"/>
-        <constructor-arg name="title" value="NCI Data Portal"/>
-        <constructor-arg name="serviceUrl" value="http://geonetworkrr2.nci.org.au/geonetwork/srv/eng/csw"/>
-        <constructor-arg name="recordInformationUrl" value="https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
-    </bean>
-	*/
-	
-	@Bean
-	CSWServiceItem cswNciGSWA() {
-		return new CSWServiceItem("cswNciGswa",
-				"http://geonetworkrl1.nci.org.au/geonetwork/srv/eng/csw",
-				"https://geonetworkrl1.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
-				"NCI GSWA Data Portal");
-	}
-	
-	/*
-	<bean id="cswNciGSWA" class="org.auscope.portal.core.services.csw.CSWServiceItem">
-	    <constructor-arg name="id" value="cswNciGswa"/>
-	    <constructor-arg name="title" value="NCI GSWA Data Portal"/>
-	    <constructor-arg name="serviceUrl" value="http://geonetworkrl1.nci.org.au/geonetwork/srv/eng/csw"/>
-	    <constructor-arg name="recordInformationUrl" value="https://geonetworkrl1.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
-    </bean>
-    */
-	
-	@Bean
-	CSWServiceItem cswNciMT() {
-		return new CSWServiceItem("cswNciMt",
-				"https://geonetworktest.nci.org.au/geonetwork/srv/eng/csw",
-				"https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s",
-				"NCI MT Data Portal");
+	public List<CSWServiceItem> getRegistries() {
+		return registries;
 	}
 
-	/*
-	<bean id="cswNciMT" class="org.auscope.portal.core.services.csw.CSWServiceItem">
-	    <constructor-arg name="id" value="cswNciMt"/>
-	    <constructor-arg name="title" value="NCI MT Data Portal"/>
-	    <constructor-arg name="serviceUrl" value="https://geonetworktest.nci.org.au/geonetwork/srv/eng/csw"/>
-	    <constructor-arg name="recordInformationUrl" value="https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"/>
-    </bean>
-    */
-	
-	@Bean
-	CSWServiceItem cswUrbanMonitor() {
-	    return new CSWServiceItem("cswUrbanMonitor",
-	            "http://dcdpgeo.data61.csiro.au:8080/api",
-	            "http://dcdpgeo.data61.csiro.au:8080/api/catalog.search#/metadata/%1$s",
-	            "Urban Monitor PyCSW",
-	            OgcServiceProviderType.PyCSW);
+	public void setRegistries(List<CSWServiceItem> registries) {
+		this.registries = registries;
 	}
-	
+
 	@Bean
-	CSWServiceItem pycswSydneyUrbanMonitor() {
-	    return new CSWServiceItem("pycswSydneyUrbanMonitor",
-	            "http://d61-50-cdc.it.csiro.au:8180/api",
-	            "http://d61-50-cdc.it.csiro.au:8180/api/catalog.search#/metadata/%1$s",
-	            "Sydney Urban Monitor",
-	            OgcServiceProviderType.PyCSW);
+	public ArrayList<CSWServiceItem> cswServiceList() {
+		return new ArrayList<CSWServiceItem>(registries);
 	}
-	
-	@Bean
-	CSWServiceItem cswUrbanGeoServer() {
-	    return new CSWServiceItem("cswUrbanGeoServer",
-	            "http://dcdpgeo.data61.csiro.au/geoserver/ows?service=csw&amp;version=2.0.2",
-	            "http://dcdpgeo.data61.csiro.au/geoserver/ows?service=csw&amp;version=2.0.2&amp;request=DescribeRecord&amp;typeName=gmd:MD_Metadata",
-	            "Urban GeoServer",
-	            OgcServiceProviderType.GeoServer);
-	}
-	
-	/*
-	<bean id="cswUrbanMonitor" class="org.auscope.portal.core.services.csw.CSWServiceItem">
-        <constructor-arg name="id" value="cswUrbanMonitor"/>
-        <constructor-arg name="title" value="Urban Monitor"/>
-        <constructor-arg name="serviceUrl" value="http://dcdpgeo.data61.csiro.au:8080/api"/>
-        <constructor-arg name="recordInformationUrl" value="http://dcdpgeo.data61.csiro.au:8080/api/catalog.search#/metadata/%1$s"/>
-    </bean>
-	 */
 
 }

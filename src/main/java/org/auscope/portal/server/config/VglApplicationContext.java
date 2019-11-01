@@ -13,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
-import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
@@ -34,7 +33,6 @@ import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusChangeListener;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
-import org.auscope.portal.core.services.csw.custom.CustomRegistry;
 import org.auscope.portal.core.services.methodmakers.OPeNDAPGetDataMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WCSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
@@ -91,27 +89,32 @@ public class VglApplicationContext {
 
     protected final Log logger = LogFactory.getLog(getClass());
     
-	@Value("${env.aws.accesskey}")
+	@Value("${aws.accesskey}")
 	private String awsAccessKey;
 	
-	@Value("${env.aws.secretkey}")
+	@Value("${aws.secretkey}")
 	private String awsSecretKey;
 	
-	@Value("${env.aws.sessionkey}")
+	@Value("${aws.sessionkey}")
 	private String awsSessionKey;
 
-	@Value("${env.nectar.ec2.accesskey}")
-	private String nectarAccessKey;
+	@Value("${nectar.ec2.accesskey}")
+	private String nectarEc2AccessKey;
 	
-	@Value("${env.nectar.ec2.secretkey}")
-	private String nectarSecretKey;
+	@Value("${nectar.ec2.secretkey}")
+	private String nectarEc2SecretKey;
+	
+	@Value("${nectar.storage.accesskey}")
+	private String nectarStorageAccessKey;
+	
+	@Value("${nectar.storage.secretkey}")
+	private String nectarStorageSecretKey;
 	
 	@Value("${portalAdminEmail}")
 	private String adminEmail;
 	
 	@Value("${aws.stsrequirement}")
 	private String awsStsRequirement;
-	//private STSRequirement awsStsRequirement;
 	
 	@Value("${localStageInDir}")
 	private String stageInDirectory;
@@ -131,7 +134,7 @@ public class VglApplicationContext {
 	@Value("${portalAdminEmail}")
 	private String portalAdminEmail;
 	
-	@Value("${env.encryption.password}")
+	@Value("${encryption.password}")
 	private String encryptionPassword;
 	
 	@Value("${solutions.url}")
@@ -175,6 +178,10 @@ public class VglApplicationContext {
 	    properties.setProperty("resource.loader", "class");
 	    properties.setProperty("class.resource.loader.class",
 	    					   "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+	    // Stop logging to velocity.log and use standard logging
+	    properties.setProperty("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.SimpleLog4JLogSystem");
+	    properties.setProperty("runtime.log.logsystem.log4j.category", "velocity");
+	    properties.setProperty("runtime.log.logsystem.log4j.logger", "velocity");
 	    VelocityEngine velocityEngine = new VelocityEngine(properties);
 	    return velocityEngine;
 	}
@@ -636,7 +643,7 @@ public class VglApplicationContext {
 		CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds(null, "aws-s3", awsAccessKey, awsSecretKey, awsSessionKey, "ap-southeast-2", false, true);
 		storageService.setName("Amazon Web Services - S3");
 		storageService.setId("amazon-aws-storage-sydney");
-		storageService.setBucket("vgl-csiro-");
+		storageService.setBucket("vgl-csiro");
 		storageService.setAdminEmail(adminEmail);
 		STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
 		storageService.setStsRequirement(req);
@@ -660,14 +667,14 @@ public class VglApplicationContext {
     </bean>
 	*/
     
-    @Bean
+	@Bean
 	public CloudStorageServiceJClouds cloudStorageServiceNectarMelb() {
-    	CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds("https://keystone.rc.nectar.org.au:5000/v2.0",
-    			"openstack-swift", nectarAccessKey, nectarSecretKey, null, "Melbourne", false, true);
+		CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds("https://keystone.rc.nectar.org.au:5000/v3",
+    			"openstack-swift", nectarStorageAccessKey, nectarStorageSecretKey, null, "Melbourne", false, true);
     	storageService.setName("National eResearch Collaboration Tools and Resources");
     	storageService.setId("nectar-openstack-storage-melb");
     	storageService.setBucket("vgl-portal");
-    	storageService.setAuthVersion("2.0");
+    	storageService.setAuthVersion("3");
     	STSRequirement req = STSRequirement.ForceNone;
 		storageService.setStsRequirement(req);
 		return storageService;
@@ -827,21 +834,17 @@ public class VglApplicationContext {
 	
 	@Bean
 	public CloudComputeServiceNectar cloudComputeServiceNectar() throws UnknownHostException {
-	    try {
-    		CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
-    				"https://keystone.rc.nectar.org.au:5000/v2.0", nectarAccessKey, nectarSecretKey);
-    		computeService.setId("nectar-nova-compute");
-    		computeService.setName("National eResearch Collaboration Tools and Resources");
-    		//computeService.setGroupName("vl-#{inetAddress().hostName.toLowerCase()}");
-    		String groupName = "vl-";
-    		groupName += inetAddress().getHostName().toLowerCase();
-    		computeService.setGroupName(groupName);
-    		computeService.setKeypair("vgl-developers");
-    		return computeService;
-	    } catch (Exception e) {
-	        logger.warn("Failed to construct CloudComputeServiceNectar object! Error message: " + e.getMessage());
-	        return null;
-	    }
+		CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
+				"https://keystone.rc.nectar.org.au:5000/v3", nectarEc2AccessKey, nectarEc2SecretKey);
+		computeService.setId("nectar-nova-compute");
+		computeService.setName("National eResearch Collaboration Tools and Resources");
+		//computeService.setGroupName("vl-#{inetAddress().hostName.toLowerCase()}");
+		String groupName = "vl-";
+		groupName += inetAddress().getHostName().toLowerCase();
+		computeService.setGroupName(groupName);
+		computeService.setKeypair("vgl-developers");
+		computeService.setApiVersion("3");
+		return computeService;
 	}
 	
 	/*

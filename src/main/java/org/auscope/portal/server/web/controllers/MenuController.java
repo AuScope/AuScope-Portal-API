@@ -66,7 +66,7 @@ public class MenuController {
     public MenuController(@Value("${googlemap.key}") String googleMapKey,
                          @Value("${google.analytics.key:}") String googleAnalyticsKey,
                          @Value("${portalAdminEmail}") String adminEmail,
-                         @Value("${aafLoginUrl}") String aafLoginUrl,
+                         @Value("${aaf.loginUrl}") String aafLoginUrl,
                          CloudComputeService[] cloudComputeServices,
                          NCIDetailsService nciDetailsService) {
         this.buildStamp = null;

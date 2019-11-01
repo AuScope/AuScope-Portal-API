@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class AAFAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 	
-	@Value("${aafCallbackUrl}")
+	@Value("${aaf.callbackUrl}")
 	private String aafCallbackUrl;
     
 	public AAFAuthenticationFilter(AuthenticationManager authenticationManager, String aafCallbackUrl) {

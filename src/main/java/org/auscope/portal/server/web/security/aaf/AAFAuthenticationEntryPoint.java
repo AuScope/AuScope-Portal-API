@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AAFAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	
-	@Value("${aafLoginUrl}")
+	@Value("${aaf.loginUrl}")
 	private String aafLoginUrl;
 
 	@Override

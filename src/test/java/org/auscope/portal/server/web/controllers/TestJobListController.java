@@ -90,7 +90,7 @@ public class TestJobListController extends PortalTestClass {
         controller = new JobListController(mockJobManager,
                 mockCloudStorageServices, mockFileStagingService,
                 mockCloudComputeServices, mockUserService,
-                mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,null,"dummy@dummy.com", mockCloudSubmissionService, mockJobAuditLogService);
+                mockVGLJobStatusAndLogReader, mockJobStatusMonitor,null,null,"dummy@dummy.com", mockCloudSubmissionService, mockJobAuditLogService);
     }
 
 

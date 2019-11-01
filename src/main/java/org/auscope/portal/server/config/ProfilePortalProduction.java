@@ -1,11 +1,8 @@
 package org.auscope.portal.server.config;
 
 import java.util.ArrayList;
-
-import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -67,41 +64,7 @@ public class ProfilePortalProduction {
 	//@Autowired
 	//KnownLayer knownTypeCunyuAem;
 
-	@Autowired
-	@Qualifier("cswVeglProduction")
-	CSWServiceItem cswVeglProduction;
 	
-	@Autowired
-	@Qualifier("cswGAECat")
-	CSWServiceItem cswGAECat;
-	
-	@Autowired
-	@Qualifier("cswNciRR2")
-	CSWServiceItem cswNciRR2;
-	
-	@Autowired
-	@Qualifier("cswNCI")
-	CSWServiceItem cswNci;
-	
-	@Autowired
-	@Qualifier("cswNciGSWA")
-	CSWServiceItem cswNciGswa;
-	
-	@Autowired
-	@Qualifier("cswNciMT")
-	CSWServiceItem cswNciMt;
-	
-	@Autowired
-    @Qualifier("cswUrbanMonitor")
-    CSWServiceItem cswUrbanMonitor;
-	
-	@Autowired
-    @Qualifier("cswUrbanGeoServer")
-    CSWServiceItem cswUrbanGeoServer;	
-	
-	@Autowired
-    @Qualifier("pycswSydneyUrbanMonitor")
-    CSWServiceItem pycswSydneyUrbanMonitor;	
 	
 	@Bean
 	public ArrayList<KnownLayer> knownTypes() {
@@ -167,29 +130,5 @@ public class ProfilePortalProduction {
     </bean>
     */
 
-	@Bean
-	public ArrayList<CSWServiceItem> cswServiceList() {
-		ArrayList<CSWServiceItem> serviceList = new ArrayList<CSWServiceItem>();
-		//serviceList.add(cswVeglProduction);
-		serviceList.add(cswGAECat);
-		serviceList.add(cswNciRR2);
-		//serviceList.add(cswNci);
-		//serviceList.add(cswNciGswa);
-		//serviceList.add(cswNciMt);
-		serviceList.add(cswUrbanMonitor);
-		serviceList.add(cswUrbanGeoServer);
-		serviceList.add(pycswSydneyUrbanMonitor);
-		return serviceList;
-	}
-	
-	/*
-    <bean id="cswServiceList" class="java.util.ArrayList">
-        <constructor-arg>
-            <list>
-                <ref bean="cswNCI" />
-            </list>
-        </constructor-arg>
-    </bean>
-	*/
 
 }

@@ -47,7 +47,6 @@ public class UserController extends BasePortalController {
     @Autowired
     private NCIDetailsService nciDetailsService;
     
-    @Autowired
     private VelocityEngine velocityEngine;
     private CloudComputeService[] cloudComputeServcies;
 
@@ -58,7 +57,7 @@ public class UserController extends BasePortalController {
     @Autowired
     public UserController(VelocityEngine velocityEngine,
     		CloudComputeService[] cloudComputeServices,
-            @Value("${env.aws.account}") String awsAccount,
+            @Value("${aws.account}") String awsAccount,
             @Value("${termsconditions.version}") String tacVersion) throws PortalServiceException {
         super();        
         this.velocityEngine = velocityEngine;
@@ -74,7 +73,7 @@ public class UserController extends BasePortalController {
      * @return
      */
     @RequestMapping("/secure/getUser.do")
-    public ModelAndView getUser(/*@AuthenticationPrincipal ANVGLUser user*/) {
+    public ModelAndView getUser() {
     	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -100,7 +99,7 @@ public class UserController extends BasePortalController {
      * @return
      */
     @RequestMapping("/secure/setUser.do")
-    public ModelAndView setUser(/*@AuthenticationPrincipal ANVGLUser user,*/
+    public ModelAndView setUser(
             @RequestParam(required=false, value="arnExecution") String arnExecution,
             @RequestParam(required=false, value="arnStorage") String arnStorage,
             @RequestParam(required=false, value="acceptedTermsConditions") Integer acceptedTermsConditions,
@@ -139,7 +138,7 @@ public class UserController extends BasePortalController {
     }
 
     @RequestMapping("/getTermsConditions.do")
-    public ModelAndView getTermsConditions(/*@AuthenticationPrincipal ANVGLUser user*/) {
+    public ModelAndView getTermsConditions() {
     	ANVGLUser user = userService.getLoggedInUser();
         try {
             String tcs = IOUtils.toString(this.getClass().getResourceAsStream("vl-termsconditions.html"));
@@ -159,7 +158,7 @@ public class UserController extends BasePortalController {
     }
 
     @RequestMapping("/secure/getCloudFormationScript.do")
-    public void getCloudFormationScript(/*@AuthenticationPrincipal ANVGLUser user, */HttpServletResponse response) throws IOException {
+    public void getCloudFormationScript(HttpServletResponse response) throws IOException {
     	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             response.sendError(HttpStatus.UNAUTHORIZED.value());
@@ -187,7 +186,7 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/getNCIDetails.do")
-    public ModelAndView getNCIDetails(/*@AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
+    public ModelAndView getNCIDetails() throws PortalServiceException {
     	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -208,7 +207,7 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/setNCIDetails.do")
-    public ModelAndView setNCIDetails(/*@AuthenticationPrincipal ANVGLUser user,*/
+    public ModelAndView setNCIDetails(
             @RequestParam(required=false, value="nciUsername") String username,
             @RequestParam(required=false, value="nciProject") String project,
             @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) throws PortalServiceException {
@@ -249,7 +248,7 @@ public class UserController extends BasePortalController {
     }
     
     @RequestMapping("/secure/getHasConfiguredComputeServices.do")
-    public ModelAndView getHasConfiguredComputeServices(/*@AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
+    public ModelAndView getHasConfiguredComputeServices() throws PortalServiceException {
     	ANVGLUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
