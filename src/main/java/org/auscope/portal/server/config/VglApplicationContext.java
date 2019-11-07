@@ -15,6 +15,9 @@ import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
 import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
+import org.auscope.portal.core.server.controllers.WCSController;
+import org.auscope.portal.core.server.controllers.WFSController;
+import org.auscope.portal.core.server.controllers.WMSController;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.CSWFilterService;
@@ -22,6 +25,7 @@ import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.WCSService;
+import org.auscope.portal.core.services.WFSService;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
@@ -44,6 +48,7 @@ import org.auscope.portal.core.services.namespaces.ErmlNamespaceContext;
 import org.auscope.portal.core.view.ViewCSWRecordFactory;
 import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
+import org.auscope.portal.core.xslt.GmlToHtml;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VglMachineImage;
@@ -1030,4 +1035,25 @@ public class VglApplicationContext {
     	return serviceConfiguration;
     }
     
+    @Bean
+    public GmlToHtml gmlToHtml() {
+    	GmlToHtml gmlToHtml = new GmlToHtml();
+    	return gmlToHtml;
+    }
+    
+    @Bean
+    WFSService wfsBaseService() {
+    	return new WFSService(httpServiceCaller(), wfsMethodMaker(), gmlToHtml());
+    }
+    
+    @Bean
+    public WFSController wfsController() {
+    	WFSController wfsController = new WFSController(wfsBaseService());
+    	return wfsController;
+    }
+    
+    @Bean
+    public ViewCSWRecordFactory viewCSWRecordFactory() {
+    	return new ViewCSWRecordFactory();
+    }
 }
