@@ -11,7 +11,9 @@ import java.util.Properties;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
+import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
+import org.auscope.portal.core.server.controllers.DownloadController;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.CSWFilterService;
@@ -1012,4 +1014,13 @@ public class VglApplicationContext {
         </property>
     </bean>
     */
+    
+    @Bean
+    public ServiceConfiguration serviceConfiguration() {
+    	List<ServiceConfigurationItem> serviceItems = new ArrayList<ServiceConfigurationItem>();
+    	serviceItems.add(nswerml2WFSTest());
+    	ServiceConfiguration serviceConfiguration = new ServiceConfiguration(serviceItems);
+    	return serviceConfiguration;
+    }
+    
 }
