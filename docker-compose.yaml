@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+
+  db:
+    image: mysql:5
+    restart: always
+
+  api:
+    image: vgl:latest
+    depends_on:
+      - db
