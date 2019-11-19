@@ -8,6 +8,9 @@ services:
       - type: volume
         source: vgl-db-data
         target: /var/lib/mysql
+      - type: volume
+        source: vgl-stageIn
+        target: /var/lib/vgl/stageIn
       # - type: bind
       #   source: /home/squ022/dumps/anvgl20191118.sql
       #   target: /docker-entrypoint-initdb.d/anvgl20191118.sql
@@ -34,4 +37,6 @@ services:
 
 volumes:
   vgl-db-data:
+    external: true
+  vgl-stageIn:
     external: true
