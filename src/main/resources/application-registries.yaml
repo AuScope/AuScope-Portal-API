@@ -35,9 +35,4 @@ csw:
         recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
         title: NCI MT Data Portal
         serverType: Default
-      - id: cswUrbanGeoServer
-        serviceUrl: "http://dcdpgeo.data61.csiro.au/geoserver/ows?service=csw&amp;version=2.0.2"
-        recordInformationUrl: "http://dcdpgeo.data61.csiro.au/geoserver/ows?service=csw&amp;version=2.0.2&amp;request=DescribeRecord&amp;typeName=gmd:MD_Metadata"
-        title: Urban GeoServer
-        serverType: GeoServer
   
