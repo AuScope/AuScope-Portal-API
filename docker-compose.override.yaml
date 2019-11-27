@@ -12,8 +12,8 @@ services:
         source: vgl-stageIn
         target: /var/lib/vgl/stageIn
       # - type: bind
-      #   source: /home/squ022/dumps/anvgl20191118.sql
-      #   target: /docker-entrypoint-initdb.d/anvgl20191118.sql
+      #   source: ./src/main/db/mysql/anvgl.sql
+      #   target: /docker-entrypoint-initdb.d/anvgl.sql
     environment:
       MYSQL_ROOT_PASSWORD: foobar
       # MYSQL_USER: vgl
