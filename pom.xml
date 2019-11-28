@@ -275,12 +275,5 @@
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>dcdp-snapshots</id>
-            <name>cgmaven release</name>
-            <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-snapshots/</url>
-        </repository>
-    </distributionManagement>
     
 </project>
