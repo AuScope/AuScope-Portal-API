@@ -48,7 +48,6 @@ vm-shutdown:
 
 googlemap:
    key: <google_map_key>
-
    
 erddapservice:
    url: http://siss2.anu.edu.au/erddap/griddap/
@@ -66,6 +65,8 @@ portalUrl: http://localhost:8080/VGL-Portal
 frontEndUrl: http://localhost:4200
 portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
 defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
+
+stripeApiKey: STRIPE_API_KEY
 
 # Gives us separation from real DB passwords.
 # Production deployment will copy env.properties file over
