@@ -297,6 +297,21 @@ public class JobDownloadController extends BasePortalController {
         return generateJSONResponseMAV(true, toView(newDownload), "");
     }
     
+    /**
+     * Creates a new VL download object from WCS parameters
+     * @param serviceUrl The WCS endpoint
+     * @param name The name of the download
+     * @param layerName
+     * @param bboxCrs
+     * @param northBoundLatitude
+     * @param southBoundLatitude
+     * @param eastBoundLongitude
+     * @param westBoundLongitude
+     * @param outputFormat
+     * @param saveSession
+     * @param request
+     * @return
+     */
     @RequestMapping("/makeWcsUrl.do")
     public ModelAndView makeWcsUrl(@RequestParam("url") final String serviceUrl,
                                    @RequestParam("name") final String name,
