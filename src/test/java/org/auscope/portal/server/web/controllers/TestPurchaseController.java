@@ -22,6 +22,7 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,7 +59,7 @@ public class TestPurchaseController extends PortalTestClass {
     public void testProcessDataPayment() throws Exception {
     	
     	final InputStream strStream = IOUtils.toInputStream(
-    							"{\"amount\": 123.45," + 
+    							"{\"amount\": 0.0," + 
     							"\"tokenId\": \"1234\"," +
     							"\"email\": \"test@123456789mail.com\"," +
     							"\"dataToPurchase\": ["+
@@ -66,25 +67,47 @@ public class TestPurchaseController extends PortalTestClass {
     							,Charset.forName("UTF-8"));
         final DelegatingServletInputStream input = new DelegatingServletInputStream(strStream);
 
-        final ANVGLUser user = new ANVGLUser();
         context.checking(new Expectations() {        	
             {
             	allowing(mockRequest).getInputStream(); will(returnValue(input));
-                allowing(mockUserService).getLoggedInUser(); will(returnValue(user));
+                allowing(mockUserService).getLoggedInUser(); will(returnValue(null)); // anonymous user!
             }
         });
         Whitebox.setInternalState(controller, "userService", mockUserService);
         
-        HttpServletResponse response = new HttpServletResponseImpl();
+        HttpServletResponseImpl response = new HttpServletResponseImpl();
     	controller.processDataPayment(mockRequest, response);
+    	// Unable to process payment for anonymous user.
+    	Assert.assertTrue(response.sw.toString().contains("anonymous user"));
     }
     
     /**
      * test processJobPayment
+     * @throws Exception 
      */
     @Test
-    public void testProcessJobPayment() {
-    	
+    public void testProcessJobPayment() throws Exception {
+    	final InputStream strStream = IOUtils.toInputStream(
+				"{\"amount\": 0.0," + 
+				"\"tokenId\": \"1234\"," +
+				"\"email\": \"test@123456789mail.com\"," +
+				"\"jobId\":1234," +
+				"\"jobName\":\"dummy\"}" 
+				,Charset.forName("UTF-8"));
+    	final DelegatingServletInputStream input = new DelegatingServletInputStream(strStream);
+
+    	context.checking(new Expectations() {        	
+    		{
+    			allowing(mockRequest).getInputStream(); will(returnValue(input));
+    			allowing(mockUserService).getLoggedInUser(); will(returnValue(null)); // anonymous user!
+    		}
+    	});
+    	Whitebox.setInternalState(controller, "userService", mockUserService);
+
+    	HttpServletResponseImpl response = new HttpServletResponseImpl();
+    	controller.processJobPayment(mockRequest, response);
+    	// Unable to process payment for anonymous user.
+    	Assert.assertTrue(response.sw.toString().contains("anonymous user"));
     }
     
     /**
