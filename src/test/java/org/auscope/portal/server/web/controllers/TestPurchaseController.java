@@ -6,7 +6,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -17,16 +19,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.auscope.portal.core.services.CSWFilterService;
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
+import org.auscope.portal.server.vegl.VGLDataPurchase;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
+import org.auscope.portal.server.web.service.VGLPurchaseService;
+
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.powermock.reflect.Whitebox;
+import org.springframework.web.servlet.ModelAndView;
 /**
  * Unit test for PurchaseController
  * @author Bo Yan
@@ -38,6 +45,7 @@ public class TestPurchaseController extends PortalTestClass {
     private CSWFilterService mockCSWFilterService = context.mock(CSWFilterService.class);
     private HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
     private ANVGLUserService mockUserService = context.mock(ANVGLUserService.class);
+    private VGLPurchaseService mockPurchaseService = context.mock(VGLPurchaseService.class);
     
     private PurchaseController controller;
     
@@ -112,18 +120,21 @@ public class TestPurchaseController extends PortalTestClass {
     
     /**
      * test getPurchases
+     * @throws PortalServiceException 
      */
     @Test
-    public void testGetPurchases() {
-    	
-    }
-    
-    /**
-     * test getServiceType
-     */
-    @Test
-    public void testGetServiceType() {
-    	
+    public void testGetPurchases() throws PortalServiceException {
+        final ANVGLUser user = new ANVGLUser();
+        context.checking(new Expectations() {        	
+            {
+                allowing(mockUserService).getLoggedInUser(); will(returnValue(user));
+                allowing(mockPurchaseService).getDataPurchasesByUser(user); will(returnValue(new LinkedList<VGLDataPurchase>())); 
+            }
+        });
+        Whitebox.setInternalState(controller, "userService", mockUserService);
+        Whitebox.setInternalState(controller, "purchaseService", mockPurchaseService);
+        ModelAndView mav = controller.getPurchases();
+        Assert.assertTrue(mav.getModel().containsKey("data"));
     }
     
     private class HttpServletResponseImpl implements HttpServletResponse {
@@ -364,14 +375,6 @@ public class TestPurchaseController extends PortalTestClass {
         public DelegatingServletInputStream(InputStream sourceStream) {
             this.sourceStream = sourceStream;
         }
-
-        /**
-         * Return the underlying source stream (never <code>null</code>).
-         */
-        public final InputStream getSourceStream() {
-            return this.sourceStream;
-        }
-
 
         public int read() throws IOException {
             return this.sourceStream.read();

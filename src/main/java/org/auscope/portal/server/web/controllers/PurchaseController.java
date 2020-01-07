@@ -456,7 +456,7 @@ public class PurchaseController extends BasePortalController {
         return url;
     }
     
-    public OgcServiceProviderType getServiceType(String serviceUrl) {
+    private OgcServiceProviderType getServiceType(String serviceUrl) {
         
         OgcServiceProviderType serviceType = null;
         String serviceBaseUrl = getBaseUrl(serviceUrl);
