@@ -25,7 +25,6 @@ import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.auscope.portal.core.services.methodmakers.WCSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
-import org.auscope.portal.core.services.responses.wcs.Resolution;
 import org.auscope.portal.server.vegl.VGLDataPurchase;
 import org.auscope.portal.server.vegl.VGLJobPurchase;
 import org.auscope.portal.server.vegl.VglDownload;
@@ -79,6 +78,11 @@ public class PurchaseController extends BasePortalController {
         this.cswFilterService = cswFilterService;
     }
 
+    /**
+     * handle exception
+     * @param ex
+     * @return
+     */
     @ResponseStatus(value = org.springframework.http.HttpStatus.BAD_REQUEST)
     public @ResponseBody String handleException(IllegalArgumentException ex) {
         return ex.getMessage();
@@ -109,7 +113,12 @@ public class PurchaseController extends BasePortalController {
     }
     
     
-    
+    /**
+     * process data payment request with Stripe
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/processDataPayment.do", method = RequestMethod.POST)
     public void processDataPayment(HttpServletRequest request,
             HttpServletResponse response)
@@ -282,6 +291,12 @@ public class PurchaseController extends BasePortalController {
         writer.close();
     }
     
+    /**
+     * process job payment request with Stripe
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/processJobPayment.do", method = RequestMethod.POST)
     public void processJobPayment(HttpServletRequest request,
             HttpServletResponse response)
