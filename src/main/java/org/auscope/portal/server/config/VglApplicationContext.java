@@ -11,7 +11,9 @@ import java.util.Properties;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
+import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
+import org.auscope.portal.core.server.controllers.DownloadController;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.CSWFilterService;
@@ -22,15 +24,15 @@ import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
-import org.auscope.portal.core.services.cloud.CloudComputeServiceNci;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceNectar;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
-import org.auscope.portal.core.services.cloud.CloudStorageServiceNci;
 import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusChangeListener;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
+import org.auscope.portal.core.services.csw.GriddedCSWRecordTransformerFactory;
+import org.auscope.portal.core.services.csw.ViewGriddedCSWRecordFactory;
 import org.auscope.portal.core.services.methodmakers.OPeNDAPGetDataMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WCSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
@@ -51,8 +53,8 @@ import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.VGLCryptoService;
-import org.auscope.portal.server.web.service.csw.GriddedCSWRecordTransformerFactory;
-import org.auscope.portal.server.web.service.csw.ViewGriddedCSWRecordFactory;
+import org.auscope.portal.server.web.service.cloud.CloudComputeServiceNci;
+import org.auscope.portal.server.web.service.cloud.CloudStorageServiceNci;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor;
 import org.quartz.Trigger;
@@ -1012,4 +1014,13 @@ public class VglApplicationContext {
         </property>
     </bean>
     */
+    
+    @Bean
+    public ServiceConfiguration serviceConfiguration() {
+    	List<ServiceConfigurationItem> serviceItems = new ArrayList<ServiceConfigurationItem>();
+    	serviceItems.add(nswerml2WFSTest());
+    	ServiceConfiguration serviceConfiguration = new ServiceConfiguration(serviceItems);
+    	return serviceConfiguration;
+    }
+    
 }
