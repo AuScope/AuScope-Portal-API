@@ -695,7 +695,7 @@ public class VglApplicationContext {
 	public CloudStorageServiceNci cloudStorageServiceNci() {
 		CloudStorageServiceNci cloudStorageService = new CloudStorageServiceNci("gadi.nci.org.au", "nci-gadi");
 		cloudStorageService.setId("nci-gadi-storage");
-		cloudStorageService.setName("National Computing Infrastructure - gadi");
+		cloudStorageService.setName("National Computing Infrastructure - Gadi");
 		return cloudStorageService;
 	}
 	
@@ -859,7 +859,7 @@ public class VglApplicationContext {
 	public CloudComputeServiceNci cloudComputeServiceNci() {
 		CloudComputeServiceNci computeService = new CloudComputeServiceNci(cloudStorageServiceNci(), "gadi.nci.org.au");
 		computeService.setId("nci-gadi-compute");
-		computeService.setName("National Computing Infrastructure - gadi");
+		computeService.setName("National Computing Infrastructure - Gadi");
 		return computeService;
 	}
 	
