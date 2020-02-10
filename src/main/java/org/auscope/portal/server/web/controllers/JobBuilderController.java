@@ -531,7 +531,7 @@ public class JobBuilderController extends BaseCloudController {
             if (ccs instanceof CloudComputeServiceAws) {
                 css = getStorageService("amazon-aws-storage-sydney");
             } else if (ccs instanceof CloudComputeServiceNci) {
-                css = getStorageService("nci-raijin-storage");
+                css = getStorageService("nci-gadi-storage");
             } else {
                 css = getStorageService("nectar-openstack-storage-melb");
             }

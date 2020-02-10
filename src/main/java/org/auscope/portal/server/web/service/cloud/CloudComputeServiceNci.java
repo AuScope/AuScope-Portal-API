@@ -18,8 +18,6 @@ import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.cloud.ComputeType;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
-import org.auscope.portal.core.services.cloud.CloudComputeService.InstanceStatus;
-import org.auscope.portal.core.services.cloud.CloudComputeService.ProviderType;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.service.cloud.SshCloudConnector.ExecResult;
@@ -64,7 +62,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
      *            The API version
      */
     public CloudComputeServiceNci(CloudStorageServiceNci storageService, String endpoint) {
-        super(ProviderType.RAIJIN, endpoint, null);
+        super(ProviderType.GADI, endpoint, null);
         this.storageService=storageService;
         this.sshCloudConnector = new SshCloudConnector(endpoint);
     }

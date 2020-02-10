@@ -126,7 +126,7 @@ public abstract class BaseCloudController extends BaseModelController {
                     configuredServices.add(ccs);
                 }
                 break;
-            case "nci-raijin-compute":
+            case "nci-gadi-compute":
                 NCIDetails details = nciDetailsService.getByUser(user);
                 if (details != null && StringUtils.isNotEmpty(details.getKey())) {
                     configuredServices.add(ccs);
