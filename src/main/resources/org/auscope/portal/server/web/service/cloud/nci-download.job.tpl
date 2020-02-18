@@ -5,6 +5,7 @@
 #PBS -l mem=300MB
 #PBS -l ncpus=1
 #PBS -l wd
+#PBS -l storage=scratch/{0}+gdata/{0}
 #PBS -j oe
 #PBS -N vl{1}
 #PBS -o {3}/.download.log

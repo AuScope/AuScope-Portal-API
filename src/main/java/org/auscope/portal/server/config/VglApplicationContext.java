@@ -693,18 +693,18 @@ public class VglApplicationContext {
 	
 	@Bean
 	public CloudStorageServiceNci cloudStorageServiceNci() {
-		CloudStorageServiceNci cloudStorageService = new CloudStorageServiceNci("raijin.nci.org.au", "nci-raijin");
-		cloudStorageService.setId("nci-raijin-storage");
-		cloudStorageService.setName("National Computing Infrastructure - Raijin");
+		CloudStorageServiceNci cloudStorageService = new CloudStorageServiceNci("gadi.nci.org.au", "nci-gadi");
+		cloudStorageService.setId("nci-gadi-storage");
+		cloudStorageService.setName("National Computing Infrastructure - Gadi");
 		return cloudStorageService;
 	}
 	
 	/*
 	<bean id="cloudStorageService-nci" class="org.auscope.portal.core.services.cloud.CloudStorageServiceNci">
-        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
-        <constructor-arg name="provider" value="nci-raijin"/>
-        <property name="name" value="National Computing Infrastructure - Raijin"/>
-        <property name="id" value="nci-raijin-storage"/>
+        <constructor-arg name="endpoint" value="gadi.nci.org.au"/>
+        <constructor-arg name="provider" value="nci-gadi"/>
+        <property name="name" value="National Computing Infrastructure - gadi"/>
+        <property name="id" value="nci-gadi-storage"/>
     </bean>
 	*/
 	
@@ -857,18 +857,18 @@ public class VglApplicationContext {
 	
 	@Bean
 	public CloudComputeServiceNci cloudComputeServiceNci() {
-		CloudComputeServiceNci computeService = new CloudComputeServiceNci(cloudStorageServiceNci(), "raijin.nci.org.au");
-		computeService.setId("nci-raijin-compute");
-		computeService.setName("National Computing Infrastructure - Raijin");
+		CloudComputeServiceNci computeService = new CloudComputeServiceNci(cloudStorageServiceNci(), "gadi.nci.org.au");
+		computeService.setId("nci-gadi-compute");
+		computeService.setName("National Computing Infrastructure - Gadi");
 		return computeService;
 	}
 	
 	/*
 	<bean id="cloudComputeService-nci" class="org.auscope.portal.core.services.cloud.CloudComputeServiceNci">
         <constructor-arg name="storageService" ref="cloudStorageService-nci"/>
-        <constructor-arg name="endpoint" value="raijin.nci.org.au"/>
-        <property name="name" value="National Computing Infrastructure - Raijin"/>
-        <property name="id" value="nci-raijin-compute"/>
+        <constructor-arg name="endpoint" value="gadi.nci.org.au"/>
+        <property name="name" value="National Computing Infrastructure - gadi"/>
+        <property name="id" value="nci-gadi-compute"/>
     </bean> 
 	*/
 	

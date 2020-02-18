@@ -50,7 +50,7 @@ public class CloudStorageServiceNci extends CloudStorageService {
      * @return
      */
     public String getWorkingJobDirectory(CloudFileOwner job) {
-        return String.format("/short/%1$s/vl-workingdir/%2$s", job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT), generateBaseKey(job));
+        return String.format("/scratch/%1$s/vl-workingdir/%2$s", job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT), generateBaseKey(job));
     }
 
     /**
