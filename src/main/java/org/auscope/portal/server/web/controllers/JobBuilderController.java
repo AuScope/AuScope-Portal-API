@@ -699,6 +699,8 @@ public class JobBuilderController extends BaseCloudController {
             job.setJobDownloads(existingDownloads);
             */
         } else {
+        	// Carsten 17/06/2019: Should no longer be necessary if setJobDownloads now does its job properly:       
+        	// jobManager.deleteJobDownloads(job);
             job.setJobDownloads(parsedDownloads);
         }
 

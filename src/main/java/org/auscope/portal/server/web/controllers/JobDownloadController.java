@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.controllers;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.auscope.portal.core.server.OgcServiceProviderType;
 import org.auscope.portal.core.server.controllers.BasePortalController;
+import org.auscope.portal.core.services.csw.CSWServiceItem;
+import org.auscope.portal.core.services.methodmakers.WCSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.server.vegl.VglDownload;
@@ -122,7 +127,7 @@ public class JobDownloadController extends BasePortalController {
 
         return generateJSONResponseMAV(true, toView(newDownload), "");
     }
-
+ 
     /**
      * Creates a new VL Download object from a some ERDDAP parameters. The Download object is returned. If saveSession
      * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list.
@@ -284,6 +289,68 @@ public class JobDownloadController extends BasePortalController {
         newDownload.setParentName(parentName);
         newDownload.setParentUrl(parentUrl);
 		*/
+
+        if (saveSession) {
+            addDownloadToSession(request, newDownload);
+        }
+
+        return generateJSONResponseMAV(true, toView(newDownload), "");
+    }
+    
+    /**
+     * Creates a new VL download object from WCS parameters
+     * @param serviceUrl The WCS endpoint
+     * @param name The name of the download
+     * @param layerName
+     * @param bboxCrs
+     * @param northBoundLatitude
+     * @param southBoundLatitude
+     * @param eastBoundLongitude
+     * @param westBoundLongitude
+     * @param outputFormat
+     * @param saveSession
+     * @param request
+     * @return
+     */
+    @RequestMapping("/makeWcsUrl.do")
+    public ModelAndView makeWcsUrl(@RequestParam("url") final String serviceUrl,
+                                   @RequestParam("name") final String name,
+                                   @RequestParam(required = false, value = "layerName") final String layerName,
+                                   @RequestParam(required = false, value = "crs") final String bboxCrs,
+                                   @RequestParam(required = false, value = "northBoundLatitude") final Double northBoundLatitude,
+                                   @RequestParam(required = false, value = "southBoundLatitude") final Double southBoundLatitude,
+                                   @RequestParam(required = false, value = "eastBoundLongitude") final Double eastBoundLongitude,
+                                   @RequestParam(required = false, value = "westBoundLongitude") final Double westBoundLongitude,
+                                   @RequestParam(required = false, value = "format") final String outputFormat,
+                                   @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
+                                   HttpServletRequest request) {
+
+        log.info("got makeWcsUrl with params: " + serviceUrl + ", " + name + ", " + layerName + ", " + bboxCrs + ", " + outputFormat);
+        
+        CSWGeographicBoundingBox bbox = new CSWGeographicBoundingBox(
+                westBoundLongitude, eastBoundLongitude, southBoundLatitude,
+                northBoundLatitude);
+        HttpRequestBase downloadUrl = null;
+        try {
+            WCSMethodMaker wcsMethodMaker = new WCSMethodMaker();
+            downloadUrl = wcsMethodMaker.getCoverageMethod(serviceUrl,
+                    layerName, outputFormat, bboxCrs, new Dimension(1000, 1000),
+                    null, bboxCrs, bbox, null, null);
+        } catch (Exception ex) {
+            log.warn(String.format(
+                    "Exception generating service request for '%2$s' from '%1$s': %3$s",
+                    serviceUrl, layerName, ex));
+            ex.printStackTrace();
+            generateExceptionResponse(ex, serviceUrl);
+        }
+
+        VglDownload newDownload = new VglDownload();
+        newDownload.setName(name);
+        newDownload.setUrl(downloadUrl.getRequestLine().getUri());
+        newDownload.setNorthBoundLatitude(northBoundLatitude);
+        newDownload.setEastBoundLongitude(eastBoundLongitude);
+        newDownload.setSouthBoundLatitude(southBoundLatitude);
+        newDownload.setWestBoundLongitude(westBoundLongitude);
 
         if (saveSession) {
             addDownloadToSession(request, newDownload);

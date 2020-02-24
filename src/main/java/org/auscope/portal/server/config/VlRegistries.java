@@ -1,5 +1,6 @@
 package org.auscope.portal.server.config;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix="csw")
 public class VlRegistries {
 	
-	private List<CSWServiceItem> registries;
+	private List<CSWServiceItem> registries= new ArrayList<CSWServiceItem>();
 	
 	
 	public List<CSWServiceItem> getRegistries() {
@@ -37,5 +38,5 @@ public class VlRegistries {
 	public ArrayList<CSWServiceItem> cswServiceList() {
 		return new ArrayList<CSWServiceItem>(registries);
 	}
-	
+
 }
