@@ -504,10 +504,38 @@ public class ScmEntryService implements ScmLoader {
      * @return Set<String> of compute service id strings
      * @throws PortalServiceException
      */
-    public Set<String> getJobProviders(Collection<String> solutionIds, ANVGLUser user)
+    public Set<String> getJobProviders(Collection<String> solutionIds)
     	throws PortalServiceException {
-        Map<String, Set<MachineImage>> images = getJobImages(solutionIds, user);
-        return (images != null) ? images.keySet() : null;
+    	
+    	Set<Solution> solutions = solutionIds.stream().map((String id) -> getScmSolution(id)).collect(Collectors.toSet());
+    	Set<Set<String>> providersForSolutions = new HashSet<Set<String>>();
+    	Set<String> result = null;
+    	
+    	for (Solution solution: solutions) {
+    		Set<String> providers = new HashSet<String>();
+    		if(result == null) {
+    			result = providers;
+    		} else {
+    			providersForSolutions.add(providers);
+    		}
+    		
+            for (Toolbox toolbox: entryToolboxes(solution)) {
+                for (Map<String, String> img: toolbox.getImages()) {
+                    String providerId = img.get("provider");
+                    providers.add(providerId);
+                }
+            }    		
+    	}
+
+    	if(result==null) {
+    		return null;
+    	}
+
+    	for (Set<String> providers : providersForSolutions) {
+			result.retainAll(providers);
+		}
+
+    	return result;
     }
     
     /**
