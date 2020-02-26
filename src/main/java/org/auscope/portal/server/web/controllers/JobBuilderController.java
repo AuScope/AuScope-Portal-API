@@ -1163,17 +1163,16 @@ public class JobBuilderController extends BaseCloudController {
      * @throws PortalServiceException
      */
     @RequestMapping("/secure/getComputeServices.do")
-    public ModelAndView getComputeServices(@RequestParam(value="jobId",
-    required=false) final
-            Integer jobId/*,
-            @AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
+    public ModelAndView getComputeServices(@RequestParam(value="jobId", required=false) final Integer jobId) throws PortalServiceException {
+    	
     	ANVGLUser user = userService.getLoggedInUser();
         Set<String> jobCCSIds;
-		    try {
-            jobCCSIds = scmEntryService.getJobProviders(jobId, user);
-		    } catch (AccessDeniedException e) {
-		        throw e;
-		    }
+        
+	    try {
+	    	jobCCSIds = scmEntryService.getJobProviders(jobId, user);
+	    } catch (AccessDeniedException e) {
+	        throw e;
+	    }
 
         Set<String> configuredServiceIds = new HashSet<String>();
         getConfiguredComputeServices(user, nciDetailsService).stream().forEach(x -> configuredServiceIds.add(x.getId()));
