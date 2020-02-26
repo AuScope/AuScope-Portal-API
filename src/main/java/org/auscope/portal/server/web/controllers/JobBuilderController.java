@@ -1167,12 +1167,11 @@ public class JobBuilderController extends BaseCloudController {
     	
     	ANVGLUser user = userService.getLoggedInUser();
         Set<String> jobCCSIds;
-        
-	    try {
-	    	jobCCSIds = scmEntryService.getJobProviders(jobId, user);
-	    } catch (AccessDeniedException e) {
-	        throw e;
-	    }
+        try {
+        	jobCCSIds = scmEntryService.getJobProviders(jobId, user);
+        } catch (AccessDeniedException e) {
+            throw e;
+        }
 
         Set<String> configuredServiceIds = new HashSet<String>();
         getConfiguredComputeServices(user, nciDetailsService).stream().forEach(x -> configuredServiceIds.add(x.getId()));
