@@ -1168,7 +1168,7 @@ public class JobBuilderController extends BaseCloudController {
     	ANVGLUser user = userService.getLoggedInUser();
         Set<String> jobCCSIds;
         try {
-        	jobCCSIds = scmEntryService.getJobProviders(jobId, user);
+            jobCCSIds = scmEntryService.getJobProviders(jobId, user);
         } catch (AccessDeniedException e) {
             throw e;
         }
