@@ -1096,7 +1096,16 @@ public class JobBuilderController extends BaseCloudController {
                 imageProviders = scmEntryService.getJobImages(job, user);
             }            
 
-            Set<MachineImage> images = (imageProviders != null) ? imageProviders.get(computeServiceId) : new HashSet<MachineImage>();
+            Set<MachineImage> images = null;
+            
+            if (imageProviders != null) {
+            	images = imageProviders.get(computeServiceId);
+            }
+            
+            if(images == null) {
+            	 images= new HashSet<MachineImage>();
+            }
+            
             if (images.isEmpty()) {
                 // Fall back on old behaviour based on configured images for now
                 // Get images available to the current user
@@ -1154,10 +1163,8 @@ public class JobBuilderController extends BaseCloudController {
      * @throws PortalServiceException
      */
     @RequestMapping("/secure/getComputeServices.do")
-    public ModelAndView getComputeServices(@RequestParam(value="jobId",
-    required=false) final
-            Integer jobId/*,
-            @AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
+    public ModelAndView getComputeServices(@RequestParam(value="jobId", required=false) final Integer jobId) throws PortalServiceException {
+    	
     	ANVGLUser user = userService.getLoggedInUser();
         Set<String> jobCCSIds;
         try {
@@ -1254,6 +1261,54 @@ public class JobBuilderController extends BaseCloudController {
         allInputs.addAll(job.getJobDownloads());
 
         return generateJSONResponseMAV(true, allInputs, "");
+    }
+
+
+    /**
+     * Gets a JSON list of id/name pairs for every available compute service for the 
+     * given list of solution ids.
+     *
+     * Only those services that have images available for the solutions.
+     *
+     * Compute services that haven't been configured by the user will be ignored
+     * 
+     * @param solutions List of solution ids for which the available compute services is to be returned
+     *  
+     * @return List of compute services which have images for the given solutions
+     * 
+     * @throws PortalServiceException
+     */
+    @RequestMapping("/secure/getComputeServicesForSolutions.do")
+    public ModelAndView getComputeServicesForSolutions(@RequestParam(value="solutions", required=false) List<String> solutions) 
+    		throws PortalServiceException {
+    	ANVGLUser user = userService.getLoggedInUser();
+
+    	
+        Set<String> configuredServiceIds = new HashSet<String>();
+        getConfiguredComputeServices(user, nciDetailsService).stream().forEach(x -> configuredServiceIds.add(x.getId()));
+
+        List<ModelMap> simpleComputeServices = new ArrayList<>();
+    	
+		if (solutions!=null && !solutions.isEmpty()) {
+		    try {
+		    	Set<String> ccsIds = scmEntryService.getJobProviders(solutions);
+	    		if (ccsIds != null) {
+	    			for (CloudComputeService ccs : cloudComputeServices) {
+	    				// Add the ccs to the list if it's valid for job or we have no job
+	    				if (ccsIds.contains(ccs.getId()) && configuredServiceIds.contains(ccs.getId())) {
+	    					ModelMap map = new ModelMap();
+	    					map.put("id", ccs.getId());
+	    					map.put("name", ccs.getName());
+	    					simpleComputeServices.add(map);
+	    				}
+	    			}
+	    		}
+		    } catch (AccessDeniedException e) {
+		        throw e;
+		    }
+        }
+                
+        return generateJSONResponseMAV(true, simpleComputeServices, "");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
