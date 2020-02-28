@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
@@ -87,6 +89,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @Configuration
 public class VglApplicationContext {
 
+    protected final Log logger = LogFactory.getLog(getClass());
+    
 	@Value("${aws.accesskey}")
 	private String awsAccessKey;
 	
@@ -269,9 +273,12 @@ public class VglApplicationContext {
 		computeServicesList.add(cloudComputeServiceAws());
 		computeServicesList.add(cloudComputeServiceNci());
 		try {
-			computeServicesList.add(cloudComputeServiceNectar());
+		    CloudComputeService nectarService = cloudComputeServiceNectar();
+		    if (nectarService != null) {
+		        computeServicesList.add(nectarService);
+		    }
 		} catch(UnknownHostException e) {
-			System.out.println("Unable to create Nectar cloud compute service");
+			logger.warn("Unable to create Nectar cloud compute service");
 		}
 		CloudComputeService computeServices[] = computeServicesList.toArray(new CloudComputeService[computeServicesList.size()]);
 		return computeServices;

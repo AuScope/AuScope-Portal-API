@@ -7,8 +7,10 @@ DROP TABLE IF EXISTS `jobs`;
 DROP TABLE IF EXISTS `series`;
 DROP TABLE IF EXISTS `users`;
 DROP TABLE IF EXISTS `nci_details`;
-DROP TABLE IF EXISTS `bookmarks`;
 DROP TABLE IF EXISTS `bookmark_download_options`;
+DROP TABLE IF EXISTS `bookmarks`;
+DROP TABLE IF EXISTS `data_purchases`;
+DROP TABLE IF EXISTS `job_purchases`;
 
 CREATE TABLE `users` (
   `id` varchar(128) NOT NULL,
@@ -147,7 +149,7 @@ CREATE TABLE `nci_details` (
 );
 
 CREATE TABLE `bookmarks` (
-  `fileIdentifier` varchar(50) NOT NULL,
+  `fileIdentifier` varchar(128) NOT NULL,
   `serviceId` varchar(25) NOT NULL,
   `userId` varchar(128) NOT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -173,3 +175,37 @@ CREATE TABLE `bookmark_download_options` (
   CONSTRAINT `ID_BOOKMARKS` FOREIGN KEY (`bookmarkId`) REFERENCES `bookmarks` (`id`) ON DELETE CASCADE
 );
 
+CREATE TABLE `data_purchases` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` datetime NOT NULL,
+  `amount` float NOT NULL,
+  `downloadUrl` varchar(4096) NOT NULL,
+  `cswRecord` text NOT NULL,
+  `onlineResourceType` varchar(25) NOT NULL,
+  `url` varchar(4096) NOT NULL,
+  `localPath` varchar(1024) DEFAULT NULL,
+  `name` varchar(128) DEFAULT NULL,
+  `description` varchar(1024) DEFAULT NULL,
+  `northBoundLatitude` double DEFAULT NULL,
+  `southBoundLatitude` double DEFAULT NULL,
+  `eastBoundLongitude` double DEFAULT NULL,
+  `westBoundLongitude` double DEFAULT NULL,
+  `paymentRecord` varchar(4096) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `USER_ID_DATA_PURCHASES` (`userId`),
+  CONSTRAINT `USER_ID_DATA_PURCHASES` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
+); 
+
+CREATE TABLE `job_purchases` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` datetime NOT NULL,
+  `amount` float NOT NULL,
+  `jobId` int(11) NOT NULL,
+  `jobName` varchar(128) DEFAULT NULL,
+  `paymentRecord` varchar(4096) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `USER_ID_JOB_PURCHASES` (`userId`),
+  CONSTRAINT `USER_ID_JOB_PURCHASES` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
+); 
