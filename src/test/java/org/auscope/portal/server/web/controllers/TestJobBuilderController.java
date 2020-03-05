@@ -690,6 +690,7 @@ public class TestJobBuilderController {
 
             oneOf(mockFileStagingService).writeFile(job, JobBuilderController.DOWNLOAD_SCRIPT);
             will(returnValue(mockOutputStream));
+            allowing(mockOutputStream).flush();
             allowing(mockOutputStream).close();
 
             //We should have 1 call to get our stage in files
@@ -784,6 +785,7 @@ public class TestJobBuilderController {
 
             oneOf(mockFileStagingService).writeFile(job, JobBuilderController.DOWNLOAD_SCRIPT);
             will(returnValue(mockOutputStream));
+            allowing(mockOutputStream).flush();
             allowing(mockOutputStream).close();
 
             //We should have 1 call to get our stage in files
