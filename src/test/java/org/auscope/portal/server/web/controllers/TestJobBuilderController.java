@@ -28,7 +28,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.STSRequirement;
-import org.auscope.portal.core.test.ResourceUtil;
+import org.auscope.portal.core.util.ResourceUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;

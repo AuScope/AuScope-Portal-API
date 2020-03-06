@@ -31,8 +31,8 @@
         <log4j.version>1.2.16</log4j.version>
         <targetJdk>13</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <powermock.version>1.6.3</powermock.version>
-        <portal.core.version>2.2.0-SNAPSHOT</portal.core.version>
+        <powermock.version>2.0.5</powermock.version>
+        <portal.core.version>2.3.0-SNAPSHOT</portal.core.version>
         <httpclient.version>4.5.9</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
     </properties>
@@ -219,19 +219,19 @@
         -->
         <dependency>
             <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-easymock</artifactId>
+            <artifactId>powermock-api-mockito2</artifactId>
             <version>${powermock.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.easymock</groupId>
-                    <artifactId>easymock</artifactId>
-                </exclusion>
-                <exclusion>
-                	<groupId>cglib</groupId>
-                	<artifactId>cglib-nodep</artifactId>
-                </exclusion>
-            </exclusions>
+<!--             <exclusions> -->
+<!--                 <exclusion> -->
+<!--                     <groupId>org.easymock</groupId> -->
+<!--                     <artifactId>easymock</artifactId> -->
+<!--                 </exclusion> -->
+<!--                 <exclusion> -->
+<!--                 	<groupId>cglib</groupId> -->
+<!--                 	<artifactId>cglib-nodep</artifactId> -->
+<!--                 </exclusion> -->
+<!--             </exclusions> -->
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
