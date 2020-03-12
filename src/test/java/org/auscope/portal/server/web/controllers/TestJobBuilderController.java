@@ -49,7 +49,7 @@ import org.auscope.portal.server.web.service.scm.Solution;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
-import org.jmock.lib.legacy.ClassImposteriser;
+import org.jmock.imposters.ByteBuddyClassImposteriser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +64,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class TestJobBuilderController {
     private Mockery context = new Mockery() {{
-        setImposteriser(ClassImposteriser.INSTANCE);
+        setImposteriser(ByteBuddyClassImposteriser.INSTANCE);
     }};
 
     private VEGLJobManager mockJobManager;
