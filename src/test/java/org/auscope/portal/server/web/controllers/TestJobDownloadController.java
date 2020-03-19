@@ -342,17 +342,27 @@ public class TestJobDownloadController extends PortalTestClass {
     public void testMakeWcsUrl() {
         final String localsServiceUrl = "http://example.org/wfs";
         final String name = "name";
-        final String layerName = "layerName";
+        final String coverageName = "coverageName";
         final Double northBoundLatitude = 2.0;
         final Double eastBoundLongitude = 4.0;
         final Double southBoundLatitude = 1.0;
         final Double westBoundLongitude = 3.0;
         final String bboxCrs = "EPSG:4387";
+        final String outputCrs = "EPSG:4387";
         final String outputFormat = "o-f";
+        final Integer outputWidth = 50;
+        final Integer outputHeight = 50;
+        final Double outputResolutionX = 1.0;
+        final Double outputResolutionY = 1.0;
+        final String description = "description";
+        final String fullDescription = "fullDescription";
+        final String localPath = "";
         
-        ModelAndView mav = controller.makeWcsUrl(localsServiceUrl, name,layerName, bboxCrs,
+        ModelAndView mav = controller.makeWcsUrl(localsServiceUrl, coverageName, outputFormat, bboxCrs,
+        		outputCrs, outputWidth, outputHeight, outputResolutionX, outputResolutionY,
         		northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude,
-        		outputFormat, false, mockRequest);
+        		name, description, fullDescription, localPath,
+        		false, mockRequest);
         Assert.assertNotNull(mav);
         Assert.assertTrue(((Boolean) mav.getModel().get("success")));
         Assert.assertNotNull(mav.getModel().get("data"));

@@ -16,7 +16,6 @@ import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.core.services.responses.wcs.Resolution;
-import org.auscope.portal.core.services.responses.wcs.TimeConstraint;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -333,12 +332,12 @@ public class JobDownloadController extends BasePortalController {
     public ModelAndView makeWcsUrl(@RequestParam("serviceUrl") final String serviceUrl,
                                    @RequestParam("coverageName") final String coverageName,
                                    @RequestParam(required = false, value = "format") final String format,
+                                   @RequestParam(required = false, value = "crs") final String inputCrs,
                                    @RequestParam(required = false, value = "outputCrs") final String outputCrs,
                                    @RequestParam(required = false, value = "outputWidth") final Integer outputWidth,
                                    @RequestParam(required = false, value = "outputHeight") final Integer outputHeight,
                                    @RequestParam(required = false, value = "outputResolutionX") final Double outputResolutionX,
                                    @RequestParam(required = false, value = "outputResolutionY") final Double outputResolutionY,
-                                   @RequestParam(required = false, value = "crs") final String inputCrs,
                                    @RequestParam(required = false, value = "northBoundLatitude") final Double northBoundLatitude,
                                    @RequestParam(required = false, value = "southBoundLatitude") final Double southBoundLatitude,
                                    @RequestParam(required = false, value = "eastBoundLongitude") final Double eastBoundLongitude,
@@ -366,7 +365,7 @@ public class JobDownloadController extends BasePortalController {
         }
         
         
-        // Styles - Hack XXX
+        // Styles - Hack XXX Make configurable?
         Map<String, String> customParams = new HashMap<String, String>();
         customParams.put("styles", "tc");
         
