@@ -12,12 +12,11 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
+import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.jmock.Expectations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
@@ -78,7 +77,6 @@ public class TestJobCompletionMailSender extends PortalTestClass {
     /**
      * jMock matcher used to compare SimpleMailMessage object.
      */
-    @Factory
     private static Matcher<SimpleMailMessage> aSimpleMailMessage(String from,
             String to, String subject, String text) {
         return new SimpleMailMessageMatcher(from, to, subject, text);
