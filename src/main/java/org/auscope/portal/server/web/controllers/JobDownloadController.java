@@ -364,15 +364,9 @@ public class JobDownloadController extends BasePortalController {
         	bbox = new CSWGeographicBoundingBox(westBoundLongitude, eastBoundLongitude, southBoundLatitude, northBoundLatitude);
         }
         
-        
-        // Styles - Hack XXX Make configurable?
-        Map<String, String> customParams = new HashMap<String, String>();
-        customParams.put("styles", "tc");
-        
-
         String response = null;
         try {
-            response = wcsService.getCoverageRequestAsString(serviceUrl, coverageName, format, outputCrs, outputSize, outputResolution, inputCrs, bbox, null, customParams);
+            response = wcsService.getCoverageRequestAsString(serviceUrl, coverageName, format, outputCrs, outputSize, outputResolution, inputCrs, bbox, null, null);
         } catch (Exception ex) {
             log.warn(String.format("Exception generating service request for '%2$s' from '%1$s': %3$s", serviceUrl, coverageName, ex));
             log.debug("Exception: ", ex);
