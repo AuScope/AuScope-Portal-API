@@ -1,10 +1,10 @@
 csw:
    registries:
-      - id: cswVeglProduction
-        serviceUrl: http://vgl-reg.auscope.org/geonetwork/srv/eng/csw
-        recordInformationUrl: http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s
-        title: SISS ANU Geonetwork
-        serverType: Default
+#      - id: cswVeglProduction
+#        serviceUrl: http://vgl-reg.auscope.org/geonetwork/srv/eng/csw
+#        recordInformationUrl: http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s
+#        title: SISS ANU Geonetwork
+#        serverType: Default
       - id: cswGAECat
         serviceUrl: https://ecat.ga.gov.au/geonetwork/srv/eng/csw
         recordInformationUrl: https://ecat.ga.gov.au/geonetwork/srv/eng/main.home?uuid=%1$s
@@ -20,19 +20,19 @@ csw:
         recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
         title: NCI Data Portal
         serverType: Default
-      - id: cswNigel
-        serviceUrl: http://130.56.244.85/geonetwork/srv/eng/csw
-        recordInformationUrl: "http://130.56.244.85/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
-        title: Nigel's test Data Portal
-        serverType: Default
-      - id: cswNciGswa
-        serviceUrl: http://geonetworkrl1.nci.org.au/geonetwork/srv/eng/csw
-        recordInformationUrl: "https://geonetworkrl1.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
-        title: NCI GSWA Data Portal
-        serverType: Default
-      - id: cswNciMt
-        serviceUrl: https://geonetworktest.nci.org.au/geonetwork/srv/eng/csw
-        recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
-        title: NCI MT Data Portal
-        serverType: Default
+#      - id: cswNigel
+#        serviceUrl: http://130.56.244.85/geonetwork/srv/eng/csw
+#        recordInformationUrl: "http://130.56.244.85/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
+#        title: Nigel's test Data Portal
+#        serverType: Default
+#      - id: cswNciGswa
+#        serviceUrl: http://geonetworkrl1.nci.org.au/geonetwork/srv/eng/csw
+#        recordInformationUrl: "https://geonetworkrl1.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
+#        title: NCI GSWA Data Portal
+#        serverType: Default
+#      - id: cswNciMt
+#        serviceUrl: https://geonetworktest.nci.org.au/geonetwork/srv/eng/csw
+#        recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
+#        title: NCI MT Data Portal
+#        serverType: Default
   
