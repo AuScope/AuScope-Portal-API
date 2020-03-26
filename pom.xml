@@ -32,7 +32,7 @@
         <targetJdk>13</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>2.0.5</powermock.version>
-        <portal.core.version>2.3.0-SNAPSHOT</portal.core.version>
+        <portal.core.version>2.3.1-SNAPSHOT</portal.core.version>
         <httpclient.version>4.5.9</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
     </properties>
