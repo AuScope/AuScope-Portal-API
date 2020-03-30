@@ -1,4 +1,4 @@
-FROM tomcat:9-jdk8
+FROM tomcat:9-jdk14-openjdk-buster
 
 MAINTAINER geoffrey.squire@data61.csiro.au
 
