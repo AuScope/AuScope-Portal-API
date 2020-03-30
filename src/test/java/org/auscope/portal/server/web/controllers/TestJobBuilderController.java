@@ -28,7 +28,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.STSRequirement;
-import org.auscope.portal.core.test.ResourceUtil;
+import org.auscope.portal.core.util.ResourceUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
@@ -49,7 +49,7 @@ import org.auscope.portal.server.web.service.scm.Solution;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
-import org.jmock.lib.legacy.ClassImposteriser;
+import org.jmock.imposters.ByteBuddyClassImposteriser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +64,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class TestJobBuilderController {
     private Mockery context = new Mockery() {{
-        setImposteriser(ClassImposteriser.INSTANCE);
+        setImposteriser(ByteBuddyClassImposteriser.INSTANCE);
     }};
 
     private VEGLJobManager mockJobManager;
@@ -207,8 +207,8 @@ public class TestJobBuilderController {
      */
     @Test
     public void testListStagedJobFiles() throws Exception {
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
+        final File mockFile1 = new File("MockFile1");
+        final File mockFile2 = new File("MockFile2");
         final StagedFile[] mockStageFiles = new StagedFile[] {
                 new StagedFile(job, "mockFile1", mockFile1),
                 new StagedFile(job, "mockFile2", mockFile2) };
@@ -222,9 +222,6 @@ public class TestJobBuilderController {
             //We should have a call to file staging service to get our files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);
             will(returnValue(mockStageFiles));
-
-            oneOf(mockFile1).length();will(returnValue(512L));
-            oneOf(mockFile2).length();will(returnValue(512L));
         }});
 
         ModelAndView mav = controller.stagedJobFiles(jobId);
@@ -430,7 +427,7 @@ public class TestJobBuilderController {
     public void testUploadFile() throws Exception {
 
         final MultipartHttpServletRequest mockMultipartRequest = context.mock(MultipartHttpServletRequest.class);
-        final File mockFile = context.mock(File.class);
+        final File mockFile = new File("");
         final StagedFile mockStagedFile = new StagedFile(job, "mockFile", mockFile);
 
 
@@ -442,9 +439,6 @@ public class TestJobBuilderController {
             //We should have a call to file staging service to update a file
             oneOf(mockFileStagingService).handleFileUpload(job, mockMultipartRequest);
             will(returnValue(mockStagedFile));
-
-            oneOf(mockFile).length();
-            will(returnValue(1024L));
         }});
 
         ModelAndView mav = controller.uploadFile(mockMultipartRequest, mockResponse, job.getId().toString());
@@ -631,15 +625,15 @@ public class TestJobBuilderController {
     public void testJobSubmission() throws Exception {
         //Instantiate our job object
 
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
-        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(job, "mockFile1", mockFile1), new StagedFile(job, "mockFile2", mockFile2)};
+        final File file1 = new File("MockFile1");
+        final File file2 = new File("MockFile2");
+        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(job, "mockFile1", file1), new StagedFile(job, "mockFile2", file2)};
         final String computeVmId = "compute-vmi-id";
         final String computeServiceId = "compute-service-id";
         final String instanceId = "new-instance-id";
         final String computeKeyName = "key-name";
         final Sequence jobFileSequence = context.sequence("jobFileSequence"); //this makes sure we aren't deleting directories before uploading (and other nonsense)
-        final OutputStream mockOutputStream = context.mock(OutputStream.class);
+        final OutputStream outputStream = new ByteArrayOutputStream();
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
         final String storageBucket = "storage-bucket";
@@ -689,8 +683,7 @@ public class TestJobBuilderController {
             oneOf(mockJobManager).saveJob(job);
 
             oneOf(mockFileStagingService).writeFile(job, JobBuilderController.DOWNLOAD_SCRIPT);
-            will(returnValue(mockOutputStream));
-            allowing(mockOutputStream).close();
+            will(returnValue(outputStream));
 
             //We should have 1 call to get our stage in files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stageInFiles));
@@ -711,7 +704,7 @@ public class TestJobBuilderController {
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeServiceId));
 
             //We should have 1 call to upload them
-            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(job)), with(equal(new File[] {mockFile1, mockFile2})));
+            oneOf(mockCloudStorageServices[0]).uploadJobFiles(with(equal(job)), with(equal(new File[] {file1, file2})));
             inSequence(jobFileSequence);
 
             //And finally 1 call to execute the job
@@ -752,11 +745,11 @@ public class TestJobBuilderController {
 
         final String computeServiceId = "ccsid";
         final String injectedComputeVmId = "injected-compute-vmi-id";
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
+        final File mockFile1 = new File("MockFile1");
+        final File mockFile2 = new File("MockFile2");
         final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(job, "mockFile1", mockFile1), new StagedFile(job, "mockFile2", mockFile2)};
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
-        final OutputStream mockOutputStream = context.mock(OutputStream.class);
+        final OutputStream mockOutputStream = new ByteArrayOutputStream();
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
         final String errorDescription = "You do not have the permission to submit this job for processing.";
         final String storageServiceId = "cssid";
@@ -784,7 +777,6 @@ public class TestJobBuilderController {
 
             oneOf(mockFileStagingService).writeFile(job, JobBuilderController.DOWNLOAD_SCRIPT);
             will(returnValue(mockOutputStream));
-            allowing(mockOutputStream).close();
 
             //We should have 1 call to get our stage in files
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stageInFiles));
@@ -827,9 +819,9 @@ public class TestJobBuilderController {
     public void testJobSubmission_S3Failure() throws Exception {
         //Instantiate our job object
         final String computeVmId = "compute-vmi-id";
-        final File mockFile1 = context.mock(File.class, "MockFile1");
-        final File mockFile2 = context.mock(File.class, "MockFile2");
-        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(job, "mockFile1", mockFile1), new StagedFile(job, "mockFile2", mockFile2)};
+        final File file1 = new File("MockFile1");
+        final File file2 = new File("MockFile2");
+        final StagedFile[] stageInFiles = new StagedFile[] {new StagedFile(job, "mockFile1", file1), new StagedFile(job, "mockFile2", file2)};
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
@@ -1614,7 +1606,7 @@ public class TestJobBuilderController {
     @Test
     public void testGetAllJobInputs() throws Exception {
         final VglDownload dl = new VglDownload(413);
-        final File mockFile = context.mock(File.class);
+        final File mockFile = new File("");
         final long mockFileLength = 21314L;
         final StagedFile[] stagedFiles = new StagedFile[]{new StagedFile(job, "another/file.ext", mockFile)};
 
@@ -1632,7 +1624,6 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), mockPortalUser);will(returnValue(job));
-            oneOf(mockFile).length();will(returnValue(mockFileLength));
             oneOf(mockFileStagingService).listStageInDirectoryFiles(job);will(returnValue(stagedFiles));
         }});
 

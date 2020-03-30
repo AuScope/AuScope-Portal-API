@@ -28,7 +28,7 @@ public class ConversionConfig {
 	@Autowired
 	private StringToArrayConversionBlocker cBlocker;
 	
-	@Bean
+	@Bean(name="conversionService")
 	@Primary
 	public ConversionService getConversionService() {
 		ConversionServiceFactoryBean bean = new ConversionServiceFactoryBean();

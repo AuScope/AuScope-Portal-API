@@ -29,10 +29,10 @@
     <!-- Project properties -->
     <properties>       
         <log4j.version>1.2.16</log4j.version>
-        <targetJdk>1.8</targetJdk>
+        <targetJdk>13</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <powermock.version>1.6.3</powermock.version>
-        <portal.core.version>2.2.0-SNAPSHOT</portal.core.version>
+        <powermock.version>2.0.5</powermock.version>
+        <portal.core.version>2.3.0-SNAPSHOT</portal.core.version>
         <httpclient.version>4.5.9</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
     </properties>
@@ -41,7 +41,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.3.RELEASE</version>
+        <version>2.2.5.RELEASE</version>
     </parent>
     
     <repositories>
@@ -58,7 +58,12 @@
     </repositories>
 
     <!-- Dependencies -->
-	<dependencies>
+		<dependencies>
+			<dependency>
+		    <groupId>net.bytebuddy</groupId>
+		    <artifactId>byte-buddy</artifactId>
+		</dependency>
+	
 	   <!-- Check if we need this if we use spring-boot-starter-web -->
 	   <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -117,9 +122,22 @@
         </dependency>
         
         <dependency>
+            <groupId>org.auscope.portal</groupId>
+            <artifactId>portal-core</artifactId>
+            <version>${portal.core.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.5</version>
             <scope>compile</scope>
         </dependency>
 
@@ -171,7 +189,6 @@
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.2.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -219,15 +236,19 @@
         -->
         <dependency>
             <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-easymock</artifactId>
+            <artifactId>powermock-api-mockito2</artifactId>
             <version>${powermock.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.easymock</groupId>
-                    <artifactId>easymock</artifactId>
-                </exclusion>
-            </exclusions>
+<!--             <exclusions> -->
+<!--                 <exclusion> -->
+<!--                     <groupId>org.easymock</groupId> -->
+<!--                     <artifactId>easymock</artifactId> -->
+<!--                 </exclusion> -->
+<!--                 <exclusion> -->
+<!--                 	<groupId>cglib</groupId> -->
+<!--                 	<artifactId>cglib-nodep</artifactId> -->
+<!--                 </exclusion> -->
+<!--             </exclusions> -->
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -238,25 +259,60 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.14</version>
         </dependency>
-        
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
             <version>3.12.0</version>
         </dependency>
-        
         <dependency>
             <groupId>org.apache.jclouds</groupId>
             <artifactId>jclouds-all</artifactId>
             <version>2.1.2-SHADED</version>
+            <exclusions>
+              <exclusion>
+                <groupId>javax.annotation</groupId>
+                <artifactId>jsr250-api</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
+         <dependency>
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
             <version>10.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock-junit4</artifactId>
+            <version>2.12.0</version>
+            <scope>test</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.ow2.asm</groupId>
+            		<artifactId>asm</artifactId>
+            	</exclusion>
+            	<exclusion>
+				    <groupId>org.jmock</groupId>
+				    <artifactId>jmock-legacy</artifactId>
+            	</exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.6</version><!--$NO-MVN-MAN-VER$-->
+            <scope>test</scope>
+        </dependency>
+         <dependency>
+         	<groupId>org.ow2.asm</groupId>
+         	<artifactId>asm</artifactId>
+         	<version>7.1</version>
+            <scope>test</scope>
+         </dependency>
     </dependencies>
     
     <build>

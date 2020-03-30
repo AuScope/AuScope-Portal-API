@@ -2,7 +2,6 @@ package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -13,7 +12,7 @@ import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeService.InstanceStatus;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
-import org.auscope.portal.core.test.ResourceUtil;
+import org.auscope.portal.core.util.ResourceUtil;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
 import org.auscope.portal.server.web.controllers.JobListController;
 import org.auscope.portal.server.web.security.NCIDetails;
@@ -196,13 +195,14 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockCloudStorageServices[0]).getId();will(returnValue(storageServiceId));
             oneOf(mockCloudStorageServices[0]).listJobFiles(with(mockJob));will(returnValue(jobActiveFiles));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_STS_ARN); will(returnValue(null));
+
             allowing(mockJob).getProperty(CloudJob.PROPERTY_CLIENT_SECRET); will(returnValue(null));
             allowing(mockJob).getProperty(CloudJob.PROPERTY_S3_ROLE); will(returnValue(null));
             allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
             allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
             allowing(mockJob).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
-            allowing(mockJob).getSubmitDate(); will(returnValue(new Date()));
             allowing(mockJob).isWalltimeSet(); will(returnValue(false));
+            
             allowing(mockJob).getWalltime(); will(returnValue(null));
             oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob);will(returnValue(InstanceStatus.Running));
         }});
@@ -449,7 +449,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
             allowing(mockJob2).getProperty(NCIDetails.PROPERTY_NCI_USER); will(returnValue(null));
             allowing(mockJob2).getProperty(NCIDetails.PROPERTY_NCI_PROJECT); will(returnValue(null));
             allowing(mockJob2).getProperty(NCIDetails.PROPERTY_NCI_KEY); will(returnValue(null));
-            allowing(mockJob2).getSubmitDate(); will(returnValue(new Date()));
+//            allowing(mockJob2).getSubmitDate(); will(returnValue(new Date()));
             allowing(mockJob2).isWalltimeSet(); will(returnValue(false));
             allowing(mockJob2).getWalltime(); will(returnValue(null));
             oneOf(mockCloudComputeServices[0]).getJobStatus(mockJob2);will(returnValue(InstanceStatus.Running));
