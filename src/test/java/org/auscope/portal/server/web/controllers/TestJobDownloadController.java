@@ -1,14 +1,20 @@
 package org.auscope.portal.server.web.controllers;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
+import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
+import org.auscope.portal.core.services.responses.wcs.Resolution;
+import org.auscope.portal.core.services.responses.wcs.TimeConstraint;
 import org.auscope.portal.core.services.responses.wfs.WFSGetCapabilitiesResponse;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VglDownload;
@@ -33,6 +39,7 @@ public class TestJobDownloadController extends PortalTestClass {
     private WCSService mockWcsService = context.mock(WCSService.class);
     private JobDownloadController controller;
     final String serviceUrl = "http://example.org/service";
+    final String coverageUrl = "http://example.org/coverage";
 
     @Before
     public void setup() {
@@ -339,7 +346,7 @@ public class TestJobDownloadController extends PortalTestClass {
      * Test the method makeWcsUrl(...)
      */
     @Test
-    public void testMakeWcsUrl() {
+    public void testMakeWcsUrl() throws PortalServiceException {
         final String localsServiceUrl = "http://example.org/wfs";
         final String name = "name";
         final String coverageName = "coverageName";
@@ -358,6 +365,20 @@ public class TestJobDownloadController extends PortalTestClass {
         final String fullDescription = "fullDescription";
         final String localPath = "";
         
+        context.checking(new Expectations() {{
+        	oneOf(mockWcsService).getCoverageRequestAsString(
+        			with(equal(localsServiceUrl)),
+        			with(equal(coverageName)),
+        			with(equal(outputFormat)),
+        			with(equal(outputCrs)),
+        			with(equal(new Dimension(outputWidth, outputHeight))),
+        			with(equal(new Resolution(outputResolutionX, outputResolutionY))),
+        			with(equal(bboxCrs)),
+        			with(any(CSWGeographicBoundingBox.class)),
+        			with(aNull(TimeConstraint.class)),
+        			with(aNull(Map.class)));
+        	will(returnValue(coverageUrl));
+        }});
         ModelAndView mav = controller.makeWcsUrl(localsServiceUrl, coverageName, outputFormat, bboxCrs,
         		outputCrs, outputWidth, outputHeight, outputResolutionX, outputResolutionY,
         		northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude,
