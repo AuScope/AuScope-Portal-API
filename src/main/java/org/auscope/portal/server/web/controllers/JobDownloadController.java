@@ -2,20 +2,20 @@ package org.auscope.portal.server.web.controllers;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.auscope.portal.core.server.OgcServiceProviderType;
 import org.auscope.portal.core.server.controllers.BasePortalController;
-import org.auscope.portal.core.services.csw.CSWServiceItem;
-import org.auscope.portal.core.services.methodmakers.WCSMethodMaker;
+import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
+import org.auscope.portal.core.services.responses.wcs.Resolution;
 import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +42,15 @@ public class JobDownloadController extends BasePortalController {
 
     protected final Log logger = LogFactory.getLog(getClass());
     private SimpleWfsService wfsService;
+    private WCSService wcsService;
 
 
     private String erddapServiceUrl;
 
     @Autowired
-    public JobDownloadController(SimpleWfsService wfsService, @Value("${erddapservice.url}") String erddapServiceUrl) {
+    public JobDownloadController(SimpleWfsService wfsService, WCSService wcsService, @Value("${erddapservice.url}") String erddapServiceUrl) {
         this.wfsService = wfsService;
+        this.wcsService = wcsService;
         this.erddapServiceUrl=erddapServiceUrl;
     }
 
@@ -66,6 +68,8 @@ public class JobDownloadController extends BasePortalController {
     }
 
     /**
+     * // TODO: No longer using session vars
+     * 
      * Utility for adding a single VglDownload object to the session based array of VglDownload objects.
      * @param request
      * @param download
@@ -127,7 +131,7 @@ public class JobDownloadController extends BasePortalController {
 
         return generateJSONResponseMAV(true, toView(newDownload), "");
     }
- 
+
     /**
      * Creates a new VL Download object from a some ERDDAP parameters. The Download object is returned. If saveSession
      * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list.
@@ -296,57 +300,84 @@ public class JobDownloadController extends BasePortalController {
 
         return generateJSONResponseMAV(true, toView(newDownload), "");
     }
-    
+
     /**
-     * Creates a new VL download object from WCS parameters
+     * Creates a new VL Download object from some WCS parameters. The Download object is returned. If saveSession
+     * is true the download object will also be saved to the session wide SESSION_DOWNLOAD_LIST list.
+     * 
+     * TODO: Do we need time constraint (TimeConstraint) and custom params (Map<String,String>)?
+     *
      * @param serviceUrl The WCS endpoint
-     * @param name The name of the download
-     * @param layerName
-     * @param bboxCrs
+     * @param coverageName
+     * @param format
+     * @param outputCrs
+     * @param outputWidth
+     * @param outputHeight
+     * @param outputResolutionX
+     * @param outputResolutionY
+     * @param inputCrs
      * @param northBoundLatitude
      * @param southBoundLatitude
      * @param eastBoundLongitude
      * @param westBoundLongitude
-     * @param outputFormat
+     * @param name
+     * @param description
+     * @param fullDescription
+     * @param localPath
      * @param saveSession
      * @param request
      * @return
      */
     @RequestMapping("/makeWcsUrl.do")
-    public ModelAndView makeWcsUrl(@RequestParam("url") final String serviceUrl,
-                                   @RequestParam("name") final String name,
-                                   @RequestParam(required = false, value = "layerName") final String layerName,
-                                   @RequestParam(required = false, value = "crs") final String bboxCrs,
+    public ModelAndView makeWcsUrl(@RequestParam("serviceUrl") final String serviceUrl,
+                                   @RequestParam("coverageName") final String coverageName,
+                                   @RequestParam(required = false, value = "format") final String format,
+                                   @RequestParam(required = false, value = "crs") final String inputCrs,
+                                   @RequestParam(required = false, value = "outputCrs") final String outputCrs,
+                                   @RequestParam(required = false, value = "outputWidth") final Integer outputWidth,
+                                   @RequestParam(required = false, value = "outputHeight") final Integer outputHeight,
+                                   @RequestParam(required = false, value = "outputResolutionX") final Double outputResolutionX,
+                                   @RequestParam(required = false, value = "outputResolutionY") final Double outputResolutionY,
                                    @RequestParam(required = false, value = "northBoundLatitude") final Double northBoundLatitude,
                                    @RequestParam(required = false, value = "southBoundLatitude") final Double southBoundLatitude,
                                    @RequestParam(required = false, value = "eastBoundLongitude") final Double eastBoundLongitude,
                                    @RequestParam(required = false, value = "westBoundLongitude") final Double westBoundLongitude,
-                                   @RequestParam(required = false, value = "format") final String outputFormat,
+                                   @RequestParam("name") final String name,
+                                   @RequestParam("description") final String description,
+                                   @RequestParam(required = false, value = "fullDescription") final String fullDescription,
+                                   @RequestParam("localPath") final String localPath,
                                    @RequestParam(required=false,defaultValue="false",value="saveSession") final boolean saveSession,
                                    HttpServletRequest request) {
 
-        log.info("got makeWcsUrl with params: " + serviceUrl + ", " + name + ", " + layerName + ", " + bboxCrs + ", " + outputFormat);
+    	Dimension outputSize = null;
+    	if(outputWidth != null && outputHeight != null) {
+    		outputSize = new Dimension(outputWidth, outputHeight);
+    	}
+    	
+    	Resolution outputResolution = null;
+    	if(outputResolutionX != null && outputResolutionY != null) {
+    		outputResolution = new Resolution(outputResolutionX, outputResolutionY);
+    	}
+    	
+        CSWGeographicBoundingBox bbox = null;
+        if (northBoundLatitude != null) {
+        	bbox = new CSWGeographicBoundingBox(westBoundLongitude, eastBoundLongitude, southBoundLatitude, northBoundLatitude);
+        }
         
-        CSWGeographicBoundingBox bbox = new CSWGeographicBoundingBox(
-                westBoundLongitude, eastBoundLongitude, southBoundLatitude,
-                northBoundLatitude);
-        HttpRequestBase downloadUrl = null;
+        String response = null;
         try {
-            WCSMethodMaker wcsMethodMaker = new WCSMethodMaker();
-            downloadUrl = wcsMethodMaker.getCoverageMethod(serviceUrl,
-                    layerName, outputFormat, bboxCrs, new Dimension(1000, 1000),
-                    null, bboxCrs, bbox, null, null);
+            response = wcsService.getCoverageRequestAsString(serviceUrl, coverageName, format, outputCrs, outputSize, outputResolution, inputCrs, bbox, null, null);
         } catch (Exception ex) {
-            log.warn(String.format(
-                    "Exception generating service request for '%2$s' from '%1$s': %3$s",
-                    serviceUrl, layerName, ex));
-            ex.printStackTrace();
-            generateExceptionResponse(ex, serviceUrl);
+            log.warn(String.format("Exception generating service request for '%2$s' from '%1$s': %3$s", serviceUrl, coverageName, ex));
+            log.debug("Exception: ", ex);
+            return generateExceptionResponse(ex, serviceUrl);
         }
 
         VglDownload newDownload = new VglDownload();
         newDownload.setName(name);
-        newDownload.setUrl(downloadUrl.getRequestLine().getUri());
+        newDownload.setDescription(fullDescription == null ? description : fullDescription);
+        newDownload.setLocalPath(localPath);
+        newDownload.setUrl(response);
         newDownload.setNorthBoundLatitude(northBoundLatitude);
         newDownload.setEastBoundLongitude(eastBoundLongitude);
         newDownload.setSouthBoundLatitude(southBoundLatitude);

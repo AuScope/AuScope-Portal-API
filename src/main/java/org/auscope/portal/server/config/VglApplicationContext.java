@@ -15,7 +15,6 @@ import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
 import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
-import org.auscope.portal.core.server.controllers.DownloadController;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.CSWFilterService;
@@ -42,6 +41,7 @@ import org.auscope.portal.core.services.methodmakers.WMSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WMSMethodMakerInterface;
 import org.auscope.portal.core.services.methodmakers.WMS_1_3_0_MethodMaker;
 import org.auscope.portal.core.services.namespaces.ErmlNamespaceContext;
+import org.auscope.portal.core.view.ViewCSWRecordFactory;
 import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -348,8 +348,6 @@ public class VglApplicationContext {
     </bean>
 	*/
 	
-	
-    
     @Bean
     public SimpleTriggerFactoryBean simpleTriggerFactoryBean() throws Exception {
     	SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
@@ -423,7 +421,7 @@ public class VglApplicationContext {
     // Second HttpServiceCaller to reduce CSW record search timeout
     @Bean
     public SearchHttpServiceCaller searchHttpServiceCaller() {
-    	return new SearchHttpServiceCaller(10000);
+    	return new SearchHttpServiceCaller(30000);
     }
     
     @Bean
@@ -1006,7 +1004,7 @@ public class VglApplicationContext {
     <bean class="org.auscope.portal.core.services.namespaces.ErmlNamespaceContext"/>
     */
 
-    // Needed? wfsService() creates a new WFSGetFEatureMethodMaker, not sure if this is referenced anywhere
+    // Needed? wfsService() creates a new WFSGetFeatureMethodMaker, not sure if this is referenced anywhere
     @Bean
     public WFSGetFeatureMethodMaker wfsMethodMakerErmlNamespace() {
     	WFSGetFeatureMethodMaker methodMaker = new WFSGetFeatureMethodMaker();
@@ -1030,4 +1028,9 @@ public class VglApplicationContext {
     	return serviceConfiguration;
     }
     
+    @Bean
+    public ViewCSWRecordFactory viewCSWRecordFactory() {
+    	return new ViewCSWRecordFactory();
+    }
+
 }

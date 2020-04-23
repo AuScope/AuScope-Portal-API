@@ -653,8 +653,11 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam("name") String[] names,
             @RequestParam("description") String[] descriptions,
             @RequestParam("url") String[] urls,
-            @RequestParam("localPath") String[] localPaths/*,
-            @AuthenticationPrincipal ANVGLUser user*/) {
+            @RequestParam("localPath") String[] localPaths,
+            @RequestParam(required=false, name="northBoundLatitude") Double[] northBoundLatitudes,
+            @RequestParam(required=false, name="eastBoundLongitude") Double[] eastBoundLongitudes,
+            @RequestParam(required=false, name="southBoundLatitude") Double[] southBoundLatitudes,
+            @RequestParam(required=false, name="westBoundLongitude") Double[] westBoundLongitudes) {
     	ANVGLUser user = userService.getLoggedInUser();
         boolean append = Boolean.parseBoolean(appendString);
 
@@ -665,6 +668,14 @@ public class JobBuilderController extends BaseCloudController {
             newDl.setDescription(descriptions[i]);
             newDl.setUrl(urls[i]);
             newDl.setLocalPath(localPaths[i]);
+            if(northBoundLatitudes != null)
+            	newDl.setNorthBoundLatitude(northBoundLatitudes[i]);
+            if(eastBoundLongitudes != null)
+            	newDl.setEastBoundLongitude(eastBoundLongitudes[i]);
+            if(southBoundLatitudes != null)
+            	newDl.setSouthBoundLatitude(southBoundLatitudes[i]);
+            if(eastBoundLongitudes != null)
+            	newDl.setWestBoundLongitude(westBoundLongitudes[i]);
             parsedDownloads.add(newDl);
         }
 
@@ -1001,6 +1012,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setStatus(STATUS_UNSUBMITTED);
         job.setSubmitDate(new Date());
 
+        // TODO: No longer using session vars
         //Transfer the 'session downloads' into actual download objects associated with a job
         @SuppressWarnings("unchecked")
         final
