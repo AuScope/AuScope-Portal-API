@@ -1,0 +1,15 @@
+language: java
+jdk:
+- openjdk13
+cache:
+  directories:
+  - "$HOME/.m2"
+deploy:
+  provider: releases
+  api_key:
+    secure: ta58reih5oUW6J2U/0JTjTlyfqr6FEQdaShrGwKmIGY6eCRQa6jOY8A8yGMbbOEhQ9KukLPkXQMFBMMWHqZQiseveb+ejmt2v2ds7/CBuZVSCSL4/eqgWYpz/y6S90WBiV27ra/aMq4vVgkZoEVVDmT/xjfBkgAF8fxQwbRJdqU=
+  file: target/AuScope-Portal.war
+  on:
+    repo: AuScope/AuScope-Portal
+    tags: true
+    branch: master

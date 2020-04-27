@@ -1,0 +1,7 @@
+<div style="background-color: #cccccc; padding:2px">
+<p>
+<img src="icons/pdficon_small.png" alt="PDF icon" />
+For a PDF version of this document click
+<a href="ug.pdf">here.</a>
+</p>
+</div>

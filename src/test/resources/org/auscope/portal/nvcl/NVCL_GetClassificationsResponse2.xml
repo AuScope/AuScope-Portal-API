@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ClassificationsCollection xmlns:ns2="http://www.w3.org/1999/xlink"
+    xmlns:ns3="http://www.auscope.org/nvcl" xmlns:ns4="http://www.opengis.net/gml"
+    xmlns:ns5="http://www.opengis.net/wfs">
+    <classifications>
+        <classText>NULL</classText>
+        <colour>8421504</colour>
+        <index>-1</index>
+    </classifications>
+    <classifications>
+        <classText>NEW_DISTINCT</classText>
+        <colour>1111111</colour>
+        <index>0</index>
+    </classifications>
+    <classifications>
+        <classText>Lazurite</classText>
+        <colour>12419145</colour>
+        <index>1</index>
+    </classifications>
+</ClassificationsCollection>

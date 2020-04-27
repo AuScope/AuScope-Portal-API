@@ -1,0 +1,24 @@
+
+
+
+
+<html>
+  <head>
+        <title>NVCL Data Services : Get Classifications</title>
+        <link rel="stylesheet" href="style/style.css" type="text/css"/>
+  </head>
+  <body  class="NVCLDSBody">
+  <h2 class="NVCLDSh2">NVCL Data Services : Get Classifications</h2>
+  <h2><font color="red">Error: algoutid or logid required</font></h2>
+  <p>the getClassifications service will generate a list of classifications available for a standard algorithm or free classification type scalar. It requires an algorithmoutputid or logid. Algorithmoutputids can be obtained from the <a href="getAlgorithms.html">getAlgorithms</a> service.</p>
+
+  <table class="usageTable"><tr><th>Parameter</th><th>Description</th><th>Required</th><th>Example values</th></tr>
+  <tr><td>algorithmoutputid</td><td>obtained through calling the getAlgorithms service</td><td>yes, or a logid</td><td>2</td></tr>
+  <tr><td>logid</td><td>obtained through calling the getLogCollection service</td><td>yes, or an algorithmoutputid</td><td>84346b38-5002-412e-8450-6ba79d38c94</td></tr>
+  <tr><td>outputformat</td><td>xml or json</td><td>no</td><td>json</td></tr>
+  
+  </table>
+  <h3>Example Queries:</h3>
+  <p>A query for available classifications of the algorithmoutput with id 2 : getClassifications.html?algorithmoutputid=2</p>
+  </body>
+</html>

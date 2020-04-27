@@ -1,0 +1,1 @@
+{"jobid":"a015180de276f01fc146e7093dbe4389","jobDescription":"test004","email":"foo@bar.com","boreholes":[{"id":"http://example/id1","msg":"id1"},{"id":"http://example/id2","msg":"id2"}],"failedBoreholes":[{"id":"http://example/id3","msg":"id3"}],"errorBoreholes":[{"id":"http://example/id4","msg":"id4"}]}

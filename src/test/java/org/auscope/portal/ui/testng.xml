@@ -1,0 +1,72 @@
+<suite name="Selenium TestNG Suite" parallel="tests" thread-count="10">
+
+    <!-- Main dev portal tests -->
+
+    <test name="Firefox main portal test">
+        <parameter name="browser" value="firefox" />
+        <parameter name="version" value="" />
+        <parameter name="port" value="4444" />
+        <parameter name="portal_url"
+            value="http://auscope-portal-dev.arrc.csiro.au/portal/gmap.html" />
+        <classes>
+            <class name="org.auscope.portal.ui.SearchLayerTest" />
+        </classes>
+    </test>
+    
+    <test name="Chrome main portal test">
+        <parameter name="browser" value="chrome" />
+        <parameter name="version" value="" />
+        <parameter name="port" value="4444" />
+        <parameter name="portal_url"
+            value="http://auscope-portal-dev.arrc.csiro.au/portal/gmap.html" />
+        <classes>
+            <class name="org.auscope.portal.ui.SearchLayerTest" />
+        </classes>
+    </test>
+
+    <test name="IE main portal test">
+        <parameter name="browser" value="internet explorer" />
+        <parameter name="version" value="" />
+        <parameter name="port" value="4444" />
+        <parameter name="portal_url"
+            value="http://auscope-portal-dev.arrc.csiro.au/portal/gmap.html" />
+        <classes>
+            <class name="org.auscope.portal.ui.SearchLayerTest" />
+        </classes>
+    </test>
+
+    <!-- Mobile tests -->
+    <test name="Firefox mobile test">
+        <parameter name="browser" value="firefox" />
+        <parameter name="version" value="" />
+        <parameter name="port" value="4444" />
+        <parameter name="portal_url"
+            value="http://auscope-portal-dev.arrc.csiro.au/portal/mobile/index.htm" />
+        <classes>
+            <class name="org.auscope.portal.ui.mobile.SearchLayerMobileTest" />
+        </classes>
+    </test> 
+
+    <test name="Chrome mobile test">
+        <parameter name="browser" value="chrome" />
+        <parameter name="version" value="" />
+        <parameter name="port" value="4444" />
+        <parameter name="portal_url"
+            value="http://auscope-portal-dev.arrc.csiro.au/portal/mobile/index.htm" />
+        <classes>
+            <class name="org.auscope.portal.ui.mobile.SearchLayerMobileTest" />
+        </classes>
+    </test>
+
+    <test name="IE mobile test">
+        <parameter name="browser" value="internet explorer" />
+        <parameter name="version" value="" />
+        <parameter name="port" value="4444" />
+        <parameter name="portal_url"
+            value="http://auscope-portal-dev.arrc.csiro.au/portal/mobile/index.htm" />
+        <classes>
+            <class name="org.auscope.portal.ui.mobile.SearchLayerMobileTest" />
+        </classes>
+    </test> 
+
+</suite>
