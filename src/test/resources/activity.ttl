@@ -1,0 +1,37 @@
+<http://placeholder.org#12df1e51-14f2-4842-8736-1568bbc388a0>
+      a       <http://www.w3.org/ns/prov#Entity> ;
+      <http://www.w3.org/ns/dcat#downloadURL>
+              "http://portal-fake.vhirl.org/secure/jobFile.do?jobId=1&key=cloudKey"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;
+      <http://www.w3.org/ns/prov#wasAttributedTo>
+              <https://plus.google.com/1> .
+
+<http://portal-fake.vhirl.org/secure/getJobObject.do?jobId=1>
+      a       <http://www.w3.org/ns/prov#Activity> ;
+      <http://purl.org/dc/elements/1.1/description>
+              "Some job I made."^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "Cool Job"^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://www.w3.org/ns/prov#startedAtTime>
+              "2014-12-17T14:22:45+11:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+      <http://www.w3.org/ns/prov#used>
+              <http://placeholder.org#12df1e51-14f2-4842-8736-1568bbc388a0> , <http://placeholder.org#fda44cab-255b-430f-a543-999318af9077> , <http://placeholder.org#38bdc1fc-bffa-45bb-892a-a48d05ea1786> ;
+      <http://www.w3.org/ns/prov#wasAssociatedWith>
+              <https://plus.google.com/1> .
+
+<http://placeholder.org#fda44cab-255b-430f-a543-999318af9077>
+      a       <http://www.w3.org/ns/prov#Entity> ;
+      <http://www.w3.org/ns/dcat#downloadURL>
+              "http://portal-fake.vhirl.org/secure/jobFile.do?jobId=1&key=activity.ttl"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;
+      <http://www.w3.org/ns/prov#wasAttributedTo>
+              <https://plus.google.com/1> .
+
+<http://placeholder.org#38bdc1fc-bffa-45bb-892a-a48d05ea1786>
+      a       <http://www.w3.org/ns/prov#Entity> ;
+      <http://promsns.org/def/proms#serviceBaseUri>
+              "http://portal-uploads.vhirl.org/file1"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "file1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://www.w3.org/ns/dcat#downloadURL>
+              "http://portal-uploads.vhirl.org/file1"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;
+      <http://www.w3.org/ns/prov#wasAttributedTo>
+              <https://plus.google.com/1> .

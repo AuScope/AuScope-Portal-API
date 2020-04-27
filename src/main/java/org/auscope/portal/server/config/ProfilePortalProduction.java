@@ -1,6 +1,7 @@
 package org.auscope.portal.server.config;
 
 import java.util.ArrayList;
+<<<<<<< HEAD
 
 import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
@@ -388,5 +389,3 @@ public class ProfilePortalProduction {
     }
 
 }
-    
- 

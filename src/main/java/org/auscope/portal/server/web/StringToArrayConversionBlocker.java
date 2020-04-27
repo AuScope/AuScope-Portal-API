@@ -16,5 +16,4 @@ public class StringToArrayConversionBlocker implements Converter<String, String[
     public String[] convert(String source) {
         return new String[] {source};
     }
-
 }

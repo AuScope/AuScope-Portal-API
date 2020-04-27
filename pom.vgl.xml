@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.auscope.portal</groupId>
+    <artifactId>VGL-Portal</artifactId>
+    <packaging>war</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>VGL-Portal</name>
+    <url>https://confluence.csiro.au/display/VGL/VGL</url>
+    <issueManagement>
+        <system>Jira</system>
+        <url>https://jira.csiro.au/projects/VGL</url>
+    </issueManagement>
+    <scm>
+        <connection>scm:git:https://github.com/AuScope/ANVGL-Portal</connection>
+        <developerConnection>scm:git:https://github.com/AuScope/ANVGL-Portal</developerConnection>
+        <url>https://github.com/AuScope/ANVGL-Portal</url>
+    </scm>
+
+    <!-- Build Configuration -->
+    <organization>
+        <name>CSIRO</name>
+        <url>http://csiro.au</url>
+    </organization>
+        
+    <!-- Project properties -->
+    <properties>       
+        <log4j.version>1.2.16</log4j.version>
+        <targetJdk>13</targetJdk>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <powermock.version>2.0.5</powermock.version>
+        <portal.core.version>2.3.1-SNAPSHOT</portal.core.version>
+        <httpclient.version>4.5.9</httpclient.version>
+        <mysql.version>8.0.14</mysql.version>
+    </properties>
+    
+    <!--  Spring Boot -->    
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.2.5.RELEASE</version>
+    </parent>
+    
+    <repositories>
+        <repository>
+            <id>dcdp-deps</id>
+            <name>AuScope Nexus - New PortalRepo</name>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
+        </repository>
+		<repository>
+            <id>cgmaven.it.csiro.au</id>
+            <name>AuScope Nexus - New PortalRepo</name>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/PortalRepository/</url>
+        </repository>
+    </repositories>
+
+    <!-- Dependencies -->
+		<dependencies>
+			<dependency>
+		    <groupId>net.bytebuddy</groupId>
+		    <artifactId>byte-buddy</artifactId>
+		</dependency>
+	
+	   <!-- Check if we need this if we use spring-boot-starter-web -->
+	   <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- JPA (Spring Boot) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        
+        <!-- Security (Spring Boot) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+            <version>2.1.3.RELEASE</version>
+        </dependency>
+
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.54</version>
+		</dependency>
+        <dependency>
+            <groupId>proms-client-java</groupId>
+            <artifactId>proms-client-java</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.auscope.portal</groupId>
+            <artifactId>portal-core</artifactId>
+            <version>${portal.core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.auscope.portal</groupId>
+            <artifactId>portal-core</artifactId>
+            <version>${portal.core.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>taglibs</groupId>
+            <artifactId>standard</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.24.1-GA</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jhlabs</groupId>
+            <artifactId>javaproj</artifactId>
+            <version>1.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-jwt</artifactId>
+            <version>1.0.10.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <!-- Added for job monitoring -->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Added for email templating -->
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.7</version>
+        </dependency>
+        
+        <dependency>
+		    <groupId>edu.ucar</groupId>
+		    <artifactId>netcdf</artifactId>
+		    <version>4.2.20</version>
+        </dependency>
+        
+        <!-- Added for using PowerMock with JMock -->
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-support</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!--
+            We depend on the EasyMock API but exclude the EasyMock dependency. The reason
+            is that PowerMock Whitebox needs a "org.powermock.reflect.spi.ProxyFramework"
+            implementation in order to work correctly. This implementation is provided by
+            the extension API:s. Since JMock uses CGLib it can reuse the
+            "org.powermock.api.extension.proxyframework.ProxyFrameworkImpl" in the
+            PowerMock EasyMock API. An alternative to depend on this class would be to simply copy
+            the class it into your code (remember that the class must be named
+            org.powermock.api.extension.proxyframework.ProxyFrameworkImpl).
+        -->
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito2</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+<!--             <exclusions> -->
+<!--                 <exclusion> -->
+<!--                     <groupId>org.easymock</groupId> -->
+<!--                     <artifactId>easymock</artifactId> -->
+<!--                 </exclusion> -->
+<!--                 <exclusion> -->
+<!--                 	<groupId>cglib</groupId> -->
+<!--                 	<artifactId>cglib-nodep</artifactId> -->
+<!--                 </exclusion> -->
+<!--             </exclusions> -->
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-core</artifactId>
+            <version>3.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jclouds</groupId>
+            <artifactId>jclouds-all</artifactId>
+            <version>2.1.2-SHADED</version>
+            <exclusions>
+              <exclusion>
+                <groupId>javax.annotation</groupId>
+                <artifactId>jsr250-api</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>10.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock-junit4</artifactId>
+            <version>2.12.0</version>
+            <scope>test</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.ow2.asm</groupId>
+            		<artifactId>asm</artifactId>
+            	</exclusion>
+            	<exclusion>
+				    <groupId>org.jmock</groupId>
+				    <artifactId>jmock-legacy</artifactId>
+            	</exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.6</version><!--$NO-MVN-MAN-VER$-->
+            <scope>test</scope>
+        </dependency>
+         <dependency>
+         	<groupId>org.ow2.asm</groupId>
+         	<artifactId>asm</artifactId>
+         	<version>7.1</version>
+            <scope>test</scope>
+         </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    
+</project>
