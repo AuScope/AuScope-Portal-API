@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
@@ -17,7 +18,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
  */
  
 @Configuration
-public class ProfilePortalTest {
+@Profile("au-portal-test")
+public class AuProfilePortalTest {
 
 /* Allow CORS for development purposes */
 @Bean
@@ -29,7 +31,7 @@ public WebMvcConfigurer configurer() {
         }
     };
 }
-    
+
     @Autowired
     KnownLayer knownTypeMine;
     @Autowired

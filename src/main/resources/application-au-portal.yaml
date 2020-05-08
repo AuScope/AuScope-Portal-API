@@ -1,0 +1,115 @@
+# This is for developers to set tomcat context path if running from PortalApplication class.
+# server:
+#     port: 8080
+#     servlet:
+#         context-path: /AuScope-Portal
+        
+spring:
+   # Include the registry definitions from application-registries.yaml
+   profiles:
+      include:
+         'registries'
+   # Using a dummy in-memory database for compatibility with VGL db classes
+   datasource:
+      driver-class-name: org.h2.Driver
+      url: "jdbc:h2:mem:"
+      username: sa
+      password: sa
+
+   jpa:
+      properties:
+         hibernate:
+            dialect: org.hibernate.dialect.H2Dialect
+      
+   mvc:
+      servlet:
+         load-on-startup: 1
+
+# Timeouts in seconds
+wait-for-body-content:
+   timeout: 90
+socket:
+   timeout: 90
+connection-establish:
+   timeout: 90
+
+# Cloud Compute Properties
+###########################################################
+vm:
+   sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl.sh
+vm-shutdown:
+   sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl-shutdown.sh
+
+# Machine / environment specific properties
+###########################################################
+
+
+googlemap:
+   key: <google_map_key>
+   
+erddapservice:
+   url: http://siss2.anu.edu.au/erddap/griddap/
+smtp:
+   server: smtp-relay.csiro.au
+localStageInDir: C:\\temp\\vegl-portal-temp
+solutions:
+   url: https://sssc-vgl.geoanalytics.csiro.au/
+proms:
+   report:
+      url: http://proms-dev1-vc.it.csiro.au/id/report/
+   reportingsystem:
+      uri: http://proms-dev1-vc.it.csiro.au/rs
+portalUrl: http://localhost:8080/VGL-Portal
+frontEndUrl: http://localhost:4200
+portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
+defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
+
+
+
+# Gives us separation from real DB passwords.
+# Production deployment will copy env.properties file over
+# this one as passwords should not be in version control.
+
+# For deployments - you can now override the location of this file...
+#   <param-name>envPropertiesLocation</param-name>
+#   <param-value>file:///c:/env.properties</param-value>
+# made possible via Spring3 SpEL in the config.
+
+google:
+   client:
+      clientId: GOOGLE_CLIENT_ID
+      clientSecret: GOOGLE_CLIENT_SECRET
+      accessTokenUri: https://www.googleapis.com/oauth2/v4/token
+      userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+      clientAuthenticationScheme: form
+      scope:
+         - openid
+         - email
+         - profile
+   resource:
+      userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
+      preferTokenInfo: true
+aaf:
+   loginUrl: AAF_LOGIN_URL
+   callbackUrl: AAF_CALLBACK_URL
+   jwtsecret: AAF_SECRET
+encryption:
+   password: ABCdefGHI
+
+
+stripeApiKey: 
+
+env:
+    twitter:
+        enable: false
+        consumerKey: ENTER_TWITTER_CONSUMER_KEY
+        consumerSecret: ENTER_TWITTER_CONSUMER_SECRET
+        accessToken: ENTER_TWITTER_ACCESS_TOKEN
+        accessTokenSecret: ENTER_TWITTER_ACCESS_SECRET
+        user: AuScope
+    vocabService:
+        url: http://vocabs.ga.gov.au/cgi/sissvoc/
+    nvclVocabService:
+        url: http://auscope-services-test.arrc.csiro.au/sissvoc/
+    nvclAnalyticalServices:
+        url: http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/

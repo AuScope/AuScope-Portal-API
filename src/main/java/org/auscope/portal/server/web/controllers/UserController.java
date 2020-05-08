@@ -48,8 +48,9 @@ public class UserController extends BasePortalController {
     private NCIDetailsService nciDetailsService;
     
     private VelocityEngine velocityEngine;
-    private CloudComputeService[] cloudComputeServcies;
+    private CloudComputeService[] cloudComputeServices;
 
+    @Autowired
     private String awsAccount;
 
     private String tacVersion;
@@ -57,13 +58,11 @@ public class UserController extends BasePortalController {
     @Autowired
     public UserController(VelocityEngine velocityEngine,
     		CloudComputeService[] cloudComputeServices,
-            @Value("${aws.account}") String awsAccount,
-            @Value("${termsconditions.version}") String tacVersion) throws PortalServiceException {
+                @Value("${termsconditions.version:1}") String tacVersion) throws PortalServiceException {
         super();        
         this.velocityEngine = velocityEngine;
-        this.cloudComputeServcies = cloudComputeServices;
-        this.awsAccount=awsAccount;
-        this.tacVersion=tacVersion;
+        this.cloudComputeServices = cloudComputeServices;
+        this.tacVersion = tacVersion;
     }
 
 
@@ -253,7 +252,7 @@ public class UserController extends BasePortalController {
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
-        boolean hasConfigured = user.configuredServicesStatus(nciDetailsService, cloudComputeServcies);
+        boolean hasConfigured = user.configuredServicesStatus(nciDetailsService, cloudComputeServices);
         return generateJSONResponseMAV(hasConfigured);
     }
 

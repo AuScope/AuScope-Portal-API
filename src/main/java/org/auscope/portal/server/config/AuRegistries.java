@@ -1,10 +1,13 @@
 package org.auscope.portal.server.config;
 
-import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
+import org.auscope.portal.core.services.csw.CSWServiceItem;
 
 @Configuration
+@Profile({"au-portal-prod", "au-portal-test"})
 class AuScopeRegistries {
 
     @Bean

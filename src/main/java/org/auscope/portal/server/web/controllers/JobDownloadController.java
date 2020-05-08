@@ -41,15 +41,15 @@ public class JobDownloadController extends BasePortalController {
 
 
     protected final Log logger = LogFactory.getLog(getClass());
-    private SimpleWfsService wfsService;
+    private SimpleWfsService simpleWfsService;
     private WCSService wcsService;
 
 
     private String erddapServiceUrl;
 
     @Autowired
-    public JobDownloadController(SimpleWfsService wfsService, WCSService wcsService, @Value("${erddapservice.url}") String erddapServiceUrl) {
-        this.wfsService = wfsService;
+    public JobDownloadController(SimpleWfsService simpleWfsService, WCSService wcsService, @Value("${erddapservice.url}") String erddapServiceUrl) {
+        this.simpleWfsService = simpleWfsService;
         this.wcsService = wcsService;
         this.erddapServiceUrl=erddapServiceUrl;
     }
@@ -272,7 +272,7 @@ public class JobDownloadController extends BasePortalController {
         String response = null;
 
         try {
-            response = wfsService.getFeatureRequestAsString(serviceUrl, featureType, bbox, maxFeatures, srsName, outputFormat);
+            response = simpleWfsService.getFeatureRequestAsString(serviceUrl, featureType, bbox, maxFeatures, srsName, outputFormat);
         } catch (Exception ex) {
             log.warn(String.format("Exception generating service request for '%2$s' from '%1$s': %3$s", serviceUrl, featureType, ex));
             log.debug("Exception: ", ex);

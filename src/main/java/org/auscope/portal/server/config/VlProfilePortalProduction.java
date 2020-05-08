@@ -1,7 +1,13 @@
-import org.auscope.portal.core.view.knownlayer.KnownLayer;
+package org.auscope.portal.server.config;
+
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
+import org.auscope.portal.core.view.knownlayer.KnownLayer;
 
 /**
  * Definitions for all known layers
@@ -10,7 +16,8 @@ import org.springframework.context.annotation.Configuration;
  *
  */
 @Configuration
-public class VglProfilePortalProduction {
+@Profile("vl-portal-prod")
+public class VlProfilePortalProduction {
 	
 	@Autowired
 	KnownLayer knownTypeBouguerGeodetic;

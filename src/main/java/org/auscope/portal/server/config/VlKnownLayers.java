@@ -3,12 +3,14 @@ package org.auscope.portal.server.config;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
 import org.auscope.portal.core.view.knownlayer.CSWRecordSelector;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.view.knownlayer.WFSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSSelector;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 
 /**
@@ -17,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
  *
  */
 @Configuration
+@Profile("vl-portal-prod")
 public class VlKnownLayers {
 	
 	@Bean

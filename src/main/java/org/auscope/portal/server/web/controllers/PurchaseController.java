@@ -68,13 +68,13 @@ public class PurchaseController extends BasePortalController {
     @Autowired
     private VGLPurchaseService purchaseService;
     
-    private SimpleWfsService wfsService;
+    private SimpleWfsService simpleWfsService;
     
     private CSWFilterService cswFilterService;
     
     // @Autowired
-    public PurchaseController(SimpleWfsService wfsService,  CSWFilterService cswFilterService) {
-        this.wfsService = wfsService;
+    public PurchaseController(SimpleWfsService simpleWfsService,  CSWFilterService cswFilterService) {
+        this.simpleWfsService = simpleWfsService;
         this.cswFilterService = cswFilterService;
     }
 
@@ -565,7 +565,7 @@ public class PurchaseController extends BasePortalController {
                 FilterBoundingBox bbox = FilterBoundingBox.parseFromValues(bboxCrs, northBoundLatitude, southBoundLatitude, eastBoundLongitude, westBoundLongitude);
                 String downloadUrl = null;
                 try {
-                    downloadUrl = wfsService.getFeatureRequestAsString(serviceUrl, featureType, bbox, maxFeatures, srsName, outputFormat);
+                    downloadUrl = simpleWfsService.getFeatureRequestAsString(serviceUrl, featureType, bbox, maxFeatures, srsName, outputFormat);
                 } catch (Exception ex) {
                     log.warn(String.format("Exception generating service request for '%2$s' from '%1$s': %3$s", serviceUrl, featureType, ex));
                 }
