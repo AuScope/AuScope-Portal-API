@@ -25,6 +25,11 @@ csw:
       #  recordInformationUrl: http://www.ga.gov.au/geonetwork/srv/en/csw?request=GetRecordById&amp;service=CSW&amp;version=2.0.2&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;elementSetName=full&amp;id=%1$s
       #  title: Geoscience Australia PMD*CRC Publications
       #  cqlText: csw:AnyText Like '%PMD*CRC Publication%' AND BBOX(ows:BoundingBox, 110,-9,160,-55)
+      # - id: Grace
+      #   serviceUrl: http://ec2-13-55-219-23.ap-southeast-2.compute.amazonaws.com:8081/api
+      #   recordInformationUrl: "http://ec2-13-55-219-23.ap-southeast-2.compute.amazonaws.com:8081/api/catalog.search#/metadata/%1$s"
+      #   title: GRACE Dev
+      #   serverType: PyCSW
 #      - id: cswNigel
 #        serviceUrl: http://130.56.244.85/geonetwork/srv/eng/csw
 #        recordInformationUrl: "http://130.56.244.85/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
@@ -40,4 +45,3 @@ csw:
 #        recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
 #        title: NCI MT Data Portal
 #        serverType: Default
-        
