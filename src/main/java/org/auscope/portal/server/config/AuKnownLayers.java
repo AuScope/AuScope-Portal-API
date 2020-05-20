@@ -38,7 +38,6 @@ import org.auscope.portal.core.uifilter.optional.xpath.UIPolygonBBox;
  *
  */
 @Configuration
-@Profile({"au-portal-prod", "au-portal-test"})
 public class AuKnownLayers { 
 
 

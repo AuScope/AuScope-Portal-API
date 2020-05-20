@@ -3,24 +3,38 @@
 #     port: 8080
 #     servlet:
 #         context-path: /AuScope-Portal
-        
+termsconditions:
+   version: 1
+
 spring:
    # Include the registry definitions from application-registries.yaml
    profiles:
       include:
          'registries'
-   # Using a dummy in-memory database for compatibility with VGL db classes
    datasource:
+      # This is for a dummy in-memory database
       driver-class-name: org.h2.Driver
       url: "jdbc:h2:mem:"
       username: sa
       password: sa
+      # Use this for MySQL db
+      #   url: jdbc:mysql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      #   username: <db_user>
+      #   password: <db_password>
+      #   driver-class-name: com.mysql.cj.jdbc.Driver
 
    jpa:
+      hibernate:
+         naming:
+            # Stop camel case fields being converted to underscore
+            physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       properties:
          hibernate:
-            dialect: org.hibernate.dialect.H2Dialect
-      
+            dialect: org.hibernate.dialect.H2Dialect # For dummy db
+      #     dialect: org.hibernate.dialect.MySQL5InnoDBDialect # For MySQL db above
+      #     format_sql: true      # FOR TESTING
+      #show-sql: true              # FOR TESTING
+ 
    mvc:
       servlet:
          load-on-startup: 1
@@ -64,7 +78,7 @@ frontEndUrl: http://localhost:4200
 portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
 defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
 
-
+stripeApiKey: STRIPE_API_KEY
 
 # Gives us separation from real DB passwords.
 # Production deployment will copy env.properties file over
@@ -74,6 +88,24 @@ defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm
 #   <param-name>envPropertiesLocation</param-name>
 #   <param-value>file:///c:/env.properties</param-value>
 # made possible via Spring3 SpEL in the config.
+
+#
+# AWS keys to be used for dev only. Production system to use AWS roles for authorization
+#
+aws:
+   account: AWS_ACCOUNT
+   accesskey: AWS_ACCESS_KEY
+   secretkey: AWS_SECRET_KEY
+   sessionkey: AWS_SESSION_KEY
+   stsrequirement: Mandatory
+
+#nectar:
+#   ec2:
+#      accesskey: NECTAR_EC2_ACCESS_KEY
+#      secretkey: NECTAR_EC2_SECRET_KEY
+#   storage:
+#      accesskey: NECTAR_STORAGE_ACCESS_KEY
+#      secretkey: NECTAR_STORAGE_SECRET_KEY
 
 google:
    client:
@@ -95,9 +127,6 @@ aaf:
    jwtsecret: AAF_SECRET
 encryption:
    password: ABCdefGHI
-
-
-stripeApiKey: 
 
 env:
     twitter:

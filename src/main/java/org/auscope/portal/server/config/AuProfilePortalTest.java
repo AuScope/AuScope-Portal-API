@@ -533,25 +533,4 @@ public WebMvcConfigurer configurer() {
 	}
                 
 
-    @Autowired
-	@Qualifier("cswAuscopeTest")
-	CSWServiceItem cswAuscopeTest;
-    
-    //@Autowired
-    //	@Qualifier("cswMDUTest")
-    //	CSWServiceItem cswMDUTest;
-    
-    @Autowired
-	@Qualifier("cswGAPMDCRC")
-	CSWServiceItem cswGAPMDCRC;
-    
-    @Bean
-	public ArrayList<CSWServiceItem> cswServiceList() {
-		ArrayList<CSWServiceItem> serviceList = new ArrayList<CSWServiceItem>();
-		serviceList.add(cswAuscopeTest);
-	        // serviceList.add(cswMDUTest);
-		serviceList.add(cswGAPMDCRC);
-		return serviceList;
-	}
-
 }

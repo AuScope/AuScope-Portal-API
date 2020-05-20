@@ -108,7 +108,6 @@ import org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer
 import org.auscope.portal.server.web.service.NotificationService;
 import org.auscope.portal.mscl.MSCLWFSService;
 import org.auscope.portal.core.services.NamespaceService;
-import org.auscope.portal.core.services.LocalCSWFilterService;
 
 
 /**

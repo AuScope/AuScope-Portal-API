@@ -363,30 +363,4 @@ public class AuProfilePortalProduction {
 		return knownLayers;
 	}
     
-    
-    
-    
-    @Autowired
-    @Qualifier("cswAuscopeProduction")
-    CSWServiceItem cswAuscopeProduction;
-    
-    // @Autowired
-    // @Qualifier("cswMDUProduction")
-    // CSWServiceItem cswMDUProduction;
-    
-    @Autowired
-    @Qualifier("cswGAPMDCRC")
-    CSWServiceItem cswGAPMDCRC;
-    
-    @Bean
-    @Primary
-    @Autowired
-    public ArrayList<CSWServiceItem> cswServiceList() {
-		ArrayList<CSWServiceItem> serviceList = new ArrayList<CSWServiceItem>();
-		serviceList.add(cswAuscopeProduction);
-		// serviceList.add(cswMDUProduction);
-		serviceList.add(cswGAPMDCRC);
-		return serviceList;
-    }
-
 }

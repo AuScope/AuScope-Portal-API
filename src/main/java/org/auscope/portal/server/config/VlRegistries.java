@@ -20,7 +20,6 @@ import org.auscope.portal.core.services.csw.CSWServiceItem;
  *
  */
 @Configuration
-@Profile("vl-portal-prod")
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix="csw")
 public class VlRegistries {
