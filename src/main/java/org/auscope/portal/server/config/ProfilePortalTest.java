@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
  
 @Configuration
 @Profile("au-portal-test")
-public class AuProfilePortalTest {
+public class ProfilePortalTest {
 
 /* Allow CORS for development purposes */
 @Bean

@@ -38,8 +38,7 @@ import org.auscope.portal.core.uifilter.optional.xpath.UIPolygonBBox;
  *
  */
 @Configuration
-public class AuKnownLayers { 
-
+public class KnownLayers {
 
     private void setupIcon(KnownLayer layer) {
         Point iconAnchor = new Point(16,32);

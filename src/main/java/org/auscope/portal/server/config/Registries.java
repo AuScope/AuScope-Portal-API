@@ -22,7 +22,7 @@ import org.auscope.portal.core.services.csw.CSWServiceItem;
 @Configuration
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix="csw")
-public class VlRegistries {
+public class Registries {
 	
 	private List<CSWServiceItem> registries= new ArrayList<CSWServiceItem>();
 	

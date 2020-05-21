@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
  
 @Configuration
 @Profile("au-portal-prod")
-public class AuProfilePortalProduction {
+public class ProfilePortalProduction {
 
 /* When running a local development server, uncomment this to disable CORS checking */
 //@Bean
