@@ -1,0 +1,7 @@
+auscope:
+  registries:
+      - id: cswAuscopeProduction
+        serviceUrl: http://portal.auscope.org/geonetwork/srv/eng/csw
+        recordInformationUrl: http://portal.auscope.org/geonetwork/srv/eng/catalog.search#/metadata/%1$s
+        title: AuScope Geonetwork
+        serverType: Default

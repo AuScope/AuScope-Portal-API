@@ -20,16 +20,6 @@ csw:
         recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
         title: NCI Data Portal
         serverType: Default
-      - id: cswAuscopeTest
-        serviceUrl: http://au-portal-2.it.csiro.au/geonetwork/srv/eng/csw
-        recordInformationUrl: http://au-portal-2.it.csiro.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s
-        title: AuScope Test Geonetwork
-        serverType: Default
-      - id: cswAuscopeProduction
-        serviceUrl: http://portal.auscope.org/geonetwork/srv/eng/csw
-        recordInformationUrl: http://portal.auscope.org/geonetwork/srv/eng/catalog.search#/metadata/%1$s
-        title: AuScope Geonetwork
-        serverType: Default
       - id: cswGAPMDCRC
         serviceUrl: http://www.ga.gov.au/geonetwork/srv/en/csw
         recordInformationUrl: http://www.ga.gov.au/geonetwork/srv/en/csw?request=GetRecordById&amp;service=CSW&amp;version=2.0.2&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;elementSetName=full&amp;id=%1$s

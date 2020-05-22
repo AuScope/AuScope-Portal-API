@@ -403,8 +403,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <profiles>
-                        <!-- <profile>au-portal-prod</profile> -->
-                        <profile>au-portal-test</profile>
+                        <!-- <profile>prod</profile> -->
+                        <profile>test</profile>
                     </profiles>
                 </configuration>
 
