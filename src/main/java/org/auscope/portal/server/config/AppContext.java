@@ -36,6 +36,8 @@ import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.WMSService;
+import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
+import org.auscope.portal.core.services.methodmakers.GoogleCloudMonitoringMethodMaker;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceNectar;
