@@ -244,7 +244,15 @@ public class ProfilePortalProduction {
     KnownLayer knownTypeUOWOSLTLOutlets;
     /* END UOW OCTOPUS */
 
-
+    /* IGSN sample layer */
+    @Autowired
+    KnownLayer knownTypeIGSNSample;
+    @Autowired
+    KnownLayer knownTypeIGSNGASample;
+    @Autowired
+    KnownLayer knownTypeIGSNANDSSample;
+    @Autowired
+    KnownLayer knownTypeIGSNWdcSample;            
     @Bean
 	public ArrayList<KnownLayer> knownTypes() {
 		ArrayList<KnownLayer> knownLayers = new ArrayList<KnownLayer>();
@@ -359,7 +367,10 @@ public class ProfilePortalProduction {
         knownLayers.add(knownTypeUOWOSLTLBasins);
         knownLayers.add(knownTypeUOWOSLTLOutlets);
         /* END UOW OCTOPUS */
-
+        knownLayers.add(knownTypeIGSNSample);        
+        knownLayers.add(knownTypeIGSNGASample);        
+        knownLayers.add(knownTypeIGSNANDSSample);        
+        knownLayers.add(knownTypeIGSNWdcSample);   
 		return knownLayers;
 	}
     

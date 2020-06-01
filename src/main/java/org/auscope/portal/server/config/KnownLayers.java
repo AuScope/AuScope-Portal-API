@@ -2,6 +2,7 @@ package org.auscope.portal.server.config;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.net.MalformedURLException;
@@ -11,52 +12,49 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
-
 import org.auscope.portal.core.uifilter.AbstractBaseFilter;
+import org.auscope.portal.core.uifilter.FilterCollection;
+import org.auscope.portal.core.uifilter.Predicate;
 import org.auscope.portal.core.uifilter.mandatory.AbstractMandatoryParamBinding;
+import org.auscope.portal.core.uifilter.optional.UICheckBoxGroupProvider;
+import org.auscope.portal.core.uifilter.optional.xpath.UIDate;
+import org.auscope.portal.core.uifilter.optional.xpath.UIDropDownRemote;
+import org.auscope.portal.core.uifilter.optional.xpath.UIDropDownSelectList;
+import org.auscope.portal.core.uifilter.optional.xpath.UIPolygonBBox;
+import org.auscope.portal.core.uifilter.optional.xpath.UITextBox;
 import org.auscope.portal.core.view.knownlayer.CSWRecordSelector;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
+import org.auscope.portal.core.view.knownlayer.KnownLayerSelector;
 import org.auscope.portal.core.view.knownlayer.WFSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSWFSSelector;
 import org.auscope.portal.view.knownlayer.IRISSelector;
-import org.auscope.portal.core.uifilter.FilterCollection;
-import org.auscope.portal.core.uifilter.optional.xpath.UITextBox;
-import org.auscope.portal.core.uifilter.optional.UICheckBoxGroupProvider;
-import org.auscope.portal.core.uifilter.Predicate;
-import org.auscope.portal.core.uifilter.optional.xpath.UIDropDownRemote;
-import org.auscope.portal.core.uifilter.optional.xpath.UIDropDownSelectList;
-import org.auscope.portal.core.uifilter.optional.xpath.UIDate;
-import org.auscope.portal.core.uifilter.optional.xpath.UIPolygonBBox;
-
-
-
-
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * Known layer bean definitions (originally migrated from Spring MVC auscope-known-layers.xml)
+ * Known layer bean definitions (originally migrated from Spring MVC
+ * auscope-known-layers.xml)
  *
  */
 @Configuration
 public class KnownLayers {
 
     private void setupIcon(KnownLayer layer) {
-        Point iconAnchor = new Point(16,32);
+        Point iconAnchor = new Point(16, 32);
         layer.setIconAnchor(iconAnchor);
-        Dimension iconSize = new Dimension(32,32);
+        Dimension iconSize = new Dimension(32, 32);
         layer.setIconSize(iconSize);
     }
 
-
     private FilterCollection createProviderFilterCollection() {
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
-        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter> ();
+        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
         optionalFilters.add(uiCheckBoxGroupProvider);
         FilterCollection filterCollection = new FilterCollection();
-        filterCollection.setOptionalFilters(optionalFilters); 
+        filterCollection.setOptionalFilters(optionalFilters);
         return filterCollection;
     }
-
 
     private FilterCollection createTextBoxFilterCollection(String label, String value) {
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
@@ -66,7 +64,6 @@ public class KnownLayers {
         filterCollection.setOptionalFilters(optionalFilters);
         return filterCollection;
     }
-
 
     private FilterCollection createIgsnFilterCollection() {
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
@@ -78,7 +75,6 @@ public class KnownLayers {
         filterCollection.setOptionalFilters(optionalFilters);
         return filterCollection;
     }
-
 
     private void addDrillDateFilters(List<AbstractBaseFilter> optionalFilters) {
         UIDate startFromDate = new UIDate("Drilling Start From", "gsmlp:drillStartDate", null, Predicate.BIGGER_THAN);
@@ -105,7 +101,8 @@ public class KnownLayers {
     public KnownLayer knownTypeMine() {
         KnownLayer layer = new KnownLayer("erml-mine", knownTypeMineSelector());
         layer.setName("Earth Resource Mine");
-        layer.setDescription("A collection of services that implement the AuScope EarthResourceML v1 Profile for er:Mine");
+        layer.setDescription(
+                "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:Mine");
         layer.setGroup("Earth Resources(old)");
         layer.setProxyUrl("doMineFilter.do");
         layer.setProxyCountUrl("doMineFilterCount.do");
@@ -114,14 +111,16 @@ public class KnownLayers {
         layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/pink-blank.png");
         setupIcon(layer);
         layer.setOrder("10");
-        
-        UITextBox uiTextBox = new UITextBox("Mine Name", "er:specification/er:Mine/er:mineName/er:MineName/er:mineName", null, Predicate.ISLIKE);
+        layer.setStackdriverServiceGroup("EarthResourcesLayers");
+
+        UITextBox uiTextBox = new UITextBox("Mine Name", "er:specification/er:Mine/er:mineName/er:MineName/er:mineName",
+                null, Predicate.ISLIKE);
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
-        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter> ();
+        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
         optionalFilters.add(uiTextBox);
         optionalFilters.add(uiCheckBoxGroupProvider);
         FilterCollection filterCollection = new FilterCollection();
-        filterCollection.setOptionalFilters(optionalFilters);        
+        filterCollection.setOptionalFilters(optionalFilters);
         layer.setFilterCollection(filterCollection);
         return layer;
     }
@@ -140,7 +139,8 @@ public class KnownLayers {
     public KnownLayer knownTypeMineralOccurrence() {
         KnownLayer layer = new KnownLayer("erml-mineraloccurrence", knownTypeMineralOccurrenceSelector());
         layer.setName("Earth Resource Mineral Occurrence");
-        layer.setDescription("A collection of services that implement the AuScope EarthResourceML v1 Profile for er:MineralOccurence");
+        layer.setDescription(
+                "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:MineralOccurence");
         layer.setGroup("Earth Resources(old)");
         layer.setProxyUrl("doMineralOccurrenceFilter.do");
         layer.setProxyCountUrl("doMineralOccurrenceFilterCount.do");
@@ -149,14 +149,17 @@ public class KnownLayers {
         layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/purple-blank.png");
         setupIcon(layer);
         layer.setOrder("11");
+        layer.setStackdriverServiceGroup("EarthResourcesLayers");
 
-        UIDropDownRemote uiDropDownRemote = new UIDropDownRemote("Commodity", "gsml:specification/er:MineralOccurrence/er:commodityDescription/er:Commodity/er:commodityName", null, Predicate.ISEQUAL, "getAllCommodities.do");
+        UIDropDownRemote uiDropDownRemote = new UIDropDownRemote("Commodity",
+                "gsml:specification/er:MineralOccurrence/er:commodityDescription/er:Commodity/er:commodityName", null,
+                Predicate.ISEQUAL, "getAllCommodities.do");
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
-        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter> ();
+        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
         optionalFilters.add(uiDropDownRemote);
         optionalFilters.add(uiCheckBoxGroupProvider);
         FilterCollection filterCollection = new FilterCollection();
-        filterCollection.setOptionalFilters(optionalFilters);        
+        filterCollection.setOptionalFilters(optionalFilters);
         layer.setFilterCollection(filterCollection);
         return layer;
     }
@@ -175,7 +178,8 @@ public class KnownLayers {
     public KnownLayer knownTypeMiningActivity() {
         KnownLayer layer = new KnownLayer("erml-miningactivity", knownTypeMiningActivitySelector());
         layer.setName("Earth Resource Mining Activity");
-        layer.setDescription("A collection of services that implement the AuScope EarthResourceML v1 Profile for er:MiningActivity");
+        layer.setDescription(
+                "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:MiningActivity");
         layer.setGroup("Earth Resources(old)");
         layer.setProxyUrl("doMiningActivityFilter.do");
         layer.setProxyCountUrl("doMiningActivityFilterCount.do");
@@ -184,8 +188,7 @@ public class KnownLayers {
         layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/orange-blank.png");
         setupIcon(layer);
         layer.setOrder("12");
-        
-        // Optional filters        
+        layer.setStackdriverServiceGroup("EarthResourcesLayers");
         layer.setFilterCollection(this.createProviderFilterCollection());
         return layer;
     }
@@ -199,7 +202,8 @@ public class KnownLayers {
     public KnownLayer knownTypeMineralTenements() {
         KnownLayer layer = new KnownLayer("mineral-tenements", knownTypeMineralTenementsSelector());
         layer.setName("Mineral Tenements");
-        layer.setDescription("A collection of services that implement the AuScope EarthResourceML v1 Profile for mt:Mineral Tenement");
+        layer.setDescription(
+                "A collection of services that implement the AuScope EarthResourceML v1 Profile for mt:Mineral Tenement");
         layer.setGroup("Tenements");
         layer.setProxyUrl("getAllMineralTenementFeatures.do");
         layer.setProxyGetFeatureInfoUrl("getMineralTenementFeatureInfo.do");
@@ -207,20 +211,22 @@ public class KnownLayers {
         layer.setProxyStyleUrl("getMineralTenementStyle.do");
         layer.setProxyDownloadUrl("doMineralTenementCSVDownload.do");
         layer.setOrder("150");
+        layer.setStackdriverServiceGroup("TenementsLayers");
 
         UITextBox nameTextBox = new UITextBox("Name", "mt:name", null, Predicate.ISLIKE);
-        List<ImmutablePair<String,String>> options = new ArrayList<ImmutablePair<String,String>>();
+        List<ImmutablePair<String, String>> options = new ArrayList<ImmutablePair<String, String>>();
         options.add(new ImmutablePair("Exploration", "exploration"));
         options.add(new ImmutablePair("Prospecting", "prospecting"));
         options.add(new ImmutablePair("Miscellaneous", "miscellaneous"));
         options.add(new ImmutablePair("Mining Lease", "mining"));
         options.add(new ImmutablePair("Licence", "licence"));
-        UIDropDownSelectList uiDropDownSelectList = new UIDropDownSelectList("Tenement Type", "mt:tenementType", null, Predicate.ISLIKE, options);
+        UIDropDownSelectList uiDropDownSelectList = new UIDropDownSelectList("Tenement Type", "mt:tenementType", null,
+                Predicate.ISLIKE, options);
         UITextBox ownerTextBox = new UITextBox("Owner", "mt:owner", null, Predicate.ISLIKE);
         UIDate expiryFromDate = new UIDate("Expiry From", "mt:expireDate", null, Predicate.BIGGER_THAN);
         UIDate expiryToDate = new UIDate("Expiry To", "mt:expireDate", null, Predicate.SMALLER_THAN);
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
-        
+
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
         optionalFilters.add(nameTextBox);
         optionalFilters.add(uiDropDownSelectList);
@@ -230,15 +236,17 @@ public class KnownLayers {
         optionalFilters.add(uiCheckBoxGroupProvider);
         FilterCollection filterCollection = new FilterCollection();
         filterCollection.setOptionalFilters(optionalFilters);
-        
-        // Mandatory filters - note use of full path names for declaring vars to prevent clashes with imported optional params
-        List<ImmutablePair<String,String>> mandatoryOptions = new ArrayList<ImmutablePair<String,String>>();
+
+        // Mandatory filters - note use of full path names for declaring vars to prevent
+        // clashes with imported optional params
+        List<ImmutablePair<String, String>> mandatoryOptions = new ArrayList<ImmutablePair<String, String>>();
         mandatoryOptions.add(new ImmutablePair("Tenement Type", "TenementType"));
         mandatoryOptions.add(new ImmutablePair("Tenement Status", "TenementStatus"));
         mandatoryOptions.add(new ImmutablePair("UnStyled", null));
         org.auscope.portal.core.uifilter.mandatory.UIDropDownSelectList mandDropDownSelectList;
-        mandDropDownSelectList = new org.auscope.portal.core.uifilter.mandatory.UIDropDownSelectList("Color Code", "ccProperty", "TenementType", mandatoryOptions);
-        List<AbstractMandatoryParamBinding> mandParamList  = new ArrayList<AbstractMandatoryParamBinding>();
+        mandDropDownSelectList = new org.auscope.portal.core.uifilter.mandatory.UIDropDownSelectList("Color Code",
+                "ccProperty", "TenementType", mandatoryOptions);
+        List<AbstractMandatoryParamBinding> mandParamList = new ArrayList<AbstractMandatoryParamBinding>();
         mandParamList.add(mandDropDownSelectList);
         filterCollection.setMandatoryFilters(mandParamList);
         layer.setFilterCollection(filterCollection);
@@ -261,13 +269,15 @@ public class KnownLayers {
         layer.setProxyStyleUrl("getErlMineViewStyle.do");
         layer.setProxyDownloadUrl("");
         layer.setOrder("160");
-        
+        layer.setStackdriverServiceGroup("EarthResourcesLayers");
+
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
         UITextBox nameTextBox = new UITextBox("Name", "erl:name", null, Predicate.ISLIKE);
-        UIDropDownRemote uiDropDownRemote = new UIDropDownRemote("Status", "erl:status_uri", null, Predicate.ISEQUAL, "getAllMineStatuses.do");
+        UIDropDownRemote uiDropDownRemote = new UIDropDownRemote("Status", "erl:status_uri", null, Predicate.ISEQUAL,
+                "getAllMineStatuses.do");
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
-        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox","erl:shape",null,Predicate.ISEQUAL);
+        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox", "erl:shape", null, Predicate.ISEQUAL);
         optionalFilters.add(nameTextBox);
         optionalFilters.add(uiDropDownRemote);
         optionalFilters.add(uiCheckBoxGroupProvider);
@@ -294,14 +304,17 @@ public class KnownLayers {
         layer.setProxyStyleUrl("getErlMineralOccurrenceViewStyle.do");
         layer.setProxyDownloadUrl("");
         layer.setOrder("160");
-        
+        layer.setStackdriverServiceGroup("EarthResourcesLayers");
+
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
         UITextBox nameTextBox = new UITextBox("Name", "erl:name", null, Predicate.ISLIKE);
-        UIDropDownRemote commodityDropDownRemote = new UIDropDownRemote("Commodity", "erl:representativeCommodity_uri", null, Predicate.ISEQUAL, "getAllCommodities.do");
-        UIDropDownRemote timescaleDropDownRemote = new UIDropDownRemote("Geologic Timescale", "erl:representativeAge_uri", null, Predicate.ISEQUAL, "getAllTimescales.do");
+        UIDropDownRemote commodityDropDownRemote = new UIDropDownRemote("Commodity", "erl:representativeCommodity_uri",
+                null, Predicate.ISEQUAL, "getAllCommodities.do");
+        UIDropDownRemote timescaleDropDownRemote = new UIDropDownRemote("Geologic Timescale",
+                "erl:representativeAge_uri", null, Predicate.ISEQUAL, "getAllTimescales.do");
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
-        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox","erl:shape",null,Predicate.ISEQUAL);
+        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox", "erl:shape", null, Predicate.ISEQUAL);
         optionalFilters.add(nameTextBox);
         optionalFilters.add(commodityDropDownRemote);
         optionalFilters.add(timescaleDropDownRemote);
@@ -329,14 +342,17 @@ public class KnownLayers {
         layer.setProxyStyleUrl("getErlCommodityResourceViewStyle.do");
         layer.setProxyDownloadUrl("");
         layer.setOrder("160");
-        
+        layer.setStackdriverServiceGroup("EarthResourcesLayers");
+
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
         UITextBox nameTextBox = new UITextBox("Mine Name", "erl:mineName", null, Predicate.ISLIKE);
-        UIDropDownRemote commodityDropDownRemote = new UIDropDownRemote("Commodity", "erl:commodityClassifier_uri", null, Predicate.ISEQUAL, "getAllCommodities.do");
-        UIDropDownRemote resourcesDropDownRemote = new UIDropDownRemote("JORC Category", "erl:resourcesCategory_uri", null, Predicate.ISEQUAL, "getAllJorcCategories.do");
+        UIDropDownRemote commodityDropDownRemote = new UIDropDownRemote("Commodity", "erl:commodityClassifier_uri",
+                null, Predicate.ISEQUAL, "getAllCommodities.do");
+        UIDropDownRemote resourcesDropDownRemote = new UIDropDownRemote("JORC Category", "erl:resourcesCategory_uri",
+                null, Predicate.ISEQUAL, "getAllJorcCategories.do");
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
-        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox","erl:shape",null,Predicate.ISEQUAL);
+        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox", "erl:shape", null, Predicate.ISEQUAL);
         optionalFilters.add(nameTextBox);
         optionalFilters.add(commodityDropDownRemote);
         optionalFilters.add(resourcesDropDownRemote);
@@ -357,13 +373,15 @@ public class KnownLayers {
     public KnownLayer knownTypeMineralOccurrenceView() {
         KnownLayer layer = new KnownLayer("mineral-occ-view", knownTypeMineralOccurrenceViewSelector());
         layer.setName("Mineral Occurrence View");
-        layer.setDescription("A collection of services that implement the AuScope EarthResourceML v1 Profile for mo:MinOccView");
+        layer.setDescription(
+                "A collection of services that implement the AuScope EarthResourceML v1 Profile for mo:MinOccView");
         layer.setGroup("Earth Resources(old)");
         layer.setProxyUrl("");
         layer.setProxyCountUrl("");
         layer.setProxyStyleUrl("doMinOccurViewFilterStyle.do");
         layer.setProxyDownloadUrl("downloadMinOccurView.do");
         layer.setOrder("13");
+        layer.setStackdriverServiceGroup("EarthResourcesLayers");
         layer.setFilterCollection(this.createProviderFilterCollection());
         return layer;
     }
@@ -378,7 +396,8 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("ga-geotransects", knownTypeGeotransectsSelector());
         layer.setId("ga-geotransects");
         layer.setName("GA Onshore Seismic Surveys");
-        layer.setDescription("The Onshore Seismic Data of Australia is a collection of all land seismic traverses cross the Australian continent and its margins. The data includes raw and processed data in SEGY format. The metadata includes acquisition reports, processing reports, processed images, logs, and so on. The data acquisition was carried out in Australia from 1949-2012 by Geoscience Australia and various partners. The set of reflection and refraction data comprises over 12,000 km of coverage, and provides an insight into the variations in crustal architecture in the varied geological domains. The complete processed dataset was first available for public access in Oct 2013 (http://www.ga.gov.au/minerals/projects/current-projects/seismic-acquisition-processing.html ). The location of seismic traverses is shown by the Gallery link on the webpage. The new survey data will be updated on the webpage by the official data release date. The attribute structure of the dataset has also been revised to be more compatible with the GeoSciML data standard, published by the IUGS Commission for Geoscience Information. The onshore seismic data were collected with partner organizations: Australian Geodynamics Cooperative Research Centre, National Research Facility for Earth Sounding, Australian Nuclear Science and Technology Organisation, Cooperative Research Centre for Greenhouse Gas Technologies, Curtin University of Technology, Geological Survey of New South Wales, NSW Department of Mineral Resources, NSW Department of Primary Industries Mineral Resources, An organisation for a National Earth Science Infrastructure Program, Geological Survey Western Australia, Northern Territory Geological Survey, Primary Industries and Resources South Australia, Predictive Mineral Discovery Cooperative Research Centre, Queensland Geological Survey, GeoScience Victoria Department of Primary Industries, Tasmania Development and Resources, University of Western Australia.");
+        layer.setDescription(
+                "The Onshore Seismic Data of Australia is a collection of all land seismic traverses cross the Australian continent and its margins. The data includes raw and processed data in SEGY format. The metadata includes acquisition reports, processing reports, processed images, logs, and so on. The data acquisition was carried out in Australia from 1949-2012 by Geoscience Australia and various partners. The set of reflection and refraction data comprises over 12,000 km of coverage, and provides an insight into the variations in crustal architecture in the varied geological domains. The complete processed dataset was first available for public access in Oct 2013 (http://www.ga.gov.au/minerals/projects/current-projects/seismic-acquisition-processing.html ). The location of seismic traverses is shown by the Gallery link on the webpage. The new survey data will be updated on the webpage by the official data release date. The attribute structure of the dataset has also been revised to be more compatible with the GeoSciML data standard, published by the IUGS Commission for Geoscience Information. The onshore seismic data were collected with partner organizations: Australian Geodynamics Cooperative Research Centre, National Research Facility for Earth Sounding, Australian Nuclear Science and Technology Organisation, Cooperative Research Centre for Greenhouse Gas Technologies, Curtin University of Technology, Geological Survey of New South Wales, NSW Department of Mineral Resources, NSW Department of Primary Industries Mineral Resources, An organisation for a National Earth Science Infrastructure Program, Geological Survey Western Australia, Northern Territory Geological Survey, Primary Industries and Resources South Australia, Predictive Mineral Discovery Cooperative Research Centre, Queensland Geological Survey, GeoScience Victoria Department of Primary Industries, Tasmania Development and Resources, University of Western Australia.");
         layer.setOrder("400");
         return layer;
     }
@@ -453,7 +472,8 @@ public class KnownLayers {
     public KnownLayer knownTypeYilgarnGeochemistry() {
         KnownLayer layer = new KnownLayer("yilgarn-geochem", knownTypeYilgarnGeochemistrySelector());
         layer.setName("Yilgarn Laterite Geochemistry");
-        layer.setDescription("A collection of detailed information about all analytes that were detected at a specific location");
+        layer.setDescription(
+                "A collection of detailed information about all analytes that were detected at a specific location");
         layer.setProxyUrl("doYilgarnGeochemistry.do");
         layer.setProxyCountUrl("doYilgarnGeochemistryCount.do");
         layer.setProxyStyleUrl("");
@@ -465,25 +485,20 @@ public class KnownLayers {
 
     @Bean
     public WFSSelector knownTypeBoreholeNvclV2Selector() {
-        String[] featNameList = {"sa:SamplingFeatureCollection", "om:GETPUBLISHEDSYSTEMTSA",
-                                 "nvcl:scannedBorehole", "nvcl:ScannedBoreholeCollection" };
-        String[] serviceEndPoints = {"http://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs",
-                        "https://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs",
-                        "http://www.mrt.tas.gov.au:80/web-services/wfs",
-                        "https://www.mrt.tas.gov.au:80/web-services/wfs",
-                        "http://geossdi.dmp.wa.gov.au:80/services/wfs",
-                        "http://geossdi.dmp.wa.gov.au/services/wfs",
-                        "https://geossdi.dmp.wa.gov.au/services/wfs",
-                        "http://geology.data.nt.gov.au:80/geoserver/wfs",
-                        "https://geology.data.nt.gov.au/geoserver/wfs",
-                        "https://gs.geoscience.nsw.gov.au/geoserver/wfs",
-                        "https://sarigdata.pir.sa.gov.au/geoserver/wfs",
-                        "http://geology-uat.information.qld.gov.au/geoserver/wfs",
-                        "https://geology-uat.information.qld.gov.au/geoserver/wfs",
-                        "http://geology.information.qld.gov.au/geoserver/wfs",
-                        "https://geology.information.qld.gov.au/geoserver/wfs",
-                        "http://geology.data.vic.gov.au/nvcl/wfs",
-                        "https://geology.data.vic.gov.au/nvcl/wfs"};
+        String[] featNameList = { "sa:SamplingFeatureCollection", "om:GETPUBLISHEDSYSTEMTSA", "nvcl:scannedBorehole",
+                "nvcl:ScannedBoreholeCollection" };
+        String[] serviceEndPoints = { "http://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs",
+                "https://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs",
+                "http://www.mrt.tas.gov.au:80/web-services/wfs", "https://www.mrt.tas.gov.au:80/web-services/wfs",
+                "http://geossdi.dmp.wa.gov.au:80/services/wfs", "http://geossdi.dmp.wa.gov.au/services/wfs",
+                "https://geossdi.dmp.wa.gov.au/services/wfs", "http://geology.data.nt.gov.au:80/geoserver/wfs",
+                "https://geology.data.nt.gov.au/geoserver/wfs", "https://gs.geoscience.nsw.gov.au/geoserver/wfs",
+                "https://sarigdata.pir.sa.gov.au/geoserver/wfs",
+                "http://geology-uat.information.qld.gov.au/geoserver/wfs",
+                "https://geology-uat.information.qld.gov.au/geoserver/wfs",
+                "http://geology.information.qld.gov.au/geoserver/wfs",
+                "https://geology.information.qld.gov.au/geoserver/wfs", "http://geology.data.vic.gov.au/nvcl/wfs",
+                "https://geology.data.vic.gov.au/nvcl/wfs" };
 
         WFSSelector wfsSelector = new WFSSelector("gsmlp:BoreholeView", serviceEndPoints, true);
         wfsSelector.setRelatedFeatureTypeNames(featNameList);
@@ -495,18 +510,21 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("nvcl-v2-borehole", knownTypeBoreholeNvclV2Selector());
         layer.setName("National Virtual Core Library V-2.0");
         layer.setGroup("Boreholes");
-        layer.setDescription("A collection of services implementing the National Virtual Core Library Profile v1 for gsml:Borehole and a collection of observations");
+        layer.setDescription(
+                "A collection of services implementing the National Virtual Core Library Profile v1 for gsml:Borehole and a collection of observations");
         layer.setProxyUrl("doBoreholeViewFilter.do");
         layer.setProxyCountUrl("");
         layer.setProxyDownloadUrl("doNVCLBoreholeViewCSVDownload.do");
         layer.setProxyStyleUrl("doNvclV2FilterStyle.do");
         setupIcon(layer);
         layer.setOrder("51");
-        
+        layer.setStackdriverServiceGroup("NVCLBoreholeViewLayer");
+
         // Mandatory filters
         org.auscope.portal.core.uifilter.mandatory.UITextBox jobidTextBox;
-        jobidTextBox = new org.auscope.portal.core.uifilter.mandatory.UITextBox("Analytics Job Id", "analyticsJobId", "");
-        List<AbstractMandatoryParamBinding> mandParamList  = new ArrayList<AbstractMandatoryParamBinding>();
+        jobidTextBox = new org.auscope.portal.core.uifilter.mandatory.UITextBox("Analytics Job Id", "analyticsJobId",
+                "");
+        List<AbstractMandatoryParamBinding> mandParamList = new ArrayList<AbstractMandatoryParamBinding>();
         mandParamList.add(jobidTextBox);
 
         // Optional filters
@@ -514,7 +532,8 @@ public class KnownLayers {
         UITextBox nameTextBox = new UITextBox("Name", "gsmlp:name", null, Predicate.ISLIKE);
         UITextBox identifierTextBox = new UITextBox("Identifier", "gsmlp:identifier", null, Predicate.ISLIKE);
         this.addDrillDateFilters(optionalFilters);
-        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox - Clipboard","gsmlp:shape",null, Predicate.ISEQUAL);
+        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox - Clipboard", "gsmlp:shape", null,
+                Predicate.ISEQUAL);
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
         optionalFilters.add(nameTextBox);
         optionalFilters.add(identifierTextBox);
@@ -529,7 +548,7 @@ public class KnownLayers {
 
     @Bean
     public WFSSelector knownTypeTimaGeoSampleSelector() {
-        return new WFSSelector("tima:geosample_and_mineralogy");                          
+        return new WFSSelector("tima:geosample_and_mineralogy");
     }
 
     @Bean
@@ -544,7 +563,7 @@ public class KnownLayers {
         layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/grn-circle.png");
         setupIcon(layer);
         layer.setOrder("180");
-        
+
         // Optional filters
         layer.setFilterCollection(this.createIgsnFilterCollection());
         return layer;
@@ -552,7 +571,7 @@ public class KnownLayers {
 
     @Bean
     public WFSSelector knownTypeSHRIMPGeoSampleSelector() {
-        return new WFSSelector("tima:view_shrimp_geochronology_result");                          
+        return new WFSSelector("tima:view_shrimp_geochronology_result");
     }
 
     @Bean
@@ -576,10 +595,8 @@ public class KnownLayers {
     @Bean
     public WFSSelector knownTypeSF0BoreholeNVCLSelector() {
         WFSSelector wfsSelector = new WFSSelector("gsmlp:BoreholeView");
-        String[] featNameList = { "sa:SamplingFeatureCollection",
-                        "om:GETPUBLISHEDSYSTEMTSA",
-                        "nvcl:scannedBorehole",
-                        "nvcl:ScannedBoreholeCollection" };
+        String[] featNameList = { "sa:SamplingFeatureCollection", "om:GETPUBLISHEDSYSTEMTSA", "nvcl:scannedBorehole",
+                "nvcl:ScannedBoreholeCollection" };
         wfsSelector.setRelatedFeatureTypeNames(featNameList);
         return wfsSelector;
     }
@@ -589,25 +606,28 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("sf0-borehole-nvcl", knownTypeSF0BoreholeNVCLSelector());
         layer.setName("All Boreholes");
         layer.setGroup("Boreholes");
-        layer.setDescription("A collection of services implementing the GeoSciML Portrayal Borehole View (gsmlp:BoreholeView)");
+        layer.setDescription(
+                "A collection of services implementing the GeoSciML Portrayal Borehole View (gsmlp:BoreholeView)");
         layer.setProxyUrl("doBoreholeViewFilter.do");
         layer.setProxyCountUrl("");
         layer.setProxyStyleUrl("doBoreholeViewFilterStyle.do");
         setupIcon(layer);
         layer.setOrder("52");
-        
-        
+        layer.setStackdriverServiceGroup("BoreholeViewLayer");
+
         // Mandatory filters
         org.auscope.portal.core.uifilter.mandatory.UITextBox jobidTextBox;
-        jobidTextBox = new org.auscope.portal.core.uifilter.mandatory.UITextBox("Analytics Job Id", "analyticsJobId", "");
-        List<AbstractMandatoryParamBinding> mandParamList  = new ArrayList<AbstractMandatoryParamBinding>();
+        jobidTextBox = new org.auscope.portal.core.uifilter.mandatory.UITextBox("Analytics Job Id", "analyticsJobId",
+                "");
+        List<AbstractMandatoryParamBinding> mandParamList = new ArrayList<AbstractMandatoryParamBinding>();
         mandParamList.add(jobidTextBox);
 
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
         UITextBox nameTextBox = new UITextBox("Name", "gsmlp:name", null, Predicate.ISLIKE);
         this.addDrillDateFilters(optionalFilters);
-        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox - Clipboard","gsmlp:shape", null, Predicate.ISEQUAL);
+        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox - Clipboard", "gsmlp:shape", null,
+                Predicate.ISEQUAL);
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
         optionalFilters.add(nameTextBox);
         optionalFilters.add(uiPolygonBBox);
@@ -621,9 +641,9 @@ public class KnownLayers {
 
     @Bean
     public WFSSelector knownTypeBoreholeMSCLSelector() {
-        String[] serviceEndPoints = {"http://meiproc.earthsci.unimelb.edu.au:80/geoserver/wfs"};
+        String[] serviceEndPoints = { "http://meiproc.earthsci.unimelb.edu.au:80/geoserver/wfs" };
         WFSSelector wfsSelector = new WFSSelector("gsmlp:BoreholeView", serviceEndPoints, true);
-        String[] featNameList = {"mscl:scanned_data", "sa:SamplingFeatureCollection" };
+        String[] featNameList = { "mscl:scanned_data", "sa:SamplingFeatureCollection" };
         wfsSelector.setRelatedFeatureTypeNames(featNameList);
         return wfsSelector;
     }
@@ -646,17 +666,18 @@ public class KnownLayers {
     public IRISSelector knownTypeSeismologyInSchoolSelector() {
         try {
             return new IRISSelector("http://service.iris.edu");
-        } catch(MalformedURLException e) {
+        } catch (MalformedURLException e) {
             // TODO: Log exception??
         }
-        return null; 
+        return null;
     }
 
     @Bean
     public KnownLayer knownTypeSeismologyInSchool() {
         KnownLayer layer = new KnownLayer("seismology-in-schools-site", knownTypeSeismologyInSchoolSelector());
         layer.setName("IRIS Feed");
-        layer.setDescription("Seismographs in Schools data feed from Incorporated Research Institutions for Seismology (IRIS). S network code.");
+        layer.setDescription(
+                "Seismographs in Schools data feed from Incorporated Research Institutions for Seismology (IRIS). S network code.");
         layer.setGroup("Seismographs in Schools Network");
         layer.setProxyUrl("getIRISStations.do");
         layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/ltblu-blank.png");
@@ -676,7 +697,8 @@ public class KnownLayers {
     public KnownLayer knownTypeAster() {
         KnownLayer layer = new KnownLayer("aster-main", knownTypeAsterSelector());
         layer.setName("ASTER Maps");
-        layer.setDescription("This is the parent datafile of a datset that comprises a set of 14+ geoscience products made up of mosaiced ASTER scenes across Australia.");
+        layer.setDescription(
+                "This is the parent datafile of a datset that comprises a set of 14+ geoscience products made up of mosaiced ASTER scenes across Australia.");
         layer.setGroup("ASTER Maps");
         layer.setHidden(true);
         layer.setOrder("30_ASTER Maps_010");
@@ -694,7 +716,8 @@ public class KnownLayers {
     public KnownLayer knownTypeAsterAloh() {
         KnownLayer layer = new KnownLayer("aster-aloh", knownTypeAsterAlohSelector());
         layer.setName("ASTER Map AlOH group composition");
-        layer.setDescription("1. Band ratio: B5/B7Blue is well ordered kaolinite, Al-rich muscovite/illite, paragonite, pyrophyllite Red is Al-poor (Si-rich) muscovite (phengite)");
+        layer.setDescription(
+                "1. Band ratio: B5/B7Blue is well ordered kaolinite, Al-rich muscovite/illite, paragonite, pyrophyllite Red is Al-poor (Si-rich) muscovite (phengite)");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_020");
         return layer;
@@ -728,7 +751,8 @@ public class KnownLayers {
     public KnownLayer knownTypeAsterOpaque() {
         KnownLayer layer = new KnownLayer("aster-opaque", knownTypeAsterOpaqueSelector());
         layer.setName("ASTER Map Opaque index");
-        layer.setDescription("1. Band ratio: B1/B4Blue is low abundance, Red is high abundance(potentially includes  carbon black (e.g. ash), magnetite, Mn oxides, and sulphides in unoxidised envornments");
+        layer.setDescription(
+                "1. Band ratio: B1/B4Blue is low abundance, Red is high abundance(potentially includes  carbon black (e.g. ash), magnetite, Mn oxides, and sulphides in unoxidised envornments");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_040");
         return layer;
@@ -762,7 +786,8 @@ public class KnownLayers {
     public KnownLayer knownTypeAsterFeoh() {
         KnownLayer layer = new KnownLayer("aster-feoh", knownTypeAsterFeohSelector());
         layer.setName("ASTER Map FeOH group content");
-        layer.setDescription("1. Band ratio: (B6+B8)/B7Blue is low content, Red is high content(potentially includes: chlorite, epidote, jarosite, nontronite, gibbsite, gypsum, opal-chalcedony)");
+        layer.setDescription(
+                "1. Band ratio: (B6+B8)/B7Blue is low content, Red is high content(potentially includes: chlorite, epidote, jarosite, nontronite, gibbsite, gypsum, opal-chalcedony)");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_060");
         return layer;
@@ -779,7 +804,8 @@ public class KnownLayers {
     public KnownLayer knownTypeFerricOxideComp() {
         KnownLayer layer = new KnownLayer("aster-ferric-oxide-comp", knownTypeFerricOxideCompSelector());
         layer.setName("ASTER Map Ferric oxide composition");
-        layer.setDescription("1. Band ratio: B2/B1Blue-cyan is goethite rich, Green is hematite-goethite, Red-yellow is hematite-rich");
+        layer.setDescription(
+                "1. Band ratio: B2/B1Blue-cyan is goethite rich, Green is hematite-goethite, Red-yellow is hematite-rich");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_070");
         return layer;
@@ -796,7 +822,8 @@ public class KnownLayers {
     public KnownLayer knownTypeGroupIndex() {
         KnownLayer layer = new KnownLayer("aster-group-index", knownTypeGroupIndexSelector());
         layer.setName("ASTER Map Kaolin group index");
-        layer.setDescription("B6/B5(potential includes: pyrophyllite, alunite, well-ordered kaolinite)Blue is low content, Red is high content");
+        layer.setDescription(
+                "B6/B5(potential includes: pyrophyllite, alunite, well-ordered kaolinite)Blue is low content, Red is high content");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_080");
         return layer;
@@ -830,7 +857,8 @@ public class KnownLayers {
     public KnownLayer knownTypeMgohContent() {
         KnownLayer layer = new KnownLayer("aster-mgoh-content", knownTypeMgohContentSelector());
         layer.setName("ASTER Map MgOH group content");
-        layer.setDescription("1. Band ratio: (B6+B9/(B7+B8)Blue is low content, Red is high content(potentially includes: calcite, dolomite, magnesite, chlorite, epidote, amphibole, talc, serpentine)");
+        layer.setDescription(
+                "1. Band ratio: (B6+B9/(B7+B8)Blue is low content, Red is high content(potentially includes: calcite, dolomite, magnesite, chlorite, epidote, amphibole, talc, serpentine)");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_100");
         return layer;
@@ -864,7 +892,8 @@ public class KnownLayers {
     public KnownLayer knownTypeFerrCarb() {
         KnownLayer layer = new KnownLayer("aster-ferr-carb", knownTypeFerrCarbSelector());
         layer.setName("ASTER Map Ferrous iron content in MgOH/carbonate");
-        layer.setDescription("1. Band ratio: B5/B4Blue is low ferrous iron content in carbonate and MgOH minerals like talc and tremolite.Red is high ferrous iron content in carbonate and MgOH minerals like chlorite and actinolite.");
+        layer.setDescription(
+                "1. Band ratio: B5/B4Blue is low ferrous iron content in carbonate and MgOH minerals like talc and tremolite.Red is high ferrous iron content in carbonate and MgOH minerals like chlorite and actinolite.");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_120");
         return layer;
@@ -881,7 +910,8 @@ public class KnownLayers {
     public KnownLayer knownTypeMgohGroupComp() {
         KnownLayer layer = new KnownLayer("aster-mgoh-group-comp", knownTypeMgohGroupCompSelector());
         layer.setName("ASTER Map MgOH group composition");
-        layer.setDescription("1. Band ratio: B7/B8Blue-cyan is magnesite-dolomite, amphibole, chlorite\tRed is calcite, epidote, amphibole");
+        layer.setDescription(
+                "1. Band ratio: B7/B8Blue-cyan is magnesite-dolomite, amphibole, chlorite\tRed is calcite, epidote, amphibole");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_130");
         return layer;
@@ -898,7 +928,8 @@ public class KnownLayers {
     public KnownLayer knownTypeAlohGroupContent() {
         KnownLayer layer = new KnownLayer("aster-aloh-group-content", knownTypeAlohGroupContentSelector());
         layer.setName("ASTER Map AlOH group content");
-        layer.setDescription("1. Band ratio: (B5+B7)/B6Blue is low abundance, Red is high abundance potentially includes: phengite, muscovite, paragonite, lepidolite, illite, brammalite, montmorillonite, beidellite, kaolinite, dickite");
+        layer.setDescription(
+                "1. Band ratio: (B5+B7)/B6Blue is low abundance, Red is high abundance potentially includes: phengite, muscovite, paragonite, lepidolite, illite, brammalite, montmorillonite, beidellite, kaolinite, dickite");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_160");
         return layer;
@@ -932,7 +963,8 @@ public class KnownLayers {
     public KnownLayer knownTypeSilicaContent() {
         KnownLayer layer = new KnownLayer("aster-silica-content", knownTypeSilicaContentSelector());
         layer.setName("ASTER Map TIR Silica index");
-        layer.setDescription("1. Band ratio: B13/B10Blue is low silica contentRed is high silica content(potentially includes Si-rich minerals, such as quartz, feldspars, Al-clays)");
+        layer.setDescription(
+                "1. Band ratio: B13/B10Blue is low silica contentRed is high silica content(potentially includes Si-rich minerals, such as quartz, feldspars, Al-clays)");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_180");
         return layer;
@@ -940,7 +972,7 @@ public class KnownLayers {
 
     @Bean
     public WFSSelector knownTypeRemanentAnomaliesSelector() {
-        String[] serviceEndPoints = {"http://remanentanomalies.csiro.au/geoserver/wfs"};
+        String[] serviceEndPoints = { "http://remanentanomalies.csiro.au/geoserver/wfs" };
         WFSSelector wfsSelector = new WFSSelector("RemAnom:Anomaly", serviceEndPoints, true);
         return wfsSelector;
     }
@@ -956,10 +988,10 @@ public class KnownLayers {
         layer.setProxyStyleUrl("getRemanentAnomaliesStyle.do");
         layer.setProxyDownloadUrl("doRemanentAnomaliesDownload.do");
         layer.setOrder("80");
-        
+
         // Optional filters
         layer.setFilterCollection(this.createTextBoxFilterCollection("Remanent Anomaly Name", "RenAnom:AnomalyName"));
-         
+
         return layer;
     }
 
@@ -970,7 +1002,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeRemanentAnomaliesAutoSearch() {
-        KnownLayer layer = new KnownLayer("remanent-anomalies-AutoSearch", knownTypeRemanentAnomaliesAutoSearchSelector());
+        KnownLayer layer = new KnownLayer("remanent-anomalies-AutoSearch",
+                knownTypeRemanentAnomaliesAutoSearchSelector());
         layer.setName("AUS5 - AutoSearch Anomalies");
         layer.setDescription("A collection of services publishing magnetic anomalies");
         layer.setGroup("Magnetics");
@@ -991,7 +1024,8 @@ public class KnownLayers {
     public KnownLayer knownTypeRemanentAnomaliesTMI() {
         KnownLayer layer = new KnownLayer("remanent-anomaliesTMI", knownTypeRemanentAnomaliesTMISelector());
         layer.setName("AUS5 - Total Magnetic Intensity");
-        layer.setDescription("Total Magnetic Intensity from Magnetic Anomaly Map of Australia (fifth edition), Geoscience Australia and other sources");
+        layer.setDescription(
+                "Total Magnetic Intensity from Magnetic Anomaly Map of Australia (fifth edition), Geoscience Australia and other sources");
         layer.setGroup("Magnetics");
         layer.setOrder("82");
         return layer;
@@ -999,7 +1033,7 @@ public class KnownLayers {
 
     @Bean
     public WFSSelector knownTypeEMAGRemanentAnomaliesSelector() {
-        String[] serviceEndPoints = {"http://remanentanomalies.csiro.au/geoserverEMAG/wfs"};
+        String[] serviceEndPoints = { "http://remanentanomalies.csiro.au/geoserverEMAG/wfs" };
         return new WFSSelector("RemAnom:Anomaly", serviceEndPoints, true);
     }
 
@@ -1014,7 +1048,7 @@ public class KnownLayers {
         layer.setProxyStyleUrl("getRemanentAnomaliesStyle.do");
         layer.setProxyDownloadUrl("doRemanentAnomaliesDownload.do");
         layer.setOrder("83");
-      
+
         // Optional filters
         layer.setFilterCollection(this.createTextBoxFilterCollection("Remanent Anomaly Name", "RemAnom:AnomalyName"));
         return layer;
@@ -1022,7 +1056,7 @@ public class KnownLayers {
 
     @Bean
     public WMSSelector knownTypeEMAGRemanentAnomaliesTMISelector() {
-        String[] serviceEndPoints = {"http://remanentanomalies.csiro.au/thredds/wms/Emag2/EMAG2.nc"};
+        String[] serviceEndPoints = { "http://remanentanomalies.csiro.au/thredds/wms/Emag2/EMAG2.nc" };
         return new WMSSelector("z", serviceEndPoints, true);
     }
 
@@ -1030,7 +1064,8 @@ public class KnownLayers {
     public KnownLayer knownTypeEMAGRemanentAnomaliesTMI() {
         KnownLayer layer = new KnownLayer("remanent-anomalies-EMAGTMI", knownTypeEMAGRemanentAnomaliesTMISelector());
         layer.setName("EMAG2 - Total Magnetic Intensity");
-        layer.setDescription("Total Magnetic Intensity from the EMAG2 datasource.http://www.geomag.org/models/emag2.html");
+        layer.setDescription(
+                "Total Magnetic Intensity from the EMAG2 datasource.http://www.geomag.org/models/emag2.html");
         layer.setGroup("Magnetics");
         layer.setOrder("84");
         return layer;
@@ -1196,7 +1231,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGsvGeologicalUnitContact250K() {
-        KnownLayer layer = new KnownLayer("gsv-geological-unit-contact-250k-", knownTypeGsvGeologicalUnitContact250KSelector());
+        KnownLayer layer = new KnownLayer("gsv-geological-unit-contact-250k-",
+                knownTypeGsvGeologicalUnitContact250KSelector());
         layer.setId("gsv-geological-unit-contact-250k-");
         layer.setName("Gsv Geological Unit Contact 250K ");
         layer.setGroup("Geological Survey of Victoria");
@@ -1212,7 +1248,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGsvGeologicalUnitContact50K() {
-        KnownLayer layer = new KnownLayer("gsv-geological-unit-contact-50k-", knownTypeGsvGeologicalUnitContact50KSelector());
+        KnownLayer layer = new KnownLayer("gsv-geological-unit-contact-50k-",
+                knownTypeGsvGeologicalUnitContact50KSelector());
         layer.setId("gsv-geological-unit-contact-50k-");
         layer.setName("Gsv Geological Unit Contact 50K ");
         layer.setGroup("Geological Survey of Victoria");
@@ -1244,7 +1281,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGsvShearDisplacementStructure250K() {
-        KnownLayer layer = new KnownLayer("gsv-shear-displacement-structure-250k-", knownTypeGsvShearDisplacementStructure250KSelector());
+        KnownLayer layer = new KnownLayer("gsv-shear-displacement-structure-250k-",
+                knownTypeGsvShearDisplacementStructure250KSelector());
         layer.setId("gsv-shear-displacement-structure-250k-");
         layer.setName("Gsv Shear Displacement Structure 250K ");
         layer.setGroup("Geological Survey of Victoria");
@@ -1260,7 +1298,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGsvGeologicalUnit250KLithology() {
-        KnownLayer layer = new KnownLayer("gsv-geological-unit-250k-lithology", knownTypeGsvGeologicalUnit250KLithologySelector());
+        KnownLayer layer = new KnownLayer("gsv-geological-unit-250k-lithology",
+                knownTypeGsvGeologicalUnit250KLithologySelector());
         layer.setId("gsv-geological-unit-250k-lithology");
         layer.setName("Gsv Geological Unit 250K Lithology");
         layer.setGroup("Geological Survey of Victoria");
@@ -1276,7 +1315,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGsvGeologicalUnit50KLithology() {
-        KnownLayer layer = new KnownLayer("gsv-geological-unit-50k-lithology", knownTypeGsvGeologicalUnit50KLithologySelector());
+        KnownLayer layer = new KnownLayer("gsv-geological-unit-50k-lithology",
+                knownTypeGsvGeologicalUnit50KLithologySelector());
         layer.setId("gsv-geological-unit-50k-lithology");
         layer.setName("Gsv Geological Unit 50K Lithology");
         layer.setGroup("Geological Survey of Victoria");
@@ -1308,7 +1348,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGsvShearDisplacementStructure50K() {
-        KnownLayer layer = new KnownLayer("gsv-shear-displacement-structure-50k-", knownTypeGsvShearDisplacementStructure50KSelector());
+        KnownLayer layer = new KnownLayer("gsv-shear-displacement-structure-50k-",
+                knownTypeGsvShearDisplacementStructure50KSelector());
         layer.setId("gsv-shear-displacement-structure-50k-");
         layer.setName("Gsv Shear Displacement Structure 50K ");
         layer.setGroup("Geological Survey of Victoria");
@@ -1342,9 +1383,12 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeL180MtIsaDeepCrusSeisSurvQld2006StacAndMigrDataAndImagForLine06GaTo06Ga() {
-        KnownLayer layer = new KnownLayer("l180-mt-isa-deep-crus-seis-surv-qld-2006-stac-and-migr-data-and-imag-for-line-06ga-to-06ga", knownTypeL180MtIsaDeepCrusSeisSurvQld2006StacAndMigrDataAndImagForLine06GaTo06GaSelector());
+        KnownLayer layer = new KnownLayer(
+                "l180-mt-isa-deep-crus-seis-surv-qld-2006-stac-and-migr-data-and-imag-for-line-06ga-to-06ga",
+                knownTypeL180MtIsaDeepCrusSeisSurvQld2006StacAndMigrDataAndImagForLine06GaTo06GaSelector());
         layer.setId("l180-mt-isa-deep-crus-seis-surv-qld-2006-stac-and-migr-data-and-imag-for-line-06ga-to-06ga");
-        layer.setName("L180 Mt Isa Deep Crustal Seismic Survey Qld 2006 Stacked And Migrated Data And Images For Lines 06Ga M1 To 06Ga M6");
+        layer.setName(
+                "L180 Mt Isa Deep Crustal Seismic Survey Qld 2006 Stacked And Migrated Data And Images For Lines 06Ga M1 To 06Ga M6");
         layer.setGroup("Geoscience Australia");
         layer.setDescription("Processed seismic data (SEG-Y format) and TIFF images for the 2006 Mt Isa Deep C");
         layer.setOrder("Registered_14");
@@ -1360,7 +1404,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeAreTherAnySandUranSystInTheEromBasi() {
-        KnownLayer layer = new KnownLayer("are-ther-any-sand-uran-syst-in-the-erom-basi", knownTypeAreTherAnySandUranSystInTheEromBasiSelector());
+        KnownLayer layer = new KnownLayer("are-ther-any-sand-uran-syst-in-the-erom-basi",
+                knownTypeAreTherAnySandUranSystInTheEromBasiSelector());
         layer.setId("are-ther-any-sand-uran-syst-in-the-erom-basi");
         layer.setName("Are There Any Sandstone Hosted Uranium Systems In The Eromanga Basin ");
         layer.setGroup("Geoscience Australia");
@@ -1378,9 +1423,12 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeL164CurnSeisSurvSa20032004StacAndMigrSeisDataAndImagForLine03Ga() {
-        KnownLayer layer = new KnownLayer("l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga", knownTypeL164CurnSeisSurvSa20032004StacAndMigrSeisDataAndImagForLine03GaSelector());
+        KnownLayer layer = new KnownLayer(
+                "l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga",
+                knownTypeL164CurnSeisSurvSa20032004StacAndMigrSeisDataAndImagForLine03GaSelector());
         layer.setId("l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga");
-        layer.setName("L164 Curnamona Seismic Survey Sa 2003 2004 Stacked And Migrated Seismic Data And Images For Lines 03Ga Cu1");
+        layer.setName(
+                "L164 Curnamona Seismic Survey Sa 2003 2004 Stacked And Migrated Seismic Data And Images For Lines 03Ga Cu1");
         layer.setGroup("Geoscience Australia");
         layer.setDescription("A seismic survey using the Australian National Seismic Imaging Resource (ANSIR) ");
         layer.setOrder("Registered_16");
@@ -1396,7 +1444,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeLawnHillPlatAndLeicRiveFaulTrouMeasStraSectOnliGis() {
-        KnownLayer layer = new KnownLayer("lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis", knownTypeLawnHillPlatAndLeicRiveFaulTrouMeasStraSectOnliGisSelector());
+        KnownLayer layer = new KnownLayer("lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis",
+                knownTypeLawnHillPlatAndLeicRiveFaulTrouMeasStraSectOnliGisSelector());
         layer.setId("lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis");
         layer.setName("Lawn Hill Platform And Leichhardt River Fault Trough Measured Stratigraphic Section Online Gis");
         layer.setGroup("Geoscience Australia");
@@ -1414,9 +1463,12 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypePredMineDiscInTheEastYilgCratAnExamOfDistTargOfAnOrogGoldMineSyst() {
-        KnownLayer layer = new KnownLayer("pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst", knownTypePredMineDiscInTheEastYilgCratAnExamOfDistTargOfAnOrogGoldMineSystSelector());
+        KnownLayer layer = new KnownLayer(
+                "pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst",
+                knownTypePredMineDiscInTheEastYilgCratAnExamOfDistTargOfAnOrogGoldMineSystSelector());
         layer.setId("pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst");
-        layer.setName("Predictive Mineral Discovery In The Eastern Yilgarn Craton An Example Of District Scale Targeting Of An Orogenic Gold Mineral System");
+        layer.setName(
+                "Predictive Mineral Discovery In The Eastern Yilgarn Craton An Example Of District Scale Targeting Of An Orogenic Gold Mineral System");
         layer.setGroup("Geoscience Australia");
         layer.setDescription("Predictive mineral discovery is concerned with the application of a whole of sys");
         layer.setOrder("Registered_18");
@@ -1432,9 +1484,12 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeFinaRepo3DGeolModeOfTheEastYilgCratProjPmdY2Sept2001Dece2004() {
-        KnownLayer layer = new KnownLayer("fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004", knownTypeFinaRepo3DGeolModeOfTheEastYilgCratProjPmdY2Sept2001Dece2004Selector());
+        KnownLayer layer = new KnownLayer(
+                "fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004",
+                knownTypeFinaRepo3DGeolModeOfTheEastYilgCratProjPmdY2Sept2001Dece2004Selector());
         layer.setId("fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004");
-        layer.setName("Final Report 3D Geological Models Of The Eastern Yilgarn Craton Project Pmd Crc Y2 September 2001 December 2004");
+        layer.setName(
+                "Final Report 3D Geological Models Of The Eastern Yilgarn Craton Project Pmd Crc Y2 September 2001 December 2004");
         layer.setGroup("Geoscience Australia");
         layer.setDescription("The pmd*CRC Y2 project operated for a little over three years, and in this time ");
         layer.setOrder("Registered_19");
@@ -1464,7 +1519,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeHistoricalExplorationActivityPoints() {
-        KnownLayer layer = new KnownLayer("historical-exploration-activity-points", knownTypeHistoricalExplorationActivityPointsSelector());
+        KnownLayer layer = new KnownLayer("historical-exploration-activity-points",
+                knownTypeHistoricalExplorationActivityPointsSelector());
         layer.setId("historical-exploration-activity-points");
         layer.setName("Historical Exploration Activity Points");
         layer.setGroup("WA Department of Mines and Petroleum");
@@ -1528,7 +1584,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeMinesAndMineralDepositsMinedex() {
-        KnownLayer layer = new KnownLayer("mines-and-mineral-deposits-minedex", knownTypeMinesAndMineralDepositsMinedexSelector());
+        KnownLayer layer = new KnownLayer("mines-and-mineral-deposits-minedex",
+                knownTypeMinesAndMineralDepositsMinedexSelector());
         layer.setId("mines-and-mineral-deposits-minedex");
         layer.setName("Mines And Mineral Deposits Minedex");
         layer.setGroup("WA Department of Mines and Petroleum");
@@ -1544,7 +1601,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeMineralisationZonesNonS572Aa() {
-        KnownLayer layer = new KnownLayer("mineralisation-zones-non-s57-2aa", knownTypeMineralisationZonesNonS572AaSelector());
+        KnownLayer layer = new KnownLayer("mineralisation-zones-non-s57-2aa",
+                knownTypeMineralisationZonesNonS572AaSelector());
         layer.setId("mineralisation-zones-non-s57-2aa");
         layer.setName("Mineralisation Zones Non S57 2Aa");
         layer.setGroup("WA Department of Mines and Petroleum");
@@ -1592,7 +1650,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeHistoricalExplorationActivityLines() {
-        KnownLayer layer = new KnownLayer("historical-exploration-activity-lines", knownTypeHistoricalExplorationActivityLinesSelector());
+        KnownLayer layer = new KnownLayer("historical-exploration-activity-lines",
+                knownTypeHistoricalExplorationActivityLinesSelector());
         layer.setId("historical-exploration-activity-lines");
         layer.setName("Historical Exploration Activity Lines");
         layer.setGroup("WA Department of Mines and Petroleum");
@@ -1736,7 +1795,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeLateriteWesternYilgarnGeochem() {
-        KnownLayer layer = new KnownLayer("laterite-western-yilgarn-geochem", knownTypeLateriteWesternYilgarnGeochemSelector());
+        KnownLayer layer = new KnownLayer("laterite-western-yilgarn-geochem",
+                knownTypeLateriteWesternYilgarnGeochemSelector());
         layer.setId("laterite-western-yilgarn-geochem");
         layer.setName("Laterite Western Yilgarn Geochem");
         layer.setGroup("CSIRO");
@@ -1784,7 +1844,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeCate3ExplLicePolyOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("cate-3-expl-lice-poly-of-tasm-min-reso-tasm", knownTypeCate3ExplLicePolyOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("cate-3-expl-lice-poly-of-tasm-min-reso-tasm",
+                knownTypeCate3ExplLicePolyOfTasmMinResoTasmSelector());
         layer.setId("cate-3-expl-lice-poly-of-tasm-min-reso-tasm");
         layer.setName("Category 3 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1800,7 +1861,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeCate1ExplLicePolyOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("cate-1-expl-lice-poly-of-tasm-min-reso-tasm", knownTypeCate1ExplLicePolyOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("cate-1-expl-lice-poly-of-tasm-min-reso-tasm",
+                knownTypeCate1ExplLicePolyOfTasmMinResoTasmSelector());
         layer.setId("cate-1-expl-lice-poly-of-tasm-min-reso-tasm");
         layer.setName("Category 1 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1816,7 +1878,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeProcLandAreaOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("proc-land-area-of-tasm-min-reso-tasm", knownTypeProcLandAreaOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("proc-land-area-of-tasm-min-reso-tasm",
+                knownTypeProcLandAreaOfTasmMinResoTasmSelector());
         layer.setId("proc-land-area-of-tasm-min-reso-tasm");
         layer.setName("Proclaimed Landslip Areas Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1832,7 +1895,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeAirbGeopSurvOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("airb-geop-surv-of-tasm-min-reso-tasm", knownTypeAirbGeopSurvOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("airb-geop-surv-of-tasm-min-reso-tasm",
+                knownTypeAirbGeopSurvOfTasmMinResoTasmSelector());
         layer.setId("airb-geop-surv-of-tasm-min-reso-tasm");
         layer.setName("Airborne Geophysical Surveys Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1848,7 +1912,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeLandPoinOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("land-poin-of-tasm-min-reso-tasm", knownTypeLandPoinOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("land-poin-of-tasm-min-reso-tasm",
+                knownTypeLandPoinOfTasmMinResoTasmSelector());
         layer.setId("land-poin-of-tasm-min-reso-tasm");
         layer.setName("Landslide Points Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1864,7 +1929,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeMineOccuPoinOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("mine-occu-poin-of-tasm-min-reso-tasm", knownTypeMineOccuPoinOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("mine-occu-poin-of-tasm-min-reso-tasm",
+                knownTypeMineOccuPoinOfTasmMinResoTasmSelector());
         layer.setId("mine-occu-poin-of-tasm-min-reso-tasm");
         layer.setName("Mineral Occurrence Points Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1880,7 +1946,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeLandLineOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("land-line-of-tasm-min-reso-tasm", knownTypeLandLineOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("land-line-of-tasm-min-reso-tasm",
+                knownTypeLandLineOfTasmMinResoTasmSelector());
         layer.setId("land-line-of-tasm-min-reso-tasm");
         layer.setName("Landslide Lines Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1896,7 +1963,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeLandDamaPolyOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("land-dama-poly-of-tasm-min-reso-tasm", knownTypeLandDamaPolyOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("land-dama-poly-of-tasm-min-reso-tasm",
+                knownTypeLandDamaPolyOfTasmMinResoTasmSelector());
         layer.setId("land-dama-poly-of-tasm-min-reso-tasm");
         layer.setName("Landslide Damage Polygons Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1912,7 +1980,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeCate4ExplLicePolyOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("cate-4-expl-lice-poly-of-tasm-min-reso-tasm", knownTypeCate4ExplLicePolyOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("cate-4-expl-lice-poly-of-tasm-min-reso-tasm",
+                knownTypeCate4ExplLicePolyOfTasmMinResoTasmSelector());
         layer.setId("cate-4-expl-lice-poly-of-tasm-min-reso-tasm");
         layer.setName("Category 4 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1928,7 +1997,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeCate6ExplLicePolyOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("cate-6-expl-lice-poly-of-tasm-min-reso-tasm", knownTypeCate6ExplLicePolyOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("cate-6-expl-lice-poly-of-tasm-min-reso-tasm",
+                knownTypeCate6ExplLicePolyOfTasmMinResoTasmSelector());
         layer.setId("cate-6-expl-lice-poly-of-tasm-min-reso-tasm");
         layer.setName("Category 6 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1944,7 +2014,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeMiniLeasPolyOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("mini-leas-poly-of-tasm-min-reso-tasm", knownTypeMiniLeasPolyOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("mini-leas-poly-of-tasm-min-reso-tasm",
+                knownTypeMiniLeasPolyOfTasmMinResoTasmSelector());
         layer.setId("mini-leas-poly-of-tasm-min-reso-tasm");
         layer.setName("Mining Lease Polygons Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1960,7 +2031,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeCate2ExplLicePolyOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("cate-2-expl-lice-poly-of-tasm-min-reso-tasm", knownTypeCate2ExplLicePolyOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("cate-2-expl-lice-poly-of-tasm-min-reso-tasm",
+                knownTypeCate2ExplLicePolyOfTasmMinResoTasmSelector());
         layer.setId("cate-2-expl-lice-poly-of-tasm-min-reso-tasm");
         layer.setName("Category 2 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1976,7 +2048,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGravMeasOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("grav-meas-of-tasm-min-reso-tasm", knownTypeGravMeasOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("grav-meas-of-tasm-min-reso-tasm",
+                knownTypeGravMeasOfTasmMinResoTasmSelector());
         layer.setId("grav-meas-of-tasm-min-reso-tasm");
         layer.setName("Gravity Measurements Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -1992,7 +2065,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeCate5ExplLicePolyOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("cate-5-expl-lice-poly-of-tasm-min-reso-tasm", knownTypeCate5ExplLicePolyOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("cate-5-expl-lice-poly-of-tasm-min-reso-tasm",
+                knownTypeCate5ExplLicePolyOfTasmMinResoTasmSelector());
         layer.setId("cate-5-expl-lice-poly-of-tasm-min-reso-tasm");
         layer.setName("Category 5 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania");
         layer.setGroup("Mineral Resources Tasmania");
@@ -2008,7 +2082,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeLandDamaPoinOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("land-dama-poin-of-tasm-min-reso-tasm", knownTypeLandDamaPoinOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("land-dama-poin-of-tasm-min-reso-tasm",
+                knownTypeLandDamaPoinOfTasmMinResoTasmSelector());
         layer.setId("land-dama-poin-of-tasm-min-reso-tasm");
         layer.setName("Landslide Damage Points Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -2024,7 +2099,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGravBaseStatOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("grav-base-stat-of-tasm-min-reso-tasm", knownTypeGravBaseStatOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("grav-base-stat-of-tasm-min-reso-tasm",
+                knownTypeGravBaseStatOfTasmMinResoTasmSelector());
         layer.setId("grav-base-stat-of-tasm-min-reso-tasm");
         layer.setName("Gravity Base Stations Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -2040,7 +2116,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeBorePoinOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("bore-poin-of-tasm-min-reso-tasm", knownTypeBorePoinOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("bore-poin-of-tasm-min-reso-tasm",
+                knownTypeBorePoinOfTasmMinResoTasmSelector());
         layer.setId("bore-poin-of-tasm-min-reso-tasm");
         layer.setName("Borehole Points Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -2056,7 +2133,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeStrategicProspectivityZones() {
-        KnownLayer layer = new KnownLayer("strategic-prospectivity-zones", knownTypeStrategicProspectivityZonesSelector());
+        KnownLayer layer = new KnownLayer("strategic-prospectivity-zones",
+                knownTypeStrategicProspectivityZonesSelector());
         layer.setId("strategic-prospectivity-zones");
         layer.setName("Strategic Prospectivity Zones");
         layer.setGroup("Mineral Resources Tasmania");
@@ -2072,7 +2150,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeLandPolyOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("land-poly-of-tasm-min-reso-tasm", knownTypeLandPolyOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("land-poly-of-tasm-min-reso-tasm",
+                knownTypeLandPolyOfTasmMinResoTasmSelector());
         layer.setId("land-poly-of-tasm-min-reso-tasm");
         layer.setName("Landslide Polygons Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -2088,7 +2167,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeBoreTracOfTasmMinResoTasm() {
-        KnownLayer layer = new KnownLayer("bore-trac-of-tasm-min-reso-tasm", knownTypeBoreTracOfTasmMinResoTasmSelector());
+        KnownLayer layer = new KnownLayer("bore-trac-of-tasm-min-reso-tasm",
+                knownTypeBoreTracOfTasmMinResoTasmSelector());
         layer.setId("bore-trac-of-tasm-min-reso-tasm");
         layer.setName("Borehole Traces Of Tasmania Mineral Resources Tasmania ");
         layer.setGroup("Mineral Resources Tasmania");
@@ -2232,7 +2312,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeNswGeologicalFieldObservations() {
-        KnownLayer layer = new KnownLayer("nsw-geological-field-observations", knownTypeNswGeologicalFieldObservationsSelector());
+        KnownLayer layer = new KnownLayer("nsw-geological-field-observations",
+                knownTypeNswGeologicalFieldObservationsSelector());
         layer.setId("nsw-geological-field-observations");
         layer.setName("Nsw Geological Field Observations");
         layer.setGroup("Geological Survey NSW");
@@ -2296,7 +2377,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeMineralOccurenceIndustryFull() {
-        KnownLayer layer = new KnownLayer("mineral-occurence-industry-full", knownTypeMineralOccurenceIndustryFullSelector());
+        KnownLayer layer = new KnownLayer("mineral-occurence-industry-full",
+                knownTypeMineralOccurenceIndustryFullSelector());
         layer.setId("mineral-occurence-industry-full");
         layer.setName("Mineral Occurence Industry Full");
         layer.setGroup("Geological Survey NSW");
@@ -2312,7 +2394,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeNswHistoricExplorationTitles() {
-        KnownLayer layer = new KnownLayer("nsw-historic-exploration-titles", knownTypeNswHistoricExplorationTitlesSelector());
+        KnownLayer layer = new KnownLayer("nsw-historic-exploration-titles",
+                knownTypeNswHistoricExplorationTitlesSelector());
         layer.setId("nsw-historic-exploration-titles");
         layer.setName("Nsw Historic Exploration Titles");
         layer.setGroup("Geological Survey NSW");
@@ -2344,7 +2427,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeBlLocalaboriginallandcouncil() {
-        KnownLayer layer = new KnownLayer("bl-localaboriginallandcouncil", knownTypeBlLocalaboriginallandcouncilSelector());
+        KnownLayer layer = new KnownLayer("bl-localaboriginallandcouncil",
+                knownTypeBlLocalaboriginallandcouncilSelector());
         layer.setId("bl-localaboriginallandcouncil");
         layer.setName("Bl Localaboriginallandcouncil");
         layer.setGroup("Geological Survey NSW");
@@ -2360,7 +2444,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeNswMineralOccurrenceIndustry() {
-        KnownLayer layer = new KnownLayer("nsw-mineral-occurrence-industry", knownTypeNswMineralOccurrenceIndustrySelector());
+        KnownLayer layer = new KnownLayer("nsw-mineral-occurrence-industry",
+                knownTypeNswMineralOccurrenceIndustrySelector());
         layer.setId("nsw-mineral-occurrence-industry");
         layer.setName("Nsw Mineral Occurrence Industry");
         layer.setGroup("Geological Survey NSW");
@@ -2408,7 +2493,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeNswGeologicalFieldObservationsPhoto() {
-        KnownLayer layer = new KnownLayer("nsw-geological-field-observations-photo", knownTypeNswGeologicalFieldObservationsPhotoSelector());
+        KnownLayer layer = new KnownLayer("nsw-geological-field-observations-photo",
+                knownTypeNswGeologicalFieldObservationsPhotoSelector());
         layer.setId("nsw-geological-field-observations-photo");
         layer.setName("Nsw Geological Field Observations Photo");
         layer.setGroup("Geological Survey NSW");
@@ -2424,7 +2510,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGeopTotaMagnInteRtpTmiRtpTiltFilt() {
-        KnownLayer layer = new KnownLayer("geop-tota-magn-inte-rtp-tmi-rtp-tilt-filt", knownTypeGeopTotaMagnInteRtpTmiRtpTiltFiltSelector());
+        KnownLayer layer = new KnownLayer("geop-tota-magn-inte-rtp-tmi-rtp-tilt-filt",
+                knownTypeGeopTotaMagnInteRtpTmiRtpTiltFiltSelector());
         layer.setId("geop-tota-magn-inte-rtp-tmi-rtp-tilt-filt");
         layer.setName("Geophysics Total Magnetic Intensity Rtp Tmi Rtp Tilt Filter");
         layer.setGroup("Geological Survey NSW");
@@ -2472,7 +2559,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGeopTotaMagnInte1StDeriReduToPole() {
-        KnownLayer layer = new KnownLayer("geop-tota-magn-inte-1st-deri-redu-to-pole", knownTypeGeopTotaMagnInte1StDeriReduToPoleSelector());
+        KnownLayer layer = new KnownLayer("geop-tota-magn-inte-1st-deri-redu-to-pole",
+                knownTypeGeopTotaMagnInte1StDeriReduToPoleSelector());
         layer.setId("geop-tota-magn-inte-1st-deri-redu-to-pole");
         layer.setName("Geophysics Total Magnetic Intensity 1St Derivative Reduced To Pole");
         layer.setGroup("Geological Survey NSW");
@@ -2488,7 +2576,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeNswGeologicalSpectralSamples() {
-        KnownLayer layer = new KnownLayer("nsw-geological-spectral-samples", knownTypeNswGeologicalSpectralSamplesSelector());
+        KnownLayer layer = new KnownLayer("nsw-geological-spectral-samples",
+                knownTypeNswGeologicalSpectralSamplesSelector());
         layer.setId("nsw-geological-spectral-samples");
         layer.setName("Nsw Geological Spectral Samples");
         layer.setGroup("Geological Survey NSW");
@@ -2536,7 +2625,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeNswCurrentMiningApplications() {
-        KnownLayer layer = new KnownLayer("nsw-current-mining-applications", knownTypeNswCurrentMiningApplicationsSelector());
+        KnownLayer layer = new KnownLayer("nsw-current-mining-applications",
+                knownTypeNswCurrentMiningApplicationsSelector());
         layer.setId("nsw-current-mining-applications");
         layer.setName("Nsw Current Mining Applications");
         layer.setGroup("Geological Survey NSW");
@@ -2648,7 +2738,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGeophysicsIsostaticBougerGravity() {
-        KnownLayer layer = new KnownLayer("geophysics-isostatic-bouger-gravity", knownTypeGeophysicsIsostaticBougerGravitySelector());
+        KnownLayer layer = new KnownLayer("geophysics-isostatic-bouger-gravity",
+                knownTypeGeophysicsIsostaticBougerGravitySelector());
         layer.setId("geophysics-isostatic-bouger-gravity");
         layer.setName("Geophysics Isostatic Bouger Gravity");
         layer.setGroup("Geological Survey NSW");
@@ -2664,7 +2755,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGeopTotaMagnInteReduToPole() {
-        KnownLayer layer = new KnownLayer("geop-tota-magn-inte-redu-to-pole", knownTypeGeopTotaMagnInteReduToPoleSelector());
+        KnownLayer layer = new KnownLayer("geop-tota-magn-inte-redu-to-pole",
+                knownTypeGeopTotaMagnInteReduToPoleSelector());
         layer.setId("geop-tota-magn-inte-redu-to-pole");
         layer.setName("Geophysics Total Magnetic Intensity Reduced To Pole");
         layer.setGroup("Geological Survey NSW");
@@ -2744,7 +2836,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeGeopIsosGravOverTmiRtpTilt() {
-        KnownLayer layer = new KnownLayer("geop-isos-grav-over-tmi-rtp-tilt", knownTypeGeopIsosGravOverTmiRtpTiltSelector());
+        KnownLayer layer = new KnownLayer("geop-isos-grav-over-tmi-rtp-tilt",
+                knownTypeGeopIsosGravOverTmiRtpTiltSelector());
         layer.setId("geop-isos-grav-over-tmi-rtp-tilt");
         layer.setName("Geophysics Isostatic Gravity Over Tmi Rtp Tilt");
         layer.setGroup("Geological Survey NSW");
@@ -2792,7 +2885,8 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeNswMineralOccurrenceCommodity() {
-        KnownLayer layer = new KnownLayer("nsw-mineral-occurrence-commodity", knownTypeNswMineralOccurrenceCommoditySelector());
+        KnownLayer layer = new KnownLayer("nsw-mineral-occurrence-commodity",
+                knownTypeNswMineralOccurrenceCommoditySelector());
         layer.setId("nsw-mineral-occurrence-commodity");
         layer.setName("Nsw Mineral Occurrence Commodity");
         layer.setGroup("Geological Survey NSW");
@@ -2814,10 +2908,10 @@ public class KnownLayers {
         layer.setGroup("Geological Provinces");
         layer.setProxyStyleUrl("getGeologicalProvincestyle.do");
         layer.setOrder("provinces_01");
-        
+
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("Name", "erl:name", null, Predicate.ISLIKE);        
+        UITextBox nameTextBox = new UITextBox("Name", "erl:name", null, Predicate.ISLIKE);
         UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox", "the_geom", null, Predicate.ISEQUAL);
         optionalFilters.add(nameTextBox);
         optionalFilters.add(uiPolygonBBox);
@@ -2997,4 +3091,97 @@ public class KnownLayers {
         return layer;
     }
 
+    @Bean
+    public KnownLayerSelector knownTypeIGSNSampleSelector() {
+        return new WMSSelector("igsn:sample");
+    }
+
+    @Bean
+    public KnownLayer knownTypeIGSNSample() {
+        KnownLayer layer = new KnownLayer("igsn-sample", knownTypeIGSNSampleSelector());
+        layer.setId("IGSN-CSIRO-SAMPLE");
+        layer.setName("igsn-csiro-sample");
+        layer.setGroup("IGSN");
+        layer.setDescription("A collection of igsn-csiro-sample");
+        layer.setProxyStyleUrl("getDefaultStyle.do?colour=0xFF0000&layerName=igsn:sample");
+        layer.setOrder("50");
+        // Optional filters
+        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
+        UITextBox nameTextBox = new UITextBox("samplename", "igsn:samplename", null, Predicate.ISLIKE);
+        optionalFilters.add(nameTextBox);
+        FilterCollection filterCollection = new FilterCollection();
+        filterCollection.setOptionalFilters(optionalFilters);
+        layer.setFilterCollection(filterCollection);        
+        return layer;
+    }
+
+    @Bean
+    public KnownLayerSelector knownTypeIGSNGASampleSelector() {
+        return new WMSSelector("igsn:igsn_ga_sample");
+    }
+
+    @Bean
+    public KnownLayer knownTypeIGSNGASample() {
+        KnownLayer layer = new KnownLayer("igsn-ga-sample", knownTypeIGSNGASampleSelector());
+        layer.setId("IGSN-GA-SAMPLE");
+        layer.setName("igsn-ga-sample");
+        layer.setGroup("IGSN");
+        layer.setDescription("A collection of igsn-ga-sample");
+        layer.setProxyStyleUrl("getDefaultStyle.do?colour=0x00FF00&layerName=igsn:igsn_ga_sample");
+        layer.setOrder("51");
+        // Optional filters
+        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
+        UITextBox nameTextBox = new UITextBox("samplename", "igsn:name", null, Predicate.ISLIKE);
+        optionalFilters.add(nameTextBox);
+        FilterCollection filterCollection = new FilterCollection();
+        filterCollection.setOptionalFilters(optionalFilters);
+        layer.setFilterCollection(filterCollection);        
+        return layer;   
+    }
+    @Bean
+    public KnownLayerSelector knownTypeIGSNANDSSampleSelector() {
+        return new WMSSelector("igsn:igsn_ands_sample");
+    }
+
+    @Bean
+    public KnownLayer knownTypeIGSNANDSSample() {
+        KnownLayer layer = new KnownLayer("igsn-ands-sample", knownTypeIGSNANDSSampleSelector());
+        layer.setId("IGSN-ANDS-SAMPLE");
+        layer.setName("igsn-ands-sample");
+        layer.setGroup("IGSN");
+        layer.setDescription("A collection of igsn-ands-sample");
+        layer.setProxyStyleUrl("getDefaultStyle.do?colour=0x0000FF&layerName=igsn:igsn_ands_sample");
+        layer.setOrder("52");
+        // Optional filters
+        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
+        UITextBox nameTextBox = new UITextBox("Identifier", "igsn:identifier", null, Predicate.ISLIKE);
+        optionalFilters.add(nameTextBox);
+        FilterCollection filterCollection = new FilterCollection();
+        filterCollection.setOptionalFilters(optionalFilters);
+        layer.setFilterCollection(filterCollection);
+        return layer;
+    }
+    @Bean
+    public KnownLayerSelector knownTypeIGSNWdcSampleSelector() {
+        return new WMSSelector("igsn:igsn_wdc_sample");
+    }
+
+    @Bean
+    public KnownLayer knownTypeIGSNWdcSample() {
+        KnownLayer layer = new KnownLayer("igsn-sample", knownTypeIGSNWdcSampleSelector());
+        layer.setId("IGSN-WDC-SAMPLE");
+        layer.setName("igsn-wdc-sample");
+        layer.setGroup("IGSN");
+        layer.setDescription("A collection of igsn-wdc-sample");
+        layer.setProxyStyleUrl("getDefaultStyle.do?colour=0xFF00FF&layerName=igsn:igsn_wdc_sample");
+        layer.setOrder("53");
+        // Optional filters
+        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
+        UITextBox nameTextBox = new UITextBox("Identifier", "igsn:identifier", null, Predicate.ISLIKE);
+        optionalFilters.add(nameTextBox);
+        FilterCollection filterCollection = new FilterCollection();
+        filterCollection.setOptionalFilters(optionalFilters);
+        layer.setFilterCollection(filterCollection);        
+        return layer;
+    }       
 }

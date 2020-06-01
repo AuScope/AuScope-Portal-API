@@ -129,6 +129,14 @@ encryption:
    password: ABCdefGHI
 
 env:
+    stackdriver:
+        enable: false
+        project_id: ENTER_GOOGLE_PROJECT_ID
+        private_key_id: ENTER_GOOGLE_PRIVATE_KEY_ID
+        private_key: ENTER_GOOGLE_PRIVATE_KEY
+        client_email: ENTER_CLIENT_EMAIL
+        client_id: ENTER_CLIENT_ID
+        token_uri: https://oauth2.googleapis.com/token
     twitter:
         enable: false
         consumerKey: ENTER_TWITTER_CONSUMER_KEY
