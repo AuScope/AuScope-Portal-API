@@ -50,7 +50,7 @@ public class CloudStorageServiceNci extends CloudStorageService {
      * @return
      */
     public String getWorkingJobDirectory(CloudFileOwner job) {
-        return String.format("/scratch/%1$s/vl-workingdir/%2$s", job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT), generateBaseKey(job));
+        return String.format("/scratch/%1$s/vl-workingdir/%2$s", job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT), jobToBaseKey(job));
     }
 
     /**
@@ -59,7 +59,7 @@ public class CloudStorageServiceNci extends CloudStorageService {
      * @return
      */
     public String getOutputJobDirectory(CloudFileOwner job) {
-        return String.format("/g/data/%1$s/vl-jobs/%2$s", job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT), generateBaseKey(job));
+        return String.format("/g/data/%1$s/vl-jobs/%2$s", job.getProperty(NCIDetails.PROPERTY_NCI_PROJECT), jobToBaseKey(job));
     }
 
     private boolean jobFileExists(ChannelSftp c, String fullPath) throws PortalServiceException {
