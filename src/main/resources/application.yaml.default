@@ -1,3 +1,8 @@
+# This file is a basic template for the server's configuration
+# The server expects to find a file called 'application.yaml'
+# To use it, make a copy of this file called 'application.yaml' in the same directory
+# and fill in the required fields.
+#
 # This is for developers to set tomcat context path if running from PortalApplication class.
 # server:
 #     port: 8080

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- NB: This pom file has two build profiles: 'prod' and 'test'
+     they are set in the <build> section towards the end of this file
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
@@ -21,7 +24,6 @@
         <url>https://github.com/AuScope/AuScope-Portal-API</url>
     </scm>
     
-    <!-- Build Configuration -->
     <organization>
         <name>AuScope</name>
         <url>http://www.auscope.org</url>
@@ -46,6 +48,7 @@
         <version>2.2.5.RELEASE</version>
     </parent>
     
+    <!-- Repositories section -->
     <repositories>
         <repository>
             <id>dcdp-deps</id>
@@ -79,7 +82,7 @@
         </repository>
     </repositories>
 
-    <!-- Dependencies -->
+    <!-- Dependencies section -->
     <dependencies>
         <dependency>
 		    <groupId>net.bytebuddy</groupId>
@@ -241,7 +244,7 @@
             <artifactId>netcdf</artifactId>
             <version>4.2.20</version>
         </dependency>
-     <!-- Added for using PowerMock with JMock -->
+        <!-- Added for using PowerMock with JMock -->
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-support</artifactId>
@@ -396,11 +399,13 @@
       </dependency>
     </dependencies>
 
+    <!-- Build section -->
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <!-- Build profiles are set here -->
                 <configuration>
                     <profiles>
                         <!-- <profile>prod</profile> -->

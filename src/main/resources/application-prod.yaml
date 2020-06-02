@@ -1,3 +1,4 @@
+# This file is part of the 'prod' build profile and enables the server to use the production geonetwork server
 auscope:
   registries:
       - id: cswAuscopeProduction
