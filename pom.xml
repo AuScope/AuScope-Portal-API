@@ -8,10 +8,10 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auscope.portal</groupId>
-    <artifactId>AuScope-Portal</artifactId>
+    <artifactId>AuScope-Portal-API</artifactId>
     <packaging>war</packaging>
     <version>5.2.0-SNAPSHOT</version>
-    <name>AuScope-Portal</name>
+    <name>AuScope-Portal-API</name>
     <description>AuScope's flagship portal</description>
     <url>http://portal.auscope.org</url>
     <issueManagement>
@@ -45,7 +45,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.5.RELEASE</version>
+        <version>2.3.0.RELEASE</version>
     </parent>
     
     <!-- Repositories section -->
@@ -114,7 +114,7 @@
         <dependency>
             <groupId>org.springframework.security.oauth.boot</groupId>
             <artifactId>spring-security-oauth2-autoconfigure</artifactId>
-            <version>2.1.3.RELEASE</version>
+            <version>2.2.7.RELEASE</version>
         </dependency>
 
         <dependency>
@@ -294,12 +294,13 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.20</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
-            <version>3.12.0</version>
+            <version>3.13.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jclouds</groupId>
