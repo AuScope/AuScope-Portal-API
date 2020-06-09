@@ -80,6 +80,10 @@
                 <updatePolicy>always</updatePolicy>
             </releases>
         </repository>
+        <repository>
+             <id>unicar</id>
+             <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases/</url>
+        </repository>
     </repositories>
 
     <!-- Dependencies section -->
