@@ -37,7 +37,7 @@
         <log4j.version>2.13.0</log4j.version>
         <geotools.version>2.6.5</geotools.version>
         <portal.core.version>2.3.1-SNAPSHOT</portal.core.version>
-        <httpclient.version>4.5.9</httpclient.version>
+        <httpclient.version>4.5.12</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
     </properties>
     
