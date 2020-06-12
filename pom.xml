@@ -404,20 +404,39 @@
       </dependency>
     </dependencies>
 
+    <!-- Profiles section -->
+    <!-- Maven profiles are used to set up spring profiles via the @spring.profiles.active@
+	 placeholder which is defined in application.yaml -->
+    <!-- There are two profiles: 'test' and 'prod' - comment out the one you don't want -->
+    <profiles>
+        <profile>
+            <id>test</id>
+            <!-- 'test' profile set here -->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+		<spring.profiles.active>test</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <!-- 'prod' profile set here -->
+	    <!-- <activation>
+                <activeByDefault>true</activeByDefault>
+	    </activation> -->
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
     <!-- Build section -->
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!-- Build profiles are set here -->
-                <configuration>
-                    <profiles>
-                        <!-- <profile>prod</profile> -->
-                        <profile>test</profile>
-                    </profiles>
-                </configuration>
-
                 <executions>
                     <execution>
                         <goals>

@@ -16,6 +16,8 @@ spring:
    profiles:
       include:
          'registries'
+      active:
+         @spring.profiles.active@
    datasource:
       # This is for a dummy in-memory database
       driver-class-name: org.h2.Driver
