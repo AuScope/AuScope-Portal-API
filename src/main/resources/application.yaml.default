@@ -16,8 +16,11 @@ spring:
    profiles:
       include:
          'registries'
-      active:
-         @spring.profiles.active@
+      # There are two profiles 'prod' and 'test'.
+      # These are for production and test builds, and control the set of map layers available to Auscope Portal
+      # Comment out the one that you don't want
+      active: test
+      #active: prod
    datasource:
       # This is for a dummy in-memory database
       driver-class-name: org.h2.Driver
