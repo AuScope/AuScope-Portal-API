@@ -410,14 +410,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!-- Build profiles are set here -->
-                <configuration>
-                    <profiles>
-                        <!-- <profile>prod</profile> -->
-                        <profile>test</profile>
-                    </profiles>
-                </configuration>
-
                 <executions>
                     <execution>
                         <goals>
