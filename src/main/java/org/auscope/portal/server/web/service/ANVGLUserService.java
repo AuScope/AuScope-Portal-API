@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 
 import org.auscope.portal.server.web.repositories.ANVGLUserRepository;
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.aaf.AAFAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
