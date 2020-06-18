@@ -1,6 +1,5 @@
 package org.auscope.portal.server.web;
 
-// import org.apache.commons.httpclient.HttpMethodBase;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 
 public interface IERDDAPMethodMaker {
