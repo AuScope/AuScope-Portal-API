@@ -326,6 +326,7 @@ public class PurchaseController extends BasePortalController {
                 inputData.append(new String(buffer, 0, numRead));
             }
             in.close();
+            reader.close();
 
             logger.info("got input data: " + inputData.toString());
             JsonParser parser = new JsonParser();
