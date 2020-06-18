@@ -1,6 +1,7 @@
 package org.auscope.portal.server.vegl;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,7 +83,7 @@ public class VGLJobStatusAndLogReader extends BaseCloudController implements Job
         InputStream is = null;
         try {
             is = cloudStorageService.getJobFile(job, logFile);
-            logContents = IOUtils.toString(is);
+            logContents = IOUtils.toString(is, StandardCharsets.UTF_8);
         } catch (Exception ex) {
             log.debug(String.format("The job %1$s hasn't uploaded %2$s yet", job.getId(), logFile));
         } finally {

@@ -14,8 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -199,12 +200,12 @@ public class ANVGLProvenanceService {
      *            URL of the webserver.
      * @return A URL for the file. May or may not be public.
      */
-    protected static String outputURL(final VEGLJob job, final CloudFileInformation outputInfo, final String serverURL)
-            throws URIException {
-        String url = String.format("%s/secure/jobFile.do?jobId=%s&key=%s", serverURL, job.getId(),
-                outputInfo.getCloudKey());
-        url = URIUtil.encodeQuery(url);
-        return url;
+    protected static String outputURL(final VEGLJob job, final CloudFileInformation outputInfo, final String serverURL) {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("jobId", job.getId().toString()));
+        params.add(new BasicNameValuePair("key", outputInfo.getCloudKey()));
+        String paramString = URLEncodedUtils.format(params, "UTF-8");
+        return String.format("%s/secure/jobFile.do?%s", serverURL, paramString);
     }
 
     /**
@@ -245,7 +246,7 @@ public class ANVGLProvenanceService {
             }
         } catch (PortalServiceException e) {
             LOGGER.error(String.format("Unable to retrieve upload file information for job: %s", e));
-        } catch (URISyntaxException | URIException ex) {
+        } catch (URISyntaxException ex) {
             LOGGER.error(
                     String.format("Error parsing data source urls %s into URIs.", job.getJobDownloads().toString()),
                     ex);
@@ -329,7 +330,7 @@ public class ANVGLProvenanceService {
                             .add(new Entity().setDataUri(outputURI).setWasAttributedTo(new URI(MAIL + job.getUser())));
                 }
             }
-        } catch (PortalServiceException | URISyntaxException | URIException ex) {
+        } catch (PortalServiceException | URISyntaxException ex) {
             LOGGER.error(
                     String.format("Error parsing data results urls %s into URIs.", job.getJobDownloads().toString()),
                     ex);

@@ -5,14 +5,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
  * Created by wis056 on 7/04/2015.
  */
-public class AAFAttributes implements UserDetails, Serializable {
+public class AAFAttributes implements UserDetails {
 
     private static final long serialVersionUID = -7842095359474432151L;
 

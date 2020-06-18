@@ -1111,7 +1111,7 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockSeries).getUser();will(returnValue(seriesEmail));
         }});
 
-        ModelAndView mav = controller.listJobs(mockRequest, mockResponse, seriesId, false);
+        controller.listJobs(mockRequest, mockResponse, seriesId, false);
     }
 
     /**

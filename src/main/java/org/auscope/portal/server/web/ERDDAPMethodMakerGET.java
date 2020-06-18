@@ -1,7 +1,7 @@
 package org.auscope.portal.server.web;
 
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.methods.GetMethod;
+//import org.apache.commons.httpclient.HttpMethodBase;
+//import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
@@ -14,7 +14,7 @@ public class ERDDAPMethodMakerGET implements
     private final Log logger = LogFactory.getLog(getClass());
 
     @Override
-    public HttpMethodBase makeMethod(String serviceUrl, String layerName,
+    public String makeMethod(String serviceUrl, String layerName,
             CSWGeographicBoundingBox bbox, String format) throws Exception {
 
         // check for the minimum ERDDAP request requirements
@@ -29,9 +29,9 @@ public class ERDDAPMethodMakerGET implements
 
         String uri = serviceUrl + layerName + "." + format + "?" + layerName + erddapDimensions;
 
-        GetMethod httpMethod = new GetMethod(uri);
+        // GetMethod httpMethod = new GetMethod(uri);
         logger.debug(String.format("uri='%1$s'", uri));
 
-        return httpMethod;
+        return uri;
     }
 }

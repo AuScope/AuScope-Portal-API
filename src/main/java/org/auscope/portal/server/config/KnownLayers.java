@@ -5,12 +5,9 @@ import java.awt.Point;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.MalformedURLException;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.auscope.portal.core.uifilter.AbstractBaseFilter;
 import org.auscope.portal.core.uifilter.FilterCollection;
@@ -29,8 +26,6 @@ import org.auscope.portal.core.view.knownlayer.WFSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSWFSSelector;
 import org.auscope.portal.view.knownlayer.IRISSelector;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Known layer bean definitions (originally migrated from Spring MVC
@@ -82,9 +77,9 @@ public class KnownLayers {
         UIDate endFromDate = new UIDate("Drilling End From", "gsmlp:drillEndDate", null, Predicate.BIGGER_THAN);
         UIDate endToDate = new UIDate("Drilling End To", "gsmlp:drillEndDate", null, Predicate.SMALLER_THAN);
         optionalFilters.add(startFromDate);
-        optionalFilters.add(startFromDate);
-        optionalFilters.add(startFromDate);
-        optionalFilters.add(startFromDate);
+        optionalFilters.add(startToDate);
+        optionalFilters.add(endFromDate);
+        optionalFilters.add(endToDate);
     }
 
     @Bean

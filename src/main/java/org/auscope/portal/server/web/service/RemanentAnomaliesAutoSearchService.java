@@ -1,7 +1,5 @@
 package org.auscope.portal.server.web.service;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.BaseWFSService;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;

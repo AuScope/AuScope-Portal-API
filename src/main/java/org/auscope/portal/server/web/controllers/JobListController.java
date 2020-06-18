@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.io.Charsets;
+import org.apache.http.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -1122,7 +1122,7 @@ public class JobListController extends BaseCloudController  {
         InputStream is = null;
         try {
             is = cloudStorageService.getJobFile(job, file);
-            InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8);
+            InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
             char[] buffer = new char[maxSize];
             int charsRead = reader.read(buffer);
             if (charsRead < 0) {

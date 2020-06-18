@@ -2,6 +2,7 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,7 +165,7 @@ public abstract class BaseCloudController extends BaseModelController {
      */
     private String getBootstrapTemplate() throws IOException {
         try (InputStream is = this.getClass().getResourceAsStream("vl-bootstrap.sh")) {
-            String template = IOUtils.toString(is);
+            String template = IOUtils.toString(is, StandardCharsets.UTF_8);
             return template.replaceAll("\r", ""); // Windows style file endings
                                                   // have a tendency to sneak in
                                                   // via StringWriter and the
@@ -180,7 +181,7 @@ public abstract class BaseCloudController extends BaseModelController {
      */
     private String getProvisioningTemplate() throws IOException {
         try (InputStream is = getClass().getResourceAsStream("vl-provisioning.sh")) {
-            String template = IOUtils.toString(is);
+            String template = IOUtils.toString(is, StandardCharsets.UTF_8);
             return template.replaceAll("\r", ""); // Windows style file endings
                                                   // have a tendency to sneak in
                                                   // via StringWriter and the

@@ -5,14 +5,12 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.HashSet;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jclouds.rest.AuthorizationException;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
@@ -24,8 +22,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import org.auscope.portal.server.web.controllers.sessonobject.StringArrayToCustomRegistry;
-import org.springframework.context.support.ConversionServiceFactoryBean;
 import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
@@ -51,7 +47,6 @@ import org.auscope.portal.core.services.WFSService;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.auscope.portal.core.services.csw.GriddedCSWRecordTransformerFactory;
 import org.auscope.portal.core.services.csw.ViewGriddedCSWRecordFactory;
-import org.auscope.portal.core.services.csw.custom.CustomRegistry;
 import org.auscope.portal.core.services.methodmakers.OPeNDAPGetDataMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WCSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
@@ -78,21 +73,14 @@ import org.auscope.portal.server.web.service.cloud.CloudStorageServiceNci;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor;
 import org.quartz.Trigger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.MethodInvokingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
-import org.auscope.portal.core.view.ViewCSWRecordFactory;
 import org.auscope.portal.core.xslt.WfsToKmlTransformer;
 import org.auscope.portal.core.services.VocabularyCacheService;
 import org.auscope.portal.core.services.VocabularyFilterService;
@@ -103,13 +91,11 @@ import org.auscope.portal.server.web.service.ErmlVocabService;
 import org.auscope.portal.server.web.service.NvclVocabService;
 import org.auscope.portal.core.server.http.download.FileDownloadService;
 import org.auscope.portal.core.services.vocabs.VocabularyServiceItem;
-import org.auscope.portal.core.services.VocabularyCacheService;
 import org.auscope.portal.nvcl.NvclVocabMethodMaker;
 import org.auscope.portal.mineraloccurrence.CommodityVocabMethodMaker;
 import org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer;
 import org.auscope.portal.server.web.service.NotificationService;
 import org.auscope.portal.mscl.MSCLWFSService;
-import org.auscope.portal.core.services.NamespaceService;
 
 
 /**
