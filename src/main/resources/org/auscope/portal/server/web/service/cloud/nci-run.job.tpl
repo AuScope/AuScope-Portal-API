@@ -6,7 +6,7 @@
 #PBS -l jobfs={7}
 #PBS -l ncpus={5}
 #PBS -l wd
-#PBS -l storage=scratch/{0}+gdata/{0}
+#PBS -l storage=scratch/{0}+gdata/{0}{10}
 #PBS -j oe
 #PBS -N vl{1}
 #PBS -o {3}/.run.log
