@@ -35,6 +35,9 @@ services:
       - type: bind
         source: ./application.yaml
         target: /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.yaml
+      - type: bind
+        source: ./application-registries.yaml
+        target: /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application-registries.yaml
 
 volumes:
   vgl-db-data:
