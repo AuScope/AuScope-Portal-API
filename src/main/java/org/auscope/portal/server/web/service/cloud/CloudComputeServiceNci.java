@@ -44,6 +44,8 @@ public class CloudComputeServiceNci extends CloudComputeService {
 
     public static final String JOB_ID_FILE = ".jobid";
 
+    public static final String ANNOTATION_STORAGE_REQUIRED = "nci-storage-required=";
+
     @SuppressWarnings("unused")
     private final Log logger = LogFactory.getLog(getClass());
     private CloudStorageServiceNci storageService;
@@ -158,6 +160,24 @@ public class CloudComputeServiceNci extends CloudComputeService {
     }
 
     /**
+     * Return extra filesystems request string, if any, for job.
+     *
+     * Returns an empty string if none required.
+     *
+     */
+    private String extraFilesystemsRequest(VEGLJob job) {
+        if (job != null) {
+            for (String annotation: job.getAnnotations()) {
+                if (annotation.toLowerCase().startsWith(ANNOTATION_STORAGE_REQUIRED)) {
+                    return annotation.substring(ANNOTATION_STORAGE_REQUIRED.length());
+                }
+            }
+        }
+
+        return "";
+    }
+
+    /**
      * Creates our bootstrap jobs/files templated for the specified job in the specified job's storage location
      * @param job
      * @throws PortalServiceException
@@ -189,7 +209,8 @@ public class CloudComputeServiceNci extends CloudComputeService {
             extractParamFromComputeType("mem", job.getComputeInstanceType()),
             extractParamFromComputeType("jobfs", job.getComputeInstanceType()),
             hpcImageFragment,
-            runCommand
+            runCommand,
+            extraFilesystemsRequest(job)
         });
 
         //storageService.uploadJobFile(job, files);
