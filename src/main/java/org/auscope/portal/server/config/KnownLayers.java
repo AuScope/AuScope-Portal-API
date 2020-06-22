@@ -5,11 +5,9 @@ import java.awt.Point;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.MalformedURLException;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.auscope.portal.core.uifilter.AbstractBaseFilter;
@@ -29,8 +27,6 @@ import org.auscope.portal.core.view.knownlayer.WFSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSWFSSelector;
 import org.auscope.portal.view.knownlayer.IRISSelector;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Known layer bean definitions (originally migrated from Spring MVC
@@ -82,9 +78,9 @@ public class KnownLayers {
         UIDate endFromDate = new UIDate("Drilling End From", "gsmlp:drillEndDate", null, Predicate.BIGGER_THAN);
         UIDate endToDate = new UIDate("Drilling End To", "gsmlp:drillEndDate", null, Predicate.SMALLER_THAN);
         optionalFilters.add(startFromDate);
-        optionalFilters.add(startFromDate);
-        optionalFilters.add(startFromDate);
-        optionalFilters.add(startFromDate);
+        optionalFilters.add(startToDate);
+        optionalFilters.add(endFromDate);
+        optionalFilters.add(endToDate);
     }
 
     @Bean
@@ -399,6 +395,22 @@ public class KnownLayers {
         layer.setDescription(
                 "The Onshore Seismic Data of Australia is a collection of all land seismic traverses cross the Australian continent and its margins. The data includes raw and processed data in SEGY format. The metadata includes acquisition reports, processing reports, processed images, logs, and so on. The data acquisition was carried out in Australia from 1949-2012 by Geoscience Australia and various partners. The set of reflection and refraction data comprises over 12,000 km of coverage, and provides an insight into the variations in crustal architecture in the varied geological domains. The complete processed dataset was first available for public access in Oct 2013 (http://www.ga.gov.au/minerals/projects/current-projects/seismic-acquisition-processing.html ). The location of seismic traverses is shown by the Gallery link on the webpage. The new survey data will be updated on the webpage by the official data release date. The attribute structure of the dataset has also been revised to be more compatible with the GeoSciML data standard, published by the IUGS Commission for Geoscience Information. The onshore seismic data were collected with partner organizations: Australian Geodynamics Cooperative Research Centre, National Research Facility for Earth Sounding, Australian Nuclear Science and Technology Organisation, Cooperative Research Centre for Greenhouse Gas Technologies, Curtin University of Technology, Geological Survey of New South Wales, NSW Department of Mineral Resources, NSW Department of Primary Industries Mineral Resources, An organisation for a National Earth Science Infrastructure Program, Geological Survey Western Australia, Northern Territory Geological Survey, Primary Industries and Resources South Australia, Predictive Mineral Discovery Cooperative Research Centre, Queensland Geological Survey, GeoScience Victoria Department of Primary Industries, Tasmania Development and Resources, University of Western Australia.");
         layer.setOrder("400");
+        return layer;
+    }
+
+    @Bean
+    public WMSSelector knownTypeMagnetotelluricsSelector() {
+        return new WMSSelector("magnetotelluric");
+    }
+
+    @Bean KnownLayer knownTypeMagnetotellurics() {
+        KnownLayer layer = new KnownLayer("magnetotellurics", knownTypeMagnetotelluricsSelector());
+        layer.setId("magnetotellurics");
+        layer.setName("Electromagnetic Surveys");
+        layer.setGroup("Magnetotellurics");
+        layer.setDescription(
+                "Electromagnetic surveys conducted in Australia with public funding (government and university) from the 1960s to present that can be obtained.");
+        layer.setOrder("401");
         return layer;
     }
 
