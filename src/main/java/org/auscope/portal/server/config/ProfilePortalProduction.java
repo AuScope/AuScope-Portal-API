@@ -2,17 +2,12 @@ package org.auscope.portal.server.config;
 
 import java.util.ArrayList;
 
-import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.Primary;
 
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 /**
  * Definitions for all known layers
@@ -131,6 +126,8 @@ public class ProfilePortalProduction {
     KnownLayer knownTypeBoreholeMSCL;
     @Autowired
     KnownLayer knownTypeSeismologyInSchool;
+    @Autowired
+    KnownLayer knownTypePassiveSeismic;
     @Autowired
     KnownLayer knownTypeSF0BoreholeNVCL;
 
@@ -306,6 +303,7 @@ public class ProfilePortalProduction {
         knownLayers.add(knownTypeSilicaContent);
         knownLayers.add(knownTypeBoreholeMSCL);
         knownLayers.add(knownTypeSeismologyInSchool);
+        knownLayers.add(knownTypePassiveSeismic);
         knownLayers.add(knownTypeSF0BoreholeNVCL);
         /* Generated from former prod "Registered" tab START */
         
