@@ -3,7 +3,6 @@ package org.auscope.portal.server.web.controllers;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -646,7 +645,6 @@ public class TestJobBuilderController {
         final String regionName = null;
 
         final String mockUser = "jo@me.com";
-        final URI mockProfileUrl = new URI("https://plus.google.com/1");
         final File activityFile = File.createTempFile("activity", ".ttl");
         final String activityFileName = "activity.ttl";
         final CloudFileInformation cloudFileInformation = new CloudFileInformation("one", 0, "");
@@ -751,7 +749,6 @@ public class TestJobBuilderController {
         final String jobInSavedState = JobBuilderController.STATUS_UNSUBMITTED;
         final OutputStream mockOutputStream = new ByteArrayOutputStream();
         final VglMachineImage[] mockImages = new VglMachineImage[] {context.mock(VglMachineImage.class)};
-        final String errorDescription = "You do not have the permission to submit this job for processing.";
         final String storageServiceId = "cssid";
 
         job.setComputeVmId(injectedComputeVmId);
@@ -1617,7 +1614,6 @@ public class TestJobBuilderController {
     public void testGetAllJobInputs() throws Exception {
         final VglDownload dl = new VglDownload(413);
         final File mockFile = new File("");
-        final long mockFileLength = 21314L;
         final StagedFile[] stagedFiles = new StagedFile[]{new StagedFile(job, "another/file.ext", mockFile)};
 
         dl.setDescription("desc");
@@ -1742,7 +1738,6 @@ public class TestJobBuilderController {
     @Test
     public void testGetComputeTypes_NoComputeService() throws Exception {
         final String computeId = "compute-id";
-        final String imageId = "image-id";
 
         context.checking(new Expectations() {{
             allowing(mockCloudComputeServices[0]).getId();will(returnValue(computeId));

@@ -2,12 +2,12 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -140,7 +140,7 @@ public class UserController extends BasePortalController {
     public ModelAndView getTermsConditions() {
     	ANVGLUser user = userService.getLoggedInUser();
         try {
-            String tcs = IOUtils.toString(this.getClass().getResourceAsStream("vl-termsconditions.html"));
+            String tcs = IOUtils.toString(this.getClass().getResourceAsStream("vl-termsconditions.html"), StandardCharsets.UTF_8);
 
             ModelMap response = new ModelMap();
             response.put("html", tcs);
@@ -178,7 +178,7 @@ public class UserController extends BasePortalController {
         response.setHeader("Content-Disposition", "inline; filename=vgl-cloudformation.json;");
 
         try {
-            response.getOutputStream().write(cloudFormationScript.getBytes(Charsets.UTF_8));
+            response.getOutputStream().write(cloudFormationScript.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }

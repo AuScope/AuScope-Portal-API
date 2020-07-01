@@ -1,7 +1,6 @@
 package org.auscope.portal.server.web.security.aaf;
 
 import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.aaf.AAFAttributes;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

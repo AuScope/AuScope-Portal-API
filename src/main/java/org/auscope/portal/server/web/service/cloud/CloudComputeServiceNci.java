@@ -80,7 +80,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
             if (is == null) {
                 return job.getComputeInstanceId();
             }
-            return IOUtils.toString(is);
+            return IOUtils.toString(is, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new PortalServiceException("Unable to access job ID file for " + job.getId(), e);
         }
@@ -93,7 +93,7 @@ public class CloudComputeServiceNci extends CloudComputeService {
      */
     private String getNamedResourceString(String name) throws IOException {
         try (InputStream is = this.getClass().getResourceAsStream(name)) {
-            String template = IOUtils.toString(is);
+            String template = IOUtils.toString(is, StandardCharsets.UTF_8);
             return template.replaceAll("\r", ""); // Normalise to Unix style line endings
         }
     }

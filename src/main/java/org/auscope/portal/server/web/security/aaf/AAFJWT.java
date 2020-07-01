@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.auscope.portal.server.web.security.aaf.AAFAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
