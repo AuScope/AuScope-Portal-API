@@ -135,11 +135,9 @@ public class PurchaseController extends BasePortalController {
 
         JsonArray dataToPurchase = null;
 
-        try {
-            // read the input data
-            InputStream in = request.getInputStream();
-            final BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(in, "UTF-8"));
+        // read the input data
+        try (InputStream in = request.getInputStream();
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"))) {
             final char[] buffer = new char[1024];
             int numRead;
             StringBuffer inputData = new StringBuffer("");
@@ -314,11 +312,9 @@ public class PurchaseController extends BasePortalController {
         int jobId = 0;
         String jobName = null;
 
-        try {
-            // read the input data
-            InputStream in = request.getInputStream();
-            final BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(in, "UTF-8"));
+        // read the input data
+        try (InputStream in = request.getInputStream();
+             final BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"))) {
             final char[] buffer = new char[1024];
             int numRead;
             StringBuffer inputData = new StringBuffer("");
