@@ -1,6 +1,5 @@
 package org.auscope.portal.server.web.security.aaf;
 
-import org.auscope.portal.server.web.security.aaf.JWTManagement;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

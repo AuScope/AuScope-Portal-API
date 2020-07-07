@@ -10,6 +10,9 @@ import org.auscope.portal.core.cloud.MachineImage;
  *
  */
 public class VglMachineImage extends MachineImage {
+
+    private static final long serialVersionUID = 2136324684785829825L;
+
     /** List of roles that have been given the permission to use this image */
     private String[] permissions;
 

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.URI;
+import java.net.URI;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.auscope.portal.core.services.responses.wfs.WFSResponse;
 import org.auscope.portal.core.test.PortalTestClass;
@@ -223,7 +223,7 @@ public class TestYilgarnGeochemistryController extends PortalTestClass {
                 will(returnValue(new WFSResponse(expectedGML, mockMethod)));
 
                 allowing(mockMethod).getURI();
-                will(returnValue(new URI(serviceUrl, true)));
+                will(returnValue(new URI(serviceUrl)));
             }
         });
         ModelAndView modelAndView = controller.doYilgarnGeochemistryFilter(serviceUrl, geologicName, bbox, maxFeatures);

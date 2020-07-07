@@ -36,8 +36,6 @@ public class TestVEGLJobManager extends PortalTestClass {
 	private VEGLSeriesService mockSeriesService;
 	private VGLJobAuditLogService mockJobAuditLogService;
 	private NCIDetailsService mockNciDetailsService;
-	
-    private final String TEST_ENC_KEY = "unit-testing-key";
 
     /**
      * Load our mock objects
