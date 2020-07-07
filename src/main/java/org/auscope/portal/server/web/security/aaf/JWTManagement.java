@@ -2,11 +2,8 @@ package org.auscope.portal.server.web.security.aaf;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.auscope.portal.server.web.security.aaf.AAFAuthentication;
-import org.auscope.portal.server.web.security.aaf.AAFJWT;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
-import org.auscope.portal.server.web.security.aaf.AAFAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;

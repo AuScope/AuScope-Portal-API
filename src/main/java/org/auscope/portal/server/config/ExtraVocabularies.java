@@ -2,7 +2,6 @@ package org.auscope.portal.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.auscope.portal.core.services.vocabs.VocabularyServiceItem;

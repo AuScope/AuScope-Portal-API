@@ -1,25 +1,17 @@
 package org.auscope.portal.server.web.service;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.net.ConnectException;
 import java.util.List;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.auscope.portal.core.server.http.HttpClientInputStream;
-import org.auscope.portal.core.server.http.HttpClientResponse;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.util.ResourceUtil;
 import org.auscope.portal.server.domain.nvcldataservice.GetDatasetCollectionResponse;
 import org.auscope.portal.server.domain.nvcldataservice.GetLogCollectionResponse;
-import org.auscope.portal.server.domain.nvcldataservice.MosaicResponse;
-import org.auscope.portal.server.domain.nvcldataservice.TSGDownloadResponse;
-import org.auscope.portal.server.domain.nvcldataservice.TSGStatusResponse;
 
 import org.auscope.portal.server.web.NVCLDataServiceMethodMaker;
 

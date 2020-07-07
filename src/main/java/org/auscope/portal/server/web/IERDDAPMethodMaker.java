@@ -1,11 +1,10 @@
 package org.auscope.portal.server.web;
 
-import org.apache.commons.httpclient.HttpMethodBase;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 
 public interface IERDDAPMethodMaker {
     /**
-     * Returns a method that makes an ERDDAP request for a given bouding box
+     * Returns a method that makes an ERDDAP request for a given bounding box
      *
      * @param serviceUrl The url to query
      * @param layerName The layer to query
@@ -14,5 +13,5 @@ public interface IERDDAPMethodMaker {
      * @return
      * @throws Exception
      */
-    public HttpMethodBase makeMethod(String serviceUrl, String layerName, CSWGeographicBoundingBox bbox, String format) throws Exception;
+    public String makeMethod(String serviceUrl, String layerName, CSWGeographicBoundingBox bbox, String format) throws Exception;
 }
