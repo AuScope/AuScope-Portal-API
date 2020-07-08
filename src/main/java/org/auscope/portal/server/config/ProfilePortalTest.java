@@ -65,6 +65,8 @@ public WebMvcConfigurer configurer() {
     @Autowired
     KnownLayer knownTypeGeotransects;
     @Autowired
+    KnownLayer knownTypeMagnetotellurics;
+    @Autowired
     KnownLayer knownTypeTimaGeoSample;
     @Autowired
     KnownLayer knownTypeSHRIMPGeoSample;
@@ -384,6 +386,7 @@ public WebMvcConfigurer configurer() {
         knownLayers.add(knownTypeReports);
         knownLayers.add(knownTypePMDCRCReports);
         knownLayers.add(knownTypeGeotransects);
+        knownLayers.add(knownTypeMagnetotellurics);
         knownLayers.add(knownTypeTimaGeoSample);
         knownLayers.add(knownTypeSHRIMPGeoSample);
         knownLayers.add(knownTypeYilgarnGeochemistry);
