@@ -452,5 +452,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- Deployment to github packages -->
+    <distributionManagement>
+      <repository>
+        <id>github</id>
+        <name>GitHub Packages</name>
+	<url>https://maven.pkg.github.com/AuScope/Auscope-Portal-API</url>
+      </repository>
+    </distributionManagement>
     
 </project>
