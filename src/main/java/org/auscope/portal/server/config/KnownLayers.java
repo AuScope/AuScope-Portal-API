@@ -383,6 +383,22 @@ public class KnownLayers {
     }
 
     @Bean
+    public WMSSelector knownTypeMagnetotelluricsSelector() {
+        return new WMSSelector("magnetotelluric");
+    }
+
+    @Bean KnownLayer knownTypeMagnetotellurics() {
+        KnownLayer layer = new KnownLayer("magnetotellurics", knownTypeMagnetotelluricsSelector());
+        layer.setId("magnetotellurics");
+        layer.setName("Electromagnetic Surveys");
+        layer.setGroup("Magnetotellurics");
+        layer.setDescription(
+                "Electromagnetic surveys conducted in Australia with public funding (government and university) from the 1960s to present that can be obtained.");
+        layer.setOrder("401");
+        return layer;
+    }
+
+    @Bean
     public CSWRecordSelector knownTypePMDCRCReportsSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
         cswSelector.setDescriptiveKeyword("PMD*CRC Publication");
