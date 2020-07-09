@@ -383,22 +383,6 @@ public class KnownLayers {
     }
 
     @Bean
-    public WMSSelector knownTypeGeotransectsSelector() {
-        return new WMSSelector("Onshore_Seismic_Surveys");
-    }
-
-    @Bean
-    public KnownLayer knownTypeGeotransects() {
-        KnownLayer layer = new KnownLayer("ga-geotransects", knownTypeGeotransectsSelector());
-        layer.setId("ga-geotransects");
-        layer.setName("GA Onshore Seismic Surveys");
-        layer.setDescription(
-                "The Onshore Seismic Data of Australia is a collection of all land seismic traverses cross the Australian continent and its margins. The data includes raw and processed data in SEGY format. The metadata includes acquisition reports, processing reports, processed images, logs, and so on. The data acquisition was carried out in Australia from 1949-2012 by Geoscience Australia and various partners. The set of reflection and refraction data comprises over 12,000 km of coverage, and provides an insight into the variations in crustal architecture in the varied geological domains. The complete processed dataset was first available for public access in Oct 2013 (http://www.ga.gov.au/minerals/projects/current-projects/seismic-acquisition-processing.html ). The location of seismic traverses is shown by the Gallery link on the webpage. The new survey data will be updated on the webpage by the official data release date. The attribute structure of the dataset has also been revised to be more compatible with the GeoSciML data standard, published by the IUGS Commission for Geoscience Information. The onshore seismic data were collected with partner organizations: Australian Geodynamics Cooperative Research Centre, National Research Facility for Earth Sounding, Australian Nuclear Science and Technology Organisation, Cooperative Research Centre for Greenhouse Gas Technologies, Curtin University of Technology, Geological Survey of New South Wales, NSW Department of Mineral Resources, NSW Department of Primary Industries Mineral Resources, An organisation for a National Earth Science Infrastructure Program, Geological Survey Western Australia, Northern Territory Geological Survey, Primary Industries and Resources South Australia, Predictive Mineral Discovery Cooperative Research Centre, Queensland Geological Survey, GeoScience Victoria Department of Primary Industries, Tasmania Development and Resources, University of Western Australia.");
-        layer.setOrder("400");
-        return layer;
-    }
-
-    @Bean
     public WMSSelector knownTypeMagnetotelluricsSelector() {
         return new WMSSelector("magnetotelluric");
     }
@@ -687,14 +671,47 @@ public class KnownLayers {
     @Bean
     public KnownLayer knownTypeSeismologyInSchool() {
         KnownLayer layer = new KnownLayer("seismology-in-schools-site", knownTypeSeismologyInSchoolSelector());
-        layer.setName("IRIS Feed");
+        layer.setName("Seismographs in Schools Network");
         layer.setDescription(
                 "Seismographs in Schools data feed from Incorporated Research Institutions for Seismology (IRIS). S network code.");
-        layer.setGroup("Seismographs in Schools Network");
+        layer.setGroup("Passive Seismic");
         layer.setProxyUrl("getIRISStations.do");
         layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/ltblu-blank.png");
         setupIcon(layer);
         layer.setOrder("300");
+        return layer;
+    }
+
+    @Bean
+    public WMSSelector knownTypePassiveSeismicSelector() {
+        return new WMSSelector("passive-seismic");
+    }
+
+    @Bean KnownLayer knownTypePassiveSeismic() {
+        KnownLayer layer = new KnownLayer("passive-seismic", knownTypePassiveSeismicSelector());
+        layer.setId("passive-seismic");
+        layer.setName("Passive Seismic Stations");
+        layer.setGroup("Passive Seismic");
+        layer.setDescription("Passive Seismic Stations");
+        layer.setOrder("301");
+        return layer;
+    }
+
+
+    @Bean
+    public WMSSelector knownTypeGeotransectsSelector() {
+        return new WMSSelector("Onshore_Seismic_Surveys");
+    }
+
+    @Bean
+    public KnownLayer knownTypeGeotransects() {
+        KnownLayer layer = new KnownLayer("ga-geotransects", knownTypeGeotransectsSelector());
+        layer.setId("ga-geotransects");
+        layer.setName("GA Onshore Seismic Surveys");
+        layer.setGroup("Passive Seismic");
+        layer.setDescription(
+                "The Onshore Seismic Data of Australia is a collection of all land seismic traverses cross the Australian continent and its margins. The data includes raw and processed data in SEGY format. The metadata includes acquisition reports, processing reports, processed images, logs, and so on. The data acquisition was carried out in Australia from 1949-2012 by Geoscience Australia and various partners. The set of reflection and refraction data comprises over 12,000 km of coverage, and provides an insight into the variations in crustal architecture in the varied geological domains. The complete processed dataset was first available for public access in Oct 2013 (http://www.ga.gov.au/minerals/projects/current-projects/seismic-acquisition-processing.html ). The location of seismic traverses is shown by the Gallery link on the webpage. The new survey data will be updated on the webpage by the official data release date. The attribute structure of the dataset has also been revised to be more compatible with the GeoSciML data standard, published by the IUGS Commission for Geoscience Information. The onshore seismic data were collected with partner organizations: Australian Geodynamics Cooperative Research Centre, National Research Facility for Earth Sounding, Australian Nuclear Science and Technology Organisation, Cooperative Research Centre for Greenhouse Gas Technologies, Curtin University of Technology, Geological Survey of New South Wales, NSW Department of Mineral Resources, NSW Department of Primary Industries Mineral Resources, An organisation for a National Earth Science Infrastructure Program, Geological Survey Western Australia, Northern Territory Geological Survey, Primary Industries and Resources South Australia, Predictive Mineral Discovery Cooperative Research Centre, Queensland Geological Survey, GeoScience Victoria Department of Primary Industries, Tasmania Development and Resources, University of Western Australia.");
+        layer.setOrder("302");
         return layer;
     }
 

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+
 /**
  * Definitions for all known layers
  */
@@ -127,6 +128,8 @@ public class ProfilePortalProduction {
     KnownLayer knownTypeBoreholeMSCL;
     @Autowired
     KnownLayer knownTypeSeismologyInSchool;
+    @Autowired
+    KnownLayer knownTypePassiveSeismic;
     @Autowired
     KnownLayer knownTypeSF0BoreholeNVCL;
 
@@ -303,6 +306,7 @@ public class ProfilePortalProduction {
         knownLayers.add(knownTypeSilicaContent);
         knownLayers.add(knownTypeBoreholeMSCL);
         knownLayers.add(knownTypeSeismologyInSchool);
+        knownLayers.add(knownTypePassiveSeismic);
         knownLayers.add(knownTypeSF0BoreholeNVCL);
         /* Generated from former prod "Registered" tab START */
         
