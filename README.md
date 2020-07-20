@@ -1,3 +1,5 @@
+![Docker](https://github.com/AuScope/AuScope-Portal-API/workflows/Docker/badge.svg?branch=master)
+
 # AuScope-Portal-API
 
 Future back-end API server for AuScope Portal (http://portal.auscope.org) and AuScope Virtual Geophysics Portal (https://vgl.auscope.org/)
