@@ -14,11 +14,12 @@ on:
   pull_request:
 
 env:
-  # TODO: Change variable to your image's name.
+  # Auscope-Portal-API docker image name
   IMAGE_NAME: auscope-portal-api
 
 jobs:
-  build:
+  # Run tests.
+  test:
 
     runs-on: ubuntu-latest
 
@@ -29,27 +30,16 @@ jobs:
       with:
         java-version: 1.14
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: |
+        mvn -B package --file pom.xml
+        ls -lR target
 
-  # Run tests.
-  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
-  test:
-    # Ensure build job passes before testing.
-    needs: build
-    
-    runs-on: ubuntu-latest
+    - uses: actions/checkout@v2
 
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Run tests
-        run: |
-          if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build
-            docker-compose --file docker-compose.test.yml run sut
-          else
-            docker build . --file Dockerfile.github
-          fi
+    - name: Run tests
+      run: |
+        ls -lR target
+        docker build . --file Dockerfile.github
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
@@ -64,8 +54,10 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build image
-        run: docker build . --file Dockerfile.github --tag $IMAGE_NAME
-
+        run: |
+          ls -lR target
+          docker build . --file Dockerfile.github --tag $IMAGE_NAME
+          
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
