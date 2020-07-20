@@ -33,13 +33,7 @@ jobs:
       run: |
         mvn -B package --file pom.xml
         ls -lR target
-
-    - uses: actions/checkout@v2
-
-    - name: Run tests
-      run: |
-        ls -lR target
-        docker build . --file Dockerfile.github
+        docker build . --file Dockerfile.github --tag $IMAGE_NAME
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
@@ -53,10 +47,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build image
-        run: |
-          ls -lR target
-          docker build . --file Dockerfile.github --tag $IMAGE_NAME
+      #- name: Build image
+      #  run: |
+      #    ls -lR target
+      #    docker build . --file Dockerfile.github --tag $IMAGE_NAME
           
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
