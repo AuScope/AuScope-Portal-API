@@ -59,3 +59,9 @@ jobs:
 
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+          
+      - name: Upload war file artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Auscope-Portal-API war file
+          path: target/AuScope-Portal-API-5.2.0-SNAPSHOT.war
