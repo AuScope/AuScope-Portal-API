@@ -2,7 +2,7 @@
 
 # AuScope-Portal-API
 
-Future back-end API server for AuScope Portal (http://portal.auscope.org) and AuScope Virtual Geophysics Portal (https://vgl.auscope.org/)
+Back-end API server for AuScope Portal (http://portal.auscope.org) and AuScope Virtual Geophysics Portal (https://vgl.auscope.org/)
 
 ### To build and test:
 
