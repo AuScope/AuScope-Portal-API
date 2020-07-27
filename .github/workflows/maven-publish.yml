@@ -47,5 +47,5 @@ jobs:
     - name: Delete old versions first
       uses: actions/delete-package-versions@v1.0.2
       with:
-        package-name: org.auscope.portal.AuScope-Portal-API 5.2.0-SNAPSHOT
-        num-old-versions-to-delete: 10
+        package-name: 'org.auscope.portal.AuScope-Portal-API'
+        num-old-versions-to-delete: 0
