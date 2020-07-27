@@ -48,4 +48,4 @@ jobs:
       uses: actions/delete-package-versions@v1.0.2
       with:
         package-name: 'org.auscope.portal.AuScope-Portal-API'
-        num-old-versions-to-delete: 0
+        num-old-versions-to-delete: 100
