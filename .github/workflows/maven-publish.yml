@@ -35,13 +35,17 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
-    - name: Delete old versions first
-      uses: actions/delete-package-versions@v1.0.2
-      with:
-        package-name: org.auscope.portal.AuScope-Portal-API 5.2.0-SNAPSHOT
-        num-old-versions-to-delete: 100
-    
     - name: Publish to GitHub Packages Apache Maven
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        
+        
+  purge:
+    runs-on: ubuntu-latest
+    steps: 
+    - name: Delete old versions first
+      uses: actions/delete-package-versions@v1.0.2
+      with:
+        package-name: org.auscope.portal.AuScope-Portal-API 5.2.0-SNAPSHOT
+        num-old-versions-to-delete: 10
