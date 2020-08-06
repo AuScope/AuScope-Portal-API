@@ -148,9 +148,8 @@ public class PurchaseController extends BasePortalController {
             reader.close();
 
             logger.info("got input data: " + inputData.toString());
-            JsonParser parser = new JsonParser();
-            JsonObject postData = (JsonObject) parser
-                    .parse(inputData.toString());
+            JsonObject postData = (JsonObject) JsonParser
+                    .parseString(inputData.toString());
             amount = postData.getAsJsonPrimitive("amount").getAsFloat();
             tokenId = postData.getAsJsonPrimitive("tokenId").getAsString();
             email = postData.getAsJsonPrimitive("email").getAsString();
@@ -199,8 +198,7 @@ public class PurchaseController extends BasePortalController {
                         "Charge processed successfully, received charge object: "
                                 + charge.toJson());
                 String chargeJson = charge.toJson();
-                JsonParser parser = new JsonParser();
-                JsonObject chargeData = (JsonObject) parser.parse(chargeJson);
+                JsonObject chargeData = (JsonObject) JsonParser.parseString(chargeJson);
                 JsonObject resultData = new JsonObject();
                 resultData.add("charge", chargeData);
                 JsonArray downloadUrls = new JsonArray();
@@ -325,9 +323,8 @@ public class PurchaseController extends BasePortalController {
             reader.close();
 
             logger.info("got input data: " + inputData.toString());
-            JsonParser parser = new JsonParser();
-            JsonObject postData = (JsonObject) parser
-                    .parse(inputData.toString());
+            JsonObject postData = (JsonObject) JsonParser
+                    .parseString(inputData.toString());
             amount = postData.getAsJsonPrimitive("amount").getAsFloat();
             tokenId = postData.getAsJsonPrimitive("tokenId").getAsString();
             email = postData.getAsJsonPrimitive("email").getAsString();
@@ -376,8 +373,7 @@ public class PurchaseController extends BasePortalController {
                         "Charge processed successfully, received charge object: "
                                 + charge.toJson());
                 String chargeJson = charge.toJson();
-                JsonParser parser = new JsonParser();
-                JsonObject chargeData = (JsonObject) parser.parse(chargeJson);
+                JsonObject chargeData = (JsonObject)JsonParser.parseString(chargeJson);
                 JsonObject resultData = new JsonObject();
                 resultData.add("charge", chargeData);
 

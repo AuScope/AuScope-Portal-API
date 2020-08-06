@@ -417,7 +417,7 @@ public class TestJobDownloadController extends PortalTestClass {
         ModelAndView mav = controller.getNumDownloadRequests(mockRequest);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Integer numDownloads = (Integer) mav.getModel().get("data");
-        Assert.assertEquals(new Integer(2), numDownloads);
+        Assert.assertEquals(Integer.valueOf(2), numDownloads);
     }
 
     /**
@@ -436,6 +436,6 @@ public class TestJobDownloadController extends PortalTestClass {
         ModelAndView mav = controller.getNumDownloadRequests(mockRequest);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
         Integer numDownloads = (Integer) mav.getModel().get("data");
-        Assert.assertEquals(new Integer(0), numDownloads);
+        Assert.assertEquals(Integer.valueOf(0), numDownloads);
     }
 }

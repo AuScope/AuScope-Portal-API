@@ -466,7 +466,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
     @Test
     public void testGetSectionedLogs() throws Exception {
         try (final InputStream logContents = ResourceUtil.loadResourceAsStream("sectionedVglLog.txt")) {
-            final String logContentString = IOUtils.toString(ResourceUtil.loadResourceAsStream("sectionedVglLog.txt"));
+            final String logContentString = IOUtils.toString(ResourceUtil.loadResourceAsStream("sectionedVglLog.txt"), "utf-8");
             final VEGLJob mockJob = context.mock(VEGLJob.class);
 
             context.checking(new Expectations() {
@@ -564,7 +564,7 @@ public class TestVGLJobStatusAndLogReader extends PortalTestClass {
     @Test
     public void testGetSectionedLogs_LogAccessError_ComputeSuccess() throws Exception {
         final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final String logContents = IOUtils.toString(ResourceUtil.loadResourceAsStream("sectionedVglLog.txt"));
+        final String logContents = IOUtils.toString(ResourceUtil.loadResourceAsStream("sectionedVglLog.txt"), "utf-8");
 
         context.checking(new Expectations() {{
             allowing(mockJob).getStorageServiceId();will(returnValue(storageServiceId));

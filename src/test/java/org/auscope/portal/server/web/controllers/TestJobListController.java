@@ -556,10 +556,10 @@ public class TestJobListController extends PortalTestClass {
             allowing(mockJobs.get(1)).getStatus();will(returnValue(JobBuilderController.STATUS_ACTIVE));
             allowing(mockJobs.get(2)).getStatus();will(returnValue(JobBuilderController.STATUS_UNSUBMITTED));
             allowing(mockJobs.get(3)).getStatus();will(returnValue(JobBuilderController.STATUS_PENDING));
-            allowing(mockJobs.get(0)).getId();will(returnValue(new Integer(0)));
-            allowing(mockJobs.get(1)).getId();will(returnValue(new Integer(1)));
-            allowing(mockJobs.get(2)).getId();will(returnValue(new Integer(2)));
-            allowing(mockJobs.get(3)).getId();will(returnValue(new Integer(3)));
+            allowing(mockJobs.get(0)).getId();will(returnValue(Integer.valueOf(0)));
+            allowing(mockJobs.get(1)).getId();will(returnValue(Integer.valueOf(1)));
+            allowing(mockJobs.get(2)).getId();will(returnValue(Integer.valueOf(2)));
+            allowing(mockJobs.get(3)).getId();will(returnValue(Integer.valueOf(3)));
             allowing(mockJobs.get(0)).getStorageServiceId();will(returnValue(storageServiceId));
             allowing(mockJobs.get(0)).getComputeServiceId();will(returnValue(computeServiceId));
             allowing(mockJobs.get(1)).getStorageServiceId();will(returnValue(storageServiceId));

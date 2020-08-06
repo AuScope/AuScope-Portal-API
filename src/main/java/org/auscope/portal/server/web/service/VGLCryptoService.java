@@ -13,8 +13,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
 
 /**
@@ -24,9 +22,6 @@ import org.auscope.portal.core.services.PortalServiceException;
  */
 
 public class VGLCryptoService {
-    /** Logger for this class. */
-    private static final Log LOGGER = LogFactory.getLog(VGLCryptoService.class);
-
     public static final String SECRET_KEY_SPEC = "AES";
     public static final String CIPHER = "AES/CBC/PKCS5Padding";
     public static final String PASSWORD_BASED_ALGO = "PBKDF2WithHmacSHA1";

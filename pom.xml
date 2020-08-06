@@ -222,7 +222,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.200</version>
         </dependency>
 
         <dependency>
@@ -316,7 +315,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.20</version>
         </dependency>
 
         <dependency>
@@ -376,7 +374,6 @@
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
-            <version>2.6.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -395,7 +392,6 @@
        <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>3.141.59</version>
             <scope>test</scope>
             <exclusions>
               <exclusion>
@@ -407,7 +403,6 @@
         <dependency>
            <groupId>com.fasterxml.jackson.core</groupId>
            <artifactId>jackson-core</artifactId>
-           <version>2.10.3</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -418,7 +413,6 @@
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-databind</artifactId>
-          <version>2.10.3</version>
       </dependency>
     </dependencies>
 
@@ -438,7 +432,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.16</version>
                 <configuration>
                     <parallel>methods</parallel>
                     <threadCount>10</threadCount>
