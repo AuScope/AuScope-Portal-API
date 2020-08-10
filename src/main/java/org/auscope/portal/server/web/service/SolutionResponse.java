@@ -15,7 +15,9 @@ import org.auscope.portal.server.web.service.scm.Solution;
  *
  */
 public class SolutionResponse implements Serializable {
-    private List<Solution> configuredSolutions;
+	private static final long serialVersionUID = 4394895058754721560L;
+	
+	private List<Solution> configuredSolutions;
     private List<Solution> unconfiguredSolutions;
     private List<Solution> otherSolutions;
 

@@ -211,11 +211,11 @@ public class KnownLayers {
 
         UITextBox nameTextBox = new UITextBox("Name", "mt:name", null, Predicate.ISLIKE);
         List<ImmutablePair<String, String>> options = new ArrayList<ImmutablePair<String, String>>();
-        options.add(new ImmutablePair("Exploration", "exploration"));
-        options.add(new ImmutablePair("Prospecting", "prospecting"));
-        options.add(new ImmutablePair("Miscellaneous", "miscellaneous"));
-        options.add(new ImmutablePair("Mining Lease", "mining"));
-        options.add(new ImmutablePair("Licence", "licence"));
+        options.add(new ImmutablePair<String, String>("Exploration", "exploration"));
+        options.add(new ImmutablePair<String, String>("Prospecting", "prospecting"));
+        options.add(new ImmutablePair<String, String>("Miscellaneous", "miscellaneous"));
+        options.add(new ImmutablePair<String, String>("Mining Lease", "mining"));
+        options.add(new ImmutablePair<String, String>("Licence", "licence"));
         UIDropDownSelectList uiDropDownSelectList = new UIDropDownSelectList("Tenement Type", "mt:tenementType", null,
                 Predicate.ISLIKE, options);
         UITextBox ownerTextBox = new UITextBox("Owner", "mt:owner", null, Predicate.ISLIKE);
@@ -236,9 +236,9 @@ public class KnownLayers {
         // Mandatory filters - note use of full path names for declaring vars to prevent
         // clashes with imported optional params
         List<ImmutablePair<String, String>> mandatoryOptions = new ArrayList<ImmutablePair<String, String>>();
-        mandatoryOptions.add(new ImmutablePair("Tenement Type", "TenementType"));
-        mandatoryOptions.add(new ImmutablePair("Tenement Status", "TenementStatus"));
-        mandatoryOptions.add(new ImmutablePair("UnStyled", null));
+        mandatoryOptions.add(new ImmutablePair<String, String>("Tenement Type", "TenementType"));
+        mandatoryOptions.add(new ImmutablePair<String, String>("Tenement Status", "TenementStatus"));
+        mandatoryOptions.add(new ImmutablePair<String, String>("UnStyled", null));
         org.auscope.portal.core.uifilter.mandatory.UIDropDownSelectList mandDropDownSelectList;
         mandDropDownSelectList = new org.auscope.portal.core.uifilter.mandatory.UIDropDownSelectList("Color Code",
                 "ccProperty", "TenementType", mandatoryOptions);

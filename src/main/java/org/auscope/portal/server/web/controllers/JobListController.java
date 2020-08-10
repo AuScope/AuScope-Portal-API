@@ -920,18 +920,11 @@ public class JobListController extends BaseCloudController  {
         }
 
         try {
-            InputStream is = null;
-            OutputStream os = null;
-
             if (fileKeys != null) {
                 for (String fileKey : fileKeys) {
-                    try {
-                        is = cloudStorageService.getJobFile(sourceJob, fileKey);
-                        os = fileStagingService.writeFile(targetJob, fileKey);
+                    try (InputStream is = cloudStorageService.getJobFile(sourceJob, fileKey);
+                    	 OutputStream os = fileStagingService.writeFile(targetJob, fileKey)) {
                         IOUtils.copy(is, os);
-                    } finally {
-                        IOUtils.closeQuietly(is);
-                        IOUtils.closeQuietly(os);
                     }
                 }
             }
@@ -1119,9 +1112,7 @@ public class JobListController extends BaseCloudController  {
             return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
         }
 
-        InputStream is = null;
-        try {
-            is = cloudStorageService.getJobFile(job, file);
+        try (InputStream is = cloudStorageService.getJobFile(job, file)) {
             InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
             char[] buffer = new char[maxSize];
             int charsRead = reader.read(buffer);
@@ -1132,8 +1123,6 @@ public class JobListController extends BaseCloudController  {
         } catch (Exception ex) {
             logger.error("Error accessing file:" + file, ex);
             return generateJSONResponseMAV(false);
-        } finally {
-            IOUtils.closeQuietly(is);
         }
     }
 
@@ -1157,16 +1146,11 @@ public class JobListController extends BaseCloudController  {
             return;
         }
 
-        InputStream is = null;
-        ServletOutputStream os = null;
-        try {
-            is = cloudStorageService.getJobFile(job, file);
+        try (InputStream is = cloudStorageService.getJobFile(job, file)) {
             response.setContentType("image");
-            os = response.getOutputStream();
-            IOUtils.copy(is, os);
-        } finally {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(os);
+            try (ServletOutputStream os = response.getOutputStream()) {
+            	IOUtils.copy(is, os);
+            }
         }
     }
 

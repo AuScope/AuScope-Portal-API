@@ -151,9 +151,9 @@ public class Entry {
      */
     public void copyMissingProperties(Entry entry) throws PortalServiceException {
         if (!entry.getClass().isInstance(this)) {
-            throw new PortalServiceException("Incompatible type passed to %s.copyMissingProperties(%s)"
-                                             .format(getClass().getName(),
-                                                     entry == null ? null : entry.getClass().getName()));
+            throw new PortalServiceException(
+            		String.format("Incompatible type passed to %s.copyMissingProperties(%s)",
+            				getClass().getName(), (entry == null ? null : entry.getClass().getName())));
         }
 
         if (name == null) {

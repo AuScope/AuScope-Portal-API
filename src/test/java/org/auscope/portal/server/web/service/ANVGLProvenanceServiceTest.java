@@ -36,7 +36,7 @@ import au.csiro.promsclient.Activity;
 import au.csiro.promsclient.Entity;
 import au.csiro.promsclient.ExternalReport;
 import au.csiro.promsclient.ProvenanceReporter;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ANVGLProvenanceServiceTest extends PortalTestClass {
     VEGLJob preparedJob;
@@ -182,13 +182,13 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
 
     @Test
     public void testJobURL() throws Exception {
-        String url = anvglProvenanceService.jobURL(preparedJob, serverURL);
+        String url = ANVGLProvenanceService.jobURL(preparedJob, serverURL);
         Assert.assertEquals(serverURL + "/secure/getJobObject.do?jobId=1", url);
     }
 
     @Test
     public void testOutputURL() throws Exception {
-        String url = anvglProvenanceService.outputURL(preparedJob, fileInformation, serverURL);
+        String url = ANVGLProvenanceService.outputURL(preparedJob, fileInformation, serverURL);
         Assert.assertEquals(serverURL + "/secure/jobFile.do?jobId=1&key=cloudKey", url);
     }
 
@@ -210,7 +210,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
                 serverURL,
                 "TURTLE");
         URI activityURI = new URI(
-                anvglProvenanceService.jobURL(turtleJob, serverURL));
+                ANVGLProvenanceService.jobURL(turtleJob, serverURL));
         activity = new Activity().setActivityUri(activityURI).setTitle(activityURI.toString()).setFromModel(model);
         if (activity != null) {
             activity.setEndedAtTime(new Date());
@@ -244,7 +244,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
                 serverURL,
                 "TURTLE");
         activity = new Activity().setActivityUri(new URI(
-                anvglProvenanceService.jobURL(turtleJob, serverURL))).setFromModel(model);
+                ANVGLProvenanceService.jobURL(turtleJob, serverURL))).setFromModel(model);
         if (activity != null) {
             activity.setEndedAtTime(new Date());
             String outputURL = serverURL + "/secure/jobFile.do?jobId=21&key=job-macgo-bt-everbloom_gmail_com-0000000021/1000_yrRP_hazard_map.png";
