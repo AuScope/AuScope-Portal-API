@@ -737,7 +737,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAsterAlohSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("1c3f5e49-4241-4511-a3cc-60314ea09414");
+        cswSelector.setServiceName("National ASTER Map AlOH group composition");
         return cswSelector;
     }
 
@@ -755,7 +755,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAsterFerrousSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("02e4fa4c-cbd0-429f-b487-381282debb8f");
+        cswSelector.setServiceName("National ASTER Map Ferrous iron index");
         return cswSelector;
     }
 
@@ -772,7 +772,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAsterOpaqueSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("ab9e636a-86f8-4366-acec-c24db7b72ff5");
+        cswSelector.setServiceName("National ASTER Map Opaque index");
         return cswSelector;
     }
 
@@ -790,7 +790,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAsterFerricOxideContentSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("7bc66a7a-5ba0-447e-9a00-bf1ccd84e4f3");
+        cswSelector.setServiceName("National ASTER Map Ferric oxide content");
         return cswSelector;
     }
 
@@ -807,7 +807,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAsterFeohSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("f938456a-926d-4547-b111-093844f8fc5d");
+        cswSelector.setServiceName("National ASTER Map FeOH group content");
         return cswSelector;
     }
 
@@ -825,7 +825,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeFerricOxideCompSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("aa27099f-13dd-4294-8558-595661eeba01");
+        cswSelector.setServiceName("National ASTER Map Ferric oxide composition");
         return cswSelector;
     }
 
@@ -843,7 +843,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeGroupIndexSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("ea755cf7-eb59-41d1-86bd-4d1954c93bfe");
+        cswSelector.setServiceName("National ASTER Map Kaolin group index");
         return cswSelector;
     }
 
@@ -861,7 +861,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeQuartzIndexSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("137a4e7e-9633-40d8-9b2f-2d2d1eb15c08");
+        cswSelector.setServiceName("National ASTER Map TIR Quartz index");
         return cswSelector;
     }
 
@@ -878,7 +878,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeMgohContentSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("a101fef8-2c52-4d62-9b43-0914487af197");
+        cswSelector.setServiceName("National ASTER Map MgOH group content");
         return cswSelector;
     }
 
@@ -896,7 +896,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeGreenVegSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("2bd17d05-22f8-4b0d-a318-3eaabc1b5c2a");
+        cswSelector.setServiceName("National ASTER Map green vegetation content");
         return cswSelector;
     }
 
@@ -913,7 +913,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeFerrCarbSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("8601612e-3f3e-4334-9d31-3c6ec30f092a");
+        cswSelector.setServiceName("National ASTER Map Ferrous iron content in MgOH/carbonate");
         return cswSelector;
     }
 
@@ -931,7 +931,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeMgohGroupCompSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("8348fe99-0d50-45cd-8a0a-5439e82da833");
+        cswSelector.setServiceName("National ASTER Map MgOH group composition");
         return cswSelector;
     }
 
@@ -949,7 +949,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAlohGroupContentSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("b070d1d4-6420-4770-8ca6-3bf4b6682c3d");
+        cswSelector.setServiceName("National ASTER Map AlOH group content");
         return cswSelector;
     }
 
@@ -967,7 +967,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeGypsumContentSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("EB574238-BCB9-4A98-B1C1-71D1D1B0A946");
+        cswSelector.setServiceName("National ASTER Map TIR Gypsum index");
         return cswSelector;
     }
 
@@ -984,7 +984,7 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeSilicaContentSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("cca633fe-5cdc-4fea-b77f-71b81c701c47");
+        cswSelector.setServiceName("National ASTER Map TIR Silica index");
         return cswSelector;
     }
 
