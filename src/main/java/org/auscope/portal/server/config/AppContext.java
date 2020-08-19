@@ -300,12 +300,9 @@ public class AppContext {
         return new JobStatusMonitor(jobStatusLogReader(), changeListeners);
     }
 
-    @Value("${portalUrl}")
-	private String portalBaseUrl;
-
     @Bean
     public WFSService wfsService() {
-        return new WFSService(httpServiceCallerApp(), methodMaker(), new GmlToHtml(portalBaseUrl));
+        return new WFSService(httpServiceCallerApp(), methodMaker(), new GmlToHtml());
     }
 
     @Bean
@@ -316,7 +313,7 @@ public class AppContext {
         return new WFSGml32Service(new HttpServiceCaller(900000),
                 methodMaker,
                 // can instantiate with a different XSLT for GML 32 mapping?
-                new GmlToHtml(portalBaseUrl)
+                new GmlToHtml()
                 );
     }
 
@@ -486,7 +483,7 @@ public class AppContext {
         List<WMSMethodMakerInterface> methodMakers = new ArrayList<WMSMethodMakerInterface>();
         methodMakers.add(wmsMethodMaker());
         methodMakers.add(wms130methodMaker());
-        return new WMSService(httpServiceCallerApp(), methodMakers, new GmlToHtml(portalBaseUrl));
+        return new WMSService(httpServiceCallerApp(), methodMakers);
     }
 
     @Bean

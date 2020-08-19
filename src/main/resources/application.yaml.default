@@ -83,7 +83,7 @@ proms:
       url: http://proms-dev1-vc.it.csiro.au/id/report/
    reportingsystem:
       uri: http://proms-dev1-vc.it.csiro.au/rs
-portalUrl: http://localhost:8080/AuScope-Portal
+portalUrl: http://localhost:8080/VGL-Portal
 frontEndUrl: http://localhost:4200
 portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
 defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
