@@ -716,35 +716,16 @@ public class KnownLayers {
     }
 
     @Bean
-    public CSWRecordSelector knownTypeAsterSelector() {
-        CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("E6029ED0-636B-4F91-A6A1-535EBA4B5AD1");
-        return cswSelector;
-    }
-
-    @Bean
-    public KnownLayer knownTypeAster() {
-        KnownLayer layer = new KnownLayer("aster-main", knownTypeAsterSelector());
-        layer.setName("ASTER Maps");
-        layer.setDescription(
-                "This is the parent datafile of a datset that comprises a set of 14+ geoscience products made up of mosaiced ASTER scenes across Australia.");
-        layer.setGroup("ASTER Maps");
-        layer.setHidden(true);
-        layer.setOrder("30_ASTER Maps_010");
-        return layer;
-    }
-
-    @Bean
     public CSWRecordSelector knownTypeAsterAlohSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("1c3f5e49-4241-4511-a3cc-60314ea09414");
+        cswSelector.setServiceName("National ASTER Map AlOH group composition");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeAsterAloh() {
         KnownLayer layer = new KnownLayer("aster-aloh", knownTypeAsterAlohSelector());
-        layer.setName("ASTER Map AlOH group composition");
+        layer.setName("AlOH group composition");
         layer.setDescription(
                 "1. Band ratio: B5/B7Blue is well ordered kaolinite, Al-rich muscovite/illite, paragonite, pyrophyllite Red is Al-poor (Si-rich) muscovite (phengite)");
         layer.setGroup("ASTER Maps");
@@ -755,14 +736,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAsterFerrousSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("02e4fa4c-cbd0-429f-b487-381282debb8f");
+        cswSelector.setServiceName("National ASTER Map Ferrous iron index");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeAsterFerrous() {
         KnownLayer layer = new KnownLayer("aster-ferrous", knownTypeAsterFerrousSelector());
-        layer.setName("ASTER Map Ferrous iron index");
+        layer.setName("Ferrous iron index");
         layer.setDescription("1. Band ratio: B5/B4Blue is low abundance, Red is high abundance");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_030");
@@ -772,14 +753,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAsterOpaqueSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("ab9e636a-86f8-4366-acec-c24db7b72ff5");
+        cswSelector.setServiceName("National ASTER Map Opaque index");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeAsterOpaque() {
         KnownLayer layer = new KnownLayer("aster-opaque", knownTypeAsterOpaqueSelector());
-        layer.setName("ASTER Map Opaque index");
+        layer.setName("Opaque index");
         layer.setDescription(
                 "1. Band ratio: B1/B4Blue is low abundance, Red is high abundance(potentially includes  carbon black (e.g. ash), magnetite, Mn oxides, and sulphides in unoxidised envornments");
         layer.setGroup("ASTER Maps");
@@ -790,14 +771,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAsterFerricOxideContentSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("7bc66a7a-5ba0-447e-9a00-bf1ccd84e4f3");
+        cswSelector.setServiceName("National ASTER Map Ferric oxide content");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeAsterFerricOxideContent() {
         KnownLayer layer = new KnownLayer("aster-ferric-oxide-content", knownTypeAsterFerricOxideContentSelector());
-        layer.setName("ASTER Map Ferric oxide content");
+        layer.setName("Ferric oxide content");
         layer.setDescription("1. Band ratio: B4/B3Blue is low abundance, Red is high abundance");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_050");
@@ -807,14 +788,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAsterFeohSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("f938456a-926d-4547-b111-093844f8fc5d");
+        cswSelector.setServiceName("National ASTER Map FeOH group content");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeAsterFeoh() {
         KnownLayer layer = new KnownLayer("aster-feoh", knownTypeAsterFeohSelector());
-        layer.setName("ASTER Map FeOH group content");
+        layer.setName("FeOH group content");
         layer.setDescription(
                 "1. Band ratio: (B6+B8)/B7Blue is low content, Red is high content(potentially includes: chlorite, epidote, jarosite, nontronite, gibbsite, gypsum, opal-chalcedony)");
         layer.setGroup("ASTER Maps");
@@ -825,14 +806,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeFerricOxideCompSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("aa27099f-13dd-4294-8558-595661eeba01");
+        cswSelector.setServiceName("National ASTER Map Ferric oxide composition");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeFerricOxideComp() {
         KnownLayer layer = new KnownLayer("aster-ferric-oxide-comp", knownTypeFerricOxideCompSelector());
-        layer.setName("ASTER Map Ferric oxide composition");
+        layer.setName("Ferric oxide composition");
         layer.setDescription(
                 "1. Band ratio: B2/B1Blue-cyan is goethite rich, Green is hematite-goethite, Red-yellow is hematite-rich");
         layer.setGroup("ASTER Maps");
@@ -843,14 +824,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeGroupIndexSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("ea755cf7-eb59-41d1-86bd-4d1954c93bfe");
+        cswSelector.setServiceName("National ASTER Map Kaolin group index");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeGroupIndex() {
         KnownLayer layer = new KnownLayer("aster-group-index", knownTypeGroupIndexSelector());
-        layer.setName("ASTER Map Kaolin group index");
+        layer.setName("Kaolin group index");
         layer.setDescription(
                 "B6/B5(potential includes: pyrophyllite, alunite, well-ordered kaolinite)Blue is low content, Red is high content");
         layer.setGroup("ASTER Maps");
@@ -861,14 +842,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeQuartzIndexSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("137a4e7e-9633-40d8-9b2f-2d2d1eb15c08");
+        cswSelector.setServiceName("National ASTER Map TIR Quartz index");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeQuartzIndex() {
         KnownLayer layer = new KnownLayer("aster-quartz-index", knownTypeQuartzIndexSelector());
-        layer.setName("ASTER Map TIR Quartz index");
+        layer.setName("TIR Quartz index");
         layer.setDescription("1. Band ratio: B11/(B10+B12)Blue is low quartz contentRed is high quartz content");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_090");
@@ -878,14 +859,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeMgohContentSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("a101fef8-2c52-4d62-9b43-0914487af197");
+        cswSelector.setServiceName("National ASTER Map MgOH group content");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeMgohContent() {
         KnownLayer layer = new KnownLayer("aster-mgoh-content", knownTypeMgohContentSelector());
-        layer.setName("ASTER Map MgOH group content");
+        layer.setName("MgOH group content");
         layer.setDescription(
                 "1. Band ratio: (B6+B9/(B7+B8)Blue is low content, Red is high content(potentially includes: calcite, dolomite, magnesite, chlorite, epidote, amphibole, talc, serpentine)");
         layer.setGroup("ASTER Maps");
@@ -896,14 +877,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeGreenVegSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("2bd17d05-22f8-4b0d-a318-3eaabc1b5c2a");
+        cswSelector.setServiceName("National ASTER Map green vegetation content");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeGreenVeg() {
         KnownLayer layer = new KnownLayer("aster-green-veg", knownTypeGreenVegSelector());
-        layer.setName("ASTER Map green vegetation content");
+        layer.setName("Green vegetation content");
         layer.setDescription("Band ratio: B3/B2 Blue is low contentRed is high content");
         layer.setGroup("ASTER Maps");
         layer.setOrder("30_ASTER Maps_110");
@@ -913,14 +894,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeFerrCarbSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("8601612e-3f3e-4334-9d31-3c6ec30f092a");
+        cswSelector.setServiceName("National ASTER Map Ferrous iron content in MgOH/carbonate");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeFerrCarb() {
         KnownLayer layer = new KnownLayer("aster-ferr-carb", knownTypeFerrCarbSelector());
-        layer.setName("ASTER Map Ferrous iron content in MgOH/carbonate");
+        layer.setName("Ferrous iron content in MgOH/carbonate");
         layer.setDescription(
                 "1. Band ratio: B5/B4Blue is low ferrous iron content in carbonate and MgOH minerals like talc and tremolite.Red is high ferrous iron content in carbonate and MgOH minerals like chlorite and actinolite.");
         layer.setGroup("ASTER Maps");
@@ -931,14 +912,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeMgohGroupCompSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("8348fe99-0d50-45cd-8a0a-5439e82da833");
+        cswSelector.setServiceName("National ASTER Map MgOH group composition");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeMgohGroupComp() {
         KnownLayer layer = new KnownLayer("aster-mgoh-group-comp", knownTypeMgohGroupCompSelector());
-        layer.setName("ASTER Map MgOH group composition");
+        layer.setName("MgOH group composition");
         layer.setDescription(
                 "1. Band ratio: B7/B8Blue-cyan is magnesite-dolomite, amphibole, chlorite\tRed is calcite, epidote, amphibole");
         layer.setGroup("ASTER Maps");
@@ -949,14 +930,14 @@ public class KnownLayers {
     @Bean
     public CSWRecordSelector knownTypeAlohGroupContentSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("b070d1d4-6420-4770-8ca6-3bf4b6682c3d");
+        cswSelector.setServiceName("National ASTER Map AlOH group content");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeAlohGroupContent() {
         KnownLayer layer = new KnownLayer("aster-aloh-group-content", knownTypeAlohGroupContentSelector());
-        layer.setName("ASTER Map AlOH group content");
+        layer.setName("AlOH group content");
         layer.setDescription(
                 "1. Band ratio: (B5+B7)/B6Blue is low abundance, Red is high abundance potentially includes: phengite, muscovite, paragonite, lepidolite, illite, brammalite, montmorillonite, beidellite, kaolinite, dickite");
         layer.setGroup("ASTER Maps");
@@ -964,34 +945,36 @@ public class KnownLayers {
         return layer;
     }
 
-    @Bean
-    public CSWRecordSelector knownTypeGypsumContentSelector() {
-        CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("EB574238-BCB9-4A98-B1C1-71D1D1B0A946");
-        return cswSelector;
-    }
+    // NB: Disabled this layer until colour representation issues are sorted out
+    //
+    // @Bean
+    // public CSWRecordSelector knownTypeGypsumContentSelector() {
+    //     CSWRecordSelector cswSelector = new CSWRecordSelector();
+    //     cswSelector.setServiceName("National ASTER Map TIR Gypsum index");
+    //     return cswSelector;
+    // }
 
-    @Bean
-    public KnownLayer knownTypeGypsumContent() {
-        KnownLayer layer = new KnownLayer("aster-gypsum-content", knownTypeGypsumContentSelector());
-        layer.setName("ASTER Map TIR Gypsum index");
-        layer.setDescription("1. Band ratio: (B10+B12)/B11Blue is low gypsum contentRed is high gypsum content");
-        layer.setGroup("ASTER Maps");
-        layer.setOrder("30_ASTER Maps_170");
-        return layer;
-    }
+    // @Bean
+    // public KnownLayer knownTypeGypsumContent() {
+    //     KnownLayer layer = new KnownLayer("aster-gypsum-content", knownTypeGypsumContentSelector());
+    //     layer.setName("TIR Gypsum index");
+    //     layer.setDescription("1. Band ratio: (B10+B12)/B11Blue is low gypsum contentRed is high gypsum content");
+    //     layer.setGroup("ASTER Maps");
+    //     layer.setOrder("30_ASTER Maps_170");
+    //     return layer;
+    // }
 
     @Bean
     public CSWRecordSelector knownTypeSilicaContentSelector() {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        cswSelector.setRecordId("cca633fe-5cdc-4fea-b77f-71b81c701c47");
+        cswSelector.setServiceName("National ASTER Map TIR Silica index");
         return cswSelector;
     }
 
     @Bean
     public KnownLayer knownTypeSilicaContent() {
         KnownLayer layer = new KnownLayer("aster-silica-content", knownTypeSilicaContentSelector());
-        layer.setName("ASTER Map TIR Silica index");
+        layer.setName("TIR Silica index");
         layer.setDescription(
                 "1. Band ratio: B13/B10Blue is low silica contentRed is high silica content(potentially includes Si-rich minerals, such as quartz, feldspars, Al-clays)");
         layer.setGroup("ASTER Maps");

@@ -83,8 +83,6 @@ public WebMvcConfigurer configurer() {
     @Autowired
     KnownLayer knownTypeGeoNetworks;
     @Autowired
-    KnownLayer knownTypeAster;
-    @Autowired
     KnownLayer knownTypeAsterAloh;
     @Autowired
     KnownLayer knownTypeAsterFerrous;
@@ -110,8 +108,9 @@ public WebMvcConfigurer configurer() {
     KnownLayer knownTypeMgohGroupComp;
     @Autowired
     KnownLayer knownTypeAlohGroupContent;
-    @Autowired
-    KnownLayer knownTypeGypsumContent;
+    // NB: Temporarily disabled until colour representation issues resolved
+    //@Autowired
+    //KnownLayer knownTypeGypsumContent;
     @Autowired
     KnownLayer knownTypeSilicaContent;
     @Autowired
@@ -397,7 +396,6 @@ public WebMvcConfigurer configurer() {
         knownLayers.add(knownTypeLateriteYilgarnGeoChem);
         knownLayers.add(knownTypePortals);
         knownLayers.add(knownTypeGeoNetworks);
-        knownLayers.add(knownTypeAster);
         knownLayers.add(knownTypeAsterAloh);
         knownLayers.add(knownTypeAsterFerrous);
         knownLayers.add(knownTypeAsterOpaque);
@@ -411,7 +409,7 @@ public WebMvcConfigurer configurer() {
         knownLayers.add(knownTypeFerrCarb);
         knownLayers.add(knownTypeMgohGroupComp);
         knownLayers.add(knownTypeAlohGroupContent);
-        knownLayers.add(knownTypeGypsumContent);
+        // knownLayers.add(knownTypeGypsumContent);
         knownLayers.add(knownTypeSilicaContent);
         knownLayers.add(knownTypeBoreholeMSCL);
         knownLayers.add(knownTypeSeismologyInSchool);
