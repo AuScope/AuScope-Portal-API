@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
+import org.auscope.portal.server.web.service.ANVGLUserDetailsService;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -31,7 +33,10 @@ public class JWTManagement {
     static private String AAF_TEST = "https://rapid.test.aaf.edu.au";
 
     @Autowired
-    private PersistedAAFUserDetailsLoader userDetailsLoader;
+    private ANVGLUserDetailsService userDetailsService;
+    
+    @Autowired
+    private ANVGLUserService userService;
     
     @Value("${aaf.jwtsecret}")
     private String jwtSecret;
@@ -39,10 +44,6 @@ public class JWTManagement {
     @Value("${portalUrl}")
     private String rootServiceUrl;
 
-    public void setUserDetailsLoader(PersistedAAFUserDetailsLoader userDetailsLoader) {
-        this.userDetailsLoader = userDetailsLoader;
-    }
-    
     public void setJwtSecret(String jwtSecret) {
         this.jwtSecret = jwtSecret;
     }
@@ -105,15 +106,15 @@ public class JWTManagement {
     }
 
     private ANVGLUser registerAAFUser(AAFAttributes attributes) {
-        ANVGLUser anvglUser = userDetailsLoader.getUserByUserEmail(attributes.email);
+        ANVGLUser anvglUser = userService.getByEmail(attributes.email);
         if (anvglUser == null) {
-            Map<String, Object> userAttributes = new HashMap<String, Object>();
-            userAttributes.put("id", attributes.email);
+        	Map<String, String> userAttributes = new HashMap<String, String>();
             userAttributes.put("email", attributes.email);
             if(attributes.displayName != null && !attributes.displayName.equals(""))
                 userAttributes.put("name", attributes.displayName);
-            anvglUser = (ANVGLUser)userDetailsLoader.createUser(attributes.email, userAttributes);
-            anvglUser.setAuthentication(AuthenticationFramework.AAF);
+            else
+            	userAttributes.put("name", attributes.email);
+            anvglUser = (ANVGLUser)userDetailsService.createNewUser(attributes.email, AuthenticationFramework.AAF, userAttributes);
         }
         return anvglUser;
     }
