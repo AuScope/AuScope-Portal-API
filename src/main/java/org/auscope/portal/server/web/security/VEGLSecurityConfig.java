@@ -81,8 +81,8 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 				.addFilterBefore(ssoFilterAAF(), BasicAuthenticationFilter.class)
 				.userDetailsService(userDetailsService())
 	    	.oauth2Login()
-	    		.loginPage("http://localhost:4200/login")
-	    		.defaultSuccessUrl("http://localhost:4200/login/loggedIn")
+	    		.loginPage(frontEndUrl + "/login")
+	    		.defaultSuccessUrl(frontEndUrl + "/login/loggedIn")
 	    		.userInfoEndpoint()
 	    			.oidcUserService(googleOidcUserService);
 	}
