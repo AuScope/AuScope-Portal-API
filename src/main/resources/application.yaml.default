@@ -53,7 +53,7 @@ spring:
       oauth2:
          client:
             registration:
-                google:
+               google:
                   clientId: GOOGLE_CLIENT_ID
                   clientSecret: GOOGLE_CLIENT_SECRET
                   accessTokenUri: https://www.googleapis.com/oauth2/v4/token
