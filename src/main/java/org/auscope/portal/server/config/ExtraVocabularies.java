@@ -32,7 +32,7 @@ class ExtraVocabularies {
 
     @Bean
     public CommodityVocabService commodityCodeService() {
-        return new CommodityVocabService(httpServiceCaller, new VocabularyMethodMaker(), "http://vocabs.ga.gov.au/cgi/sissvoc/commodity-code");
+        return new CommodityVocabService(httpServiceCaller, new VocabularyMethodMaker(), "https://vocabs.ardc.edu.au/repository/api/lda/ga/commodity-code/v0-2");
     }
     @Bean
     public VocabularyServiceItem vocabularyCommodities() {
@@ -41,7 +41,7 @@ class ExtraVocabularies {
 
     @Bean
     public MineStatusVocabService mineStatusService() {
-        return new MineStatusVocabService(httpServiceCaller, new VocabularyMethodMaker(), "http://vocabs.ga.gov.au/cgi/sissvoc/mine-status");
+        return new MineStatusVocabService(httpServiceCaller, new VocabularyMethodMaker(), "https://vocabs.ardc.edu.au/repository/api/lda/ga/mine-status/v0-1");
     }
     @Bean
     public VocabularyServiceItem vocabularyMineStatuses() {
@@ -50,7 +50,7 @@ class ExtraVocabularies {
 
     @Bean
     public ResourceCategoryVocabService resourceCategoryService() {
-        return new ResourceCategoryVocabService(httpServiceCaller, new VocabularyMethodMaker(), "http://vocabs.ga.gov.au/cgi/sissvoc/resource-assessment-category");
+        return new ResourceCategoryVocabService(httpServiceCaller, new VocabularyMethodMaker(), "https://vocabs.ardc.edu.au/repository/api/lda/ga/resource-assessment-category/v0-1");
     }
     @Bean
     public VocabularyServiceItem vocabularyResourceCategories() {
@@ -59,7 +59,7 @@ class ExtraVocabularies {
 
     @Bean
     public ReserveCategoryVocabService reserveCategoryService() {
-        return new ReserveCategoryVocabService(httpServiceCaller, new VocabularyMethodMaker(), "http://vocabs.ga.gov.au/cgi/sissvoc/reserve-assessment-category");
+        return new ReserveCategoryVocabService(httpServiceCaller, new VocabularyMethodMaker(), "https://vocabs.ardc.edu.au/repository/api/lda/ga/reserve-assessment-category/v0-1");
     }
     @Bean
     public VocabularyServiceItem vocabularyReserveCategories() {
