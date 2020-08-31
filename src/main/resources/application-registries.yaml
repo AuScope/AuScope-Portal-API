@@ -20,11 +20,11 @@ csw:
         recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
         title: NCI Data Portal
         serverType: Default
-      - id: cswGAPMDCRC
-        serviceUrl: http://www.ga.gov.au/geonetwork/srv/en/csw
-        recordInformationUrl: http://www.ga.gov.au/geonetwork/srv/en/csw?request=GetRecordById&amp;service=CSW&amp;version=2.0.2&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;elementSetName=full&amp;id=%1$s
-        title: Geoscience Australia PMD*CRC Publications
-        cqlText: csw:AnyText Like '%PMD*CRC Publication%' AND BBOX(ows:BoundingBox, 110,-9,160,-55)
+      #- id: cswGAPMDCRC
+      #  serviceUrl: http://www.ga.gov.au/geonetwork/srv/en/csw
+      #  recordInformationUrl: http://www.ga.gov.au/geonetwork/srv/en/csw?request=GetRecordById&amp;service=CSW&amp;version=2.0.2&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;elementSetName=full&amp;id=%1$s
+      #  title: Geoscience Australia PMD*CRC Publications
+      #  cqlText: csw:AnyText Like '%PMD*CRC Publication%' AND BBOX(ows:BoundingBox, 110,-9,160,-55)
 #      - id: cswNigel
 #        serviceUrl: http://130.56.244.85/geonetwork/srv/eng/csw
 #        recordInformationUrl: "http://130.56.244.85/geonetwork/srv/eng/catalog.search#/metadata/%1$s"

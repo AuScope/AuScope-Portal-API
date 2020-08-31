@@ -3,12 +3,13 @@ package org.auscope.portal.server.web.security;
 import java.util.HashSet;
 
 import org.auscope.portal.core.test.PortalTestClass;
+import org.auscope.portal.server.web.service.ANVGLUserDetailsService;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestPersistedGoogleUserDetailsLoader extends PortalTestClass {
+public class TestANVGLUserDetailsService extends PortalTestClass {
 
-    private PersistedGoogleUserDetailsLoader loader = new PersistedGoogleUserDetailsLoader("TEST_DEFAULT");
+    private ANVGLUserDetailsService userDetailsService = new ANVGLUserDetailsService("TEST_DEFAULT");
 
     /**
      * Throwaway test to ensure that we get slightly random results (i.e. - noone completely stuffed the implementation) that are valid from Amazon's point of view.
@@ -19,7 +20,7 @@ public class TestPersistedGoogleUserDetailsLoader extends PortalTestClass {
 
         HashSet<String> previousNames = new HashSet<>(ITERATION_COUNT);
         for (int i = 0; i < ITERATION_COUNT; i++) {
-            String bucketName = loader.generateRandomBucketName();
+            String bucketName = userDetailsService.generateRandomBucketName();
 
             Assert.assertNotNull(bucketName);
             Assert.assertTrue("Bucket name too long", bucketName.length() < 64);

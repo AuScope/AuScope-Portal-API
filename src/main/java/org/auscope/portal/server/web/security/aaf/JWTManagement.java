@@ -1,20 +1,22 @@
 package org.auscope.portal.server.web.security.aaf;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
+import org.auscope.portal.server.web.service.ANVGLUserDetailsService;
+import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.jwt.Jwt;
-import org.springframework.security.jwt.JwtHelper;
-import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,23 +28,22 @@ import java.util.Map;
 
 @Component
 public class JWTManagement {
-    
+
     static private String AAF_PRODUCTION = "https://rapid.aaf.edu.au";
     static private String AAF_TEST = "https://rapid.test.aaf.edu.au";
 
     @Autowired
-    private PersistedAAFUserDetailsLoader userDetailsLoader;
-    
+    private ANVGLUserDetailsService userDetailsService;
+
+    @Autowired
+    private ANVGLUserService userService;
+
     @Value("${aaf.jwtsecret}")
     private String jwtSecret;
-    
+
     @Value("${portalUrl}")
     private String rootServiceUrl;
 
-    public void setUserDetailsLoader(PersistedAAFUserDetailsLoader userDetailsLoader) {
-        this.userDetailsLoader = userDetailsLoader;
-    }
-    
     public void setJwtSecret(String jwtSecret) {
         this.jwtSecret = jwtSecret;
     }
@@ -54,17 +55,25 @@ public class JWTManagement {
     public AAFAuthentication parseJWT(String tokenString) throws AuthenticationException {
         if (tokenString == null)
             throw new AuthenticationCredentialsNotFoundException("Unable to authenticate. No AAF credentials found.");
-        Jwt jwt = JwtHelper.decodeAndVerify(tokenString, new MacSigner(jwtSecret.getBytes()));
-        String claims = jwt.getClaims();
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            AAFJWT token = mapper.readValue(claims, AAFJWT.class);
-
+            SignedJWT signedJWT = SignedJWT.parse(tokenString);
+            // Verify token
+            JWSVerifier verifier = new MACVerifier(jwtSecret);
+            JWSObject jwsObject = JWSObject.parse(tokenString);
+            if (!jwsObject.verify(verifier))
+                throw new AuthenticationServiceException("Unabe to authenticate. The token could not be "
+                        + "verified. Please check the JWS secret in settings");
+            // Validate claims
+            JWTClaimsSet claimSet = signedJWT.getJWTClaimsSet();
+            ObjectMapper mapper = new ObjectMapper();
+            AAFJWT token = mapper.readValue(claimSet.toString(), AAFJWT.class);
             if (!(token.aafServiceUrl.equals(AAF_PRODUCTION) || token.aafServiceUrl.equals(AAF_TEST)))
-                throw new AuthenticationServiceException("Unable to authenticate. The AAF URL does not match the expected " +
-                        "value for the test or production AAF Rapid Connect services. Expected " + AAF_PRODUCTION +
-                        " or " + AAF_TEST + " but got " + token.aafServiceUrl);
-            // Make sure a trailing slash on the end of portal URL or token URL doesn't trip us up
+                throw new AuthenticationServiceException(
+                        "Unable to authenticate. The AAF URL does not match the expected "
+                                + "value for the test or production AAF Rapid Connect services. Expected "
+                                + AAF_PRODUCTION + " or " + AAF_TEST + " but got " + token.aafServiceUrl);
+            // Make sure a trailing slash on the end of portal URL or token URL doesn't trip
+            // us up
             if (rootServiceUrl.endsWith("/")) {
                 rootServiceUrl = rootServiceUrl.substring(0, rootServiceUrl.length() - 1);
             }
@@ -74,46 +83,45 @@ public class JWTManagement {
             }
             if (!(tokenServiceUrl.equals(rootServiceUrl)))
                 throw new AuthenticationServiceException("Unable to authenticate. The URL of this server, "
-                        + rootServiceUrl +
-                        " does not match the URL registered with AAF " + tokenServiceUrl);
+                        + rootServiceUrl + " does not match the URL " + "registered with AAF " + tokenServiceUrl);
 
             Date now = new Date();
             if (now.before(token.notBefore))
-                throw new AuthenticationServiceException("Unable to authenticate. The authentication is " +
-                        "marked to not be used before the current date, " + now.toString());
+                throw new AuthenticationServiceException("Unable to authenticate. The authentication is "
+                        + "marked to not be used before the current date, " + now.toString());
 
             if (token.expires.before(now))
-                throw new AuthenticationServiceException("Unable to authenticate. The authentication has expired. " +
-                        "Now: " + now.toString() + " expired: " + token.expires.toString() );
+                throw new AuthenticationServiceException("Unable to authenticate. The authentication has "
+                        + "expired. Now: " + now.toString() + " expired: " + token.expires.toString());
 
-            // XXX We're not currently storing tokens in order to check for replay attacks 
+            // We're not currently storing tokens in order to check for replay attacks
             /*
             try {
                 this.jdbcTemplate.update(INSERT, token.replayPreventionToken);
             } catch (DataAccessException e) {
                 logger.error(e);
-                throw new AuthenticationServiceException("Unable to authenticate. The replay attack prevention " +
-                        "token already exists, so this is probably a replay attack.");
-            }
-            */
-            
+                throw new AuthenticationServiceException("Unable to authenticate. The replay attack prevention "
+                + "token already exists, so this is probably a replay attack.");
+             }
+             */
             ANVGLUser anvglUser = registerAAFUser(token.attributes);
             return new AAFAuthentication(anvglUser, token.attributes, token, true);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new AuthenticationServiceException(e.getLocalizedMessage());
         }
     }
 
     private ANVGLUser registerAAFUser(AAFAttributes attributes) {
-        ANVGLUser anvglUser = userDetailsLoader.getUserByUserEmail(attributes.email);
+        ANVGLUser anvglUser = userService.getByEmail(attributes.email);
         if (anvglUser == null) {
-            Map<String, Object> userAttributes = new HashMap<String, Object>();
-            userAttributes.put("id", attributes.email);
+            Map<String, String> userAttributes = new HashMap<String, String>();
             userAttributes.put("email", attributes.email);
-            if(attributes.displayName != null && !attributes.displayName.equals(""))
+            if (attributes.displayName != null && !attributes.displayName.equals(""))
                 userAttributes.put("name", attributes.displayName);
-            anvglUser = (ANVGLUser)userDetailsLoader.createUser(attributes.email, userAttributes);
-            anvglUser.setAuthentication(AuthenticationFramework.AAF);
+            else
+                userAttributes.put("name", attributes.email);
+            anvglUser = (ANVGLUser) userDetailsService.createNewUser(attributes.email, AuthenticationFramework.AAF,
+                    userAttributes);
         }
         return anvglUser;
     }
