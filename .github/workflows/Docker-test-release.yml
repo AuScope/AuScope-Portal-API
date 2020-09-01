@@ -4,7 +4,7 @@ name: Docker-test-release
 on:
   push:
     tags:
-      - v*
+      - 2*
 
 env:
   IMAGE_NAME: auscope-portal-api-test-release
