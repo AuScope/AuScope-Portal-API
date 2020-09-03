@@ -10,7 +10,7 @@
     <groupId>org.auscope.portal</groupId>
     <artifactId>AuScope-Portal-API</artifactId>
     <packaging>war</packaging>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>5.2.1-SNAPSHOT</version>
     <name>AuScope-Portal-API</name>
     <description>AuScope's flagship portal</description>
     <url>http://portal.auscope.org</url>
@@ -36,7 +36,7 @@
         <powermock.version>2.0.5</powermock.version>
         <log4j.version>2.13.0</log4j.version>
         <geotools.version>2.6.5</geotools.version>
-        <portal.core.version>2.3.2-SNAPSHOT</portal.core.version>
+        <portal.core.version>2.3.3-SNAPSHOT</portal.core.version>
         <httpclient.version>4.5.12</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
     </properties>
