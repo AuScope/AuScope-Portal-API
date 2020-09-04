@@ -1,6 +1,6 @@
 FROM tomcat:9-jdk14-openjdk-buster
 
-ARG war_file=target/AuScope-Portal-API-5.2.0-SNAPSHOT.war
+ARG war_file=target/AuScope-Portal-API-5.2.0.war
 
 ADD ${war_file} /usr/local/tomcat/webapps/AuScope-Portal-API.war
 
