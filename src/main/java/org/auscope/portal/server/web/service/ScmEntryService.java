@@ -33,6 +33,7 @@ import org.auscope.portal.server.web.service.scm.Problem;
 import org.auscope.portal.server.web.service.scm.ScmLoader;
 import org.auscope.portal.server.web.service.scm.ScmLoaderFactory;
 import org.auscope.portal.server.web.service.scm.Solution;
+import org.auscope.portal.server.web.service.scm.SsscImage;
 import org.auscope.portal.server.web.service.scm.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -43,6 +44,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.MapperFeature;
+
 
 /**
  * A service for handling Scientific Code Marketplace templates.
@@ -307,8 +309,8 @@ public class ScmEntryService implements ScmLoader {
             for (Dependency dep: solution.getDependencies()) {
                 if (dep.type == Dependency.Type.TOOLBOX) {
                     Toolbox toolbox = restTemplate().getForObject(dep.identifier, Toolbox.class);
-                    for (Map<String, String> image: toolbox.getImages()) {
-                        String provider = image.get("provider");
+                    for (SsscImage image: toolbox.getImages()) {
+                        String provider = image.getProvider();
 
                         if (StringUtils.isNotEmpty(providerFilter) && !providerFilter.equals(provider)) {
                             continue;
@@ -391,22 +393,23 @@ public class ScmEntryService implements ScmLoader {
             // Toolbox model allows multiple images for a given provider, but we
             // assume only one in practice, so take the first one that matches
             // the requested provider.
-            for (Map<String, String> img: toolbox.getImages()) {
-                if (provider.equals(img.get("provider"))) {
+            for (SsscImage img: toolbox.getImages()) {
+                if (provider.equals(img.getProvider())) {
                     // Allow the image to override the run command, fall back to
                     // the toolbox supplied command (if any). Test for isEmpty
                     // rather than isBlank since we want to allow an image to
                     // override a non-blank toolbox command with an empty
                     // string.
-                    String runCommand = img.get("command");
+                    String runCommand = img.getCommand();
                     if (StringUtils.isEmpty(runCommand)) {
                         runCommand = toolbox.getCommand();
                     }
 
-                    MachineImage image = new MachineImage(img.get("image_id"));
+                    MachineImage image = new MachineImage(img.getImageId());
                     image.setName(toolbox.getName());
                     image.setDescription(toolbox.getDescription());
                     image.setRunCommand(runCommand);
+                    image.setAnnotations(img.getAnnotations());
                     return image;
                 }
             }
@@ -465,17 +468,18 @@ public class ScmEntryService implements ScmLoader {
     	
     	for (Solution solution: solutions) {
             for (Toolbox toolbox: entryToolboxes(solution)) {
-                for (Map<String, String> img: toolbox.getImages()) {
-                    String providerId = img.get("provider");
+                for (SsscImage img: toolbox.getImages()) {
+                    String providerId = img.getProvider();
                     Set<MachineImage> vms = images.get(providerId);
                     if (vms == null) {
                         vms = new HashSet<>();
                         images.put(providerId, vms);
                     }
-                    MachineImage mi = new MachineImage(img.get("image_id"));
+                    MachineImage mi = new MachineImage(img.getImageId());
                     mi.setName(toolbox.getName());
                     mi.setDescription(toolbox.getDescription());
-                    mi.setRunCommand(img.get("command"));
+                    mi.setRunCommand(img.getCommand());
+                    mi.setAnnotations(img.getAnnotations());
                     vms.add(mi);
                 }
             }    		
@@ -520,8 +524,8 @@ public class ScmEntryService implements ScmLoader {
     		}
     		
             for (Toolbox toolbox: entryToolboxes(solution)) {
-                for (Map<String, String> img: toolbox.getImages()) {
-                    String providerId = img.get("provider");
+                for (SsscImage img: toolbox.getImages()) {
+                    String providerId = img.getProvider();
                     providers.add(providerId);
                 }
             }    		

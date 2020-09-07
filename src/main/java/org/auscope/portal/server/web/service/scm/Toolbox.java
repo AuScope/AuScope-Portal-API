@@ -8,10 +8,11 @@ import org.auscope.portal.core.services.PortalServiceException;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Toolbox extends Entry {
     private Map<String, String> source;
-    private List<Map<String, String>> images;
+    private List<SsscImage> images;
     private String puppet;
     private String puppetHash;
     private String command;
@@ -63,11 +64,11 @@ public class Toolbox extends Entry {
         this.source = source;
     }
 
-    public List<Map<String, String>> getImages() {
+    public List<SsscImage> getImages() {
         return images;
     }
 
-    public void setImages(List<Map<String, String>> images) {
+    public void setImages(List<SsscImage> images) {
         this.images = images;
     }
 

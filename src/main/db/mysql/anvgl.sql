@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS `bookmark_download_options`;
 DROP TABLE IF EXISTS `bookmarks`;
 DROP TABLE IF EXISTS `data_purchases`;
 DROP TABLE IF EXISTS `job_purchases`;
+DROP TABLE IF EXISTS `job_annotations`;
 
 CREATE TABLE `users` (
   `id` varchar(128) NOT NULL,
@@ -209,3 +210,13 @@ CREATE TABLE `job_purchases` (
   KEY `USER_ID_JOB_PURCHASES` (`userId`),
   CONSTRAINT `USER_ID_JOB_PURCHASES` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ); 
+
+CREATE TABLE `job_annotations` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `job_id` int(11) NOT NULL,
+    `value` varchar(255) NOT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`job_id`)
+        REFERENCES jobs(`id`)
+        ON DELETE CASCADE
+);

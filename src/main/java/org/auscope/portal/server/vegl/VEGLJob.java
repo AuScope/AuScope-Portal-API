@@ -3,6 +3,7 @@ package org.auscope.portal.server.vegl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,6 +86,14 @@ public class VEGLJob extends CloudJob implements Cloneable {
     @CollectionTable(name="job_solutions", joinColumns=@JoinColumn(name="job_id"))
     @Column(name="solution_id")
     private Set<String> jobSolutions;
+
+    /**
+     * A set of annotations associated with this job.
+     */
+    @ElementCollection(fetch=FetchType.EAGER)
+    @CollectionTable(name="job_annotations", joinColumns=@JoinColumn(name="job_id"))
+    @Column(name="value")
+    private Set<String> annotations;
     
     /*
      * CloudJob parameters
@@ -317,6 +326,20 @@ public class VEGLJob extends CloudJob implements Cloneable {
 	        	this.jobSolutions.addAll(solutions);
 	        }
     	}
+    }
+
+    public Set<String> getAnnotations() {
+        return (annotations != null) ? annotations : new HashSet<String>();
+    }
+
+    public void setAnnotations(Collection<String> annotations) {
+        if (this.annotations == null) {
+            this.annotations = new HashSet<String>();
+        } else {
+            this.annotations.clear();
+        }
+
+        this.annotations.addAll(annotations);
     }
 
     /**
