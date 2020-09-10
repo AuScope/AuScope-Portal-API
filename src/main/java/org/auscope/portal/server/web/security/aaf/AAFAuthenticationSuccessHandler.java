@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 /**
+ * Redirect successful AAF logins to the front end
  * 
  * @author woo392
  *
@@ -25,9 +26,6 @@ public class AAFAuthenticationSuccessHandler implements AuthenticationSuccessHan
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
-		//authentication.setAuthenticated(true);
-		
-		// Redirect to front end
 		response.sendRedirect(frontEndUrl + "/login/loggedIn");
 	}
 

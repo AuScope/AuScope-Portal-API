@@ -31,6 +31,8 @@ import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.WCSService;
+import org.auscope.portal.core.services.WFSGml32Service;
+import org.auscope.portal.core.services.WFSService;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.methodmakers.GoogleCloudMonitoringMethodMaker;
@@ -42,8 +44,6 @@ import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.STSRequirement;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusChangeListener;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
-import org.auscope.portal.core.services.WFSService;
-
 import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.auscope.portal.core.services.csw.GriddedCSWRecordTransformerFactory;
 import org.auscope.portal.core.services.csw.ViewGriddedCSWRecordFactory;
@@ -80,7 +80,7 @@ import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-
+import org.auscope.portal.core.xslt.GmlToHtml;
 import org.auscope.portal.core.xslt.WfsToKmlTransformer;
 import org.auscope.portal.core.services.VocabularyCacheService;
 import org.auscope.portal.core.services.VocabularyFilterService;
@@ -302,9 +302,21 @@ public class AppContext {
 
     @Bean
     public WFSService wfsService() {
-        return new WFSService(httpServiceCallerApp(), methodMaker(), null);
+        return new WFSService(httpServiceCallerApp(), methodMaker(), new GmlToHtml());
     }
-    
+
+    @Bean
+    public WFSGml32Service wfsGml32Service() {
+        WFSGetFeatureMethodMaker methodMaker = new WFSGetFeatureMethodMaker();
+        // give it a ERML 2.0 namespace context
+        methodMaker.setNamespaces(new ErmlNamespaceContext("2.0"));
+        return new WFSGml32Service(new HttpServiceCaller(900000),
+                methodMaker,
+                // can instantiate with a different XSLT for GML 32 mapping?
+                new GmlToHtml()
+                );
+    }
+
     @Bean
     public JobDetailFactoryBean vglJobStatusMonitorDetail() throws Exception {
         JobDetailFactoryBean jobDetail = new JobDetailFactoryBean();

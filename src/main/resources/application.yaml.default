@@ -49,6 +49,24 @@ spring:
       servlet:
          load-on-startup: 1
 
+   security:
+      oauth2:
+         client:
+            registration:
+               google:
+                  clientId: GOOGLE_CLIENT_ID
+                  clientSecret: GOOGLE_CLIENT_SECRET
+                  accessTokenUri: https://www.googleapis.com/oauth2/v4/token
+                  userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+                  clientAuthenticationScheme: form
+                  scope:
+                     - openid
+                     - email
+                     - profile
+               resource:
+                  userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
+                  preferTokenInfo: true
+
 # Timeouts in seconds
 wait-for-body-content:
    timeout: 90
@@ -117,20 +135,6 @@ aws:
 #      accesskey: NECTAR_STORAGE_ACCESS_KEY
 #      secretkey: NECTAR_STORAGE_SECRET_KEY
 
-google:
-   client:
-      clientId: GOOGLE_CLIENT_ID
-      clientSecret: GOOGLE_CLIENT_SECRET
-      accessTokenUri: https://www.googleapis.com/oauth2/v4/token
-      userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
-      clientAuthenticationScheme: form
-      scope:
-         - openid
-         - email
-         - profile
-   resource:
-      userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
-      preferTokenInfo: true
 aaf:
    loginUrl: AAF_LOGIN_URL
    callbackUrl: AAF_CALLBACK_URL

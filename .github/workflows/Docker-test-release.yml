@@ -1,14 +1,13 @@
-# This creates docker image for the most recent commit to the repository
-# The docker image is intended for development purposes
-# 
-name: Docker
+# Create builds for testing releases
+name: Docker-test-release
 
 on:
-  push
+  push:
+    tags:
+      - 2*
 
 env:
-  # Auscope-Portal-API docker image name
-  IMAGE_NAME: auscope-portal-api
+  IMAGE_NAME: auscope-portal-api-test-release
 
 jobs:
   # Push image to GitHub Packages.
@@ -31,6 +30,7 @@ jobs:
       - name: Build with Maven, then with docker 
         run: |
           mvn -B package --file pom.xml
+          ls -lR target
           docker build . --file Dockerfile.github --tag $IMAGE_NAME
           
       - name: Log into registry
@@ -39,21 +39,12 @@ jobs:
       - name: Push image
         run: |
           IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
           # Always the latest version
           VERSION=latest
-
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
-
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
           
-      - name: Upload war file artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Auscope-Portal-API war file
-          path: target/AuScope-Portal-API-5.2.1-SNAPSHOT.war

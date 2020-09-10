@@ -471,6 +471,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="registeredUrl", required=false) String registeredUrl,
             @RequestParam(value="emailNotification", required=false) boolean emailNotification,
             @RequestParam(value="walltime", required=false) Integer walltime,
+            @RequestParam(value="annotations", required=false) String[] annotations,
             HttpServletRequest request) {
     	ANVGLUser user = userService.getLoggedInUser();
         //Get our job
@@ -508,6 +509,7 @@ public class JobBuilderController extends BaseCloudController {
         job.setComputeVmRunCommand(computeVmRunCommand);
         job.setEmailNotification(emailNotification);
         job.setWalltime(walltime);
+        job.setAnnotations((annotations != null) ? Arrays.asList(annotations) : new ArrayList<String>());
 
         //HPC doesn't support compute types - for this case we munge our parameters into a the compute instance type string
         if (StringUtils.isEmpty(computeTypeId)) {

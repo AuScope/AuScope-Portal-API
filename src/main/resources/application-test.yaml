@@ -2,7 +2,7 @@
 auscope:
   registries:
       - id: auscopeTestRegistry
-        serviceUrl: http://au-portal-2.it.csiro.au/geonetwork/srv/eng/csw
-        recordInformationUrl: http://au-portal-2.it.csiro.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s
+        serviceUrl: https://au-portal-2.it.csiro.au/geonetwork/srv/eng/csw
+        recordInformationUrl: https://au-portal-2.it.csiro.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s
         title: AuScope Test Geonetwork
         serverType: Default
