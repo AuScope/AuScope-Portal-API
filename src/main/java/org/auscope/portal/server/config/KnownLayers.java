@@ -2940,7 +2940,7 @@ public class KnownLayers {
 
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("Name", "erl:name", null, Predicate.ISLIKE);
+        UITextBox nameTextBox = new UITextBox("Name", "gml:name", null, Predicate.ISLIKE);
         UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox", "the_geom", null, Predicate.ISEQUAL);
         optionalFilters.add(nameTextBox);
         optionalFilters.add(uiPolygonBBox);
