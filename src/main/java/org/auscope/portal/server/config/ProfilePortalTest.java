@@ -71,13 +71,9 @@ public WebMvcConfigurer configurer() {
     @Autowired
     KnownLayer knownTypeSHRIMPGeoSample;
     @Autowired
-    KnownLayer knownTypeYilgarnGeochemistry;
-    @Autowired
     KnownLayer knownTypeSamplingPoint;
     @Autowired
     KnownLayer knownTypeFeatureCollection;
-    @Autowired
-    KnownLayer knownTypeLateriteYilgarnGeoChem;
     @Autowired
     KnownLayer knownTypePortals;
     @Autowired
@@ -127,8 +123,6 @@ public WebMvcConfigurer configurer() {
     KnownLayer knownTypeHighpSiteIronlayer;
     @Autowired
     KnownLayer knownTypeHighpfeaturetype;
-    @Autowired
-    KnownLayer knownTypeLateriteWesternYilgarnGeochem;
     @Autowired
     KnownLayer knownTypeHighpReIronlayer;
     @Autowired
@@ -390,10 +384,8 @@ public WebMvcConfigurer configurer() {
         knownLayers.add(knownTypeMagnetotellurics);
         knownLayers.add(knownTypeTimaGeoSample);
         knownLayers.add(knownTypeSHRIMPGeoSample);
-        knownLayers.add(knownTypeYilgarnGeochemistry);
         knownLayers.add(knownTypeSamplingPoint);
         knownLayers.add(knownTypeFeatureCollection);
-        knownLayers.add(knownTypeLateriteYilgarnGeoChem);
         knownLayers.add(knownTypePortals);
         knownLayers.add(knownTypeGeoNetworks);
         knownLayers.add(knownTypeAsterAloh);
@@ -419,7 +411,6 @@ public WebMvcConfigurer configurer() {
         /* Generated from former test "Registered" tab START */
         knownLayers.add(knownTypeHighpSiteIronlayer);
         knownLayers.add(knownTypeHighpfeaturetype);
-        knownLayers.add(knownTypeLateriteWesternYilgarnGeochem);
         knownLayers.add(knownTypeHighpReIronlayer);
         knownLayers.add(knownTypeHighpSiteFeatureType);
         knownLayers.add(knownTypeHighpSitePhoslayer);
