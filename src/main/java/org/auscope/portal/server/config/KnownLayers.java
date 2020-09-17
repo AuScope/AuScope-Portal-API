@@ -454,32 +454,6 @@ public class KnownLayers {
     }
 
     @Bean
-    public WFSSelector knownTypeYilgarnGeochemistrySelector() {
-        WFSSelector wfsSelector = new WFSSelector("gsml:GeologicUnit");
-        String[] featNameList = new String[3];
-        featNameList[0] = "omx:ObservationProcess";
-        featNameList[1] = "gml:TimeInstant";
-        featNameList[2] = "sa:LocatedSpecimen";
-        wfsSelector.setRelatedFeatureTypeNames(featNameList);
-        return wfsSelector;
-    }
-
-    @Bean
-    public KnownLayer knownTypeYilgarnGeochemistry() {
-        KnownLayer layer = new KnownLayer("yilgarn-geochem", knownTypeYilgarnGeochemistrySelector());
-        layer.setName("Yilgarn Laterite Geochemistry");
-        layer.setDescription(
-                "A collection of detailed information about all analytes that were detected at a specific location");
-        layer.setProxyUrl("doYilgarnGeochemistry.do");
-        layer.setProxyCountUrl("doYilgarnGeochemistryCount.do");
-        layer.setProxyStyleUrl("");
-        layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/grn-blank.png");
-        setupIcon(layer);
-        layer.setOrder("430");
-        return layer;
-    }
-
-    @Bean
     public WFSSelector knownTypeBoreholeNvclV2Selector() {
         String[] featNameList = { "sa:SamplingFeatureCollection", "om:GETPUBLISHEDSYSTEMTSA", "nvcl:scannedBorehole",
                 "nvcl:ScannedBoreholeCollection" };
@@ -1104,18 +1078,6 @@ public class KnownLayers {
     @Bean
     public KnownLayer knownTypeFeatureCollection() {
         KnownLayer layer = new KnownLayer("notused-featurecollection", knownTypeFeatureCollectionSelector());
-        layer.setHidden(true);
-        return layer;
-    }
-
-    @Bean
-    public WFSSelector knownTypeLateriteYilgarnGeoChemSelector() {
-        return new WFSSelector("Geochem:LateriteYilgarnGeoChem");
-    }
-
-    @Bean
-    public KnownLayer knownTypeLateriteYilgarnGeoChem() {
-        KnownLayer layer = new KnownLayer("notused-lateriteyilgarngeochem", knownTypeLateriteYilgarnGeoChemSelector());
         layer.setHidden(true);
         return layer;
     }
@@ -1797,23 +1759,6 @@ public class KnownLayers {
         layer.setGroup("CSIRO");
         layer.setDescription("Layer-Group type layer: HighP-Site-PhosLayer");
         layer.setOrder("Registered_39");
-        return layer;
-    }
-
-    @Bean
-    public WMSSelector knownTypeLateriteWesternYilgarnGeochemSelector() {
-        return new WMSSelector("Geochem:LateriteYilgarnGeoChem");
-    }
-
-    @Bean
-    public KnownLayer knownTypeLateriteWesternYilgarnGeochem() {
-        KnownLayer layer = new KnownLayer("laterite-western-yilgarn-geochem",
-                knownTypeLateriteWesternYilgarnGeochemSelector());
-        layer.setId("laterite-western-yilgarn-geochem");
-        layer.setName("Laterite Western Yilgarn Geochem");
-        layer.setGroup("CSIRO");
-        layer.setDescription("This Record is the ?nal release of a 53-element dataset for approximately 3150 l");
-        layer.setOrder("Registered_40");
         return layer;
     }
 
