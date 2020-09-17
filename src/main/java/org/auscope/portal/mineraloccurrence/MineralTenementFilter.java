@@ -38,37 +38,6 @@ public class MineralTenementFilter extends GenericFilter {
 
         }
     }
-    /**
-     * Given a mine name, this object will build a filter to a wild card search for mine names
-     *
-     * @param mineName
-     *            the main name
-     */
-    public MineralTenementFilter(String tenementName, String tenementType, String owner, String startDate, String endDate, MineralTenementServiceProviderType mineralTenementServiceProviderType) {
-        if (mineralTenementServiceProviderType == null) {
-            mineralTenementServiceProviderType = MineralTenementServiceProviderType.GeoServer;
-        }
-        fragments = new ArrayList<String>();
-        if (tenementName != null && !tenementName.isEmpty()) {
-            fragments.add(this.generatePropertyIsLikeFragment(mineralTenementServiceProviderType.nameField(), "*" + tenementName + "*"));
-        }
-        if (tenementType != null && !tenementType.isEmpty()) {
-            fragments.add(this.generatePropertyIsLikeFragment("mt:tenementType", tenementType));
-        }
-
-        if (owner != null && !owner.isEmpty()) {
-            fragments.add(this.generatePropertyIsLikeFragment(mineralTenementServiceProviderType.ownerField(), owner));
-        }
-
-        if (startDate != null && !startDate.isEmpty()) {
-            fragments.add(this.generatePropertyIsGreaterThanOrEqualTo("mt:grantDate", startDate));
-        }
-
-        if (endDate != null && !endDate.isEmpty()) {
-            fragments.add(this.generatePropertyIsLessThanOrEqualTo("mt:expireDate", endDate));
-        }
-
-    }
     @Override
     public String getFilterStringAllRecords() {
         return this.generateFilter(this.generateAndComparisonFragment(fragments.toArray(new String[fragments.size()])));

@@ -200,9 +200,7 @@ public class MineralTenementController extends BasePortalController {
                     "</NamedLayer>" +
                     "</StyledLayerDescriptor>";
         return style;
-    }   
-    
-    private String getRules(boolean isLegend,String ccProperty,String name, String tenementType,String owner, String size, String endDate) {
+    }
 
     private String getRules(boolean isLegend, String ccProperty, String optionalFilters) {
 
