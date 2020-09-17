@@ -47,18 +47,17 @@ public class MineralTenementService extends BaseWFSService {
         return filterString;
     }
 
-    public String getMineralTenementFilter(String name, String tenementType, String owner, String size, String endDate,
-            FilterBoundingBox bbox,String optionalFilters, MineralTenementServiceProviderType mineralTenementServiceProviderType)
+    public String getMineralTenementFilter(FilterBoundingBox bbox,String optionalFilters,
+    		MineralTenementServiceProviderType mineralTenementServiceProviderType)
                     throws Exception {
-        MineralTenementFilter filter = new MineralTenementFilter(name, tenementType, owner, size, endDate,null,optionalFilters, mineralTenementServiceProviderType);
+        MineralTenementFilter filter = new MineralTenementFilter(optionalFilters, mineralTenementServiceProviderType);
         return generateFilterString(filter, bbox);
     }
-    public String getMineralTenementFilterCCProperty(String name, String tenementType, String owner, String size, String endDate,
-            FilterBoundingBox bbox,String ccProperty,String ccPropertyValue)
+    public String getMineralTenementFilterCCProperty(String optionalFilters, FilterBoundingBox bbox, String ccProperty, String ccPropertyValue)
                     throws Exception {
-        MineralTenementCCFilter filter = new MineralTenementCCFilter(name, tenementType, owner, size, endDate);
+        MineralTenementCCFilter filter = new MineralTenementCCFilter(optionalFilters);
         filter.addCCPropertyInFilter(ccProperty,ccPropertyValue);
         return generateFilterString(filter, bbox);
     }
-
 }
+
