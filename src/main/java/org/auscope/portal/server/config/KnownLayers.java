@@ -146,13 +146,13 @@ public class KnownLayers {
         setupIcon(layer);
         layer.setOrder("11");
         layer.setStackdriverServiceGroup("EarthResourcesLayers");
-
-        UIDropDownRemote uiDropDownRemote = new UIDropDownRemote("Commodity",
-                "gsml:specification/er:MineralOccurrence/er:commodityDescription/er:Commodity/er:commodityName", null,
-                Predicate.ISEQUAL, "getAllCommodities.do");
+// RA: this is not working due to lack of vocabs, but it's covered in ERlite anyway
+//        UIDropDownRemote uiDropDownRemote = new UIDropDownRemote("Commodity",
+//                "gsml:specification/er:MineralOccurrence/er:commodityDescription/er:Commodity/er:commodityName", null,
+//                Predicate.ISEQUAL, "getAllCommodities.do");
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        optionalFilters.add(uiDropDownRemote);
+//        optionalFilters.add(uiDropDownRemote);
         optionalFilters.add(uiCheckBoxGroupProvider);
         FilterCollection filterCollection = new FilterCollection();
         filterCollection.setOptionalFilters(optionalFilters);
