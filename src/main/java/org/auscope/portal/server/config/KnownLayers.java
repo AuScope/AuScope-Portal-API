@@ -3120,7 +3120,7 @@ public class KnownLayers {
         layer.setOrder("50");
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("Identifier", "igsn", null, Predicate.ISLIKE);
+        UITextBox nameTextBox = new UITextBox("IGSN Identifier", "igsn", null, Predicate.ISLIKE);
         optionalFilters.add(nameTextBox);
         FilterCollection filterCollection = new FilterCollection();
         filterCollection.setOptionalFilters(optionalFilters);
@@ -3144,7 +3144,7 @@ public class KnownLayers {
         layer.setOrder("51");
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("Identifier", "identifier", null, Predicate.ISLIKE);
+        UITextBox nameTextBox = new UITextBox("IGSN Identifier", "identifier", null, Predicate.ISLIKE);
         optionalFilters.add(nameTextBox);
         FilterCollection filterCollection = new FilterCollection();
         filterCollection.setOptionalFilters(optionalFilters);
@@ -3167,7 +3167,7 @@ public class KnownLayers {
         layer.setOrder("52");
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("Identifier", "identifier", null, Predicate.ISLIKE);
+        UITextBox nameTextBox = new UITextBox("IGSN Identifier", "identifier", null, Predicate.ISLIKE);
         optionalFilters.add(nameTextBox);
         FilterCollection filterCollection = new FilterCollection();
         filterCollection.setOptionalFilters(optionalFilters);
