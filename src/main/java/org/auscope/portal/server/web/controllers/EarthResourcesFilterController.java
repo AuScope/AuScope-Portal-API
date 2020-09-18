@@ -123,10 +123,9 @@ public class EarthResourcesFilterController extends BasePortalController {
             @RequestParam(required = false, value = "optionalFilters") String optionalFilters,
             @RequestParam(required = false, value = "maxFeatures", defaultValue = "0") int maxFeatures)
                     throws Exception {
-        FilterBoundingBox bbox = null;
         // Get the mining activities
-        String filter = this.mineralOccurrenceService.getMineFilter(mineName,
-                bbox,optionalFilters);
+        GenericFilterAdapter filterObject = new GenericFilterAdapter(optionalFilters,"shape");
+        String filter = filterObject.getFilterStringAllRecords();
 
         String style = this.getStyle(serviceUrl, filter, "er:MiningFeatureOccurrence", "#AA0078");
 
