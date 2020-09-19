@@ -69,13 +69,9 @@ public class ProfilePortalProduction {
     @Autowired
     KnownLayer knownTypeSHRIMPGeoSample;
     @Autowired
-    KnownLayer knownTypeYilgarnGeochemistry;
-    @Autowired
     KnownLayer knownTypeSamplingPoint;
     @Autowired
     KnownLayer knownTypeFeatureCollection;
-    @Autowired
-    KnownLayer knownTypeLateriteYilgarnGeoChem;
     @Autowired
     KnownLayer knownTypeHighPSiteFeatureType;
     @Autowired
@@ -137,8 +133,6 @@ public class ProfilePortalProduction {
     KnownLayer knownTypeHighpSiteIronlayer;
     @Autowired
     KnownLayer knownTypeHighpfeaturetype;
-    @Autowired
-    KnownLayer knownTypeLateriteWesternYilgarnGeochem;
     @Autowired
     KnownLayer knownTypeHighpSitePhoslayer;
     @Autowired
@@ -275,10 +269,8 @@ public class ProfilePortalProduction {
         knownLayers.add(knownTypeMagnetotellurics);
         knownLayers.add(knownTypeTimaGeoSample);
         knownLayers.add(knownTypeSHRIMPGeoSample);
-        knownLayers.add(knownTypeYilgarnGeochemistry);
         knownLayers.add(knownTypeSamplingPoint);
         knownLayers.add(knownTypeFeatureCollection);
-        knownLayers.add(knownTypeLateriteYilgarnGeoChem);
         knownLayers.add(knownTypeHighPSiteFeatureType);
         knownLayers.add(knownTypeHighPFeatureType);
         knownLayers.add(knownTypeHighPREIronLayer);
@@ -310,7 +302,6 @@ public class ProfilePortalProduction {
         
         knownLayers.add(knownTypeHighpSiteIronlayer);
         knownLayers.add(knownTypeHighpfeaturetype);
-        knownLayers.add(knownTypeLateriteWesternYilgarnGeochem);
         knownLayers.add(knownTypeHighpSitePhoslayer);
         knownLayers.add(knownTypeHighpRePhoslayer);
         knownLayers.add(knownTypeHighpSiteFeatureType);

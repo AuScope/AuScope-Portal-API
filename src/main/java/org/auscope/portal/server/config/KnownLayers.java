@@ -146,13 +146,13 @@ public class KnownLayers {
         setupIcon(layer);
         layer.setOrder("11");
         layer.setStackdriverServiceGroup("EarthResourcesLayers");
-
-        UIDropDownRemote uiDropDownRemote = new UIDropDownRemote("Commodity",
-                "gsml:specification/er:MineralOccurrence/er:commodityDescription/er:Commodity/er:commodityName", null,
-                Predicate.ISEQUAL, "getAllCommodities.do");
+// RA: this is not working due to lack of vocabs, but it's covered in ERlite anyway
+//        UIDropDownRemote uiDropDownRemote = new UIDropDownRemote("Commodity",
+//                "gsml:specification/er:MineralOccurrence/er:commodityDescription/er:Commodity/er:commodityName", null,
+//                Predicate.ISEQUAL, "getAllCommodities.do");
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        optionalFilters.add(uiDropDownRemote);
+//        optionalFilters.add(uiDropDownRemote);
         optionalFilters.add(uiCheckBoxGroupProvider);
         FilterCollection filterCollection = new FilterCollection();
         filterCollection.setOptionalFilters(optionalFilters);
@@ -450,32 +450,6 @@ public class KnownLayers {
         layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/blu-square.png");
         setupIcon(layer);
         layer.setOrder("410");
-        return layer;
-    }
-
-    @Bean
-    public WFSSelector knownTypeYilgarnGeochemistrySelector() {
-        WFSSelector wfsSelector = new WFSSelector("gsml:GeologicUnit");
-        String[] featNameList = new String[3];
-        featNameList[0] = "omx:ObservationProcess";
-        featNameList[1] = "gml:TimeInstant";
-        featNameList[2] = "sa:LocatedSpecimen";
-        wfsSelector.setRelatedFeatureTypeNames(featNameList);
-        return wfsSelector;
-    }
-
-    @Bean
-    public KnownLayer knownTypeYilgarnGeochemistry() {
-        KnownLayer layer = new KnownLayer("yilgarn-geochem", knownTypeYilgarnGeochemistrySelector());
-        layer.setName("Yilgarn Laterite Geochemistry");
-        layer.setDescription(
-                "A collection of detailed information about all analytes that were detected at a specific location");
-        layer.setProxyUrl("doYilgarnGeochemistry.do");
-        layer.setProxyCountUrl("doYilgarnGeochemistryCount.do");
-        layer.setProxyStyleUrl("");
-        layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/grn-blank.png");
-        setupIcon(layer);
-        layer.setOrder("430");
         return layer;
     }
 
@@ -1104,18 +1078,6 @@ public class KnownLayers {
     @Bean
     public KnownLayer knownTypeFeatureCollection() {
         KnownLayer layer = new KnownLayer("notused-featurecollection", knownTypeFeatureCollectionSelector());
-        layer.setHidden(true);
-        return layer;
-    }
-
-    @Bean
-    public WFSSelector knownTypeLateriteYilgarnGeoChemSelector() {
-        return new WFSSelector("Geochem:LateriteYilgarnGeoChem");
-    }
-
-    @Bean
-    public KnownLayer knownTypeLateriteYilgarnGeoChem() {
-        KnownLayer layer = new KnownLayer("notused-lateriteyilgarngeochem", knownTypeLateriteYilgarnGeoChemSelector());
         layer.setHidden(true);
         return layer;
     }
@@ -1797,23 +1759,6 @@ public class KnownLayers {
         layer.setGroup("CSIRO");
         layer.setDescription("Layer-Group type layer: HighP-Site-PhosLayer");
         layer.setOrder("Registered_39");
-        return layer;
-    }
-
-    @Bean
-    public WMSSelector knownTypeLateriteWesternYilgarnGeochemSelector() {
-        return new WMSSelector("Geochem:LateriteYilgarnGeoChem");
-    }
-
-    @Bean
-    public KnownLayer knownTypeLateriteWesternYilgarnGeochem() {
-        KnownLayer layer = new KnownLayer("laterite-western-yilgarn-geochem",
-                knownTypeLateriteWesternYilgarnGeochemSelector());
-        layer.setId("laterite-western-yilgarn-geochem");
-        layer.setName("Laterite Western Yilgarn Geochem");
-        layer.setGroup("CSIRO");
-        layer.setDescription("This Record is the ?nal release of a 53-element dataset for approximately 3150 l");
-        layer.setOrder("Registered_40");
         return layer;
     }
 
@@ -2923,7 +2868,7 @@ public class KnownLayers {
 
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("Name", "gml:name", null, Predicate.ISLIKE);
+        UITextBox nameTextBox = new UITextBox("Name", "NAME", null, Predicate.ISLIKE);
         UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox", "the_geom", null, Predicate.ISEQUAL);
         optionalFilters.add(nameTextBox);
         optionalFilters.add(uiPolygonBBox);
@@ -3115,11 +3060,12 @@ public class KnownLayers {
         layer.setName("igsn-csiro-sample");
         layer.setGroup("IGSN");
         layer.setDescription("A collection of igsn-csiro-sample");
-        layer.setProxyStyleUrl("getDefaultStyle.do?colour=0xFF0000&layerName=igsn:sample");
+        layer.setProxyStyleUrl("doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=igsn:sample");
+
         layer.setOrder("50");
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("samplename", "igsn:samplename", null, Predicate.ISLIKE);
+        UITextBox nameTextBox = new UITextBox("IGSN Identifier", "igsn", null, Predicate.ISLIKE);
         optionalFilters.add(nameTextBox);
         FilterCollection filterCollection = new FilterCollection();
         filterCollection.setOptionalFilters(optionalFilters);
@@ -3139,11 +3085,11 @@ public class KnownLayers {
         layer.setName("igsn-ga-sample");
         layer.setGroup("IGSN");
         layer.setDescription("A collection of igsn-ga-sample");
-        layer.setProxyStyleUrl("getDefaultStyle.do?colour=0x00FF00&layerName=igsn:igsn_ga_sample");
+        layer.setProxyStyleUrl("doGenericFilterStyle.do?styleType=POINT&color=0x00FF00&layerName=igsn:igsn_ga_sample");
         layer.setOrder("51");
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("samplename", "igsn:name", null, Predicate.ISLIKE);
+        UITextBox nameTextBox = new UITextBox("IGSN Identifier", "identifier", null, Predicate.ISLIKE);
         optionalFilters.add(nameTextBox);
         FilterCollection filterCollection = new FilterCollection();
         filterCollection.setOptionalFilters(optionalFilters);
@@ -3162,11 +3108,11 @@ public class KnownLayers {
         layer.setName("igsn-ands-sample");
         layer.setGroup("IGSN");
         layer.setDescription("A collection of igsn-ands-sample");
-        layer.setProxyStyleUrl("getDefaultStyle.do?colour=0x0000FF&layerName=igsn:igsn_ands_sample");
+        layer.setProxyStyleUrl("doGenericFilterStyle.do?styleType=POINT&color=0x0000FF&layerName=igsn:igsn_ands_sample");
         layer.setOrder("52");
         // Optional filters
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("Identifier", "igsn:identifier", null, Predicate.ISLIKE);
+        UITextBox nameTextBox = new UITextBox("IGSN Identifier", "identifier", null, Predicate.ISLIKE);
         optionalFilters.add(nameTextBox);
         FilterCollection filterCollection = new FilterCollection();
         filterCollection.setOptionalFilters(optionalFilters);
@@ -3185,15 +3131,8 @@ public class KnownLayers {
         layer.setName("igsn-wdc-sample");
         layer.setGroup("IGSN");
         layer.setDescription("A collection of igsn-wdc-sample");
-        layer.setProxyStyleUrl("getDefaultStyle.do?colour=0xFF00FF&layerName=igsn:igsn_wdc_sample");
-        layer.setOrder("53");
-        // Optional filters
-        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
-        UITextBox nameTextBox = new UITextBox("Identifier", "igsn:identifier", null, Predicate.ISLIKE);
-        optionalFilters.add(nameTextBox);
-        FilterCollection filterCollection = new FilterCollection();
-        filterCollection.setOptionalFilters(optionalFilters);
-        layer.setFilterCollection(filterCollection);        
+        layer.setProxyStyleUrl("doGenericFilterStyle.do?styleType=POINT&color=0xFF00FF&layerName=igsn:igsn_wdc_sample");
+        layer.setOrder("53");     
         return layer;
     }       
 }

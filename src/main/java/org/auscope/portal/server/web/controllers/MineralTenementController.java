@@ -80,8 +80,7 @@ public class MineralTenementController extends BasePortalController {
 
         FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
         MineralTenementServiceProviderType mineralTenementServiceProviderType = MineralTenementServiceProviderType.parseUrl(serviceUrl);
-        String filter = this.mineralTenementService.getMineralTenementFilter(name, tenementType, owner, size, endDate,
-                bbox, null,  mineralTenementServiceProviderType);
+        String filter = this.mineralTenementService.getMineralTenementFilter(bbox, null, mineralTenementServiceProviderType);
 
         // Some ArcGIS servers do not support filters (not enabled?)
         if (mineralTenementServiceProviderType == MineralTenementServiceProviderType.ArcGIS) {
@@ -108,8 +107,8 @@ public class MineralTenementController extends BasePortalController {
      *        type of mineral tenement
      * @param owner
      *        name of mineral tenement owner
-     * @param size
-     *        size of mineral tenement area
+     * @param startDate
+     *        mineral tenement grant date
      * @param endDate
      *        mineral tenement expiry date
      * @param ccProperty
@@ -122,11 +121,6 @@ public class MineralTenementController extends BasePortalController {
     @RequestMapping("/getMineralTenementStyle.do")
     public void doMineFilterStyle(
             @RequestParam(required = false, value = "serviceUrl") String serviceUrl,
-            @RequestParam(required = false, value = "name") String name,
-            @RequestParam(required = false, value = "tenementType") String tenementType,
-            @RequestParam(required = false, value = "owner") String owner,
-            @RequestParam(required = false, value = "size") String size,
-            @RequestParam(required = false, value = "endDate") String endDate,
             @RequestParam(required = false, value = "ccProperty", defaultValue="") String ccProperty,
             @RequestParam(required = false, value = "optionalFilters") String optionalFilters,
             HttpServletResponse response) throws Exception {
@@ -134,14 +128,14 @@ public class MineralTenementController extends BasePortalController {
         ccProperty = org.auscope.portal.core.util.TextUtil.cleanQueryParameter(ccProperty);
         switch (ccProperty) {
         case "TenementType" :
-            style = this.getStyle(false,ccProperty,"mt:MineralTenement",name, tenementType, owner, size, endDate);
+            style = this.getStyle(false,ccProperty,"mt:MineralTenement", optionalFilters);
             break;
         case "TenementStatus":
-            style = this.getStyle(false,ccProperty,"mt:MineralTenement",name, tenementType, owner, size, endDate);
+            style = this.getStyle(false,ccProperty,"mt:MineralTenement", optionalFilters);
             break;
         default:
             MineralTenementServiceProviderType mineralTenementServiceProviderType = MineralTenementServiceProviderType.GeoServer;
-            String filter = this.mineralTenementService.getMineralTenementFilter(name, tenementType, owner, size, endDate,null,optionalFilters, mineralTenementServiceProviderType); //VT:get filter from service
+            String filter = this.mineralTenementService.getMineralTenementFilter(null, optionalFilters, mineralTenementServiceProviderType); //VT:get filter from service
             style = this.getPolygonStyle(filter, mineralTenementServiceProviderType.featureType(), mineralTenementServiceProviderType.fillColour(), mineralTenementServiceProviderType.borderColour(),
                     mineralTenementServiceProviderType.styleName());
             break;
@@ -172,8 +166,17 @@ public class MineralTenementController extends BasePortalController {
         return  SLDLoader.loadSLD("/org/auscope/portal/slds/MineralTenement_getPolygonStyle.sld", valueMap,false);
 
     }
-    public String getStyle(boolean isLegend,String ccProperty,String layerName,String name, String tenementType, String owner, String size, String endDate) {
-        String rules = getRules(isLegend,ccProperty,name,  tenementType, owner,  size,  endDate) ;
+
+    /**
+     * Generate an SLD content for tenement filter
+     * @param isLegend
+     * @param ccProperty
+     * @param layerName
+     * @param optionalFilters
+     * @return
+     */
+    public String getStyle(boolean isLegend,String ccProperty, String layerName, String optionalFilters) {
+        String rules = getRules(isLegend,ccProperty, optionalFilters);
         String header="";
         if (isLegend) {
             header = "<StyledLayerDescriptor version=\"1.0.0\" " +
@@ -197,34 +200,34 @@ public class MineralTenementController extends BasePortalController {
                     "</NamedLayer>" +
                     "</StyledLayerDescriptor>";
         return style;
-    }   
-    
-    private String getRules(boolean isLegend,String ccProperty,String name, String tenementType,String owner, String size, String endDate) {
+    }
+
+    private String getRules(boolean isLegend, String ccProperty, String optionalFilters) {
 
         String rules = "";
         if (ccProperty.contains("TenementType")){
-            rules += getRuleByName(isLegend,ccProperty,"exploration",name,tenementType, owner, size, endDate);
-            rules += getRuleByName(isLegend,ccProperty,"prospecting",name,tenementType, owner, size, endDate);
-            rules += getRuleByName(isLegend,ccProperty,"miscellaneous",name,tenementType, owner, size, endDate);
-            rules += getRuleByName(isLegend,ccProperty,"mining",name,tenementType, owner, size, endDate);
-            rules += getRuleByName(isLegend,ccProperty,"licence",name,tenementType, owner, size, endDate);
+            rules += getRuleByName(isLegend,ccProperty,"exploration", optionalFilters);
+            rules += getRuleByName(isLegend,ccProperty,"prospecting", optionalFilters);
+            rules += getRuleByName(isLegend,ccProperty,"miscellaneous", optionalFilters);
+            rules += getRuleByName(isLegend,ccProperty,"mining", optionalFilters);
+            rules += getRuleByName(isLegend,ccProperty,"licence", optionalFilters);
         } else if (ccProperty.contains("TenementStatus")){
-            rules += getRuleByName(isLegend,ccProperty,"LIVE",name,tenementType, owner, size, endDate);
-            rules += getRuleByName(isLegend,ccProperty,"CURRENT",name,tenementType, owner, size, endDate);
-            rules += getRuleByName(isLegend,ccProperty,"PENDING",name,tenementType, owner, size, endDate);            
+            rules += getRuleByName(isLegend,ccProperty,"LIVE", optionalFilters);
+            rules += getRuleByName(isLegend,ccProperty,"CURRENT", optionalFilters);
+            rules += getRuleByName(isLegend,ccProperty,"PENDING", optionalFilters);
         } else {
-            rules = getRuleByName(isLegend,ccProperty,"Tenement",name,tenementType, owner, size, endDate);
+            rules = getRuleByName(isLegend,ccProperty,"Tenement", optionalFilters);
         }
         return rules;
     }
-    
-    private String getRuleByName(boolean isLegend,String ccProperty,String ruleName,String name, String tenementType,String owner, String size, String endDate) {
-        String filter = "";        
-        if (isLegend) { 
+
+    private String getRuleByName(boolean isLegend,String ccProperty,String ruleName, String optionalFilters) {
+        String filter = "";
+        if (isLegend) {
             filter = "";
         } else {
             try {
-                filter = this.mineralTenementService.getMineralTenementFilterCCProperty(name,tenementType, owner, size, endDate, null, ccProperty,ruleName+ "*");
+                filter = this.mineralTenementService.getMineralTenementFilterCCProperty(optionalFilters, null, ccProperty, ruleName+ "*");
             } catch (Exception e) {
                 e.printStackTrace();
             }            

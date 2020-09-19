@@ -5,23 +5,21 @@ import org.auscope.portal.core.services.BaseWFSService;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.methodmakers.filter.IFilter;
-import org.auscope.portal.mineraloccurrence.MineralTenementCCFilter;
-import org.auscope.portal.mineraloccurrence.MineralTenementFilter;
-import org.auscope.portal.server.MineralTenementServiceProviderType;
+import org.auscope.portal.server.web.service.GenericFilter2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Manages mineral tenement queries
+ * Manages GenericService queries
  *
- * @author VictorTey
+ * @author Lingbo Jiang
  * @version
  */
 @Service
-public class MineralTenementService extends BaseWFSService {
+public class GenericService extends BaseWFSService {
 
     @Autowired
-    public MineralTenementService(
+    public GenericService(
             HttpServiceCaller httpServiceCaller,
             WFSGetFeatureMethodMaker methodMaker) {
         super(httpServiceCaller, methodMaker);
@@ -47,17 +45,8 @@ public class MineralTenementService extends BaseWFSService {
         return filterString;
     }
 
-    public String getMineralTenementFilter(FilterBoundingBox bbox,String optionalFilters,
-    		MineralTenementServiceProviderType mineralTenementServiceProviderType)
-                    throws Exception {
-        MineralTenementFilter filter = new MineralTenementFilter(optionalFilters, mineralTenementServiceProviderType);
-        return generateFilterString(filter, bbox);
-    }
-    public String getMineralTenementFilterCCProperty(String optionalFilters, FilterBoundingBox bbox, String ccProperty, String ccPropertyValue)
-                    throws Exception {
-        MineralTenementCCFilter filter = new MineralTenementCCFilter(optionalFilters);
-        filter.addCCPropertyInFilter(ccProperty,ccPropertyValue);
+    public String getFilter(FilterBoundingBox bbox,String optionalFilters) throws Exception {
+      GenericFilter2 filter = new GenericFilter2(optionalFilters);
         return generateFilterString(filter, bbox);
     }
 }
-
