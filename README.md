@@ -22,4 +22,3 @@ mvn clean spring-boot:run
 5) On Windows, if you get 'CreateProcess error=206, The filename or extension is too long' when you run with 'spring-boot:run' then try turning off forking by adding '-Dspring-boot.run.fork=false' to the command line
 6) Before deploying into development/production server, please fill out stackdriver entries in application.yaml with:
 https://bitbucket.csiro.au/projects/GAP/repos/auscopeportalconfig/browse/stackdriver_entries_for_application.yaml
-
