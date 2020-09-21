@@ -1,7 +1,7 @@
 # This creates docker image for the most recent commit to the repository
 # The docker image is intended for development purposes
 # 
-name: Docker
+name: build-dev
 
 on:
   push
