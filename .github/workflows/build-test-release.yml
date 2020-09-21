@@ -1,5 +1,5 @@
-# Create builds for testing releases
-name: Docker-test-release
+# Create a Docker build for testing releases
+name: build-test-release
 
 
 on:
