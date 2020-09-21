@@ -6,7 +6,7 @@ on:
   push:
     # Publish `RELEASE-*` as Docker `latest` test image.
     branches:
-      - RELEASE-*
+      - RELEASE*
 
 env:
   IMAGE_NAME: auscope-portal-api-test-release
