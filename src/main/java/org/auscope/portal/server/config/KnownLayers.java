@@ -390,10 +390,10 @@ public class KnownLayers {
     @Bean KnownLayer knownTypeMagnetotellurics() {
         KnownLayer layer = new KnownLayer("magnetotellurics", knownTypeMagnetotelluricsSelector());
         layer.setId("magnetotellurics");
-        layer.setName("Electromagnetic Surveys");
+        layer.setName("Magnetotelluric Survey Sites");
         layer.setGroup("Magnetotellurics");
         layer.setDescription(
-                "Electromagnetic surveys conducted in Australia with public funding (government and university) from the 1960s to present that can be obtained.");
+                "The magnetotelluric surveys were conducted in Australia with public funding (government and university) from the 1960s to present.");
         layer.setOrder("401");
         return layer;
     }
@@ -664,9 +664,9 @@ public class KnownLayers {
     @Bean KnownLayer knownTypePassiveSeismic() {
         KnownLayer layer = new KnownLayer("passive-seismic", knownTypePassiveSeismicSelector());
         layer.setId("passive-seismic");
-        layer.setName("Passive Seismic Stations");
+        layer.setName("Passive Seismic Sites");
         layer.setGroup("Passive Seismic");
-        layer.setDescription("Passive Seismic Stations");
+        layer.setDescription("Passive Seismic Sites");
         layer.setOrder("301");
         return layer;
     }
@@ -3103,11 +3103,11 @@ public class KnownLayers {
 
     @Bean
     public KnownLayer knownTypeIGSNANDSSample() {
-        KnownLayer layer = new KnownLayer("igsn-ands-sample", knownTypeIGSNANDSSampleSelector());
-        layer.setId("IGSN-ANDS-SAMPLE");
-        layer.setName("igsn-ands-sample");
+        KnownLayer layer = new KnownLayer("igsn-ardc-sample", knownTypeIGSNANDSSampleSelector());
+        layer.setId("IGSN-ARDC-SAMPLE");
+        layer.setName("igsn-ardc-sample");
         layer.setGroup("IGSN");
-        layer.setDescription("A collection of igsn-ands-sample");
+        layer.setDescription("A collection of igsn-ardc-sample");
         layer.setProxyStyleUrl("doGenericFilterStyle.do?styleType=POINT&color=0x0000FF&layerName=igsn:igsn_ands_sample");
         layer.setOrder("52");
         // Optional filters
