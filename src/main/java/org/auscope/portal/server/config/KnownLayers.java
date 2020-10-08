@@ -688,6 +688,337 @@ public class KnownLayers {
         layer.setOrder("302");
         return layer;
     }
+    
+    // GA National Geophysics Compilation
+
+    // Bouguer Gravity Anomaly Grid of Onshore Australia 2016
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector1() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        //cswSelector.setServiceName("Bouguer Gravity Anomaly Grid of Onshore Australia 2016");
+        // NB: Using recordId because are multiple records with the same title
+        cswSelector.setRecordId("f0886_1142_1614_4044");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys1() {
+        KnownLayer layer = new KnownLayer("ga-geophys-1", knownTypeGANatGeoPhysSelector1());
+        layer.setName("Bouguer Gravity Anomaly Grid of Onshore Australia 2016");
+        layer.setDescription("This gravity anomaly grid is derived from observations stored in the Australian National Gravity Database (ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey. Out of the almost 1.8 million records in the ANGD approximately 1.4 million stations together with 19,558 stations from the Riverina survey were used to generate this grid. This product shows spherical cap Bouguer anomalies over onshore continental Australia. The data used in this grid has been acquired by the Commonwealth, State and Territory Governments, the mining and exploration industry, universities and research organisations from the 1940's to the present day. The spherical cap Bouguer anomalies in this grid are the combination of Bullard A and B corrections to the Free Air anomaly values using a density of 2670 kg/m^3.");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("351");
+        return layer;
+    }
+
+
+    // Complete Bouguer Gravity Anomaly Grid of Onshore Australia 2016
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector2() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Complete Bouguer Gravity Anomaly Grid of Onshore Australia 2016");
+        // NB: Using recordId because are multiple records with the same title
+        //cswSelector.setRecordId("f2848_9429_6275_5590");
+        return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys2() {
+        KnownLayer layer = new KnownLayer("ga-geophys-2", knownTypeGANatGeoPhysSelector2());
+        layer.setName("Complete Bouguer Gravity Anomaly Grid of Onshore Australia 2016");
+        layer.setDescription("Complete Bouguer Gravity Anomaly Grid of Onshore Australia 2016");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("352");
+        return layer;
+    }
+
+
+    // Isostatic Residual Gravity Anomaly Grid of Onshore Australia 2016
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector3() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        //cswSelector.setServiceName("Isostatic Residual Gravity Anomaly Grid of Onshore Australia 2016");
+        // NB: Using recordId because are multiple records with the same title
+        cswSelector.setRecordId("f4523_7439_0612_0991");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys3() {
+        KnownLayer layer = new KnownLayer("ga-geophys-3", knownTypeGANatGeoPhysSelector3());
+        layer.setName("Isostatic Residual Gravity Anomaly Grid of Onshore Australia 2016");
+        layer.setDescription("Isostatic Residual Gravity Anomaly Grid of Onshore Australia 2016");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("353");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 filtered pct potassium grid
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector4() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 filtered pct potassium grid");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys4() {
+        KnownLayer layer = new KnownLayer("ga-geophys-4", knownTypeGANatGeoPhysSelector4());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 filtered pct potassium grid");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 filtered pct potassium grid");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("354");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm thorium
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector5() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm thorium");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys5() {
+        KnownLayer layer = new KnownLayer("ga-geophys-5", knownTypeGANatGeoPhysSelector5());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm thorium");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm thorium");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("355");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm uranium
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector6() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm uranium");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys6() {
+        KnownLayer layer = new KnownLayer("ga-geophys-6", knownTypeGANatGeoPhysSelector6());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm uranium");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm uranium");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("356");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 filtered terrestrial dose rate
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector7() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 filtered terrestrial dose rate");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys7() {
+        KnownLayer layer = new KnownLayer("ga-geophys-7", knownTypeGANatGeoPhysSelector7());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 filtered terrestrial dose rate");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 filtered terrestrial dose rate");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("357");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 ratio thorium over potassium
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector8() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 ratio thorium over potassium");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys8() {
+        KnownLayer layer = new KnownLayer("ga-geophys-8", knownTypeGANatGeoPhysSelector8());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 ratio thorium over potassium");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 ratio thorium over potassium");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("358");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over potassium
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector9() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over potassium");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys9() {
+        KnownLayer layer = new KnownLayer("ga-geophys-9", knownTypeGANatGeoPhysSelector9());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over potassium");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over potassium");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("359");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over thorium
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector10() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over thorium");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys10() {
+        KnownLayer layer = new KnownLayer("ga-geophys-10", knownTypeGANatGeoPhysSelector10());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over thorium");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over thorium");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("360");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium squared over thorium 
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector11() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium squared over thorium");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys11() {
+        KnownLayer layer = new KnownLayer("ga-geophys-11", knownTypeGANatGeoPhysSelector11());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium squared over thorium");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium squared over thorium");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("361");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 unfiltered pct potassium
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector12() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered pct potassium");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys12() {
+        KnownLayer layer = new KnownLayer("ga-geophys-12", knownTypeGANatGeoPhysSelector12());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered pct potassium");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered pct potassium");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("362");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm thorium
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector13() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm thorium");;
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys13() {
+        KnownLayer layer = new KnownLayer("ga-geophys-13", knownTypeGANatGeoPhysSelector13());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm thorium");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm thorium");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("363");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm uranium
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector14() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm uranium");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys14() {
+        KnownLayer layer = new KnownLayer("ga-geophys-14", knownTypeGANatGeoPhysSelector14());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm uranium");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm uranium");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("364");
+        return layer;
+    }
+
+
+    // Radiometric Grid of Australia (Radmap) v4 2019 unfiltered terrestrial dose rate
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector15() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered terrestrial dose rate");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys15() {
+        KnownLayer layer = new KnownLayer("ga-geophys-15", knownTypeGANatGeoPhysSelector15());
+        layer.setName("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered terrestrial dose rate");
+        layer.setDescription("Radiometric Grid of Australia (Radmap) v4 2019 unfiltered terrestrial dose rate");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("365");
+        return layer;
+    }
+
+
+    // Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 40 m cell size
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector16() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 40 m cell size");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys16() {
+        KnownLayer layer = new KnownLayer("ga-geophys-16", knownTypeGANatGeoPhysSelector16());
+        layer.setName("Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 40 m cell size");
+        layer.setDescription("Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 40 m cell size");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("366");
+        return layer;
+    }
+
+
+    // Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 80 m cell size
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector17() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 80 m cell size");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys17() {
+        KnownLayer layer = new KnownLayer("ga-geophys-17", knownTypeGANatGeoPhysSelector17());
+        layer.setName("Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 80 m cell size");
+        layer.setDescription("Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 80 m cell size");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("367");
+        return layer;
+    }
+
+
+    // Total Magnetic Intensity (TMI) Grid of Australia with Variable Reduction to Pole (VRTP) 2019 - seventh edition
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector18() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Total Magnetic Intensity (TMI) Grid of Australia with Variable Reduction to Pole (VRTP) 2019 - seventh edition");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys18() {
+        KnownLayer layer = new KnownLayer("ga-geophys-18", knownTypeGANatGeoPhysSelector18());
+        layer.setName("Total Magnetic Intensity (TMI) Grid of Australia with Variable Reduction to Pole (VRTP) 2019 - seventh edition");
+        layer.setDescription("Total Magnetic Intensity (TMI) Grid of Australia with Variable Reduction to Pole (VRTP) 2019 - seventh edition");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("368");
+        return layer;
+    }
+
+
+    // Total Magnetic Intensity Grid of Australia 2019 - First Vertical Derivative (1VD)
+    @Bean CSWRecordSelector knownTypeGANatGeoPhysSelector19() {
+        CSWRecordSelector cswSelector = new CSWRecordSelector();
+        cswSelector.setServiceName("Total Magnetic Intensity Grid of Australia 2019 - First Vertical Derivative (1VD)");
+	    return cswSelector;
+    }
+
+    @Bean KnownLayer knownTypeGANatGeoPhys19() {
+        KnownLayer layer = new KnownLayer("ga-geophys-19", knownTypeGANatGeoPhysSelector19());
+        layer.setName("Total Magnetic Intensity Grid of Australia 2019 - First Vertical Derivative (1VD)");
+        layer.setDescription("Total Magnetic Intensity Grid of Australia 2019 - First Vertical Derivative (1VD)");
+        layer.setGroup("GA/NCI National Geophysical Compilations");
+        layer.setOrder("369");
+        return layer;
+    }
+    // End of GA National Geophysics Compilation
 
     @Bean
     public CSWRecordSelector knownTypeAsterAlohSelector() {
