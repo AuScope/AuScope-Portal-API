@@ -635,7 +635,7 @@ public class KnownLayers {
     @Bean
     public IRISSelector knownTypeSeismologyInSchoolSelector() {
         try {
-            return new IRISSelector("http://service.iris.edu");
+            return new IRISSelector("http://auspass.edu.au:80");
         } catch (MalformedURLException e) {
             // TODO: Log exception??
         }
@@ -647,10 +647,9 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("seismology-in-schools-site", knownTypeSeismologyInSchoolSelector());
         layer.setName("Seismographs in Schools Network");
         layer.setDescription(
-                "Seismographs in Schools data feed from Incorporated Research Institutions for Seismology (IRIS). S network code.");
+                "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server.");
         layer.setGroup("Passive Seismic");
         layer.setProxyUrl("getIRISStations.do");
-        layer.setIconUrl("http://maps.google.com/mapfiles/kml/paddle/ltblu-blank.png");
         setupIcon(layer);
         layer.setOrder("300");
         return layer;
