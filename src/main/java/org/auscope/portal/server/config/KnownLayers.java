@@ -687,6 +687,94 @@ public class KnownLayers {
         layer.setOrder("302");
         return layer;
     }
+
+    // GA Geophysical Survey Datasets (GADDS v2.0)
+
+    // All datasets
+    @Bean
+    public WMSSelector knownTypeGeophysSurveysSelector() {
+        return new WMSSelector("gadds:geophysical_survey_datasets");
+    }
+
+    @Bean
+    public KnownLayer knownTypeGeophysSurveys() {
+        KnownLayer layer = new KnownLayer("ga-geophysicalsurveys-all", knownTypeGeophysSurveysSelector());
+        layer.setId("ga-geophysicalsurveys-all");
+        layer.setName("Geophysical Surveys - All");
+        layer.setGroup("GA Geophysical Survey Datasets");
+        layer.setDescription("Descriptions of geophysical datasets, their associated surveys, and the methods used for delivery of those datasets. Includes datasets collected from airborne, land, and marine surveys conducted or managed by Geoscience Australia and its predecessor agencies, as well as data and surveys from State and Territory geological survey agencies.");
+        layer.setOrder("310");
+        return layer;
+    }
+
+    // Gravity datasets
+    @Bean
+    public WMSSelector knownTypeGeophysSurveysGravSelector() {
+        return new WMSSelector("gadds:geophysical_datasets_gravity");
+    }
+
+    @Bean
+    public KnownLayer knownTypeGeophysGravSurveys() {
+        KnownLayer layer = new KnownLayer("ga-geophysicalsurveys-grav", knownTypeGeophysSurveysGravSelector());
+        layer.setId("ga-geophysicalsurveys-grav");
+        layer.setName("Geophysical Surveys - Gravity");
+        layer.setGroup("GA Geophysical Survey Datasets");
+        layer.setDescription("Gravity data measures small changes in gravity due to changes in the density of rocks beneath the Earth's surface.");
+        layer.setOrder("311");
+        return layer;
+    }
+
+    // Radiometric datasets
+    @Bean
+    public WMSSelector knownTypeGeophysRadioSurveysSelector() {
+        return new WMSSelector("gadds:geophysical_datasets_radiometric");
+    }
+
+    @Bean
+    public KnownLayer knownTypeGeophysRadioSurveys() {
+        KnownLayer layer = new KnownLayer("ga-geophysicalsurveys-radio", knownTypeGeophysRadioSurveysSelector());
+        layer.setId("ga-geophysicalsurveys-radio");
+        layer.setName("Geophysical Surveys - Radiometric");
+        layer.setGroup("GA Geophysical Survey Datasets");
+        layer.setDescription("The radiometric, or gamma-ray spectrometric method, measures the natural variations in the gamma-rays detected near the Earth's surface as the result of the natural radioactive decay of potassium (K), uranium (U) and thorium (Th). Radiometrics can tell us about the distribution of certain soils and rocks.");
+        layer.setOrder("312");
+        return layer;
+    }
+
+    // Magnetic datasets
+    @Bean
+    public WMSSelector knownTypeGeophysMagSurveysSelector() {
+        return new WMSSelector("gadds:geophysical_datasets_magnetic");
+    }
+
+    @Bean
+    public KnownLayer knownTypeGeophysMagSurveys() {
+        KnownLayer layer = new KnownLayer("ga-geophysicalsurveys-mag", knownTypeGeophysMagSurveysSelector());
+        layer.setId("ga-geophysicalsurveys-mag");
+        layer.setName("Geophysical Surveys - Magnetic");
+        layer.setGroup("GA Geophysical Survey Datasets");
+        layer.setDescription("Total magnetic intensity (TMI) data measures variations in the intensity of the Earth's magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust. Magnetic anomalies can be either positive (field stronger than normal) or negative (field weaker) depending on the susceptibility of the rock. ");
+        layer.setOrder("313");
+        return layer;
+    }
+
+    // Elevation datasets
+    @Bean
+    public WMSSelector knownTypeGeophysElevSurveysSelector() {
+        return new WMSSelector("gadds:geophysical_datasets_elevation");
+    }
+
+    @Bean
+    public KnownLayer knownTypeGeophysElevSurveys() {
+        KnownLayer layer = new KnownLayer("ga-geophysicalsurveys-elev", knownTypeGeophysElevSurveysSelector());
+        layer.setId("ga-geophysicalsurveys-elev");
+        layer.setName("Geophysical Surveys - Elevation");
+        layer.setGroup("GA Geophysical Survey Datasets");
+        layer.setDescription("Digital Elevation data record the terrain height variations from the processed point-located data recorded during a geophysical survey.");
+        layer.setOrder("314");
+        return layer;
+    }
+
     
     // GA National Geophysics Compilation
 

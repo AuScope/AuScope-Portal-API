@@ -244,7 +244,19 @@ public class ProfilePortalProduction {
     @Autowired
     KnownLayer knownTypeIGSNANDSSample;
     @Autowired
-    KnownLayer knownTypeIGSNWdcSample;            
+    KnownLayer knownTypeIGSNWdcSample;
+    
+    /* GA Geophysical Survey Datasets */
+    @Autowired
+    KnownLayer knownTypeGeophysSurveys;
+    @Autowired
+    KnownLayer knownTypeGeophysGravSurveys;
+    @Autowired
+    KnownLayer knownTypeGeophysRadioSurveys;
+    @Autowired
+    KnownLayer knownTypeGeophysMagSurveys;
+    @Autowired
+    KnownLayer knownTypeGeophysElevSurveys;
 
     /* GA Geophysical Layers */
     @Autowired
@@ -401,7 +413,14 @@ public class ProfilePortalProduction {
         knownLayers.add(knownTypeIGSNSample);        
         knownLayers.add(knownTypeIGSNGASample);        
         knownLayers.add(knownTypeIGSNANDSSample);        
-        knownLayers.add(knownTypeIGSNWdcSample);   
+        knownLayers.add(knownTypeIGSNWdcSample);
+
+        /* GA Geophysical Survey Datasets */
+        knownLayers.add(knownTypeGeophysSurveys);
+        knownLayers.add(knownTypeGeophysGravSurveys);
+        knownLayers.add(knownTypeGeophysRadioSurveys);
+        knownLayers.add(knownTypeGeophysMagSurveys);
+        knownLayers.add(knownTypeGeophysElevSurveys);
 
 	    /* GA National Geophysical Layers */
         knownLayers.add(knownTypeGANatGeoPhys1);
