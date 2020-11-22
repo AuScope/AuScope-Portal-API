@@ -358,7 +358,61 @@ public WebMvcConfigurer configurer() {
     @Autowired
     KnownLayer knownTypeIGSNANDSSample;
     @Autowired
-    KnownLayer knownTypeIGSNWdcSample;      
+    KnownLayer knownTypeIGSNWdcSample;
+
+    /* GA Geophysical Survey Datasets */
+    @Autowired
+    KnownLayer knownTypeGeophysSurveys;
+    @Autowired
+    KnownLayer knownTypeGeophysGravSurveys;
+    @Autowired
+    KnownLayer knownTypeGeophysRadioSurveys;
+    @Autowired
+    KnownLayer knownTypeGeophysMagSurveys;
+    @Autowired
+    KnownLayer knownTypeGeophysElevSurveys;
+    
+     /* GA Geophysical Layers */
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys1;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys2;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys3;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys4;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys5;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys6;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys7;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys8;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys9;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys10;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys11;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys12;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys13;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys14;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys15;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys16;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys17;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys18;
+     @Autowired
+     KnownLayer knownTypeGANatGeoPhys19;
+
+
     
     @Bean
  	public ArrayList<KnownLayer> knownTypes() {
@@ -532,8 +586,37 @@ public WebMvcConfigurer configurer() {
         knownLayers.add(knownTypeIGSNSample);        
         knownLayers.add(knownTypeIGSNGASample);        
         knownLayers.add(knownTypeIGSNANDSSample);        
-        knownLayers.add(knownTypeIGSNWdcSample); 
-		return knownLayers;
+        knownLayers.add(knownTypeIGSNWdcSample);
+
+        /* GA Geophysical Survey Datasets */
+        knownLayers.add(knownTypeGeophysSurveys);
+        knownLayers.add(knownTypeGeophysGravSurveys);
+        knownLayers.add(knownTypeGeophysRadioSurveys);
+        knownLayers.add(knownTypeGeophysMagSurveys);
+        knownLayers.add(knownTypeGeophysElevSurveys);
+
+        /* GA National Geophysical Layers */
+        knownLayers.add(knownTypeGANatGeoPhys1);
+        knownLayers.add(knownTypeGANatGeoPhys2);
+        knownLayers.add(knownTypeGANatGeoPhys3);
+        knownLayers.add(knownTypeGANatGeoPhys4);
+        knownLayers.add(knownTypeGANatGeoPhys5);
+        knownLayers.add(knownTypeGANatGeoPhys6);
+        knownLayers.add(knownTypeGANatGeoPhys7);
+        knownLayers.add(knownTypeGANatGeoPhys8);
+        knownLayers.add(knownTypeGANatGeoPhys9);
+        knownLayers.add(knownTypeGANatGeoPhys10);
+        knownLayers.add(knownTypeGANatGeoPhys11);
+        knownLayers.add(knownTypeGANatGeoPhys12);
+        knownLayers.add(knownTypeGANatGeoPhys13);
+        knownLayers.add(knownTypeGANatGeoPhys14);
+        knownLayers.add(knownTypeGANatGeoPhys15);
+        knownLayers.add(knownTypeGANatGeoPhys16);
+        knownLayers.add(knownTypeGANatGeoPhys17);
+        knownLayers.add(knownTypeGANatGeoPhys18);
+        knownLayers.add(knownTypeGANatGeoPhys19);
+
+        return knownLayers;
 	}
                 
 

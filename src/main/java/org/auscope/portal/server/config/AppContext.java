@@ -376,7 +376,7 @@ public class AppContext {
     // Second HttpServiceCaller to reduce CSW record search timeout
     @Bean
     public SearchHttpServiceCaller searchHttpServiceCaller() {
-        return new SearchHttpServiceCaller(30000);
+        return new SearchHttpServiceCaller(60000);
     }
     
     @Bean

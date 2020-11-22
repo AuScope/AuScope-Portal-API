@@ -21,13 +21,8 @@ spring:
       # Comment out the one that you don't want
       active: test
       #active: prod
-   datasource:
-      # This is for a dummy in-memory database
-      driver-class-name: org.h2.Driver
-      url: "jdbc:h2:mem:"
-      username: sa
-      password: sa
       # Use this for MySQL db
+      #datasource:
       #   url: jdbc:mysql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
       #   username: <db_user>
       #   password: <db_password>
