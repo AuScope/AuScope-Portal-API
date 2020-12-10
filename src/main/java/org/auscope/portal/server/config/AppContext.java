@@ -3,9 +3,9 @@ package org.auscope.portal.server.config;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
@@ -14,28 +14,25 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.cloud.MachineImage;
 import org.auscope.portal.core.cloud.StagingInformation;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
 import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
+import org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer;
+import org.auscope.portal.core.server.controllers.KnownLayerController;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
+import org.auscope.portal.core.server.http.download.FileDownloadService;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.CSWFilterService;
+import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.SISSVoc2Service;
+import org.auscope.portal.core.services.VocabularyCacheService;
+import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.WFSGml32Service;
 import org.auscope.portal.core.services.WFSService;
 import org.auscope.portal.core.services.WMSService;
-import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
-import org.auscope.portal.core.services.methodmakers.GoogleCloudMonitoringMethodMaker;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceNectar;
@@ -47,16 +44,25 @@ import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.auscope.portal.core.services.csw.GriddedCSWRecordTransformerFactory;
 import org.auscope.portal.core.services.csw.ViewGriddedCSWRecordFactory;
+import org.auscope.portal.core.services.methodmakers.GoogleCloudMonitoringMethodMaker;
 import org.auscope.portal.core.services.methodmakers.OPeNDAPGetDataMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WCSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WMSMethodMaker;
 import org.auscope.portal.core.services.methodmakers.WMSMethodMakerInterface;
 import org.auscope.portal.core.services.methodmakers.WMS_1_3_0_MethodMaker;
+import org.auscope.portal.core.services.methodmakers.sissvoc.SISSVoc2MethodMaker;
 import org.auscope.portal.core.services.namespaces.ErmlNamespaceContext;
+import org.auscope.portal.core.services.responses.vocab.ConceptFactory;
+import org.auscope.portal.core.services.vocabs.VocabularyServiceItem;
 import org.auscope.portal.core.view.ViewCSWRecordFactory;
 import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
+import org.auscope.portal.core.xslt.GmlToHtml;
+import org.auscope.portal.core.xslt.WfsToKmlTransformer;
+import org.auscope.portal.mineraloccurrence.CommodityVocabMethodMaker;
+import org.auscope.portal.mscl.MSCLWFSService;
+import org.auscope.portal.nvcl.NvclVocabMethodMaker;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VglMachineImage;
@@ -65,37 +71,33 @@ import org.auscope.portal.server.web.SearchHttpServiceCaller;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.ErmlVocabService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
+import org.auscope.portal.server.web.service.NotificationService;
+import org.auscope.portal.server.web.service.NvclVocabService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.VGLCryptoService;
 import org.auscope.portal.server.web.service.cloud.CloudComputeServiceNci;
 import org.auscope.portal.server.web.service.cloud.CloudStorageServiceNci;
+import org.auscope.portal.server.web.service.monitor.KnownLayerStatusMonitor;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusChangeHandler;
 import org.auscope.portal.server.web.service.monitor.VGLJobStatusMonitor;
 import org.quartz.Trigger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.MethodInvokingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.auscope.portal.core.xslt.GmlToHtml;
-import org.auscope.portal.core.xslt.WfsToKmlTransformer;
-import org.auscope.portal.core.services.VocabularyCacheService;
-import org.auscope.portal.core.services.VocabularyFilterService;
-import org.auscope.portal.core.services.responses.vocab.ConceptFactory;
-import org.auscope.portal.core.services.methodmakers.sissvoc.SISSVoc2MethodMaker;
-import org.auscope.portal.core.services.SISSVoc2Service;
-import org.auscope.portal.server.web.service.ErmlVocabService;
-import org.auscope.portal.server.web.service.NvclVocabService;
-import org.auscope.portal.core.server.http.download.FileDownloadService;
-import org.auscope.portal.core.services.vocabs.VocabularyServiceItem;
-import org.auscope.portal.nvcl.NvclVocabMethodMaker;
-import org.auscope.portal.mineraloccurrence.CommodityVocabMethodMaker;
-import org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer;
-import org.auscope.portal.server.web.service.NotificationService;
-import org.auscope.portal.mscl.MSCLWFSService;
 
 
 /**
@@ -177,10 +179,9 @@ public class AppContext {
 
         @Autowired
         private ANVGLUserService userService;
-
+        
         @Autowired
         private NCIDetailsService nciDetailsService;
-
 
 
     @Autowired
@@ -330,6 +331,24 @@ public class AppContext {
         return jobDetail;
     }
 
+//    @Autowired
+//    private ApplicationContext appContext;
+//    
+//    private KnownLayerController knownLayerController;
+    
+    @Bean
+    public JobDetailFactoryBean knownLayerStatusMonitorDetail() throws Exception {
+//        if(knownLayerController==null)
+//            knownLayerController = appContext.getBean(KnownLayerController.class);
+
+        JobDetailFactoryBean jobDetail = new JobDetailFactoryBean();
+        jobDetail.setJobClass(KnownLayerStatusMonitor.class);
+        Map<String, Object> jobData = new HashMap<String, Object>();
+        jobData.put("cswKnownLayerService", this.cswKnownLayerService());
+        jobDetail.setJobDataAsMap(jobData);        
+        return jobDetail;
+    }
+
     @Bean
     public static PortalPropertySourcesPlaceholderConfigurer propertyConfigurer() {
         PortalPropertySourcesPlaceholderConfigurer pPropConf = new PortalPropertySourcesPlaceholderConfigurer();
@@ -338,7 +357,7 @@ public class AppContext {
     }
     
     @Bean
-    public SimpleTriggerFactoryBean simpleTriggerFactoryBean() throws Exception {
+    public SimpleTriggerFactoryBean jobMonitorTriggerFactoryBean() throws Exception {
         SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
         trigger.setJobDetail(vglJobStatusMonitorDetail().getObject());
         trigger.setRepeatInterval(300000);
@@ -347,11 +366,21 @@ public class AppContext {
     }
 
     @Bean
+    public SimpleTriggerFactoryBean knownLayerStatusTriggerFactoryBean() throws Exception {
+        SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
+        trigger.setJobDetail(knownLayerStatusMonitorDetail().getObject());
+        trigger.setRepeatInterval(5 * 60 * 1000);
+        trigger.setStartDelay(1000);
+        return trigger;
+    }
+
+    @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setTaskExecutor(taskExecutor());
-        Trigger[] triggers = new Trigger[1];
-        triggers[0] = simpleTriggerFactoryBean().getObject();
+        Trigger[] triggers = new Trigger[2];
+        triggers[0] = jobMonitorTriggerFactoryBean().getObject();
+        triggers[1] = knownLayerStatusTriggerFactoryBean().getObject();
         schedulerFactory.setTriggers(triggers);
         return schedulerFactory;
     }
@@ -534,9 +563,15 @@ public class AppContext {
         return cloudStorageService;
     }
 
+    @Autowired
+    private ViewKnownLayerFactory viewFactory;
+
+    @Autowired
+    private ViewCSWRecordFactory viewCSWRecordFactory;
+    
     @Bean
     public KnownLayerService cswKnownLayerService() {
-        return new KnownLayerService(knownTypes, cswCacheService());
+        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory);
     }
 
     @Bean

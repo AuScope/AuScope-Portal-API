@@ -16,3 +16,4 @@ src/local/
 /make.bat
 velocity.log
 /application-registries.yaml
+.temp-PortalApplication-classpath-arg-*
