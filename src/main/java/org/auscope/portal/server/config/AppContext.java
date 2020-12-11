@@ -17,7 +17,6 @@ import org.auscope.portal.core.cloud.StagingInformation;
 import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
 import org.auscope.portal.core.server.PortalPropertySourcesPlaceholderConfigurer;
-import org.auscope.portal.core.server.controllers.KnownLayerController;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.server.http.download.FileDownloadService;
 import org.auscope.portal.core.services.CSWCacheService;
@@ -86,7 +85,6 @@ import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.MethodInvokingBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -330,17 +328,9 @@ public class AppContext {
         jobDetail.setJobDataAsMap(jobData);        
         return jobDetail;
     }
-
-//    @Autowired
-//    private ApplicationContext appContext;
-//    
-//    private KnownLayerController knownLayerController;
     
     @Bean
     public JobDetailFactoryBean knownLayerStatusMonitorDetail() throws Exception {
-//        if(knownLayerController==null)
-//            knownLayerController = appContext.getBean(KnownLayerController.class);
-
         JobDetailFactoryBean jobDetail = new JobDetailFactoryBean();
         jobDetail.setJobClass(KnownLayerStatusMonitor.class);
         Map<String, Object> jobData = new HashMap<String, Object>();
@@ -369,7 +359,7 @@ public class AppContext {
     public SimpleTriggerFactoryBean knownLayerStatusTriggerFactoryBean() throws Exception {
         SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
         trigger.setJobDetail(knownLayerStatusMonitorDetail().getObject());
-        trigger.setRepeatInterval(5 * 60 * 1000);
+        trigger.setRepeatInterval(15 * 60 * 1000);
         trigger.setStartDelay(1000);
         return trigger;
     }
