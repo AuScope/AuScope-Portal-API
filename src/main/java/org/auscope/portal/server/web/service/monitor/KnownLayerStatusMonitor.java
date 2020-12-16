@@ -11,7 +11,10 @@ import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
- * @author fri096
+ * This class implements a Quartz jobs to regularly update the service status of the known layers.
+ * The update is done through the class KnownLayerService 
+ * 
+ * @author Carsten Friedrich, CSIRO
  *
  */
 public class KnownLayerStatusMonitor extends QuartzJobBean{

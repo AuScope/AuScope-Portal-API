@@ -329,6 +329,13 @@ public class AppContext {
         return jobDetail;
     }
     
+    /***
+     * Returns a factory to create jobs that update the OpenStack service status
+     * for known layer services 
+     * @return a factory to create jobs that update the OpenStack service status
+     * for known layer services
+     * @throws Exception
+     */
     @Bean
     public JobDetailFactoryBean knownLayerStatusMonitorDetail() throws Exception {
         JobDetailFactoryBean jobDetail = new JobDetailFactoryBean();
@@ -355,6 +362,12 @@ public class AppContext {
         return trigger;
     }
 
+    /***
+     * Returns a factory bean that create trigger for the known layer service status update job. The trigger can 
+     * be used in the Quartz scheduler.
+     * @return a factory bean that create trigger for the known layer service status update job
+     * @throws Exception
+     */
     @Bean
     public SimpleTriggerFactoryBean knownLayerStatusTriggerFactoryBean() throws Exception {
         SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
