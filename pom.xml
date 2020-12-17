@@ -58,7 +58,7 @@
         <repository>
             <id>spring-plugins</id>
             <name>Spring Plugins</name>
-            <url>https://repo.spring.io/plugins-release</url>
+            <url>https://repo.spring.io/snapshot</url>
         </repository>
         <!-- This is only for the temporary usage of JClouds snapshots-->
         <repository>
