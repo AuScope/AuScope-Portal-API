@@ -143,7 +143,7 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
      * @throws Exception
      */
     @Test
-    public void testStackdriverErrorHandling() throws Exception {
+    public void testKnownLayerStatusScheduling() throws Exception {
 
         List<ModelMap> data = knownLayerService.getKnownLayersCache();
         Assert.assertEquals(0, data.size()); // LayersCache has never been populated, so should be empty.
