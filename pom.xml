@@ -55,11 +55,11 @@
             <name>AuScope Nexus - New PortalRepo</name>
             <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
         </repository>
-        <repository>
+      <!--  <repository>
             <id>spring-plugins</id>
             <name>Spring Plugins</name>
             <url>https://repo.spring.io/snapshot</url>
-        </repository>
+        </repository> -->
         <!-- This is only for the temporary usage of JClouds snapshots-->
         <repository>
             <id>apache-snapshots</id>
@@ -365,12 +365,6 @@
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.custommonkey.xmlunit</groupId>
-            <artifactId>com.springsource.org.custommonkey.xmlunit</artifactId>
-            <version>1.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
