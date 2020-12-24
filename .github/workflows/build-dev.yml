@@ -55,5 +55,5 @@ jobs:
       - name: Upload war file artifact
         uses: actions/upload-artifact@v2
         with:
-          name: Auscope-Portal-API war file
-          path: target/AuScope-Portal-API-5.2.1-SNAPSHOT.war
+          name: auscope-portal-api war file
+          path: target/auscope-portal-api-5.2.1-SNAPSHOT.war
