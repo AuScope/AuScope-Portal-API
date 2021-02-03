@@ -39,3 +39,10 @@ jobs:
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
       env:
         GITHUB_TOKEN: ${{ github.token }}
+      continue-on-error: true # Temporary until repo upload bug is fixed
+    
+    - name: Upload artifact # In case repo upload fails
+      uses: actions/upload-artifact@v2
+      with:
+        name: auscope-portal-api.war
+        path: target/auscope-portal-api-5.2.2-SNAPSHOT.war
