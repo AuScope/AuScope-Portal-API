@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
+import org.json.JSONArray;
 
 import org.apache.http.HttpStatus;
 import org.apache.commons.io.IOUtils;

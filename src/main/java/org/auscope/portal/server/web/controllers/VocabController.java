@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.JSONArray;
+import org.json.JSONArray;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -249,9 +249,9 @@ public class VocabController extends BasePortalController {
             String label = vocabularyMappings.get(urn);
 
             JSONArray tableRow = new JSONArray();
-            tableRow.add(urn);
-            tableRow.add(label);
-            dataItems.add(tableRow);
+            tableRow.put(urn);
+            tableRow.put(label);
+            dataItems.put(tableRow);
         }
 
         return generateJSONResponseMAV(true, dataItems, "");

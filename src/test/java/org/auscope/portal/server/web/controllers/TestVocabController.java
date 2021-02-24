@@ -20,7 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.apache.jena.rdf.model.SimpleSelector;
 
 import au.gov.geoscience.portal.services.vocabularies.VocabularyLookup;
-import net.sf.json.JSONArray;
+import org.json.JSONArray;
 
 /**
  * Test Vocabulary Controller
@@ -105,7 +105,7 @@ public class TestVocabController extends PortalTestClass {
 
         JSONArray data = (JSONArray) mav.getModel().get("data");
         Assert.assertNotNull(data);
-        Assert.assertEquals(serviceResult.size(), data.size());
+        Assert.assertEquals(serviceResult.size(), data.length());
 
         for (Object obj : data) {
             String urn = ((JSONArray) obj).getString(0);
@@ -159,7 +159,7 @@ public class TestVocabController extends PortalTestClass {
 
         JSONArray data = (JSONArray) mav.getModel().get("data");
         Assert.assertNotNull(data);
-        Assert.assertEquals(serviceResult.size(), data.size());
+        Assert.assertEquals(serviceResult.size(), data.length());
 
         // We want to make sure each of our map items are included in the list
         // We do this by removing items from serviceResult as they appear in the
@@ -232,7 +232,7 @@ public class TestVocabController extends PortalTestClass {
 
         JSONArray data = (JSONArray) mav.getModel().get("data");
         Assert.assertNotNull(data);
-        Assert.assertEquals(serviceResults.size(), data.size());
+        Assert.assertEquals(serviceResults.size(), data.length());
 
         // We want to make sure each of our map items are included in the list
         // We do this by removing items from serviceResult as they appear in the
@@ -295,7 +295,7 @@ public class TestVocabController extends PortalTestClass {
 
         JSONArray data = (JSONArray) mav.getModel().get("data");
         Assert.assertNotNull(data);
-        Assert.assertEquals(serviceResult.size(), data.size());
+        Assert.assertEquals(serviceResult.size(), data.length());
 
         // We want to make sure each of our map items are included in the list
         // We do this by removing items from serviceResult as they appear in the
