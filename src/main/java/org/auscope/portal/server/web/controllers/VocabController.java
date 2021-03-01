@@ -2,9 +2,10 @@ package org.auscope.portal.server.web.controllers;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
-
-import org.json.JSONArray;
+import java.util.Collections;
+import java.util.Comparator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -188,7 +189,6 @@ public class VocabController extends BasePortalController {
         Map<String, String> vocabularyMappings = this.vocabularyFilterService.getVocabularyById(TIMESCALE_VOCABULARY_ID, selectors);
 
         return getVocabularyMappings(vocabularyMappings);
-
     }
 
     /**
@@ -242,18 +242,23 @@ public class VocabController extends BasePortalController {
      * @return
      */
     private ModelAndView getVocabularyMappings(Map<String, String> vocabularyMappings) {
-        JSONArray dataItems = new JSONArray();
-
+        List<String[]> dataItems = new ArrayList<String[]>();
         // Turn our map of urns -> labels into an array of arrays for the view
         for (String urn : vocabularyMappings.keySet()) {
             String label = vocabularyMappings.get(urn);
-
-            JSONArray tableRow = new JSONArray();
-            tableRow.put(urn);
-            tableRow.put(label);
-            dataItems.put(tableRow);
+            String[] tableRow = new String[2];
+            tableRow[0] = urn;
+            tableRow[1] = label;
+            dataItems.add(tableRow);
         }
-
+        // Alphabetically sort the result by label
+        Collections.sort(dataItems, new Comparator<String[]>() {
+            @Override
+            public int compare(
+              String[] o1, String[] o2) {
+                return o1[1].toLowerCase().compareTo(o2[1].toLowerCase());
+            }
+        });
         return generateJSONResponseMAV(true, dataItems, "");
     }
 
