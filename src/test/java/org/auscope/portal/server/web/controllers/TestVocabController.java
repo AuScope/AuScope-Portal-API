@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.VocabularyFilterService;
@@ -103,13 +104,14 @@ public class TestVocabController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
 
-        JSONArray data = (JSONArray) mav.getModel().get("data");
+        @SuppressWarnings("unchecked")
+        ArrayList<String[]> data = ArrayList.class.cast(mav.getModel().get("data"));
         Assert.assertNotNull(data);
-        Assert.assertEquals(serviceResult.size(), data.length());
+        Assert.assertEquals(serviceResult.size(), data.size());
 
-        for (Object obj : data) {
-            String urn = ((JSONArray) obj).getString(0);
-            String label = ((JSONArray) obj).getString(1);
+        for (String[] obj : data) {
+            String urn = obj[0];
+            String label = obj[1];;
 
             Assert.assertEquals(serviceResult.get(urn), label);
             serviceResult.remove(urn);
@@ -157,17 +159,18 @@ public class TestVocabController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
 
-        JSONArray data = (JSONArray) mav.getModel().get("data");
+        @SuppressWarnings("unchecked")
+        ArrayList<String[]> data = ArrayList.class.cast(mav.getModel().get("data"));
         Assert.assertNotNull(data);
-        Assert.assertEquals(serviceResult.size(), data.length());
+        Assert.assertEquals(serviceResult.size(), data.size());
 
         // We want to make sure each of our map items are included in the list
         // We do this by removing items from serviceResult as they appear in the
         // response
         // Success will be measured by an empty serviceResult
-        for (Object obj : data) {
-            String urn = ((JSONArray) obj).getString(0);
-            String label = ((JSONArray) obj).getString(1);
+        for (String[] obj : data) {
+            String urn = obj[0];
+            String label = obj[1];
 
             Assert.assertEquals(serviceResult.get(urn), label);
             serviceResult.remove(urn);
@@ -230,17 +233,18 @@ public class TestVocabController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
 
-        JSONArray data = (JSONArray) mav.getModel().get("data");
+        @SuppressWarnings("unchecked")
+        ArrayList<String[]> data = ArrayList.class.cast(mav.getModel().get("data"));
         Assert.assertNotNull(data);
-        Assert.assertEquals(serviceResults.size(), data.length());
+        Assert.assertEquals(serviceResults.size(), data.size());
 
         // We want to make sure each of our map items are included in the list
         // We do this by removing items from serviceResult as they appear in the
         // response
         // Success will be measured by an empty serviceResult
-        for (Object obj : data) {
-            String urn = ((JSONArray) obj).getString(0);
-            String label = ((JSONArray) obj).getString(1);
+        for (String[] obj : data) {
+            String urn = obj[0];
+            String label = obj[1];
 
             Assert.assertEquals(serviceResults.get(urn), label);
             serviceResults.remove(urn);
@@ -293,17 +297,18 @@ public class TestVocabController extends PortalTestClass {
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
 
-        JSONArray data = (JSONArray) mav.getModel().get("data");
+        @SuppressWarnings("unchecked")
+        ArrayList<String[]> data = ArrayList.class.cast(mav.getModel().get("data"));
         Assert.assertNotNull(data);
-        Assert.assertEquals(serviceResult.size(), data.length());
+        Assert.assertEquals(serviceResult.size(), data.size());
 
         // We want to make sure each of our map items are included in the list
         // We do this by removing items from serviceResult as they appear in the
         // response
         // Success will be measured by an empty serviceResult
-        for (Object obj : data) {
-            String urn = ((JSONArray) obj).getString(0);
-            String label = ((JSONArray) obj).getString(1);
+        for (String[] obj : data) {
+            String urn = obj[0];
+            String label = obj[1];
 
             Assert.assertEquals(serviceResult.get(urn), label);
             serviceResult.remove(urn);
