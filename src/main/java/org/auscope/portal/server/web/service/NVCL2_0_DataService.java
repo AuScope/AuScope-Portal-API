@@ -143,7 +143,6 @@ public class NVCL2_0_DataService {
         
         //Prepare parsing
         InputStream responseStream = httpServiceCaller.getMethodResponseAsStream(method);
-        // CSVReader reader = new CSVReader(new InputStreamReader(responseStream), ',', quoteChar, 0));
         CSVParser parser = new CSVParserBuilder().withSeparator(',').withQuoteChar(quoteChar).build();
         CSVReader reader = new CSVReaderBuilder(new InputStreamReader(responseStream)).withCSVParser(parser).build();
         String[] headerLine = reader.readNext();

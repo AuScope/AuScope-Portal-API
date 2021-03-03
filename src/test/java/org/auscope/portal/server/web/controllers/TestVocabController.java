@@ -21,7 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.apache.jena.rdf.model.SimpleSelector;
 
 import au.gov.geoscience.portal.services.vocabularies.VocabularyLookup;
-import org.json.JSONArray;
 
 /**
  * Test Vocabulary Controller
