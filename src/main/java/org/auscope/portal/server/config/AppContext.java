@@ -59,7 +59,6 @@ import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.xslt.GmlToHtml;
 import org.auscope.portal.core.xslt.WfsToKmlTransformer;
-import org.auscope.portal.mineraloccurrence.CommodityVocabMethodMaker;
 import org.auscope.portal.mscl.MSCLWFSService;
 import org.auscope.portal.nvcl.NvclVocabMethodMaker;
 import org.auscope.portal.server.vegl.VEGLJobManager;
@@ -70,7 +69,6 @@ import org.auscope.portal.server.web.SearchHttpServiceCaller;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.ANVGLUserService;
-import org.auscope.portal.server.web.service.ErmlVocabService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.NotificationService;
 import org.auscope.portal.server.web.service.NvclVocabService;
@@ -690,20 +688,6 @@ public class AppContext {
         return new CommonsMultipartResolver();
     }
 
-    @Value("${env.vocabService.url}")
-    private String ermlVocabServiceURL;
-    
-    @Bean
-    public ServiceConfigurationItem nswerml2WFSTest() {
-        return new ServiceConfigurationItem("NSWERML2Test",
-                "http://aus-test-worker2.arrc.csiro.au:8080/gsnsw-earthresource/wfs", false, true);
-    }
-
-    @Bean
-    public ErmlVocabService ermlVocabService() {
-        return new ErmlVocabService(httpServiceCallerApp(), new CommodityVocabMethodMaker(), ermlVocabServiceURL);
-    }
-
     @Value("${env.nvclVocabService.url}")
     private String nvclVocabServiceURL;
 
@@ -733,7 +717,6 @@ public class AppContext {
     @Bean
     public ServiceConfiguration serviceConfiguration() {
         List<ServiceConfigurationItem> serviceItems = new ArrayList<ServiceConfigurationItem>();
-        serviceItems.add(nswerml2WFSTest());
         ServiceConfiguration serviceConfiguration = new ServiceConfiguration(serviceItems);
         return serviceConfiguration;
     }

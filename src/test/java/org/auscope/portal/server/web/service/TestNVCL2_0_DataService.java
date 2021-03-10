@@ -18,8 +18,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 /**
  * Unit tests for NVCLDataService
@@ -67,9 +67,9 @@ public class TestNVCL2_0_DataService extends PortalTestClass {
 
         String response = dataService.getNVCL2_0_JSONDownsampledData(serviceUrl, logIds);
         Assert.assertNotNull(response);
-        JSONArray dataArr = JSONArray.fromObject(response);
+        JSONArray dataArr = new JSONArray(response);
         JSONObject firstObj = dataArr.getJSONObject(0);
-        Assert.assertEquals(true, firstObj.containsKey("numericValues"));
+        Assert.assertEquals(true, firstObj.has("numericValues"));
         Assert.assertEquals("id1", firstObj.get("logId"));
         JSONArray firstArr = firstObj.getJSONArray("numericValues");
         JSONObject firstValObj = firstArr.getJSONObject(0);
@@ -101,9 +101,9 @@ public class TestNVCL2_0_DataService extends PortalTestClass {
 
         String response = dataService.getNVCL2_0_JSONDownsampledData(serviceUrl, logIds);
         Assert.assertNotNull(response);
-        JSONArray dataArr = JSONArray.fromObject(response);
+        JSONArray dataArr = new JSONArray(response);
         JSONObject firstObj = dataArr.getJSONObject(0);
-        Assert.assertEquals(true, firstObj.containsKey("stringValues"));
+        Assert.assertEquals(true, firstObj.has("stringValues"));
         Assert.assertEquals("id1", firstObj.get("logId"));
         JSONArray firstArr = firstObj.getJSONArray("stringValues");
         JSONObject firstValObj = firstArr.getJSONObject(0);
@@ -140,8 +140,8 @@ public class TestNVCL2_0_DataService extends PortalTestClass {
 
         String response = dataService.getNVCL2_0_JSONDownsampledData(serviceUrl, logIds);
         Assert.assertNotNull(response);
-        JSONArray dataArr = JSONArray.fromObject(response);
-        Assert.assertEquals(0,dataArr.size());
+        JSONArray dataArr = new JSONArray(response);
+        Assert.assertEquals(0,dataArr.length());
     }
     
     

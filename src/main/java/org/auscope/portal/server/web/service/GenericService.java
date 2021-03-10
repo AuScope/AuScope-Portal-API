@@ -5,7 +5,6 @@ import org.auscope.portal.core.services.BaseWFSService;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.methodmakers.filter.IFilter;
-import org.auscope.portal.server.web.service.GenericFilter2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

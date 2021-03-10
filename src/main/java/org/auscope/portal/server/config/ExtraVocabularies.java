@@ -23,7 +23,7 @@ class ExtraVocabularies {
     
     @Bean
     public GeologicTimescaleVocabService geologicTimescaleService() {
-        return new GeologicTimescaleVocabService(httpServiceCaller, new VocabularyMethodMaker(), "http://vocabs.ands.org.au/repository/api/lda/csiro/international-chronostratigraphic-chart/2017");
+        return new GeologicTimescaleVocabService(httpServiceCaller, new VocabularyMethodMaker(), "http://vocabs.ardc.edu.au/repository/api/lda/csiro/international-chronostratigraphic-chart/2017");
     }
     @Bean
     public VocabularyServiceItem vocabularyGeologicTimescales() {

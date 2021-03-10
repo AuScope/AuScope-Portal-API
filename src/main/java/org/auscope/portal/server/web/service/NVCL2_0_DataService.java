@@ -13,8 +13,8 @@ import java.util.Map.Entry;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -40,7 +40,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -139,116 +142,52 @@ public class NVCL2_0_DataService {
         Bin[] bins = null;
         
         //Prepare parsing
-        try (
-            InputStream responseStream = httpServiceCaller.getMethodResponseAsStream(method);
-            CSVReader reader = new CSVReader(new InputStreamReader(responseStream), ',', quoteChar, 0)) {
-            String[] headerLine = reader.readNext();
-            if (headerLine == null || headerLine.length <= startAtCol) {
-                throw new IOException("No or malformed CSV header sent");
+        InputStream responseStream = httpServiceCaller.getMethodResponseAsStream(method);
+        CSVParser parser = new CSVParserBuilder().withSeparator(',').withQuoteChar(quoteChar).build();
+        CSVReader reader = new CSVReaderBuilder(new InputStreamReader(responseStream)).withCSVParser(parser).build();
+        String[] headerLine = reader.readNext();
+        if (headerLine == null || headerLine.length <= startAtCol) {
+            throw new IOException("No or malformed CSV header sent");
+        }
+        // Set start & stop columns to default
+        if (stopAtCol<0) {
+            stopAtCol=headerLine.length;
+        }
+        if (startAtCol<0) {
+            startAtCol=2;
+        }
+        //Prepare our bins
+        bins = new Bin[stopAtCol - startAtCol];
+        List<HashMap<String, Integer>> valueCounts = new ArrayList<HashMap<String, Integer>>(bins.length);
+        double[] numericTotal = new double[bins.length];
+        int[] numericCount = new int[bins.length];
+        double currentBinStartDepth = -Double.MAX_VALUE;
+        int currentBinSize = 0;
+        for (int i = 0; i < bins.length; i++) {
+            String name = headerLine[startAtCol + i];
+            if (altName!=null) {
+                name=altName;
             }
-            // Set start & stop columns to default
-            if (stopAtCol<0) {
-                stopAtCol=headerLine.length;
-            }
-            if (startAtCol<0) {
-                startAtCol=2;
-            }
-            //Prepare our bins
-            bins = new Bin[stopAtCol - startAtCol];
-            List<HashMap<String, Integer>> valueCounts = new ArrayList<HashMap<String, Integer>>(bins.length);
-            double[] numericTotal = new double[bins.length];
-            int[] numericCount = new int[bins.length];
-            double currentBinStartDepth = -Double.MAX_VALUE;
-            int currentBinSize = 0;
-            for (int i = 0; i < bins.length; i++) {
-                String name = headerLine[startAtCol + i];
-                if (altName!=null) {
-                    name=altName;
-                }
-                bins[i] = binnedResponse.new Bin(name, new ArrayList<Double>(INITIAL_LIST_SIZE), true, new ArrayList<Map<String, Integer>>(INITIAL_LIST_SIZE), new ArrayList<String>(INITIAL_LIST_SIZE), new ArrayList<Double>(INITIAL_LIST_SIZE));
-                bins[i].setNumeric(true);
-                valueCounts.add(new HashMap<String, Integer>());
+            bins[i] = binnedResponse.new Bin(name, new ArrayList<Double>(INITIAL_LIST_SIZE), true, new ArrayList<Map<String, Integer>>(INITIAL_LIST_SIZE), new ArrayList<String>(INITIAL_LIST_SIZE), new ArrayList<Double>(INITIAL_LIST_SIZE));
+            bins[i].setNumeric(true);
+            valueCounts.add(new HashMap<String, Integer>());
+        }
+
+        //Start parsing our data - loading it into bins
+        String[] dataLine = null;
+        while ((dataLine = reader.readNext()) != null) {
+            if (dataLine.length != headerLine.length) {
+                continue; //skip malformed lines
             }
 
-            //Start parsing our data - loading it into bins
-            String[] dataLine = null;
-            while ((dataLine = reader.readNext()) != null) {
-                if (dataLine.length != headerLine.length) {
-                    continue; //skip malformed lines
-                }
+            //If we've exceeded our current bin size - save the data and start a new bin
+            double depth = Double.parseDouble(dataLine[0]);
+            if (depth - currentBinStartDepth >= binSizeMetres) {
 
-                //If we've exceeded our current bin size - save the data and start a new bin
-                double depth = Double.parseDouble(dataLine[0]);
-                if (depth - currentBinStartDepth >= binSizeMetres) {
-
-                    if (currentBinStartDepth == -Double.MAX_VALUE) {
-                        currentBinStartDepth = depth;
-                    }
-
-                    for (int i = 0; i < bins.length; i++) {
-                        if (bins[i].isNumeric()) {
-                            if (numericCount[i] > 0) {
-                                bins[i].getNumericValues().add(numericTotal[i] / (double) numericCount[i]);
-                                bins[i].getStartDepths().add(currentBinStartDepth);
-                            }
-                        } else {
-                            String value = getMostCountedValue(valueCounts.get(i));
-                            if (value != null) {
-                                bins[i].getStartDepths().add(currentBinStartDepth);
-                                bins[i].getHighStringValues().add(value);
-                                bins[i].getStringValues().add(valueCounts.get(i));
-                            }
-                        }
-                    }
-
-                    //Reset our working bin data
-                    for (int i = 0; i < bins.length; i++) {
-                        valueCounts.set(i, new HashMap<String, Integer>());
-                        numericTotal[i] = 0.0;
-                        numericCount[i] = 0;
-                    }
-
+                if (currentBinStartDepth == -Double.MAX_VALUE) {
                     currentBinStartDepth = depth;
-                    currentBinSize = 0;
                 }
 
-                //Build up our current bin
-                boolean dataAdded = false;
-                for (int i = 0; i < bins.length; i++) {
-                    String rawBinData = dataLine[startAtCol + i];
-                    if (rawBinData == null || rawBinData.isEmpty() || rawBinData.equals(MISSING_DATA_STRING)) {
-                        continue; //skip missing data
-                    } else {
-                        dataAdded = true;
-                    }
-
-                    if (bins[i].isNumeric()) {
-                        try {
-                            double newData = Double.parseDouble(rawBinData);
-                            numericCount[i]++;
-                            numericTotal[i] += newData;
-                        } catch (NumberFormatException nfe) {
-                            //OK - this column isn't actually numeric
-                            bins[i].setNumeric(false);
-                        }
-                    }
-
-                    if (!bins[i].isNumeric()) {
-                        Integer currentCount = valueCounts.get(i).get(rawBinData);
-                        if (currentCount == null) {
-                            valueCounts.get(i).put(rawBinData, 1);
-                        } else {
-                            valueCounts.get(i).put(rawBinData, currentCount + 1);
-                        }
-                    }
-                }
-                if (dataAdded) {
-                    currentBinSize++;
-                }
-            }
-
-            //If we've got a partial bin at the end - let's include the data
-            if (currentBinSize > 0) {
                 for (int i = 0; i < bins.length; i++) {
                     if (bins[i].isNumeric()) {
                         if (numericCount[i] > 0) {
@@ -262,6 +201,69 @@ public class NVCL2_0_DataService {
                             bins[i].getHighStringValues().add(value);
                             bins[i].getStringValues().add(valueCounts.get(i));
                         }
+                    }
+                }
+
+                //Reset our working bin data
+                for (int i = 0; i < bins.length; i++) {
+                    valueCounts.set(i, new HashMap<String, Integer>());
+                    numericTotal[i] = 0.0;
+                    numericCount[i] = 0;
+                }
+
+                currentBinStartDepth = depth;
+                currentBinSize = 0;
+            }
+
+            //Build up our current bin
+            boolean dataAdded = false;
+            for (int i = 0; i < bins.length; i++) {
+                String rawBinData = dataLine[startAtCol + i];
+                if (rawBinData == null || rawBinData.isEmpty() || rawBinData.equals(MISSING_DATA_STRING)) {
+                    continue; //skip missing data
+                } else {
+                    dataAdded = true;
+                }
+
+                if (bins[i].isNumeric()) {
+                    try {
+                        double newData = Double.parseDouble(rawBinData);
+                        numericCount[i]++;
+                        numericTotal[i] += newData;
+                    } catch (NumberFormatException nfe) {
+                        //OK - this column isn't actually numeric
+                        bins[i].setNumeric(false);
+                    }
+                }
+
+                if (!bins[i].isNumeric()) {
+                    Integer currentCount = valueCounts.get(i).get(rawBinData);
+                    if (currentCount == null) {
+                        valueCounts.get(i).put(rawBinData, 1);
+                    } else {
+                        valueCounts.get(i).put(rawBinData, currentCount + 1);
+                    }
+                }
+            }
+            if (dataAdded) {
+                currentBinSize++;
+            }
+        }
+
+        //If we've got a partial bin at the end - let's include the data
+        if (currentBinSize > 0) {
+            for (int i = 0; i < bins.length; i++) {
+                if (bins[i].isNumeric()) {
+                    if (numericCount[i] > 0) {
+                        bins[i].getNumericValues().add(numericTotal[i] / (double) numericCount[i]);
+                        bins[i].getStartDepths().add(currentBinStartDepth);
+                    }
+                } else {
+                    String value = getMostCountedValue(valueCounts.get(i));
+                    if (value != null) {
+                        bins[i].getStartDepths().add(currentBinStartDepth);
+                        bins[i].getHighStringValues().add(value);
+                        bins[i].getStringValues().add(valueCounts.get(i));
                     }
                 }
             }
@@ -284,18 +286,20 @@ public class NVCL2_0_DataService {
         for (String logId : logIds) {
             HttpRequestBase method = nvclMethodMaker.getGetClassificationsMethod(serviceUrl, logId);
             String httpResponseStr = httpServiceCaller.getMethodResponseAsString(method);
-            JSONObject inObj = JSONObject.fromObject(httpResponseStr);
+            JSONObject inObj = new JSONObject(httpResponseStr);
             if (inObj.has("classifications")) {
                 JSONArray jsonClassList = inObj.getJSONArray("classifications");
                 JSONObject colourTable = new JSONObject();
-                for (int i = 0; i < jsonClassList.size(); i++)
+                for (int i = 0; i < jsonClassList.length(); i++)
                 {
-                    String mineralName = jsonClassList.getJSONObject(i).getString("classText");
-                    String bgrColour = jsonClassList.getJSONObject(i).getString("colour");
-                    String hexColourStr = BGRColorToHexColorStr(Integer.parseInt(bgrColour));
-                    colourTable.element(mineralName, hexColourStr);
+                    String mineralName = jsonClassList.getJSONObject(i).optString("classText");
+                    String bgrColour = jsonClassList.getJSONObject(i).optString("colour");
+                    if (mineralName.length() > 0 && bgrColour.length() > 0) {
+                        String hexColourStr = BGRColorToHexColorStr(Integer.parseInt(bgrColour));
+                        colourTable.put(mineralName, hexColourStr);
+                    }
                 }
-                outObj.element(logId, colourTable);
+                outObj.put(logId, colourTable);
             }
         }
         return outObj.toString();
@@ -315,19 +319,19 @@ public class NVCL2_0_DataService {
         for (String logId: logIds) {
             HttpRequestBase method = nvclMethodMaker.getDownloadJSONMethod(serviceUrl, logId);
             String httpResponseStr = httpServiceCaller.getMethodResponseAsString(method);
-            JSONArray inArr = JSONArray.fromObject(httpResponseStr);
-            if (inArr.size()>0) {
+            JSONArray inArr = new JSONArray(httpResponseStr);
+            if (inArr.length() > 0) {
                 JSONObject firstObj = inArr.getJSONObject(0);
                 if (firstObj.has("classCount")) {
                     JSONObject baseObj = new JSONObject();
-                    baseObj.element("logId", logId);
-                    baseObj.element("stringValues", inArr);
-                    outArr.element(baseObj);
+                    baseObj.put("logId", logId);
+                    baseObj.put("stringValues", inArr);
+                    outArr.put(baseObj);
                 } else if (firstObj.has("averageValue")) {
                     JSONObject baseObj = new JSONObject();
-                    baseObj.element("logId", logId);
-                    baseObj.element("numericValues", inArr);
-                    outArr.element(baseObj);
+                    baseObj.put("logId", logId);
+                    baseObj.put("numericValues", inArr);
+                    outArr.put(baseObj);
                 }                    
             }
         }
@@ -569,7 +573,7 @@ public class NVCL2_0_DataService {
             String[] algorithmOutputIds, String logName, String classification, int startDepth, int endDepth, String operator, String value, String units, int span) throws Exception {
         HttpRequestBase method = nvclMethodMaker.submitProcessingJob(analyticalServicesUrl, email, jobName, wfsUrls, wfsFilter, algorithmOutputIds, logName, classification, startDepth, endDepth, operator, value, units, span);
         String responseText = httpServiceCaller.getMethodResponseAsString(method);
-        JSONObject response = JSONObject.fromObject(responseText);
+        JSONObject response = new JSONObject(responseText);
         return response.getString("response").toString().toLowerCase().equals("success");
     }
 
@@ -594,7 +598,7 @@ public class NVCL2_0_DataService {
         
         HttpRequestBase method = nvclMethodMaker.submitProcessingTsgJob(analyticalServicesUrl, email, jobName, wfsUrls, wfsFilter, tsgAlgName, tsgAlgorithm, startDepth, endDepth, operator, value, units, span);
         String responseText = httpServiceCaller.getMethodResponseAsString(method);
-        JSONObject response = JSONObject.fromObject(responseText);
+        JSONObject response = new JSONObject(responseText);
         return response.getString("response").toString().toLowerCase().equals("success");
         
     }
@@ -611,20 +615,19 @@ public class NVCL2_0_DataService {
 
         HttpRequestBase method = nvclMethodMaker.checkProcessingJob(analyticalServicesUrl, email);
         String responseText = httpServiceCaller.getMethodResponseAsString(method);
-        JSONArray response = JSONArray.fromObject(responseText);
-        for (Object i : response) {
-            JSONObject obj = (JSONObject) i;
-
+        JSONArray response = new JSONArray(responseText);
+        for (int i = 0; i < response.length(); i++) {
+            JSONObject obj = response.getJSONObject(i);
             AnalyticalJobStatus status = new AnalyticalJobStatus();
-            status.setJobId(obj.getString("jobid"));
-            status.setJobDescription(obj.getString("jobDescription"));
-            status.setEmail(obj.getString("email"));
-            status.setStatus(obj.getString("status"));
-            status.setJobUrl(obj.getString("joburl"));
-            status.setMessage(obj.getString("message"));
-            status.setTimeStamp(obj.getString("jmstimestamp"));
-            status.setMsgId(obj.getString("jmsmsgID"));
-            status.setCorrelationId(obj.getString("jmscorrelationID"));
+            status.setJobId(obj.optString("jobid"));
+            status.setJobDescription(obj.optString("jobDescription"));
+            status.setEmail(obj.optString("email"));
+            status.setStatus(obj.optString("status"));
+            status.setJobUrl(obj.optString("joburl"));
+            status.setMessage(obj.optString("message"));
+            status.setTimeStamp(obj.optString("jmstimestamp"));
+            status.setMsgId(obj.optString("jmsmsgID"));
+            status.setCorrelationId(obj.optString("jmscorrelationID"));
 
             //Parse the timestamp to milliseconds since Unix Epoch
             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
@@ -646,31 +649,31 @@ public class NVCL2_0_DataService {
     public AnalyticalJobResults getProcessingResults(String jobId) throws Exception {
         HttpRequestBase method = nvclMethodMaker.getProcessingJobResults(analyticalServicesUrl, jobId);
         String responseText = httpServiceCaller.getMethodResponseAsString(method);
-        JSONObject response = JSONObject.fromObject(responseText);
+        JSONObject response = new JSONObject(responseText);
 
         AnalyticalJobResults results = new AnalyticalJobResults(response.getString("jobid"));
-        results.setJobDescription(response.getString("jobDescription"));
-        results.setEmail(response.getString("email"));
+        results.setJobDescription(response.optString("jobDescription"));
+        results.setEmail(response.optString("email"));
 
 
         JSONArray successes = response.getJSONArray("boreholes");
-        List<String> successIds = new ArrayList<String>(successes.size());
-        for (Object obj : successes) {
-            successIds.add(((JSONObject) obj).getString("id"));
+        List<String> successIds = new ArrayList<String>(successes.length());
+        for (int i = 0; i < successes.length(); i++) {
+            successIds.add(successes.getJSONObject(i).getString("id"));
         }
         results.setPassBoreholes(successIds);
 
         JSONArray fails = response.getJSONArray("failedBoreholes");
-        List<String> failIds = new ArrayList<String>(fails.size());
-        for (Object obj : fails) {
-            failIds.add(((JSONObject) obj).getString("id"));
+        List<String> failIds = new ArrayList<String>(fails.length());
+        for (int i = 0; i < fails.length(); i++) {
+            failIds.add(fails.getJSONObject(i).getString("id"));
         }
         results.setFailBoreholes(failIds);
 
         JSONArray errors = response.getJSONArray("errorBoreholes");
-        List<String> errorIds = new ArrayList<String>(errors.size());
-        for (Object obj : errors) {
-            errorIds.add(((JSONObject) obj).getString("id"));
+        List<String> errorIds = new ArrayList<String>(errors.length());
+        for (int i = 0; i < errors.length(); i++) {
+            errorIds.add(errors.getJSONObject(i).getString("id"));
         }
         results.setErrorBoreholes(errorIds);
 
@@ -697,17 +700,17 @@ public class NVCL2_0_DataService {
         JSONArray outArr = new JSONArray();
         HttpRequestBase method = nvclMethodMaker.getTSGJobsByBoreholeIdMethod(analyticalServicesUrl, boreholeId, email);
         String httpResponseStr = httpServiceCaller.getMethodResponseAsString(method);
-        JSONArray inArray = JSONArray.fromObject(httpResponseStr);
-        for (Object i : inArray) {
-            JSONObject inObj = (JSONObject) i;
+        JSONArray inArray = new JSONArray(httpResponseStr);
+        for (int i = 0; i < inArray.length(); i++) {
+            JSONObject inObj = inArray.getJSONObject(i);
             if (inObj.has("jobid") && inObj.has("jobName")) {
                 String jobId = inObj.getString("jobid");
                 String jobName = inObj.getString("jobName");
                 JSONObject outObj = new JSONObject();
-                outObj.element("boreholeId", boreholeId);
-                outObj.element("jobId", jobId);
-                outObj.element("jobName", jobName);
-                outArr.add(outObj);
+                outObj.put("boreholeId", boreholeId);
+                outObj.put("jobId", jobId);
+                outObj.put("jobName", jobName);
+                outArr.put(outObj);
             }
         }
         return outArr;

@@ -17,17 +17,6 @@ import org.springframework.context.annotation.Profile;
 @Profile("prod")
 public class ProfilePortalProduction {
 
-/* When running a local development server, uncomment this to disable CORS checking */
-//@Bean
-//public WebMvcConfigurer configurer() {
-//    return new WebMvcConfigurer(){
-//        @Override
-//        public void addCorsMappings(CorsRegistry registry) {
-//            registry.addMapping("/*").allowedOrigins("*");
-//        }
-//    };
-//}
-
     @Autowired
     KnownLayer knownTypeMine;
     @Autowired
