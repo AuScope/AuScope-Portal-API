@@ -105,7 +105,23 @@ fi
 #/////////////////////////////
 
 # Directory where vl modules will be installed
-moduleDir="/etc/puppet/code/modules"
+# Should we install into the "code" subdir?
+moduleDirPrefix="/etc/puppet/code"
+if [ ! -d "$moduleDirPrefix" ]; then
+    # Ensure /etc/puppet exists, and try installing modules into that
+    moduleDirPrefix="/etc/puppet"
+    if [ ! -d "$moduleDirPrefix" ]; then
+        echo "/etc/puppet directory does not exist, puppet install not found."
+        exit 1
+    fi
+fi
+
+# Ensure the modules subdirectory exists
+moduleDir="$moduleDirPrefix/modules"
+if [ ! -d "$moduleDir" ]; then
+    echo "Creating the 'modules' subdirectory for puppet."
+    sudo mkdir -p "$moduleDir"
+fi
 
 if [ ! -d "$moduleDir/vl_common" ]; then
     echo "Installing vl common modules into $moduleDir/vl_common"
