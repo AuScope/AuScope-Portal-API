@@ -631,11 +631,11 @@ public class KnownLayers {
         layer.setOrder("200");
         return layer;
     }
-
+    
     @Bean
     public IRISSelector knownTypeSeismologyInSchoolSelector() {
         try {
-            return new IRISSelector("http://auspass.edu.au:80");
+            return new IRISSelector("S1","http://auspass.edu.au:80");
         } catch (MalformedURLException e) {
             // TODO: Log exception??
         }
@@ -651,10 +651,538 @@ public class KnownLayers {
         layer.setGroup("Passive Seismic");
         layer.setProxyUrl("getIRISStations.do");
         setupIcon(layer);
-        layer.setOrder("300");
+        layer.setOrder("250");
         return layer;
     }
 
+    @Bean
+    public IRISSelector knownTypeSKIPPYSelector() {
+        try {
+            return new IRISSelector("7B","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+     
+    @Bean
+    public KnownLayer knownTypeSKIPPY(){
+        KnownLayer layer = new KnownLayer("seismology-skippy", knownTypeSKIPPYSelector());
+        layer.setName("SKIPPY");
+        layer.setDescription(
+                "The SKIPPY seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("251");
+        return layer;
+     }
+    
+    @Bean
+    public IRISSelector knownTypeKIMBA97Selector() {
+        try {
+            return new IRISSelector("7D","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+     
+    @Bean
+    public KnownLayer knownTypeKIMBA97(){
+        KnownLayer layer = new KnownLayer("seismology-kimba97", knownTypeKIMBA97Selector());
+        layer.setName("KIMBA97: Kimberley Region in 1997");
+        layer.setDescription(
+                "The KIMBA97 seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("252");
+        return layer;
+     }
+    
+    @Bean
+    public IRISSelector knownTypeKIMBA98Selector() {
+        try {
+            return new IRISSelector("7E","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+     
+    @Bean
+    public KnownLayer knownTypeKIMBA98(){
+        KnownLayer layer = new KnownLayer("seismology-kimba98", knownTypeKIMBA98Selector());
+        layer.setName("KIMBA98: Kimberley Region in 1998");
+        layer.setDescription(
+                "The KIMBA98 seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("253");
+        return layer;
+     }
+    
+    @Bean
+    public IRISSelector knownTypeWACRATONSelector() {
+        try {
+            return new IRISSelector("7G","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+     
+    @Bean
+    public KnownLayer knownTypeWACRATON(){
+        KnownLayer layer = new KnownLayer("seismology-wacraton", knownTypeWACRATONSelector());
+        layer.setName("WACRATON: Western Australia");
+        layer.setDescription(
+                "The West Australian Cratons seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("254");
+        return layer;
+     }
+    
+    @Bean
+    public IRISSelector knownTypeSEALSelector() {
+        try {
+            return new IRISSelector("7Q","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+     
+    @Bean
+    public KnownLayer knownTypeSEAL(){
+        KnownLayer layer = new KnownLayer("seismology-seal", knownTypeSEALSelector());
+        layer.setName("SEAL: South East Australia Linkage");
+        layer.setDescription(
+                "The SEAL seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("255");
+        return layer;
+     }    
+    @Bean
+    public IRISSelector knownTypeSEAL2Selector() {
+        try {
+            return new IRISSelector("7T","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+     
+    @Bean
+    public KnownLayer knownTypeSEAL2(){
+        KnownLayer layer = new KnownLayer("seismology-seal2", knownTypeSEAL2Selector());
+        layer.setName("SEAL2: South East Australia Linkage");
+        layer.setDescription(
+                "The SEAL2 seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("256");
+        return layer;
+     }  
+    
+    @Bean
+    public IRISSelector knownTypeSEAL3Selector() {
+        try {
+            return new IRISSelector("7U","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+     
+    @Bean
+    public KnownLayer knownTypeSEAL3(){
+        KnownLayer layer = new KnownLayer("seismology-seal3", knownTypeSEAL3Selector());
+        layer.setName("SEAL3: South East Australia Linkage");
+        layer.setDescription(
+                "The SEAL3 seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("257");
+        return layer;
+     }  
+    
+    @Bean
+    public IRISSelector knownTypeCAPRALSelector() {
+        try {
+            return new IRISSelector("7J","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+     
+    @Bean
+    public KnownLayer knownTypeCAPRAL(){
+        KnownLayer layer = new KnownLayer("seismology-capral", knownTypeCAPRALSelector());
+        layer.setName("CAPRAL: Northwest Australia");
+        layer.setDescription(
+                "The CAPRAL seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("258");
+        return layer;
+     }  
+    
+    @Bean
+    public IRISSelector knownTypeSOCSelector() {
+        try {
+            return new IRISSelector("7K","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+    
+     
+    @Bean
+    public KnownLayer knownTypeSOC(){
+        KnownLayer layer = new KnownLayer("seismology-soc", knownTypeSOCSelector());
+        layer.setName("SOC: Southern Craton");
+        layer.setDescription(
+                "The SOC seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("259");
+        return layer;
+     }  
+    
+    @Bean
+    public IRISSelector knownTypeGAWLERSelector() {
+        try {
+            return new IRISSelector("1G","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+    
+     
+    @Bean
+    public KnownLayer knownTypeGAWLER(){
+        KnownLayer layer = new KnownLayer("seismology-gawler", knownTypeGAWLERSelector());
+        layer.setName("GAWLER");
+        layer.setDescription(
+                "The GAWLER seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("260");
+        return layer;
+     } 
+    
+    @Bean
+    public IRISSelector knownTypeBILBYSelector() {
+        try {
+            return new IRISSelector("6F","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }
+    
+    @Bean
+    public KnownLayer knownTypeBILBY(){
+        KnownLayer layer = new KnownLayer("seismology-bilby", knownTypeBILBYSelector());
+        layer.setName("BILBY: Australian Cratonic Lithosphere");
+        layer.setDescription(
+                "The BILBY seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("261");
+        return layer;
+     } 
+    
+    @Bean
+    public IRISSelector knownTypeCURNAMONASelector() {
+        try {
+            return new IRISSelector("1F","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeCURNAMONA(){
+        KnownLayer layer = new KnownLayer("seismology-curnamona", knownTypeCURNAMONASelector());
+        layer.setName("CURNAMONA: Seismic structure of South Australia");
+        layer.setDescription(
+                "The CURNAMONA seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("262");
+        return layer;
+     }  
+    
+    @Bean
+    public IRISSelector knownTypeMINQSelector() {
+        try {
+            return new IRISSelector("ZR","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeMINQ(){
+        KnownLayer layer = new KnownLayer("seismology-minq", knownTypeMINQSelector());
+        layer.setName("MINQ: Mount Isa Northern Queensland");
+        layer.setDescription(
+                "The MINQ seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("263");
+        return layer;
+     }  
+    
+    @Bean
+    public IRISSelector knownTypeEAL1Selector() {
+        try {
+            return new IRISSelector("YJ","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeEAL1(){
+        KnownLayer layer = new KnownLayer("seismology-eal1", knownTypeEAL1Selector());
+        layer.setName("EAL1: Eastern Australia Linkage");
+        layer.setDescription(
+                "The EAL1 seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("264");
+        return layer;
+     } 
+    
+    @Bean
+    public IRISSelector knownTypeEAL2Selector() {
+        try {
+            return new IRISSelector("1H","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeEAL2(){
+        KnownLayer layer = new KnownLayer("seismology-eal2", knownTypeEAL2Selector());
+        layer.setName("EAL2: Eastern Australia Linkage");
+        layer.setDescription(
+                "The EAL2 seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("265");
+        return layer;
+     } 
+    
+    @Bean
+    public IRISSelector knownTypeEAL3Selector() {
+        try {
+            return new IRISSelector("7L","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeEAL3(){
+        KnownLayer layer = new KnownLayer("seismology-eal3", knownTypeEAL3Selector());
+        layer.setName("EAL3: Eastern Australia Linkage");
+        layer.setDescription(
+                "The EAL3 seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("266");
+        return layer;
+     } 
+    
+    @Bean
+    public IRISSelector knownTypeBASSSelector() {
+        try {
+            return new IRISSelector("1P","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeBASS(){
+        KnownLayer layer = new KnownLayer("seismology-bass", knownTypeBASSSelector());
+        layer.setName("BASS: Bass strait from 2011 to 2013");
+        layer.setDescription(
+                "The BASS seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("267");
+        return layer;
+     } 
+    
+    @Bean
+    public IRISSelector knownTypeSQEALSelector() {
+        try {
+            return new IRISSelector("8J","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeSQEAL(){
+        KnownLayer layer = new KnownLayer("seismology-sqeal", knownTypeSQEALSelector());
+        layer.setName("SQEAL: South Queensland Eastern Australia Linkage");
+        layer.setDescription(
+                "The SQEAL seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("268");
+        return layer;
+     }    
+    
+    @Bean
+    public IRISSelector knownTypeAQ3Selector() {
+        try {
+            return new IRISSelector("4J","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeAQ3(){
+        KnownLayer layer = new KnownLayer("seismology-aq3", knownTypeAQ3Selector());
+        layer.setName("AQ3 SW Queensland and NW New South Wales");
+        layer.setDescription(
+                "The AQ3 seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("269");
+        return layer;
+     }  
+    
+    @Bean
+    public IRISSelector knownTypeAQTSelector() {
+        try {
+            return new IRISSelector("1Q","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeAQT(){
+        KnownLayer layer = new KnownLayer("seismology-aqt", knownTypeAQTSelector());
+        layer.setName("AQT: Western Queensland");
+        layer.setDescription(
+                "The AQT seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("270");
+        return layer;
+     }    
+    
+    @Bean
+    public IRISSelector knownTypeBANDASelector() {
+        try {
+            return new IRISSelector("YS","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeBANDA(){
+        KnownLayer layer = new KnownLayer("seismology-banda", knownTypeBANDASelector());
+        layer.setName("Banda Arc: Transitions in the Banda Arc-Australia continental collision");
+        layer.setDescription(
+                "The BANDA seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("271");
+        return layer;
+     }    
+    
+    @Bean
+    public IRISSelector knownTypeASRSelector() {
+        try {
+            return new IRISSelector("5J","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeASR(){
+        KnownLayer layer = new KnownLayer("seismology-asr", knownTypeASRSelector());
+        layer.setName("ASR");
+        layer.setDescription(
+                "The ASR seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("272");
+        return layer;
+     }    
+    @Bean
+    public IRISSelector knownTypeMARLALINESelector() {
+        try {
+            return new IRISSelector("3G","http://auspass.edu.au:80");
+        } catch (MalformedURLException e) {
+            // TODO: Log exception??
+        }
+        return null;
+    }    
+     
+    @Bean
+    public KnownLayer knownTypeMARLALINE(){
+        KnownLayer layer = new KnownLayer("seismology-marla-line", knownTypeBANDASelector());
+        layer.setName("Marla Line");
+        layer.setDescription(
+                "The MARLA LINE seismic array feed from AusPass: the Australian Passive Seismic Server.");
+        layer.setGroup("Passive Seismic");
+        layer.setProxyUrl("getIRISStations.do");
+        setupIcon(layer);
+        layer.setOrder("273");
+        return layer;
+     }    
     @Bean
     public WMSSelector knownTypePassiveSeismicSelector() {
         return new WMSSelector("passive-seismic");
@@ -666,7 +1194,7 @@ public class KnownLayers {
         layer.setName("Passive Seismic Sites");
         layer.setGroup("Passive Seismic");
         layer.setDescription("Passive Seismic Sites");
-        layer.setOrder("301");
+        layer.setOrder("274");
         return layer;
     }
 
@@ -684,7 +1212,7 @@ public class KnownLayers {
         layer.setGroup("Passive Seismic");
         layer.setDescription(
                 "The Onshore Seismic Data of Australia is a collection of all land seismic traverses cross the Australian continent and its margins. The data includes raw and processed data in SEGY format. The metadata includes acquisition reports, processing reports, processed images, logs, and so on. The data acquisition was carried out in Australia from 1949-2012 by Geoscience Australia and various partners. The set of reflection and refraction data comprises over 12,000 km of coverage, and provides an insight into the variations in crustal architecture in the varied geological domains. The complete processed dataset was first available for public access in Oct 2013 (http://www.ga.gov.au/minerals/projects/current-projects/seismic-acquisition-processing.html ). The location of seismic traverses is shown by the Gallery link on the webpage. The new survey data will be updated on the webpage by the official data release date. The attribute structure of the dataset has also been revised to be more compatible with the GeoSciML data standard, published by the IUGS Commission for Geoscience Information. The onshore seismic data were collected with partner organizations: Australian Geodynamics Cooperative Research Centre, National Research Facility for Earth Sounding, Australian Nuclear Science and Technology Organisation, Cooperative Research Centre for Greenhouse Gas Technologies, Curtin University of Technology, Geological Survey of New South Wales, NSW Department of Mineral Resources, NSW Department of Primary Industries Mineral Resources, An organisation for a National Earth Science Infrastructure Program, Geological Survey Western Australia, Northern Territory Geological Survey, Primary Industries and Resources South Australia, Predictive Mineral Discovery Cooperative Research Centre, Queensland Geological Survey, GeoScience Victoria Department of Primary Industries, Tasmania Development and Resources, University of Western Australia.");
-        layer.setOrder("302");
+        layer.setOrder("275");
         return layer;
     }
 

@@ -16,6 +16,9 @@ import org.auscope.portal.core.view.knownlayer.KnownLayerSelector;
  */
 public class IRISSelector implements KnownLayerSelector {
 
+    /** The Network Code. */
+    private String networkCode;
+    
     /**
      * The service endpoint that the instance of the selector is concerned with.
      */
@@ -24,14 +27,37 @@ public class IRISSelector implements KnownLayerSelector {
     /**
      * Initialises a new instance of the IRISSelector class.
      * 
+     * @param networkCode
+     *            The networkCode that identifies which IRIS this KnownLayer is identifying
      * @param serviceEndpoint
      *            The service endpoint that the instance of the selector is concerned with.
      * @throws MalformedURLException
      */
-    public IRISSelector(String serviceEndpoint) throws MalformedURLException {
+    public IRISSelector(String networkCode, String serviceEndpoint) throws MalformedURLException {
+        this.networkCode = networkCode;
         this.serviceEndpoint = new URL(serviceEndpoint);
     }
 
+    /**
+     * Gets the networkCode that identifies which IRIS this KnownLayer is identifying.
+     *
+     * @return the networkCode
+     */
+    public String getnetworkCode() {
+        return networkCode;
+    }
+
+    /**
+     * Sets the networkCode that identifies which IRIS this KnownLayer is identifying.
+     *
+     * @param networkCode
+     *            the networkCode to set
+     */
+    public void setnetworkCode(String networkCode) {
+        this.networkCode = networkCode;
+    }
+
+   
     /**
      * Returns a RelationType enum that indicates the relationship between the record provided and the service endpoint that this IRISSelector was instantiated
      * with.
@@ -42,8 +68,10 @@ public class IRISSelector implements KnownLayerSelector {
 
         if (onlineResources.length > 0) {
             for (AbstractCSWOnlineResource onlineResource : onlineResources) {
-                if (serviceEndpoint.sameFile(onlineResource.getLinkage())) {
-                    return RelationType.Belongs;
+                if (networkCode.equals(onlineResource.getName())) {
+                    if (serviceEndpoint.sameFile(onlineResource.getLinkage())) {
+                        return RelationType.Belongs;
+                    }
                 }
             }
         }
@@ -51,3 +79,4 @@ public class IRISSelector implements KnownLayerSelector {
         return RelationType.NotRelated;
     }
 }
+    

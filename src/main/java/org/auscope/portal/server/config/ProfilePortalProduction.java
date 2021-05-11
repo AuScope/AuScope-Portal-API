@@ -113,6 +113,52 @@ public class ProfilePortalProduction {
     @Autowired
     KnownLayer knownTypeSeismologyInSchool;
     @Autowired
+    KnownLayer knownTypeSKIPPY;
+    @Autowired
+    KnownLayer knownTypeKIMBA97;
+    @Autowired
+    KnownLayer knownTypeKIMBA98;
+    @Autowired
+    KnownLayer knownTypeWACRATON;
+    @Autowired
+    KnownLayer knownTypeSEAL;
+    @Autowired
+    KnownLayer knownTypeSEAL2;
+    @Autowired
+    KnownLayer knownTypeSEAL3;
+    @Autowired
+    KnownLayer knownTypeCAPRAL;
+    @Autowired
+    KnownLayer knownTypeSOC;
+    @Autowired
+    KnownLayer knownTypeGAWLER;
+    @Autowired
+    KnownLayer knownTypeBILBY;
+    @Autowired
+    KnownLayer knownTypeCURNAMONA;
+    @Autowired
+    KnownLayer knownTypeMINQ;
+    @Autowired
+    KnownLayer knownTypeEAL1;
+    @Autowired
+    KnownLayer knownTypeEAL2;
+    @Autowired
+    KnownLayer knownTypeEAL3;
+    @Autowired
+    KnownLayer knownTypeBASS;
+    @Autowired
+    KnownLayer knownTypeSQEAL;
+    @Autowired
+    KnownLayer knownTypeAQ3;
+    @Autowired
+    KnownLayer knownTypeAQT;
+    @Autowired
+    KnownLayer knownTypeBANDA;
+    @Autowired
+    KnownLayer knownTypeASR;
+    @Autowired
+    KnownLayer knownTypeMARLALINE;
+    @Autowired
     KnownLayer knownTypePassiveSeismic;
     @Autowired
     KnownLayer knownTypeSF0BoreholeNVCL;
@@ -338,6 +384,29 @@ public class ProfilePortalProduction {
         knownLayers.add(knownTypeSilicaContent);
         knownLayers.add(knownTypeBoreholeMSCL);
         knownLayers.add(knownTypeSeismologyInSchool);
+        knownLayers.add(knownTypeSKIPPY);
+        knownLayers.add(knownTypeKIMBA97);
+        knownLayers.add(knownTypeKIMBA98);
+        knownLayers.add(knownTypeWACRATON);
+        knownLayers.add(knownTypeSEAL);
+        knownLayers.add(knownTypeSEAL2);
+        knownLayers.add(knownTypeSEAL3);
+        knownLayers.add(knownTypeCAPRAL);
+        knownLayers.add(knownTypeSOC);
+        knownLayers.add(knownTypeGAWLER);
+        knownLayers.add(knownTypeBILBY);
+        knownLayers.add(knownTypeCURNAMONA);
+        knownLayers.add(knownTypeMINQ);
+        knownLayers.add(knownTypeEAL1);
+        knownLayers.add(knownTypeEAL2);
+        knownLayers.add(knownTypeEAL3);
+        knownLayers.add(knownTypeBASS);
+        knownLayers.add(knownTypeSQEAL);
+        knownLayers.add(knownTypeAQ3);
+        knownLayers.add(knownTypeAQT);
+        knownLayers.add(knownTypeBANDA);
+        knownLayers.add(knownTypeASR);
+        knownLayers.add(knownTypeMARLALINE );
         knownLayers.add(knownTypePassiveSeismic);
         knownLayers.add(knownTypeSF0BoreholeNVCL);
         /* Generated from former prod "Registered" tab START */
