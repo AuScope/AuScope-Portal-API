@@ -50,11 +50,11 @@ cd "$VL_WORKING_DIR" || finish 2 "ERROR: Unable to access working directory at $
 module purge
 {8}
 
-# Emulate our "cloud" command line tool
-export PATH="$VL_WORKING_DIR:$PATH"
-echo ''#!/bin/bash'' > cloud
-echo ''cp "$3" "$VL_OUTPUT_DIR/$2"'' >> cloud
-chmod +x cloud
+## Emulate our "cloud" command line tool
+#export PATH="$VL_WORKING_DIR:$PATH"
+#echo ''#!/bin/bash'' > cloud
+#echo ''cp "$3" "$VL_OUTPUT_DIR/$2"'' >> cloud
+#chmod +x cloud
 
 # Run User Script
 echo "#### Python start ####"

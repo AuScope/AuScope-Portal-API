@@ -26,6 +26,6 @@ function log {
 function cloud {
   if [ "$1" == "upload" ]
   then
-    cp "$2" "$VL_OUTPUT_DIR/$2" || finish 3 "ERROR: Unable to copy file $2 to output directory $VL_OUTPUT_DIR/$2"
+    cp -r "$3" "$VL_OUTPUT_DIR/$2" || finish 3 "ERROR: Unable to copy file $3 to output directory $VL_OUTPUT_DIR/$2"
   fi
 }
