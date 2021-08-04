@@ -75,7 +75,7 @@ public class MSCLWFSService extends BaseWFSService {
             final String endDepth) throws ConnectException, ConnectTimeoutException, UnknownHostException, Exception {
 
         // Remove the first part of the id.; we need to use the numerical part when looking up the observations:
-        String boreholeHeaderIdDigitsOnly = boreholeHeaderId.replaceFirst("borehole\\.", "");
+        String boreholeHeaderIdDigitsOnly = boreholeHeaderId.replaceFirst("\\S*\\.", "");
 
         String filterString = String.format(
                 "<Filter>" +
