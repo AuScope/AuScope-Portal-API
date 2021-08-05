@@ -10,11 +10,6 @@ csw:
         recordInformationUrl: https://ecat.ga.gov.au/geonetwork/srv/eng/main.home?uuid=%1$s
         title: Geoscience Australia eCat
         serverType: Default
-      - id: cswNciRR2
-        serviceUrl: http://geonetworkrr2.nci.org.au/geonetwork/srv/eng/csw
-        recordInformationUrl: "https://geonetworkrr2.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
-        title: NCI Geophysics Data Portal
-        serverType: Default
       - id: cswNCI
         serviceUrl: https://geonetwork.nci.org.au/geonetwork/srv/eng/csw
         recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
