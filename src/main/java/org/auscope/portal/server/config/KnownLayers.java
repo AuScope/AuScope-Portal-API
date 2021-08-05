@@ -459,7 +459,7 @@ public class KnownLayers {
                 "nvcl:ScannedBoreholeCollection" };
         String[] serviceEndPoints = { "http://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs",
                 "https://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs",
-                "http://www.mrt.tas.gov.au:80/web-services/wfs", "https://www.mrt.tas.gov.au:80/web-services/wfs",
+                "http://www.mrt.tas.gov.au:80/web-services/wfs", "https://www.mrt.tas.gov.au/web-services/wfs",
                 "http://geossdi.dmp.wa.gov.au:80/services/wfs", "http://geossdi.dmp.wa.gov.au/services/wfs",
                 "https://geossdi.dmp.wa.gov.au/services/wfs", "http://geology.data.nt.gov.au:80/geoserver/wfs",
                 "https://geology.data.nt.gov.au/geoserver/wfs", "https://gs.geoscience.nsw.gov.au/geoserver/wfs",
