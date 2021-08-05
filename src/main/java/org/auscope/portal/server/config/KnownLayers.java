@@ -611,8 +611,7 @@ public class KnownLayers {
 
     @Bean
     public WFSSelector knownTypeBoreholeMSCLSelector() {
-        String[] serviceEndPoints = { "http://meiproc.earthsci.unimelb.edu.au:80/geoserver/wfs" };
-        WFSSelector wfsSelector = new WFSSelector("gsmlp:BoreholeView", serviceEndPoints, true);
+        WFSSelector wfsSelector = new WFSSelector("gsmlp:MSCL-BoreholeView");
         String[] featNameList = { "mscl:scanned_data", "sa:SamplingFeatureCollection" };
         wfsSelector.setRelatedFeatureTypeNames(featNameList);
         return wfsSelector;
@@ -1197,7 +1196,6 @@ public class KnownLayers {
         layer.setOrder("274");
         return layer;
     }
-
 
     @Bean
     public WMSSelector knownTypeGeotransectsSelector() {

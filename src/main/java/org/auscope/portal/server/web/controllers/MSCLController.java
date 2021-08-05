@@ -151,6 +151,11 @@ public class MSCLController extends BasePortalController {
 
             for (int i = 0; i < results.getLength(); i++) {
                 Node result = results.item(i);
+
+                // Avoid blank or empty value strings
+                if (result.getTextContent() == null || result.getTextContent().trim().isEmpty()) {
+                    continue;
+                }
                 Node currentParentNode = result.getParentNode();
                 if (!currentParentNode.equals(targetParentNode)) {
                     targetParentNode = currentParentNode;
@@ -163,7 +168,6 @@ public class MSCLController extends BasePortalController {
                     }
                     relatedValues = new ModelMap();
                 }
-
                 relatedValues.put(result.getLocalName(), Float.parseFloat(result.getTextContent()));
             }
 
