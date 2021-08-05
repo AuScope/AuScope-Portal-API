@@ -6,5 +6,6 @@ ADD ${war_file} /usr/local/tomcat/webapps/AuScope-Portal-API.war
 
 RUN rm -rf /usr/local/tomcat/webapps/ROOT \
   && unzip /usr/local/tomcat/webapps/AuScope-Portal-API.war -d /usr/local/tomcat/webapps/ROOT \
-  && rm /usr/local/tomcat/webapps/AuScope-Portal-API.war
+  && rm /usr/local/tomcat/webapps/AuScope-Portal-API.war \
+  && cp /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.yaml.default /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.yaml
 #  && sed 's/active: test/#active: test/' /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.yaml.default | sed 's/#active: prod/active: prod/' > /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/application.yaml
