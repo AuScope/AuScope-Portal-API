@@ -219,8 +219,8 @@ public class KnownLayers {
         UIDropDownSelectList uiDropDownSelectList = new UIDropDownSelectList("Tenement Type", "mt:tenementType", null,
                 Predicate.ISLIKE, options);
         UITextBox ownerTextBox = new UITextBox("Owner", "mt:owner", null, Predicate.ISLIKE);
-        UIDate expiryFromDate = new UIDate("Expiry From", "mt:expireDate", null, Predicate.BIGGER_THAN);
-        UIDate expiryToDate = new UIDate("Expiry To", "mt:expireDate", null, Predicate.SMALLER_THAN);
+        UIDate expiryFromDate = new UIDate("Expires After", "mt:expireDate", null, Predicate.BIGGER_THAN);
+        UIDate expiryToDate = new UIDate("Expires Before", "mt:expireDate", null, Predicate.SMALLER_THAN);
         UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
 
         List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
