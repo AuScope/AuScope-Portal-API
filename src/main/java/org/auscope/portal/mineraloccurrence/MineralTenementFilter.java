@@ -31,7 +31,7 @@ public class MineralTenementFilter extends GenericFilter {
         fragments = new ArrayList<String>();
 
         if(optionalFilters == null || optionalFilters.isEmpty()){
-            GenericFilterAdapter filterObject = new GenericFilterAdapter(optionalFilters, "mt:shape");
+            GenericFilterAdapter filterObject = new GenericFilterAdapter("", "mt:shape");
             fragments.add(filterObject.getFilterStringAllRecords());
         }else{
             fragments = this.generateParameterFragments();
