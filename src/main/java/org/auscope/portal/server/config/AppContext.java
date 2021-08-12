@@ -70,7 +70,6 @@ import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
-import org.auscope.portal.server.web.service.NotificationService;
 import org.auscope.portal.server.web.service.NvclVocabService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.VGLCryptoService;
@@ -756,21 +755,9 @@ public class AppContext {
         return stackdriverService;
     }
 
-    
-    @Value("${env.twitter.enable}") private boolean twitterEnable;
-    @Value("${env.twitter.user}") private String twitterUser;
-    @Value("${env.twitter.consumerKey}") private String twitterConsumerKey;
-    @Value("${env.twitter.consumerSecret}") private String twitterConsumerSecret;
-    @Value("${env.twitter.accessToken}") private String twitterAccessToken;
-    @Value("${env.twitter.accessTokenSecret}") private String twitterAccessTokenSecret;
-
     @Bean
     public ViewCSWRecordFactory viewCSWRecordFactory() {
         return new ViewCSWRecordFactory();
     }
 
-    @Bean
-    public NotificationService notificationService() {
-        return new NotificationService(twitterEnable, twitterUser, twitterConsumerKey, twitterConsumerSecret, twitterAccessToken, twitterAccessTokenSecret);
-    }
 }
