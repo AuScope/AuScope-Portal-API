@@ -146,13 +146,6 @@ env:
         client_email: ENTER_CLIENT_EMAIL
         client_id: ENTER_CLIENT_ID
         token_uri: https://oauth2.googleapis.com/token
-    twitter:
-        enable: false
-        consumerKey: ENTER_TWITTER_CONSUMER_KEY
-        consumerSecret: ENTER_TWITTER_CONSUMER_SECRET
-        accessToken: ENTER_TWITTER_ACCESS_TOKEN
-        accessTokenSecret: ENTER_TWITTER_ACCESS_SECRET
-        user: AuScope
     nvclVocabService:
         url: http://auscope-services-test.arrc.csiro.au/sissvoc/
     nvclAnalyticalServices:

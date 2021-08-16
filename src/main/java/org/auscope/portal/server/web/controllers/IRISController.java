@@ -131,25 +131,31 @@ public class IRISController extends BasePortalController {
             NodeList stations = irisDoc.getDocumentElement().getElementsByTagName("Station");
             NamespaceContext nc = getIrisNamespace();
             XPathExpression nameExpression = DOMUtil.compileXPathExpr("default:Site/default:Name/text()", nc);
+            XPathExpression countryExpression = DOMUtil.compileXPathExpr("default:Site/default:Country/text()", nc);
             XPathExpression latExpression = DOMUtil.compileXPathExpr("default:Latitude/text()", nc);
             XPathExpression lonExpression = DOMUtil.compileXPathExpr("default:Longitude/text()", nc);
+            XPathExpression elevationExpression = DOMUtil.compileXPathExpr("default:Elevation/text()", nc);
 
             StringBuilder kml = new StringBuilder(
-                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document><name>GML Links to KML</name><description><![CDATA[GeoSciML data converted to KML]]></description>");
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document><name>GML Links to KML</name><description>GeoSciML data converted to KML</description>");
 
             // For each station:
             for (int i = 0; i < stations.getLength(); i++) {
                 Node station = stations.item(i);
                 Node staCode = station.getAttributes().getNamedItem("code");
                 kml.append(
-                        String.format(
-                                "<Placemark><name>%s</name><description><![CDATA[GENERIC_PARSER:%s]]></description>"
-                                        +
-                                        "<MultiGeometry><Point><coordinates>%s,%s,0</coordinates></Point></MultiGeometry></Placemark>",
+                		String.format(
+                				"<Placemark><name>%s</name><description>IRIS layer for station: %s></description>" +
+                                "<MultiGeometry><Point><coordinates>%s,%s,%s</coordinates></Point></MultiGeometry><ExtendedData>" +
+                				"<Data name=\"Country\"><value>%s</value></Data><Data name=\"Code\"><value>%s</value></Data>" +
+                                "</ExtendedData></Placemark>",
                                 nameExpression.evaluate(station, XPathConstants.STRING),
                                 staCode.getTextContent(),
                                 lonExpression.evaluate(station, XPathConstants.STRING),
-                                latExpression.evaluate(station, XPathConstants.STRING)));
+                                latExpression.evaluate(station, XPathConstants.STRING),
+                                elevationExpression.evaluate(station, XPathConstants.STRING),
+                                countryExpression.evaluate(station, XPathConstants.STRING),
+                                staCode.getTextContent()));
             }
 
             kml.append("</Document></kml>");
