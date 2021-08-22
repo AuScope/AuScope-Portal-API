@@ -315,8 +315,6 @@ public class ProfilePortalTest {
     @Autowired
     KnownLayer knownTypeNswLithologySamples;
     @Autowired
-    KnownLayer knownTypeRadnlOperR25PcprrL3Color;
-    @Autowired
     KnownLayer knownTypeNswBase;
     @Autowired
     KnownLayer knownTypeHist;
@@ -586,7 +584,6 @@ public class ProfilePortalTest {
         knownLayers.add(knownTypeGeopIsosGravOverTmiRtpTilt);
         knownLayers.add(knownTypeGsvShearDisplacementStructure250K);
         knownLayers.add(knownTypeNswLithologySamples);
-        knownLayers.add(knownTypeRadnlOperR25PcprrL3Color);
         knownLayers.add(knownTypeNswBase);
         knownLayers.add(knownTypeHist);
         knownLayers.add(knownTypeNswMineralOccurrenceCommodity);
