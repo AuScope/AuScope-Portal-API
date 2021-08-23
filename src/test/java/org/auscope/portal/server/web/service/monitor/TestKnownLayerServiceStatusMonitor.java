@@ -11,12 +11,15 @@ import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
 import org.auscope.portal.core.services.responses.csw.CSWOnlineResourceImpl;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.core.services.responses.stackdriver.ServiceStatusResponse;
+import org.auscope.portal.core.services.responses.wms.GetCapabilitiesRecord;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.view.ViewCSWRecordFactory;
+import org.auscope.portal.core.view.ViewGetCapabilitiesFactory;
 import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.view.knownlayer.KnownLayerAndRecords;
@@ -92,10 +95,10 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
         kl4.setStackdriverServiceGroup("Tenements");
 
         List<KnownLayerAndRecords> knownLayers = Arrays.asList(
-                new KnownLayerAndRecords(kl1, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>()),
-                new KnownLayerAndRecords(kl2, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>()),
-                new KnownLayerAndRecords(kl3, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>()),
-                new KnownLayerAndRecords(kl4, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>()));
+                new KnownLayerAndRecords(kl1, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()),
+                new KnownLayerAndRecords(kl2, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()),
+                new KnownLayerAndRecords(kl3, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()),
+                new KnownLayerAndRecords(kl4, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()));
         
         KnownLayerGrouping knownLayerGroupingMock = context.mock(KnownLayerGrouping.class);
         
@@ -123,7 +126,7 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
 
 
         knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4), mockCacheService, 
-                new ViewKnownLayerFactory(), new ViewCSWRecordFactory()) {
+                new ViewKnownLayerFactory(), new ViewCSWRecordFactory(), new ViewGetCapabilitiesFactory(), new WMSService(null, null)) {
                     @Override
                     public KnownLayerGrouping groupKnownLayerRecords() {
                         return knownLayerGroupingMock;

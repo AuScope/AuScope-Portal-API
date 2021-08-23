@@ -55,6 +55,7 @@ import org.auscope.portal.core.services.namespaces.ErmlNamespaceContext;
 import org.auscope.portal.core.services.responses.vocab.ConceptFactory;
 import org.auscope.portal.core.services.vocabs.VocabularyServiceItem;
 import org.auscope.portal.core.view.ViewCSWRecordFactory;
+import org.auscope.portal.core.view.ViewGetCapabilitiesFactory;
 import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.xslt.GmlToHtml;
@@ -424,6 +425,11 @@ public class AppContext {
     }
 
     @Bean
+    public ViewGetCapabilitiesFactory viewGetCapabilitiesFactory() {
+        return new ViewGetCapabilitiesFactory();
+    }
+
+    @Bean
     public GriddedCSWRecordTransformerFactory griddedCswTransformerFactory() {
         return new GriddedCSWRecordTransformerFactory();
     }
@@ -568,10 +574,13 @@ public class AppContext {
 
     @Autowired
     private ViewCSWRecordFactory viewCSWRecordFactory;
-    
+
+    @Autowired
+    private ViewGetCapabilitiesFactory viewGetCapabilitiesFactory;
+
     @Bean
     public KnownLayerService cswKnownLayerService() {
-        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory);
+        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService());
     }
 
     @Bean
