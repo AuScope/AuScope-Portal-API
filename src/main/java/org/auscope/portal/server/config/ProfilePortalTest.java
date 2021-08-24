@@ -153,18 +153,6 @@ public class ProfilePortalTest {
 
     /* Generated from former test "Registered" tab START */
     @Autowired
-    KnownLayer knownTypeHighpSiteIronlayer;
-    @Autowired
-    KnownLayer knownTypeHighpfeaturetype;
-    @Autowired
-    KnownLayer knownTypeHighpReIronlayer;
-    @Autowired
-    KnownLayer knownTypeHighpSiteFeatureType;
-    @Autowired
-    KnownLayer knownTypeHighpSitePhoslayer;
-    @Autowired
-    KnownLayer knownTypeHighpRePhoslayer;
-    @Autowired
     KnownLayer knownTypeLandDamaPolyOfTasmMinResoTasm;
     @Autowired
     KnownLayer knownTypeNswDrillhole;
@@ -206,8 +194,6 @@ public class ProfilePortalTest {
     KnownLayer knownTypeCate1ExplLicePolyOfTasmMinResoTasm;
     @Autowired
     KnownLayer knownTypeGravBaseStatOfTasmMinResoTasm;
-    @Autowired
-    KnownLayer knownTypeRadnlOperR25PcprrL3Knmi;
     @Autowired
     KnownLayer knownTypeGsvGeologicalUnit250KAge;
     @Autowired
@@ -321,8 +307,6 @@ public class ProfilePortalTest {
     @Autowired
     KnownLayer knownTypeRestorations;
     @Autowired
-    KnownLayer knownTypeBorehole;
-    @Autowired
     KnownLayer knownTypeNswGeology;
     @Autowired
     KnownLayer knownTypeGeopIsosGravOverTmiRtpTilt;
@@ -330,8 +314,6 @@ public class ProfilePortalTest {
     KnownLayer knownTypeGsvShearDisplacementStructure250K;
     @Autowired
     KnownLayer knownTypeNswLithologySamples;
-    @Autowired
-    KnownLayer knownTypeRadnlOperR25PcprrL3Color;
     @Autowired
     KnownLayer knownTypeNswBase;
     @Autowired
@@ -519,12 +501,6 @@ public class ProfilePortalTest {
         knownLayers.add(knownTypeSF0BoreholeNVCL);
 
         /* Generated from former test "Registered" tab START */
-        knownLayers.add(knownTypeHighpSiteIronlayer);
-        knownLayers.add(knownTypeHighpfeaturetype);
-        knownLayers.add(knownTypeHighpReIronlayer);
-        knownLayers.add(knownTypeHighpSiteFeatureType);
-        knownLayers.add(knownTypeHighpSitePhoslayer);
-        knownLayers.add(knownTypeHighpRePhoslayer);
         knownLayers.add(knownTypeLandDamaPolyOfTasmMinResoTasm);
         knownLayers.add(knownTypeNswDrillhole);
         knownLayers.add(knownTypeStrategicProspectivityZones);
@@ -546,7 +522,6 @@ public class ProfilePortalTest {
         knownLayers.add(knownTypeNswDrillholesPetroleum);
         knownLayers.add(knownTypeCate1ExplLicePolyOfTasmMinResoTasm);
         knownLayers.add(knownTypeGravBaseStatOfTasmMinResoTasm);
-        knownLayers.add(knownTypeRadnlOperR25PcprrL3Knmi);
         knownLayers.add(knownTypeGsvGeologicalUnit250KAge);
         knownLayers.add(knownTypeReleases);
         knownLayers.add(knownTypeMineOccuPoinOfTasmMinResoTasm);
@@ -605,12 +580,10 @@ public class ProfilePortalTest {
 
         knownLayers.add(knownTypeHistoricalExplorationActivityLines);
         knownLayers.add(knownTypeRestorations);
-        knownLayers.add(knownTypeBorehole);
         knownLayers.add(knownTypeNswGeology);
         knownLayers.add(knownTypeGeopIsosGravOverTmiRtpTilt);
         knownLayers.add(knownTypeGsvShearDisplacementStructure250K);
         knownLayers.add(knownTypeNswLithologySamples);
-        knownLayers.add(knownTypeRadnlOperR25PcprrL3Color);
         knownLayers.add(knownTypeNswBase);
         knownLayers.add(knownTypeHist);
         knownLayers.add(knownTypeNswMineralOccurrenceCommodity);

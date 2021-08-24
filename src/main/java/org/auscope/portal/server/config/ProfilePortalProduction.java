@@ -62,18 +62,6 @@ public class ProfilePortalProduction {
     @Autowired
     KnownLayer knownTypeFeatureCollection;
     @Autowired
-    KnownLayer knownTypeHighPSiteFeatureType;
-    @Autowired
-    KnownLayer knownTypeHighPFeatureType;
-    @Autowired
-    KnownLayer knownTypeHighPREIronLayer;
-    @Autowired
-    KnownLayer knownTypeHighPREPhosLayer;
-    @Autowired
-    KnownLayer knownTypeHighPSiteIronLayer;
-    @Autowired
-    KnownLayer knownTypeHighPSitePhosLayer;
-    @Autowired
     KnownLayer knownTypePortals;
     @Autowired
     KnownLayer knownTypeGeoNetworks;
@@ -164,18 +152,6 @@ public class ProfilePortalProduction {
     KnownLayer knownTypeSF0BoreholeNVCL;
 
     /* Generated from former prod "Registered" tab START */
-    @Autowired
-    KnownLayer knownTypeHighpSiteIronlayer;
-    @Autowired
-    KnownLayer knownTypeHighpfeaturetype;
-    @Autowired
-    KnownLayer knownTypeHighpSitePhoslayer;
-    @Autowired
-    KnownLayer knownTypeHighpRePhoslayer;
-    @Autowired
-    KnownLayer knownTypeHighpSiteFeatureType;
-    @Autowired
-    KnownLayer knownTypeHighpReIronlayer;
     @Autowired
     KnownLayer knownTypeStrategicProspectivityZones;
     @Autowired
@@ -359,12 +335,6 @@ public class ProfilePortalProduction {
         knownLayers.add(knownTypeSHRIMPGeoSample);
         knownLayers.add(knownTypeSamplingPoint);
         knownLayers.add(knownTypeFeatureCollection);
-        knownLayers.add(knownTypeHighPSiteFeatureType);
-        knownLayers.add(knownTypeHighPFeatureType);
-        knownLayers.add(knownTypeHighPREIronLayer);
-        knownLayers.add(knownTypeHighPREPhosLayer);
-        knownLayers.add(knownTypeHighPSiteIronLayer);
-        knownLayers.add(knownTypeHighPSitePhosLayer);
         knownLayers.add(knownTypePortals);
         knownLayers.add(knownTypeGeoNetworks);
         knownLayers.add(knownTypeAsterAloh);
@@ -411,12 +381,6 @@ public class ProfilePortalProduction {
         knownLayers.add(knownTypeSF0BoreholeNVCL);
         /* Generated from former prod "Registered" tab START */
         
-        knownLayers.add(knownTypeHighpSiteIronlayer);
-        knownLayers.add(knownTypeHighpfeaturetype);
-        knownLayers.add(knownTypeHighpSitePhoslayer);
-        knownLayers.add(knownTypeHighpRePhoslayer);
-        knownLayers.add(knownTypeHighpSiteFeatureType);
-        knownLayers.add(knownTypeHighpReIronlayer);
         knownLayers.add(knownTypeStrategicProspectivityZones);
         knownLayers.add(knownTypeCate5ExplLicePolyOfTasmMinResoTasm);
         knownLayers.add(knownTypeRsSample);
