@@ -157,7 +157,7 @@ public class MSCLController extends BasePortalController {
                     continue;
                 }
                 Node currentParentNode = result.getParentNode();
-                if (currentParentNode != null &&!currentParentNode.equals(targetParentNode)) {
+                if (currentParentNode != null && !currentParentNode.equals(targetParentNode)) {
                     targetParentNode = currentParentNode;
 
                     // relatedValues will be null on the first entry so we don't add it.
