@@ -11,10 +11,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.VocabularyFilterService;
-import org.auscope.portal.server.web.service.NvclVocabService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,6 +24,7 @@ import org.apache.jena.rdf.model.Selector;
 import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.SKOS;
 
 import au.gov.geoscience.portal.services.vocabularies.VocabularyLookup;
 
@@ -42,13 +41,10 @@ public class VocabController extends BasePortalController {
     public static final String RESERVE_VOCABULARY_ID = "vocabularyReserveCategories";
     public static final String TENEMENT_TYPE_VOCABULARY_ID = "vocabularyTenementType";
     public static final String TENEMENT_STATUS_VOCABULARY_ID = "vocabularyTenementStatus";
-    public static final String MINERAL_OCCURRENCE_TYPE_VOCABULARY = "vocabularyMineralOccurrenceType";
-	
-	
+    public static final String NVCL_SCALARS_VOCABULARY_ID = "vocabularyNVCLScalars";
+
     private final Log log = LogFactory.getLog(getClass());
 
-    private NvclVocabService nvclVocabService;
-    
     private VocabularyFilterService vocabularyFilterService;
 
     /**
@@ -57,66 +53,42 @@ public class VocabController extends BasePortalController {
      * @param
      */
     @Autowired
-    public VocabController(NvclVocabService nvclVocabService, VocabularyFilterService vocabularyFilterService) {
+    public VocabController(VocabularyFilterService vocabularyFilterService) {
         super();
-        this.nvclVocabService = nvclVocabService;
         this.vocabularyFilterService = vocabularyFilterService;
     }
 
     /**
-     * Performs a query to the vocabulary service on behalf of the client and
-     * returns a JSON Map success: Set to either true or false data: The raw XML
-     * response scopeNote: The scope note element from the response label: The
-     * label element from the response
+     * Looks for an NVCL Scalar definition by querying the vocabulary service on behalf of the client and
+     * returns a JSON Map success: Set to either true or false, the 'label' and its 'definition'
      *
-     * @param repository
-     * @param label
+     * @param repository name of repository i.e. 'nvcl-scalars'
+     * @param label name of label
      * @return
      */
     @RequestMapping("/getScalar.do")
     public ModelAndView getScalarQuery(@RequestParam("repository") final String repository,
                                        @RequestParam("label") final String label) throws Exception {
 
-        // Attempt to request and parse our response
-        try {
-            // Do the request
-            List<String> definitions = nvclVocabService.getScalarDefinitionsByLabel(label);
-
-            String labelString = null;
-            String scopeNoteString = null;
-            String definitionString = null;
-            if (definitions != null && definitions.size() > 0) {
-                labelString = label;
-                scopeNoteString = definitions.get(0); // this is for legacy
-                // support
-                definitionString = definitions.get(0);
-            }
-
-            return generateJSONResponseMAV(true, createScalarQueryModel(scopeNoteString, labelString, definitionString),
-                    "");
-        } catch (Exception ex) {
-            // On error, just return failure JSON (and the response string if
-            // any)
-            log.error("getVocabQuery ERROR: " + ex.getMessage());
-
-            return generateJSONResponseMAV(false, null, "");
+        if (!repository.equals("nvcl-scalars")) {
+            log.warn("'repository' parameter has incorrect value, try 'nvcl-scalars'");
+            return generateJSONResponseMAV(false, null, "'repository' parameter has incorrect value, try 'nvcl-scalars'");
         }
-    }
-
-    private ModelMap createScalarQueryModel(final String scopeNote, final String label, final String definition) {
-        ModelMap map = new ModelMap();
-        map.put("scopeNote", scopeNote);
-        map.put("definition", definition);
-        map.put("label", label);
-
-        return map;
+        ArrayList<String> defns = this.vocabularyFilterService.getVocabularyById(NVCL_SCALARS_VOCABULARY_ID, label, SKOS.definition);
+        Map<String,String> dataItems = new HashMap<>();
+        if (defns.size() > 0) {
+            dataItems.put("scopeNote", defns.get(0));
+            dataItems.put("definition", defns.get(0));
+            dataItems.put("label", label);
+        }
+        return generateJSONResponseMAV(true, dataItems, "");
     }
 
 
     /**
      * Get all GA commodity URNs with prefLabels
      *
-     * @return vocubulary mapping in JSON format
+     * @return vocabulary mapping in JSON format
      */
     @RequestMapping("getAllCommodities.do")
     public ModelAndView getAllCommodities() {
@@ -129,7 +101,7 @@ public class VocabController extends BasePortalController {
     /**
      * Queries the vocabulary service for mine status types
      *
-     * @return vocubulary mapping in JSON format
+     * @return vocabulary mapping in JSON format
      */
     @RequestMapping("getAllMineStatuses.do")
     public ModelAndView getAllMineStatuses() {
@@ -143,7 +115,7 @@ public class VocabController extends BasePortalController {
      * Queries the vocabulary service for a list of the JORC (Joint Ore Reserves Committee) categories
      * (also known as "Australasian  Code  for  Reporting  of  Exploration Results, Mineral Resources and Ore Reserves")
      *
-     * @return vocubulary mapping in JSON format
+     * @return vocabulary mapping in JSON format
      */
     @RequestMapping("getAllJorcCategories.do")
     public ModelAndView getAllJorcCategories() {

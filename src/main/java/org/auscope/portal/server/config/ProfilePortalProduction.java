@@ -157,8 +157,6 @@ public class ProfilePortalProduction {
     @Autowired
     KnownLayer knownTypeCate5ExplLicePolyOfTasmMinResoTasm;
     @Autowired
-    KnownLayer knownTypeRsSample;
-    @Autowired
     KnownLayer knownTypeMineOccuPoinOfTasmMinResoTasm;
     @Autowired
     KnownLayer knownTypeGravBaseStatOfTasmMinResoTasm;
@@ -383,7 +381,6 @@ public class ProfilePortalProduction {
         
         knownLayers.add(knownTypeStrategicProspectivityZones);
         knownLayers.add(knownTypeCate5ExplLicePolyOfTasmMinResoTasm);
-        knownLayers.add(knownTypeRsSample);
         knownLayers.add(knownTypeMineOccuPoinOfTasmMinResoTasm);
         knownLayers.add(knownTypeGravBaseStatOfTasmMinResoTasm);
         
