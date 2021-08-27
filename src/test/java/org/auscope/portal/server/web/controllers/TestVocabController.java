@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
-import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.test.PortalTestClass;
-import org.auscope.portal.server.web.service.NvclVocabService;
+import org.auscope.portal.server.web.controllers.VocabController;
 import org.hamcrest.Matcher;
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -17,8 +16,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
-
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Selector;
 import org.apache.jena.rdf.model.SimpleSelector;
+import org.auscope.portal.core.services.PortalServiceException;
+import org.apache.jena.vocabulary.SKOS;
 
 import au.gov.geoscience.portal.services.vocabularies.VocabularyLookup;
 
@@ -30,13 +36,11 @@ public class TestVocabController extends PortalTestClass {
 
     private VocabController vocabularyController;
 
-    private NvclVocabService mockNvclVocabService = context.mock(NvclVocabService.class);
-
     private VocabularyFilterService mockVocabularyFilterService = context.mock(VocabularyFilterService.class);
 
     @Before
     public void setUp() {
-        this.vocabularyController = new VocabController(mockNvclVocabService, mockVocabularyFilterService);
+        this.vocabularyController = new VocabController(mockVocabularyFilterService);
     }
 
     /**
@@ -44,42 +48,27 @@ public class TestVocabController extends PortalTestClass {
      */
     @Test
     public void testGetScalarQuery() throws Exception {
-        final String repository = "repo";
-        final String label = "label";
-        final List<String> defns = Arrays.asList("defn");
+        final String repository = "nvcl-scalars";
+        final String label = "labelX";
+        final String defn = "defnX";
+        final ArrayList<String> serviceResult = new ArrayList<String>();
+        serviceResult.add(defn);
 
         context.checking(new Expectations() {
             {
-                oneOf(mockNvclVocabService).getScalarDefinitionsByLabel(label);
-                will(returnValue(defns));
+                oneOf(mockVocabularyFilterService).getVocabularyById(VocabController.NVCL_SCALARS_VOCABULARY_ID, label, SKOS.definition);
+                will(returnValue(serviceResult));
             }
         });
 
         ModelAndView mav = vocabularyController.getScalarQuery(repository, label);
         Assert.assertNotNull(mav);
         Assert.assertTrue((Boolean) mav.getModel().get("success"));
-        ModelMap data = (ModelMap) mav.getModel().get("data");
+        HashMap<String,String> data = (HashMap<String,String>) mav.getModel().get("data");
         Assert.assertNotNull(data);
         Assert.assertEquals(label, data.get("label"));
-        Assert.assertEquals(defns.get(0), data.get("definition"));
-        Assert.assertEquals(defns.get(0), data.get("scopeNote"));
-    }
-
-    @Test
-    public void testGetScalarQueryError() throws Exception {
-        final String repository = "repo";
-        final String label = "label";
-
-        context.checking(new Expectations() {
-            {
-                oneOf(mockNvclVocabService).getScalarDefinitionsByLabel(label);
-                will(throwException(new PortalServiceException("")));
-            }
-        });
-
-        ModelAndView mav = vocabularyController.getScalarQuery(repository, label);
-        Assert.assertNotNull(mav);
-        Assert.assertFalse((Boolean) mav.getModel().get("success"));
+        Assert.assertEquals(defn, data.get("definition"));
+        Assert.assertEquals(defn, data.get("scopeNote"));
     }
 
     /**

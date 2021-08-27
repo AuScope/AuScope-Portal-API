@@ -61,7 +61,6 @@ import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.xslt.GmlToHtml;
 import org.auscope.portal.core.xslt.WfsToKmlTransformer;
 import org.auscope.portal.mscl.MSCLWFSService;
-import org.auscope.portal.nvcl.NvclVocabMethodMaker;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VglMachineImage;
@@ -71,7 +70,6 @@ import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
 import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
-import org.auscope.portal.server.web.service.NvclVocabService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.VGLCryptoService;
 import org.auscope.portal.server.web.service.cloud.CloudComputeServiceNci;
@@ -497,6 +495,9 @@ public class AppContext {
     @Autowired
     VocabularyServiceItem vocabularyResourceCategories;
 
+    @Autowired
+    VocabularyServiceItem nvclScalarsCategories;
+
     @Bean
     public WMS_1_3_0_MethodMaker wms130methodMaker() {
         return new WMS_1_3_0_MethodMaker(httpServiceCallerApp());
@@ -510,6 +511,7 @@ public class AppContext {
         servList.add(vocabularyMineStatuses);
         servList.add(vocabularyReserveCategories);
         servList.add(vocabularyResourceCategories);
+        servList.add(nvclScalarsCategories);
         return servList;
     }
     
@@ -642,11 +644,6 @@ public class AppContext {
     }
 
     @Bean
-    public SISSVoc2Service sissVocService() {
-        return new SISSVoc2Service(httpServiceCallerApp(), conceptFactory(),  sissVocMethodMaker());
-    }
-
-    @Bean
     public CloudComputeServiceNectar cloudComputeServiceNectar() throws UnknownHostException {
         if (!nectarEc2AccessKey.equals("undefined") && !nectarEc2SecretKey.equals("undefined")) {
             CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
@@ -696,17 +693,9 @@ public class AppContext {
         return new CommonsMultipartResolver();
     }
 
-    @Value("${env.nvclVocabService.url}")
-    private String nvclVocabServiceURL;
-
     @Bean
     public ErmlNamespaceContext ermlNamespaceContext() {
         return new ErmlNamespaceContext();
-    }
-
-    @Bean
-    public NvclVocabService nvclVocabService() {
-        return new NvclVocabService(httpServiceCallerApp(), new NvclVocabMethodMaker(), nvclVocabServiceURL);
     }
 
     // Needed? wfsService() creates a new WFSGetFeatureMethodMaker, not sure if this is referenced anywhere

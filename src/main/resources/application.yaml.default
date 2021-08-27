@@ -146,7 +146,5 @@ env:
         client_email: ENTER_CLIENT_EMAIL
         client_id: ENTER_CLIENT_ID
         token_uri: https://oauth2.googleapis.com/token
-    nvclVocabService:
-        url: http://auscope-services-test.arrc.csiro.au/sissvoc/
     nvclAnalyticalServices:
         url: http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/
