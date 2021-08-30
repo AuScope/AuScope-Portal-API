@@ -46,10 +46,6 @@ public class ProfilePortalTest {
     @Autowired
     KnownLayer knownTypeBoreholeNvclV2;
     @Autowired
-    KnownLayer knownTypeReports;
-    @Autowired
-    KnownLayer knownTypePMDCRCReports;
-    @Autowired
     KnownLayer knownTypeGeotransects;
     @Autowired
     KnownLayer knownTypeMagnetotellurics;
@@ -159,8 +155,6 @@ public class ProfilePortalTest {
     @Autowired
     KnownLayer knownTypeStrategicProspectivityZones;
     @Autowired
-    KnownLayer knownTypeMineralFields;
-    @Autowired
     KnownLayer knownTypeNswAssaySurface;
     @Autowired
     KnownLayer knownTypeNswFieldObservations;
@@ -187,8 +181,6 @@ public class ProfilePortalTest {
     @Autowired
     KnownLayer knownTypeNswGeologySimplified;
     @Autowired
-    KnownLayer knownTypeHistoricalExplorationActivityPoints;
-    @Autowired
     KnownLayer knownTypeNswDrillholesPetroleum;
     @Autowired
     KnownLayer knownTypeCate1ExplLicePolyOfTasmMinResoTasm;
@@ -196,8 +188,6 @@ public class ProfilePortalTest {
     KnownLayer knownTypeGravBaseStatOfTasmMinResoTasm;
     @Autowired
     KnownLayer knownTypeGsvGeologicalUnit250KAge;
-    @Autowired
-    KnownLayer knownTypeReleases;
     @Autowired
     KnownLayer knownTypeMineOccuPoinOfTasmMinResoTasm;
     @Autowired
@@ -210,8 +200,6 @@ public class ProfilePortalTest {
     KnownLayer knownTypeCate2ExplLicePolyOfTasmMinResoTasm;
     @Autowired
     KnownLayer knownTypeNswMapBlockGraticule;
-    @Autowired
-    KnownLayer knownTypeSection574;
     @Autowired
     KnownLayer knownTypeBlLocalaboriginallandcouncil;
     @Autowired
@@ -227,13 +215,9 @@ public class ProfilePortalTest {
     @Autowired
     KnownLayer knownTypeGsvGeologicalUnit50KLithology;
     @Autowired
-    KnownLayer knownTypeSection19;
-    @Autowired
     KnownLayer knownTypeNsw100KMapSheetExtents;
     @Autowired
     KnownLayer knownTypeCate5ExplLicePolyOfTasmMinResoTasm;
-    @Autowired
-    KnownLayer knownTypeMinesAndMineralDepositsMinedex;
     @Autowired
     KnownLayer knownTypeNswFossickingDistricts;
     @Autowired
@@ -258,18 +242,12 @@ public class ProfilePortalTest {
     @Autowired
     KnownLayer knownTypeCate4ExplLicePolyOfTasmMinResoTasm;
     @Autowired
-    KnownLayer knownTypeMineralisationZonesNonS572Aa;
-    @Autowired
     KnownLayer knownTypeNswDrillholesCsg;
     @Autowired
     KnownLayer knownTypeNswCurrentMiningApplications;
     @Autowired
-    KnownLayer knownTypeAmalgamations;
-    @Autowired
     KnownLayer knownTypeNswOperatingMineralMines;
     
-    @Autowired
-    KnownLayer knownTypeTenementsCurrent;
     @Autowired
     KnownLayer knownTypeBoreTracOfTasmMinResoTasm;
     @Autowired
@@ -303,10 +281,6 @@ public class ProfilePortalTest {
     KnownLayer knownTypeGsvGeologicalUnit250KLithology;
     
     @Autowired
-    KnownLayer knownTypeHistoricalExplorationActivityLines;
-    @Autowired
-    KnownLayer knownTypeRestorations;
-    @Autowired
     KnownLayer knownTypeNswGeology;
     @Autowired
     KnownLayer knownTypeGeopIsosGravOverTmiRtpTilt;
@@ -316,8 +290,6 @@ public class ProfilePortalTest {
     KnownLayer knownTypeNswLithologySamples;
     @Autowired
     KnownLayer knownTypeNswBase;
-    @Autowired
-    KnownLayer knownTypeHist;
     @Autowired
     KnownLayer knownTypeNswMineralOccurrenceCommodity;
     @Autowired
@@ -447,8 +419,6 @@ public class ProfilePortalTest {
         knownLayers.add(knownTypeEMAGRemanentAnomaliesTMI);
         knownLayers.add(knownTypeMineralOccurrenceView);
         knownLayers.add(knownTypeBoreholeNvclV2);
-        knownLayers.add(knownTypeReports);
-        knownLayers.add(knownTypePMDCRCReports);
         knownLayers.add(knownTypeGeotransects);
         knownLayers.add(knownTypeMagnetotellurics);
         knownLayers.add(knownTypeTimaGeoSample);
@@ -504,7 +474,6 @@ public class ProfilePortalTest {
         knownLayers.add(knownTypeLandDamaPolyOfTasmMinResoTasm);
         knownLayers.add(knownTypeNswDrillhole);
         knownLayers.add(knownTypeStrategicProspectivityZones);
-        knownLayers.add(knownTypeMineralFields);
         knownLayers.add(knownTypeNswAssaySurface);
         knownLayers.add(knownTypeNswFieldObservations);
         knownLayers.add(knownTypeLandDamaPoinOfTasmMinResoTasm);
@@ -518,19 +487,16 @@ public class ProfilePortalTest {
         knownLayers.add(knownTypeNswGeologicalFieldObservations);
         knownLayers.add(knownTypeNswDrillholesMinerals);
         knownLayers.add(knownTypeNswGeologySimplified);
-        knownLayers.add(knownTypeHistoricalExplorationActivityPoints);
         knownLayers.add(knownTypeNswDrillholesPetroleum);
         knownLayers.add(knownTypeCate1ExplLicePolyOfTasmMinResoTasm);
         knownLayers.add(knownTypeGravBaseStatOfTasmMinResoTasm);
         knownLayers.add(knownTypeGsvGeologicalUnit250KAge);
-        knownLayers.add(knownTypeReleases);
         knownLayers.add(knownTypeMineOccuPoinOfTasmMinResoTasm);
         knownLayers.add(knownTypeGsvShearDisplacementStructure50K);
         knownLayers.add(knownTypeMineralOccurenceIndustryFull);
         knownLayers.add(knownTypeNswHistoricExplorationTitles);
         knownLayers.add(knownTypeCate2ExplLicePolyOfTasmMinResoTasm);
         knownLayers.add(knownTypeNswMapBlockGraticule);
-        knownLayers.add(knownTypeSection574);
         knownLayers.add(knownTypeBlLocalaboriginallandcouncil);
         knownLayers.add(knownTypeLandLineOfTasmMinResoTasm);
         knownLayers.add(knownTypeMiniLeasPolyOfTasmMinResoTasm);
@@ -538,10 +504,8 @@ public class ProfilePortalTest {
         knownLayers.add(knownTypeLandPoinOfTasmMinResoTasm);
         knownLayers.add(knownTypeProcLandAreaOfTasmMinResoTasm);
         knownLayers.add(knownTypeGsvGeologicalUnit50KLithology);
-        knownLayers.add(knownTypeSection19);
         knownLayers.add(knownTypeNsw100KMapSheetExtents);
         knownLayers.add(knownTypeCate5ExplLicePolyOfTasmMinResoTasm);
-        knownLayers.add(knownTypeMinesAndMineralDepositsMinedex);
         knownLayers.add(knownTypeNswFossickingDistricts);
         knownLayers.add(knownTypeNswGeologicalFieldObservationsPhoto);
         knownLayers.add(knownTypeGeopTotaMagnInteRtpTmiRtpTiltFilt);
@@ -554,13 +518,10 @@ public class ProfilePortalTest {
         knownLayers.add(knownTypeGeopTernRadiPota);
         knownLayers.add(knownTypeGsvGeologicalUnit250K);
         knownLayers.add(knownTypeCate4ExplLicePolyOfTasmMinResoTasm);
-        knownLayers.add(knownTypeMineralisationZonesNonS572Aa);
         knownLayers.add(knownTypeNswDrillholesCsg);
         knownLayers.add(knownTypeNswCurrentMiningApplications);
-        knownLayers.add(knownTypeAmalgamations);
         knownLayers.add(knownTypeNswOperatingMineralMines);
 
-        knownLayers.add(knownTypeTenementsCurrent);
         knownLayers.add(knownTypeBoreTracOfTasmMinResoTasm);
         knownLayers.add(knownTypeGsvGeologicalUnitContact250K);
         knownLayers.add(knownTypeGeophysicsElevation);
@@ -578,14 +539,11 @@ public class ProfilePortalTest {
         knownLayers.add(knownTypeNswTitles);
         knownLayers.add(knownTypeGsvGeologicalUnit250KLithology);
 
-        knownLayers.add(knownTypeHistoricalExplorationActivityLines);
-        knownLayers.add(knownTypeRestorations);
         knownLayers.add(knownTypeNswGeology);
         knownLayers.add(knownTypeGeopIsosGravOverTmiRtpTilt);
         knownLayers.add(knownTypeGsvShearDisplacementStructure250K);
         knownLayers.add(knownTypeNswLithologySamples);
         knownLayers.add(knownTypeNswBase);
-        knownLayers.add(knownTypeHist);
         knownLayers.add(knownTypeNswMineralOccurrenceCommodity);
         knownLayers.add(knownTypeLandPolyOfTasmMinResoTasm);
         knownLayers.add(knownTypeGsvGeologicalUnitContact50K);
