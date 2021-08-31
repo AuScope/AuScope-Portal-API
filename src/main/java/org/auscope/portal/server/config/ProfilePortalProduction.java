@@ -46,10 +46,6 @@ public class ProfilePortalProduction {
     @Autowired
     KnownLayer knownTypeBoreholeNvclV2;                
     @Autowired
-    KnownLayer knownTypeReports;
-    @Autowired
-    KnownLayer knownTypePMDCRCReports;
-    @Autowired
     KnownLayer knownTypeGeotransects;
     @Autowired
     KnownLayer knownTypeMagnetotellurics;
@@ -324,9 +320,7 @@ public class ProfilePortalProduction {
         knownLayers.add(knownTypeEMAGRemanentAnomalies);
         knownLayers.add(knownTypeEMAGRemanentAnomaliesTMI);
         knownLayers.add(knownTypeMineralOccurrenceView);
-        knownLayers.add(knownTypeBoreholeNvclV2                );
-        knownLayers.add(knownTypeReports);
-        knownLayers.add(knownTypePMDCRCReports);
+        knownLayers.add(knownTypeBoreholeNvclV2);
         knownLayers.add(knownTypeGeotransects);
         knownLayers.add(knownTypeMagnetotellurics);
         knownLayers.add(knownTypeTimaGeoSample);
