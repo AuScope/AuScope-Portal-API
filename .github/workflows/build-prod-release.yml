@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
     inputs:
       api-buildtag:
-        description: 'Tag to build AuScope-Portal-API at'
+        description: 'Tag to build AuScope-Portal-API at (format: vX.YY.ZZ)'
         required: true
       pc-buildtag:
-        description: 'Tag to build portal-core at'
+        description: 'Tag to build portal-core at (format: vX.YY.ZZ)'
         required: true
 env:
   IMAGE_NAME: auscope-portal-api-prod-release  
@@ -47,21 +47,23 @@ jobs:
         run: |
           mvn -B package --file pom.xml
           ls -lR target
-          docker build . --file Dockerfile.github --tag $IMAGE_NAME --build-arg war_file=target/auscope-portal-api-6.0.0.war
+          WAR_VERSION = $(echo ${{ github.event.inputs.api-buildtag }} | sed 's/v//')
+          echo WAR_VERSION=$WAR_VERSION
+          docker build . --file Dockerfile.github --tag $IMAGE_NAME --build-arg war_file=target/auscope-portal-api-$WAR_VERSION.war
           
-      #- name: Log into registry
-      #  run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-      #
-      #- name: Push image
-      #  run: |
-      #    IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-      #    # Change all uppercase to lowercase
-      #    IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-      #    # Always the latest version
-      #    VERSION=latest
-      #    echo "Build Tag: ${{ github.event.inputs.buildtag }}"
-      #    echo IMAGE_ID=$IMAGE_ID
-      #    echo VERSION=$VERSION
-      #    docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-      #    docker push $IMAGE_ID:$VERSION
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+      
+      - name: Push image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Always the latest version
+          VERSION=latest
+          echo "Build Tag: ${{ github.event.inputs.buildtag }}"
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
           
