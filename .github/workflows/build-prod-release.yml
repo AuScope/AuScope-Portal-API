@@ -47,7 +47,7 @@ jobs:
         run: |
           mvn -B package --file pom.xml
           ls -lR target
-          docker build . --file Dockerfile.github --tag $IMAGE_NAME
+          docker build . --file Dockerfile.github --tag $IMAGE_NAME --build-arg war_file=target/auscope-portal-api-6.0.0.war
           
       #- name: Log into registry
       #  run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
