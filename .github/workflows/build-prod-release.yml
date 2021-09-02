@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
     inputs:
       api-buildtag:
-        description: 'Tag to build AuScope-Portal-API at (format: vX.YY.ZZ)'
+        description: 'AuScope-Portal-API build tag: (format: vX.Y.Z)'
         required: true
       pc-buildtag:
-        description: 'Tag to build portal-core at (format: vX.YY.ZZ)'
+        description: 'portal-core build tag: (format: vX.Y.Z)'
         required: true
 env:
   IMAGE_NAME: auscope-portal-api-prod-release  
@@ -47,7 +47,7 @@ jobs:
         run: |
           mvn -B package --file pom.xml
           ls -lR target
-          WAR_VERSION = $(echo ${{ github.event.inputs.api-buildtag }} | sed 's/v//')
+          WAR_VERSION=$(echo "${{ github.event.inputs.api-buildtag }}" | sed 's/v//')
           echo WAR_VERSION=$WAR_VERSION
           docker build . --file Dockerfile.github --tag $IMAGE_NAME --build-arg war_file=target/auscope-portal-api-$WAR_VERSION.war
           
