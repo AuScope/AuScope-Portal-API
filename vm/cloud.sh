@@ -42,6 +42,17 @@ then
                 swift upload "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH" "$fileName" $additionalFlags
                 cd "$originalDir"
         fi
+        
+        if [[ "$1" == "dirupload" ]]
+        then
+                originalDir=`pwd`
+                fileDir=`dirname "$3"`
+                fileName=`basename "$3"`
+
+                cd "$fileDir"
+                swift upload "$STORAGE_BUCKET/$STORAGE_BASE_KEY_PATH" "$3" $additionalFlags
+                cd "$originalDir"
+        fi
 fi
 
 #wrapper for aws upload
