@@ -30,6 +30,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.cloud.CloudDirectoryInformation;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
@@ -463,7 +464,40 @@ public class JobListController extends BaseCloudController  {
 
         return generateJSONResponseMAV(true, fileDetails, "");
     }
+    
+    /**
+     * 
+     * @param request
+     * @param response
+     * @param jobId
+     * @return
+     */
+    @RequestMapping("/secure/jobCloudDirectoriesAndFiles.do")
+    public ModelAndView jobCloudDirectoriesAndFiles(HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam("jobId") Integer jobId) {
+    	ANVGLUser user = userService.getLoggedInUser();
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The requested job was not found.");
+        }
 
+        CloudDirectoryInformation directoryDetails = null;
+        try {
+            CloudStorageService cloudStorageService = getStorageService(job);
+            if (cloudStorageService == null) {
+                return generateJSONResponseMAV(true, new CloudDirectoryInformation("", null), "No cloud storage service found for job");
+            } else {
+                directoryDetails = cloudStorageService.listJobDirectoriesAndFiles(job, new CloudDirectoryInformation("", null));
+            }
+        } catch (Exception e) {
+            logger.warn("Error fetching output directory information."+e.getMessage());
+            logger.debug("Exception details:",e);
+            return generateJSONResponseMAV(false, null, "Error fetching output directory information");
+        }
+
+        return generateJSONResponseMAV(true, directoryDetails, "");
+    }
 
     /**
      * Sends the contents of a job file to the client.

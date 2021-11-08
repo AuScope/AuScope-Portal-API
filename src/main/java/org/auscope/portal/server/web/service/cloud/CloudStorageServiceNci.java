@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.auscope.portal.core.cloud.CloudDirectoryInformation;
 import org.auscope.portal.core.cloud.CloudFileInformation;
 import org.auscope.portal.core.cloud.CloudFileOwner;
 import org.auscope.portal.core.services.PortalServiceException;
@@ -122,6 +123,47 @@ public class CloudStorageServiceNci extends CloudStorageService {
                 res.add(new CloudFileInformation(entry.getFilename(), entry.getAttrs().getSize(), null));
             }
             return res.toArray(new CloudFileInformation[0]);
+        } catch (JSchException | SftpException e) {
+            throw new PortalServiceException("Error listing job " + job.getId() + " files at " + fullPath , e);
+        } finally {
+            if (channel != null) {
+                channel.disconnect();
+            }
+            if (session != null) {
+                session.disconnect();
+            }
+        }
+    }
+    
+    @Override
+    public CloudDirectoryInformation listJobDirectoriesAndFiles(CloudFileOwner job, CloudDirectoryInformation cloudDirectory) throws PortalServiceException {
+        String fullPath = getOutputJobDirectory(job);
+        if(cloudDirectory != null) {
+        	fullPath = fullPath + "/" + cloudDirectory.getPath();
+    	}
+        Session session = null;
+        Channel channel = null;
+        try {
+            session = sshCloudConnector.getSession(job);
+            channel = session.openChannel("sftp");
+            channel.connect();
+            ChannelSftp c = (ChannelSftp) channel;
+            Vector<LsEntry> files = c.ls(fullPath);
+            ArrayList<CloudFileInformation> res = new ArrayList<>(files.size());
+            for (LsEntry entry : files) {
+                String fileName = entry.getFilename();
+                if (fileName.startsWith(".")) {
+                    continue;
+                }
+                SftpATTRS attribs = entry.getAttrs();
+                if (attribs.isDir()) {
+                	CloudDirectoryInformation childDirectory = new CloudDirectoryInformation(fileName, cloudDirectory);
+                	cloudDirectory.addDirectory(listJobDirectoriesAndFiles(job, childDirectory));
+                } else {
+                	cloudDirectory.addFile(new CloudFileInformation(entry.getFilename(), entry.getAttrs().getSize(), null));
+                }
+            }
+            return cloudDirectory;
         } catch (JSchException | SftpException e) {
             throw new PortalServiceException("Error listing job " + job.getId() + " files at " + fullPath , e);
         } finally {
