@@ -1,4 +1,5 @@
-![Docker](https://github.com/AuScope/AuScope-Portal-API/workflows/Docker/badge.svg?branch=master) ![Java CI with Maven](https://github.com/AuScope/AuScope-Portal-API/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
+![Docker](https://github.com/AuScope/AuScope-Portal-API/workflows/Docker/badge.svg?branch=master)
+![Java CI with Maven](https://github.com/AuScope/AuScope-Portal-API/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
 
 # AuScope-Portal-API
 
