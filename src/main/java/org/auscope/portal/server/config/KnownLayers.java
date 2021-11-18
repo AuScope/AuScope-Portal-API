@@ -592,6 +592,20 @@ public class KnownLayers {
         layer.setProxyCountUrl("");
         setupIcon(layer);
         layer.setOrder("200");
+
+        // Optional filters
+        List<AbstractBaseFilter> optionalFilters = new ArrayList<AbstractBaseFilter>();
+        UITextBox nameTextBox = new UITextBox("Name", "gsmlp:name", null, Predicate.ISLIKE);
+        this.addDrillDateFilters(optionalFilters);
+        UIPolygonBBox uiPolygonBBox = new UIPolygonBBox("Polygon BBox - Clipboard", "gsmlp:shape", null,
+                Predicate.ISEQUAL);
+        UICheckBoxGroupProvider uiCheckBoxGroupProvider = new UICheckBoxGroupProvider("Provider", null);
+        optionalFilters.add(nameTextBox);
+        optionalFilters.add(uiPolygonBBox);
+        optionalFilters.add(uiCheckBoxGroupProvider);
+        FilterCollection filterCollection = new FilterCollection();
+        filterCollection.setOptionalFilters(optionalFilters);
+        layer.setFilterCollection(filterCollection);
         return layer;
     }
     

@@ -25,7 +25,6 @@ import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.PortalServiceException;
-import org.auscope.portal.core.services.SISSVoc2Service;
 import org.auscope.portal.core.services.VocabularyCacheService;
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.services.WCSService;
