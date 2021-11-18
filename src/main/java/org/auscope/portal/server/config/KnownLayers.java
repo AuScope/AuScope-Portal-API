@@ -584,8 +584,8 @@ public class KnownLayers {
     @Bean
     public KnownLayer knownTypeBoreholeMSCL() {
         KnownLayer layer = new KnownLayer("mscl-borehole", knownTypeBoreholeMSCLSelector());
-        layer.setName("MSCL Data");
-        layer.setDescription("Borehole observations made with a multi-sensor core logger.");
+        layer.setName("MSCL Petrophysics Data");
+        layer.setDescription("Petrophysical properties of drill core collected using Geotek Multi-Sensor Core Logger (MSCL)");
         layer.setGroup("Boreholes");
         layer.setProxyUrl("doBoreholeViewFilter.do");
         layer.setProxyStyleUrl("");
