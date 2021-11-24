@@ -1,4 +1,5 @@
-![Docker](https://github.com/AuScope/AuScope-Portal-API/workflows/Docker/badge.svg?branch=master) ![Java CI with Maven](https://github.com/AuScope/AuScope-Portal-API/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
+![Docker](https://github.com/AuScope/AuScope-Portal-API/workflows/Docker/badge.svg?branch=master)
+![Java CI with Maven](https://github.com/AuScope/AuScope-Portal-API/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
 
 # AuScope-Portal-API
 
@@ -26,5 +27,5 @@ mvn clean spring-boot:run
 ```
 mvn -Dspring-boot.run.fork=false clean spring-boot:run
 ```
-6) Before deploying into development/production server, please fill out stackdriver entries in application.yaml with:
+6) Before deploying into development/production server, please fill out stackdriver entries in 'application.yaml' with:
 https://bitbucket.csiro.au/projects/GAP/repos/auscopeportalconfig/browse/stackdriver_entries_for_application.yaml

@@ -584,8 +584,8 @@ public class KnownLayers {
     @Bean
     public KnownLayer knownTypeBoreholeMSCL() {
         KnownLayer layer = new KnownLayer("mscl-borehole", knownTypeBoreholeMSCLSelector());
-        layer.setName("MSCL Data");
-        layer.setDescription("Borehole observations made with a multi-sensor core logger.");
+        layer.setName("MSCL Petrophysics Data");
+        layer.setDescription("Petrophysical properties of drill core collected using Geotek Multi-Sensor Core Logger (MSCL)");
         layer.setGroup("Boreholes");
         layer.setProxyUrl("doBoreholeViewFilter.do");
         layer.setProxyStyleUrl("");
@@ -3364,7 +3364,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-Crn-Aus-Basins", knownTypeUOWCrnAusBasinsSelector());
         layer.setId("UOW-Crn-Aus-Basins");
         layer.setName("CRN Australia: river Basins");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("CRN Australia: river Basins");
         layer.setProxyStyleUrl("getDefaultPolygonStyle.do?colour=0x0000EE");
         layer.setOrder("Registered_1");
@@ -3381,7 +3381,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-Crn-Aus-Outlets", knownTypeUOWCrnAusOutletsSelector());
         layer.setId("UOW-Crn-Aus-Outlets");
         layer.setName("CRN Australia: sample sites");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("CRN Australia: sample sites");
         layer.setProxyStyleUrl("getDefaultStyle.do?colour=0x00AAFF&layerName=be10-denude:crn_aus_outlets");
         layer.setOrder("Registered_1");
@@ -3398,7 +3398,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-Crn-Inprep-Basins", knownTypeUOWCrnInprepBasinsSelector());
         layer.setId("UOW-Crn-Inprep-Basins");
         layer.setName("CRN InPrep: river Basins");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("CRN InPrep: river Basins");
         layer.setProxyStyleUrl("getDefaultPolygonStyle.do?colour=0x00FFFF");
         layer.setOrder("Registered_1");
@@ -3415,7 +3415,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-Crn-Inprep-Outlets", knownTypeUOWCrnInprepOutletsSelector());
         layer.setId("UOW-Crn-Inprep-Outlets");
         layer.setName("CRN InPrep: sample sites");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("CRN InPrep: sample sites");
         layer.setProxyStyleUrl("getDefaultStyle.do?colour=0x00FFBB&layerName=be10-denude:crn_inprep_outlets");
         layer.setOrder("Registered_1");
@@ -3432,7 +3432,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-Crn-Int-Basins", knownTypeUOWCrnIntBasinsSelector());
         layer.setId("UOW-Crn-Int-Basins");
         layer.setName("CRN International: river Basins");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("CRN International: river Basins");
         layer.setProxyStyleUrl("getDefaultPolygonStyle.do?colour=0xBBFF00");
         layer.setOrder("Registered_1");
@@ -3449,7 +3449,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-Crn-Int-Outlets", knownTypeUOWCrnIntOutletsSelector());
         layer.setId("UOW-Crn-Int-Outlets");
         layer.setName("CRN International: sample sites");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("CRN International: sample sites");
         layer.setProxyStyleUrl("getDefaultStyle.do?colour=0xBBFFAA&layerName=be10-denude:crn_int_outlets");
         layer.setOrder("Registered_1");
@@ -3466,7 +3466,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-Crn-XXL-Basins", knownTypeUOWCrnXXLBasinsSelector());
         layer.setId("UOW-Crn-XXL-Basins");
         layer.setName("CRN XXL: river Basins");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("CRN XXL: river Basins");
         layer.setProxyStyleUrl("getDefaultPolygonStyle.do?colour=0xDDFF00");
         layer.setOrder("Registered_1");
@@ -3483,7 +3483,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-Crn-XXL-Outlets", knownTypeUOWCrnXXLOutletsSelector());
         layer.setId("UOW-Crn-XXL-Outlets");
         layer.setName("CRN XXL: sample sites");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("CRN XXL: sample sites");
         layer.setProxyStyleUrl("getDefaultStyle.do?colour=0xDDFFAA&layerName=be10-denude:crn_xxl_outlets");
         layer.setOrder("Registered_1");
@@ -3500,7 +3500,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-OSLTL-Basins", knownTypeUOWOSLTLBasinsSelector());
         layer.setId("UOW-OSLTL-Basins");
         layer.setName("OSL & TL: river Basins");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("OSL & TL: river Basins");
         layer.setProxyStyleUrl("getDefaultPolygonStyle.do?colour=0xFFDD00");
         layer.setOrder("Registered_1");
@@ -3517,7 +3517,7 @@ public class KnownLayers {
         KnownLayer layer = new KnownLayer("UOW-OSLTL-Outlets", knownTypeUOWOSLTLOutletsSelector());
         layer.setId("UOW-OSLTL-Outlets");
         layer.setName("OSL & TL: sample sites");
-        layer.setGroup("University of Wollongong");
+        layer.setGroup("Cosmogenic Isotope and Luminescence");
         layer.setDescription("OSL & TL: sample sites");
         layer.setProxyStyleUrl("getDefaultStyle.do?colour=0xFFDDAA&layerName=be10-denude:osltl_samples");
         layer.setOrder("Registered_1");
