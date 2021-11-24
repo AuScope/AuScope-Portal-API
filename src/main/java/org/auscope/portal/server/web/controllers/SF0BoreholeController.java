@@ -95,6 +95,8 @@ public class SF0BoreholeController extends BasePortalController {
     public void doNVCLBoreholeViewCSVDownload(String serviceUrl,String typeName,
     		@RequestParam(required=false, value="bbox") String bbox,
             @RequestParam(required=false, value="outputFormat") String outputFormat,
+            @RequestParam(required=false, value="filter") String filter,
+            @RequestParam(required=false, value="maxFeatures",defaultValue = "100000") Integer maxFeatures,
             HttpServletResponse response) throws Exception {
     	
     	OutputStream outputStream = response.getOutputStream();
@@ -105,14 +107,21 @@ public class SF0BoreholeController extends BasePortalController {
             
             String filterString;
             SF0BoreholeFilter sf0BoreholeFilter = new SF0BoreholeFilter(true);
-            if (box == null) {
-                filterString = sf0BoreholeFilter.getFilterStringAllRecords();
+
+            InputStream result = null;
+            if (filter != null) {
+                filterString = filter;
+                result = wfsService.downloadCSVByPolygonFilter(serviceUrl, typeName, filterString, maxFeatures);
             } else {
-                filterString = sf0BoreholeFilter.getFilterStringBoundingBox(box);
-            }
+                if (box == null ) {
+                    filterString = sf0BoreholeFilter.getFilterStringAllRecords();
+                } else {
+                    filterString = sf0BoreholeFilter.getFilterStringBoundingBox(box);
+                }
+
+                result = wfsService.downloadCSV(serviceUrl, typeName, filterString,maxFeatures);
+            }            
             
-            
-            InputStream result = wfsService.downloadCSV(serviceUrl, typeName, filterString,0);
             FileIOUtil.writeInputToOutputStream(result, outputStream, 8 * 1024, true);
             outputStream.close();
             
