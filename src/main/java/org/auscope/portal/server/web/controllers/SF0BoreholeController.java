@@ -109,7 +109,7 @@ public class SF0BoreholeController extends BasePortalController {
             SF0BoreholeFilter sf0BoreholeFilter = new SF0BoreholeFilter(true);
 
             InputStream result = null;
-            if (filter != null) {
+            if (filter != null && filter.indexOf("ogc:Filter")>0) { //Polygon filter
                 filterString = filter;
                 result = wfsService.downloadCSVByPolygonFilter(serviceUrl, typeName, filterString, maxFeatures);
             } else {
