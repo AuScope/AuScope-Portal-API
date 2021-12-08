@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Hashtable;
+import org.apache.commons.io.IOUtils;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletResponse;
 import org.auscope.portal.core.server.controllers.BasePortalController;
@@ -76,21 +78,43 @@ public class MineralTenementController extends BasePortalController {
             @RequestParam(required = false, value = "size") String size,
             @RequestParam(required = false, value = "endDate") String endDate,
             @RequestParam(required = false, value = "bbox") String bboxJson,
+            @RequestParam(required = false, value="filter") String filter,
+            @RequestParam(required = false, value="maxFeatures",defaultValue = "100000") Integer maxFeatures,
             HttpServletResponse response) throws Exception {
 
-        FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
-        MineralTenementServiceProviderType mineralTenementServiceProviderType = MineralTenementServiceProviderType.parseUrl(serviceUrl);
-        String filter = this.mineralTenementService.getMineralTenementFilter(bbox, null, mineralTenementServiceProviderType);
 
-        // Some ArcGIS servers do not support filters (not enabled?)
-        if (mineralTenementServiceProviderType == MineralTenementServiceProviderType.ArcGIS) {
-            filter = "";
-        }
-        response.setContentType("text/csv");
-        OutputStream outputStream = response.getOutputStream();
-        InputStream results = this.mineralTenementService.downloadCSV(serviceUrl, mineralTenementServiceProviderType.featureType(), filter, null);
-        FileIOUtil.writeInputToOutputStream(results, outputStream, 8 * 1024, true);
-        outputStream.close();
+            OutputStream outputStream = response.getOutputStream();
+            try {
+                response.setContentType("text/csv");
+                MineralTenementServiceProviderType mineralTenementServiceProviderType = MineralTenementServiceProviderType.parseUrl(serviceUrl);
+
+                FilterBoundingBox box = FilterBoundingBox.attemptParseFromJSON(bboxJson);
+                
+                String filterString;
+
+                InputStream result = null;
+                if (filter != null && filter.indexOf("ogc:Filter")>0) { //Polygon filter
+                    filterString = filter.replace("gsmlp:shape","mt:shape");
+                    result = this.mineralTenementService.downloadCSVByPolygonFilter(serviceUrl, mineralTenementServiceProviderType.featureType(), filterString, maxFeatures);
+                } else {
+                    filterString = this.mineralTenementService.getMineralTenementFilter(box, null, mineralTenementServiceProviderType);
+                    // Some ArcGIS servers do not support filters (not enabled?)
+                    if (mineralTenementServiceProviderType == MineralTenementServiceProviderType.ArcGIS) {
+                        filterString = "";
+                    }
+
+                    outputStream = response.getOutputStream();
+                    result = this.mineralTenementService.downloadCSV(serviceUrl, mineralTenementServiceProviderType.featureType(), filterString, null);
+                }            
+                
+                FileIOUtil.writeInputToOutputStream(result, outputStream, 8 * 1024, true);
+                outputStream.close();
+            } catch (Exception e) {
+                log.warn(String.format("Unable to request/transform WFS response from '%1$s': %2$s", serviceUrl,e));
+                log.debug("Exception: ", e);  
+                IOUtils.write("An error has occurred: "+ e.getMessage(), outputStream, StandardCharsets.UTF_8);
+                outputStream.close();
+            }              
 
     }
 
