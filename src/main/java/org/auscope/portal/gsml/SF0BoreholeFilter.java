@@ -134,8 +134,8 @@ public class SF0BoreholeFilter extends BoreholeFilter {
         if (this.justNVCL != null && this.justNVCL==true) {
             // We can "optimise" the query if we are using "justNVCL" boreholes.
             // NB: 'matchCase' isn't supported by all geoserver installations, hence have to use the 'OR' operator
-            return this.generateAndComparisonFragment(this.generateOrComparisonFragment(this.generatePropertyIsEqualToFragment("gsmlp:nvclCollection", "TRUE", false),
-                            this.generatePropertyIsEqualToFragment("gsmlp:nvclCollection", "true", false)),
+            // NB: the Or operator causes problems for newer geoservers 2.18.2 and above. fortunately, all NVCL layers now use lower case 'true' 
+            return this.generateAndComparisonFragment(this.generatePropertyIsEqualToFragment("gsmlp:nvclCollection", "true", false),
                     this.generateAndComparisonFragment(parameterFragments.toArray(new String[parameterFragments.size()])));
         } else {
             return this.generateAndComparisonFragment(parameterFragments.toArray(new String[parameterFragments.size()]));
