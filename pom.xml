@@ -50,11 +50,11 @@
     
     <!-- Repositories section -->
     <repositories>
-        <repository>
+	<repository>
             <id>dcdp-deps</id>
             <name>AuScope Nexus - New PortalRepo</name>
             <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
-        </repository>
+	</repository>
         <!-- This is only for the temporary usage of JClouds snapshots-->
         <repository>
             <id>apache-snapshots</id>
@@ -65,14 +65,27 @@
             </snapshots>
         </repository>
         <repository>
-            <id>cgmaven.it.csiro.au</id>
+            <id>portal-repository</id>
             <name>AuScope Nexus - PortalRepo</name>
             <url>https://cgmaven.it.csiro.au/nexus/repository/PortalRepository/</url>
             <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>portal-snapshots</id>
+            <name>AuScope Nexus - PortalSnapshot</name>
+            <url>https://cgmaven.it.csiro.au/nexus/repository/PortalSnapshot/</url>
+            <snapshots>
+                <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
             <releases>
-                <updatePolicy>always</updatePolicy>
+                <enabled>false</enabled>
             </releases>
         </repository>
         <repository>
