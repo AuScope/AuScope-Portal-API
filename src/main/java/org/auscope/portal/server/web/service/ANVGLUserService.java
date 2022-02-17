@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.auscope.portal.server.web.repositories.ANVGLUserRepository;
 import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.VGLUserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,10 +27,17 @@ public class ANVGLUserService {
 	public ANVGLUser getLoggedInUser() {
 		Authentication userAuth = SecurityContextHolder.getContext().getAuthentication();
 		String userEmail = "";
-		// Google OAuth2
+		// Google/Github OAuth2
 		if(userAuth instanceof OAuth2AuthenticationToken) {
 			Map<String, Object> userDetails = ((OAuth2AuthenticationToken)userAuth).getPrincipal().getAttributes();
-			userEmail = (String)userDetails.get("email");
+			// Google
+			if(userDetails != null) {
+				userEmail = (String)userDetails.get("email");
+			}
+			// Github
+			else {
+				userEmail = ((VGLUserPrincipal)((OAuth2AuthenticationToken)userAuth).getPrincipal()).getEmail();
+			}
 		}
 		// Only other supported Authentication is AAFAuthentication, where
 		// unique name has been set to user's email

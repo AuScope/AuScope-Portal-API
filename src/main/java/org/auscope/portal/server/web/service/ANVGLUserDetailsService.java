@@ -72,6 +72,12 @@ public class ANVGLUserDetailsService implements UserDetailsService {
 		return this.userService.getById(username);
 	}
 	
+	public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
+		if(StringUtils.isEmpty(email)) 
+            throw new UsernameNotFoundException("Email is empty");
+		return this.userService.getByEmail(email);
+	}
+	
 	/**
 	 * Create and persist an ANVGLUSer
 	 * 

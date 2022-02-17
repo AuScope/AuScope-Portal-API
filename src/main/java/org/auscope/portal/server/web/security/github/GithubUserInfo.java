@@ -1,4 +1,4 @@
-package org.auscope.portal.server.web.security.google;
+package org.auscope.portal.server.web.security.github;
 
 import java.util.Map;
 
@@ -6,19 +6,19 @@ import org.auscope.portal.server.web.security.VGLOAuth2UserInfo;
 
 
 /**
- * Map of returned Google user attributes
+ * Map of returned Github user attributes
  * 
  * @author woo392
  *
  */
-public class GoogleUserInfo extends VGLOAuth2UserInfo {
+public class GithubUserInfo extends VGLOAuth2UserInfo {
 
-    public GoogleUserInfo(Map<String, Object> attributes) {
+    public GithubUserInfo(Map<String, Object> attributes) {
     	super(attributes);
     }
 
     public String getId() {
-        return (String) attributes.get("sub");
+        return (String) attributes.get("id");
     }
 
     public String getName() {
@@ -28,4 +28,5 @@ public class GoogleUserInfo extends VGLOAuth2UserInfo {
     public String getEmail() {
         return (String) attributes.get("email");
     }
+    
 }
