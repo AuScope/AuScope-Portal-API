@@ -34,7 +34,6 @@ import org.auscope.portal.core.services.WFSService;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.core.services.cloud.CloudComputeServiceAws;
-//import org.auscope.portal.core.services.cloud.CloudComputeServiceNectar;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.services.cloud.STSRequirement;
@@ -128,20 +127,6 @@ public class AppContext {
 
         @Value("${aws.stsrequirement:Mandatory}")
         private String awsStsRequirement;
-
-        /*
-        @Value("${nectar.ec2.accesskey:undefined}")
-        private String nectarEc2AccessKey;
-
-        @Value("${nectar.ec2.secretkey:undefined}")
-        private String nectarEc2SecretKey;
-
-        @Value("${nectar.storage.accesskey:undefined}")
-        private String nectarStorageAccessKey;
-
-        @Value("${nectar.storage.secretkey:undefined}")
-        private String nectarStorageSecretKey;
-        */
 
         @Value("${portalAdminEmail}")
         private String adminEmail;
@@ -237,12 +222,6 @@ public class AppContext {
 
     @Bean
     public CloudStorageService[] cloudStorageServices() {
-    	/*
-        CloudStorageService[] storageServices = new CloudStorageService[3];
-        storageServices[0] = cloudStorageServiceAwsSydney();
-        storageServices[1] = cloudStorageServiceNectarMelb();
-        storageServices[2] = cloudStorageServiceNci();
-        */
     	CloudStorageService[] storageServices = new CloudStorageService[2];
         storageServices[0] = cloudStorageServiceAwsSydney();
         storageServices[1] = cloudStorageServiceNci();
@@ -261,16 +240,6 @@ public class AppContext {
         ArrayList<CloudComputeService> computeServicesList = new ArrayList<CloudComputeService>();
         computeServicesList.add(cloudComputeServiceAws());
         computeServicesList.add(cloudComputeServiceNci());
-        /*
-        try {
-            CloudComputeService nectarService = cloudComputeServiceNectar();
-            if (nectarService != null) {
-                computeServicesList.add(nectarService);
-            }
-        } catch(UnknownHostException e) {
-            logger.warn("Unable to create Nectar cloud compute service");
-        }
-		*/
         CloudComputeService computeServices[] = computeServicesList.toArray(new CloudComputeService[computeServicesList.size()]);
         return computeServices;
     }
@@ -557,21 +526,6 @@ public class AppContext {
         return storageService;
     }
 
-    /*
-    @Bean
-    public CloudStorageServiceJClouds cloudStorageServiceNectarMelb() {
-        CloudStorageServiceJClouds storageService = new CloudStorageServiceJClouds("https://keystone.rc.nectar.org.au:5000/v3",
-                "openstack-swift", nectarStorageAccessKey, nectarStorageSecretKey, null, "Melbourne", false, true);
-        storageService.setName("National eResearch Collaboration Tools and Resources");
-        storageService.setId("nectar-openstack-storage-melb");
-        storageService.setBucket("vgl-portal");
-        storageService.setAuthVersion("3");
-        STSRequirement req = STSRequirement.ForceNone;
-        storageService.setStsRequirement(req);
-        return storageService;
-    }
-    */
-
     @Bean
     public CloudStorageServiceNci cloudStorageServiceNci() {
         CloudStorageServiceNci cloudStorageService = new CloudStorageServiceNci("gadi.nci.org.au", "nci-gadi");
@@ -651,26 +605,6 @@ public class AppContext {
         computeService.setAvailableImages(vglMachineImages());
         return computeService;
     }
-
-    /*
-    @Bean
-    public CloudComputeServiceNectar cloudComputeServiceNectar() throws UnknownHostException {
-        if (!nectarEc2AccessKey.equals("undefined") && !nectarEc2SecretKey.equals("undefined")) {
-            CloudComputeServiceNectar computeService = new CloudComputeServiceNectar(
-                "https://keystone.rc.nectar.org.au:5000/v3", nectarEc2AccessKey, nectarEc2SecretKey);
-            computeService.setId("nectar-nova-compute");
-            computeService.setName("National eResearch Collaboration Tools and Resources");
-            //computeService.setGroupName("vl-#{inetAddress().hostName.toLowerCase()}");
-            String groupName = "vl-";
-            groupName += inetAddress().getHostName().toLowerCase();
-            computeService.setGroupName(groupName);
-            computeService.setKeypair("vgl-developers");
-            computeService.setApiVersion("3");
-            return computeService;
-        }
-        return null;
-    }
-    */
 
     @Bean
     public CloudComputeServiceNci cloudComputeServiceNci() {
