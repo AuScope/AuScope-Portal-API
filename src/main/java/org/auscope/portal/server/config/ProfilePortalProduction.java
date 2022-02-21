@@ -509,10 +509,10 @@ public class ProfilePortalProduction {
         yamlLayers.forEach((k, v) -> {
             counter[0]++;
             String id = k.toString();
-            if (counter[0] <= 181) { // 180
+            //if (counter[0] <= 181) { // 180
                 System.out.println(counter[0] + ", Key = " + id + ", Value = " + v);
                 knownLayers.add(knownType(id));
-            }
+            //}
         });
 
         return knownLayers;

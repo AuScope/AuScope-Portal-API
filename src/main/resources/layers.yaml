@@ -249,7 +249,7 @@
                polygonbox:
                     - [ "Polygon BBox - Clipboard", "gsmlp:shape", null, "ISEQUAL" ]
                checkbox:
-                    - [ "Provider" , null ]
+                    - [ "Provider", null ]
 "tima-geosample":
         name: "TESCAN TIMA Heavy Mineral Analyses"
         group: "Curtin University"
