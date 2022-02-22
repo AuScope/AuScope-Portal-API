@@ -33,7 +33,7 @@ public class ANVGLUser implements UserDetails {
 	private static final long serialVersionUID = -8923427161200232245L;
 
 	// Authentication frameworks
-    public enum AuthenticationFramework { GOOGLE, AAF }
+    public enum AuthenticationFramework { GOOGLE, GITHUB, AAF }
 
     @Id
     private String id;

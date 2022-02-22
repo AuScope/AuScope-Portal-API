@@ -45,6 +45,9 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	GoogleOidcUserService googleOidcUserService;
+	
+	@Autowired
+	VGLOAuth2UserService oauth2UserService;
 
 	@Autowired
 	AAFAuthenticationSuccessHandler aafSuccessHandler;
@@ -84,7 +87,7 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	    		.loginPage(frontEndUrl + "/login")
 	    		.defaultSuccessUrl(frontEndUrl + "/login/loggedIn")
 	    		.userInfoEndpoint()
-	    			.oidcUserService(googleOidcUserService);
+	    			.userService(oauth2UserService);
 	}
 	
 	@Bean

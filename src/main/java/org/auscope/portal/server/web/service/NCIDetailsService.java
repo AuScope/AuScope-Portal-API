@@ -25,10 +25,16 @@ public class NCIDetailsService {
         NCIDetails res = new NCIDetails();
         if(encRes != null) {
 	        res.setId(encRes.getId());
-	        res.setKey(encryptionService.decrypt(encRes.getKey()));
-	        res.setProject(encryptionService.decrypt(encRes.getProject()));
+	        if(encRes.getKey() != null) {
+	        	res.setKey(encryptionService.decrypt(encRes.getKey()));
+	        }
+	        if(encRes.getProject() != null) {
+	        	res.setProject(encryptionService.decrypt(encRes.getProject()));
+	        }
 	        res.setUser(encRes.getUser());
-	        res.setUsername(encryptionService.decrypt(encRes.getUsername()));
+	        if(encRes.getUsername() != null) {
+	        	res.setUsername(encryptionService.decrypt(encRes.getUsername()));
+	        }
         }
         return res;
 	}

@@ -6,6 +6,7 @@
  */
 package org.auscope.portal.server.web.controllers;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -50,6 +52,8 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.service.ANVGLUserService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.VGLJobAuditLogService;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
@@ -61,6 +65,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
+
 
 /**
  * Controller for the job list view.
@@ -1130,8 +1135,9 @@ public class JobListController extends BaseCloudController  {
             @RequestParam("file") String file,
             @RequestParam("maxSize") Integer maxSize) {
     	ANVGLUser user = userService.getLoggedInUser();
-        if (maxSize > 512 * 1024) {
-            maxSize = 512 * 1024; //Don't allow us to burn GB's on previews
+    	final int charactersPerMegabyte = 1048576;
+        if (maxSize > 50 * charactersPerMegabyte) {
+            maxSize = 50 * charactersPerMegabyte; //Don't allow us to burn GB's on previews
         }
 
         //Lookup the job whose logs we are accessing
@@ -1187,7 +1193,62 @@ public class JobListController extends BaseCloudController  {
             }
         }
     }
-
+    
+    @RequestMapping("/secure/getJSONPreview.do")
+    public ModelAndView getJSONPreview(
+            HttpServletResponse response,
+            @RequestParam("jobId") Integer jobId,
+            @RequestParam("file") String file,
+            @RequestParam("arrayPosition") Integer arrayPosition,
+            @RequestParam("zip") Boolean zip) throws Exception {
+    	ANVGLUser user = userService.getLoggedInUser();
+        //Lookup the job whose logs we are accessing
+        VEGLJob job = attemptGetJob(jobId, user);
+        if (job == null) {
+            return generateJSONResponseMAV(false, null, "The specified job does not exist.");
+        }
+        CloudStorageService cloudStorageService = getStorageService(job);
+        if (cloudStorageService == null) {
+            logger.error(String.format("No cloud storage service with id '%1$s' for job '%2$s'. Cloud file cannot be downloaded", job.getStorageServiceId(), job.getId()));
+            return generateJSONResponseMAV(false, null, "No cloud storage service found for job");
+        }
+        String jsonResult = "";
+        try (InputStream is = cloudStorageService.getJobFile(job, file)) {
+        	if (zip) {
+        		System.out.println("Zipped file");
+	        	ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
+        		StringBuilder s = new StringBuilder();
+        		byte[] buffer = new byte[1024];
+        		int read = 0;
+        		ZipEntry entry;
+        		while ((entry = zis.getNextEntry()) != null) {
+        		      while ((read = zis.read(buffer, 0, 1024)) >= 0) {
+        		           s.append(new String(buffer, 0, read));
+        		      }
+        		      zis.closeEntry();
+        		}
+        		zis.close();
+      			jsonResult = s.toString();
+        	} else {
+        		jsonResult = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        	}
+        	if (arrayPosition != null) {
+    			//jsonResult = s.toString();
+    			JSONArray jsonArray = new JSONArray(jsonResult);
+    			if (arrayPosition < jsonArray.length()) {
+    				JSONObject jsonObj = jsonArray.getJSONObject(arrayPosition);
+    				jsonResult = jsonObj.toString();
+    			}
+    		}
+        	//System.out.println("jsonResult: " + jsonResult);
+        } catch (Exception ex) {
+            logger.error("Error accessing JSON file:" + file, ex);
+            return generateJSONResponseMAV(false);
+        }
+        
+        return generateJSONResponseMAV(true, jsonResult, "");
+    }
+    
     /**
      * Gets all AuditLog entries for the specified jobId. If the authenticated user doesn't own the specified job an error will be returned.
      * @param jobId
