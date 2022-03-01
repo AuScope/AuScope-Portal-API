@@ -132,6 +132,8 @@ public class AppContext {
 
         @Value("${localStageInDir}")
         private String stageInDirectory;
+        @Value("${localCacheDir:#{null}}")
+        private String localCacheDir;
 
         @Value("${proms.report.url}")
         private String promsUrl;
@@ -410,7 +412,7 @@ public class AppContext {
     @Bean
     public CSWCacheService cswCacheService() {
         CSWCacheService cacheService = new CSWCacheService(
-                taskExecutor(), httpServiceCallerApp(), cswServiceList, griddedCswTransformerFactory());
+                taskExecutor(), httpServiceCallerApp(), cswServiceList, griddedCswTransformerFactory(), localCacheDir );
         cacheService.setForceGetMethods(true);
         return cacheService;
     }
