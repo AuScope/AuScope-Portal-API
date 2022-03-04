@@ -72,7 +72,7 @@ public class VGLOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
-        VGLOAuth2UserInfo oAuth2UserInfo = VGLOAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes());
+        VGLOAuth2UserInfo oAuth2UserInfo = VGLOAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getClientName(), oAuth2User.getAttributes());
         String email = "";
         if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             email = requestEmailAddressFromGithub(oAuth2UserRequest, oAuth2User.getAttributes());
@@ -82,7 +82,7 @@ public class VGLOAuth2UserService extends DefaultOAuth2UserService {
         // Note, this would be findById except we're not persisting authentication framework used to first log in
         ANVGLUser user = userRepository.findByEmail(email);
         if (user != null) {
-        	// Reimplement this if we want to overwrite Google login with same email address
+        	// Reimplement this if we want to overwrite Google login with same email address, but might change name
 	        //user = updateExistingUser(user, oAuth2UserInfo);
         } else {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo, email);
@@ -91,12 +91,10 @@ public class VGLOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private ANVGLUser registerNewUser(OAuth2UserRequest oAuth2UserRequest, VGLOAuth2UserInfo oAuth2UserInfo, String email) {
-    	
     	Map<String, String> attributes = new HashMap<String, String>();
     	attributes.put("name", oAuth2UserInfo.getName());
     	attributes.put("email", email);
-    	
-    	final AuthenticationFramework authFramework = oAuth2UserRequest.getClientRegistration().getClientId().equalsIgnoreCase("github") ?
+    	final AuthenticationFramework authFramework = oAuth2UserRequest.getClientRegistration().getClientName().equalsIgnoreCase("github") ?
     			AuthenticationFramework.GITHUB : AuthenticationFramework.GOOGLE;
     	ANVGLUser user = userDetailsService.createNewUser(oAuth2UserInfo.getId(), authFramework, attributes);
     	return user;

@@ -2,6 +2,7 @@ package org.auscope.portal.server.web.security.github;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auscope.portal.server.web.security.VGLOAuth2UserInfo;
 
 
@@ -18,11 +19,17 @@ public class GithubUserInfo extends VGLOAuth2UserInfo {
     }
 
     public String getId() {
-        return (String) attributes.get("id");
+        return String.valueOf(attributes.get("id"));
     }
 
     public String getName() {
-        return (String) attributes.get("name");
+    	String name = (String)attributes.get("name");
+    	if (StringUtils.isEmpty(name)) {
+	    	if (!StringUtils.isEmpty((String)attributes.get("login"))) {
+	    		name = (String)attributes.get("login");
+	    	}
+    	}
+        return name;
     }
 
     public String getEmail() {
