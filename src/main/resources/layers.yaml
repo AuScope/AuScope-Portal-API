@@ -1,0 +1,1611 @@
+"erml-mine":
+        group: "Earth Resources(old)"
+        name: "Earth Resource Mine"
+        description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:Mine"
+        proxyUrl: "doMineFilter.do"
+        proxyCountUrl: "doMineFilterCount.do"
+        proxyStyleUrl: "doMineFilterStyle.do"
+        proxyDownloadUrl: "doMineFilterDownload.do"
+        icon:
+                url: "http://maps.google.com/mapfiles/kml/paddle/pink-blank.png"
+        order: "10"
+        stackdriverServiceGroup: "EarthResourcesLayers"
+        wfs:
+               selector: "gsml:MappedFeature"
+               feature:
+                    - "er:Commodity"
+                    - "er:MineralOccurrence"
+        filters:
+               textbox: 
+                    - [ "Mine Name", "er:specification/er:Mine/er:mineName/er:MineName/er:mineName", null, "ISLIKE" ]
+               checkbox:
+                    - [ "Provider", null ]
+"erml-mineraloccurrence":
+        name: "Earth Resource Mineral Occurrence"
+        description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:MineralOccurence"
+        group: "Earth Resources(old)"
+        proxyUrl: "doMineralOccurrenceFilter.do"
+        proxyCountUrl: "doMineralOccurrenceFilterCount.do"
+        proxyStyleUrl: "doMineralOccurrenceFilterStyle.do"
+        proxyDownloadUrl: "doMineralOccurrenceFilterDownload.do"
+        icon:
+                url: "http://maps.google.com/mapfiles/kml/paddle/purple-blank.png"
+        order: "11"
+        stackdriverServiceGroup: "EarthResourcesLayers"
+        wfs:
+               selector: "gsml:MappedFeature"
+               feature:
+                    - "er:MiningActivity"
+                    - "gsml:MappedFeature"
+        filters:
+               checkbox:
+                    - ["Provider", null ]
+"erml-miningactivity":
+        group: "Earth Resources(old)"
+        name: "Earth Resource Mining Activity"
+        description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:MiningActivity"
+        proxyUrl: "doMiningActivityFilter.do"
+        proxyCountUrl: "doMiningActivityFilterCount.do"
+        proxyStyleUrl: "doMiningActivityFilterStyle.do"
+        proxyDownloadUrl: "doMiningActivityFilterDownload.do"        
+        icon:
+                url: "http://maps.google.com/mapfiles/kml/paddle/orange-blank.png"
+        order: "12"
+        stackdriverServiceGroup: "EarthResourcesLayers"
+        wfs:
+               selector: "gsml:MappedFeature"
+               feature:
+                    - "er:Commodity"
+                    - "er:MineralOccurrence"
+        filters:
+               checkbox:
+                    - [ "Provider", null ]
+"mineral-tenements":
+        group: "Tenements"
+        name: "Mineral Tenements"
+        description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for mt:Mineral Tenement"
+        group: "Tenements"
+        proxyUrl: "getAllMineralTenementFeatures.do"
+        proxyGetFeatureInfoUrl: "getMineralTenementFeatureInfo.do"
+        proxyCountUrl: "getMineralTenementCount.do"
+        proxyStyleUrl: "getMineralTenementStyle.do"
+        proxyDownloadUrl: "doMineralTenementCSVDownload.do"
+        order: "150"
+        stackdriverServiceGroup: "TenementsLayers"
+        wmswfs:
+               featureName: "mt:MineralTenement"
+               layerName: "MineralTenement"
+        filters:
+               textbox:
+                    - [ "Name", "mt:name", null, "ISLIKE" ]
+                    - [ "Owner", "mt:owner", null, "ISLIKE" ]
+               selectlist:
+                   params:
+                        - "Tenement Type"
+                        - "mt:tenementType"
+                        - null 
+                        - "ISLIKE"
+                   options: 
+                        - [ "Exploration", "exploration" ]
+                        - [ "Prospecting", "prospecting" ]
+                        - [ "Miscellaneous", "miscellaneous" ]
+                        - [ "Mining Lease", "mining" ]
+                        - [ "Licence", "licence" ]
+               mandatorylist:
+                   params:
+                        - "Color Code"
+                        - "ccProperty"
+                        - "TenementType"
+                   options: 
+                        - [ "Tenement Type", "TenementType" ]
+                        - [ "Tenement Status", "TenementStatus" ]
+                        - [ "UnStyled", null ]
+               checkbox:
+                    - [ "Provider" , null ]
+               date:
+                    - [ "Expires After", "mt:expireDate", null, "BIGGER_THAN" ]
+                    - [ "Expires Before", "mt:expireDate", null, "SMALLER_THAN" ]
+"erl-mineview":
+        name: "Mine View"
+        description: "Earth ResourceML Lite Mine"
+        group: "Earth Resources Lite(new)"
+        proxyUrl: ""
+        proxyCountUrl: ""
+        proxyStyleUrl: "getErlMineViewStyle.do"
+        proxyDownloadUrl: ""
+        order: "160"
+        stackdriverServiceGroup: "EarthResourcesLayers"
+        wfs:
+            selector: "erl:MineView"
+        filters:
+            textbox:
+                 - [ "Name", "erl:name", null, "ISLIKE" ]
+            dropdownremote:
+                 - [ "Status", "erl:status_uri", null, "ISEQUAL", "getAllMineStatuses.do" ]
+            checkbox:
+                 - [ "Provider", null ]
+            polygonbox:
+                 - [ "Polygon BBox", "erl:shape", null, "ISEQUAL" ]
+"erl-mineraloccurrenceview":
+        name: "Mineral Occurrence"
+        description: "Earth ResourceML Lite Mineral Occurrence View"
+        group: "Earth Resources Lite(new)"
+        proxyUrl: ""
+        proxyCountUrl: ""
+        proxyStyleUrl: "getErlMineralOccurrenceViewStyle.do"
+        proxyDownloadUrl: ""
+        order: "160"
+        stackdriverServiceGroup: "EarthResourcesLayers"
+        wfs:
+            selector: "erl:MineralOccurrenceView"
+        filters:
+            textbox:
+                 - [ "Name", "erl:name", null, "ISLIKE" ]
+            dropdownremote:
+                 - [ "Commodity", "erl:representativeCommodity_uri", null, "ISEQUAL", "getAllCommodities.do" ]
+                 - [ "Geologic Timescale", "erl:representativeAge_uri", null, "ISEQUAL", "getAllTimescales.do" ]
+            checkbox:
+                 - [ "Provider", null ]
+            polygonbox:
+                 - [ "Polygon BBox", "erl:shape", null, "ISEQUAL" ]
+"erl-commodityresourceview":
+        name: "Commodity Resource"
+        description: "Earth ResourceML Lite Commodity Resource View"
+        group: "Earth Resources Lite(new)"
+        proxyUrl: ""
+        proxyCountUrl: ""
+        proxyStyleUrl: "getErlCommodityResourceViewStyle.do"
+        proxyDownloadUrl: ""
+        order: "160"
+        stackdriverServiceGroup: "EarthResourcesLayers"
+        wfs:
+            selector: "erl:CommodityResourceView"
+        filters:
+            textbox:
+                 - [ "Mine Name", "erl:mineName", null, "ISLIKE" ]
+            dropdownremote:
+                 - [ "Commodity", "erl:commodityClassifier_uri", null, "ISEQUAL", "getAllCommodities.do" ]
+                 - [ "JORC Category", "erl:resourcesCategory_uri", null, "ISEQUAL", "getAllJorcCategories.do" ]
+            checkbox:
+                 - [ "Provider", null ]
+            polygonbox:
+                 - [ "Polygon BBox", "erl:shape", null, "ISEQUAL" ]
+"mineral-occ-view":
+        name: "Mineral Occurrence View"
+        description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for mo:MinOccView"
+        group: "Earth Resources(old)"
+        proxyUrl: ""
+        proxyCountUrl: ""
+        proxyStyleUrl: "doMinOccurViewFilterStyle.do"
+        proxyDownloadUrl: "downloadMinOccurView.do"
+        order: "13"
+        stackdriverServiceGroup: "EarthResourcesLayers"
+        wfs:
+            selector: "mo:MinOccView"
+"magnetotellurics":
+        name: "Magnetotelluric Survey Sites"
+        group: "Magnetotellurics"
+        description: "The magnetotelluric surveys were conducted in Australia with public funding (government and university) from the 1960s to present."
+        order: "401"
+        wfs:
+            selector: "magnetotelluric"
+"portal-geo-models":
+        name: "3D Geological Models"
+        group: "Models"
+        description: "Various Geological Models"
+        icon:
+            url: "http://maps.google.com/mapfiles/kml/paddle/blu-square.png"
+        order: "407"
+        csw:
+            keyword: "3D Geological Models"
+"nvcl-v2-borehole":
+        name: "National Virtual Core Library V-2.0"
+        group: "Boreholes"
+        description: "A collection of services implementing the National Virtual Core Library Profile v1 for gsml:Borehole and a collection of observations"
+        proxyUrl: "doBoreholeViewFilter.do"
+        proxyCountUrl: ""
+        proxyDownloadUrl: "doNVCLBoreholeViewCSVDownload.do"
+        proxyStyleUrl: "doNvclV2FilterStyle.do"
+        icon: 
+               setup: "true"
+        order: "51"
+        stackdriverServiceGroup: "NVCLBoreholeViewLayer"
+        wfs:
+               selector: "gsml:MappedFeature"
+               feature:
+                    - "sa:SamplingFeatureCollection"
+                    - "om:GETPUBLISHEDSYSTEMTSA"
+                    - "nvcl:scannedBorehole"
+                    - "nvcl:ScannedBoreholeCollection"
+               endPoints:
+                    - "http://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs"
+                    - "https://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs"
+                    - "http://www.mrt.tas.gov.au:80/web-services/wfs"
+                    - "https://www.mrt.tas.gov.au/web-services/wfs"
+                    - "http://geossdi.dmp.wa.gov.au:80/services/wfs"
+                    - "http://geossdi.dmp.wa.gov.au/services/wfs"
+                    - "https://geossdi.dmp.wa.gov.au/services/wfs"
+                    - "http://geology.data.nt.gov.au:80/geoserver/wfs"
+                    - "https://geology.data.nt.gov.au/geoserver/wfs"
+                    - "https://gs.geoscience.nsw.gov.au/geoserver/wfs"
+                    - "https://sarigdata.pir.sa.gov.au/geoserver/wfs"
+                    - "http://geology-uat.information.qld.gov.au/geoserver/wfs"
+                    - "https://geology-uat.information.qld.gov.au/geoserver/wfs"
+                    - "http://geology.information.qld.gov.au/geoserver/wfs"
+                    - "https://geology.information.qld.gov.au/geoserver/wfs"
+                    - "http://geology.data.vic.gov.au/nvcl/wfs"
+                    - "https://geology.data.vic.gov.au/nvcl/wfs" 
+        filters:
+               date:
+                    - [ "Drilling Start From", "gsmlp:drillStartDate", null, "BIGGER_THAN" ]
+                    - [ "Drilling Start To", "gsmlp:drillStartDate", null, "SMALLER_THAN" ]
+                    - [ "Drilling End From", "gsmlp:drillEndDate", null, "BIGGER_THAN" ]
+                    - [ "Drilling End To", "gsmlp:drillEndDate", null, "SMALLER_THAN" ]
+               mandatorytextbox:
+                    - [ "Analytics Job Id", "analyticsJobId", "" ]
+               textbox:
+                    - [ "Name", "gsmlp:name", null, "ISLIKE" ]
+                    - [ "Identifier", "gsmlp:identifier", null, "ISLIKE" ]
+               polygonbox:
+                    - [ "Polygon BBox - Clipboard", "gsmlp:shape", null, "ISEQUAL" ]
+               checkbox:
+                    - [ "Provider", null ]
+"tima-geosample":
+        name: "TESCAN TIMA Heavy Mineral Analyses"
+        group: "Curtin University"
+        description: "A collection of the results published from TIMA"
+        proxyUrl: "doTIMAGeoSample.do"
+        proxyCountUrl: ""
+        proxyDownloadUrl: "doTIMAGeoSampleCSVDownload.do"
+        icon:
+               url: "http://maps.google.com/mapfiles/kml/paddle/grn-circle.png"
+        order: "180"
+        wfs:
+               selector: "tima:geosample_and_mineralogy"
+        filters:
+               textbox:
+                    - [ "Name", "gsmlp:name", null, "ISLIKE" ]
+                    - [ "IGSN", "igsn", null, "ISLIKE" ]
+"tima-shrimp-geosample":
+        name: "SHRIMP Geochronology"
+        group: "Curtin University"
+        description: "A collection of the results published from SHRIMP U-Pb mass spectrometer"
+        proxyUrl: "doSHRIMPGeoSample.do"
+        proxyCountUrl: ""
+        proxyDownloadUrl: "doSHRIMPGeoSampleCSVDownload.do"
+        icon:
+               url: "http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png"
+        order: "180"
+        wfs:
+               selector: "tima:view_shrimp_geochronology_result"
+        filters:
+               textbox:
+                    - [ "Name", "gsmlp:name", null, "ISLIKE" ]
+                    - [ "IGSN", "igsn", null, "ISLIKE" ]
+"sf0-borehole-nvcl":
+        name: "All Boreholes"
+        group: "Boreholes"
+        description: "A collection of services implementing the GeoSciML Portrayal Borehole View (gsmlp:BoreholeView)"
+        proxyUrl: "doBoreholeViewFilter.do"
+        proxyCountUrl: ""
+        proxyStyleUrl: "doBoreholeViewFilterStyle.do"
+        icon:
+               setup: "true"
+        order: "52"
+        stackdriverServiceGroup: "BoreholeViewLayer"
+        wfs:
+               selector: "gsmlp:BoreholeView"
+               feature:
+                    - "sa:SamplingFeatureCollection"
+                    - "om:GETPUBLISHEDSYSTEMTSA"
+                    - "nvcl:scannedBorehole"
+                    - "nvcl:ScannedBoreholeCollection"
+        filters:
+               mandatorytextbox:
+                    - [ "Analytics Job Id", "analyticsJobId", "" ]
+               textbox:
+                    - [ "Name", "gsmlp:name", null, "ISLIKE" ]
+               date:
+                    - [ "Drilling Start From", "gsmlp:drillStartDate", null, "BIGGER_THAN" ]
+                    - [ "Drilling Start To", "gsmlp:drillStartDate", null, "SMALLER_THAN" ]
+                    - [ "Drilling End From", "gsmlp:drillEndDate", null, "BIGGER_THAN" ]
+                    - [ "Drilling End To", "gsmlp:drillEndDate", null, "SMALLER_THAN" ]
+               polygonbox:
+                    - [ "Polygon BBox - Clipboard", "gsmlp:shape", null, "ISEQUAL" ]
+               checkbox:
+                    - [ "Provider" , null ]
+"mscl-borehole":
+        name: "MSCL Data"
+        description: "Borehole observations made with a multi-sensor core logger."
+        group: "Boreholes"
+        proxyUrl: "doBoreholeViewFilter.do"
+        proxyStyleUrl: ""
+        proxyCountUrl: ""
+        icon:
+               setup : "true"
+        order: "200"
+        wfs:
+               selector: "gsmlp:MSCL-BoreholeView"
+               feature:
+                    - "mscl:scanned_data"
+                    - "sa:SamplingFeatureCollection"
+"seismology-in-schools-site":
+        name: "Seismographs in Schools Network"
+        description: "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "250"
+        iris:
+               selector: [ "S1", "http://auspass.edu.au:80" ]
+"seismology-skippy":
+        name: "SKIPPY"
+        description: "The SKIPPY seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "251"
+        iris:
+               selector: [ "7B", "http://auspass.edu.au:80" ]
+"seismology-kimba97":
+        name: "KIMBA97: Kimberley Region in 1997"
+        description: "The KIMBA97 seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "252"
+        iris:
+               selector: [ "7D", "http://auspass.edu.au:80" ]
+"seismology-kimba98":
+        name: "KIMBA98: Kimberley Region in 1998"
+        description: "The KIMBA98 seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "253"
+        iris:
+               selector: [ "7E","http://auspass.edu.au:80" ]
+"seismology-wacraton":
+        name: "WACRATON: Western Australia"
+        description: "The West Australian Cratons seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "254"
+        iris:
+               selector: [ "7G","http://auspass.edu.au:80" ]
+"seismology-seal":
+        name: "SEAL: South East Australia Linkage"
+        description: "The SEAL seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "255"
+        iris:
+               selector: [ "7Q","http://auspass.edu.au:80" ]
+"seismology-seal2":
+        name: "SEAL2: South East Australia Linkage"
+        description: "The SEAL2 seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "256"
+        iris:
+               selector: [ "7T","http://auspass.edu.au:80" ]
+"seismology-seal3":
+        name: "SEAL3: South East Australia Linkage"
+        description: "The SEAL3 seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "257"
+        iris:
+               selector: [ "7U","http://auspass.edu.au:80" ]
+"seismology-capral":
+        name: "CAPRAL: Northwest Australia"
+        description: "The CAPRAL seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "258"
+        iris:
+               selector: [ "7J","http://auspass.edu.au:80" ]
+"seismology-soc":
+        name: "SOC: Southern Craton"
+        description: "The SOC seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "259"
+        iris:
+               selector: [ "7K","http://auspass.edu.au:80" ]
+"seismology-gawler":
+        name: "GAWLER"
+        description: "The GAWLER seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "260"
+        iris:
+               selector: [ "1G","http://auspass.edu.au:80" ]
+"seismology-bilby":
+        name: "BILBY: Australian Cratonic Lithosphere"
+        description: "The BILBY seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "261"
+        iris:
+               selector: [ "6F","http://auspass.edu.au:80" ]
+"seismology-curnamona":
+        name: "CURNAMONA: Seismic structure of South Australia"
+        description: "The CURNAMONA seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "262"
+        iris:
+               selector: [ "1F","http://auspass.edu.au:80" ]
+"seismology-minq":
+        name: "MINQ: Mount Isa Northern Queensland"
+        description: "The MINQ seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "263"
+        iris:
+               selector: [ "ZR","http://auspass.edu.au:80" ]
+"seismology-eal1":
+        name: "EAL1: Eastern Australia Linkage"
+        description: "The EAL1 seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "264"
+        iris:
+               selector: [ "YJ","http://auspass.edu.au:80" ]
+"seismology-eal2":
+        name: "EAL2: Eastern Australia Linkage"
+        description: "The EAL2 seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "265"
+        iris:
+               selector: [ "1H","http://auspass.edu.au:80" ]
+"seismology-eal3":
+        name: "EAL3: Eastern Australia Linkage"
+        description: "The EAL3 seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "266"
+        iris:
+               selector: [ "7L","http://auspass.edu.au:80" ]
+"seismology-bass":
+        name: "BASS: Bass strait from 2011 to 2013"
+        description: "The BASS seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "267"
+        iris:
+               selector: [ "1P","http://auspass.edu.au:80" ]
+"seismology-sqeal":
+        name: "SQEAL: South Queensland Eastern Australia Linkage"
+        description: "The SQEAL seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "268"
+        iris:
+               selector: [ "8J","http://auspass.edu.au:80" ]
+"seismology-aq3":
+        name: "AQ3 SW Queensland and NW New South Wales"
+        description: "The AQ3 seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "269"
+        iris:
+               selector: [ "4J","http://auspass.edu.au:80" ]
+"seismology-aqt":
+        name: "AQT: Western Queensland"
+        description: "The AQT seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "270"
+        iris:
+               selector: [ "1Q","http://auspass.edu.au:80" ]
+"seismology-banda":
+        name: "Banda Arc: Transitions in the Banda Arc-Australia continental collision"
+        description: "The BANDA seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "271"
+        iris:
+               selector: ["YS","http://auspass.edu.au:80" ]
+"seismology-asr":
+        name: "ASR"
+        description: "The ASR seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "272"
+        iris:
+               selector: [ "5J","http://auspass.edu.au:80" ]
+"seismology-marla-line":
+        name: "Marla Line"
+        description: "The MARLA LINE seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        icon:
+               setup : "true"
+        order: "273"
+        iris:
+               selector: [ "3G","http://auspass.edu.au:80" ]
+"passive-seismic":
+        name: "Passive Seismic Sites"
+        group: "Passive Seismic"
+        description: "Passive Seismic Sites"
+        wms:
+               selector: "passive-seismic"
+"ga-geotransects":
+        name: "GA Onshore Seismic Surveys"
+        group: "Passive Seismic"
+        description: "The Onshore Seismic Data of Australia is a collection of all land seismic traverses cross the Australian continent and its margins. The data includes raw and processed data in SEGY format. The metadata includes acquisition reports, processing reports, processed images, logs, and so on. The data acquisition was carried out in Australia from 1949-2012 by Geoscience Australia and various partners. The set of reflection and refraction data comprises over 12,000 km of coverage, and provides an insight into the variations in crustal architecture in the varied geological domains. The complete processed dataset was first available for public access in Oct 2013 (http://www.ga.gov.au/minerals/projects/current-projects/seismic-acquisition-processing.html ). The location of seismic traverses is shown by the Gallery link on the webpage. The new survey data will be updated on the webpage by the official data release date. The attribute structure of the dataset has also been revised to be more compatible with the GeoSciML data standard, published by the IUGS Commission for Geoscience Information. The onshore seismic data were collected with partner organizations: Australian Geodynamics Cooperative Research Centre, National Research Facility for Earth Sounding, Australian Nuclear Science and Technology Organisation, Cooperative Research Centre for Greenhouse Gas Technologies, Curtin University of Technology, Geological Survey of New South Wales, NSW Department of Mineral Resources, NSW Department of Primary Industries Mineral Resources, An organisation for a National Earth Science Infrastructure Program, Geological Survey Western Australia, Northern Territory Geological Survey, Primary Industries and Resources South Australia, Predictive Mineral Discovery Cooperative Research Centre, Queensland Geological Survey, GeoScience Victoria Department of Primary Industries, Tasmania Development and Resources, University of Western Australia."
+        order: "275"
+        wms:
+               selector: "Onshore_Seismic_Surveys"
+"ga-geophysicalsurveys-all":
+        name: "Geophysical Surveys - All"
+        group: "GA Geophysical Survey Datasets"
+        description: "Descriptions of geophysical datasets, their associated surveys, and the methods used for delivery of those datasets. Includes datasets collected from airborne, land, and marine surveys conducted or managed by Geoscience Australia and its predecessor agencies, as well as data and surveys from State and Territory geological survey agencies."
+        order: "310"
+        wms:
+               selector: "gadds:geophysical_survey_datasets"
+"ga-geophysicalsurveys-grav":
+        name: "Geophysical Surveys - Gravity"
+        group: "GA Geophysical Survey Datasets"
+        description: "Gravity data measures small changes in gravity due to changes in the density of rocks beneath the Earth's surface."
+        order: "311"
+        wms:
+               selector: "gadds:geophysical_datasets_gravity"
+"ga-geophysicalsurveys-radio":
+        name: "Geophysical Surveys - Radiometric"
+        group: "GA Geophysical Survey Datasets"
+        description: "The radiometric, or gamma-ray spectrometric method, measures the natural variations in the gamma-rays detected near the Earth's surface as the result of the natural radioactive decay of potassium (K), uranium (U) and thorium (Th). Radiometrics can tell us about the distribution of certain soils and rocks."
+        order: "312"
+        wms:
+               selector: "gadds:geophysical_datasets_radiometric"
+"ga-geophysicalsurveys-mag":
+        name: "Geophysical Surveys - Magnetic"
+        group: "GA Geophysical Survey Datasets"
+        description: "Total magnetic intensity (TMI) data measures variations in the intensity of the Earth's magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust. Magnetic anomalies can be either positive (field stronger than normal) or negative (field weaker) depending on the susceptibility of the rock. "
+        order: "313"
+        wms:
+               selector: "gadds:geophysical_datasets_radiometric"
+"gga-geophysicalsurveys-elev":
+        name: "Geophysical Surveys - Elevation"
+        group: "GA Geophysical Survey Datasets"
+        description: "Digital Elevation data record the terrain height variations from the processed point-located data recorded during a geophysical survey."
+        order: "314"
+        wms:
+               selector: "gadds:geophysical_datasets_elevation"
+"ga-geophys-1":
+    name: "Bouguer Gravity Anomaly Grid of Onshore Australia 2016"
+    description: "This gravity anomaly grid is derived from observations stored in the Australian National Gravity Database ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "351"
+    csw:
+        id: "f0886_1142_1614_4044"
+"ga-geophys-2":
+    name: "Complete Bouguer Gravity Anomaly Grid of Onshore Australia 2016"
+    description: "This gravity anomaly grid is derived from observations stored in the Australian National Gravity Database ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "352"
+    csw:
+        serviceName: "Complete Bouguer Gravity Anomaly Grid of Onshore Australia 2016"
+"ga-geophys-3":
+    name: "Isostatic Residual Gravity Anomaly Grid of Onshore Australia 2016"
+    description: "This grid is derived from gravity observations stored in the Australian National Gravity Database ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "353"
+    csw:
+        id: "f4523_7439_0612_0991"
+"ga-geophys-4":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 filtered pct potassium grid"
+    description: "The filtered potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "354"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 filtered pct potassium grid"
+"ga-geophys-5":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 filtered ppm thorium"
+    description: "The filtered thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "355"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm thorium"
+"ga-geophys-6":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 filtered ppm uranium"
+    description: "The filtered uranium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "356"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm uranium"
+"ga-geophys-7":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 filtered terrestrial dose rate"
+    description: "The filtered terrestrial dose rate grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia, made of a combination of over 600 individual survey grids."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "357"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 filtered terrestrial dose rate"
+"ga-geophys-8":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 ratio thorium over potassium"
+    description: "The thorium over potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "358"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 ratio thorium over potassium"
+"ga-geophys-9":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 ratio uranium over potassium"
+    description: "The uranium over potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia comprising over 600 airborne gamma-ray spectrometric surveys."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "359"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over potassium"
+"ga-geophys-10":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 ratio uranium over thorium"
+    description: "The uranium over thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "360"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over thorium"
+"ga-geophys-11":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 ratio uranium squared over thorium"
+    description: "The uranium squared over thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "361"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium squared over thorium"
+"ga-geophys-12":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered pct potassium"
+    description: "The unfiltered potassium grid is a derivative of the 2019 radiometric grid of Australia."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "362"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 unfiltered pct potassium"
+"ga-geophys-13":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered ppm thorium"
+    description: "The unfiltered thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "363"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm thorium"
+"ga-geophys-14":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered ppm uranium"
+    description: "The unfiltered uranium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "364"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm uranium"
+"ga-geophys-15":
+    name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered terrestrial dose rate"
+    description: "The unfiltered terrestrial dose rate grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia, which is a merge of over 600 individual gamma-ray spectrometric surveys."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "365"
+    csw:
+        serviceName: "Radiometric Grid of Australia (Radmap) v4 2019 unfiltered terrestrial dose rate"
+"ga-geophys-16":
+    name: "Total Magnetic Intensity TMI) Grid of Australia 2019 - seventh edition - 40 m cell size"
+    description: "Total magnetic intensity TMI) data measures variations in the intensity of the Earth magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "366"
+    csw:
+        serviceName: "Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 40 m cell size"
+"ga-geophys-17":
+    name: "Total Magnetic Intensity TMI) Grid of Australia 2019 - seventh edition - 80 m cell size"
+    description: "Total magnetic intensity TMI) data measures variations in the intensity of the Earth magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "367"
+    csw:
+        serviceName: "Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 80 m cell size"
+"ga-geophys-18":
+    name: "Total Magnetic Intensity TMI) Grid of Australia with Variable Reduction to Pole VRTP) 2019 - seventh edition"
+    description: "The 2019 Total magnetic Intensity TMI) grid of Australia with variable reduction to pole VRTP) has a grid cell size of ~3 seconds of arc approximately 80 m). This grid only includes airborne-derived TMI data for onshore and near-offshore continental areas."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "368"
+    csw:
+        serviceName: "Total Magnetic Intensity (TMI) Grid of Australia with Variable Reduction to Pole (VRTP) 2019 - seventh edition"
+"ga-geophys-19":
+    name: "Total Magnetic Intensity Grid of Australia 2019 - First Vertical Derivative 1VD)"
+    description: " The first vertical derivative 1VD) grid is derived from the 2019 Total magnetic Intensity TMI) grid of Australia which has a grid cell size of ~3 seconds of arc approximately 80 m)."
+    group: "GA/NCI National Geophysical Compilations"
+    order: "369"
+    csw:
+        serviceName: "Total Magnetic Intensity Grid of Australia 2019 - First Vertical Derivative (1VD)"
+"aster-aloh":
+    name: "AlOH group composition"
+    description: "1. Band ratio: B5/B7Blue is well ordered kaolinite, Al-rich muscovite/illite, paragonite, pyrophyllite Red is Al-poor Si-rich) muscovite phengite)"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_020"
+    csw:
+        serviceName: "National ASTER Map AlOH group composition"
+"aster-ferrous":
+    name: "Ferrous iron index"
+    description: "1. Band ratio: B5/B4Blue is low abundance, Red is high abundance"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_030"
+    csw:
+        serviceName: "National ASTER Map Ferrous iron index"
+"aster-opaque":
+    name: "Opaque index"
+    description: "1. Band ratio: B1/B4Blue is low abundance, Red is high abundancepotentially includes  carbon black e.g. ash), magnetite, Mn oxides, and sulphides in unoxidised envornments"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_040"
+    csw:
+        serviceName: "National ASTER Map Opaque index"
+"aster-ferric-oxide-content":
+    name: "Ferric oxide content2"
+    description: "1. Band ratio: B4/B3Blue is low abundance, Red is high abundance"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_050"
+    csw:
+        serviceName: "National ASTER Map Ferric oxide content"
+"aster-feoh":
+    name: "FeOH group content"
+    description: "1. Band ratio: (B6+B8)/B7Blue is low content, Red is high contentpotentially includes: chlorite, epidote, jarosite, nontronite, gibbsite, gypsum, opal-chalcedony)"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_060"
+    csw:
+        serviceName: "National ASTER Map FeOH group content"
+"aster-ferric-oxide-comp":
+    name: "Ferric oxide composition"
+    description: "1. Band ratio: B2/B1Blue-cyan is goethite rich, Green is hematite-goethite, Red-yellow is hematite-rich"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_070"
+    csw:
+        serviceName: "National ASTER Map Ferric oxide composition"
+"aster-group-index":
+    name: "Kaolin group index"
+    description: "B6/B5(potential includes: pyrophyllite, alunite, well-ordered kaolinite)Blue is low content, Red is high content"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_080"
+    csw:
+        serviceName: "National ASTER Map Kaolin group index"
+"aster-quartz-index":
+    name: "TIR Quartz index"
+    description: "1. Band ratio: B11/(B10+B12)Blue is low quartz contentRed is high quartz content"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_090"
+    csw:
+        serviceName: "National ASTER Map TIR Quartz index"
+"aster-mgoh-content":
+    name: "MgOH group content"
+    description: "1. Band ratio: (B6+B9/(B7+B8)Blue is low content, Red is high contentpotentially includes: calcite, dolomite, magnesite, chlorite, epidote, amphibole, talc, serpentine)"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_100"
+    csw:
+        serviceName: "National ASTER Map MgOH group content"
+"aster-green-veg":
+    name: "Green vegetation content"
+    description: "Band ratio: B3/B2 Blue is low contentRed is high content"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_110"
+    csw:
+        serviceName: "National ASTER Map green vegetation content"
+"aster-ferr-carb":
+    name: "Ferrous iron content in MgOH/carbonate"
+    description: "1. Band ratio: B5/B4Blue is low ferrous iron content in carbonate and MgOH minerals like talc and tremolite.Red is high ferrous iron content in carbonate and MgOH minerals like chlorite and actinolite."
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_120"
+    csw:
+        serviceName: "National ASTER Map Ferrous iron content in MgOH/carbonate"
+"aster-mgoh-group-comp":
+    name: "MgOH group composition"
+    description: "1. Band ratio: B7/B8Blue-cyan is magnesite-dolomite, amphibole, chlorite\tRed is calcite, epidote, amphibole"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_130"
+    csw:
+        serviceName: "National ASTER Map MgOH group composition"
+"aster-aloh-group-content":
+    name: "AlOH group content"
+    description: "1. Band ratio: (B5+B7)/B6Blue is low abundance, Red is high abundance potentially includes: phengite, muscovite, paragonite, lepidolite, illite, brammalite, montmorillonite, beidellite, kaolinite, dickite"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_160"
+    csw:
+        serviceName: "National ASTER Map AlOH group content"
+"aster-silica-content":
+    name: "TIR Silica index"
+    description: "1. Band ratio: B13/B10Blue is low silica contentRed is high silica content(potentially includes Si-rich minerals, such as quartz, feldspars, Al-clays)"
+    group: "ASTER Maps"
+    order: "30_ASTER Maps_180"
+    csw:
+        serviceName: "National ASTER Map TIR Silica index"
+"remanent-anomalies":
+    name: "AUS5 - Remanent Anomalies"
+    description: "A collection of services publishing magnetic anomalies"
+    group: "Magnetics"
+    proxyUrl: ""
+    proxyCountUrl: ""
+    proxyStyleUrl: "getRemanentAnomaliesStyle.do"
+    proxyDownloadUrl: "doRemanentAnomaliesDownload.do"
+    order: "80"
+    wfs:
+        selector: "RemAnom:Anomaly"
+        endPoints:
+            - "http://remanentanomalies.csiro.au/geoserver/wfs"
+    filters:
+        textbox: 
+            - [ "Remanent Anomaly Name", "RenAnom:AnomalyName", null, "ISLIKE" ]
+"remanent-anomalies-AutoSearch":
+    name: "AUS5 - AutoSearch Anomalies"
+    description: "A collection of services publishing magnetic anomalies"
+    group: "Magnetics"
+    proxyUrl: ""
+    proxyCountUrl: ""
+    proxyStyleUrl: "getRemanentAnomaliesAutoSearchStyle.do"
+    proxyDownloadUrl: "doRemanentAnomaliesAutoSearchDownload.do"
+    order: "81"
+    wfs:
+        selector: "RemAnomAutoSearch:AutoSearchAnomalies"
+"remanent-anomaliesTMI":
+    name: "AUS5 - Total Magnetic Intensity"
+    description: "Total Magnetic Intensity from Magnetic Anomaly Map of Australia fifth edition), Geoscience Australia and other sources"
+    group: "Magnetics"
+    order: "82"
+    wms:
+        selector: "mag:australia_tmihires2a"
+"remanent-anomalies-EMAG":
+    name: "EMAG2 - Remanent Anomalies"
+    description: "A collection of services publishing magnetic anomalies from the EMAG2 layer"
+    group: "Magnetics"
+    proxyUrl: ""
+    proxyCountUrl: ""
+    proxyStyleUrl: "getRemanentAnomaliesStyle.do"
+    proxyDownloadUrl: "doRemanentAnomaliesDownload.do"
+    order: "83"
+    wfs:
+        selector: "RemAnom:Anomaly"
+        endPoints:
+            - "http://remanentanomalies.csiro.au/geoserverEMAG/wfs"
+    filters:
+        textbox: 
+            - [ "Remanent Anomaly Name", "RenAnom:AnomalyName", null, "ISLIKE" ]
+"remanent-anomalies-EMAGTMI":
+    name: "EMAG2 - Total Magnetic Intensity"
+    description: "Total Magnetic Intensity from the EMAG2 datasource.http://www.geomag.org/models/emag2.html"
+    group: "Magnetics"
+    order: "84"
+    wms:
+        selector: "z"
+        endPoints: 
+            - "http://remanentanomalies.csiro.au/thredds/wms/Emag2/EMAG2.nc"
+"notused-samplingpoint":
+    hidden: true
+    order: "450"
+    wfs:
+        selector: "sa:SamplingPoint"
+"notused-featurecollection":
+    hidden: true
+    wfs:
+        selector: "gml:FeatureCollection"
+"notused-portals":
+    hidden: true
+    csw:
+        keyword: "Portal"
+"notused-geonetwork":
+    hidden: true
+    csw:
+        keyword: "GeoNetwork"
+"gsv-geological-unit-250k-":
+    name: "Gsv Geological Unit 250K "
+    group: "Geological Survey of Victoria"
+    description: "Geological units represented as two dimensional polygons, designed for portrayal"
+    order: "Registered_1"
+    wms:
+        selector: "erdd:GSV_SG_250K_GEOLUNIT"
+"gsv-geological-unit-contact-250k-":
+    name: "Gsv Geological Unit Contact 250K "
+    group: "Geological Survey of Victoria"
+    description: "Geological boundaries represented as two dimensional lines, designed for portray"
+    order: "Registered_2"
+    wms:
+        selector: "erdd:GSV_SG_250K_GEOLUNITCONTACT"
+"gsv-geological-unit-contact-50k-":
+    name: "Gsv Geological Unit Contact 50K "
+    group: "Geological Survey of Victoria"
+    description: "Geological boundaries represented as two dimensional lines, designed for portray"
+    order: "Registered_3"
+    wms:
+        selector: "erdd:GSV_SG_50K_GEOLUNITCONTACT"
+"gsv-geological-unit-250k-age":
+    name: "Gsv Geological Unit 250K Age"
+    group: "Geological Survey of Victoria"
+    description: "Geological units represented as two dimensional polygons, designed for portrayal"
+    order: "Registered_4"
+    wms:
+        selector: "erdd:GSV_SG_250K_GEOLUNIT_AGE"
+"gsv-shear-displacement-structure-250k-":
+    name: "Gsv Shear Displacement Structure 250K "
+    group: "Geological Survey of Victoria"
+    description: "Shear displacement structures faults) represented as two dimensional lines, des"
+    order: "Registered_5"
+    wms:
+        selector: "erdd:GSV_SG_250K_SHEARDISPSTRUCTURE"
+"gsv-geological-unit-250k-lithology":
+    name: "Gsv Geological Unit 250K Lithology"
+    group: "Geological Survey of Victoria"
+    description: "Geological units represented as two dimensional polygons, designed for portrayal"
+    order: "Registered_6"
+    wms:
+        selector: "erdd:GSV_SG_250K_GEOLUNIT_LITHOLOGY"
+"gsv-geological-unit-50k-lithology":
+    name: "Gsv Geological Unit 50K Lithology"
+    group: "Geological Survey of Victoria"
+    description: "Geological units represented as two dimensional polygons, designed for portrayal"
+    order: "Registered_7"
+    wms:
+        selector: "erdd:GSV_SG_50K_GEOLUNIT_LITHOLOGY"
+"gsv-geological-unit-50k-":
+    name: "Gsv Geological Unit 50K "
+    group: "Geological Survey of Victoria"
+    description: "Geological units represented as two dimensional polygons, designed for portrayal"
+    order: "Registered_8"
+    wms:
+        selector: "erdd:GSV_SG_50K_GEOLUNIT"
+"gsv-shear-displacement-structure-50k-":
+    name: "Gsv Shear Displacement Structure 50K "
+    group: "Geological Survey of Victoria"
+    description: "Shear displacement structures faults) represented as two dimensional lines, des"
+    order: "Registered_9"
+    wms:
+        selector: "erdd:GSV_SG_50K_SHEARDISPSTRUCTURE"
+"gsv-geological-unit-50k-age":
+    name: "Gsv Geological Unit 50K Age"
+    group: "Geological Survey of Victoria"
+    description: "Geological units represented as two dimensional polygons, designed for portrayal"
+    order: "Registered_10"
+    wms:
+        selector: "erdd:GSV_SG_50K_GEOLUNIT_AGE"
+"l180-mt-isa-deep-crus-seis-surv-qld-2006-stac-and-migr-data-and-imag-for-line-06ga-to-06ga":
+    name: "L180 Mt Isa Deep Crustal Seismic Survey Qld 2006 Stacked And Migrated Data And Images For Lines 06Ga M1 To 06Ga M6"
+    group: "Geoscience Australia"
+    description: "Processed seismic data SEG-Y format) and TIFF images for the 2006 Mt Isa Deep C"
+    order: "Registered_14"
+    csw:
+        id: "a05f7892-ee53-7506-e044-00144fdd4fa6"
+"are-ther-any-sand-uran-syst-in-the-erom-basi":
+    name: "Are There Any Sandstone Hosted Uranium Systems In The Eromanga Basin "
+    group: "Geoscience Australia"
+    description: "As part of Geoscience Australia's Onshore Energy Security Program the authors ha"
+    order: "Registered_15"
+    csw:
+        id: "a05f7892-f9c4-7506-e044-00144fdd4fa6"
+"l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga":
+    name: "L164 Curnamona Seismic Survey Sa 2003 2004 Stacked And Migrated Seismic Data And Images For Lines 03Ga Cu1"
+    group: "Geoscience Australia"
+    description: "A seismic survey using the Australian National Seismic Imaging Resource ANSIR) "
+    order: "Registered_16"
+    csw:
+        id: "cd697530-5b75-3811-e044-00144fdd4fa6"
+"lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis":
+    name: "Lawn Hill Platform And Leichhardt River Fault Trough Measured Stratigraphic Section Online Gis"
+    group: "Geoscience Australia"
+    description: "This GIS web browser contains stratigraphic information from the southern flank "
+    order: "Registered_17"
+    csw:
+        id: "a05f7892-b7a0-7506-e044-00144fdd4fa6"
+"pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst":
+    name: "Predictive Mineral Discovery In The Eastern Yilgarn Craton An Example Of District Scale Targeting Of An Orogenic Gold Mineral System"
+    group: "Geoscience Australia"
+    description: "Predictive mineral discovery is concerned with the application of a whole of sys"
+    order: "Registered_18"
+    csw:
+        id: "a05f7892-eafd-7506-e044-00144fdd4fa6"
+"fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004":
+    name: "Final Report 3D Geological Models Of The Eastern Yilgarn Craton Project Pmd Crc Y2 September 2001 December 2004"
+    group: "Geoscience Australia"
+    description: "The pmd*CRC Y2 project operated for a little over three years, and in this time "
+    order: "Registered_19"
+    csw:
+        id: "a05f7892-ccc9-7506-e044-00144fdd4fa6"
+"cate-3-expl-lice-poly-of-tasm-min-reso-tasm":
+    name: "Category 3 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Category 3 Exploration Licence polygons and Exploration Release Areas across Tas"
+    order: "Registered_43"
+    wms:
+        selector: "mrtwfs:LicenceCategory3"
+"cate-1-expl-lice-poly-of-tasm-min-reso-tasm":
+    name: "Category 1 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Category 1 Exploration Licence polygons and Exploration Release Areas across Tas"
+    order: "Registered_44"
+    wms:
+        selector: "mrtwfs:LicenceCategory1"
+"proc-land-area-of-tasm-min-reso-tasm":
+    name: "Proclaimed Landslip Areas Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Proclaimed Landslip Areas A and B) of Tasmania, which are defined under the Min"
+    order: "Registered_45"
+    wms:
+        selector: "mrtwfs:ProclaimedAreasPoly"
+"airb-geop-surv-of-tasm-min-reso-tasm":
+    name: "Airborne Geophysical Surveys Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Spatial index of open file airborne geophysical surveys for which digital data i"
+    order: "Registered_46"
+    wms:
+        selector: "mrtwfs:AirborneSurveys"
+"land-poin-of-tasm-min-reso-tasm":
+    name: "Landslide Points Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Landslide features across Tasmania as representative points, with summary landsl"
+    order: "Registered_47"
+    wms:
+        selector: "mrtwfs:LandSlidePoint"
+"mine-occu-poin-of-tasm-min-reso-tasm":
+    name: "Mineral Occurrence Points Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Mineral occurrences, including operating and abandoned mines, located in Tasmani"
+    order: "Registered_48"
+    wms:
+        selector: "mrtwfs:MineralOccurences"
+"land-line-of-tasm-min-reso-tasm":
+    name: "Landslide Lines Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Linear landslide components of landslide features mapped across Tasmania, with s"
+    order: "Registered_49"
+    wms:
+        selector: "mrtwfs:LandSlideLine"
+"land-dama-poly-of-tasm-min-reso-tasm":
+    name: "Landslide Damage Polygons Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Polygons of structures or property known to be damaged by a landslide in Tasmani"
+    order: "Registered_50"
+    wms:
+        selector: "mrtwfs:DamagePoly"
+"cate-4-expl-lice-poly-of-tasm-min-reso-tasm":
+    name: "Category 4 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Category 4 Exploration Licence polygons and Exploration Release Areas across Tas"
+    order: "Registered_51"
+    wms:
+        selector: "mrtwfs:LicenceCategory4"
+"cate-6-expl-lice-poly-of-tasm-min-reso-tasm":
+    name: "Category 6 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Category 6 Exploration Licence polygons and Exploration Release Areas across Tas"
+    order: "Registered_52"
+    wms:
+        selector: "mrtwfs:LicenceCategory6"
+"mini-leas-poly-of-tasm-min-reso-tasm":
+    name: "Mining Lease Polygons Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Mining Lease polygons and production licence polygons for all mineral categories"
+    order: "Registered_53"
+    wms:
+        selector: "mrtwfs:Leases"
+"cate-2-expl-lice-poly-of-tasm-min-reso-tasm":
+    name: "Category 2 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Category 2 Exploration Licence polygons and Exploration Release Areas across Tas"
+    order: "Registered_54"
+    wms:
+        selector: "mrtwfs:LicenceCategory2"
+"grav-meas-of-tasm-min-reso-tasm":
+    name: "Gravity Measurements Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Primary and derived i.e. Bouguer anomaly) gravity observation points stations)"
+    order: "Registered_55"
+    wms:
+        selector: "mrtwfs:GravityMeasurements"
+"cate-5-expl-lice-poly-of-tasm-min-reso-tasm":
+    name: "Category 5 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania"
+    group: "Mineral Resources Tasmania"
+    description: "Category 5 Exploration Licence polygons and Exploration Release Areas across Tas"
+    order: "Registered_56"
+    wms:
+        selector: "mrtwfs:GravityMeasurements"
+"land-dama-poin-of-tasm-min-reso-tasm":
+    name: "Landslide Damage Points Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Point locations of known damage to structures or property caused by a landslide "
+    order: "Registered_57"
+    wms:
+        selector: "mrtwfs:DamagePoint"
+"grav-base-stat-of-tasm-min-reso-tasm":
+    name: "Gravity Base Stations Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Precise locations where the absolute value of gravity is known."
+    order: "Registered_58"
+    wms:
+        selector: "mrtwfs:GravityBaseStations"
+"bore-poin-of-tasm-min-reso-tasm":
+    name: "Borehole Points Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Borehole features across Tasmania derived from the Borehole Database, administer"
+    order: "Registered_59"
+    wms:
+        selector: "mrtwfs:Boreholes"
+"strategic-prospectivity-zones":
+    name: "Strategic Prospectivity Zones"
+    group: "Mineral Resources Tasmania"
+    description: ""
+    order: "Registered_60"
+    wms:
+        selector: "mrtwfs:StrategicProspectivityZones"
+"land-poly-of-tasm-min-reso-tasm":
+    name: "Landslide Polygons Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: "Landslide component polygons of landslide features mapped across Tasmania, with "
+    order: "Registered_61"
+    wms:
+        selector: "mrtwfs:LandSlidePoly"
+"bore-trac-of-tasm-min-reso-tasm":
+    name: "Borehole Traces Of Tasmania Mineral Resources Tasmania "
+    group: "Mineral Resources Tasmania"
+    description: ""
+    order: "Registered_62"
+    wms:
+        selector: "mrtwfs:BoreholeTrace"
+"nsw-drillhole":
+    name: "Nsw Drillhole"
+    group: "Geological Survey NSW"
+    description: "This is the full NSW drilling dataset available from Geoscientific Data Warehous"
+    order: "Registered_68"
+    wms:
+        selector: "gsnsw:dw_drillhole"
+"nsw-assay-surface":
+    name: "Nsw Assay Surface"
+    group: "Geological Survey NSW"
+    description: "This dataset contains geochemical assay data collected by companies exploring in"
+    order: "Registered_69"
+    wms:
+        selector: "gsnsw:dw_surfassay"
+"nsw-field-observations":
+    name: "Nsw Field Observations"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_70"
+    wms:
+        selector: "gsnsw:dw_fieldobs_full"
+"nsw-downhole-assay-samples":
+    name: "Nsw Downhole Assay Samples"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_71"
+    wms:
+        selector: "gsnsw:dw_assayhole"
+"nsw-drillhole-all":
+    name: "Nsw Drillhole All"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_72"
+    wms:
+        selector: "gsnsw:dw_drillhole_full"
+"nsw-drillholes-coal":
+    name: "Nsw Drillholes Coal"
+    group: "Geological Survey NSW"
+    description: "This is the coal subset of the NSW drilling dataset available from Geoscientific"
+    order: "Registered_73"
+    wms:
+        selector: "gsnsw:dw_drillhole_full_coal"
+"nsw-geological-field-observations":
+    name: "Nsw Geological Field Observations"
+    group: "Geological Survey NSW"
+    description: "The Field Observations FieldObs) database stores observations and measurements "
+    order: "Registered_74"
+    wms:
+        selector: "gsnsw:dw_fieldobs"
+"nsw-drillholes-minerals":
+    name: "Nsw Drillholes Minerals"
+    group: "Geological Survey NSW"
+    description: "This is the mineral subset of the NSW drilling dataset available from Geoscienti"
+    order: "Registered_75"
+    wms:
+        selector: "gsnsw:dw_drillhole_full_min"
+"nsw-geology-simplified":
+    name: "Nsw Geology Simplified"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_76"
+    wms:
+        selector: "gsnsw:ge_geology15m"
+"nsw-drillholes-petroleum":
+    name: "Nsw Drillholes Petroleum"
+    group: "Geological Survey NSW"
+    description: "The petroleum drillholes dataset stores information about conventional petroleum"
+    order: "Registered_77"
+    wms:
+        selector: "gsnsw:dw_drillhole_full_pet"
+"mineral-occurence-industry-full":
+    name: "Mineral Occurence Industry Full"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_78"
+    wms:
+        selector: "gsnsw:dw_mineraloccurrence_full"
+"nsw-historic-exploration-titles":
+    name: "Nsw Historic Exploration Titles"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_79"
+    wms:
+        selector: "gsnsw:bl_histels"
+"nsw-map-block-graticule":
+    name: "Nsw Map Block Graticule"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_80"
+    wms:
+        selector: "gsnsw:bl_mapblock"
+"bl-localaboriginallandcouncil":
+    name: "Bl Localaboriginallandcouncil"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_81"
+    wms:
+        selector: "gsnsw:bl_localaboriginallandcouncil"
+"nsw-mineral-occurrence-industry":
+    name: "Nsw Mineral Occurrence Industry"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_82"
+    wms:
+        selector: "gsnsw:dw_metindustry"
+"nsw-100k-map-sheet-extents":
+    name: "Nsw 100K Map Sheet Extents"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_83"
+    wms:
+        selector: "gsnsw:bl_mapsheet100k"
+"nsw-fossicking-districts":
+    name: "Nsw Fossicking Districts"
+    group: "Geological Survey NSW"
+    description: "Fossicking is the small scale search for and collection of minerals, gemstones o"
+    order: "Registered_84"
+    wms:
+        selector: "gsnsw:bl_fossicking"
+"nsw-geological-field-observations-photo":
+    name: "Nsw Geological Field Observations Photo"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_85"
+    wms:
+        selector: "gsnsw:dw_photo"
+"geop-tota-magn-inte-rtp-tmi-rtp-tilt-filt":
+    name: "Geophysics Total Magnetic Intensity Rtp Tmi Rtp Tilt Filter"
+    group: "Geological Survey NSW"
+    description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  To"
+    order: "Registered_86"
+    wms:
+        selector: "geophys:MagRTPtilt"
+"nsw-seismic":
+    name: "Nsw Seismic"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_87"
+    wms:
+        selector: "geophys:MagRTPtilt"
+"nsw-curr-mini-and-expl-titl":
+    name: "Nsw Current Mining And Exploration Titles"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_88"
+    wms:
+        selector: "gsnsw:bl_title"
+"geop-tota-magn-inte-1st-deri-redu-to-pole":
+    name: "Geophysics Total Magnetic Intensity 1St Derivative Reduced To Pole"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_89"
+    wms:
+        selector: "geophys:TMI_RTP_1st"
+"nsw-geological-spectral-samples":
+    name: "Nsw Geological Spectral Samples"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_90"
+    wms:
+        selector: "gsnsw:dw_spectral"
+"geop-tern-radi-pota":
+    name: "Geophysics Ternary Radioelement Potassium K Thorium Th Uranium U "
+    group: "Geological Survey NSW"
+    description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Te"
+    order: "Registered_91"
+    wms:
+        selector: "geophys:Radio"
+"nsw-drillholes-csg":
+    name: "Nsw Drillholes Csg"
+    group: "Geological Survey NSW"
+    description: "The coal seam gas drillholes dataset stores information about CSG sites within N"
+    order: "Registered_92"
+    wms:
+        selector: "geophys:Radio"
+"nsw-current-mining-applications":
+    name: "Nsw Current Mining Applications"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_93"
+    wms:
+        selector: "gsnsw:bl_titleappl"
+"nsw-operating-mineral-mines":
+    name: "Nsw Operating Mineral Mines"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_94"
+    wms:
+        selector: "gsnsw:dw_opmines"
+"geophysics-elevation":
+    name: "Geophysics Elevation"
+    group: "Geological Survey NSW"
+    description: "Elevation is a pseudocolour layer with a histogram-equalised colour-stretch. Coo"
+    order: "Registered_95"
+    wms:
+        selector: "geophys:DEM"
+"nsw-geol-simp-rock-unit-boun":
+    name: "Nsw Geology Simplified Rock Unit Boundary"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_96"
+    wms:
+        selector: "gsnsw:ge_geology15m_bdy"
+"blocks-and-units-graticule":
+    name: "Blocks And Units Graticule"
+    group: "Geological Survey NSW"
+    description: "Layer-Group type layer: gsnsw:Map Blocks and Units"
+    order: "Registered_97"
+    wms:
+        selector: gsnsw:Map Blocks and Units""
+"nsw-map-unit-graticule":
+    name: "Nsw Map Unit Graticule"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_98"
+    wms:
+        selector: "gsnsw:bl_mapunit"
+"nsw-geochronology":
+    name: "Nsw Geochronology"
+    group: "Geological Survey NSW"
+    description: "The radiogenic isotope database contains geochronological data managed by the Ge"
+    order: "Registered_99"
+    wms:
+        selector: "gsnsw:dw_geochron"
+"geophysics-isostatic-bouger-gravity":
+    name: "Geophysics Isostatic Bouger Gravity"
+    group: "Geological Survey NSW"
+    description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Is"
+    order: "Registered_100"
+    wms:
+        selector: "geophys:IsoGrav"
+"geop-tota-magn-inte-redu-to-pole":
+    name: "Geophysics Total Magnetic Intensity Reduced To Pole"
+    group: "Geological Survey NSW"
+    description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  To"
+    order: "Registered_101"
+    wms:
+        selector: "geophys:MagRTP"
+"nsw-core-library-samples":
+    name: "Nsw Core Library Samples"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_102"
+    wms:
+        selector: "gsnsw:dw_corelibhole"
+"nsw-geochemistry-samples":
+    name: "Nsw Geochemistry Samples"
+    group: "Geological Survey NSW"
+    description: "The Geochemistry Whole Rock) dataset contains information about the chemistry o"
+    order: "Registered_103"
+    wms:
+        selector: "gsnsw:dw_geochemistry"
+"nsw-titles":
+    name: "Nsw Titles"
+    group: "Geological Survey NSW"
+    description: "Layer-Group type layer: gsnsw:Titles"
+    order: "Registered_104"
+    wms:
+        selector: "gsnsw:Titles"
+"nsw-geology":
+    name: "Nsw Geology"
+    group: "Geological Survey NSW"
+    description: "Layer-Group type layer: gsnsw:NSW_Geology"
+    order: "Registered_105"
+    wms:
+        selector: "gsnsw:NSW_Geology"
+"geop-isos-grav-over-tmi-rtp-tilt":
+    name: "Geophysics Isostatic Gravity Over Tmi Rtp Tilt"
+    group: "Geological Survey NSW"
+    description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Bo"
+    order: "Registered_106"
+    wms:
+        selector: "geophys:IsoGravTilt"
+"nsw-lithology-samples":
+    name: "Nsw Lithology Samples"
+    group: "Geological Survey NSW"
+    description: ""
+    order: "Registered_107"
+    wms:
+        selector: "gsnsw:dw_lithhole"
+"nsw-base":
+    name: "Nsw Base"
+    group: "Geological Survey NSW"
+    description: "Layer-Group type layer: gsnsw:NSW_Base"
+    order: "Registered_108"
+    wms:
+        selector: "gsnsw:NSW_Base"
+"nsw-mineral-occurrence-commodity":
+    name: "Nsw Mineral Occurrence Commodity"
+    group: "Geological Survey NSW"
+    description: "This spatial dataset is a derivative product of the New South Wales Mineral Occu"
+    order: "Registered_109"
+    wms:
+        selector: "gsnsw:dw_metelement"
+"geological-provinces":
+    name: "Geological Provinces"
+    description: "Geological Provinces provided by GA"
+    group: "Geological Provinces"
+    proxyStyleUrl: "getGeologicalProvincestyle.do"
+    order: "provinces_01"
+    wmswfs:
+         featureName: "gml:ProvinceFullExtent"
+         layerName: "GeologicalProvinces"
+    filters:
+        textbox: 
+            - [ "Name", "NAME", null, "ISLIKE" ]
+        polygonbox:
+            - ["Polygon BBox", "the_geom", null, "ISEQUAL" ]
+"UOW-Crn-Aus-Basins":
+    name: "CRN Australia: river Basins"
+    group: "University of Wollongong"
+    description: "CRN Australia: river Basins"
+    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0x0000EE"
+    order: "Registered_1"
+    wms:
+        selector: "denude:crn_aus_basins"
+"UOW-Crn-Aus-Outlets":
+    name: "CRN Australia: sample sites"
+    group: "University of Wollongong"
+    description: "CRN Australia: sample sites"
+    proxyStyleUrl: "getDefaultStyle.do?colour=0x00AAFF&layerName=be10-denude:crn_aus_outlets"
+    order: "Registered_1"
+    wms:
+        selector: "denude:crn_inprep_basins"
+"UOW-Crn-Inprep-Basins":
+    name: "CRN InPrep: river Basins"
+    group: "University of Wollongong"
+    description: "CRN InPrep: river Basins"
+    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0x00FFFF"
+    order: "Registered_1"
+    wms:
+        selector: "denude:crn_inprep_outlets"
+"UOW-Crn-Inprep-Outlets":
+    name: "CRN InPrep: sample sites"
+    group: "University of Wollongong"
+    description: "CRN InPrep: sample sites"
+    proxyStyleUrl: "getDefaultStyle.do?colour=0x00FFBB&layerName=be10-denude:crn_inprep_outlets"
+    order: "Registered_1"
+    wms:
+        selector: "denude:crn_int_basins"
+"UOW-Crn-Int-Basins":
+    name: "CRN International: river Basins"
+    group: "University of Wollongong"
+    description: "CRN International: river Basins"
+    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0xBBFF00"
+    order: "Registered_1"
+    wms:
+        selector: "denude:crn_int_outlets"
+"UOW-Crn-Int-Outlets":
+    name: "CRN International: sample sites"
+    group: "University of Wollongong"
+    description: "CRN International: sample sites"
+    proxyStyleUrl: "getDefaultStyle.do?colour=0xBBFFAA&layerName=be10-denude:crn_int_outlets"
+    order: "Registered_1"
+    wms:
+        selector: "denude:crn_xxl_outlets"
+"UOW-Crn-XXL-Basins":
+    name: "CRN XXL: river Basins"
+    group: "University of Wollongong"
+    description: "CRN XXL: river Basins"
+    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0xDDFF00"
+    order: "Registered_1"
+    wms:
+        selector: "denude:crn_xxl_basins"
+"UOW-Crn-XXL-Outlets":
+    name: "CRN XXL: sample sites"
+    group: "University of Wollongong"
+    description: "CRN XXL: sample sites"
+    proxyStyleUrl: "getDefaultStyle.do?colour=0xDDFFAA&layerName=be10-denude:crn_xxl_outlets"
+    order: "Registered_1"
+    wms:
+        selector: "denude:crn_xxl_outlets"
+"UOW-OSLTL-Basins":
+    name: "OSL & TL: river Basins"
+    group: "University of Wollongong"
+    description: "OSL & TL: river Basins"
+    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0xFFDD00"
+    order: "Registered_1"
+    wms:
+        selector: "denude:osltl_basins"
+"UOW-OSLTL-Outlets":
+    name: "OSL & TL: sample sites"
+    group: "University of Wollongong"
+    description: "OSL & TL: sample sites"
+    proxyStyleUrl: "getDefaultStyle.do?colour=0xFFDDAA&layerName=be10-denude:osltl_samples"
+    order: "Registered_1"
+    wms:
+        selector: "denude:osltl_samples"
+"igsn-sample":
+    id: "IGSN-CSIRO-SAMPLE"
+    name: "igsn-csiro-sample"
+    group: "IGSN"
+    description: "A collection of igsn-csiro-sample"
+    proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=igsn:sample"
+    order: "50"
+    wms:
+        selector: "igsn:sample"
+    filters:
+        textbox: 
+            - [ "IGSN Identifier", "igsn", null, "ISLIKE" ]
+"igsn-ga-sample":
+    id: "IGSN-GA-SAMPLE"
+    name: "igsn-ga-sample"
+    group: "IGSN"
+    description: "A collection of igsn-ga-sample"
+    proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0x00FF00&layerName=igsn:igsn_ga_sample"
+    order: "51"
+    wms:
+        selector: "igsn:igsn_ga_sample"
+    filters:
+        textbox: 
+            - [ "IGSN Identifier", "identifier", null, "ISLIKE" ]
+"igsn-ardc-sample":
+    id: "IGSN-ARDC-SAMPLE"
+    name: "igsn-ardc-sample"
+    group: "IGSN"
+    description: "A collection of igsn-ardc-sample"
+    proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0x0000FF&layerName=igsn:igsn_ands_sample"
+    order: "52"
+    wms:
+        selector: "igsn:igsn_ands_sample"
+    filters:
+        textbox: 
+            - [ "IGSN Identifier", "identifier", null, "ISLIKE" ]
+"igsn-wdc-sample":
+    id: "IGSN-WDC-SAMPLE"
+    name: "igsn-wdc-sample"
+    group: "IGSN"
+    description: "A collection of igsn-wdc-sample"
+    proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF00FF&layerName=igsn:igsn_wdc_sample"
+    order: "53"
+    wms:
+        selector: "igsn:igsn_wdc_sample"

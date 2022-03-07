@@ -11,7 +11,7 @@ public class Initializer {
     private final Log log = LogFactory.getLog(getClass());
 
     public Initializer() {
-
+            
     }
 
     public void run() {
