@@ -55,12 +55,11 @@ spring:
                   userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
                   clientAuthenticationScheme: form
                   scope:
-                     - openid
                      - email
                      - profile
-               resource:
-                  userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
-                  preferTokenInfo: true
+               github:
+                  clientId: client-id-goes-here
+                  clientSecret: client-secret-goes-here
 
 # Timeouts in seconds
 wait-for-body-content:
@@ -121,14 +120,6 @@ aws:
    secretkey: AWS_SECRET_KEY
    sessionkey: AWS_SESSION_KEY
    stsrequirement: Mandatory
-
-#nectar:
-#   ec2:
-#      accesskey: NECTAR_EC2_ACCESS_KEY
-#      secretkey: NECTAR_EC2_SECRET_KEY
-#   storage:
-#      accesskey: NECTAR_STORAGE_ACCESS_KEY
-#      secretkey: NECTAR_STORAGE_SECRET_KEY
 
 aaf:
    loginUrl: AAF_LOGIN_URL
