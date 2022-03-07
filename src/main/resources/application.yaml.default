@@ -58,8 +58,8 @@ spring:
                      - email
                      - profile
                github:
-                  clientId: 
-                  clientSecret: 
+                  clientId: client-id-goes-here
+                  clientSecret: client-secret-goes-here
 
 # Timeouts in seconds
 wait-for-body-content:
