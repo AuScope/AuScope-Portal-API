@@ -611,7 +611,7 @@
         wms:
                selector: "gadds:geophysical_datasets_radiometric"
 "gga-geophysicalsurveys-elev":
-        name: "GGeophysical Surveys - Elevation"
+        name: "Geophysical Surveys - Elevation"
         group: "GA Geophysical Survey Datasets"
         description: "Digital Elevation data record the terrain height variations from the processed point-located data recorded during a geophysical survey."
         order: "314"
