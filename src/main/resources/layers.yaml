@@ -211,29 +211,21 @@
         order: "51"
         stackdriverServiceGroup: "NVCLBoreholeViewLayer"
         wfs:
-               selector: "gsml:MappedFeature"
+               selector: "gsmlp:BoreholeView"
                feature:
                     - "sa:SamplingFeatureCollection"
                     - "om:GETPUBLISHEDSYSTEMTSA"
                     - "nvcl:scannedBorehole"
                     - "nvcl:ScannedBoreholeCollection"
                endPoints:
-                    - "http://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs"
-                    - "https://nvclwebservices.vm.csiro.au:80/geoserverBH/wfs"
-                    - "http://www.mrt.tas.gov.au:80/web-services/wfs"
+                    - "https://nvclwebservices.vm.csiro.au/geoserverBH/wfs"
                     - "https://www.mrt.tas.gov.au/web-services/wfs"
-                    - "http://geossdi.dmp.wa.gov.au:80/services/wfs"
-                    - "http://geossdi.dmp.wa.gov.au/services/wfs"
                     - "https://geossdi.dmp.wa.gov.au/services/wfs"
-                    - "http://geology.data.nt.gov.au:80/geoserver/wfs"
                     - "https://geology.data.nt.gov.au/geoserver/wfs"
                     - "https://gs.geoscience.nsw.gov.au/geoserver/wfs"
                     - "https://sarigdata.pir.sa.gov.au/geoserver/wfs"
-                    - "http://geology-uat.information.qld.gov.au/geoserver/wfs"
                     - "https://geology-uat.information.qld.gov.au/geoserver/wfs"
-                    - "http://geology.information.qld.gov.au/geoserver/wfs"
                     - "https://geology.information.qld.gov.au/geoserver/wfs"
-                    - "http://geology.data.vic.gov.au/nvcl/wfs"
                     - "https://geology.data.vic.gov.au/nvcl/wfs" 
         filters:
                date:
