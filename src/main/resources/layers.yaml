@@ -1478,7 +1478,7 @@
             - ["Polygon BBox", "the_geom", null, "ISEQUAL" ]
 "UOW-Crn-Aus-Basins":
     name: "CRN Australia: river Basins"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "CRN Australia: river Basins"
     proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0x0000EE"
     order: "Registered_1"
@@ -1486,7 +1486,7 @@
         selector: "denude:crn_aus_basins"
 "UOW-Crn-Aus-Outlets":
     name: "CRN Australia: sample sites"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "CRN Australia: sample sites"
     proxyStyleUrl: "getDefaultStyle.do?colour=0x00AAFF&layerName=be10-denude:crn_aus_outlets"
     order: "Registered_1"
@@ -1494,7 +1494,7 @@
         selector: "denude:crn_inprep_basins"
 "UOW-Crn-Inprep-Basins":
     name: "CRN InPrep: river Basins"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "CRN InPrep: river Basins"
     proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0x00FFFF"
     order: "Registered_1"
@@ -1502,7 +1502,7 @@
         selector: "denude:crn_inprep_outlets"
 "UOW-Crn-Inprep-Outlets":
     name: "CRN InPrep: sample sites"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "CRN InPrep: sample sites"
     proxyStyleUrl: "getDefaultStyle.do?colour=0x00FFBB&layerName=be10-denude:crn_inprep_outlets"
     order: "Registered_1"
@@ -1510,7 +1510,7 @@
         selector: "denude:crn_int_basins"
 "UOW-Crn-Int-Basins":
     name: "CRN International: river Basins"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "CRN International: river Basins"
     proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0xBBFF00"
     order: "Registered_1"
@@ -1518,7 +1518,7 @@
         selector: "denude:crn_int_outlets"
 "UOW-Crn-Int-Outlets":
     name: "CRN International: sample sites"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "CRN International: sample sites"
     proxyStyleUrl: "getDefaultStyle.do?colour=0xBBFFAA&layerName=be10-denude:crn_int_outlets"
     order: "Registered_1"
@@ -1526,7 +1526,7 @@
         selector: "denude:crn_xxl_outlets"
 "UOW-Crn-XXL-Basins":
     name: "CRN XXL: river Basins"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "CRN XXL: river Basins"
     proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0xDDFF00"
     order: "Registered_1"
@@ -1534,7 +1534,7 @@
         selector: "denude:crn_xxl_basins"
 "UOW-Crn-XXL-Outlets":
     name: "CRN XXL: sample sites"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "CRN XXL: sample sites"
     proxyStyleUrl: "getDefaultStyle.do?colour=0xDDFFAA&layerName=be10-denude:crn_xxl_outlets"
     order: "Registered_1"
@@ -1542,7 +1542,7 @@
         selector: "denude:crn_xxl_outlets"
 "UOW-OSLTL-Basins":
     name: "OSL & TL: river Basins"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "OSL & TL: river Basins"
     proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0xFFDD00"
     order: "Registered_1"
@@ -1550,7 +1550,7 @@
         selector: "denude:osltl_basins"
 "UOW-OSLTL-Outlets":
     name: "OSL & TL: sample sites"
-    group: "University of Wollongong"
+    group: "Cosmogenic Isotope and Luminescence"
     description: "OSL & TL: sample sites"
     proxyStyleUrl: "getDefaultStyle.do?colour=0xFFDDAA&layerName=be10-denude:osltl_samples"
     order: "Registered_1"
