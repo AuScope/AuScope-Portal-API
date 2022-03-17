@@ -1611,124 +1611,147 @@
     order: "pmdcrc01"
     csw:
         keyword: "Project A1-Presentations"
+
 "pmd-crc-project-c1-final-report":
     id: "pmd-crc-project-c1-final-report"
-    name: "Project C1 Final Report"
+    name: "Project C1 Final Report - Curnamona"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Project C1 Final Report - Curnamona"
     order: "pmdcrc02"
     csw:
         serviceName: "C1 Final Report"
+
 "pmd-crc-project-c2-final-report":
     id: "pmd-crc-project-c2-final-report"
-    name: "Project C2 Final Report"
+    name: "Project C2 Final Report - Curnamona"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Project C2 Final Report - Curnamona ASTER"
     order: "pmdcrc03"
     csw:
         serviceName: "Project C2 - Curnamona ASTER"
+
 "pmd-crc-project-c6-final-report":
     id: "pmd-crc-project-c6-final-report"
-    name: "Project C6 Final Report"
+    name: "Project C6 Final Report - Broken Hill"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Project C6 Final Report - Broken Hill Geological Modelling Project Using 3D-WEG Geological Editor"
     order: "pmdcrc04"
     csw:
         serviceName: "Project C6 Final Report Broken Hill Geological Modelling Project Using 3D-WEG Geological Editor"
+
 "pmd-crc-project-c7-final-report":
     id: "pmd-crc-project-c7-final-report"
-    name: "Project C7 Final Report"
+    name: "Project C7 Final Report - Curnamona"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Project C7 Final Report - Curnamona Craton Deep Seismic Reflection Survey"
     order: "pmdcrc05"
     csw:
         serviceName: "Project C7 - Curnamona Craton Deep Seismic Reflection Survey"
-"pmd-crc-project-i1-presentations":
-    id: "pmd-crc-project-i1-presentations"
-    name: "Project I1 Presentations"
+
+"pmd-crc-project-i1-appendix1":
+    id: "pmd-crc-project-i1-appendix1"
+    name: "Project I1 Appendix 1 - Mt Isa"
     group: "PMD*CRC Reports"
-    description: "PMD*CRC Project I1 Presentations"
-    order: "pmccrc06"
+    description: "PMD*CRC Project I1 Appendix 1 Materials"
+    order: "pmdcrc06"
+    csw:
+        keyword: "Project I1-Appendix 1"
+
+"pmd-crc-project-i1-appendix5":
+    id: "pmd-crc-project-i1-appendix5"
+    name: "Project I1 Appendix 5 - Mt Isa"
+    group: "PMD*CRC Reports"
+    description: "PMD*CRC Project I1 Appendix 5 Materials"
+    order: "pmdcrc07"
     csw:
         keyword: "Project I1-Appendix 5"
+
 "pmd-crc-project-i2-presentations":
     id: "pmd-crc-project-i2-presentations"
     name: "Project I2 Presentations and Posters"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Project I2 Presentations and Posters"
-    order: "pmccrc07"
+    order: "pmdcrc08"
     csw:
         keyword: "Project I2-Prests and Posters"
-"pmd-crc-project-i5-report":
+
+"pmd-crc-project-i5-final-report":
     id: "pmd-crc-project-i5-final-report"
-    name: "Project I5 Final Report"
+    name: "Project I5 Final Report - Batten Trough"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Project I5 Final Report - Batten Trough Deep Seismic Reflection Traverses"
-    order: "pmccrc08"
+    order: "pmdcrc09"
     csw:
         serviceName: "Project I5 : Batten Trough Deep Seismic Reflection Traverses"
-"pmd-crc-project-i6-report":
+
+"pmd-crc-project-i6-final-report":
     id: "pmd-crc-project-i6-final-report"
-    name: "Project I6 Final Report"
+    name: "Project I6 Final Report - Batten Trough"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Project I6 Final Report - Batten Trough Seismic Survey -North South Traverse"
-    order: "pmccrc09"
-    csw:
-        serviceName: "Project I6 - Batten Trough Seismic Survey -North South Traverse"
-"pmd-crc-project-i9-final-report":
-    id: "pmd-crc-project-i9-final-report"
-    name: "Project I9 Final Report"
-    group: "PMD*CRC Reports"
-    description: "PMD*CRC Project I9 Final Report - Final Report Geological Applications of new hyperspectral data in the Mt Isa area" 
     order: "pmdcrc10"
     csw:
-        serviceName: "Project I9 Final Report Geological Applications of new hyperspectral data in the Mt Isa area"
-"pmd-crc-project-t1-final-report":
-    id: "pmd-crc-project-t1-final-report"
-    name: "Project T1 Final Report"
+        serviceName: "Project I6 - Batten Trough Seismic Survey -North South Traverse"
+
+"pmd-crc-project-i9-final-report":
+    id: "pmd-crc-project-i9-final-report"
+    name: "Project I9 Final Report - Mt Isa"
     group: "PMD*CRC Reports"
-    description: "PMD*CRC Project T1 Final Report - Targeting new mineral deposits in western Victoria"
+    description: "PMD*CRC Project I9 Final Report - Final Report Geological Applications of new hyperspectral data in the Mt Isa area" 
     order: "pmdcrc11"
     csw:
-        serviceName: "Project T1 Final Report - Targeting new mineral deposits in western Victoria"
-"pmd-crc-project-t3-final-report":
-    id: "pmd-crc-project-t3-final-report"
-    name: "Project T3 Final Report"
+        serviceName: "Project I9 Final Report Geological Applications of new hyperspectral data in the Mt Isa area"
+
+"pmd-crc-project-t1-final-report":
+    id: "pmd-crc-project-t1-final-report"
+    name: "Project T1 Final Report - Western Victoria"
     group: "PMD*CRC Reports"
-    description: "PMD*CRC Project T3 Final Report - Tasmania Mineral Province Geoscientific database, 3D Geological Modeling, Mines and Mineral Prospectivity"
+    description: "PMD*CRC Project T1 Final Report - Targeting new mineral deposits in western Victoria"
     order: "pmdcrc12"
     csw:
-        serviceName: "Project T3 Tasmania Mineral Province Geoscientific database, 3D Geological Modeling, Mines and Mineral Prospectivity"
-"pmd-crc-project-t67-final-report":
-    id: "pmd-crc-project-t67-final-report"
-    name: "Project T6+7 Final Report"
+        serviceName: "Project T1 Final Report - Targeting new mineral deposits in western Victoria"
+
+"pmd-crc-project-t3-final-report":
+    id: "pmd-crc-project-t3-final-report"
+    name: "Project T3 Final Report - Tasmania"
     group: "PMD*CRC Reports"
-    description: "PMD*CRC Project T6 and T7 Final Report"
+    description: "PMD*CRC Project T3 Final Report - Tasmania Mineral Province Geoscientific database, 3D Geological Modeling, Mines and Mineral Prospectivity"
     order: "pmdcrc13"
     csw:
+        serviceName: "Project T3 Tasmania Mineral Province Geoscientific database, 3D Geological Modeling, Mines and Mineral Prospectivity"
+
+"pmd-crc-project-t67-final-report":
+    id: "pmd-crc-project-t67-final-report"
+    name: "Project T6+7 Final Report - Victoria"
+    group: "PMD*CRC Reports"
+    description: "PMD*CRC Project T6 and T7 Final Report"
+    order: "pmdcrc14"
+    csw:
         serviceName: "Terrain Projects T6 and T7 Final Report"
+
 "pmd-crc-project-t11-final-report":
     id: "pmd-crc-project-t11-final-report"
-    name: "Project T11 Final Report"
+    name: "Project T11 Final Report - Lachlan & Cobar"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Project T11 Final Report - 3D Architecture and Predictive Mineral System Analysis of the Central Lachlan Subprovince and Cobar Basin, New South Wales"
-    order: "pmdcrc14"
+    order: "pmdcrc15"
     csw:
         serviceName: "T11 Report 3D Architecture and Predictive Mineral System Analysis of the Central Lachlan Subprovince and Cobar Basin, New South Wales"      
 "pmd-crc-project-y2-appendix":
     id: "pmd-crc-project-y2-appendix"
-    name: "Project Y2 Appendix 2"
+    name: "Project Y2 Appendix 2 - Yilgarn"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Reports Project Y2 Appendix 2"
-    order: "pmdcrc15"
+    order: "pmdcrc16"
     csw:
         keyword: "Project Y2 - Appendix 2"
-"pmd-crc-project-y4-report":
+
+"pmd-crc-project-y4-final-report":
     id: "pmd-crc-project-y4-final-report"
-    name: "Project Y4 Report"
+    name: "Project Y4 Report - Yilgarn"
     group: "PMD*CRC Reports"
     description: "PMD*CRC Y4 Report - Deliverable #4 Report on likely geodynamic models of the Yilgarn, with appropriate tests and possible analogues"
-    order: "pmdcrc16"
+    order: "pmdcrc17"
     csw:
         serviceName: "Project Y4 Deliverable #4 Report on likely geodynamic models of the Yilgarn, with appropriate tests and possible analogues"
 
