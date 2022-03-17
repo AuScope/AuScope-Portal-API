@@ -1480,7 +1480,7 @@
 # Octopus CRN Australia
 "Octopus-Crn-Aus-Basins":
     name: "CRN Australia: River Basins"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Australian Collection: River Basins"
     order: "Octopus_01"
     wms:
@@ -1488,7 +1488,7 @@
 
 "Octopus-Crn-Aus-Outlets":
     name: "CRN Australia: Sample Sites"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Australian Collection: Sample Sites"
     order: "Octopus_02"
     wms:
@@ -1497,7 +1497,7 @@
 # Octopus CRN Global 
 "Octopus-Crn-Int-Basins":
     name: "CRN Global: River Basins"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Global Collection: River Basins"
     order: "Octopus_03"
     wms:
@@ -1505,7 +1505,7 @@
 
 "Octopus-Crn-Int-Outlets":
     name: "CRN Global: Sample Sites"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN International Collection: Sample Sites"
     order: "Octopus_04"
     wms:
@@ -1514,7 +1514,7 @@
 # Octopus CRN Large Basins
 "Octopus-Crn-XXL-Basins":
     name: "CRN Large Basins: River Basins"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Large Basins: River Basins"
     order: "Octopus_05"
     wms:
@@ -1522,7 +1522,7 @@
 
 "Octopus-Crn-XXL-Outlets":
     name: "CRN Large Basins: Sample Sites"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Large Basins: Sample Sites"
     order: "Octopus_06"
     wms:
@@ -1531,7 +1531,7 @@
 # Octopus CRN Basin Bounding boxes 
 "Octopus-Crn-Basin-BBoxes":
     name: "CRN Basin Bounding Boxes"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Basin Bounding Boxes"
     order: "Octopus_07"
     wms:
@@ -1540,7 +1540,7 @@
 # Octopus Sahul Archaeology
 "Octopus-Sahul-Arch-Radicarbon":
     name: "Sahul Archaeology Radiocarbon"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Archaeology: Radiocarbon collection"
     order: "Octopus_08"
     wms:
@@ -1548,7 +1548,7 @@
 
 "Octopus-Sahul-Arch-OSL":
     name: "Sahul Archaeology OSL"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Archaeology: optically stimulated luminescence (OSL) collection"
     order: "Octopus_09"
     wms:
@@ -1556,7 +1556,7 @@
 
 "Octopus-Sahul-Arch-TL":
     name: "Sahul Archaeology TL"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Archaeology: thermoluminescence (TL) collection"
     order: "Octopus_10"
     wms:
@@ -1565,7 +1565,7 @@
 # Octopus Sahul Sedimentary Archives
 "Octopus-Sahul-Sed-Archives-Aeolian-Osl":
     name: "Sahul Sed Archives Aeolian OSL"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Aeolian optically stimulated luminescence (OSL)"
     order: "Octopus_11"
     wms:
@@ -1573,7 +1573,7 @@
 
 "Octopus-Sahul-Sed-Archives-Aeolian-Tl":
     name: "Sahul Sed Archives Aeolian TL"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Aeolian thermoluminescence (TL)"
     order: "Octopus_12"
     wms:
@@ -1581,7 +1581,7 @@
 
 "Octopus-Sahul-Sed-Archives-Fluvial-Osl":
     name: "Sahul Sed Archives Fluvial OSL"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Fluvial optically stimulated luminescence (OSL)"
     order: "Octopus_13"
     wms:
@@ -1589,7 +1589,7 @@
 
 "Octopus-Sahul-Sed-Archives-Fluvial-Tl":
     name: "Sahul Sed Archives Fluvial TL"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Fluvial thermoluminescence (TL)"
     order: "Octopus_14"
     wms:
@@ -1597,7 +1597,7 @@
 
 "Octopus-Sahul-Sed-Archives-Lacustrine-Osl":
     name: "Sahul Sed Archives Lacustrine OSL"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Lacustrine optically stimulated luminescence (OSL)"
     order: "Octopus_15"
     wms:
@@ -1605,7 +1605,7 @@
 
 "Octopus-Sahul-Sed-Archives-Lacustrine-Tl":
     name: "Sahul Sed Archives Lacustrine TL"
-    group: "OCTOPUS Database"
+    group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Lacustrine thermoluminescence (TL)"
     order: "Octopus_16"
     wms:
