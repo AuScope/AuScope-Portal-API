@@ -88,6 +88,7 @@ erddapservice:
 smtp:
    server: smtp-relay.csiro.au
 localStageInDir: C:\\temp\\vegl-portal-temp
+localCacheDir: C:\\temp\\
 solutions:
    url: https://sssc-vgl.geoanalytics.csiro.au/
 proms:
