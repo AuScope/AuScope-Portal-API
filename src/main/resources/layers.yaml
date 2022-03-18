@@ -1476,86 +1476,141 @@
             - [ "Name", "NAME", null, "ISLIKE" ]
         polygonbox:
             - ["Polygon BBox", "the_geom", null, "ISEQUAL" ]
-"UOW-Crn-Aus-Basins":
-    name: "CRN Australia: river Basins"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "CRN Australia: river Basins"
-    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0x0000EE"
-    order: "Registered_1"
+ 
+# Octopus CRN Australia
+"Octopus-Crn-Aus-Basins":
+    name: "CRN Australia: River Basins"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "CRN Australian Collection: River Basins"
+    order: "Octopus_01"
     wms:
-        selector: "denude:crn_aus_basins"
-"UOW-Crn-Aus-Outlets":
-    name: "CRN Australia: sample sites"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "CRN Australia: sample sites"
-    proxyStyleUrl: "getDefaultStyle.do?colour=0x00AAFF&layerName=be10-denude:crn_aus_outlets"
-    order: "Registered_1"
+        selector: "be10-denude:crn_aus_basins"
+
+"Octopus-Crn-Aus-Outlets":
+    name: "CRN Australia: Sample Sites"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "CRN Australian Collection: Sample Sites"
+    order: "Octopus_02"
     wms:
-        selector: "denude:crn_inprep_basins"
-"UOW-Crn-Inprep-Basins":
-    name: "CRN InPrep: river Basins"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "CRN InPrep: river Basins"
-    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0x00FFFF"
-    order: "Registered_1"
+        selector: "be10-denude:crn_aus_outlets"
+ 
+# Octopus CRN Global 
+"Octopus-Crn-Int-Basins":
+    name: "CRN Global: River Basins"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "CRN Global Collection: River Basins"
+    order: "Octopus_03"
     wms:
-        selector: "denude:crn_inprep_outlets"
-"UOW-Crn-Inprep-Outlets":
-    name: "CRN InPrep: sample sites"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "CRN InPrep: sample sites"
-    proxyStyleUrl: "getDefaultStyle.do?colour=0x00FFBB&layerName=be10-denude:crn_inprep_outlets"
-    order: "Registered_1"
+        selector: "be10-denude:crn_int_basins"
+
+"Octopus-Crn-Int-Outlets":
+    name: "CRN Global: Sample Sites"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "CRN International Collection: Sample Sites"
+    order: "Octopus_04"
     wms:
-        selector: "denude:crn_int_basins"
-"UOW-Crn-Int-Basins":
-    name: "CRN International: river Basins"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "CRN International: river Basins"
-    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0xBBFF00"
-    order: "Registered_1"
+        selector: "be10-denude:crn_int_outlets"
+
+# Octopus CRN Large Basins
+"Octopus-Crn-XXL-Basins":
+    name: "CRN Large Basins: River Basins"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "CRN Large Basins: River Basins"
+    order: "Octopus_05"
     wms:
-        selector: "denude:crn_int_outlets"
-"UOW-Crn-Int-Outlets":
-    name: "CRN International: sample sites"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "CRN International: sample sites"
-    proxyStyleUrl: "getDefaultStyle.do?colour=0xBBFFAA&layerName=be10-denude:crn_int_outlets"
-    order: "Registered_1"
+        selector: "be10-denude:crn_xxl_basins"
+
+"Octopus-Crn-XXL-Outlets":
+    name: "CRN Large Basins: Sample Sites"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "CRN Large Basins: Sample Sites"
+    order: "Octopus_06"
     wms:
-        selector: "denude:crn_xxl_outlets"
-"UOW-Crn-XXL-Basins":
-    name: "CRN XXL: river Basins"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "CRN XXL: river Basins"
-    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0xDDFF00"
-    order: "Registered_1"
+        selector: "be10-denude:crn_xxl_outlets"
+
+# Octopus CRN Basin Bounding boxes 
+"Octopus-Crn-Basin-BBoxes":
+    name: "CRN Basin Bounding Boxes"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "CRN Basin Bounding Boxes"
+    order: "Octopus_07"
     wms:
-        selector: "denude:crn_xxl_basins"
-"UOW-Crn-XXL-Outlets":
-    name: "CRN XXL: sample sites"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "CRN XXL: sample sites"
-    proxyStyleUrl: "getDefaultStyle.do?colour=0xDDFFAA&layerName=be10-denude:crn_xxl_outlets"
-    order: "Registered_1"
+        selector: "be10-denude:publications"
+
+# Octopus Sahul Archaeology
+"Octopus-Sahul-Arch-Radicarbon":
+    name: "Sahul Archaeology Radiocarbon"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "Sahul Archaeology: Radiocarbon collection"
+    order: "Octopus_08"
     wms:
-        selector: "denude:crn_xxl_outlets"
-"UOW-OSLTL-Basins":
-    name: "OSL & TL: river Basins"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "OSL & TL: river Basins"
-    proxyStyleUrl: "getDefaultPolygonStyle.do?colour=0xFFDD00"
-    order: "Registered_1"
+        selector: "be10-denude:sahularch_c14"
+
+"Octopus-Sahul-Arch-OSL":
+    name: "Sahul Archaeology OSL"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "Sahul Archaeology: optically stimulated luminescence (OSL) collection"
+    order: "Octopus_09"
     wms:
-        selector: "denude:osltl_basins"
-"UOW-OSLTL-Outlets":
-    name: "OSL & TL: sample sites"
-    group: "Cosmogenic Isotope and Luminescence"
-    description: "OSL & TL: sample sites"
-    proxyStyleUrl: "getDefaultStyle.do?colour=0xFFDDAA&layerName=be10-denude:osltl_samples"
-    order: "Registered_1"
+        selector: "be10-denude:sahularch_osl"
+
+"Octopus-Sahul-Arch-TL":
+    name: "Sahul Archaeology TL"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "Sahul Archaeology: thermoluminescence (TL) collection"
+    order: "Octopus_10"
     wms:
-        selector: "denude:osltl_samples"
+        selector: "be10-denude:sahularch_c14"
+
+# Octopus Sahul Sedimentary Archives
+"Octopus-Sahul-Sed-Archives-Aeolian-Osl":
+    name: "Sahul Sed Archives Aeolian OSL"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "Sahul Sedimentary Archives: Aeolian optically stimulated luminescence (OSL)"
+    order: "Octopus_11"
+    wms:
+        selector: "be10-denude:sahulsed_aeolian_osl"
+
+"Octopus-Sahul-Sed-Archives-Aeolian-Tl":
+    name: "Sahul Sed Archives Aeolian TL"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "Sahul Sedimentary Archives: Aeolian thermoluminescence (TL)"
+    order: "Octopus_12"
+    wms:
+        selector: "be10-denude:sahulsed_aeolian_tl"
+
+"Octopus-Sahul-Sed-Archives-Fluvial-Osl":
+    name: "Sahul Sed Archives Fluvial OSL"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "Sahul Sedimentary Archives: Fluvial optically stimulated luminescence (OSL)"
+    order: "Octopus_13"
+    wms:
+        selector: "be10-denude:sahulsed_fluvial_osl"
+
+"Octopus-Sahul-Sed-Archives-Fluvial-Tl":
+    name: "Sahul Sed Archives Fluvial TL"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "Sahul Sedimentary Archives: Fluvial thermoluminescence (TL)"
+    order: "Octopus_14"
+    wms:
+        selector: "be10-denude:sahulsed_fluvial_tl"
+
+"Octopus-Sahul-Sed-Archives-Lacustrine-Osl":
+    name: "Sahul Sed Archives Lacustrine OSL"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "Sahul Sedimentary Archives: Lacustrine optically stimulated luminescence (OSL)"
+    order: "Octopus_15"
+    wms:
+        selector: "be10-denude:sahulsed_lacustrine_osl"
+
+"Octopus-Sahul-Sed-Archives-Lacustrine-Tl":
+    name: "Sahul Sed Archives Lacustrine TL"
+    group: "OCTOPUS (Cosmogenic DB)"
+    description: "Sahul Sedimentary Archives: Lacustrine thermoluminescence (TL)"
+    order: "Octopus_16"
+    wms:
+        selector: "be10-denude:sahulsed_lacustrine_tl"
+
 "igsn-sample":
     id: "IGSN-CSIRO-SAMPLE"
     name: "igsn-csiro-sample"
