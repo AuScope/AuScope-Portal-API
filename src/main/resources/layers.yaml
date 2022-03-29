@@ -61,7 +61,6 @@
                checkbox:
                     - [ "Provider", null ]
 "mineral-tenements":
-        group: "Tenements"
         name: "Mineral Tenements"
         description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for mt:Mineral Tenement"
         group: "Tenements"
@@ -1818,4 +1817,23 @@
     order: "lemecrc01"
     csw:
         serviceName: "Regolith landform maps CRC LEME"
+
+# GRACE
+"grace-mascons":
+    id: "grace_mascons"
+    name: "GRACE Mascons"
+    group: "GRACE"
+    description: "GRACE/GRACE-FO mascons"
+    order: "grace01"
+    wms:
+        selector: "grace:grace_view"
+    
+"world-boundaries":
+    id: "Countries_WSG84"
+    name: "World Boundaries"
+    group: "GRACE"
+    description: "World boundaries"
+    order: "grace02"
+    wms:
+        selector: "grace:Countries_WGS84"
 
