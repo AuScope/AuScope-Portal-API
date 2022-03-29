@@ -187,7 +187,7 @@
         group: "Magnetotellurics"
         description: "The magnetotelluric surveys were conducted in Australia with public funding (government and university) from the 1960s to present."
         order: "401"
-        wfs:
+        wms:
             selector: "magnetotelluric"
 "portal-geo-models":
         name: "3D Geological Models"
@@ -320,7 +320,6 @@
                selector: "gsmlp:MSCL-BoreholeView"
                feature:
                     - "mscl:scanned_data"
-                    - "sa:SamplingFeatureCollection"
 "seismology-in-schools-site":
         name: "Seismographs in Schools Network"
         description: "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server."
