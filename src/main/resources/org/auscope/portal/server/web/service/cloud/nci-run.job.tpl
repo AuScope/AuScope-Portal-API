@@ -61,7 +61,7 @@ echo "#### Python start ####"
 computeStartTime=`date +%s`
 {9} "vl_script.py"
 computeEndTime=`date +%s` 
-echo "#### Python start ####"
+echo "#### Python end ####"
 
 echo "#### Compute Time start ####"
 totalComputeTime=`expr $computeEndTime - $computeStartTime`
