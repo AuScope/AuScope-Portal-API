@@ -90,7 +90,7 @@ public class TestSF0BoreholeService extends PortalTestClass {
         });
 
         WFSResponse result = service.getAllBoreholes(serviceUrl, boreholeName, custodian,
-                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null);
+                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, "gsmlp:BoreholeView");
         Assert.assertNotNull(result);
         Assert.assertEquals(gmlString, result.getData());
         Assert.assertSame(mockMethod, result.getMethod());
@@ -127,11 +127,44 @@ public class TestSF0BoreholeService extends PortalTestClass {
         });
 
         WFSResponse result = service.getAllBoreholes(serviceUrl, boreholeName, custodian,
-                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null);
+                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, "gsmlp:BoreholeView");
         Assert.assertNotNull(result);
         Assert.assertEquals(gmlString, result.getData());
         Assert.assertSame(mockMethod, result.getMethod());
     }
+
+
+    /**
+     * Test get all boreholes with a custom borehole layer name 
+     *
+     * @throws Exception
+     *             the exception
+     */
+    @Test
+    public void testGetAllBoreholesMyBoreholeView() throws Exception {
+        final String serviceUrl = "http://example.com";
+        final int maxFeatures = 45;
+        final String gmlString = "xmlString";
+
+        context.checking(new Expectations() {
+            {
+
+                oneOf(mockMethodMaker).makePostMethod(with(equal(serviceUrl)), with(equal("gsmlp:MyBoreholeView")),
+                        with(any(String.class)), with(equal(maxFeatures)), with(any(String.class)),
+                        with(equal(ResultType.Results)), with(equal((String) null)), with(equal((String) null)));
+                will(returnValue(mockMethod));
+                oneOf(mockHttpServiceCaller).getMethodResponseAsString(with(any(HttpRequestBase.class)));
+                will(returnValue(gmlString));
+            }
+        });
+
+        WFSResponse result = service.getAllBoreholes(serviceUrl, null, null,
+                null, null, maxFeatures, null, null, "gsmlp:MyBoreholeView");
+        Assert.assertNotNull(result);
+        Assert.assertEquals(gmlString, result.getData());
+        Assert.assertSame(mockMethod, result.getMethod());
+    }
+
 
     /**
      * Test get restricted boreholes bbox.
@@ -164,7 +197,7 @@ public class TestSF0BoreholeService extends PortalTestClass {
         });
 
         WFSResponse result = service.getAllBoreholes(serviceUrl, boreholeName, custodian,
-                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, null, null);
+                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, null, null, "gsmlp:BoreholeView");
         Assert.assertNotNull(result);
         Assert.assertEquals(gmlString, result.getData());
         Assert.assertSame(mockMethod, result.getMethod());
