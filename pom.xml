@@ -51,11 +51,16 @@
     <!-- Repositories section -->
     <repositories>
         <repository>
-            <id>dcdp-deps</id>
-            <name>AuScope Nexus - New PortalRepo</name>
-            <url>https://cgmaven.it.csiro.au/nexus/repository/dcdp-deps/</url>
+            <id>aus-mvn</id>
+            <url>https://pkgs.dev.azure.com/CSIROMineralResources/40352a90-4ca9-4028-b1e6-953538e003b4/_packaging/aus-mvn/maven/v1</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
-        <!-- This is only for the temporary usage of JClouds snapshots-->
+
         <repository>
             <id>apache-snapshots</id>
             <name>snapshots  apache maven repo</name>
@@ -63,17 +68,6 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository>
-        <repository>
-            <id>cgmaven.it.csiro.au</id>
-            <name>AuScope Nexus - PortalRepo</name>
-            <url>https://cgmaven.it.csiro.au/nexus/repository/PortalRepository/</url>
-            <snapshots>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-            <releases>
-                <updatePolicy>always</updatePolicy>
-            </releases>
         </repository>
         <repository>
              <id>unicar</id>
