@@ -31,7 +31,7 @@
     
     <!-- Project properties -->
     <properties>
-        <targetJdk>13</targetJdk>
+        <targetJdk>17</targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>2.0.5</powermock.version>
         <log4j.version>2.17.1</log4j.version>
