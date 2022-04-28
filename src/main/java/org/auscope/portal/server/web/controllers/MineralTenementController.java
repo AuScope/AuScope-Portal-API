@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
+import org.auscope.portal.core.services.responses.wfs.WFSResponse;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.core.util.SLDLoader;
 import org.auscope.portal.server.MineralTenementServiceProviderType;
@@ -92,7 +93,7 @@ public class MineralTenementController extends BasePortalController {
                 
                 String filterString;
 
-                InputStream result = null;
+                WFSResponse result = null;
                 if (filter != null && filter.indexOf("ogc:Filter")>0) { //Polygon filter
                     filterString = filter.replace("gsmlp:shape","mt:shape");
                     result = this.mineralTenementService.downloadCSVByPolygonFilter(serviceUrl, mineralTenementServiceProviderType.featureType(), filterString, maxFeatures);
@@ -102,12 +103,13 @@ public class MineralTenementController extends BasePortalController {
                     if (mineralTenementServiceProviderType == MineralTenementServiceProviderType.ArcGIS) {
                         filterString = "";
                     }
-
                     outputStream = response.getOutputStream();
                     result = this.mineralTenementService.downloadCSV(serviceUrl, mineralTenementServiceProviderType.featureType(), filterString, null);
-                }            
-                
-                FileIOUtil.writeInputToOutputStream(result, outputStream, 8 * 1024, true);
+                }
+                // If there are no results, the GML response will contain only a single header line
+                if(result != null && result.getData().lines().count() > 1) {
+                	FileIOUtil.writeInputToOutputStream(new ByteArrayInputStream(result.getData().getBytes()), outputStream, 8 * 1024, true);
+                }
                 outputStream.close();
             } catch (Exception e) {
                 log.warn(String.format("Unable to request/transform WFS response from '%1$s': %2$s", serviceUrl,e));

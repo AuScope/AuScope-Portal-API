@@ -67,12 +67,15 @@ public class SF0BoreholeController extends BasePortalController {
     public ModelAndView doBoreholeFilter(String serviceUrl, String boreholeName, String custodian,
             String dateOfDrillingStart, String dateOfDrillingEnd, int maxFeatures, String bbox, String typeName,
             @RequestParam(required=false, value="outputFormat") String outputFormat) throws Exception {
-
         try {
             FilterBoundingBox box = FilterBoundingBox.attemptParseFromJSON(bbox);
             WFSResponse response = this.boreholeService.getAllBoreholes(serviceUrl, boreholeName, custodian,
                     dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, box, outputFormat, typeName);
-            return generateNamedJSONResponseMAV(true, "gml", response.getData(), response.getMethod());
+            // If there are no results, the GML response will contain only a single header line
+            if(response.getData().lines().count() > 1) {
+            	return generateNamedJSONResponseMAV(true, "gml", response.getData(), response.getMethod());
+            }
+            return generateJSONResponseMAV(false, null, "This service returned no boreholes within the specified area.");
         } catch (Exception e) {
             return this.generateExceptionResponse(e, serviceUrl);
         }
@@ -92,39 +95,35 @@ public class SF0BoreholeController extends BasePortalController {
      * @throws Exception
      */
     @RequestMapping("/doNVCLBoreholeViewCSVDownload.do")
-    public void doNVCLBoreholeViewCSVDownload(String serviceUrl,String typeName,
+    public void doNVCLBoreholeViewCSVDownload(String serviceUrl, String typeName,
     		@RequestParam(required=false, value="bbox") String bbox,
             @RequestParam(required=false, value="outputFormat") String outputFormat,
             @RequestParam(required=false, value="filter") String filter,
             @RequestParam(required=false, value="maxFeatures",defaultValue = "100000") Integer maxFeatures,
             HttpServletResponse response) throws Exception {
-    	
     	OutputStream outputStream = response.getOutputStream();
         try {
         	response.setContentType("text/csv");
-        	
             FilterBoundingBox box = FilterBoundingBox.attemptParseFromJSON(bbox);
-            
             String filterString;
             SF0BoreholeFilter sf0BoreholeFilter = new SF0BoreholeFilter(true);
-
-            InputStream result = null;
+            WFSResponse wfsResponse = null;
             if (filter != null && filter.indexOf("ogc:Filter")>0) { //Polygon filter
                 filterString = filter;
-                result = wfsService.downloadCSVByPolygonFilter(serviceUrl, typeName, filterString, maxFeatures);
+                wfsResponse = wfsService.downloadCSVByPolygonFilter(serviceUrl, typeName, filterString, maxFeatures);
             } else {
                 if (box == null ) {
                     filterString = sf0BoreholeFilter.getFilterStringAllRecords();
                 } else {
                     filterString = sf0BoreholeFilter.getFilterStringBoundingBox(box);
                 }
-
-                result = wfsService.downloadCSV(serviceUrl, typeName, filterString,maxFeatures);
-            }            
-            
-            FileIOUtil.writeInputToOutputStream(result, outputStream, 8 * 1024, true);
+                wfsResponse = wfsService.downloadCSV(serviceUrl, typeName, filterString,maxFeatures);
+            }
+            // If there are no results, the GML response will contain only a single header line
+            if(wfsResponse != null && wfsResponse.getData().lines().count() > 1) {
+            	FileIOUtil.writeInputToOutputStream(new ByteArrayInputStream(wfsResponse.getData().getBytes()), outputStream, 8 * 1024, true);
+            }
             outputStream.close();
-            
         } catch (Exception e) {
         	log.warn(String.format("Unable to request/transform WFS response from '%1$s': %2$s", serviceUrl,e));
             log.debug("Exception: ", e);  
@@ -132,6 +131,7 @@ public class SF0BoreholeController extends BasePortalController {
             outputStream.close();
         }
     }
+    
     /**
      * Handles getting the style of the SF0 borehole filter queries. (If the bbox elements are specified, they will limit the output response to 200 records
      * implicitly)
@@ -261,6 +261,7 @@ public class SF0BoreholeController extends BasePortalController {
         styleStream.close();
         outputStream.close();
     }
+    
     /**
      * Handles getting the style of the SF0 borehole filter queries. (If the bbox elements are specified, they will limit the output response to 200 records
      * implicitly)

@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.controllers;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.WFSService;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
+import org.auscope.portal.core.services.responses.wfs.WFSResponse;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.gsml.TIMAGeosampleFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,10 +65,9 @@ public class TIMAController extends BasePortalController {
         String filterString;
 
         //Make our request and get it transformed
-        InputStream result = null;
+        WFSResponse result = null;
         response.setContentType("text/csv");
         OutputStream outputStream = response.getOutputStream();
-
         try {
             if (filter != null && filter.indexOf("ogc:Filter")>0) { //Polygon filter
                 filterString = filter.replace("gsmlp:shape","gml:location");
@@ -81,7 +82,10 @@ public class TIMAController extends BasePortalController {
                     serviceUrl, ex));
             log.debug("Exception: ", ex);
         }
-        FileIOUtil.writeInputToOutputStream(result, outputStream, 8 * 1024, true);
+        // If there are no results, the GML response will contain only a single header line
+        if(result != null && result.getData().lines().count() > 1) {
+        	FileIOUtil.writeInputToOutputStream(new ByteArrayInputStream(result.getData().getBytes()), outputStream, 8 * 1024, true);
+        }
         outputStream.close();
     }
 
@@ -114,23 +118,25 @@ public class TIMAController extends BasePortalController {
         response.setContentType("text/csv");
         OutputStream outputStream = response.getOutputStream();
         //Make our request and get it transformed
-        InputStream results = null;
-
+        WFSResponse result = null;
         try {
             if (filter != null && filter.indexOf("ogc:Filter")>0) { //Polygon filter
                 filterString = filter.replace("gsmlp:shape","gml:location");
-                results = wfsService.downloadCSVByPolygonFilter(serviceUrl, "tima:view_shrimp_geochronology_result", filterString, maxFeatures);
+                result = wfsService.downloadCSVByPolygonFilter(serviceUrl, "tima:view_shrimp_geochronology_result", filterString, maxFeatures);
             } else{ //BBox or no filter
                 //Build our filter details
                 filterString = generateGeoSampleFilter(sampleName, igsn, bboxJson, optionalFilters);
-                results = wfsService.downloadCSV(serviceUrl, "tima:view_shrimp_geochronology_result", filterString, maxFeatures);
+                result = wfsService.downloadCSV(serviceUrl, "tima:view_shrimp_geochronology_result", filterString, maxFeatures);
             }
         } catch (Exception ex) {
             log.warn(String.format("Unable to request/transform WFS response for '%1$s' from '%2$s': %3$s", sampleName,
                     serviceUrl, ex));
             log.debug("Exception: ", ex);
         }
-        FileIOUtil.writeInputToOutputStream(results, outputStream, 8 * 1024, true);
+        // If there are no results, the GML response will contain only a single header line
+        if(result != null && result.getData().lines().count() > 1) {
+        	FileIOUtil.writeInputToOutputStream(new ByteArrayInputStream(result.getData().getBytes()), outputStream, 8 * 1024, true);
+        }
         outputStream.close();
     }
 
