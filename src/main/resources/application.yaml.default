@@ -10,6 +10,10 @@
 #         context-path: /AuScope-Portal
 termsconditions:
    version: 1
+   
+access:
+   # set a whitelist for the request URL only from the Commonwealth Government or the State Governments or Universities or Octopus will pass
+   whitelist: .gov.au .edu.au .octopusdata.org .csiro.au
 
 spring:
    # Include the registry definitions from application-registries.yaml
