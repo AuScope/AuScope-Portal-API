@@ -144,3 +144,18 @@ env:
         token_uri: https://oauth2.googleapis.com/token
     nvclAnalyticalServices:
         url: http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics
+  endpoint:
+    health:
+        show-details: always
+
+
+info:
+  application:
+    portal-core-version: "@portal.core.version@"
+    gitCommitMessage: "@git.commit.message.short@"

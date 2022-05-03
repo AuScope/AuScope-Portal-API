@@ -63,6 +63,7 @@ import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.mail.JobCompletionMailSender;
+import org.auscope.portal.server.web.CatalogServicesHealthIndicator;
 import org.auscope.portal.server.web.SearchHttpServiceCaller;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
@@ -702,6 +703,11 @@ public class AppContext {
     @Bean
     public ViewCSWRecordFactory viewCSWRecordFactory() {
         return new ViewCSWRecordFactory();
+    }
+
+    @Bean
+    public CatalogServicesHealthIndicator CatalogServicesHealthIndicator() {
+        return new CatalogServicesHealthIndicator(cswCacheService(), cswKnownLayerService(), cswServiceList);
     }
 
 }
