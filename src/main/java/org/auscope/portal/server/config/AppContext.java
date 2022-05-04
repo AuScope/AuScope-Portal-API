@@ -58,6 +58,7 @@ import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.xslt.GmlToHtml;
 import org.auscope.portal.core.xslt.WfsToKmlTransformer;
+import org.auscope.portal.core.services.admin.StateService;
 import org.auscope.portal.mscl.MSCLWFSService;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
@@ -708,6 +709,10 @@ public class AppContext {
     @Bean
     public CatalogServicesHealthIndicator CatalogServicesHealthIndicator() {
         return new CatalogServicesHealthIndicator(cswCacheService(), cswKnownLayerService(), cswServiceList);
+
+    @Bean
+    public StateService stateServiceFactory() {
+        return new StateService(localCacheDir);
     }
 
 }
