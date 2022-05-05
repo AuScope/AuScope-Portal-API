@@ -709,7 +709,8 @@ public class AppContext {
     @Bean
     public CatalogServicesHealthIndicator CatalogServicesHealthIndicator() {
         return new CatalogServicesHealthIndicator(cswCacheService(), cswKnownLayerService(), cswServiceList);
-
+    }
+    
     @Bean
     public StateService stateServiceFactory() {
         return new StateService(localCacheDir);
