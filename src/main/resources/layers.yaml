@@ -762,7 +762,7 @@
     csw:
         serviceName: "National ASTER Map Opaque index"
 "aster-ferric-oxide-content":
-    name: "Ferric oxide content2"
+    name: "Ferric oxide content"
     description: "1. Band ratio: B4/B3Blue is low abundance, Red is high abundance"
     group: "ASTER Maps"
     order: "30_ASTER Maps_050"
