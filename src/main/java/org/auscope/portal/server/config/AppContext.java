@@ -712,8 +712,9 @@ public class AppContext {
     }
     
     @Bean
-    public StateService stateServiceFactory() {
-        return new StateService(localCacheDir);
+    public StateService stateServiceFactory() { // This service is used to store permanent links in a database
+        final int DB_LIMIT = 100000; // Maximum number of permanent links in database
+        return new StateService(localCacheDir, DB_LIMIT);
     }
 
 }
