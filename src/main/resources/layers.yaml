@@ -307,7 +307,7 @@
                     - [ "Provider" , null ]
 "mscl-borehole":
         name: "MSCL Data"
-        description: "Borehole observations made with a multi-sensor core logger."
+        description: "Petrophysical data acquired using Geotek MSCL-S."
         group: "Boreholes"
         proxyUrl: "doBoreholeViewFilter.do"
         proxyStyleUrl: ""
