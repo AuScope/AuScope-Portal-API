@@ -241,7 +241,7 @@
             <artifactId>opencsv</artifactId>
             <version>5.5</version>
         </dependency>
-	<dependency>
+        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20201115</version>
@@ -323,6 +323,12 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.28</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.36.0</version>
+         </dependency>
 
         <dependency>
             <groupId>org.apache.jena</groupId>

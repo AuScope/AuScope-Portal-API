@@ -897,23 +897,6 @@
         selector: "z"
         endPoints: 
             - "http://remanentanomalies.csiro.au/thredds/wms/Emag2/EMAG2.nc"
-"notused-samplingpoint":
-    hidden: true
-    order: "450"
-    wfs:
-        selector: "sa:SamplingPoint"
-"notused-featurecollection":
-    hidden: true
-    wfs:
-        selector: "gml:FeatureCollection"
-"notused-portals":
-    hidden: true
-    csw:
-        keyword: "Portal"
-"notused-geonetwork":
-    hidden: true
-    csw:
-        keyword: "GeoNetwork"
 "gsv-geological-unit-250k-":
     name: "Gsv Geological Unit 250K "
     group: "Geological Survey of Victoria"
