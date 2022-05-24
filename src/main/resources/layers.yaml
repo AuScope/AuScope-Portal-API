@@ -1820,3 +1820,88 @@
     wms:
         selector: "grace:Countries_WGS84"
 
+# Loop3D
+"2_5m_interpgeop15":
+    name: "2.5m Interpgeop 15 4326"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop01"
+    wms:
+        selector: "loop:2_5m_interpgeop15_4326"
+"2m_linear_structures":
+    name: "2m Linear Structures"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop02"
+    wms:
+        selector: "SA:2m_linear_structures"
+"500k_faults_4326":
+    name: "500k Faults 4326"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop03"
+    wms:
+        selector: "loop:500k_faults_4326"
+"500k_geol_28350":
+    name: "500k Geol 28350"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop04"
+    wms:
+        selector: "loop:500k_geol_28350"
+"500k_geol_4326":
+    name: "500k Geol 4326"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop05"
+    wms:
+        selector: "loop:500k_geol_4326"
+"bulkdensitypoint_4326":
+    name: "Bulk Density Point 4326"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop06"
+    wms:
+        selector: "loop:bulkdensitypoint_4326"
+"paterson_polygons_4wg_2350":
+    name: "Paterson Polygons 4wg 2350"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop09"
+    wms:
+        selector: "loop:paterson_polygons_4wg_2350"
+"paterson_polygons_4wg_2350b":
+    name: "Paterson Polygons 4wg 2350b"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop10"
+    wms:
+        selector: "loop:paterson_polygons_4wg_2350b"
+"paterson_polygons_4wg_4326b":
+    name: "Paterson Polygons 4wg 4326b"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop11"
+    wms:
+        selector: "loop:paterson_polygons_4wg_4326b"
+"loop:pg_wgs84":
+    name: "PG WGS84"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop12"
+    wms:
+        selector: "loop:waroxi_wa_4326_bed"
+"waroxi_wa_4326_bed":
+    name: "Waroxi WA 4326 Bed"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop13"
+    wms:
+        selector: "loop:waroxi_wa_4326_bed"
+"world_bradley_ancient_passive":
+    name: "World Bradley Ancient Passive"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop14"
+    wms:
+        selector: "world:world_bradley_ancient_passive"
