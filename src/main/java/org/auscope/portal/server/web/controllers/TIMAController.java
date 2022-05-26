@@ -1,6 +1,5 @@
 package org.auscope.portal.server.web.controllers;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -24,6 +23,7 @@ public class TIMAController extends BasePortalController {
 
     /** Used for making general WFS requests */
     private WFSService wfsService;
+
     @Autowired
     public TIMAController(WFSService wfsService) {
         this.wfsService = wfsService;
@@ -149,4 +149,5 @@ public class TIMAController extends BasePortalController {
             return timaGeosampleFilter.getFilterStringBoundingBox(bbox);
         }
     }
+
 }
