@@ -248,6 +248,7 @@
         proxyUrl: "doTIMAGeoSample.do"
         proxyCountUrl: ""
         proxyDownloadUrl: "doTIMAGeoSampleCSVDownload.do"
+        proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:geosample_and_mineralogy"
         icon:
                url: "http://maps.google.com/mapfiles/kml/paddle/grn-circle.png"
         order: "180"
@@ -264,6 +265,7 @@
         proxyUrl: "doSHRIMPGeoSample.do"
         proxyCountUrl: ""
         proxyDownloadUrl: "doSHRIMPGeoSampleCSVDownload.do"
+        proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:view_shrimp_geochronology_result"
         icon:
                url: "http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png"
         order: "180"
