@@ -188,6 +188,13 @@
         order: "401"
         wms:
             selector: "magnetotelluric"
+"auslamp":
+        name: "Northern Australia AusLAMP Stations"
+        group: "Magnetotellurics"
+        description: "Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) Stations."
+        order: "402"
+        wfs:
+            selector: "mt:nth_aus_AusLAMP_siteloc"
 "portal-geo-models":
         name: "3D Geological Models"
         group: "Models"
