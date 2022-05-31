@@ -153,9 +153,13 @@ management:
   endpoint:
     health:
         show-details: always
+  info:
+    git:
+      mode: full
 
 
 info:
   application:
     portal-core-version: "@portal.core.version@"
-    gitCommitMessage: "@git.commit.message.short@"
+
+     

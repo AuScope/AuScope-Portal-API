@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,6 +9,7 @@ import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Health.Builder;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -19,7 +21,9 @@ public class CatalogServicesHealthIndicator implements HealthIndicator {
     private KnownLayerService cswKnownLayerService;
     private CSWCacheService cswCacheService;
     private ArrayList<CSWServiceItem> cswServiceList;
-    private RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate = new RestTemplateBuilder().setConnectTimeout(Duration.ofMillis(5000))
+        .setReadTimeout(Duration.ofMillis(5000))
+        .build();
 
     public CatalogServicesHealthIndicator(CSWCacheService cswCacheService, KnownLayerService cswKnownLayerService,
             ArrayList<CSWServiceItem> cswServiceList) {
@@ -34,8 +38,8 @@ public class CatalogServicesHealthIndicator implements HealthIndicator {
         int recordcount = this.cswCacheService.getRecordCache().size();
         int keywordcount = this.cswCacheService.getKeywordCache().size();
         HashMap<String, String> cswrecordstatus = new HashMap<String, String>();
-        try {
-            for (CSWServiceItem cswservice : cswServiceList) {
+        for (CSWServiceItem cswservice : cswServiceList) {
+            try {
                 ResponseEntity<String> responseEntity = restTemplate.getForEntity(
                         cswservice.getServiceUrl() + "?SERVICE=CSW&REQUEST=GetCapabilities", String.class);
                 if (responseEntity.getStatusCode().is2xxSuccessful()) {
@@ -49,8 +53,11 @@ public class CatalogServicesHealthIndicator implements HealthIndicator {
                     cswrecordstatus.put(cswservice.getServiceUrl(), "DOWN");
                 }
             }
-        } catch (Exception e) {
+            catch (Exception e) {
+                cswrecordstatus.put(cswservice.getServiceUrl(), "DOWN");
+            }
         }
+
         Builder result;
         if (recordcount > 0) {
             result = Health.up()
