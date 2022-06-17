@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.auscope.portal.core.configuration.ServiceConfigurationItem;
+import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.csw.CSWRecordsFilterVisitor;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
@@ -33,6 +35,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.web.servlet.ModelAndView;
+import org.auscope.portal.core.configuration.ServiceConfiguration;
+
 
 /**
  * The Class TestNVCLController.
@@ -62,6 +66,9 @@ public class TestNVCLController extends PortalTestClass {
 
     private SF0BoreholeService mockSF0Service;
 
+    private HttpServiceCaller mockServiceCaller;
+
+    private ServiceConfiguration mockServiceConfiguration;
     /**
      * Setup.
      */
@@ -73,8 +80,10 @@ public class TestNVCLController extends PortalTestClass {
         this.mockDataService = context.mock(NVCLDataService.class);
         this.mock2_0_DataService = context.mock(NVCL2_0_DataService.class);
         this.mockSF0Service = context.mock(SF0BoreholeService.class);
+        this.mockServiceCaller = context.mock(HttpServiceCaller.class);
+        this.mockServiceConfiguration = context.mock(ServiceConfiguration.class);  
         this.nvclController = new NVCLController(this.mockBoreholeService, this.mockCSWService, this.mockDataService,
-                this.mock2_0_DataService, this.mockSF0Service);
+                this.mock2_0_DataService, this.mockSF0Service, this.mockServiceCaller, this.mockServiceConfiguration );
     }
 
     /**

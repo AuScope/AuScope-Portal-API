@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -25,6 +26,7 @@ import org.auscope.portal.core.services.csw.CSWRecordsHostFilter;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.responses.wfs.WFSResponse;
 import org.auscope.portal.core.util.FileIOUtil;
+import org.auscope.portal.core.util.MimeUtil;
 import org.auscope.portal.server.domain.nvcldataservice.AbstractStreamResponse;
 import org.auscope.portal.server.domain.nvcldataservice.AlgorithmOutputClassification;
 import org.auscope.portal.server.domain.nvcldataservice.AlgorithmOutputResponse;
@@ -49,6 +51,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.auscope.portal.core.configuration.ServiceConfiguration;
+import org.auscope.portal.core.server.http.HttpServiceCaller;
+import org.auscope.portal.core.server.http.download.DownloadResponse;
+import org.auscope.portal.core.server.http.download.ServiceDownloadManager;
 /**
  * Controller for handling requests for the NVCL boreholes
  *
@@ -63,21 +73,28 @@ public class NVCLController extends BasePortalController {
     private NVCL2_0_DataService dataService2_0;
     private CSWCacheService cswService;
     private SF0BoreholeService sf0BoreholeService;
+    private HttpServiceCaller serviceCaller;
+    private ServiceConfiguration serviceConfiguration;
 
     private int BUFFERSIZE = 1024 * 1024;
 
+    
     @Autowired
     public NVCLController(BoreholeService boreholeService,
             CSWCacheService cswService,
             NVCLDataService dataService,
             NVCL2_0_DataService dataService2_0,
-            SF0BoreholeService sf0BoreholeService) {
+            SF0BoreholeService sf0BoreholeService,
+            HttpServiceCaller serviceCaller,
+            ServiceConfiguration serviceConfiguration) {
 
         this.boreholeService = boreholeService;
         this.cswService = cswService;
         this.dataService = dataService;
         this.dataService2_0 = dataService2_0;
         this.sf0BoreholeService = sf0BoreholeService;
+        this.serviceCaller = serviceCaller;
+        this.serviceConfiguration = serviceConfiguration;
     }
  
     
@@ -824,5 +841,62 @@ public class NVCLController extends BasePortalController {
             log.debug("Exception: ", ex);
             return generateJSONResponseMAV(false);
         }
-    }    
+    }   
+
+    /**
+     * Given a list of URls, this function will collate the responses into csv files, then find datsetNames based on boreholeID , then build the TSG Files url list and send the list back to the browser. 
+     *
+     * @param serviceUrls
+     * @param response
+     * @param email
+     * @throws Exception
+     */
+    @RequestMapping("/downloadTsgFiles.do")
+    public void downloadTsgFiles(
+            @RequestParam("serviceUrls") final String[] serviceUrls,
+            @RequestParam(required = false, value = "email", defaultValue = "") final String email,
+            HttpServletResponse response) throws Exception {
+
+        //downloadCSV with filter
+        ExecutorService threadpool = Executors.newCachedThreadPool();
+
+        log.trace("downloadTsgFiles.do: No. of serviceUrls: " + serviceUrls.length);
+        OutputStream outputStream = response.getOutputStream();
+
+        String extension = null;
+        String outputFormat = "csv";
+        if (outputFormat != null) {
+            String ext = MimeUtil.mimeToFileExtension(outputFormat);
+            if (ext != null && !ext.isEmpty()) {
+                extension = "." + ext;
+            }
+        }
+
+        ServiceDownloadManager downloadManager = new ServiceDownloadManager(serviceUrls, serviceCaller, threadpool, this.serviceConfiguration, extension);
+        //build the tsgFileUrls fore each record in downloadCSV.
+        if (email != null && email.length() > 0 && outputFormat.equals("csv")) {
+            // set the content type for text
+            response.setContentType("text");
+            ArrayList<DownloadResponse> gmlDownloads = downloadManager.downloadAll();
+            //Loop all serviceUrls to find the matched datasetName and URI for it.
+            for (int i = 0; i < gmlDownloads.size(); i++) {
+                String csv = FileIOUtil.writeResponseToString(gmlDownloads.get(i));
+                if (csv == null) {
+                    continue;
+                }
+                String endpoint = gmlDownloads.get(i).getRequestURL();
+                endpoint = "https://" + new URL(endpoint).getHost() + "/";
+
+                String tsgFileUrls = this.dataService.getTsgFileUrls(endpoint, csv);
+                if (tsgFileUrls == null) {
+                    continue;
+                }
+                System.out.println(tsgFileUrls);
+                outputStream.write(tsgFileUrls.getBytes());
+            }
+            outputStream.close();
+        }
+        return;
+    }
+
 }
