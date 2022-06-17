@@ -608,7 +608,7 @@
         description: "Total magnetic intensity (TMI) data measures variations in the intensity of the Earth's magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust. Magnetic anomalies can be either positive (field stronger than normal) or negative (field weaker) depending on the susceptibility of the rock. "
         order: "313"
         wms:
-               selector: "gadds:geophysical_datasets_radiometric"
+               selector: "gadds:geophysical_datasets_magnetic"
 "gga-geophysicalsurveys-elev":
         name: "Geophysical Surveys - Elevation"
         group: "GA Geophysical Survey Datasets"
