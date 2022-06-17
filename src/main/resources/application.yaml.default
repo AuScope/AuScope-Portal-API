@@ -142,8 +142,9 @@ env:
         client_email: ENTER_CLIENT_EMAIL
         client_id: ENTER_CLIENT_ID
         token_uri: https://oauth2.googleapis.com/token
-    nvclAnalyticalServices:
-        url: http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/
+    nvcl:
+      AnalyticalSeviceUrl: http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/
+      tsgFileCacheUrl: https://nvclanalyticscache.z8.web.core.windows.net/
 
 management:
   endpoints:
