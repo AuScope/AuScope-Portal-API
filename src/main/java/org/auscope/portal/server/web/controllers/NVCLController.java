@@ -898,5 +898,20 @@ public class NVCLController extends BasePortalController {
         }
         return;
     }
+    /**
+     * checkTsgDownloadAvailable
+     *
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping("/isTSGDownloadAvailable.do")
+    public ModelAndView downloadTsgFiles() throws Exception {
+       String url = this.dataService.getTsgFileCacheUrl();
+       if (url != null && url.length()>1) {
+            return generateJSONResponseMAV(true, url, "TSG files download is ready.");
+       } else {
+        return generateJSONResponseMAV(false, url, "TSG files download is not ready.");
 
+       }
+    }
 }

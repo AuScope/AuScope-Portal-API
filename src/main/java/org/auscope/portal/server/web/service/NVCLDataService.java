@@ -77,13 +77,15 @@ public class NVCLDataService {
     public NVCLDataService(HttpServiceCaller httpServiceCaller, 
                             NVCLDataServiceMethodMaker methodMaker,
                             WFSGetFeatureMethodMaker wfsMethodMaker, 
-                            @Value("${env.nvcl.tsgFileCacheUrl}") String nvclTsgFileCacheUrl) {
+                            @Value("${env.nvcl.tsgFileCacheUrl:#{null}}") String nvclTsgFileCacheUrl) {
         this.httpServiceCaller = httpServiceCaller;
         this.methodMaker = methodMaker;
         this.nvclTsgFileCacheUrl = nvclTsgFileCacheUrl;
         this.loadTsgDownloadMaps();
     }
-
+    public String getTsgFileCacheUrl() {
+        return this.nvclTsgFileCacheUrl;
+    }
     /**
      * Makes and parses a getDatasetCollection request to a NVCLDataService
      * 
