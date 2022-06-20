@@ -505,7 +505,9 @@ public class LayerFactory {
                                             (String) filter.selectlist.params.get(0),
                                             (String) filter.selectlist.params.get(1),
                                             (String) filter.selectlist.params.get(2),
-                                            Predicate.valueOf((String) filter.selectlist.params.get(3)), options);
+                                            Predicate.valueOf((String) filter.selectlist.params.get(3)),
+                                            options,
+                                            (boolean) filter.selectlist.params.get(4));
                                     optionalFilters.add(uiDropDownSelectList);
                                 }
                                 if (filter.mandatorylist != null) {

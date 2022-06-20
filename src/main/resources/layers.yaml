@@ -84,6 +84,7 @@
                         - "mt:tenementType"
                         - null 
                         - "ISLIKE"
+                        - false
                    options: 
                         - [ "Exploration", "exploration" ]
                         - [ "Prospecting", "prospecting" ]
@@ -328,6 +329,45 @@
                selector: "gsmlp:MSCL-BoreholeView"
                feature:
                     - "mscl:scanned_data"
+        filters:
+                selectlist:
+                    params:
+                        - "Dataset Property" # label
+                        - "strToLowerCase(datasetProperties)" # xpath or CQL attribute expression
+                        - null # value
+                        - "CQL_LIKE" # predicate: if "CQL_LIKE" then uses a CQL_FILTER param
+                        #                         if "ISLIKE" then uses an SLD_BODY param
+                        - true # this is multiselect
+                    options:
+                        - [ "Diameter", "diameter" ]
+                        - [ "P-Wave (Any)", "p_wave_" ]
+                        - [ "P-Wave Amplitude", "p_wave_amplitude" ]
+                        - [ "P-Wave Velocity", "p_wave_velocity" ]
+                        - [ "Density" , "density" ]
+                        - [ "Impedance", "impedance" ]
+                        - [ "Resistivity", "resistivity" ]
+                        - [ "Mag Susc (Any)", "magnetic_" ]
+                        - [ "Mag Susc Point", "magnetic_susc_point" ]
+                        - [ "Mag Susc Loop Volume Corrected", "magnetic_susceptibility" ]
+                        - [ "Mag Susc Loop Density Corrected", "magnetic_susc_loop_dc" ]
+                        - [ "Natural Gamma (Any)", "natural_gamma" ]
+                        - [ "Natural Gamma Potassium", "natural_gamma_k" ]
+                        - [ "Natural Gamma Uranium", "natural_gamma_u" ]
+                        - [ "Natural Gamma Thorium", "natural_gamma_th" ]
+                        - [ "Fractional Porosity", "frac_porosity" ]
+                        - [ "Temperature", "temperature" ]
+                        - [ "Spectrophotometer (Any)", "sp_"]
+                        - [ "Spectrophot Munsell Value", "sp_munsell" ]
+                        - [ "Spectrophot Colour L*", "sp_cie_colour_l" ]
+                        - [ "Spectrophot Colour a*", "sp_cie_colour_a" ]
+                        - [ "Spectrophot Colour b*", "sp_cie_colour_b" ]
+                        - [ "Spectrophot Colour X", "sp_cie_colour_x" ]
+                        - [ "Spectrophot Colour Y", "sp_cie_colour_y" ]
+                        - [ "Spectrophot Colour Z", "sp_cie_colour_z" ]
+                        - [ "Spectrophot Refl Red", "sp_refl_red" ]
+                        - [ "Spectrophot Refl Green", "sp_refl_green" ]
+                        - [ "Spectrophot Refl Blue", "sp_refl_blue" ]
+                        - [ "XRF (Any)", "xrf_"]
 "seismology-in-schools-site":
         name: "Seismographs in Schools Network"
         description: "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server."
