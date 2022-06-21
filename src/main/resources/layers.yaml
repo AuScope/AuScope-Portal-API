@@ -1912,34 +1912,6 @@
     order: "loop06"
     wms:
         selector: "loop:bulkdensitypoint_4326"
-"paterson_polygons_4wg_2350":
-    name: "Paterson Polygons 4wg 2350"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop09"
-    wms:
-        selector: "loop:paterson_polygons_4wg_2350"
-"paterson_polygons_4wg_2350b":
-    name: "Paterson Polygons 4wg 2350b"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop10"
-    wms:
-        selector: "loop:paterson_polygons_4wg_2350b"
-"paterson_polygons_4wg_4326b":
-    name: "Paterson Polygons 4wg 4326b"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop11"
-    wms:
-        selector: "loop:paterson_polygons_4wg_4326b"
-"loop:pg_wgs84":
-    name: "PG WGS84"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop12"
-    wms:
-        selector: "loop:waroxi_wa_4326_bed"
 "waroxi_wa_4326_bed":
     name: "Waroxi WA 4326 Bed"
     group: "Loop3D"
@@ -1947,10 +1919,3 @@
     order: "loop13"
     wms:
         selector: "loop:waroxi_wa_4326_bed"
-"world_bradley_ancient_passive":
-    name: "World Bradley Ancient Passive"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop14"
-    wms:
-        selector: "world:world_bradley_ancient_passive"
