@@ -891,7 +891,6 @@ public class NVCLController extends BasePortalController {
                 if (tsgFileUrls == null) {
                     continue;
                 }
-                System.out.println(tsgFileUrls);
                 outputStream.write(tsgFileUrls.getBytes());
             }
             outputStream.close();

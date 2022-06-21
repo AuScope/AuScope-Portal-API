@@ -144,7 +144,7 @@ env:
         token_uri: https://oauth2.googleapis.com/token
     nvcl:
       AnalyticalSeviceUrl: http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/
-      tsgFileCacheUrl: https://nvclanalyticscache.z8.web.core.windows.net/
+      tsgFileCacheUrl: DEFAULT, https://nvclanalyticscache.z8.web.core.windows.net, https://www.mrt.tas.gov.au/,$DEFAULT/Tas/,https://geossdi.dmp.wa.gov.au/,$DEFAULT/WA/,https://geology.data.nt.gov.au/,$DEFAULT/NT/,https://gs.geoscience.nsw.gov.au/,$DEFAULT/NSW/,https://sarigdata.pir.sa.gov.au/,$DEFAULT/SA/
 
 management:
   endpoints:

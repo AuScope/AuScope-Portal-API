@@ -293,6 +293,8 @@ public class NVCLDataService {
         CSVReader reader = new CSVReaderBuilder(new InputStreamReader(inputstreamCSV)).withCSVParser(parser).build();
         String[] headerLine = reader.readNext();
         int indexOfIdentifier = Arrays.asList(headerLine).indexOf("gsmlp:identifier");
+        int indexOfNvclCollection = Arrays.asList(headerLine).indexOf("gsmlp:nvclCollection");
+
         if (headerLine == null || headerLine.length <= 2 || indexOfIdentifier < 0) {
             throw new Exception("No or malformed CSV header sent");
         }
@@ -304,6 +306,9 @@ public class NVCLDataService {
         while ((dataLine = reader.readNext()) != null) {
             if (dataLine.length != headerLine.length) {
                 continue; //skip malformed lines
+            }
+            if (dataLine[indexOfNvclCollection].trim().equalsIgnoreCase("false")){
+                continue; //skip none nvclCollection lines.
             }
             //example: http://geossdi.dmp.wa.gov.au/resource/feature/gswa/borehole/ABDP1
             String boreholeURI = dataLine[indexOfIdentifier];
@@ -321,7 +326,6 @@ public class NVCLDataService {
 
             if (bhDatasetName == null) {
                 tsgFileCacheURL = "NoMatchedDatasetName-https://" + boreholeURI + "\n";
-                System.out.println(tsgFileCacheURL);
             } else {
                 tsgFileCacheURL = cacheUrlPath + bhDatasetName + ".zip\n"; 
                 //LINGBO https://nvclanalyticscache.z8.web.core.windows.net/WA/PDD446.zip
@@ -382,42 +386,30 @@ public class NVCLDataService {
         }
         this.mapEndpoint.clear();
         this.mapTsgCachePath.clear();
-        String endpoint;
 
         try {
-            endpoint = "https://www.mrt.tas.gov.au/";
-            this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
-            this.mapTsgCachePath.put(endpoint,this.nvclTsgFileCacheUrl+"Tas/");
+            String[] urlArrays = this.nvclTsgFileCacheUrl.split(",");
+            //Sample:tsgFileCacheUrl: DEFAULT, https://nvclanalyticscache.z8.web.core.windows.net, https://www.mrt.tas.gov.au/,$DEFAULT/Tas/,https://geossdi.dmp.wa.gov.au/,$DEFAULT/WA/,https://geology.data.nt.gov.au/,$DEFAULT/NT/,https://gs.geoscience.nsw.gov.au/,$DEFAULT/NSW/,https://sarigdata.pir.sa.gov.au/,$DEFAULT/SA/
 
-            endpoint = "https://geossdi.dmp.wa.gov.au/";
-            this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
-            this.mapTsgCachePath.put(endpoint,this.nvclTsgFileCacheUrl+"WA/");
+            String endpoint, cacheUrl;
+            String defaultUrl = null;
+            int start = 0;
+            if (urlArrays[0].contains("DEFAULT")) {
+                defaultUrl = urlArrays[1].trim();
+                start = 2; //skip the default;
+            }
+            for (int i = start; i<urlArrays.length; i+=2) {
+                endpoint = urlArrays[i].trim();
+                cacheUrl = urlArrays[i+1].trim();
+                if (defaultUrl != null) {
+                    cacheUrl = cacheUrl.replace("$DEFAULT",defaultUrl);
+                }
 
-            endpoint = "https://geology.data.nt.gov.au/";
-            this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
-            this.mapTsgCachePath.put(endpoint,this.nvclTsgFileCacheUrl+"NT/");
+                this.mapTsgCachePath.put(endpoint,cacheUrl);
+                this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
+            }
 
-            endpoint = "https://gs.geoscience.nsw.gov.au/";
-            this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
-            this.mapTsgCachePath.put(endpoint,this.nvclTsgFileCacheUrl+"NSW/");
-
-            endpoint = "https://sarigdata.pir.sa.gov.au/";
-            this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
-            this.mapTsgCachePath.put(endpoint,this.nvclTsgFileCacheUrl+"SA/");
-/* getDatasetCollection headless  doesnot works on QLD and VIC yet.
-        endpoint = "https://geology-uat.information.qld.gov.au/";
-        this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
-        this.mapTsgCachePath.put(endpoint,this.nvclTsgFileCacheUrl+"Qld/");
-
-        endpoint = "https://geology.information.qld.gov.au/";
-        this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
-        this.mapTsgCachePath.put(endpoint,this.nvclTsgFileCacheUrl+"Qld/");
-
-        endpoint = "https://geology.data.vic.gov.au/";
-        this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
-        this.mapTsgCachePath.put(endpoint,this.nvclTsgFileCacheUrl+"Vic/");
-        logger.trace("downloadTsgFiles.do: Loaded maps: " + this.mapEndpoint.size());
-*/      } catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return;
