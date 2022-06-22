@@ -38,7 +38,7 @@ public class SF0BoreholeController extends BasePortalController {
 
     private SF0BoreholeService boreholeService;
 
-    // private GsmlpNameSpaceTable gsmlpNameSpaceTable;
+    private GsmlpNameSpaceTable gsmlpNameSpaceTable;
     private NVCL2_0_DataService nvclDataService;
     private WFSService wfsService;
 
@@ -46,8 +46,8 @@ public class SF0BoreholeController extends BasePortalController {
     public SF0BoreholeController(SF0BoreholeService sf0BoreholeService, CSWCacheService cswService, NVCL2_0_DataService nvclDataService, WFSService wfsService) {
         this.boreholeService = sf0BoreholeService;
         this.nvclDataService = nvclDataService;
-        // GsmlpNameSpaceTable _gsmlpNameSpaceTable = new GsmlpNameSpaceTable();
-        // this.gsmlpNameSpaceTable = _gsmlpNameSpaceTable;
+        GsmlpNameSpaceTable _gsmlpNameSpaceTable = new GsmlpNameSpaceTable();
+        this.gsmlpNameSpaceTable = _gsmlpNameSpaceTable;
         this.wfsService = wfsService;
     }
 
@@ -208,10 +208,9 @@ public class SF0BoreholeController extends BasePortalController {
         List<String> filterColors = new ArrayList<String>();
         List<String> filters = new ArrayList<String>();
         List<String> filterMarks = new ArrayList<String>();
-        String gsmlpNameSpace = "http://xmlns.geosciml.org/geosciml-portrayal/4.0";
-		// gsmlpNameSpaceTable is no longer required as all data providers support v4
-		// However it may be required again for future versions of boreholeview 		
-		// String gsmlpNameSpace = gsmlpNameSpaceTable.getGsmlpNameSpace(serviceUrl);
+        
+ 		// Run a query to find the URI for the 'gsmlp' namespace
+		String gsmlpNameSpace = gsmlpNameSpaceTable.getGsmlpNameSpace(serviceUrl);
         if (StringUtils.isNotEmpty(analyticsJobId)) {
             //Generate a style for displaying pass/fail/error holes
             AnalyticalJobResults analyticsResults = nvclDataService.getProcessingResults(analyticsJobId);
@@ -220,7 +219,6 @@ public class SF0BoreholeController extends BasePortalController {
                 filterNames.add("Error Boreholes");
                 filterColors.add("#ff8000");
                 filters.add(this.boreholeService.getFilter(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, analyticsResults.getErrorBoreholes(), true,optionalFilters));
-                //filterMarks.add("ttf://Webdings#0x0073");
                 filterMarks.add("circle");
             }
 
@@ -228,7 +226,6 @@ public class SF0BoreholeController extends BasePortalController {
                 filterNames.add("Fail Boreholes");
                 filterColors.add("#cc0000");
                 filters.add(this.boreholeService.getFilter(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, analyticsResults.getFailBoreholes(), true,optionalFilters));
-                //filterMarks.add("ttf://Webdings#0x0072");
                 filterMarks.add("circle");
             }
 
@@ -236,7 +233,6 @@ public class SF0BoreholeController extends BasePortalController {
                 filterNames.add("Pass Boreholes");
                 filterColors.add(color.isEmpty() ? "#0000ff" : color);
                 filters.add(this.boreholeService.getFilter(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, analyticsResults.getPassBoreholes(), true,optionalFilters));
-                //filterMarks.add("ttf://Webdings#0x0061");
                 filterMarks.add("circle");
             }
         } else {
@@ -319,10 +315,10 @@ public class SF0BoreholeController extends BasePortalController {
         List<String> filterColors = new ArrayList<String>();
         List<String> filters = new ArrayList<String>();
         List<String> filterMarks = new ArrayList<String>();
-		String gsmlpNameSpace = "http://xmlns.geosciml.org/geosciml-portrayal/4.0";
-		// gsmlpNameSpaceTable is no longer required as all data providers support v4
-		// However it may be required again for future versions of boreholeview 
-        // String gsmlpNameSpace = gsmlpNameSpaceTable.getGsmlpNameSpace(serviceUrl);
+
+        // Run a query to find the URI for the 'gsmlp' namespace
+        String gsmlpNameSpace = gsmlpNameSpaceTable.getGsmlpNameSpace(serviceUrl);
+
         if (StringUtils.isNotEmpty(analyticsJobId)) {
             //Generate a style for displaying pass/fail/error holes
             AnalyticalJobResults analyticsResults = nvclDataService.getProcessingResults(analyticsJobId);
@@ -331,7 +327,6 @@ public class SF0BoreholeController extends BasePortalController {
                 filterNames.add("Error Boreholes");
                 filterColors.add("#ff8000");
                 filters.add(this.boreholeService.getFilter(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, analyticsResults.getErrorBoreholes(), true,optionalFilters));
-                //filterMarks.add("ttf://Webdings#0x0073");
                 filterMarks.add("circle");
             }
 
@@ -339,7 +334,6 @@ public class SF0BoreholeController extends BasePortalController {
                 filterNames.add("Fail Boreholes");
                 filterColors.add("#cc0000");
                 filters.add(this.boreholeService.getFilter(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, analyticsResults.getFailBoreholes(), true,optionalFilters));
-                //filterMarks.add("ttf://Webdings#0x0072");
                 filterMarks.add("circle");
             }
 
@@ -347,7 +341,6 @@ public class SF0BoreholeController extends BasePortalController {
                 filterNames.add("Pass Boreholes");
                 filterColors.add(color.isEmpty() ? "#0000ff" : color);
                 filters.add(this.boreholeService.getFilter(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, analyticsResults.getPassBoreholes(), true,optionalFilters));
-                //filterMarks.add("ttf://Webdings#0x0061");
                 filterMarks.add("circle");
             }
         } else {

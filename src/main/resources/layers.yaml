@@ -84,6 +84,7 @@
                         - "mt:tenementType"
                         - null 
                         - "ISLIKE"
+                        - false
                    options: 
                         - [ "Exploration", "exploration" ]
                         - [ "Prospecting", "prospecting" ]
@@ -188,6 +189,13 @@
         order: "401"
         wms:
             selector: "magnetotelluric"
+"auslamp":
+        name: "Northern Australia AusLAMP Stations"
+        group: "Magnetotellurics"
+        description: "Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) Stations."
+        order: "402"
+        wfs:
+            selector: "mt:nth_aus_AusLAMP_siteloc"
 "portal-geo-models":
         name: "3D Geological Models"
         group: "Models"
@@ -248,6 +256,7 @@
         proxyUrl: "doTIMAGeoSample.do"
         proxyCountUrl: ""
         proxyDownloadUrl: "doTIMAGeoSampleCSVDownload.do"
+        proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:geosample_and_mineralogy"
         icon:
                url: "http://maps.google.com/mapfiles/kml/paddle/grn-circle.png"
         order: "180"
@@ -264,6 +273,7 @@
         proxyUrl: "doSHRIMPGeoSample.do"
         proxyCountUrl: ""
         proxyDownloadUrl: "doSHRIMPGeoSampleCSVDownload.do"
+        proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:view_shrimp_geochronology_result"
         icon:
                url: "http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png"
         order: "180"
@@ -307,7 +317,7 @@
                     - [ "Provider" , null ]
 "mscl-borehole":
         name: "MSCL Data"
-        description: "Borehole observations made with a multi-sensor core logger."
+        description: "Petrophysical data acquired using Geotek MSCL-S."
         group: "Boreholes"
         proxyUrl: "doBoreholeViewFilter.do"
         proxyStyleUrl: ""
@@ -319,6 +329,45 @@
                selector: "gsmlp:MSCL-BoreholeView"
                feature:
                     - "mscl:scanned_data"
+        filters:
+                selectlist:
+                    params:
+                        - "Dataset Property" # label
+                        - "strToLowerCase(datasetProperties)" # xpath or CQL attribute expression
+                        - null # value
+                        - "CQL_LIKE" # predicate: if "CQL_LIKE" then uses a CQL_FILTER param
+                        #                         if "ISLIKE" then uses an SLD_BODY param
+                        - true # this is multiselect
+                    options:
+                        - [ "Diameter", "diameter" ]
+                        - [ "P-Wave (Any)", "p_wave_" ]
+                        - [ "P-Wave Amplitude", "p_wave_amplitude" ]
+                        - [ "P-Wave Velocity", "p_wave_velocity" ]
+                        - [ "Density" , "density" ]
+                        - [ "Impedance", "impedance" ]
+                        - [ "Resistivity", "resistivity" ]
+                        - [ "Mag Susc (Any)", "magnetic_" ]
+                        - [ "Mag Susc Point", "magnetic_susc_point" ]
+                        - [ "Mag Susc Loop Volume Corrected", "magnetic_susceptibility" ]
+                        - [ "Mag Susc Loop Density Corrected", "magnetic_susc_loop_dc" ]
+                        - [ "Natural Gamma (Any)", "natural_gamma" ]
+                        - [ "Natural Gamma Potassium", "natural_gamma_k" ]
+                        - [ "Natural Gamma Uranium", "natural_gamma_u" ]
+                        - [ "Natural Gamma Thorium", "natural_gamma_th" ]
+                        - [ "Fractional Porosity", "frac_porosity" ]
+                        - [ "Temperature", "temperature" ]
+                        - [ "Spectrophotometer (Any)", "sp_"]
+                        - [ "Spectrophot Munsell Value", "sp_munsell" ]
+                        - [ "Spectrophot Colour L*", "sp_cie_colour_l" ]
+                        - [ "Spectrophot Colour a*", "sp_cie_colour_a" ]
+                        - [ "Spectrophot Colour b*", "sp_cie_colour_b" ]
+                        - [ "Spectrophot Colour X", "sp_cie_colour_x" ]
+                        - [ "Spectrophot Colour Y", "sp_cie_colour_y" ]
+                        - [ "Spectrophot Colour Z", "sp_cie_colour_z" ]
+                        - [ "Spectrophot Refl Red", "sp_refl_red" ]
+                        - [ "Spectrophot Refl Green", "sp_refl_green" ]
+                        - [ "Spectrophot Refl Blue", "sp_refl_blue" ]
+                        - [ "XRF (Any)", "xrf_"]
 "seismology-in-schools-site":
         name: "Seismographs in Schools Network"
         description: "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server."
@@ -599,7 +648,7 @@
         description: "Total magnetic intensity (TMI) data measures variations in the intensity of the Earth's magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust. Magnetic anomalies can be either positive (field stronger than normal) or negative (field weaker) depending on the susceptibility of the rock. "
         order: "313"
         wms:
-               selector: "gadds:geophysical_datasets_radiometric"
+               selector: "gadds:geophysical_datasets_magnetic"
 "gga-geophysicalsurveys-elev":
         name: "Geophysical Surveys - Elevation"
         group: "GA Geophysical Survey Datasets"
@@ -897,23 +946,6 @@
         selector: "z"
         endPoints: 
             - "http://remanentanomalies.csiro.au/thredds/wms/Emag2/EMAG2.nc"
-"notused-samplingpoint":
-    hidden: true
-    order: "450"
-    wfs:
-        selector: "sa:SamplingPoint"
-"notused-featurecollection":
-    hidden: true
-    wfs:
-        selector: "gml:FeatureCollection"
-"notused-portals":
-    hidden: true
-    csw:
-        keyword: "Portal"
-"notused-geonetwork":
-    hidden: true
-    csw:
-        keyword: "GeoNetwork"
 "gsv-geological-unit-250k-":
     name: "Gsv Geological Unit 250K "
     group: "Geological Survey of Victoria"
@@ -1837,3 +1869,53 @@
     wms:
         selector: "grace:Countries_WGS84"
 
+# Loop3D
+"2_5m_interpgeop15":
+    name: "2.5m Interpgeop 15 4326"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop01"
+    wms:
+        selector: "loop:2_5m_interpgeop15_4326"
+"2m_linear_structures":
+    name: "2m Linear Structures"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop02"
+    wms:
+        selector: "SA:2m_linear_structures"
+"500k_faults_4326":
+    name: "500k Faults 4326"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop03"
+    wms:
+        selector: "loop:500k_faults_4326"
+"500k_geol_28350":
+    name: "500k Geol 28350"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop04"
+    wms:
+        selector: "loop:500k_geol_28350"
+"500k_geol_4326":
+    name: "500k Geol 4326"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop05"
+    wms:
+        selector: "loop:500k_geol_4326"
+"bulkdensitypoint_4326":
+    name: "Bulk Density Point 4326"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop06"
+    wms:
+        selector: "loop:bulkdensitypoint_4326"
+"waroxi_wa_4326_bed":
+    name: "Waroxi WA 4326 Bed"
+    group: "Loop3D"
+    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop13"
+    wms:
+        selector: "loop:waroxi_wa_4326_bed"

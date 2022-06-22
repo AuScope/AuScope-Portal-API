@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -124,7 +125,7 @@ public class IRISController extends BasePortalController {
         serviceUrl = ensureTrailingForwardslash(serviceUrl);
 
         try {
-            Document irisDoc = getDocumentFromURL(serviceUrl + "fdsnws/station/1/query?net=" + networkCode);
+            Document irisDoc = getDocumentFromURL(serviceUrl + "fdsnws/station/1/query?net=" + networkCode + "&level=channel");
 
             //TODO VT: As part of the review for AGOS-15 , we should be following the same architecture as the rest of portal and
             // create a xslt file to do the transformation from xml to kml
@@ -143,19 +144,52 @@ public class IRISController extends BasePortalController {
             for (int i = 0; i < stations.getLength(); i++) {
                 Node station = stations.item(i);
                 Node staCode = station.getAttributes().getNamedItem("code");
+                Node startDate = station.getAttributes().getNamedItem("startDate");
+                XPathExpression azimuthExpression = DOMUtil.compileXPathExpr("default:Azimuth /text()", nc);
+                XPathExpression dipExpression = DOMUtil.compileXPathExpr("default:Dip /text()", nc);
+                XPathExpression sampleRateExpression = DOMUtil.compileXPathExpr("default:SampleRate /text()", nc);
+
+                Element staElement = (Element)station;
+                NodeList channels =staElement.getElementsByTagName("Channel");
+                StringBuilder channelExpr = new StringBuilder();   
+                // For each channel:
+                for (int j = 0; j < channels.getLength(); j++) {
+                    Node channel = channels.item(j);
+                    Node channelCode = channel.getAttributes().getNamedItem("code");
+                    channelExpr.append(
+                            String.format(  
+                                    "<Channel Code=\"%s\">"+
+                                        "<Azimuth>%s</Azimuth>\""+
+                                        "<Dip>%s</Dip>"+
+                                        "<SampleRate>%s</SampleRate>"+
+                                    "</Channel>",
+                                    channelCode.getTextContent(),
+                                    azimuthExpression.evaluate(channel, XPathConstants.STRING),
+                                    dipExpression.evaluate(channel, XPathConstants.STRING),
+                                    sampleRateExpression.evaluate(channel, XPathConstants.STRING)));                                   
+                }
                 kml.append(
                 		String.format(
-                				"<Placemark><name>%s</name><description>IRIS layer for station: %s></description>" +
-                                "<MultiGeometry><Point><coordinates>%s,%s,%s</coordinates></Point></MultiGeometry><ExtendedData>" +
-                				"<Data name=\"Country\"><value>%s</value></Data><Data name=\"Code\"><value>%s</value></Data>" +
-                                "</ExtendedData></Placemark>",
+                				"<Placemark><name>%s</name>"+
+                				        "<description>IRIS layer for station: %s></description>" +
+                				        "<MultiGeometry><Point><coordinates>%s,%s,%s</coordinates></Point></MultiGeometry>"+
+                				        "<ExtendedData>" +
+                            				"<Data name=\"Country\"><value>%s</value></Data>"+
+                                            "<Data name=\"Code\"><value>%s</value></Data>" +
+                            				"<Data name=\"StartDate\"><value>%s</value></Data>"+
+                            			"</ExtendedData>"+
+                                        "<Channels>%s</Channels>"+	
+                            	"</Placemark>",
                                 nameExpression.evaluate(station, XPathConstants.STRING),
                                 staCode.getTextContent(),
                                 lonExpression.evaluate(station, XPathConstants.STRING),
                                 latExpression.evaluate(station, XPathConstants.STRING),
                                 elevationExpression.evaluate(station, XPathConstants.STRING),
                                 countryExpression.evaluate(station, XPathConstants.STRING),
-                                staCode.getTextContent()));
+                                staCode.getTextContent(),
+                                startDate.getTextContent(),
+                                channelExpr
+                                ));
             }
 
             kml.append("</Document></kml>");
