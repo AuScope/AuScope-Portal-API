@@ -857,11 +857,19 @@ public class NVCLController extends BasePortalController {
             @RequestParam(required = false, value = "email", defaultValue = "") final String email,
             HttpServletResponse response) throws Exception {
 
+        OutputStream outputStream = response.getOutputStream();
+
+        String url = this.dataService.getTsgFileCacheUrl();
+        if (url == null ) {
+            //TSGDownloadService is not avaiable
+            outputStream.write("TSGDownloadService is not avaiable".getBytes());
+            outputStream.close();
+            return;
+        }
         //downloadCSV with filter
         ExecutorService threadpool = Executors.newCachedThreadPool();
 
         log.trace("downloadTsgFiles.do: No. of serviceUrls: " + serviceUrls.length);
-        OutputStream outputStream = response.getOutputStream();
 
         String extension = null;
         String outputFormat = "csv";
@@ -904,13 +912,13 @@ public class NVCLController extends BasePortalController {
      * @throws Exception
      */
     @RequestMapping("/isTSGDownloadAvailable.do")
-    public ModelAndView downloadTsgFiles() throws Exception {
+    public ModelAndView isTSGDownloadAvailable() throws Exception {
        String url = this.dataService.getTsgFileCacheUrl();
+       String msg = this.dataService.getTsgDownloadServiceMsg();
        if (url != null && url.length()>1) {
-            return generateJSONResponseMAV(true, url, "TSG files download is ready.");
+            return generateJSONResponseMAV(true, url, msg);
        } else {
-        return generateJSONResponseMAV(false, url, "TSG files download is not ready.");
-
+            return generateJSONResponseMAV(false, url, "TSG files download is not ready.");
        }
     }
 }

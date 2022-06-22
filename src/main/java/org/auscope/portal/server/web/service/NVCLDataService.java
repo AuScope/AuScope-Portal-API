@@ -69,7 +69,7 @@ public class NVCLDataService {
     private HashMap<String, HashMap> mapEndpoint = new HashMap<String, HashMap>();
     private HashMap<String, String> mapTsgCachePath = new HashMap<String,String>();
     private String nvclTsgFileCacheUrl;
-    
+    private String nvclTsgDownloadServiceMsg;    
     /**
      * Creates a new NVCLDataService with the specified dependencies
      */
@@ -77,11 +77,16 @@ public class NVCLDataService {
     public NVCLDataService(HttpServiceCaller httpServiceCaller, 
                             NVCLDataServiceMethodMaker methodMaker,
                             WFSGetFeatureMethodMaker wfsMethodMaker, 
-                            @Value("${env.nvcl.tsgFileCacheUrl:#{null}}") String nvclTsgFileCacheUrl) {
+                            @Value("${env.nvcl.tsgFileCacheUrl:#{null}}") String nvclTsgFileCacheUrl,
+                            @Value("${env.nvcl.tsgDownloadServiceMsg:#{null}}") String nvclTsgDownloadServiceMsg) {
         this.httpServiceCaller = httpServiceCaller;
         this.methodMaker = methodMaker;
         this.nvclTsgFileCacheUrl = nvclTsgFileCacheUrl;
+        this.nvclTsgDownloadServiceMsg = nvclTsgDownloadServiceMsg;
         this.loadTsgDownloadMaps();
+    }
+    public String getTsgDownloadServiceMsg() {
+        return this.nvclTsgDownloadServiceMsg;
     }
     public String getTsgFileCacheUrl() {
         return this.nvclTsgFileCacheUrl;
@@ -381,6 +386,9 @@ public class NVCLDataService {
      * @return
      */
     private void loadTsgDownloadMaps() {
+        if (this.nvclTsgFileCacheUrl == null) {
+            return;
+        }
         if (this.mapEndpoint.size() > 0) {
             return;
         }
@@ -388,6 +396,7 @@ public class NVCLDataService {
         this.mapTsgCachePath.clear();
 
         try {
+
             String[] urlArrays = this.nvclTsgFileCacheUrl.split(",");
             //Sample:tsgFileCacheUrl: DEFAULT, https://nvclanalyticscache.z8.web.core.windows.net, https://www.mrt.tas.gov.au/,$DEFAULT/Tas/,https://geossdi.dmp.wa.gov.au/,$DEFAULT/WA/,https://geology.data.nt.gov.au/,$DEFAULT/NT/,https://gs.geoscience.nsw.gov.au/,$DEFAULT/NSW/,https://sarigdata.pir.sa.gov.au/,$DEFAULT/SA/
 

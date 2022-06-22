@@ -27,12 +27,12 @@ import org.junit.Test;
  */
 public class TestNVCLDataService extends PortalTestClass {
     private static final String TSGFILECache_SERVICES_URL = "http://foo.bar/service";
-
+    private static final String TSGFILECache_SERVICES_MSG = "someMessage";
     private HttpServiceCaller mockServiceCaller = context.mock(HttpServiceCaller.class);
     private NVCLDataServiceMethodMaker mockMethodMaker = context.mock(NVCLDataServiceMethodMaker.class);
     private HttpRequestBase mockMethod = context.mock(HttpRequestBase.class);
     private WFSGetFeatureMethodMaker mockWFSMethodMaker = context.mock(WFSGetFeatureMethodMaker.class);
-    private NVCLDataService dataService = new NVCLDataService(mockServiceCaller, mockMethodMaker, mockWFSMethodMaker,TSGFILECache_SERVICES_URL);
+    private NVCLDataService dataService = new NVCLDataService(mockServiceCaller, mockMethodMaker, mockWFSMethodMaker,TSGFILECache_SERVICES_URL, TSGFILECache_SERVICES_MSG);
 
     /**
      * Tests parsing of a getDatasetCollectionResponse

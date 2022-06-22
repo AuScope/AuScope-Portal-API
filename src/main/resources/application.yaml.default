@@ -145,6 +145,7 @@ env:
     nvcl:
       AnalyticalSeviceUrl: http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/
       tsgFileCacheUrl: DEFAULT, https://nvclanalyticscache.z8.web.core.windows.net, https://www.mrt.tas.gov.au/,$DEFAULT/Tas/,https://geossdi.dmp.wa.gov.au/,$DEFAULT/WA/,https://geology.data.nt.gov.au/,$DEFAULT/NT/,https://gs.geoscience.nsw.gov.au/,$DEFAULT/NSW/,https://sarigdata.pir.sa.gov.au/,$DEFAULT/SA/
+      tsgDownloadServiceMsg: Please be aware that the TSGDownloadService currently only available on TAS, WA, NT, NSW and SA. For VIC&QLD, it will be avaiable once dataService is upgraded. Sorry for the inconvenience.
 
 management:
   endpoints:
