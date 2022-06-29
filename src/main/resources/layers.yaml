@@ -219,13 +219,8 @@
         stackdriverServiceGroup: "NVCLBoreholeViewLayer"
         wfs:
                selector: "gsmlp:BoreholeView"
-               feature:
-                    - "sa:SamplingFeatureCollection"
-                    - "om:GETPUBLISHEDSYSTEMTSA"
-                    - "nvcl:scannedBorehole"
-                    - "nvcl:ScannedBoreholeCollection"
                endPoints:
-                    - "https://nvclwebservices.vm.csiro.au/geoserverBH/wfs"
+                    - "https://nvclwebservices.csiro.au/geoserver/wfs"
                     - "https://www.mrt.tas.gov.au/web-services/wfs"
                     - "https://geossdi.dmp.wa.gov.au/services/wfs"
                     - "https://geology.data.nt.gov.au/geoserver/wfs"
@@ -296,11 +291,6 @@
         stackdriverServiceGroup: "BoreholeViewLayer"
         wfs:
                selector: "gsmlp:BoreholeView"
-               feature:
-                    - "sa:SamplingFeatureCollection"
-                    - "om:GETPUBLISHEDSYSTEMTSA"
-                    - "nvcl:scannedBorehole"
-                    - "nvcl:ScannedBoreholeCollection"
         filters:
                mandatorytextbox:
                     - [ "Analytics Job Id", "analyticsJobId", "" ]
