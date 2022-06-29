@@ -39,7 +39,11 @@ spring:
             physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       properties:
          hibernate:
-            dialect: org.hibernate.dialect.H2Dialect # For dummy db
+            dialect: org.hibernate.dialect.HSQLDialect  # Setup a dummy DB
+            connection:
+               url: "jdbc:hsqldb:mem:test"
+               username: "sa"
+               password: ""
       #     dialect: org.hibernate.dialect.MySQL5InnoDBDialect # For MySQL db above
       #     format_sql: true      # FOR TESTING
       #show-sql: true              # FOR TESTING
