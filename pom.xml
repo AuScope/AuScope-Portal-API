@@ -229,8 +229,7 @@
             <version>3.27.0-GA</version>
         </dependency>
 
-    <!-- This is a dummy database used for development builds
-         Not used in production                       -->
+	<!-- This is a dummy database used for non-VGL deployments -->
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
