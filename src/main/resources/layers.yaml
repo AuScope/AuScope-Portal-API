@@ -84,6 +84,7 @@
                         - "mt:tenementType"
                         - null 
                         - "ISLIKE"
+                        - false
                    options: 
                         - [ "Exploration", "exploration" ]
                         - [ "Prospecting", "prospecting" ]
@@ -218,13 +219,8 @@
         stackdriverServiceGroup: "NVCLBoreholeViewLayer"
         wfs:
                selector: "gsmlp:BoreholeView"
-               feature:
-                    - "sa:SamplingFeatureCollection"
-                    - "om:GETPUBLISHEDSYSTEMTSA"
-                    - "nvcl:scannedBorehole"
-                    - "nvcl:ScannedBoreholeCollection"
                endPoints:
-                    - "https://nvclwebservices.vm.csiro.au/geoserverBH/wfs"
+                    - "https://nvclwebservices.csiro.au/geoserver/wfs"
                     - "https://www.mrt.tas.gov.au/web-services/wfs"
                     - "https://geossdi.dmp.wa.gov.au/services/wfs"
                     - "https://geology.data.nt.gov.au/geoserver/wfs"
@@ -295,11 +291,6 @@
         stackdriverServiceGroup: "BoreholeViewLayer"
         wfs:
                selector: "gsmlp:BoreholeView"
-               feature:
-                    - "sa:SamplingFeatureCollection"
-                    - "om:GETPUBLISHEDSYSTEMTSA"
-                    - "nvcl:scannedBorehole"
-                    - "nvcl:ScannedBoreholeCollection"
         filters:
                mandatorytextbox:
                     - [ "Analytics Job Id", "analyticsJobId", "" ]
@@ -328,6 +319,45 @@
                selector: "gsmlp:MSCL-BoreholeView"
                feature:
                     - "mscl:scanned_data"
+        filters:
+                selectlist:
+                    params:
+                        - "Dataset Property" # label
+                        - "strToLowerCase(datasetProperties)" # xpath or CQL attribute expression
+                        - null # value
+                        - "CQL_LIKE" # predicate: if "CQL_LIKE" then uses a CQL_FILTER param
+                        #                         if "ISLIKE" then uses an SLD_BODY param
+                        - true # this is multiselect
+                    options:
+                        - [ "Diameter", "diameter" ]
+                        - [ "P-Wave (Any)", "p_wave_" ]
+                        - [ "P-Wave Amplitude", "p_wave_amplitude" ]
+                        - [ "P-Wave Velocity", "p_wave_velocity" ]
+                        - [ "Density" , "density" ]
+                        - [ "Impedance", "impedance" ]
+                        - [ "Resistivity", "resistivity" ]
+                        - [ "Mag Susc (Any)", "magnetic_" ]
+                        - [ "Mag Susc Point", "magnetic_susc_point" ]
+                        - [ "Mag Susc Loop Volume Corrected", "magnetic_susceptibility" ]
+                        - [ "Mag Susc Loop Density Corrected", "magnetic_susc_loop_dc" ]
+                        - [ "Natural Gamma (Any)", "natural_gamma" ]
+                        - [ "Natural Gamma Potassium", "natural_gamma_k" ]
+                        - [ "Natural Gamma Uranium", "natural_gamma_u" ]
+                        - [ "Natural Gamma Thorium", "natural_gamma_th" ]
+                        - [ "Fractional Porosity", "frac_porosity" ]
+                        - [ "Temperature", "temperature" ]
+                        - [ "Spectrophotometer (Any)", "sp_"]
+                        - [ "Spectrophot Munsell Value", "sp_munsell" ]
+                        - [ "Spectrophot Colour L*", "sp_cie_colour_l" ]
+                        - [ "Spectrophot Colour a*", "sp_cie_colour_a" ]
+                        - [ "Spectrophot Colour b*", "sp_cie_colour_b" ]
+                        - [ "Spectrophot Colour X", "sp_cie_colour_x" ]
+                        - [ "Spectrophot Colour Y", "sp_cie_colour_y" ]
+                        - [ "Spectrophot Colour Z", "sp_cie_colour_z" ]
+                        - [ "Spectrophot Refl Red", "sp_refl_red" ]
+                        - [ "Spectrophot Refl Green", "sp_refl_green" ]
+                        - [ "Spectrophot Refl Blue", "sp_refl_blue" ]
+                        - [ "XRF (Any)", "xrf_"]
 "seismology-in-schools-site":
         name: "Seismographs in Schools Network"
         description: "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server."
@@ -978,42 +1008,42 @@
         selector: "erdd:GSV_SG_50K_GEOLUNIT_AGE"
 "l180-mt-isa-deep-crus-seis-surv-qld-2006-stac-and-migr-data-and-imag-for-line-06ga-to-06ga":
     name: "L180 Mt Isa Deep Crustal Seismic Survey Qld 2006 Stacked And Migrated Data And Images For Lines 06Ga M1 To 06Ga M6"
-    group: "Geoscience Australia"
+    group: "Geoscience Australia Reports"
     description: "Processed seismic data SEG-Y format) and TIFF images for the 2006 Mt Isa Deep C"
     order: "Registered_14"
     csw:
         id: "a05f7892-ee53-7506-e044-00144fdd4fa6"
 "are-ther-any-sand-uran-syst-in-the-erom-basi":
     name: "Are There Any Sandstone Hosted Uranium Systems In The Eromanga Basin "
-    group: "Geoscience Australia"
+    group: "Geoscience Australia Reports"
     description: "As part of Geoscience Australia's Onshore Energy Security Program the authors ha"
     order: "Registered_15"
     csw:
         id: "a05f7892-f9c4-7506-e044-00144fdd4fa6"
 "l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga":
     name: "L164 Curnamona Seismic Survey Sa 2003 2004 Stacked And Migrated Seismic Data And Images For Lines 03Ga Cu1"
-    group: "Geoscience Australia"
+    group: "Geoscience Australia Reports"
     description: "A seismic survey using the Australian National Seismic Imaging Resource ANSIR) "
     order: "Registered_16"
     csw:
         id: "cd697530-5b75-3811-e044-00144fdd4fa6"
 "lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis":
     name: "Lawn Hill Platform And Leichhardt River Fault Trough Measured Stratigraphic Section Online Gis"
-    group: "Geoscience Australia"
+    group: "Geoscience Australia Reports"
     description: "This GIS web browser contains stratigraphic information from the southern flank "
     order: "Registered_17"
     csw:
         id: "a05f7892-b7a0-7506-e044-00144fdd4fa6"
 "pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst":
     name: "Predictive Mineral Discovery In The Eastern Yilgarn Craton An Example Of District Scale Targeting Of An Orogenic Gold Mineral System"
-    group: "Geoscience Australia"
+    group: "Geoscience Australia Reports"
     description: "Predictive mineral discovery is concerned with the application of a whole of sys"
     order: "Registered_18"
     csw:
         id: "a05f7892-eafd-7506-e044-00144fdd4fa6"
 "fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004":
     name: "Final Report 3D Geological Models Of The Eastern Yilgarn Craton Project Pmd Crc Y2 September 2001 December 2004"
-    group: "Geoscience Australia"
+    group: "Geoscience Australia Reports"
     description: "The pmd*CRC Y2 project operated for a little over three years, and in this time "
     order: "Registered_19"
     csw:
@@ -1833,84 +1863,49 @@
 "2_5m_interpgeop15":
     name: "2.5m Interpgeop 15 4326"
     group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    description: "1:2 500 000 Interpreted Bedrock Geological map of Western Australia, (https://catalogue.data.wa.gov.au/dataset/1-2-500-000-state-interpreted-bedrock-geology-dmirs-014) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop01"
     wms:
         selector: "loop:2_5m_interpgeop15_4326"
 "2m_linear_structures":
     name: "2m Linear Structures"
     group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    description: "Generalised Linear Geology Regions, BioRegional Assessment Program (https://data.gov.au/data/dataset/ffacd84c-8cd9-49d8-8562-e0d8e59220f6) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop02"
     wms:
         selector: "SA:2m_linear_structures"
 "500k_faults_4326":
     name: "500k Faults 4326"
     group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    description: "1:500 000 State linear structures layer (https://catalogue.data.wa.gov.au/dataset/1-500-000-state-linear-structures-layer-dmirs-015) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop03"
     wms:
         selector: "loop:500k_faults_4326"
 "500k_geol_28350":
     name: "500k Geol 28350"
     group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    description: "1:500 000 State interpreted bedrock geology (https://catalogue.data.wa.gov.au/dataset/1-500-000-state-interpreted-bedrock-geology-dmirs-016) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop04"
     wms:
         selector: "loop:500k_geol_28350"
 "500k_geol_4326":
     name: "500k Geol 4326"
     group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    description: "1:500 000 State interpreted bedrock geology (https://catalogue.data.wa.gov.au/dataset/1-500-000-state-interpreted-bedrock-geology-dmirs-016) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop05"
     wms:
         selector: "loop:500k_geol_4326"
 "bulkdensitypoint_4326":
     name: "Bulk Density Point 4326"
     group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    description: "A compilation of bulk rock density petrophysics data from various sources: Geoscience Australia, Geological Survey Victoria, Mineral Resources Tasmania and Northern Territory Geological Survey. Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop06"
     wms:
         selector: "loop:bulkdensitypoint_4326"
-"paterson_polygons_4wg_2350":
-    name: "Paterson Polygons 4wg 2350"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop09"
-    wms:
-        selector: "loop:paterson_polygons_4wg_2350"
-"paterson_polygons_4wg_2350b":
-    name: "Paterson Polygons 4wg 2350b"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop10"
-    wms:
-        selector: "loop:paterson_polygons_4wg_2350b"
-"paterson_polygons_4wg_4326b":
-    name: "Paterson Polygons 4wg 4326b"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop11"
-    wms:
-        selector: "loop:paterson_polygons_4wg_4326b"
-"loop:pg_wgs84":
-    name: "PG WGS84"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop12"
-    wms:
-        selector: "loop:waroxi_wa_4326_bed"
 "waroxi_wa_4326_bed":
     name: "Waroxi WA 4326 Bed"
     group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop13"
+    description: "A compilation of Geological Survey of Western Australia WAROX datasets (https://geodocsget.dmirs.wa.gov.au/api/GeoDocsGet?filekey=4fc69b2e-853c-4715-b45a-580ec04b5895-ccowu056xeclcsf0w3y5x3jjg999kl2fbsv92r87) Part of a collecion of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
+    order: "loop07"
     wms:
         selector: "loop:waroxi_wa_4326_bed"
-"world_bradley_ancient_passive":
-    name: "World Bradley Ancient Passive"
-    group: "Loop3D"
-    description: "Source datasets from the ‘map2loop’ application, part of Work Package 2 of Loop3D project (https://loop3d.github.io/)"
-    order: "loop14"
-    wms:
-        selector: "world:world_bradley_ancient_passive"

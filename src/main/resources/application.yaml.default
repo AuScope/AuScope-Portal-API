@@ -143,7 +143,7 @@ env:
         client_id: ENTER_CLIENT_ID
         token_uri: https://oauth2.googleapis.com/token
     nvcl:
-      AnalyticalSeviceUrl: http://aus-analytical.it.csiro.au/NVCLAnalyticalServices/
+      AnalyticalSeviceUrl: https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/
       tsgFileCacheUrl: DEFAULT, https://nvclstore.z8.web.core.windows.net, https://www.mrt.tas.gov.au/,$DEFAULT/Tas/,https://geossdi.dmp.wa.gov.au/,$DEFAULT/WA/,https://geology.data.nt.gov.au/,$DEFAULT/NT/,https://gs.geoscience.nsw.gov.au/,$DEFAULT/NSW/,https://sarigdata.pir.sa.gov.au/,$DEFAULT/SA/,https://nvclwebservices.csiro.au/,$DEFAULT/CSIRO/
       tsgDownloadServiceMsg: Please be aware that the TSGDownloadService is currently only available on TAS, WA, NT, NSW and SA. For VIC & QLD, it will be avaiable once dataService is upgraded. Sorry for the inconvenience.
 
