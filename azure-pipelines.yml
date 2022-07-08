@@ -20,6 +20,11 @@ stages:
       - job: buildandUploadImage
         displayName: build docker image and upload to ECR
         steps:
+        - task: JavaToolInstaller@0
+          inputs:
+            versionSpec: '17'
+            jdkArchitectureOption: 'x86'
+            jdkSourceOption: 'PreInstalled'
         - task: DockerInstaller@0
           inputs:
             dockerVersion: '17.09.0-ce'
