@@ -10,7 +10,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  - group: xt-vault-connection
+  - group: vault-connection
 
 stages:
   - stage: buildandUploadImage
