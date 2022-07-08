@@ -28,6 +28,10 @@ stages:
         - task: DockerInstaller@0
           inputs:
             dockerVersion: '17.09.0-ce'
+        - task: Bash@3
+          inputs:
+            targetType: 'inline'
+            script: 'BP_JVM_VERSION=17'
         - task: Maven@3
           inputs:
             mavenPomFile: 'pom.xml'
