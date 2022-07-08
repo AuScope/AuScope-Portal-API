@@ -1,11 +1,21 @@
 package org.auscope.portal.server.web.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+
+import com.google.gson.Gson;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -20,11 +30,14 @@ import org.auscope.portal.server.domain.nvcldataservice.TSGDownloadResponse;
 import org.auscope.portal.server.domain.nvcldataservice.TSGStatusResponse;
 import org.auscope.portal.server.web.NVCLDataServiceMethodMaker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 /**
  * Service class for accessing an instance of a NVCLDataService web service.
  *
@@ -37,17 +50,47 @@ public class NVCLDataService {
 
     private HttpServiceCaller httpServiceCaller;
     private NVCLDataServiceMethodMaker methodMaker;
-
+	class Dataset{
+        String datasetID;
+        String boreholeURI;
+        String datasetName;
+        String description;
+        String spectralLogCollection;
+        String imageLogCollection;
+        String profLogCollection;
+        String logCollection;
+        String trayID;
+        String sectionID;
+        String domainID;
+    }
+    class DatasetCollection {
+        Dataset[] datasetCollection;
+    }
+    private HashMap<String, HashMap> mapEndpoint = new HashMap<String, HashMap>();
+    private HashMap<String, String> mapTsgCachePath = new HashMap<String,String>();
+    private String nvclTsgFileCacheUrl;
+    private String nvclTsgDownloadServiceMsg;    
     /**
      * Creates a new NVCLDataService with the specified dependencies
      */
     @Autowired
-    public NVCLDataService(HttpServiceCaller httpServiceCaller, NVCLDataServiceMethodMaker methodMaker,
-            WFSGetFeatureMethodMaker wfsMethodMaker) {
+    public NVCLDataService(HttpServiceCaller httpServiceCaller, 
+                            NVCLDataServiceMethodMaker methodMaker,
+                            WFSGetFeatureMethodMaker wfsMethodMaker, 
+                            @Value("${env.nvcl.tsgFileCacheUrl:#{null}}") String nvclTsgFileCacheUrl,
+                            @Value("${env.nvcl.tsgDownloadServiceMsg:#{null}}") String nvclTsgDownloadServiceMsg) {
         this.httpServiceCaller = httpServiceCaller;
         this.methodMaker = methodMaker;
+        this.nvclTsgFileCacheUrl = nvclTsgFileCacheUrl;
+        this.nvclTsgDownloadServiceMsg = nvclTsgDownloadServiceMsg;
+        this.loadTsgDownloadMaps();
     }
-
+    public String getTsgDownloadServiceMsg() {
+        return this.nvclTsgDownloadServiceMsg;
+    }
+    public String getTsgFileCacheUrl() {
+        return this.nvclTsgFileCacheUrl;
+    }
     /**
      * Makes and parses a getDatasetCollection request to a NVCLDataService
      * 
@@ -228,4 +271,156 @@ public class NVCLDataService {
 
         return new TSGStatusResponse(responseStream, contentHeader == null ? null : contentHeader.getValue());
     }
+
+    /**
+     * getTsgFileUrls to get TSG File download Urls.
+     *
+     * @param serviceUrl
+     *            The URL of the NVCLDataService
+     * @param endpoint
+     * @param csv 
+     * @param email
+     *            The user's email address
+     * @return
+     * @throws Exception
+     */
+    public String  getTsgFileUrls(String endpoint, String  csv) throws Exception {
+        HashMap<String, String> mapDatasetCollection = this.mapEndpoint.get(endpoint);
+        String cacheUrlPath  = this.mapTsgCachePath.get(endpoint);
+        if (mapDatasetCollection == null) {
+            return null;
+        }
+        InputStream inputstreamCSV = new ByteArrayInputStream(csv.getBytes());
+
+        StringBuilder sb = new StringBuilder();
+
+        CSVParser parser = new CSVParserBuilder().withSeparator(',').withQuoteChar('"').build();
+        CSVReader reader = new CSVReaderBuilder(new InputStreamReader(inputstreamCSV)).withCSVParser(parser).build();
+        String[] headerLine = reader.readNext();
+        int indexOfIdentifier = Arrays.asList(headerLine).indexOf("gsmlp:identifier");
+        int indexOfNvclCollection = Arrays.asList(headerLine).indexOf("gsmlp:nvclCollection");
+
+        if (headerLine == null || headerLine.length <= 2 || indexOfIdentifier < 0) {
+            throw new Exception("No or malformed CSV header sent");
+        }
+
+
+        //Start parsing our data - loading it into bins
+        String[] dataLine = null;
+        ArrayList<String> tsgFileCacheUrlList =new ArrayList<String> ();
+        while ((dataLine = reader.readNext()) != null) {
+            if (dataLine.length != headerLine.length) {
+                continue; //skip malformed lines
+            }
+            if (dataLine[indexOfNvclCollection].trim().equalsIgnoreCase("false")){
+                continue; //skip none nvclCollection lines.
+            }
+            //example: http://geossdi.dmp.wa.gov.au/resource/feature/gswa/borehole/ABDP1
+            String boreholeURI = dataLine[indexOfIdentifier];
+            //Filter out bad boreholeURI
+            if (!boreholeURI.startsWith("http")){
+                continue;
+            }
+            //remove starter of http or https.
+            int index = boreholeURI.indexOf("//");
+            if (index > 0 ) {
+                boreholeURI = boreholeURI.substring( index +2);
+            }            
+            String bhDatasetName = mapDatasetCollection.get(boreholeURI);
+            String tsgFileCacheURL="";
+
+            if (bhDatasetName == null) {
+                tsgFileCacheURL = "NoMatchedDatasetName-https://" + boreholeURI + "\n";
+            } else {
+                tsgFileCacheURL = cacheUrlPath + bhDatasetName + ".zip\n"; 
+                //LINGBO https://nvclanalyticscache.z8.web.core.windows.net/WA/PDD446.zip
+            }
+            sb.append(tsgFileCacheURL);
+            tsgFileCacheUrlList.add(tsgFileCacheURL);
+        }
+        return sb.toString();
+    }    
+
+    /**
+     * getDatasetCollectionMap to get a map for <boreholeURI, datasetName> 
+     *
+     * @param serviceUrl
+     *            The URL of the NVCLDataService
+     * @param holeIdentifier
+     * @return
+     * @throws Exception
+     */
+    public HashMap<String, String> getDatasetCollectionMap(String serviceUrl, String holeIdentifier) throws Exception {
+        //https://geology.data.nt.gov.au/NVCLDataServices/getDatasetCollection.html?holeidentifier=all&headersonly=yes&outputformat=json
+        HashMap<String, String> mapDatasetCollection = new HashMap<String, String>();
+        HttpGet method = new HttpGet();
+        URIBuilder builder = new URIBuilder(serviceUrl + "getDatasetCollection.html");
+        System.out.println("getDatasetCollectionMap:" + serviceUrl);
+        //set all of the parameters.
+        builder.setParameter("holeidentifier", holeIdentifier);
+        builder.setParameter("headersonly", "yes");
+        builder.setParameter("outputformat", "json");
+        method.setURI(builder.build());
+
+        HttpServiceCaller httpServiceCaller = new HttpServiceCaller(90000);
+        //Make our request, parse it into a DOM document
+        String response = httpServiceCaller.getMethodResponseAsString(method);
+        DatasetCollection datasetCollection = new Gson().fromJson(response, DatasetCollection.class);
+
+        for (Dataset dataset : datasetCollection.datasetCollection) {
+            String boreholeURI =dataset.boreholeURI;
+            //remove starter of http or https.
+            int index = dataset.boreholeURI.indexOf("//");
+            if (index > 0 ) {
+                boreholeURI = boreholeURI.substring( index +2);
+            }  
+            mapDatasetCollection.put(boreholeURI, dataset.datasetName);
+            //System.out.println(boreholeURI +  ',' + dataset.datasetName);
+        }
+        System.out.println("getDatasetCollectionMap:" + mapDatasetCollection.size());
+        return mapDatasetCollection;
+    }
+
+    /**
+     * loadTsgDownloadMaps to prepare map for DatasetCollection. 
+     * @return
+     */
+    private void loadTsgDownloadMaps() {
+        if (this.nvclTsgFileCacheUrl == null) {
+            return;
+        }
+        if (this.mapEndpoint.size() > 0) {
+            return;
+        }
+        this.mapEndpoint.clear();
+        this.mapTsgCachePath.clear();
+
+        try {
+
+            String[] urlArrays = this.nvclTsgFileCacheUrl.split(",");
+            //Sample:tsgFileCacheUrl: DEFAULT, https://nvclanalyticscache.z8.web.core.windows.net, https://www.mrt.tas.gov.au/,$DEFAULT/Tas/,https://geossdi.dmp.wa.gov.au/,$DEFAULT/WA/,https://geology.data.nt.gov.au/,$DEFAULT/NT/,https://gs.geoscience.nsw.gov.au/,$DEFAULT/NSW/,https://sarigdata.pir.sa.gov.au/,$DEFAULT/SA/
+
+            String endpoint, cacheUrl;
+            String defaultUrl = null;
+            int start = 0;
+            if (urlArrays[0].contains("DEFAULT")) {
+                defaultUrl = urlArrays[1].trim();
+                start = 2; //skip the default;
+            }
+            for (int i = start; i<urlArrays.length; i+=2) {
+                endpoint = urlArrays[i].trim();
+                cacheUrl = urlArrays[i+1].trim();
+                if (defaultUrl != null) {
+                    cacheUrl = cacheUrl.replace("$DEFAULT",defaultUrl);
+                }
+
+                this.mapTsgCachePath.put(endpoint,cacheUrl);
+                this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return;
+    }        
 }
