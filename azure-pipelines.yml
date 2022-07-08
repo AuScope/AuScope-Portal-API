@@ -27,6 +27,7 @@ stages:
           inputs:
             mavenPomFile: 'pom.xml'
             goals: 'spring-boot:build-image'
+            options: '-Dspring-boot.build-image.imageName=auscope-portal-api'
             publishJUnitResults: true
             testResultsFiles: '**/surefire-reports/TEST-*.xml'
             javaHomeOption: 'JDKVersion'
