@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  - group: xt-vault-connection
+
 steps:
 - task: DockerInstaller@0
   inputs:
