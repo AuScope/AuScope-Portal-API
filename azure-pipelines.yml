@@ -40,11 +40,6 @@ stages:
         - task: DockerInstaller@0
           inputs:
             dockerVersion: '17.09.0-ce'
-        - task: Bash@3
-          inputs:
-            targetType: 'inline'
-            script: |
-              export BP_JVM_VERSION=17
         - task: Maven@3
           inputs:
             mavenPomFile: 'pom.xml'
@@ -55,7 +50,7 @@ stages:
             javaHomeOption: 'JDKVersion'
             jdkVersionOption: '1.17'
             mavenVersionOption: 'Default'
-            mavenOptions: '-Xmx3072m'
+            mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
             mavenAuthenticateFeed: false
             effectivePomSkip: false
             sonarQubeRunAnalysis: false
