@@ -39,7 +39,13 @@ spring:
             physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       properties:
          hibernate:
-            dialect: org.hibernate.dialect.H2Dialect # For dummy db
+            # Set up an in memory DB using "in-process" mode
+            # i.e. can only be accessed within process
+            dialect: org.hibernate.dialect.HSQLDialect
+            connection:
+               url: "jdbc:hsqldb:mem:dummyDB"
+               username: "sa"
+               password: ""
       #     dialect: org.hibernate.dialect.MySQL5InnoDBDialect # For MySQL db above
       #     format_sql: true      # FOR TESTING
       #show-sql: true              # FOR TESTING
