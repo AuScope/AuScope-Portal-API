@@ -882,6 +882,7 @@ public class NVCLController extends BasePortalController {
 
         ServiceDownloadManager downloadManager = new ServiceDownloadManager(serviceUrls, serviceCaller, threadpool, this.serviceConfiguration, extension);
         //build the tsgFileUrls fore each record in downloadCSV.
+        String retTsgFileUrls = "";
         if (email != null && email.length() > 0 && outputFormat.equals("csv")) {
             // set the content type for text
             response.setContentType("text");
@@ -899,12 +900,15 @@ public class NVCLController extends BasePortalController {
                 if (tsgFileUrls == null) {
                     continue;
                 }
+                retTsgFileUrls += tsgFileUrls;
                 outputStream.write(tsgFileUrls.getBytes());
             }
             outputStream.close();
+            this.dataService.sendMail(email, retTsgFileUrls);
         }
         return;
     }
+
     /**
      * checkTsgDownloadAvailable
      *
