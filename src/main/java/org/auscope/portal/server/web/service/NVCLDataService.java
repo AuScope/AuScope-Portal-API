@@ -31,6 +31,8 @@ import org.auscope.portal.server.domain.nvcldataservice.TSGStatusResponse;
 import org.auscope.portal.server.web.NVCLDataServiceMethodMaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -47,7 +49,8 @@ import org.apache.http.client.utils.URIBuilder;
  */
 @Service
 public class NVCLDataService {
-
+    @Autowired
+    private MailSender mailSender;
     private HttpServiceCaller httpServiceCaller;
     private NVCLDataServiceMethodMaker methodMaker;
 	class Dataset{
@@ -84,6 +87,28 @@ public class NVCLDataService {
         this.nvclTsgFileCacheUrl = nvclTsgFileCacheUrl;
         this.nvclTsgDownloadServiceMsg = nvclTsgDownloadServiceMsg;
         this.loadTsgDownloadMaps();
+    }
+    public void sendMail(String email, String tsgFileUrls) {
+
+        //filter out NoMatchedDatasetName:
+        String[] urls = tsgFileUrls.split("\n");
+        String retTsgFileUrls = "";
+        for (String url: urls) {
+            if (url.contains("NoMatchedDatasetName")) continue;
+            retTsgFileUrls = retTsgFileUrls + url + "\n";
+        }
+        String msgHeader = "This is your query result for TsgFiles. If you have downloaded it successfully, please ignore this email. Otherwise, please copy the URLs behind \"----\" line to your professional download manager tools(etc. Chrono) to download.\n------------------------\n";
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom("cg-admin@csiro.au");
+        msg.setTo(email);
+        msg.setSubject("TsgFileDownloadService");
+        msg.setText(msgHeader + retTsgFileUrls);
+
+        try {
+            this.mailSender.send(msg);
+        } catch (Exception ex) {
+            System.out.println("TsgFileDownloadService: Sending of email notification failed for id [" + email + "]."+ ex.toString());
+        }
     }
     public String getTsgDownloadServiceMsg() {
         return this.nvclTsgDownloadServiceMsg;
