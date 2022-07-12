@@ -1,10 +1,5 @@
 csw:
    registries:
-#      - id: cswVeglProduction
-#        serviceUrl: http://vgl-reg.auscope.org/geonetwork/srv/eng/csw
-#        recordInformationUrl: http://vgl-reg.auscope.org/geonetwork/srv/eng/main.home?uuid=%1$s
-#        title: SISS ANU Geonetwork
-#        serverType: Default
       - id: cswGAECat
         serviceUrl: https://ecat.ga.gov.au/geonetwork/srv/eng/csw
         recordInformationUrl: https://ecat.ga.gov.au/geonetwork/srv/eng/main.home?uuid=%1$s
@@ -15,28 +10,8 @@ csw:
         recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
         title: NCI Data Portal
         serverType: Default
-      #- id: cswGAPMDCRC
-      #  serviceUrl: http://www.ga.gov.au/geonetwork/srv/en/csw
-      #  recordInformationUrl: http://www.ga.gov.au/geonetwork/srv/en/csw?request=GetRecordById&amp;service=CSW&amp;version=2.0.2&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;elementSetName=full&amp;id=%1$s
-      #  title: Geoscience Australia PMD*CRC Publications
-      #  cqlText: csw:AnyText Like '%PMD*CRC Publication%' AND BBOX(ows:BoundingBox, 110,-9,160,-55)
       # - id: Grace
       #   serviceUrl: http://ec2-13-55-219-23.ap-southeast-2.compute.amazonaws.com:8081/api
       #   recordInformationUrl: "http://ec2-13-55-219-23.ap-southeast-2.compute.amazonaws.com:8081/api/catalog.search#/metadata/%1$s"
       #   title: GRACE Dev
       #   serverType: PyCSW
-#      - id: cswNigel
-#        serviceUrl: http://130.56.244.85/geonetwork/srv/eng/csw
-#        recordInformationUrl: "http://130.56.244.85/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
-#        title: Nigel's test Data Portal
-#        serverType: Default
-#      - id: cswNciGswa
-#        serviceUrl: http://geonetworkrl1.nci.org.au/geonetwork/srv/eng/csw
-#        recordInformationUrl: "https://geonetworkrl1.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
-#        title: NCI GSWA Data Portal
-#        serverType: Default
-#      - id: cswNciMt
-#        serviceUrl: https://geonetworktest.nci.org.au/geonetwork/srv/eng/csw
-#        recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
-#        title: NCI MT Data Portal
-#        serverType: Default
