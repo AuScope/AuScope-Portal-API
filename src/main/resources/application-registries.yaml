@@ -13,8 +13,8 @@ csw:
         serverType: Default
         pageSize: 1000
       # - id: Grace
-      #   serviceUrl: http://ec2-13-55-219-23.ap-southeast-2.compute.amazonaws.com:8081/api
-      #   recordInformationUrl: "http://ec2-13-55-219-23.ap-southeast-2.compute.amazonaws.com:8081/api/catalog.search#/metadata/%1$s"
-      #   title: GRACE Dev
+      #   serviceUrl: https://insargrace.geoanalytics.csiro.au/pycsw/api
+      #   recordInformationUrl: "https://insargrace.geoanalytics.csiro.au/pycsw/api/catalog.search#/metadata/%1$s"
+      #   title: InSAR/GRACE
       #   serverType: PyCSW
       #   pageSize: 500
