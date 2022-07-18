@@ -5,13 +5,16 @@ csw:
         recordInformationUrl: https://ecat.ga.gov.au/geonetwork/srv/eng/main.home?uuid=%1$s
         title: Geoscience Australia eCat
         serverType: Default
+        pageSize: 400
       - id: cswNCI
         serviceUrl: https://geonetwork.nci.org.au/geonetwork/srv/eng/csw
         recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
         title: NCI Data Portal
         serverType: Default
+        pageSize: 1000
       # - id: Grace
       #   serviceUrl: http://ec2-13-55-219-23.ap-southeast-2.compute.amazonaws.com:8081/api
       #   recordInformationUrl: "http://ec2-13-55-219-23.ap-southeast-2.compute.amazonaws.com:8081/api/catalog.search#/metadata/%1$s"
       #   title: GRACE Dev
       #   serverType: PyCSW
+      #   pageSize: 500
