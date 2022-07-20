@@ -925,4 +925,50 @@ public class NVCLController extends BasePortalController {
             return generateJSONResponseMAV(false, url, "TSG files download is not ready.");
        }
     }
+    
+    /**
+     * Given a list of serviceUrls, this function will collate the responses into csv files. 
+     * This works only on NVCL layer so far, but it could be extended to other borehole layers.
+     * @param serviceUrls
+     * @param response
+     * @param email
+     * @throws Exception
+     */
+    @RequestMapping("/downloadNvclCSV.do")
+    public void downloadNvclCSV(
+            @RequestParam("serviceUrls") final String[] serviceUrls,
+            HttpServletResponse response) throws Exception {
+
+        OutputStream outputStream = response.getOutputStream();
+        //downloadCSV with filter
+        ExecutorService threadpool = Executors.newCachedThreadPool();
+
+        log.trace("downloadNvclCSV.do: No. of serviceUrls: " + serviceUrls.length);
+
+        String extension = null;
+        String outputFormat = "csv";
+        if (outputFormat != null) {
+            String ext = MimeUtil.mimeToFileExtension(outputFormat);
+            if (ext != null && !ext.isEmpty()) {
+                extension = "." + ext;
+            }
+        }
+
+        ServiceDownloadManager downloadManager = new ServiceDownloadManager(serviceUrls, serviceCaller, threadpool, this.serviceConfiguration, extension);
+        if (outputFormat.equals("csv")) {
+            // set the content type for text
+            response.setContentType("text");
+            ArrayList<DownloadResponse> gmlDownloads = downloadManager.downloadAll();
+            //Loop all serviceUrls to find the matched datasetName and URI for it.
+            for (int i = 0; i < gmlDownloads.size(); i++) {
+                String csv = FileIOUtil.writeResponseToString(gmlDownloads.get(i));
+                if (csv == null || csv.split("\n").length == 1) {
+                    continue;
+                }
+                outputStream.write(csv.getBytes());
+            }
+            outputStream.close();
+        }
+        return;
+    }
 }
