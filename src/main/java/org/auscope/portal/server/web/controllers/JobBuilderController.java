@@ -125,9 +125,9 @@ public class JobBuilderController extends BaseCloudController {
 
     @Autowired
     public JobBuilderController(@Value("${portalAdminEmail}") String adminEmail,
-            @Value("${defaultToolbox}") String defaultToolbox,
+            @Value("${cloud.sssc.defaultToolbox}") String defaultToolbox,
             VEGLJobManager jobManager, FileStagingService fileStagingService,
-            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
+            @Value("${cloud.vm.sh}") String vmSh, @Value("${cloud.vm-shutdown.sh}") String vmShutdownSh,
             CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices,
             ANVGLUserService userService,

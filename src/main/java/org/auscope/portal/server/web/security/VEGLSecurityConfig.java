@@ -40,7 +40,7 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${portalUrl}")
 	private String portalUrl;
 	
-	@Value("${aaf.callbackUrl}")
+	@Value("${spring.security.jwt.aaf.callbackUrl}")
 	private String aafCallbackUrl;
 	
 	@Autowired

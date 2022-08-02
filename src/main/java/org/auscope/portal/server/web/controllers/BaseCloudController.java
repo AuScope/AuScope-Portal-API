@@ -46,7 +46,7 @@ public abstract class BaseCloudController extends BaseModelController {
     }
 
     public BaseCloudController(CloudStorageService[] cloudStorageServices, CloudComputeService[] cloudComputeServices, VEGLJobManager jobManager,
-            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh) {
+            @Value("${cloud.vm.sh}") String vmSh, @Value("${cloud.vm-shutdown.sh}") String vmShutdownSh) {
         super(jobManager);
         this.cloudComputeServices = cloudComputeServices;
         this.cloudStorageServices = cloudStorageServices;
