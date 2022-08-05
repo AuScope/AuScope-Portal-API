@@ -9,7 +9,6 @@ on:
 
 # runs tests and generate Jacoco report
 # 
-name: build-test
 
 env:
   # Auscope-Portal-API docker image name
