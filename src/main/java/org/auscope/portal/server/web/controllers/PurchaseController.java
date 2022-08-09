@@ -56,10 +56,10 @@ public class PurchaseController extends BasePortalController {
     
     protected final Log logger = LogFactory.getLog(getClass());
     
-    @Value("${stripeApiKey}")
+    @Value("${cloud.stripeApiKey}")
     private String stripeApiKey;
     
-    @Value("${erddapservice.url}")
+    @Value("${cloud.erddapservice.url}")
     private String erddapServiceUrl;
     
     @Autowired

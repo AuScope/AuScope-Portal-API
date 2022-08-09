@@ -32,7 +32,7 @@ public class VGLCryptoService {
 
     public VGLCryptoService(String encryptionPassword) throws PortalServiceException {
         if(encryptionPassword==null || encryptionPassword.isEmpty())
-            throw new PortalServiceException("Configuration parameter env.encryption.password must not be empty!");
+            throw new PortalServiceException("Configuration parameter cloud.encryption.password must not be empty!");
         this.encryptionPassword=encryptionPassword;
     }
 

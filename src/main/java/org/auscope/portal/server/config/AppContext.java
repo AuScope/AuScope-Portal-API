@@ -110,37 +110,34 @@ public class AppContext {
 
    protected final Log logger = LogFactory.getLog(getClass());
 
-        @Value("${aws.account:undefined}") 
+        @Value("${cloud.aws.account:undefined}") 
         private String awsAcct;
 
         @Bean public String awsAccount() {
             return awsAcct;
         }
 
-        @Value("${aws.accesskey:undefined}")
+        @Value("${cloud.aws.accesskey:undefined}")
         private String awsAccessKey;
 
-        @Value("${aws.secretkey:undefined}")
+        @Value("${cloud.aws.secretkey:undefined}")
         private String awsSecretKey;
 
-        @Value("${aws.sessionkey:undefined}")
+        @Value("${cloud.aws.sessionkey:undefined}")
         private String awsSessionKey;
 
-        @Value("${aws.stsrequirement:Mandatory}")
+        @Value("${cloud.aws.stsrequirement:Mandatory}")
         private String awsStsRequirement;
 
-        @Value("${portalAdminEmail}")
-        private String adminEmail;
-
-        @Value("${localStageInDir}")
+        @Value("${cloud.localStageInDir}")
         private String stageInDirectory;
         @Value("${localCacheDir:#{null}}")
         private String localCacheDir;
 
-        @Value("${proms.report.url}")
+        @Value("${cloud.proms.report.url}")
         private String promsUrl;
 
-        @Value("${proms.reportingsystem.uri}")
+        @Value("${cloud.proms.reportingsystem.uri}")
         private String promsReportingSystemUri;
 
         @Value("${smtp.server}")
@@ -152,10 +149,10 @@ public class AppContext {
         @Value("${portalAdminEmail}")
         private String portalAdminEmail;
 
-        @Value("${encryption.password}")
+        @Value("${cloud.encryption.password}")
         private String encryptionPassword;
 
-        @Value("${solutions.url}")
+        @Value("${cloud.sssc.solutions.url}")
         private String solutionsUrl;
 
         @Autowired
@@ -523,7 +520,7 @@ public class AppContext {
         storageService.setName("Amazon Web Services - S3");
         storageService.setId("amazon-aws-storage-sydney");
         storageService.setBucket("vgl-csiro");
-        storageService.setAdminEmail(adminEmail);
+        storageService.setAdminEmail(portalAdminEmail);
         STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
         storageService.setStsRequirement(req);
         return storageService;

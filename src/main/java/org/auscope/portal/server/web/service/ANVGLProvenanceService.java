@@ -88,8 +88,8 @@ public class ANVGLProvenanceService {
     @Autowired
     public ANVGLProvenanceService(final ANVGLFileStagingService anvglFileStagingService,
             final CloudStorageService[] cloudStorageServices,
-            @Value("${proms.report.url}") String promsUrl,
-            @Value("${proms.reportingsystem.uri}") String promsReportingSystemUri) {
+            @Value("${cloud.proms.report.url}") String promsUrl,
+            @Value("${cloud.proms.reportingsystem.uri}") String promsReportingSystemUri) {
         this.anvglFileStagingService = anvglFileStagingService;
         this.cloudStorageServices = cloudStorageServices;
         this.PROMSReportingSystem = promsReportingSystemUri;

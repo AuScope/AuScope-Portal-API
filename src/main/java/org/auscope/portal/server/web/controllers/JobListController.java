@@ -116,7 +116,7 @@ public class JobListController extends BaseCloudController  {
             FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
             ANVGLUserService userService, VGLJobStatusAndLogReader jobStatusLogReader,
             JobStatusMonitor jobStatusMonitor,
-            @Value("${vm.sh}") String vmSh, @Value("${vm-shutdown.sh}") String vmShutdownSh,
+            @Value("${cloud.vm.sh}") String vmSh, @Value("${cloud.vm-shutdown.sh}") String vmShutdownSh,
             @Value("${portalAdminEmail}") String adminEmail,
             CloudSubmissionService cloudSubmissionService,
             VGLJobAuditLogService jobAuditLogService) {

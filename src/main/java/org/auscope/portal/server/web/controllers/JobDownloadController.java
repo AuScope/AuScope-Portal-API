@@ -46,7 +46,7 @@ public class JobDownloadController extends BasePortalController {
     private String erddapServiceUrl;
 
     @Autowired
-    public JobDownloadController(SimpleWfsService simpleWfsService, WCSService wcsService, @Value("${erddapservice.url}") String erddapServiceUrl) {
+    public JobDownloadController(SimpleWfsService simpleWfsService, WCSService wcsService, @Value("${cloud.erddapservice.url}") String erddapServiceUrl) {
         this.simpleWfsService = simpleWfsService;
         this.wcsService = wcsService;
         this.erddapServiceUrl=erddapServiceUrl;

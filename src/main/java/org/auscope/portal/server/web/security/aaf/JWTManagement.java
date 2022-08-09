@@ -38,7 +38,7 @@ public class JWTManagement {
     @Autowired
     private ANVGLUserService userService;
 
-    @Value("${aaf.jwtsecret}")
+    @Value("${spring.security.jwt.aaf.jwtsecret}")
     private String jwtSecret;
 
     @Value("${portalUrl}")
