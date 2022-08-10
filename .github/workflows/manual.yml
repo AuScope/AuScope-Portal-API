@@ -31,15 +31,15 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Checkout portal-core
+      - name: Checkout AusScope-Portal-API
         uses: actions/checkout@v2.3.4
         with:
-          repository: AuScope/portal-core
+          repository: AuScope/AusScope-Portal-API
           ref: master
-          path: portal-core
-      - name: Build portal-core 
+          path: AusScope-Portal-API
+      - name: Build AusScope-Portal-API
         run: |
-          cd portal-core
+          cd AusScope-Portal-API
           mvn clean install
       - name: run tests with Maven
         run: |
