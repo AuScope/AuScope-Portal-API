@@ -10,10 +10,6 @@ on:
 # runs tests and generate Jacoco report
 # 
 
-env:
-  # Auscope-Portal-API docker image name
-  IMAGE_NAME: auscope-portal-api
-
 jobs:
   # This workflow contains a single job called "test"
   test:
