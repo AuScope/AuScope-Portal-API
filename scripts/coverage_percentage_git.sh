@@ -1,4 +1,3 @@
-#!/bin/bash
 percent=
 if [ -e /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/target/site/jacoco/jacoco.csv ]
 then
