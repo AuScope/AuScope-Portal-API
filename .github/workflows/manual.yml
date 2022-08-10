@@ -1,4 +1,6 @@
-# This is a basic workflow that is manually triggered
+# Workflow that is manually triggered - to generate coverage in the file jacaco.csv. 
+# This file is then parsed to generate a coverage percentage.
+# readme.MD is then updated with this value to make a coverage badge.
 
 name: Test workflow
 
@@ -33,4 +35,7 @@ jobs:
       - name: run tests with Maven
         run: |
           mvn test --file pom.xml
+      - name: Run coverage parse script
+        run: scripts/coverage_percentage.sh
+        shell: bash
       - run: echo "End step"
