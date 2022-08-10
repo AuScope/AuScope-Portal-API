@@ -12,6 +12,9 @@ on:
 # runs tests and generate Jacoco report
 # 
 
+before_install:
+  - chmod +x scripts/coverage_percentage.sh
+  
 jobs:
   # This workflow contains a single job called "test"
   test:
