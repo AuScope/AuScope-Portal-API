@@ -36,6 +36,6 @@ jobs:
         run: |
           mvn test --file pom.xml
       - name: Run coverage parse script
-        run: coverage_percentage_git.sh
+        run: scripts/coverage_percentage_git.sh
         shell: bash
       - run: echo "End step"
