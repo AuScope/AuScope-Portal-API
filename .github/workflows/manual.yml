@@ -16,8 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: |
-          echo "Start step"
+      - run: echo "Start step"
       - uses: actions/checkout@v2
       - name: Set up JDK 1.17
         uses: actions/setup-java@v1
@@ -30,10 +29,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
           
-      - run: |
-          echo "maven step"
+      - run: echo "maven step"
       - name: run tests with Maven
         run: |
           mvn test --file pom.xml
-      - run: |
-          echo "End step"
+      - run: echo "End step"
