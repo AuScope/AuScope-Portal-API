@@ -34,7 +34,7 @@ jobs:
       - name: Checkout AusScope-Portal-API
         uses: actions/checkout@v2.3.4
         with:
-          repository: AuScope/AusScope-Portal-API
+          repository: chrisvpeters/AusScope-Portal-API
           ref: master
           path: AusScope-Portal-API
       - name: Build AusScope-Portal-API
