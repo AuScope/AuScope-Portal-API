@@ -11,9 +11,6 @@ on:
 
 # runs tests and generate Jacoco report
 # 
-
-before_install:
-  - chmod +x scripts/coverage_percentage.sh
   
 jobs:
   # This workflow contains a single job called "test"
@@ -39,6 +36,6 @@ jobs:
         run: |
           mvn test --file pom.xml
       - name: Run coverage parse script
-        run: scripts/coverage_percentage.sh
+        run: scripts/coverage_percentage_git.sh
         shell: bash
       - run: echo "End step"
