@@ -1,3 +1,4 @@
+echo "coverage_prcentage_git.sh started..."
 percent=
 if [ -e /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/target/site/jacoco/jacoco.csv ]
 then
