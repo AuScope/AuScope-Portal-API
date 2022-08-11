@@ -24,26 +24,25 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.17
-      - name: Cache Maven packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-          
-      - run: echo "maven step"
-      - name: run tests with Maven
-        run: |
-          mvn test --file pom.xml
+   #   - name: Cache Maven packages
+   #     uses: actions/cache@v2
+   #     with:
+   #       path: ~/.m2
+   #       key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+   #       restore-keys: ${{ runner.os }}-m2
+   #   - run: echo "maven step"
+   #   - name: run tests with Maven
+   #     run: |
+   #       mvn test --file pom.xml
       - name: Run coverage parse script
         run: |
          chmod +x scripts/coverage_percentage_git.sh
          percent=`scripts/coverage_percentage_git.sh`
-         echo $percent > /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/coverage/percentage.txt
+         echo $percent > coverage/percentage.txt
         shell: bash
       - name: Upload percentage file artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: auscope-portal-api coverage file
-          path: /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/coverage/percentage.txt
+          name: my-artifact
+          path: coverage/percentage.txt
       - run: echo "End step"
