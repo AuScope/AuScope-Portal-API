@@ -11,7 +11,7 @@ csw:
         recordInformationUrl: "https://geonetwork.nci.org.au/geonetwork/srv/eng/catalog.search#/metadata/%1$s"
         title: NCI Data Portal
         serverType: Default
-        pageSize: 1000
+        pageSize: 500
       # - id: Grace
       #   serviceUrl: https://insargrace.geoanalytics.csiro.au/pycsw/api
       #   recordInformationUrl: "https://insargrace.geoanalytics.csiro.au/pycsw/api/catalog.search#/metadata/%1$s"
