@@ -1,5 +1,5 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-AuScope-Portal-API,org.auscope.portal.server.web.service.cloud,SshCloudConnector.ExecResult,58,0,0,0,16,0,8,0,8,0
+AuScope-Portal-API,org.auscope.portal.server.web.service.cloud,SshCloudConnector.ExecResult,58,1,0,0,16,0,8,0,8,0
 AuScope-Portal-API,org.auscope.portal.server.web.service.cloud,SshInputStream,68,0,4,0,22,0,13,0,11,0
 AuScope-Portal-API,org.auscope.portal.server.web.service.cloud,CloudComputeServiceNci,649,0,48,0,114,0,38,0,14,0
 AuScope-Portal-API,org.auscope.portal.server.web.service.cloud,CloudStorageServiceNci,646,0,50,0,153,0,37,0,12,0
