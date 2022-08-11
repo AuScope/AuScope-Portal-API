@@ -38,6 +38,11 @@ jobs:
       - name: Run coverage parse script
         run: |
          chmod +x scripts/coverage_percentage_git.sh
-         scripts/coverage_percentage_git.sh
+         scripts/coverage_percentage_git.sh > percentage.txt
         shell: bash
+      - name: Upload percentage file artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: auscope-portal-api coverage file
+          path: coverage/percentage.txt
       - run: echo "End step"
