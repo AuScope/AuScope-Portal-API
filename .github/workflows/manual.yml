@@ -44,5 +44,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: auscope-portal-api coverage file
-          path: coverage/percentage.txt
+          path: /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/coverage/percentage.txt
       - run: echo "End step"
