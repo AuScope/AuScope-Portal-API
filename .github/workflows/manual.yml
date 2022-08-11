@@ -38,9 +38,8 @@ jobs:
         run: |
          chmod +x scripts/coverage_percentage_git.sh
          percent=`scripts/coverage_percentage_git.sh`
-         percent=76.25
          echo $percent > coverage/percentage.txt
-         cat coverage/percentage.txt
+         echo "coverage = ${{ percentage }}"
          cat /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/target/site/jacoco/jacoco.csv > coverage/jacoco.csv
         shell: bash
 
