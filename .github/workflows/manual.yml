@@ -49,7 +49,6 @@ jobs:
           author_name: Chris Peters
           author_email: chris.peters@csiro.au
           message: coverage percentage
-          add: 'coverage/percentage.txt'
+          add: coverage/percentage.txt coverage/jacoco.csv
   
-          
       - run: echo "End step"
