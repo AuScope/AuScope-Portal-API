@@ -42,18 +42,14 @@ jobs:
          echo $percent > coverage/percentage.txt
          cat coverage/percentage.txt
         shell: bash
-      - name: Upload percentage file artifact
-        uses: actions/upload-artifact@v3
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v8
         with:
-          name: my-artifact
-          path: coverage/percentage.txt
-          
-      - uses: actions/checkout@v2
-      - run: mkdir -p path/to/artifact
-      - run: echo hello > path/to/artifact/world.txt
-      - uses: actions/upload-artifact@v3
-        with:
-          name: my-artifact
-          path: path/to/artifact/world.txt
+          author_name: Chris Peters
+          author_email: chris.peters@csiro.au
+          message: coverage percentage date +%s
+          add: 'coverage/percentage.txt'
+  
           
       - run: echo "End step"
