@@ -39,7 +39,7 @@ jobs:
         run: |
          chmod +x scripts/coverage_percentage_git.sh
          scripts/coverage_percentage_git.sh > percentage.txt
-         echo /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/coverage/percentage.txt
+         cat /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/coverage/percentage.txt
         shell: bash
       - name: Upload percentage file artifact
         uses: actions/upload-artifact@v2
