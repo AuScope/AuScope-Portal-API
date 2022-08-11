@@ -41,6 +41,7 @@ jobs:
          percent=76.25
          echo $percent > coverage/percentage.txt
          cat coverage/percentage.txt
+         cat /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/target/site/jacoco/jacoco.csv > coverage/jacoco.csv
         shell: bash
 
       - name: Commit changes
