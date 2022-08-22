@@ -2,7 +2,7 @@
 # This file is then parsed to generate a coverage percentage.
 # readme.MD is then updated with this value to make a coverage badge.
 
-name: Test workflow
+name: Coverage portal-core
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
