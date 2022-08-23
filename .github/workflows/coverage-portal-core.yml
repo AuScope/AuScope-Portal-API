@@ -43,7 +43,6 @@ jobs:
           mvn test --file pom.xml
       - name: Run coverage parse script
         run: |
-        /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/portal-core/target/jacoco.exec
          cat /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/portal-core/target/site/jacoco/jacoco.csv
          chmod +x scripts/coverage_percentage_portal_core_git.sh
          percent=`scripts/coverage_percentage_portal_core_git.sh`
