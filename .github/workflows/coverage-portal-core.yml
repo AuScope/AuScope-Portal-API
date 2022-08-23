@@ -43,11 +43,12 @@ jobs:
           mvn test --file pom.xml
       - name: Run coverage parse script
         run: |
-         cat /home/runner/work/portal-core/portal-core/target/site/jacoco/jacoco.csv
+        /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/portal-core/target/jacoco.exec
+         cat /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/portal-core/target/site/jacoco/jacoco.csv
          chmod +x scripts/coverage_percentage_portal_core_git.sh
          percent=`scripts/coverage_percentage_portal_core_git.sh`
          echo $percent > coverage/percentage.txt
          echo coverage = $percent
-         cat /home/runner/work/portal-core/portal-core/target/site/jacoco/jacoco.csv > coverage/jacoco.csv
+         cat /home/runner/work/AuScope-Portal-API/AuScope-Portal-API/portal-core/target/site/jacoco/jacoco.csv > coverage/jacoco.csv
         shell: bash
       - run: echo "End step"
