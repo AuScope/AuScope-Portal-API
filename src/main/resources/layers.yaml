@@ -367,7 +367,7 @@
                setup : "true"
         order: "250"
         iris:
-               selector: [ "S1", "http://auspass.edu.au:80" ]
+               selector: [ "S1", "https://auspass.edu.au" ]
 "seismology-skippy":
         name: "SKIPPY"
         description: "The SKIPPY seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -377,7 +377,7 @@
                setup : "true"
         order: "251"
         iris:
-               selector: [ "7B", "http://auspass.edu.au:80" ]
+               selector: [ "7B", "https://auspass.edu.au" ]
 "seismology-kimba97":
         name: "KIMBA97: Kimberley Region in 1997"
         description: "The KIMBA97 seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -387,7 +387,7 @@
                setup : "true"
         order: "252"
         iris:
-               selector: [ "7D", "http://auspass.edu.au:80" ]
+               selector: [ "7D", "https://auspass.edu.au" ]
 "seismology-kimba98":
         name: "KIMBA98: Kimberley Region in 1998"
         description: "The KIMBA98 seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -397,7 +397,7 @@
                setup : "true"
         order: "253"
         iris:
-               selector: [ "7E","http://auspass.edu.au:80" ]
+               selector: [ "7E","https://auspass.edu.au" ]
 "seismology-wacraton":
         name: "WACRATON: Western Australia"
         description: "The West Australian Cratons seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -407,7 +407,7 @@
                setup : "true"
         order: "254"
         iris:
-               selector: [ "7G","http://auspass.edu.au:80" ]
+               selector: [ "7G","https://auspass.edu.au" ]
 "seismology-seal":
         name: "SEAL: South East Australia Linkage"
         description: "The SEAL seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -417,7 +417,7 @@
                setup : "true"
         order: "255"
         iris:
-               selector: [ "7Q","http://auspass.edu.au:80" ]
+               selector: [ "7Q","https://auspass.edu.au" ]
 "seismology-seal2":
         name: "SEAL2: South East Australia Linkage"
         description: "The SEAL2 seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -427,7 +427,7 @@
                setup : "true"
         order: "256"
         iris:
-               selector: [ "7T","http://auspass.edu.au:80" ]
+               selector: [ "7T","https://auspass.edu.au" ]
 "seismology-seal3":
         name: "SEAL3: South East Australia Linkage"
         description: "The SEAL3 seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -437,7 +437,7 @@
                setup : "true"
         order: "257"
         iris:
-               selector: [ "7U","http://auspass.edu.au:80" ]
+               selector: [ "7U","https://auspass.edu.au" ]
 "seismology-capral":
         name: "CAPRAL: Northwest Australia"
         description: "The CAPRAL seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -447,7 +447,7 @@
                setup : "true"
         order: "258"
         iris:
-               selector: [ "7J","http://auspass.edu.au:80" ]
+               selector: [ "7J","https://auspass.edu.au" ]
 "seismology-soc":
         name: "SOC: Southern Craton"
         description: "The SOC seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -457,7 +457,7 @@
                setup : "true"
         order: "259"
         iris:
-               selector: [ "7K","http://auspass.edu.au:80" ]
+               selector: [ "7K","https://auspass.edu.au" ]
 "seismology-gawler":
         name: "GAWLER"
         description: "The GAWLER seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -467,7 +467,7 @@
                setup : "true"
         order: "260"
         iris:
-               selector: [ "1G","http://auspass.edu.au:80" ]
+               selector: [ "1G","https://auspass.edu.au" ]
 "seismology-bilby":
         name: "BILBY: Australian Cratonic Lithosphere"
         description: "The BILBY seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -477,7 +477,7 @@
                setup : "true"
         order: "261"
         iris:
-               selector: [ "6F","http://auspass.edu.au:80" ]
+               selector: [ "6F","https://auspass.edu.au" ]
 "seismology-curnamona":
         name: "CURNAMONA: Seismic structure of South Australia"
         description: "The CURNAMONA seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -487,7 +487,7 @@
                setup : "true"
         order: "262"
         iris:
-               selector: [ "1F","http://auspass.edu.au:80" ]
+               selector: [ "1F","https://auspass.edu.au" ]
 "seismology-minq":
         name: "MINQ: Mount Isa Northern Queensland"
         description: "The MINQ seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -497,7 +497,7 @@
                setup : "true"
         order: "263"
         iris:
-               selector: [ "ZR","http://auspass.edu.au:80" ]
+               selector: [ "ZR","https://auspass.edu.au" ]
 "seismology-eal1":
         name: "EAL1: Eastern Australia Linkage"
         description: "The EAL1 seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -507,7 +507,7 @@
                setup : "true"
         order: "264"
         iris:
-               selector: [ "YJ","http://auspass.edu.au:80" ]
+               selector: [ "YJ","https://auspass.edu.au" ]
 "seismology-eal2":
         name: "EAL2: Eastern Australia Linkage"
         description: "The EAL2 seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -517,7 +517,7 @@
                setup : "true"
         order: "265"
         iris:
-               selector: [ "1H","http://auspass.edu.au:80" ]
+               selector: [ "1H","https://auspass.edu.au" ]
 "seismology-eal3":
         name: "EAL3: Eastern Australia Linkage"
         description: "The EAL3 seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -527,7 +527,7 @@
                setup : "true"
         order: "266"
         iris:
-               selector: [ "7L","http://auspass.edu.au:80" ]
+               selector: [ "7L","https://auspass.edu.au" ]
 "seismology-bass":
         name: "BASS: Bass strait from 2011 to 2013"
         description: "The BASS seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -537,7 +537,7 @@
                setup : "true"
         order: "267"
         iris:
-               selector: [ "1P","http://auspass.edu.au:80" ]
+               selector: [ "1P","https://auspass.edu.au" ]
 "seismology-sqeal":
         name: "SQEAL: South Queensland Eastern Australia Linkage"
         description: "The SQEAL seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -547,7 +547,7 @@
                setup : "true"
         order: "268"
         iris:
-               selector: [ "8J","http://auspass.edu.au:80" ]
+               selector: [ "8J","https://auspass.edu.au" ]
 "seismology-aq3":
         name: "AQ3 SW Queensland and NW New South Wales"
         description: "The AQ3 seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -557,7 +557,7 @@
                setup : "true"
         order: "269"
         iris:
-               selector: [ "4J","http://auspass.edu.au:80" ]
+               selector: [ "4J","https://auspass.edu.au" ]
 "seismology-aqt":
         name: "AQT: Western Queensland"
         description: "The AQT seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -567,7 +567,7 @@
                setup : "true"
         order: "270"
         iris:
-               selector: [ "1Q","http://auspass.edu.au:80" ]
+               selector: [ "1Q","https://auspass.edu.au" ]
 "seismology-banda":
         name: "Banda Arc: Transitions in the Banda Arc-Australia continental collision"
         description: "The BANDA seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -577,7 +577,7 @@
                setup : "true"
         order: "271"
         iris:
-               selector: ["YS","http://auspass.edu.au:80" ]
+               selector: ["YS","https://auspass.edu.au" ]
 "seismology-asr":
         name: "ASR"
         description: "The ASR seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -587,7 +587,7 @@
                setup : "true"
         order: "272"
         iris:
-               selector: [ "5J","http://auspass.edu.au:80" ]
+               selector: [ "5J","https://auspass.edu.au" ]
 "seismology-marla-line":
         name: "Marla Line"
         description: "The MARLA LINE seismic array feed from AusPass: the Australian Passive Seismic Server."
@@ -597,7 +597,7 @@
                setup : "true"
         order: "273"
         iris:
-               selector: [ "3G","http://auspass.edu.au:80" ]
+               selector: [ "3G","https://auspass.edu.au" ]
 "passive-seismic":
         name: "Passive Seismic Sites"
         group: "Passive Seismic"
@@ -889,7 +889,7 @@
     wfs:
         selector: "RemAnom:Anomaly"
         endPoints:
-            - "http://remanentanomalies.csiro.au/geoserver/wfs"
+            - "https://remanentanomalies.csiro.au/geoserver/wfs"
     filters:
         textbox: 
             - [ "Remanent Anomaly Name", "RenAnom:AnomalyName", null, "ISLIKE" ]
@@ -923,7 +923,7 @@
     wfs:
         selector: "RemAnom:Anomaly"
         endPoints:
-            - "http://remanentanomalies.csiro.au/geoserverEMAG/wfs"
+            - "https://remanentanomalies.csiro.au/geoserverEMAG/wfs"
     filters:
         textbox: 
             - [ "Remanent Anomaly Name", "RenAnom:AnomalyName", null, "ISLIKE" ]
