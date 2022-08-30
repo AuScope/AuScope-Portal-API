@@ -11,8 +11,8 @@ on:
 # runs tests and generate Jacoco report
 # 
 jobs:
-  # This workflow contains a single job called "covergae"
-  test:
+  # This workflow contains a single job called "coverage"
+  coverage:
     runs-on: ubuntu-latest
 
     steps:
