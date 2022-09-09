@@ -15,6 +15,8 @@ portalUrl: http://localhost:8080/VGL-Portal
 frontEndUrl: http://localhost:4200
 portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
 localCacheDir: C:\\temp\\
+# CSWRecords should be cached before KnownLayers is built 
+knownLayersStartupDelay: 60000
 termsconditions:
    version: 1
 smtp:

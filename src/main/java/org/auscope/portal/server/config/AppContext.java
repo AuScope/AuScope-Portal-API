@@ -148,6 +148,9 @@ public class AppContext {
 
         @Value("${portalAdminEmail}")
         private String portalAdminEmail;
+        
+        @Value("${knownLayersStartupDelay}")
+        private int knownLayersStartupDelay;
 
         @Value("${cloud.encryption.password}")
         private String encryptionPassword;
@@ -345,7 +348,7 @@ public class AppContext {
         SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
         trigger.setJobDetail(knownLayerStatusMonitorDetail().getObject());
         trigger.setRepeatInterval(15 * 60 * 1000);
-        trigger.setStartDelay(1000);
+        trigger.setStartDelay(knownLayersStartupDelay);
         return trigger;
     }
 
@@ -411,7 +414,7 @@ public class AppContext {
     @Bean
     public CSWCacheService cswCacheService() {
         CSWCacheService cacheService = new CSWCacheService(
-                taskExecutor(), httpServiceCallerApp(), cswServiceList, griddedCswTransformerFactory(), localCacheDir );
+                taskExecutor(), httpServiceCallerApp(), cswServiceList, griddedCswTransformerFactory(), localCacheDir);
         cacheService.setForceGetMethods(true);
         return cacheService;
     }
