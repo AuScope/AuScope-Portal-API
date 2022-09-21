@@ -146,7 +146,7 @@ AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.selRec,16,0,0,0
 AuScope-Portal-API,org.auscope.portal.server.config,Registries,29,0,0,0,8,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.domain.xml,XMLStreamAttributeExtractor,29,78,5,7,8,16,6,5,2,3
 AuScope-Portal-API,org.auscope.portal.server,MineralTenementServiceProviderType,37,55,6,0,11,12,11,2,8,2
-AuScope-Portal-API,org.auscope.portal.server,PortalApplication,10,0,0,0,4,0,3,0,3,0
+AuScope-Portal-API,org.auscope.portal.server,PortalApplication,16,0,0,0,6,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server,CORSAdvice,43,0,0,0,11,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server,Initializer,10,47,1,5,3,14,1,5,0,3
 AuScope-Portal-API,org.auscope.portal.server.vegl,VGLBookMarkDownload,86,0,0,0,38,0,24,0,24,0
