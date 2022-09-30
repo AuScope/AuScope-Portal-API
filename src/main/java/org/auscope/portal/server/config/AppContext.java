@@ -25,6 +25,7 @@ import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.SearchService;
 import org.auscope.portal.core.services.VocabularyCacheService;
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.services.WCSService;
@@ -560,7 +561,7 @@ public class AppContext {
 
     @Bean
     public KnownLayerService cswKnownLayerService() {
-        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService());
+        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService(), searchService());
     }
 
     @Bean
@@ -727,6 +728,10 @@ public class AppContext {
     public StateService stateServiceFactory() { // This service is used to store permanent links in a database
         final int DB_LIMIT = 100000; // Maximum number of permanent links in database
         return new StateService(localCacheDir, DB_LIMIT);
+    }
+    
+    @Bean SearchService searchService() {
+    	return new SearchService(localCacheDir);
     }
 
 }

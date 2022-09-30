@@ -145,7 +145,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-	<dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
         </dependency>
@@ -271,6 +271,7 @@
             <artifactId>netcdf4</artifactId>
             <version>5.3.3</version>
         </dependency>
+        
         <!-- Added for using PowerMock with JMock -->
         <dependency>
             <groupId>org.powermock</groupId>
@@ -414,8 +415,19 @@
             <version>2.6.3</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>9.3.0</version>
+        </dependency>
+        <!-- TODO: Using this for search testing, remove for final commit -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>9.3.0</version>
+        </dependency>
 
-        <!-- Selenium and testng are needed for automated UI testing -->
+        <!-- Selenium and testing are needed for automated UI testing -->
        <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
