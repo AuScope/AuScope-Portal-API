@@ -158,6 +158,10 @@ public class AppContext {
         @Value("${cloud.sssc.solutions.url}")
         private String solutionsUrl;
 
+        // Active profile i.e. 'test' or 'prod'
+        @Value("${spring.profiles.active}")
+        private String activeProfile;
+
         @Autowired
         private VEGLJobManager jobManager;
 
@@ -381,9 +385,17 @@ public class AppContext {
     }
     
     // Second HttpServiceCaller to reduce CSW record search timeout
+    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
     @Bean
     public SearchHttpServiceCaller searchHttpServiceCaller() {
-        return new SearchHttpServiceCaller(60000);
+        return new SearchHttpServiceCaller(60000, activeProfile.contains("test"));
+    }
+
+    // Third HttpServiceCaller for CSW cache services 
+    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
+    @Bean
+    public HttpServiceCaller cswCacheHttpServiceCaller() {
+        return new HttpServiceCaller(900000, activeProfile.contains("test"));
     }
     
     @Bean
@@ -414,7 +426,7 @@ public class AppContext {
     @Bean
     public CSWCacheService cswCacheService() {
         CSWCacheService cacheService = new CSWCacheService(
-                taskExecutor(), httpServiceCallerApp(), cswServiceList, griddedCswTransformerFactory(), localCacheDir);
+                taskExecutor(), cswCacheHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory(), localCacheDir);
         cacheService.setForceGetMethods(true);
         return cacheService;
     }
