@@ -2,8 +2,10 @@ package org.auscope.portal.server.web.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,6 +13,10 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.namespaces.IterableNamespace;
@@ -168,7 +174,9 @@ public class MSCLController extends BasePortalController {
                     }
                     relatedValues = new ModelMap();
                 }
-                relatedValues.put(result.getLocalName(), Float.parseFloat(result.getTextContent()));
+                if (relatedValues != null) {
+                    relatedValues.put(result.getLocalName(), Float.parseFloat(result.getTextContent()));
+                }
             }
 
             Collections.<ModelMap> sort(series, new Comparator<ModelMap>() {
@@ -178,6 +186,60 @@ public class MSCLController extends BasePortalController {
                 }
             });
 
+            data.put("series", series);
+            return generateJSONResponseMAV(true, data, null);
+        } catch (Exception e) {
+            return generateJSONResponseMAV(false, null, e.getMessage());
+        }
+    }
+
+
+    /**
+     * Get all measurements for a borehole at a cetain depth range
+     * in GSML v4.1 standard
+     * 
+     * @param serviceUrl service URL
+     * @param boreholeHeaderId borehole header id
+     * @param startDepth get observations starting from this depth
+     * @param endDepth get observations ending at this depth
+     */
+    @RequestMapping("/getMsclObservationsForGraph41.do")
+    public ModelAndView getMsclObservationsForGraph41(
+            @RequestParam("serviceUrl") final String serviceUrl,
+            @RequestParam("boreholeHeaderId") final String boreholeHeaderId,
+            @RequestParam("startDepth") final String startDepth,
+            @RequestParam("endDepth") final String endDepth,
+            @RequestParam("observationsToReturn") final String[] observationsToReturn) {
+
+        try {
+            String wfsResponse = msclWfsService.getObservationsGSML41(serviceUrl, boreholeHeaderId);
+
+            ModelMap data = new ModelMap();
+            ArrayList<ModelMap> series = new ArrayList<ModelMap>();
+            ModelMap relatedValues = new ModelMap();
+
+            // Parse JSON with paths, like XML's XPATH 
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(wfsResponse);
+            JsonNode typNode = rootNode.at("/features/0/properties/logElement");
+            Iterator<JsonNode> it = typNode.elements();
+            while (it.hasNext()) {
+                JsonNode n = it.next();
+                double intvlDepth = n.at("/mappedIntervalBegin/Quantity/value").asDouble();
+                String label = n.at("/specification/OM_Observation/result/Quantity/label").asText();
+                double val = n.at("/specification/OM_Observation/result/Quantity/value").asDouble();
+                try {
+                    if (label != null && !label.equals("") && (Arrays.asList(observationsToReturn).contains(label)) &&
+                    intvlDepth >= Double.valueOf(startDepth) && intvlDepth < Double.valueOf(endDepth)) {
+                        relatedValues.put("depth", intvlDepth);
+                        relatedValues.put(label, val);
+                        series.add(relatedValues);
+                        relatedValues = new ModelMap();
+                    }
+                } catch (NumberFormatException exc) {
+                    log.trace("Error in depth parameter: " + exc.getMessage());
+                }
+            }
             data.put("series", series);
             return generateJSONResponseMAV(true, data, null);
         } catch (Exception e) {
