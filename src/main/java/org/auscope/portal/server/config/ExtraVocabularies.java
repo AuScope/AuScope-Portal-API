@@ -2,6 +2,7 @@ package org.auscope.portal.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.auscope.portal.core.services.vocabs.VocabularyServiceItem;
@@ -20,6 +21,7 @@ import au.gov.geoscience.portal.services.vocabularies.NVCLScalarsVocabService;
 @Configuration
 class ExtraVocabularies {
 
+    @Lazy
     @Autowired
     HttpServiceCaller httpServiceCaller;
     
