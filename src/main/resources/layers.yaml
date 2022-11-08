@@ -235,7 +235,7 @@
                checkbox:
                     - [ "Provider", null ]
 "tima-geosample":
-        name: "TESCAN TIMA Heavy Mineral Analyses"
+        name: "W.A. Geosample Minerology"
         group: "Curtin University"
         description: "A collection of the results published from TIMA"
         proxyUrl: "doTIMAGeoSample.do"
@@ -250,7 +250,7 @@
                     - [ "Name", "gsmlp:name", null, "ISLIKE" ]
                     - [ "IGSN", "igsn", null, "ISLIKE" ]
 "tima-shrimp-geosample":
-        name: "SHRIMP Geochronology"
+        name: "W.A. Geosample Geochronology"
         group: "Curtin University"
         description: "A collection of the results published from SHRIMP U-Pb mass spectrometer"
         proxyUrl: "doSHRIMPGeoSample.do"
