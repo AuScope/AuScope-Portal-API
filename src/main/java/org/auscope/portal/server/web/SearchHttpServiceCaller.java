@@ -10,8 +10,8 @@ import org.auscope.portal.core.server.http.HttpServiceCaller;
  */
 public class SearchHttpServiceCaller extends HttpServiceCaller {
 
-	public SearchHttpServiceCaller(int connectionTimeOut) {
-		super(connectionTimeOut);
+	public SearchHttpServiceCaller(int connectionTimeOut, boolean noSSLCheck) {
+		super(connectionTimeOut, noSSLCheck);
 	}
 
 }

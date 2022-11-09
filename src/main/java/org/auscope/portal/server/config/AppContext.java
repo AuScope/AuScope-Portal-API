@@ -25,6 +25,7 @@ import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.SearchService;
 import org.auscope.portal.core.services.VocabularyCacheService;
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.services.WCSService;
@@ -157,6 +158,10 @@ public class AppContext {
 
         @Value("${cloud.sssc.solutions.url}")
         private String solutionsUrl;
+
+        // Active profile i.e. 'test' or 'prod'
+        @Value("${spring.profiles.active}")
+        private String activeProfile;
 
         @Autowired
         private VEGLJobManager jobManager;
@@ -381,9 +386,17 @@ public class AppContext {
     }
     
     // Second HttpServiceCaller to reduce CSW record search timeout
+    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
     @Bean
     public SearchHttpServiceCaller searchHttpServiceCaller() {
-        return new SearchHttpServiceCaller(60000);
+        return new SearchHttpServiceCaller(60000, activeProfile.contains("test"));
+    }
+
+    // Third HttpServiceCaller for CSW cache services 
+    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
+    @Bean
+    public HttpServiceCaller cswCacheHttpServiceCaller() {
+        return new HttpServiceCaller(900000, activeProfile.contains("test"));
     }
     
     @Bean
@@ -414,7 +427,7 @@ public class AppContext {
     @Bean
     public CSWCacheService cswCacheService() {
         CSWCacheService cacheService = new CSWCacheService(
-                taskExecutor(), httpServiceCallerApp(), cswServiceList, griddedCswTransformerFactory(), localCacheDir);
+                taskExecutor(), cswCacheHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory(), localCacheDir);
         cacheService.setForceGetMethods(true);
         return cacheService;
     }
@@ -548,7 +561,7 @@ public class AppContext {
 
     @Bean
     public KnownLayerService cswKnownLayerService() {
-        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService());
+        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService(), searchService());
     }
 
     @Bean
@@ -715,6 +728,10 @@ public class AppContext {
     public StateService stateServiceFactory() { // This service is used to store permanent links in a database
         final int DB_LIMIT = 100000; // Maximum number of permanent links in database
         return new StateService(localCacheDir, DB_LIMIT);
+    }
+    
+    @Bean SearchService searchService() {
+    	return new SearchService(localCacheDir);
     }
 
 }
