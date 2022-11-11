@@ -1843,3 +1843,159 @@
     order: "loop07"
     wms:
         selector: "loop:waroxi_wa_4326_bed"
+
+# Geochronology and Isotopes
+"interpreted_age_samples_all_geochronology":
+    name: "All Geochronology"
+    group: "Geochronology"
+    description: "A compilation of publicly-available radiometric age results from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Full analytical data tables are not available through the service. Complete analytical data for GA results are available from Geochron Delivery: http://www.ga.gov.au/geochron-sapub-web/."
+    order: "geochron01"
+    wms:
+        selector: "isotope:interpreted_age_samples_all_geochronology"
+"interpreted_age_samples_igneous_crystallisation":
+    name: "Igneous Crystallisation Age Data"
+    group: "Geochronology"
+    description: "A subset of the All Geochronology layer, comprising summary radiometric age results interpreted as constraining the crystallisation of igneous rocks, with data derived from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Full datasets, including inheritance data, are not available through this service. Complete analytical data for GA results are available from Geochron Delivery: http://www.ga.gov.au/geochron-sapub-web/."
+    order: "geochron02"
+    wms:
+        selector: "isotope:interpreted_age_samples_igneous_crystallisation"
+"isotope:geochron_magmatic_age_grid":
+    name: "Igneous Crystallisation Age Grid"
+    group: "Geochronology"
+    description: "This grid is an interpolation of magmatic (igneous crystallisation) age point data held in the Isotopic Atlas as of February 2021. Data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Igneous Crystallisation Age Data layer (classification 2)."
+    order: "geochron03"
+    wms:
+        selector: "isotope:geochron_magmatic_age_grid"
+"interpreted_age_samples_metamorphism":
+    name: "Deformation/Metamorphism/Alteration Age Data"
+    group: "Geochronology"
+    description: "A subset of the All Geochronology layer, comprising summary radiometric age results interpreted as constraining deformation, metamorphism and alteration processes affecting pre-existing rocks, with data derived from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Full analytical data for GA results are available from Geochron Delivery: http://www.ga.gov.au/geochron-sapub-web/."
+    order: "geochron04"
+    wms:
+        selector: "isotope:interpreted_age_samples_metamorphism"
+"geochron_metamorphic_age_grid":
+    name: "Deformation/Metamorphism/Alteration Age Grid"
+    group: "Geochronology"
+    description: "This grid is an interpolation of deformation/metamorphism/alteration age point data held in the Isotopic Atlas as of February 2021. Data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Deformation/Metamorphism/Alteration Age Data layer (classification 2)."
+    order: "geochron05"
+    wms:
+        selector: "isotope:geochron_metamorphic_age_grid"
+"interpreted_age_samples_sedimentary_processes":
+    name: "Sedimentary Processes Age Data"
+    group: "Geochronology"
+    description: "A subset of the All Geochronology layer, comprising summary radiometric age results relating to sedimentary processes, with data derived from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. A large proportion constrain the youngest detrital mineral component in order to provide a maximum estimate for the age of sediment deposition. These rarely reflect the true depositional age of sediments and sedimentary rocks. Full detrital provenance results are not available through this service. Complete analytical data for GA results are available from Geochron Delivery: http://www.ga.gov.au/geochron-sapub-web/."
+    order: "geochron06"
+    wms:
+        selector: "isotope:interpreted_age_samples_sedimentary_processes"
+"geochron_maxdep_age_grid":
+    name: "Maximum Depositional Age Grid"
+    group: "Geochronology"
+    description: "This grid is an interpolation of maximum depositional age point data held in the Isotopic Atlas as of February 2021. Data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Sedimentary Processes Age Data layer (classification 2)."
+    order: "geochron07"
+    wms:
+        selector: "isotope:geochron_maxdep_age_grid"
+"isotopes_smnd":
+    name: "Sm-Nd Isotope Data"
+    group: "Isotopes"
+    description: "A compilation of full analytical data tables for publicly-available Sm-Nd isotope data from Geoscience Australia (GA), State and Geological Surveys, and from literature-compiled sources. Each result links to information about the sample (including unit name, lithology and age), sample collection site, method of analysis, analytical errors, associated Reference Standards and analytical values, and references for location, age data, and the source publication information. Refer to Champion (2013) for further details: http://pid.geoscience.gov.au/dataset/ga/77772. Note that intervals used for the T2DM, Residence Age and Crystallisation Age are rounded to the nearest 100 Ma."
+    order: "isotopes01"
+    wms:
+        selector: "isotope:isotopes_smnd"
+"smnd_t2dm_grid":
+    name: "Sm-Nd Model Age (T2DM) Grid (felsic igneous rocks)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Nd two-stage model ages, based on whole-rock Nd isotopic analyses from felsic magmatic rocks, particularly focusing on I- and A-type granites and volcanic rocks. The data provides an estimate of the timing of extraction from the mantle of the middle to lower crustal source regions from which the felsic melts were generated. The point data used for the interpolation is the “felsic igneous rock” subset of the Sm-Nd data held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same nine-class interval binning and colour scheme applied to the source point data in the Sm-Nd Isotope Data layer (classification 2)."
+    order: "isotopes02"
+    wms:
+        selector: "isotope:smnd_t2dm_grid"
+"smnd_epsilon_grid":
+    name: "Sm-Nd Epsilon Grid (felsic igneous rocks)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Sm-Nd epsilon values, based on whole-rock Nd isotopic analyses from felsic magmatic rocks, particularly focusing on I- and A-type granites and volcanic rocks. The point data used for the interpolation is the “felsic igneous rock” subset of the Sm-Nd data held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Sm-Nd Isotope Data layer (classification 2)."
+    order: "isotopes03"
+    wms:
+        selector: "isotope:smnd_epsilon_grid"
+"smnd_residence_time_grid":
+    name: "Sm-Nd Residence Time Grid (felsic igneous rocks)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Nd residence time values, based on whole-rock Nd isotopic analyses from felsic magmatic rocks, particularly focusing on I- and A-type granites and volcanic rocks. The data provides an estimate of the duration for material residing in the crust prior to its last melting event. The point data used for the interpolation is the “felsic igneous rock” subset of the Sm-Nd data held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same nine-class interval binning and colour scheme applied to the source point data in the Sm-Nd Isotope Data layer (classification 2)."
+    order: "isotopes04"
+    wms:
+        selector: "isotope:smnd_residence_time_grid"
+"isotopes_hf":
+    name: "Lu-Hf Isotopes: Summary Data"
+    group: "Isotopes"
+    description: "A compilation of summary information for publicly-available Lu-Hf isotope and associated O-isotope data from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Full analytical data tables are available through the complementary service. Refer to Waltenberg et al (2021) for further details: http://dx.doi.org/10.11636/Record.2021.016."
+    order: "isotopes05"
+    wms:
+        selector: "isotope:isotopes_hf"
+"luhf_t2dm_grid":
+    name: "Lu-Hf Model Age (T2DM) Grid (igneous)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Lu-Hf two-stage model ages, based on (primarily zircon) Lu-Hf isotopic analyses from igneous rocks. The data provides an estimate of the timing of extraction from the mantle of the middle to lower crustal source regions from which the melts were generated. The point data used for the interpolation is the median magmatic T2DM data of the summary Lu-Hf dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same three-class interval binning and colour scheme applied to the source point data in the Lu-Hf Isotopes - Summary Data layer (classification 2)."
+    order: "isotopes06"
+    wms:
+        selector: "isotope:luhf_t2dm_grid"
+"luhf_magmatic_ehft_grid":
+    name: "Lu-Hf Epsilon-Hf Grid (igneous)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Lu-Hf epsilon values, based on (primarily zircon) Lu-Hf isotopic analyses from igneous rocks. The point data used for the interpolation is the median magmatic epsilon Hf data from the summary Lu-Hf dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same eight-class interval binning and colour scheme applied to the source point data in the Lu-Hf Isotopes - Summary Data layer (classification 2)."
+    order: "isotopes07"
+    wms:
+        selector: "isotope:luhf_magmatic_ehft_grid"
+"luhf_residence_time_grid":
+    name: "Lu-Hf Residence Time Grid (igneous)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Lu-Hf residence time estimates, based on (primarily zircon) Lu-Hf isotopic analyses from igneous rocks. The data provides an estimate of the duration for material residing in the crust prior to its last melting event. The point data used for the interpolation is the median magmatic residence time data from the summary Lu-Hf dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Lu-Hf Isotopes - Summary Data layer (classification 2)."
+    order: "isotopes08"
+    wms:
+        selector: "isotope:luhf_residence_time_grid"
+"isotopes_hf_all":
+    name: "Lu-Hf Isotopes: Full Analytical Data"
+    group: "Isotopes"
+    description: "A compilation of full analytical data tables for publicly-available Lu-Hf isotope and associated O-isotope data from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample (including unit name, lithology and age), sample collection site, method of analysis, analytical errors, associated Reference Standards and analytical values, and source publication information. Refer to Waltenberg et al (2021) for further details: http://dx.doi.org/10.11636/Record.2021.016."
+    order: "isotopes09"
+    wms:
+        selector: "isotope:isotopes_hf_all"
+"isotopes_pbpb":
+    name: "Pb-Pb Isotope Data"
+    group: "Isotopes"
+    description: "A compilation of full analytical data tables for publicly-available Pb-Pb isotope data from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Refer to Huston (2019) for further details: http://pid.geoscience.gov.au/dataset/ga/127263."
+    order: "isotopes10"
+    wms:
+        selector: "isotope:isotopes_pbpb"
+"pbpb_mu_grid":
+    name: "Pb-Pb Mu Grid (ores)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Pb-Pb μ (mu, 238U/204Pb) data from primarily ore-related rocks and minerals. The point data used for the interpolation is from the Pb-Pb dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Pb-Pb Isotope Data layer (classification 2)."
+    order: "isotopes11"
+    wms:
+        selector: "isotope:pbpb_mu_grid"
+"pbpb_kappa_grid":
+    name: "Pb-Pb Kappa Grid (ores)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Pb-Pb κ (kappa, 232Th/238U) data from primarily ore-related rocks and minerals. The point data used for the interpolation is from the Pb-Pb dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Pb-Pb Isotope Data layer (classification 2)."
+    order: "isotopes12"
+    wms:
+        selector: "isotope:pbpb_kappa_grid"
+"pbpb_omega_grid":
+    name: "Pb-Pb Omega Grid (ores)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Pb-Pb ω (omega, 232Th/204Pb) data from primarily ore-related rocks and minerals. The point data used for the interpolation is from the Pb-Pb dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Pb-Pb Isotope Data layer (classification 2)."
+    order: "isotopes13"
+    wms:
+        selector: "isotope:pbpb_omega_grid"
+"pbpb_model_age_grid":
+    name: "Pb-Pb Model Age Grid (ores)"
+    group: "Isotopes"
+    description: "This is an interpolated grid of Pb-Pb model age data from primarily ore-related rocks and minerals. The point data used for the interpolation is from the Pb-Pb dataset held in the Isotopic Atlas as of February 2021, and the model ages are calculated using Stacey and Kramers (1975) Pb-evolution model. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same six-class interval binning and colour scheme applied to the source point data in the Pb-Pb Isotope Data layer (classification 2)."
+    order: "isotopes14"
+    wms:
+        selector: "isotope:pbpb_model_age_grid"
+"isotopes_rbsr":
+    name: "Rb-Sr Isotope Data"
+    group: "Isotopes"
+    description: "Analytical data tables for publicly-available Sr-isotope data from Geoscience Australia (GA). Each result links to information about the sample, analytical metadata, and the source publication. Refer to de Caritat et al. (2022) for further details: http://pid.geoscience.gov.au/dataset/ga/71912."
+    order: "isotopes15"
+    wms:
+        selector: "isotope:isotopes_rbsr"

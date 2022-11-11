@@ -84,6 +84,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.MethodInvokingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailSender;
@@ -550,12 +551,15 @@ public class AppContext {
         return cloudStorageService;
     }
 
+    @Lazy
     @Autowired
     private ViewKnownLayerFactory viewFactory;
 
+    @Lazy
     @Autowired
     private ViewCSWRecordFactory viewCSWRecordFactory;
 
+    @Lazy
     @Autowired
     private ViewGetCapabilitiesFactory viewGetCapabilitiesFactory;
 

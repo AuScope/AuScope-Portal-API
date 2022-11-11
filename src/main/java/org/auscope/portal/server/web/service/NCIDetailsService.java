@@ -6,6 +6,7 @@ import org.auscope.portal.server.web.security.ANVGLUser;
 import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.security.NCIDetailsEnc;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +18,8 @@ public class NCIDetailsService {
 	@Autowired
 	ANVGLUserService userService;
 
-	@Autowired
+	@Lazy
+    @Autowired
 	private VGLCryptoService encryptionService;
 	
 	public NCIDetails getByUser(ANVGLUser user) throws PortalServiceException {
