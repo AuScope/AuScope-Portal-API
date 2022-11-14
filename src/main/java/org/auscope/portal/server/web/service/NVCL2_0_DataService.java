@@ -3,8 +3,10 @@ package org.auscope.portal.server.web.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +90,55 @@ public class NVCL2_0_DataService {
 
         return new CSVDownloadResponse(responseStream, contentHeader == null ? null : contentHeader.getValue());
     }
+    /**
+     * Filter out the csvRecord which is not nvclCollection. from NVCL 2.0 service and returns the resulting data in a CSVDownloadResponse
+     *
+     * Response should be a stream of bytes for a CSV file
+     *
+     * @param inputstreamCSV
+     *            inputstream of CSV 
+     * @param outputStream
+     *            outputStream
+     * @return
+     * @throws Exception
+     */
+    public  int nvclCollectionFilter(InputStream inputstreamCSV, OutputStream outputStream) throws Exception {
+        int ret = 0;
+        CSVParser parser = new CSVParserBuilder().withSeparator(',').withQuoteChar('"').build();
+        CSVReader reader = new CSVReaderBuilder(new InputStreamReader(inputstreamCSV)).withCSVParser(parser).build();
+        String[] headerLine = reader.readNext();
+        int indexOfIdentifier = Arrays.asList(headerLine).indexOf("gsmlp:identifier");
+        int indexOfNvclCollection = Arrays.asList(headerLine).indexOf("gsmlp:nvclCollection");
 
+        if (headerLine == null || headerLine.length <= 2 || indexOfIdentifier < 0) {
+            throw new Exception("No or malformed CSV header sent");
+        }
+
+        outputStream.write(String.join(",", headerLine).getBytes());
+        outputStream.write('\n');
+
+        //Start parsing our data - loading it into bins
+        String[] dataLine = null;
+        while ((dataLine = reader.readNext()) != null) {
+            if (dataLine.length != headerLine.length) {
+                continue; //skip malformed lines
+            }
+            if (dataLine[indexOfNvclCollection].trim().equalsIgnoreCase("false")){
+                continue; //skip none nvclCollection lines.
+            }
+            //example: http://geossdi.dmp.wa.gov.au/resource/feature/gswa/borehole/ABDP1
+            String boreholeURI = dataLine[indexOfIdentifier];
+            //Filter out bad boreholeURI
+            if (!boreholeURI.startsWith("http")){
+                continue;
+            }
+            outputStream.write(String.join(",", dataLine).getBytes());
+            outputStream.write('\n');
+            ret++;
+        }
+        return ret;
+    }
+    
     private String getMostCountedValue(HashMap<String, Integer> map) {
         String largestValue = null;
         int largestCount = Integer.MIN_VALUE;
