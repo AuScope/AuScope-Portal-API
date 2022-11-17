@@ -1895,7 +1895,7 @@
     group: "GRACE"
     description: "GRACE/GRACE-FO mascons"
     order: "grace01"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "grace:grace_view"
     
@@ -1984,7 +1984,7 @@
     supportsCsvDownloads: true
     wfs:
         selector: "isotope:interpreted_age_samples_igneous_crystallisation"
-"isotope:geochron_magmatic_age_grid":
+"geochron_magmatic_age_grid":
     name: "Igneous Crystallisation Age Grid"
     group: "Geochronology"
     description: "This grid is an interpolation of magmatic (igneous crystallisation) age point data held in the Isotopic Atlas as of February 2021. Data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Igneous Crystallisation Age Data layer (classification 2)."
