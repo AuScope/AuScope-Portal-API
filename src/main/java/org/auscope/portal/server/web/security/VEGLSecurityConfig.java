@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -43,15 +44,18 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${spring.security.jwt.aaf.callbackUrl}")
 	private String aafCallbackUrl;
 	
+	@Lazy
 	@Autowired
 	GoogleOidcUserService googleOidcUserService;
 	
+	@Lazy
 	@Autowired
 	VGLOAuth2UserService oauth2UserService;
 
 	@Autowired
 	AAFAuthenticationSuccessHandler aafSuccessHandler;
 	
+	@Lazy
 	@Autowired
 	private AAFAuthenticationProvider aafAuthenticationProvider;
 	
