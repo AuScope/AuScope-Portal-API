@@ -252,6 +252,9 @@ public class LayerFactory {
                         case "stackdriverServiceGroup":
                             layer.setStackdriverServiceGroup(value);
                             break;
+                        case "supportsCsvDownloads":
+                            layer.setSupportsCsvDownloads(Boolean.valueOf(value));
+                            break;
                         case "wfs": {
                             wfs.feature.clear();
                             wfs.endPoints.clear();
