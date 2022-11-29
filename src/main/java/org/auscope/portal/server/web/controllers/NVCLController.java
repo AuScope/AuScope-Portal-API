@@ -898,7 +898,7 @@ public class NVCLController extends BasePortalController {
                 endpoint = "https://" + new URL(endpoint).getHost() + "/";
 
                 String tsgFileUrls = this.dataService.getTsgFileUrls(endpoint, csv);
-                if (tsgFileUrls == null) {
+                if (tsgFileUrls == null || tsgFileUrls.isEmpty()) {
                     continue;
                 }
                 retTsgFileUrls += tsgFileUrls;
