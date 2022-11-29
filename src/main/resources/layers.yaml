@@ -340,8 +340,24 @@
                         - [ "Spectrophot Refl Green", "sp_refl_green" ]
                         - [ "Spectrophot Refl Blue", "sp_refl_blue" ]
                         - [ "XRF (Any)", "xrf_"]
+"mscl-gssa-borehole":
+        name: "GSSA MSCL Data"
+        description: "Petrophysical data acquired using Geotek MSCL-S by Geological Survey of South Australia"
+        group: "Boreholes"
+        proxyUrl: "doBoreholeViewFilter.do"
+        proxyStyleUrl: ""
+        proxyCountUrl: ""
+        order: "201"
+        supportsCsvDownloads: false
+        wfs:
+               selector: "gsmlbh:Borehole"
+               feature:
+                    - "gsmlbh:Borehole"
+        filters:
+                textbox:
+                    - [ "Name", "gsmlbh:name", null, "ISLIKE" ]
 
-# AusPASS
+# AusPASS - passive seismic
 "seismology-in-schools-site":
         name: "Seismographs in Schools Network"
         description: "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server."

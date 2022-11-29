@@ -103,6 +103,9 @@ public class MSCLController extends BasePortalController {
      *            ending depth
      * @param observationsToReturn
      *            string which specifies which observations to return
+     * @param useGMLObs
+     *            optional boolean which tell us where to expect the observations,
+     *            nested in complete GeoSciML model, or in a simple shallow structure 
      * @return A ModelAndView object encapsulating the data series to plot along with an indicator of success or failure.
      * @throws Exception
      */
@@ -112,8 +115,14 @@ public class MSCLController extends BasePortalController {
             @RequestParam("boreholeHeaderId") final String boreholeHeaderId,
             @RequestParam("startDepth") final String startDepth,
             @RequestParam("endDepth") final String endDepth,
-            @RequestParam("observationsToReturn") final String[] observationsToReturn) {
-
+            @RequestParam("observationsToReturn") final String[] observationsToReturn,
+            @RequestParam(name="useGMLObs", required=false, defaultValue="false") final boolean useGMLObs) {
+        
+        // If this serviceUrl's response is a full GeoSciML model
+        if (useGMLObs) {
+            return this.getObsForGraphGMLObs(serviceUrl, boreholeHeaderId, startDepth, endDepth, observationsToReturn);
+        }
+        // If this serviceUrl's response is a simple shallow model 
         try {
             String wfsResponse = msclWfsService.getObservations(serviceUrl, boreholeHeaderId, startDepth, endDepth);
 
@@ -195,25 +204,20 @@ public class MSCLController extends BasePortalController {
 
 
     /**
-     * Get all measurements for a borehole at a cetain depth range
-     * in GSML v4.1 standard
+     * Get all observations for a borehole at a certain depth range
+     * from a complete GeoSciML v4.1 response
      * 
      * @param serviceUrl service URL
      * @param boreholeHeaderId borehole header id
      * @param startDepth get observations starting from this depth
      * @param endDepth get observations ending at this depth
+     * @param observationsToReturn string which specifies which observations to return
      */
-    @RequestMapping("/getMsclObservationsForGraph41.do")
-    public ModelAndView getMsclObservationsForGraph41(
-            @RequestParam("serviceUrl") final String serviceUrl,
-            @RequestParam("boreholeHeaderId") final String boreholeHeaderId,
-            @RequestParam("startDepth") final String startDepth,
-            @RequestParam("endDepth") final String endDepth,
-            @RequestParam("observationsToReturn") final String[] observationsToReturn) {
+    public ModelAndView getObsForGraphGMLObs(String serviceUrl, String boreholeHeaderId,
+            String startDepth, String endDepth, String[] observationsToReturn) {
 
         try {
             String wfsResponse = msclWfsService.getObservationsGSML41(serviceUrl, boreholeHeaderId);
-
             ModelMap data = new ModelMap();
             ArrayList<ModelMap> series = new ArrayList<ModelMap>();
             ModelMap relatedValues = new ModelMap();
