@@ -734,98 +734,98 @@
     group: "ASTER Maps"
     order: "30_ASTER Maps_020"
     csw:
-        serviceName: "National ASTER Map AlOH group composition"
+        id: "f1823_6337_2787_1326"
 "aster-ferrous":
     name: "Ferrous iron index"
     description: "1. Band ratio: B5/B4Blue is low abundance, Red is high abundance"
     group: "ASTER Maps"
     order: "30_ASTER Maps_030"
     csw:
-        serviceName: "National ASTER Map Ferrous iron index"
+        id: "f3532_2246_1929_4927"
 "aster-opaque":
     name: "Opaque index"
     description: "1. Band ratio: B1/B4Blue is low abundance, Red is high abundancepotentially includes  carbon black e.g. ash), magnetite, Mn oxides, and sulphides in unoxidised envornments"
     group: "ASTER Maps"
     order: "30_ASTER Maps_040"
     csw:
-        serviceName: "National ASTER Map Opaque index"
+        id: "f3401_6961_4148_6080"
 "aster-ferric-oxide-content":
     name: "Ferric oxide content"
     description: "1. Band ratio: B4/B3Blue is low abundance, Red is high abundance"
     group: "ASTER Maps"
     order: "30_ASTER Maps_050"
     csw:
-        serviceName: "National ASTER Map Ferric oxide content"
+        id: "f0613_6306_9085_9820"
 "aster-feoh":
     name: "FeOH group content"
     description: "1. Band ratio: (B6+B8)/B7Blue is low content, Red is high contentpotentially includes: chlorite, epidote, jarosite, nontronite, gibbsite, gypsum, opal-chalcedony)"
     group: "ASTER Maps"
     order: "30_ASTER Maps_060"
     csw:
-        serviceName: "National ASTER Map FeOH group content"
+        id: "f8711_1072_0979_6939"
 "aster-ferric-oxide-comp":
     name: "Ferric oxide composition"
     description: "1. Band ratio: B2/B1Blue-cyan is goethite rich, Green is hematite-goethite, Red-yellow is hematite-rich"
     group: "ASTER Maps"
     order: "30_ASTER Maps_070"
     csw:
-        serviceName: "National ASTER Map Ferric oxide composition"
+        id: "f7401_6489_2308_2725"
 "aster-group-index":
     name: "Kaolin group index"
     description: "B6/B5(potential includes: pyrophyllite, alunite, well-ordered kaolinite)Blue is low content, Red is high content"
     group: "ASTER Maps"
     order: "30_ASTER Maps_080"
     csw:
-        serviceName: "National ASTER Map Kaolin group index"
+        id: "f9063_0048_5432_4205"
 "aster-quartz-index":
     name: "TIR Quartz index"
     description: "1. Band ratio: B11/(B10+B12)Blue is low quartz contentRed is high quartz content"
     group: "ASTER Maps"
     order: "30_ASTER Maps_090"
     csw:
-        serviceName: "National ASTER Map TIR Quartz index"
+        id: "f1011_7875_7538_2807"
 "aster-mgoh-content":
     name: "MgOH group content"
     description: "1. Band ratio: (B6+B9/(B7+B8)Blue is low content, Red is high contentpotentially includes: calcite, dolomite, magnesite, chlorite, epidote, amphibole, talc, serpentine)"
     group: "ASTER Maps"
     order: "30_ASTER Maps_100"
     csw:
-        serviceName: "National ASTER Map MgOH group content"
+        id: "f1734_9663_3557_9883"
 "aster-green-veg":
     name: "Green vegetation content"
     description: "Band ratio: B3/B2 Blue is low contentRed is high content"
     group: "ASTER Maps"
     order: "30_ASTER Maps_110"
     csw:
-        serviceName: "National ASTER Map green vegetation content"
+        id: "f7232_3072_6209_7100"
 "aster-ferr-carb":
     name: "Ferrous iron content in MgOH/carbonate"
     description: "1. Band ratio: B5/B4Blue is low ferrous iron content in carbonate and MgOH minerals like talc and tremolite.Red is high ferrous iron content in carbonate and MgOH minerals like chlorite and actinolite."
     group: "ASTER Maps"
     order: "30_ASTER Maps_120"
     csw:
-        serviceName: "National ASTER Map Ferrous iron content in MgOH/carbonate"
+        id: "f2024_0154_4178_4072"
 "aster-mgoh-group-comp":
     name: "MgOH group composition"
     description: "1. Band ratio: B7/B8Blue-cyan is magnesite-dolomite, amphibole, chlorite\tRed is calcite, epidote, amphibole"
     group: "ASTER Maps"
     order: "30_ASTER Maps_130"
     csw:
-        serviceName: "National ASTER Map MgOH group composition"
+        id: "f4127_0310_8856_3869"
 "aster-aloh-group-content":
     name: "AlOH group content"
     description: "1. Band ratio: (B5+B7)/B6Blue is low abundance, Red is high abundance potentially includes: phengite, muscovite, paragonite, lepidolite, illite, brammalite, montmorillonite, beidellite, kaolinite, dickite"
     group: "ASTER Maps"
     order: "30_ASTER Maps_160"
     csw:
-        serviceName: "National ASTER Map AlOH group content"
+        id: "f1168_3523_3375_4697"
 "aster-silica-content":
     name: "TIR Silica index"
     description: "1. Band ratio: B13/B10Blue is low silica contentRed is high silica content(potentially includes Si-rich minerals, such as quartz, feldspars, Al-clays)"
     group: "ASTER Maps"
     order: "30_ASTER Maps_180"
     csw:
-        serviceName: "National ASTER Map TIR Silica index"
+        id: "f2150_3654_7441_8491"
 
 # Magnetics
 "remanent-anomalies":
