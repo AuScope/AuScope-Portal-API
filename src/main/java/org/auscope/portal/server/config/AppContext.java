@@ -290,7 +290,8 @@ public class AppContext {
         WFSGetFeatureMethodMaker methodMaker = new WFSGetFeatureMethodMaker();
         // give it a ERML 2.0 namespace context
         methodMaker.setNamespaces(new ErmlNamespaceContext("2.0"));
-        return new WFSGml32Service(new HttpServiceCaller(900000),
+        // HttpServiceCaller will ignore SSL errors if the test profile is active (locally signed SSL certs)
+        return new WFSGml32Service(new HttpServiceCaller(900000, activeProfile.contains("test")),
                 methodMaker,
                 // can instantiate with a different XSLT for GML 32 mapping?
                 new GmlToHtml()
@@ -379,11 +380,13 @@ public class AppContext {
         return taskExec;
     }
 
+    // Primary (default) HttpServiceCaller bean
+    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
     @Bean
     @Autowired
     @Primary
     public HttpServiceCaller httpServiceCallerApp() {
-        return new HttpServiceCaller(900000);
+        return new HttpServiceCaller(900000, activeProfile.contains("test"));
     }
     
     // Second HttpServiceCaller to reduce CSW record search timeout
