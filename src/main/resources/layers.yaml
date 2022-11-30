@@ -1714,16 +1714,17 @@
     filters:
         textbox: 
             - [ "IGSN Identifier", "identifier", null, "ISLIKE" ]
-"igsn-wdc-sample":
-    id: "IGSN-WDC-SAMPLE"
-    name: "igsn-wdc-sample"
-    group: "IGSN"
-    description: "A collection of igsn-wdc-sample"
-    proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF00FF&layerName=igsn:igsn_wdc_sample"
-    order: "53"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "igsn:igsn_wdc_sample"
+# Lingbo comment out for the timebeing, will bring back once wdc is reharvested.
+# "igsn-wdc-sample":
+#     id: "IGSN-WDC-SAMPLE"
+#     name: "igsn-wdc-sample"
+#     group: "IGSN"
+#     description: "A collection of igsn-wdc-sample"
+#     proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF00FF&layerName=igsn:igsn_wdc_sample"
+#     order: "53"
+#     supportsCsvDownloads: true
+#     wfs:
+#         selector: "igsn:igsn_wdc_sample"
 
 # PMD*CRC Reports with geographical bounding boxes
 "pmd-crc-project-a1-presentations":
