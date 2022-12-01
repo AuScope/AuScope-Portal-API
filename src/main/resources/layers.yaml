@@ -243,7 +243,7 @@
                selector: "tima:geosample_and_mineralogy"
         filters:
                textbox:
-                    - [ "Name", "gsmlp:name", null, "ISLIKE" ]
+                    - [ "Name", "name", null, "ISLIKE" ]
                     - [ "IGSN", "igsn", null, "ISLIKE" ]
 
 # W.A. Geosample Geochronology
@@ -260,7 +260,7 @@
                selector: "tima:view_shrimp_geochronology_result"
         filters:
                textbox:
-                    - [ "Name", "gsmlp:name", null, "ISLIKE" ]
+                    - [ "Name", "name", null, "ISLIKE" ]
                     - [ "IGSN", "igsn", null, "ISLIKE" ]
 
 # All boreholes
