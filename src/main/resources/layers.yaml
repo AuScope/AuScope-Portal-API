@@ -355,7 +355,7 @@
                     - "gsmlbh:Borehole"
         filters:
                 textbox:
-                    - [ "Name", "gsmlbh:name", null, "ISLIKE" ]
+                    - [ "Name", "gml:name", null, "ISLIKE" ]
 
 # AusPASS - passive seismic
 "seismology-in-schools-site":
