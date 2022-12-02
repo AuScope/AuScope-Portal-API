@@ -857,7 +857,7 @@
             - "https://remanentanomalies.csiro.au/geoserver/wfs"
     filters:
         textbox: 
-            - [ "Remanent Anomaly Name", "RenAnom:AnomalyName", null, "ISLIKE" ]
+            - [ "Remanent Anomaly Name", "RemAnom:AnomalyName", null, "ISLIKE" ]
 "remanent-anomalies-AutoSearch":
     name: "AUS5 - AutoSearch Anomalies"
     description: "A collection of services publishing magnetic anomalies"
@@ -887,7 +887,7 @@
             - "https://remanentanomalies.csiro.au/geoserverEMAG/wfs"
     filters:
         textbox: 
-            - [ "Remanent Anomaly Name", "RenAnom:AnomalyName", null, "ISLIKE" ]
+            - [ "Remanent Anomaly Name", "RemAnom:AnomalyName", null, "ISLIKE" ]
 "remanent-anomalies-EMAGTMI":
     name: "EMAG2 - Total Magnetic Intensity"
     description: "Total Magnetic Intensity from the EMAG2 datasource. http://www.geomag.org/models/emag2.html"
