@@ -46,7 +46,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,JobDownloadControll
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,RemanentAnomaliesController,130,0,5,0,26,0,7,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,GeologicalProvincesController,59,0,0,0,15,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController,190,256,3,5,28,49,5,7,3,5
-AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController,201,0,16,0,42,0,11,0,3,0
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController,345,0,32,0,72,0,20,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,TIMAController,179,0,10,0,38,0,9,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabController,102,235,6,6,14,43,6,9,2,7
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,BaseModelController,40,187,7,13,9,32,7,6,0,3
@@ -58,7 +58,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController.new 
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabularyCacheController,48,0,0,0,12,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new Comparator() {...},16,0,0,0,2,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new IterableNamespace() {...},66,0,0,0,12,0,1,0,1,0
-AuScope-Portal-API,org.auscope.portal.mscl,MSCLWFSService,93,0,4,0,15,0,6,0,4,0
+AuScope-Portal-API,org.auscope.portal.mscl,MSCLWFSService,110,0,4,0,18,0,7,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.vegl.mail,JobCompletionMailSender,27,333,8,8,9,72,13,14,5,14
 AuScope-Portal-API,org.auscope.portal.server.web.security,VEGLSecurityConfig.new AuthenticationFailureHandler() {...},18,0,0,0,3,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.security,ANVGLUser.AuthenticationFramework,21,0,0,0,1,0,1,0,1,0
