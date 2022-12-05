@@ -1136,7 +1136,7 @@
     order: "Registered_56"
     supportsCsvDownloads: true
     wfs:
-        selector: "mrtwfs:GravityMeasurements"
+        selector: "mrtwfs:LicenceCategory5"
 "land-dama-poin-of-tasm-min-reso-tasm":
     name: "Landslide Damage Points Of Tasmania Mineral Resources Tasmania "
     group: "Mineral Resources Tasmania"
