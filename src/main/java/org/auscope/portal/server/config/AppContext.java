@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -90,6 +93,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
@@ -151,8 +155,11 @@ public class AppContext {
         @Value("${portalAdminEmail}")
         private String portalAdminEmail;
         
-        @Value("${knownLayersStartupDelay}")
+        @Value("${knownLayersStartupDelay:1}")
         private int knownLayersStartupDelay;
+        
+        @Value("${knownLayersCronExpression:0 0 0 * * ?}")
+        private String knownLayersCronExpression;
 
         @Value("${cloud.encryption.password}")
         private String encryptionPassword;
@@ -319,7 +326,7 @@ public class AppContext {
      * @throws Exception
      */
     @Bean
-    public JobDetailFactoryBean knownLayerStatusMonitorDetail() throws Exception {
+    public JobDetailFactoryBean knownLayerCronStatusMonitorDetail() throws Exception {
         JobDetailFactoryBean jobDetail = new JobDetailFactoryBean();
         jobDetail.setJobClass(KnownLayerStatusMonitor.class);
         Map<String, Object> jobData = new HashMap<String, Object>();
@@ -332,6 +339,7 @@ public class AppContext {
     public static PortalPropertySourcesPlaceholderConfigurer propertyConfigurer() {
         PortalPropertySourcesPlaceholderConfigurer pPropConf = new PortalPropertySourcesPlaceholderConfigurer();
         pPropConf.setLocations(new ClassPathResource("config.properties"), new ClassPathResource("config.properties"));
+        pPropConf.setIgnoreResourceNotFound(true);
         return new PortalPropertySourcesPlaceholderConfigurer();
     }
     
@@ -351,22 +359,33 @@ public class AppContext {
      * @throws Exception
      */
     @Bean
-    public SimpleTriggerFactoryBean knownLayerStatusTriggerFactoryBean() throws Exception {
-        SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
-        trigger.setJobDetail(knownLayerStatusMonitorDetail().getObject());
-        trigger.setRepeatInterval(15 * 60 * 1000);
-        trigger.setStartDelay(knownLayersStartupDelay);
+    public CronTriggerFactoryBean knownLayerStatusCronTriggerFactoryBean() throws Exception {
+        CronTriggerFactoryBean trigger = new CronTriggerFactoryBean();
+        trigger.setJobDetail(knownLayerCronStatusMonitorDetail().getObject());
+        trigger.setCronExpression(knownLayersCronExpression);
         return trigger;
     }
-
+    
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
+        
         schedulerFactory.setTaskExecutor(taskExecutor());
         Trigger[] triggers = new Trigger[2];
         triggers[0] = jobMonitorTriggerFactoryBean().getObject();
-        triggers[1] = knownLayerStatusTriggerFactoryBean().getObject();
+        triggers[1] = knownLayerStatusCronTriggerFactoryBean().getObject();
         schedulerFactory.setTriggers(triggers);
+
+        // One off scheduler to get known layers X minutes after startup
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.schedule(new Runnable() {
+            @Override
+            public void run() {
+            	cswKnownLayerService().updateKnownLayersCache();
+            }
+        }, knownLayersStartupDelay, TimeUnit.MINUTES);
+        scheduler.shutdown();
+        
         return schedulerFactory;
     }
 
