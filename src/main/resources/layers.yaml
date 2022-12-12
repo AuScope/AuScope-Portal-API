@@ -477,7 +477,7 @@
         proxyUrl: "getIRISStations.do"
         order: "264"
         iris:
-               selector: [ "YJ","https://auspass.edu.au" ]
+               selector: [ "4H","https://auspass.edu.au" ]
 "seismology-eal2":
         name: "EAL2: Eastern Australia Linkage"
         description: "The EAL2 seismic array feed from AusPass: the Australian Passive Seismic Server."
