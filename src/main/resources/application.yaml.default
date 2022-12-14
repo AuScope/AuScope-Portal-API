@@ -18,7 +18,7 @@ localCacheDir: C:\\temp\\
 # KnownLayers update on start-up delay (in minutes) 
 knownLayersStartupDelay: 1
 # Schedule regular KnownLayers update (default is 3am, time zone is Eastern Australia)
-knownLayersCronExpression: "0 3 0 * * ?"
+knownLayersCronExpression: "0 0 3 * * ?"
 
 termsconditions:
    version: 1
