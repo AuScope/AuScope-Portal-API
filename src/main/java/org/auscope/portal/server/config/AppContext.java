@@ -159,7 +159,7 @@ public class AppContext {
         @Value("${knownLayersStartupDelay:1}")
         private int knownLayersStartupDelay;
         
-        @Value("${knownLayersCronExpression:0 0 0 * * ?}")
+        @Value("${knownLayersCronExpression:0 0 3 * * ?}")
         private String knownLayersCronExpression;
 
         @Value("${cloud.encryption.password}")
