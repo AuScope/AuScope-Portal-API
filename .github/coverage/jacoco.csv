@@ -134,7 +134,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,CloudSubmissionService.
 AuScope-Portal-API,org.auscope.portal.server.web.service.download,MineralOccurrenceDownloadService,19,0,2,0,7,0,3,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.mandRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext.new Runnable() {...},11,0,0,0,3,0,2,0,2,0
-AuScope-Portal-API,org.auscope.portal.server.config,AppContext,1077,0,2,0,214,0,72,0,71,0
+AuScope-Portal-API,org.auscope.portal.server.config,AppContext,1081,0,2,0,215,0,72,0,71,0
 AuScope-Portal-API,org.auscope.portal.server.config,ExtraVocabularies,111,0,0,0,13,0,13,0,13,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1405,0,126,0,331,0,106,0,35,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.wfsRec,16,0,0,0,3,0,1,0,1,0
