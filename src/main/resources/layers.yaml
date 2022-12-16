@@ -341,8 +341,8 @@
                         - [ "Spectrophot Refl Blue", "sp_refl_blue" ]
                         - [ "XRF (Any)", "xrf_"]
 "mscl-gssa-borehole":
-        name: "GSSA MSCL Data"
-        description: "Petrophysical data acquired using Geotek MSCL-S by Geological Survey of South Australia"
+        name: "GSSA GeoSciML v4.1 Boreholes"
+        description: "South Australian boreholes with an OGC WFS service which outputs GeoSciML v4.1 Borehole XML. Some boreholes include petrophysical data acquired using Geotek MSCL-S by Geological Survey of South Australia"
         group: "Boreholes"
         proxyUrl: "doBoreholeViewFilter.do"
         proxyStyleUrl: ""
