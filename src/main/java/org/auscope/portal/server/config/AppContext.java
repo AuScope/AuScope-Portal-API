@@ -8,6 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +29,7 @@ import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.SearchService;
 import org.auscope.portal.core.services.VocabularyCacheService;
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.services.WCSService;
@@ -83,11 +88,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.MethodInvokingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
@@ -110,37 +117,34 @@ public class AppContext {
 
    protected final Log logger = LogFactory.getLog(getClass());
 
-        @Value("${aws.account:undefined}") 
+        @Value("${cloud.aws.account:undefined}") 
         private String awsAcct;
 
         @Bean public String awsAccount() {
             return awsAcct;
         }
 
-        @Value("${aws.accesskey:undefined}")
+        @Value("${cloud.aws.accesskey:undefined}")
         private String awsAccessKey;
 
-        @Value("${aws.secretkey:undefined}")
+        @Value("${cloud.aws.secretkey:undefined}")
         private String awsSecretKey;
 
-        @Value("${aws.sessionkey:undefined}")
+        @Value("${cloud.aws.sessionkey:undefined}")
         private String awsSessionKey;
 
-        @Value("${aws.stsrequirement:Mandatory}")
+        @Value("${cloud.aws.stsrequirement:Mandatory}")
         private String awsStsRequirement;
 
-        @Value("${portalAdminEmail}")
-        private String adminEmail;
-
-        @Value("${localStageInDir}")
+        @Value("${cloud.localStageInDir}")
         private String stageInDirectory;
         @Value("${localCacheDir:#{null}}")
         private String localCacheDir;
 
-        @Value("${proms.report.url}")
+        @Value("${cloud.proms.report.url}")
         private String promsUrl;
 
-        @Value("${proms.reportingsystem.uri}")
+        @Value("${cloud.proms.reportingsystem.uri}")
         private String promsReportingSystemUri;
 
         @Value("${smtp.server}")
@@ -151,12 +155,22 @@ public class AppContext {
 
         @Value("${portalAdminEmail}")
         private String portalAdminEmail;
+        
+        @Value("${knownLayersStartupDelay:1}")
+        private int knownLayersStartupDelay;
+        
+        @Value("${knownLayersCronExpression:0 0 3 * * ?}")
+        private String knownLayersCronExpression;
 
-        @Value("${encryption.password}")
+        @Value("${cloud.encryption.password}")
         private String encryptionPassword;
 
-        @Value("${solutions.url}")
+        @Value("${cloud.sssc.solutions.url}")
         private String solutionsUrl;
+
+        // Active profile i.e. 'test' or 'prod'
+        @Value("${spring.profiles.active}")
+        private String activeProfile;
 
         @Autowired
         private VEGLJobManager jobManager;
@@ -284,7 +298,8 @@ public class AppContext {
         WFSGetFeatureMethodMaker methodMaker = new WFSGetFeatureMethodMaker();
         // give it a ERML 2.0 namespace context
         methodMaker.setNamespaces(new ErmlNamespaceContext("2.0"));
-        return new WFSGml32Service(new HttpServiceCaller(900000),
+        // HttpServiceCaller will ignore SSL errors if the test profile is active (locally signed SSL certs)
+        return new WFSGml32Service(new HttpServiceCaller(900000, activeProfile.contains("test")),
                 methodMaker,
                 // can instantiate with a different XSLT for GML 32 mapping?
                 new GmlToHtml()
@@ -312,7 +327,7 @@ public class AppContext {
      * @throws Exception
      */
     @Bean
-    public JobDetailFactoryBean knownLayerStatusMonitorDetail() throws Exception {
+    public JobDetailFactoryBean knownLayerCronStatusMonitorDetail() throws Exception {
         JobDetailFactoryBean jobDetail = new JobDetailFactoryBean();
         jobDetail.setJobClass(KnownLayerStatusMonitor.class);
         Map<String, Object> jobData = new HashMap<String, Object>();
@@ -325,6 +340,7 @@ public class AppContext {
     public static PortalPropertySourcesPlaceholderConfigurer propertyConfigurer() {
         PortalPropertySourcesPlaceholderConfigurer pPropConf = new PortalPropertySourcesPlaceholderConfigurer();
         pPropConf.setLocations(new ClassPathResource("config.properties"), new ClassPathResource("config.properties"));
+        pPropConf.setIgnoreResourceNotFound(true);
         return new PortalPropertySourcesPlaceholderConfigurer();
     }
     
@@ -344,22 +360,34 @@ public class AppContext {
      * @throws Exception
      */
     @Bean
-    public SimpleTriggerFactoryBean knownLayerStatusTriggerFactoryBean() throws Exception {
-        SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
-        trigger.setJobDetail(knownLayerStatusMonitorDetail().getObject());
-        trigger.setRepeatInterval(15 * 60 * 1000);
-        trigger.setStartDelay(1000);
+    public CronTriggerFactoryBean knownLayerStatusCronTriggerFactoryBean() throws Exception {
+        CronTriggerFactoryBean trigger = new CronTriggerFactoryBean();
+        trigger.setJobDetail(knownLayerCronStatusMonitorDetail().getObject());
+        trigger.setCronExpression(knownLayersCronExpression);
+        trigger.setTimeZone(TimeZone.getTimeZone("Australia/Melbourne"));
         return trigger;
     }
-
+    
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
+        
         schedulerFactory.setTaskExecutor(taskExecutor());
         Trigger[] triggers = new Trigger[2];
         triggers[0] = jobMonitorTriggerFactoryBean().getObject();
-        triggers[1] = knownLayerStatusTriggerFactoryBean().getObject();
+        triggers[1] = knownLayerStatusCronTriggerFactoryBean().getObject();
         schedulerFactory.setTriggers(triggers);
+
+        // One off scheduler to get known layers X minutes after startup
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.schedule(new Runnable() {
+            @Override
+            public void run() {
+            	cswKnownLayerService().updateKnownLayersCache();
+            }
+        }, knownLayersStartupDelay, TimeUnit.MINUTES);
+        scheduler.shutdown();
+        
         return schedulerFactory;
     }
 
@@ -373,17 +401,27 @@ public class AppContext {
         return taskExec;
     }
 
+    // Primary (default) HttpServiceCaller bean
+    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
     @Bean
     @Autowired
     @Primary
     public HttpServiceCaller httpServiceCallerApp() {
-        return new HttpServiceCaller(900000);
+        return new HttpServiceCaller(900000, activeProfile.contains("test"));
     }
     
     // Second HttpServiceCaller to reduce CSW record search timeout
+    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
     @Bean
     public SearchHttpServiceCaller searchHttpServiceCaller() {
-        return new SearchHttpServiceCaller(60000);
+        return new SearchHttpServiceCaller(60000, activeProfile.contains("test"));
+    }
+
+    // Third HttpServiceCaller for CSW cache services 
+    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
+    @Bean
+    public HttpServiceCaller cswCacheHttpServiceCaller() {
+        return new HttpServiceCaller(900000, activeProfile.contains("test"));
     }
     
     @Bean
@@ -414,7 +452,7 @@ public class AppContext {
     @Bean
     public CSWCacheService cswCacheService() {
         CSWCacheService cacheService = new CSWCacheService(
-                taskExecutor(), httpServiceCallerApp(), cswServiceList, griddedCswTransformerFactory(), localCacheDir );
+                taskExecutor(), cswCacheHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory(), localCacheDir);
         cacheService.setForceGetMethods(true);
         return cacheService;
     }
@@ -523,7 +561,7 @@ public class AppContext {
         storageService.setName("Amazon Web Services - S3");
         storageService.setId("amazon-aws-storage-sydney");
         storageService.setBucket("vgl-csiro");
-        storageService.setAdminEmail(adminEmail);
+        storageService.setAdminEmail(portalAdminEmail);
         STSRequirement req = STSRequirement.valueOf(awsStsRequirement);
         storageService.setStsRequirement(req);
         return storageService;
@@ -537,18 +575,21 @@ public class AppContext {
         return cloudStorageService;
     }
 
+    @Lazy
     @Autowired
     private ViewKnownLayerFactory viewFactory;
 
+    @Lazy
     @Autowired
     private ViewCSWRecordFactory viewCSWRecordFactory;
 
+    @Lazy
     @Autowired
     private ViewGetCapabilitiesFactory viewGetCapabilitiesFactory;
 
     @Bean
     public KnownLayerService cswKnownLayerService() {
-        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService());
+        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService(), searchService());
     }
 
     @Bean
@@ -715,6 +756,10 @@ public class AppContext {
     public StateService stateServiceFactory() { // This service is used to store permanent links in a database
         final int DB_LIMIT = 100000; // Maximum number of permanent links in database
         return new StateService(localCacheDir, DB_LIMIT);
+    }
+    
+    @Bean SearchService searchService() {
+    	return new SearchService(localCacheDir);
     }
 
 }

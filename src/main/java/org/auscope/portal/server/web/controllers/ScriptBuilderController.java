@@ -87,8 +87,8 @@ public class ScriptBuilderController extends BaseCloudController {
                                    TemplateLintService templateLintService,
                                    CloudStorageService[] cloudStorageServices,
                                    CloudComputeService[] cloudComputeServices,
-                                   @Value("${vm.sh}") String vmSh,
-                                   @Value("${vm-shutdown.sh}") String vmShutdownSh) {
+                                   @Value("${cloud.vm.sh}") String vmSh,
+                                   @Value("${cloud.vm-shutdown.sh}") String vmShutdownSh) {
         super(cloudStorageServices, cloudComputeServices, jobManager,vmSh,vmShutdownSh);
         this.sbService = sbService;
         this.userService= userService;

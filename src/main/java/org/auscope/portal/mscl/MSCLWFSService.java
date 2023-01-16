@@ -68,6 +68,37 @@ public class MSCLWFSService extends BaseWFSService {
         return httpServiceCaller.getMethodResponseAsString(method);
     }
 
+    /**
+     * Get all measurements for a borehole in GSML v4.1 standard
+     * 
+     * @param serviceUrl service URL
+     * @param boreholeHeaderId borehole header id
+     */
+    public String getObservationsGSML41(
+        final String serviceUrl,
+        final String boreholeHeaderId) throws ConnectException, ConnectTimeoutException, UnknownHostException, Exception {
+        
+        HttpRequestBase method = this.generateWFSRequest(
+                serviceUrl,
+                "gsmlbh:Borehole", // TODO: hard-coding feels bad but this is, after all, an MSCL-specific service...
+                boreholeHeaderId,
+                null,
+                1,
+                null,
+                WFSGetFeatureMethodMaker.ResultType.Results,
+                "application/json");
+
+        return httpServiceCaller.getMethodResponseAsString(method);
+    }
+
+    /**
+     * Get all measurements for a borehole at a cetain depth range
+     * 
+     * @param serviceUrl service URL
+     * @param boreholeHeaderId borehole header id
+     * @param startDepth get observations starting from this depth
+     * @param endDepth get observations ending at this depth
+     */
     public String getObservations(
             final String serviceUrl,
             final String boreholeHeaderId,

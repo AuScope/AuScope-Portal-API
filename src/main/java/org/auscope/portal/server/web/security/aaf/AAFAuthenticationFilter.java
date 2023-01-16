@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class AAFAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 	
-	@Value("${aaf.callbackUrl}")
+	@Value("${spring.security.jwt.aaf.callbackUrl}")
 	private String aafCallbackUrl;
     
 	public AAFAuthenticationFilter(AuthenticationManager authenticationManager, String aafCallbackUrl) {

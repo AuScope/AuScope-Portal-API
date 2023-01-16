@@ -112,6 +112,9 @@ public class SF0BoreholeController extends BasePortalController {
             if (filter != null && filter.indexOf("ogc:Filter")>0) { //Polygon filter
                 filterString = filter;
                 result = wfsService.downloadCSVByPolygonFilter(serviceUrl, typeName, filterString, maxFeatures);
+                // LJ filtering out records of nvclCollection == false
+                int totalReturnLine = nvclDataService.nvclCollectionFilter(result, outputStream);
+                //System.out.print(totalReturnLine);
             } else {
                 if (box == null ) {
                     filterString = sf0BoreholeFilter.getFilterStringAllRecords();

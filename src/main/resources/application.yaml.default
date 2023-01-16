@@ -8,9 +8,33 @@
 #     port: 8080
 #     servlet:
 #         context-path: /AuScope-Portal
+
+# Server properties
+###########################################################
+portalUrl: http://localhost:8080/VGL-Portal
+frontEndUrl: http://localhost:4200
+portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
+localCacheDir: C:\\temp\\
+# KnownLayers update on start-up delay (in minutes) 
+knownLayersStartupDelay: 1
+# Schedule regular KnownLayers update (default is 3am, time zone is Eastern Australia)
+knownLayersCronExpression: "0 0 3 * * ?"
+
 termsconditions:
    version: 1
-   
+smtp:
+   server: smtp-relay.csiro.au
+googlemap:
+   key: <google_map_key>
+
+# Timeouts in seconds
+wait-for-body-content:
+   timeout: 90
+socket:
+   timeout: 90
+connection-establish:
+   timeout: 90
+
 access:
    # set a whitelist for the request URL only from the Commonwealth Government or the State Governments or Universities or Octopus will pass
    whitelist: .gov.au .edu.au .octopusdata.org .csiro.au
@@ -22,7 +46,7 @@ spring:
          'registries'
       # There are two profiles 'prod' and 'test'.
       # These are for production and test builds, and control the set of map layers available to Auscope Portal
-      # Comment out the one that you don't want
+      # Make sure only one is present (or that one is commented)
       active: test
       #active: prod
       # Use this for MySQL db
@@ -49,11 +73,12 @@ spring:
       #     dialect: org.hibernate.dialect.MySQL5InnoDBDialect # For MySQL db above
       #     format_sql: true      # FOR TESTING
       #show-sql: true              # FOR TESTING
- 
+
    mvc:
       servlet:
          load-on-startup: 1
 
+   # OAuth2 (Google, Github) and JWT (AAF) security settings
    security:
       oauth2:
          client:
@@ -70,104 +95,74 @@ spring:
                github:
                   clientId: client-id-goes-here
                   clientSecret: client-secret-goes-here
+      jwt:
+         aaf:
+            loginUrl: AAF_LOGIN_URL
+            callbackUrl: AAF_CALLBACK_URL
+            jwtsecret: AAF_SECRET
 
-# Timeouts in seconds
-wait-for-body-content:
-   timeout: 90
-socket:
-   timeout: 90
-connection-establish:
-   timeout: 90
+# Cloud specific settings
+cloud:
+   localStageInDir: C:\\temp\\vegl-portal-temp
+   sssc:
+      solutions:
+         url: https://sssc-vgl.geoanalytics.csiro.au/
+      defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
+   proms:
+      report:
+         url: http://proms-dev1-vc.it.csiro.au/id/report/
+      reportingsystem:
+         uri: http://proms-dev1-vc.it.csiro.au/rs
 
-# Cloud Compute Properties
-###########################################################
-vm:
-   sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl.sh
-vm-shutdown:
-   sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl-shutdown.sh
+   # Gives us separation from real DB passwords.
+   encryption:
+      password: ABCdefGHI
 
-# Machine / environment specific properties
-###########################################################
+   # AWS keys to be used for dev only. Production system to use AWS roles for authorization
+   aws:
+      account: AWS_ACCOUNT
+      accesskey: AWS_ACCESS_KEY
+      secretkey: AWS_SECRET_KEY
+      sessionkey: AWS_SESSION_KEY
+      stsrequirement: Mandatory
 
+   # Cloud VM files
+   vm:
+      sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl.sh
+   vm-shutdown:
+      sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl-shutdown.sh
 
-googlemap:
-   key: <google_map_key>
-   
-erddapservice:
-   url: http://siss2.anu.edu.au/erddap/griddap/
-smtp:
-   server: smtp-relay.csiro.au
-localStageInDir: C:\\temp\\vegl-portal-temp
-localCacheDir: C:\\temp\\
-solutions:
-   url: https://sssc-vgl.geoanalytics.csiro.au/
-proms:
-   report:
-      url: http://proms-dev1-vc.it.csiro.au/id/report/
-   reportingsystem:
-      uri: http://proms-dev1-vc.it.csiro.au/rs
-portalUrl: http://localhost:8080/VGL-Portal
-frontEndUrl: http://localhost:4200
-portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
-defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
-
-stripeApiKey: STRIPE_API_KEY
-
-# Gives us separation from real DB passwords.
-# Production deployment will copy env.properties file over
-# this one as passwords should not be in version control.
-
-# For deployments - you can now override the location of this file...
-#   <param-name>envPropertiesLocation</param-name>
-#   <param-value>file:///c:/env.properties</param-value>
-# made possible via Spring3 SpEL in the config.
-
-#
-# AWS keys to be used for dev only. Production system to use AWS roles for authorization
-#
-aws:
-   account: AWS_ACCOUNT
-   accesskey: AWS_ACCESS_KEY
-   secretkey: AWS_SECRET_KEY
-   sessionkey: AWS_SESSION_KEY
-   stsrequirement: Mandatory
-
-aaf:
-   loginUrl: AAF_LOGIN_URL
-   callbackUrl: AAF_CALLBACK_URL
-   jwtsecret: AAF_SECRET
-encryption:
-   password: ABCdefGHI
+   erddapservice:
+      url: http://siss2.anu.edu.au/erddap/griddap/
+   stripeApiKey: STRIPE_API_KEY
 
 env:
-    stackdriver:
-        enable: false
-        project_id: ENTER_GOOGLE_PROJECT_ID
-        private_key_id: ENTER_GOOGLE_PRIVATE_KEY_ID
-        private_key: ENTER_GOOGLE_PRIVATE_KEY
-        client_email: ENTER_CLIENT_EMAIL
-        client_id: ENTER_CLIENT_ID
-        token_uri: https://oauth2.googleapis.com/token
-    nvcl:
-      AnalyticalSeviceUrl: https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/
+   stackdriver:
+      enable: false
+      project_id: ENTER_GOOGLE_PROJECT_ID
+      private_key_id: ENTER_GOOGLE_PRIVATE_KEY_ID
+      private_key: ENTER_GOOGLE_PRIVATE_KEY
+      client_email: ENTER_CLIENT_EMAIL
+      client_id: ENTER_CLIENT_ID
+      token_uri: https://oauth2.googleapis.com/token
+   nvcl:
+      AnalyticalServiceUrl: https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/
       tsgFileCacheUrl: DEFAULT, https://nvclstore.z8.web.core.windows.net, https://www.mrt.tas.gov.au/,$DEFAULT/Tas/,https://geossdi.dmp.wa.gov.au/,$DEFAULT/WA/,https://geology.data.nt.gov.au/,$DEFAULT/NT/,https://gs.geoscience.nsw.gov.au/,$DEFAULT/NSW/,https://sarigdata.pir.sa.gov.au/,$DEFAULT/SA/,https://nvclwebservices.csiro.au/,$DEFAULT/CSIRO/
-      tsgDownloadServiceMsg: Please be aware that the TSGDownloadService is currently only available on TAS, WA, NT, NSW and SA. For VIC & QLD, it will be avaiable once dataService is upgraded. Sorry for the inconvenience.
+      tsgDownloadServiceMsg: Please be aware that the TSGDownloadService is currently only available on TAS, WA, NT, NSW and SA. For VIC & QLD, it will be available once dataService is upgraded. Sorry for the inconvenience.
 
+# Server management, health, metrics, etc.
 management:
-  endpoints:
-    web:
-      exposure:
-        include: info, health, metrics
-  endpoint:
-    health:
-        show-details: always
-  info:
-    git:
-      mode: full
-
+   endpoints:
+      web:
+         exposure:
+            include: info, health, metrics
+   endpoint:
+      health:
+         show-details: always
+   info:
+      git:
+         mode: full
 
 info:
-  application:
-    portal-core-version: "@portal.core.version@"
-
-     
+   application:
+      portal-core-version: "@portal.core.version@"
