@@ -462,7 +462,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration><fork>false</fork></configuration>
+                <configuration>
+		    <fork>false</fork>
+		    <image>
+                        <env>
+                            <BP_JVM_VERSION>17.*</BP_JVM_VERSION>
+                        </env>
+                    </image>
+		</configuration>
                 <executions>
                     <execution>
                         <goals>

@@ -1,0 +1,111 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: vault-connection
+  - name: MAVEN_CACHE_FOLDER
+    value: $(Pipeline.Workspace)/.m2/repository
+  - name: MAVEN_OPTS
+    value: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+
+stages:
+  - stage: buildandUploadImage
+    displayName: build docker image and upload to ECR
+
+    jobs:
+      - job: buildandUploadImage
+        displayName: build docker image and upload to ECR
+        steps:
+        - task: JavaToolInstaller@0
+          inputs:
+            versionSpec: '17'
+            jdkArchitectureOption: 'x64'
+            jdkSourceOption: 'PreInstalled'
+        - task: Cache@2
+          inputs:
+            key: 'maven | "$(Agent.OS)" | **/pom.xml'
+            restoreKeys: |
+              maven | "$(Agent.OS)"
+              maven
+            path: $(MAVEN_CACHE_FOLDER)
+          displayName: Cache Maven local repo
+        - task: DockerInstaller@0
+          inputs:
+            dockerVersion: '17.09.0-ce'
+        - task: Maven@3
+          inputs:
+            mavenPomFile: 'pom.xml'
+            goals: 'spring-boot:build-image'
+            options: '-Dspring-boot.build-image.imageName=auscope-portal-api'
+            publishJUnitResults: true
+            testResultsFiles: '**/surefire-reports/TEST-*.xml'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.17'
+            mavenVersionOption: 'Default'
+            mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+            mavenAuthenticateFeed: false
+            effectivePomSkip: false
+            sonarQubeRunAnalysis: false
+        - task: Bash@3
+          name: vaultClientInstaller
+          displayName: Vault client & httpie installer
+          continueOnError: false
+          inputs:
+            targetType: inline
+            script: |
+              curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+              sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+              sudo apt-get update
+              sudo apt-get install vault httpie
+        - task: Bash@3
+          name: generateAWScreds
+          displayName: Generate AWS service account credentials
+          continueOnError: false
+          inputs:
+            targetType: inline
+            # There is no nice AzDO Vault plugin, so we do some manual handling
+            script: |
+              echo 'login to vault'
+              VAULT_TOKEN=$(vault write -format=json auth/approle/$(vaultAppRole)/login role_id=$(ROLE_ID) secret_id=$(SECRET_ID) | jq -r '.auth.client_token')
+              vault login -no-print $VAULT_TOKEN
+              echo 'retrieving AWS credentials from Vault'
+              VAULT_AWS_DATA=$(mktemp)
+              vault read -format=json $(awsVaultPath)/creds/$(awsRoleName) >> $VAULT_AWS_DATA
+              echo 'record lease ID'
+              VAULT_AWS_LEASE_ID=$(cat $VAULT_AWS_DATA | jq -r '.lease_id')
+              echo 'decode AWS credentials'
+              AWS_ACCESS_KEY_ID=$(cat $VAULT_AWS_DATA | jq -r '.data.access_key')
+              AWS_SECRET_ACCESS_KEY=$(cat $VAULT_AWS_DATA | jq -r '.data.secret_key')
+              AWS_SESSION_TOKEN=$(cat $VAULT_AWS_DATA | jq -r '.data.security_token')
+
+              echo 'Exporting variables'
+              echo "##vso[task.setvariable variable=AWS.AccessKeyID]$AWS_ACCESS_KEY_ID"
+              echo "##vso[task.setvariable variable=AWS.SecretAccessKey]$AWS_SECRET_ACCESS_KEY"
+              echo "##vso[task.setvariable variable=AWS.SessionToken]$AWS_SESSION_TOKEN"
+              echo "##vso[task.setvariable variable=VAULT_AWS_LEASE_ID]$VAULT_AWS_LEASE_ID"
+        - task: ECRPushImage@1
+          inputs:
+            regionName: 'ap-southeast-2'
+            imageSource: 'imagename'
+            sourceImageName: 'auscope-portal-api'
+            repositoryName: 'auscope-portal-api'
+        - task: Bash@3
+          name: revokeVaultLeases
+          displayName: Revoke Vault leases
+          continueOnError: true # lease has a limited TTL so will eventually expire
+          inputs:
+            targetType: inline
+            script: |
+              echo 'login to vault'
+              VAULT_TOKEN=$(vault write -format=json auth/approle/$(vaultAppRole)/login role_id=$(ROLE_ID) secret_id=$(SECRET_ID) | jq -r '.auth.client_token')
+              vault login -no-print $VAULT_TOKEN
+              echo 'revoke lease'
+              vault lease revoke $(VAULT_AWS_LEASE_ID)
