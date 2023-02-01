@@ -1,1 +1,168 @@
-../src/main/resources/application.yaml.default
+# This file is a basic template for the server's configuration
+# The server expects to find a file called 'application.yaml'
+# To use it, make a copy of this file called 'application.yaml' in the same directory
+# and fill in the required fields.
+#
+# This is for developers to set tomcat context path if running from PortalApplication class.
+# server:
+#     port: 8080
+#     servlet:
+#         context-path: /AuScope-Portal
+
+# Server properties
+###########################################################
+portalUrl: http://localhost:8080/VGL-Portal
+frontEndUrl: http://localhost:4200
+portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
+localCacheDir: C:\\temp\\
+# KnownLayers update on start-up delay (in minutes) 
+knownLayersStartupDelay: 1
+# Schedule regular KnownLayers update (default is 3am, time zone is Eastern Australia)
+knownLayersCronExpression: "0 0 3 * * ?"
+
+termsconditions:
+   version: 1
+smtp:
+   server: smtp-relay.csiro.au
+googlemap:
+   key: <google_map_key>
+
+# Timeouts in seconds
+wait-for-body-content:
+   timeout: 90
+socket:
+   timeout: 90
+connection-establish:
+   timeout: 90
+
+access:
+   # set a whitelist for the request URL only from the Commonwealth Government or the State Governments or Universities or Octopus will pass
+   whitelist: .gov.au .edu.au .octopusdata.org .csiro.au
+
+spring:
+   # Include the registry definitions from application-registries.yaml
+   profiles:
+      include:
+         'registries'
+      # There are two profiles 'prod' and 'test'.
+      # These are for production and test builds, and control the set of map layers available to Auscope Portal
+      # Make sure only one is present (or that one is commented)
+      active: test
+      #active: prod
+      # Use this for MySQL db
+      #datasource:
+      #   url: jdbc:mysql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      #   username: <db_user>
+      #   password: <db_password>
+      #   driver-class-name: com.mysql.cj.jdbc.Driver
+
+   jpa:
+      hibernate:
+         naming:
+            # Stop camel case fields being converted to underscore
+            physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      properties:
+         hibernate:
+            # Set up an in memory DB using "in-process" mode
+            # i.e. can only be accessed within process
+            dialect: org.hibernate.dialect.HSQLDialect
+            connection:
+               url: "jdbc:hsqldb:mem:dummyDB"
+               username: "sa"
+               password: ""
+      #     dialect: org.hibernate.dialect.MySQL5InnoDBDialect # For MySQL db above
+      #     format_sql: true      # FOR TESTING
+      #show-sql: true              # FOR TESTING
+
+   mvc:
+      servlet:
+         load-on-startup: 1
+
+   # OAuth2 (Google, Github) and JWT (AAF) security settings
+   security:
+      oauth2:
+         client:
+            registration:
+               google:
+                  clientId: GOOGLE_CLIENT_ID
+                  clientSecret: GOOGLE_CLIENT_SECRET
+                  accessTokenUri: https://www.googleapis.com/oauth2/v4/token
+                  userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+                  clientAuthenticationScheme: form
+                  scope:
+                     - email
+                     - profile
+               github:
+                  clientId: client-id-goes-here
+                  clientSecret: client-secret-goes-here
+      jwt:
+         aaf:
+            loginUrl: AAF_LOGIN_URL
+            callbackUrl: AAF_CALLBACK_URL
+            jwtsecret: AAF_SECRET
+
+# Cloud specific settings
+cloud:
+   localStageInDir: C:\\temp\\vegl-portal-temp
+   sssc:
+      solutions:
+         url: https://sssc-vgl.geoanalytics.csiro.au/
+      defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
+   proms:
+      report:
+         url: http://proms-dev1-vc.it.csiro.au/id/report/
+      reportingsystem:
+         uri: http://proms-dev1-vc.it.csiro.au/rs
+
+   # Gives us separation from real DB passwords.
+   encryption:
+      password: ABCdefGHI
+
+   # AWS keys to be used for dev only. Production system to use AWS roles for authorization
+   aws:
+      account: AWS_ACCOUNT
+      accesskey: AWS_ACCESS_KEY
+      secretkey: AWS_SECRET_KEY
+      sessionkey: AWS_SESSION_KEY
+      stsrequirement: Mandatory
+
+   # Cloud VM files
+   vm:
+      sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl.sh
+   vm-shutdown:
+      sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl-shutdown.sh
+
+   erddapservice:
+      url: http://siss2.anu.edu.au/erddap/griddap/
+   stripeApiKey: STRIPE_API_KEY
+
+env:
+   stackdriver:
+      enable: false
+      project_id: ENTER_GOOGLE_PROJECT_ID
+      private_key_id: ENTER_GOOGLE_PRIVATE_KEY_ID
+      private_key: ENTER_GOOGLE_PRIVATE_KEY
+      client_email: ENTER_CLIENT_EMAIL
+      client_id: ENTER_CLIENT_ID
+      token_uri: https://oauth2.googleapis.com/token
+   nvcl:
+      AnalyticalServiceUrl: https://nvclanalytics.azurewebsites.net/NVCLAnalyticalServices/
+      tsgFileCacheUrl: DEFAULT, https://nvclstore.z8.web.core.windows.net, https://www.mrt.tas.gov.au/,$DEFAULT/Tas/,https://geossdi.dmp.wa.gov.au/,$DEFAULT/WA/,https://geology.data.nt.gov.au/,$DEFAULT/NT/,https://gs.geoscience.nsw.gov.au/,$DEFAULT/NSW/,https://sarigdata.pir.sa.gov.au/,$DEFAULT/SA/,https://nvclwebservices.csiro.au/,$DEFAULT/CSIRO/
+      tsgDownloadServiceMsg: Please be aware that the TSGDownloadService is currently only available on TAS, WA, NT, NSW and SA. For VIC & QLD, it will be available once dataService is upgraded. Sorry for the inconvenience.
+
+# Server management, health, metrics, etc.
+management:
+   endpoints:
+      web:
+         exposure:
+            include: info, health, metrics
+   endpoint:
+      health:
+         show-details: always
+   info:
+      git:
+         mode: full
+
+info:
+   application:
+      portal-core-version: "@portal.core.version@"
