@@ -152,17 +152,19 @@ env:
 
 # Server management, health, metrics, etc.
 management:
-   endpoints:
-      web:
-         exposure:
-            include: info, health, metrics
-   endpoint:
-      health:
-         show-details: always
-   info:
-      git:
-         mode: full
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics
+  endpoint:
+    health:
+      show-details: always
+	  probes:
+        enabled: true 
+  info:
+    git:
+      mode: full
 
 info:
-   application:
-      portal-core-version: "@portal.core.version@"
+  application:
+    portal-core-version: "@portal.core.version@"
