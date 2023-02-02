@@ -83,7 +83,7 @@ tolerations: []
 affinity: {}
 
 applicationconfig:
-  localCacheDir: /cswcache
+  localCacheDir: /cswcache/
 
 extraPodEnv: |
   - name: spring.config.location
