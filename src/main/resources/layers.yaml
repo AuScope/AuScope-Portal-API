@@ -566,6 +566,15 @@
         wms:
                selector: "Onshore_Seismic_Surveys"
 
+# National Argon Map
+"national-argon-map":
+        name: "National Argon Map"
+        group: "Argon Geochronology"
+        description: "The National Argon Map (NAM) is an AuScope Opportunity supported Project with ANU Argon team, an Oversight Committee, and the Australian Argon Laboratories Network: ANU, Melbourne University, University of Queensland and Curtin University. Having the argon laboratories working as a network has been key to AuScope. NAM is providing an opportunity for researchers, students, and industry to explore 40Ar/39Ar as a geochronometer. Allowing the scientific community the opportunity to be exposed to a wide variation of scientific scenarios that this geochronometer can provide. The information provided by NAM is extensive in the geological context, the sample characterisation and report."
+        order: "300"
+        kml:
+               selector: "https://www.google.com/maps/d/viewer?mid=11IuAOf150Ws2yDVmDdJcPCKR9NsC2ChE&ll=-27.153514165861377%2C132.07721573444098&z=4"
+
 # GA Geophysical Survey (GADDS V2.0)
 "ga-geophysicalsurveys-all":
         name: "Geophysical Surveys - All"
