@@ -11,9 +11,9 @@
 
 # Server properties
 ###########################################################
-portalUrl: http://localhost:8080/VGL-Portal
+portalUrl: http://localhost:8080/api
 frontEndUrl: http://localhost:4200
-portalAdminEmail: ANVGL Admin <anvgl-admin@csiro.au>
+portalAdminEmail: Portal Admin <cg-admin@csiro.au>
 localCacheDir: C:\\temp\\
 # KnownLayers update on start-up delay (in minutes) 
 knownLayersStartupDelay: 1
