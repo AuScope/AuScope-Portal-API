@@ -24,7 +24,7 @@ public class AAFAuthenticationProvider implements AuthenticationProvider, Initia
     private JWTManagement jwtManagement;
 
 
-    public final void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() throws Exception {
         Assert.notNull(this.jwtManagement, "A JWT management system must be set");
         Assert.notNull(this.messages, "A message source must be set");
         doAfterPropertiesSet();

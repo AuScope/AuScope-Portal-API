@@ -29,6 +29,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -74,15 +75,22 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.csrf().disable()
-			.authorizeRequests()			
+			.formLogin().disable()
+			.authorizeRequests()
 				.antMatchers("/secure/**")
 					.authenticated()
 				.antMatchers("/**")
 					.permitAll()
 			.and()
+				.exceptionHandling()
+				.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
+			.and()
 				.logout()
 					.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-					.logoutSuccessUrl(frontEndUrl)
+					// Disable auto-redirect from back-end, let front-end handle it
+					.logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
+					    httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+					})
 					.permitAll()
 			.and()
 				.addFilterBefore(ssoFilterAAF(), BasicAuthenticationFilter.class)
