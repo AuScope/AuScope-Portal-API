@@ -3,15 +3,15 @@ DROP TABLE IF EXISTS job_solutions;
 DROP TABLE IF EXISTS downloads;
 DROP TABLE IF EXISTS jobs_audit_log;
 DROP TABLE IF EXISTS parameters;
+DROP TABLE IF EXISTS job_purchases;
+DROP TABLE IF EXISTS job_annotations;
 DROP TABLE IF EXISTS jobs;
 DROP TABLE IF EXISTS series;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS nci_details;
 DROP TABLE IF EXISTS bookmark_download_options;
 DROP TABLE IF EXISTS bookmarks;
 DROP TABLE IF EXISTS data_purchases;
-DROP TABLE IF EXISTS job_purchases;
-DROP TABLE IF EXISTS job_annotations;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS nci_details;
 
 CREATE TABLE users (
   id varchar(128) NOT NULL,
