@@ -51,10 +51,12 @@ spring:
       #active: prod
       # Use this for MySQL db
       #datasource:
-      #   url: jdbc:mysql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      #   url: jdbc:mysql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true			# MySQL only
+      #   url: jdbc:postgresql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true	# PostgreSQL only
       #   username: <db_user>
       #   password: <db_password>
-      #   driver-class-name: com.mysql.cj.jdbc.Driver
+      #   driver-class-name: com.mysql.cj.jdbc.Driver	# MySQL only
+      #   driver-class-name: org.postgresql.Driver		# PostgreSQL only
 
    jpa:
       hibernate:
@@ -70,7 +72,8 @@ spring:
                url: "jdbc:hsqldb:mem:dummyDB"
                username: "sa"
                password: ""
-      #     dialect: org.hibernate.dialect.MySQL5InnoDBDialect # For MySQL db above
+      #     dialect: org.hibernate.dialect.MySQL5InnoDBDialect # If using MySQL only
+      #     dialect: org.hibernate.dialect.PostgreSQL81Dialect # If using PostgreSQL only
       #     format_sql: true      # FOR TESTING
       #show-sql: true              # FOR TESTING
 
