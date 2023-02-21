@@ -1547,7 +1547,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Australian Collection: River Basins"
     order: "Octopus_01"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:crn_aus_basins"
 
@@ -1556,7 +1556,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Australian Collection: Sample Sites"
     order: "Octopus_02"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:crn_aus_outlets"
  
@@ -1566,7 +1566,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Global Collection: River Basins"
     order: "Octopus_03"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:crn_int_basins"
 
@@ -1575,7 +1575,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN International Collection: Sample Sites"
     order: "Octopus_04"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:crn_int_outlets"
 
@@ -1585,7 +1585,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Large Basins: River Basins"
     order: "Octopus_05"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:crn_xxl_basins"
 
@@ -1594,7 +1594,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Large Basins: Sample Sites"
     order: "Octopus_06"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:crn_xxl_outlets"
 
@@ -1604,7 +1604,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "CRN Basin Bounding Boxes"
     order: "Octopus_07"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:publications"
 
@@ -1614,7 +1614,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Archaeology: Radiocarbon collection"
     order: "Octopus_08"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:sahularch_c14"
 
@@ -1623,7 +1623,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Archaeology: optically stimulated luminescence (OSL) collection"
     order: "Octopus_09"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:sahularch_osl"
 
@@ -1632,7 +1632,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Archaeology: thermoluminescence (TL) collection"
     order: "Octopus_10"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:sahularch_c14"
 
@@ -1642,7 +1642,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Aeolian optically stimulated luminescence (OSL)"
     order: "Octopus_11"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:sahulsed_aeolian_osl"
 
@@ -1651,7 +1651,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Aeolian thermoluminescence (TL)"
     order: "Octopus_12"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:sahulsed_aeolian_tl"
 
@@ -1660,7 +1660,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Fluvial optically stimulated luminescence (OSL)"
     order: "Octopus_13"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:sahulsed_fluvial_osl"
 
@@ -1669,7 +1669,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Fluvial thermoluminescence (TL)"
     order: "Octopus_14"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:sahulsed_fluvial_tl"
 
@@ -1678,7 +1678,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Lacustrine optically stimulated luminescence (OSL)"
     order: "Octopus_15"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:sahulsed_lacustrine_osl"
 
@@ -1687,7 +1687,7 @@
     group: "OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Lacustrine thermoluminescence (TL)"
     order: "Octopus_16"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "be10-denude:sahulsed_lacustrine_tl"
 
