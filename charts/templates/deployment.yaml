@@ -40,6 +40,12 @@ spec:
           - name: cswcache
             mountPath: "/cswcache"
             readOnly: false
+          {{- if .Values.existingLayerConfigMap }}
+          - name: "{{ .Values.existingLayerConfigMap . }}"
+            mountPath: "/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/layers.yaml"
+            subPath: "{{ .Values.existingLayerConfigMapKey . }}"
+            readOnly: true
+          {{- end }}
           ports:
             - name: http
               containerPort: 8080
