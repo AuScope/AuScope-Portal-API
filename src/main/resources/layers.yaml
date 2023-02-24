@@ -5,6 +5,7 @@
         group: "Earth Resources v1"
         proxyStyleUrl: "doMineFilterStyle.do"
         order: "10"
+        supportsCsvDownloads: true
         stackdriverServiceGroup: "EarthResourcesLayers"
         wfs:
                selector: "gsml:MappedFeature"
@@ -22,6 +23,7 @@
         group: "Earth Resources v1"
         proxyStyleUrl: "doMineralOccurrenceFilterStyle.do"
         order: "11"
+        supportsCsvDownloads: true
         stackdriverServiceGroup: "EarthResourcesLayers"
         wfs:
                selector: "gsml:MappedFeature"
@@ -37,6 +39,7 @@
         group: "Earth Resources v1"
         proxyStyleUrl: "doMiningActivityFilterStyle.do"
         order: "12"
+        supportsCsvDownloads: true
         stackdriverServiceGroup: "EarthResourcesLayers"
         wfs:
                selector: "gsml:MappedFeature"
