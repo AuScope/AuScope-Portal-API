@@ -181,6 +181,16 @@
         wfs:
             selector: "mt:nth_aus_AusLAMP_siteloc"
 
+# CSIRO Mafic-Ultramafic Geochemical Data Collection
+"csiro-maf-geochem":
+        name: "Mafic-Ultramafic Geochemical Data Collection"
+        group: "CSIRO"
+        description: "The CSIRO mafic-ultramafic package includes whole-rock geochemical data and mineral chemistry data collected from CSIRO research projects from the mid-1980s to 2021."
+        order: "402"
+        supportsCsvDownloads: true
+        wfs:
+            selector: "csiro_whole_rock_geochem"
+
 # 3D Geological Models
 "portal-geo-models":
         name: "3D Geological Models"
