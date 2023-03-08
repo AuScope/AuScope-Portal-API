@@ -186,7 +186,7 @@
         name: "Mafic-Ultramafic Geochemical Data Collection"
         group: "CSIRO"
         description: "The CSIRO mafic-ultramafic package includes whole-rock geochemical data and mineral chemistry data collected from CSIRO research projects from the mid-1980s to 2021."
-        order: "402"
+        order: "405"
         supportsCsvDownloads: true
         wfs:
             selector: "csiro_whole_rock_geochem"
