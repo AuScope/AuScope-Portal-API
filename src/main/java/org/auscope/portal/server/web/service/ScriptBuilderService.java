@@ -12,7 +12,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class ScriptBuilderService {
      * @param scriptText
      * @throws PortalServiceException
      */
-    public void saveScript(VEGLJob job, String scriptText, ANVGLUser user) throws PortalServiceException {
+    public void saveScript(VEGLJob job, String scriptText, PortalUser user) throws PortalServiceException {
         //Apply text contents to job stage in directory
         try (OutputStream scriptFile = jobFileService.writeFile(job, SCRIPT_FILE_NAME)) {
             PrintWriter writer = new PrintWriter(scriptFile);
@@ -71,7 +71,7 @@ public class ScriptBuilderService {
      * @return the file contents if the script file exists otherwise an empty string if the script file doesn't exist or is empty.
      * @throws PortalServiceException
      */
-    public String loadScript(VEGLJob job, ANVGLUser user) throws PortalServiceException {
+    public String loadScript(VEGLJob job, PortalUser user) throws PortalServiceException {
         try (InputStream is = jobFileService.readFile(job, SCRIPT_FILE_NAME)){
             //Load script from VL server's filesystem
 

@@ -24,8 +24,8 @@ import org.auscope.portal.core.services.csw.SearchFacet.Comparison;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.LintResult;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.ScmEntryService;
@@ -68,7 +68,7 @@ public class ScriptBuilderController extends BaseCloudController {
     /** Script checking */
     private TemplateLintService templateLintService;
     
-    private ANVGLUserService userService;
+    private PortalUserService userService;
 
     @Autowired
     private NCIDetailsService nciDetailsService;
@@ -81,7 +81,7 @@ public class ScriptBuilderController extends BaseCloudController {
      */
     @Autowired
     public ScriptBuilderController(ScriptBuilderService sbService,
-    							   ANVGLUserService userService,
+    							   PortalUserService userService,
                                    VEGLJobManager jobManager,
                                    ScmEntryService scmEntryService,
                                    TemplateLintService templateLintService,
@@ -107,9 +107,8 @@ public class ScriptBuilderController extends BaseCloudController {
     @RequestMapping("/secure/saveScript.do")
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
                                    @RequestParam("sourceText") String sourceText,
-                                   @RequestParam("solutions") Set<String> solutions/*,
-                                   @AuthenticationPrincipal ANVGLUser user*/) {
-    	ANVGLUser user = userService.getLoggedInUser();
+                                   @RequestParam("solutions") Set<String> solutions) {
+    	PortalUser user = userService.getLoggedInUser();
         if (sourceText == null || sourceText.trim().isEmpty()) {
             return generateJSONResponseMAV(false, null, "No source text specified");
         }
@@ -147,9 +146,9 @@ public class ScriptBuilderController extends BaseCloudController {
      * @return A JSON encoded response which contains the contents of a saved job's script file
      */
     @RequestMapping("/getSavedScript.do")
-    public ModelAndView getSavedScript(@RequestParam("jobId") String jobId/*, @AuthenticationPrincipal ANVGLUser user*/) {
+    public ModelAndView getSavedScript(@RequestParam("jobId") String jobId) {
         logger.debug("getSavedScript with jobId: " + jobId);
-        ANVGLUser user = userService.getLoggedInUser();
+        PortalUser user = userService.getLoggedInUser();
         String script = null;
 
         VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
@@ -175,8 +174,8 @@ public class ScriptBuilderController extends BaseCloudController {
      * @throws PortalServiceException
      */
     @RequestMapping("/secure/getConfiguredComputeServices.do")
-    public ModelAndView getComputeServices(/*@AuthenticationPrincipal ANVGLUser user*/) throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    public ModelAndView getComputeServices() throws PortalServiceException {
+    	PortalUser user = userService.getLoggedInUser();
         List<CloudComputeService> configuredServices = getConfiguredComputeServices(user, nciDetailsService);
         List<ModelMap> parsedItems = new ArrayList<ModelMap>();
         for (CloudComputeService ccs : configuredServices) {
@@ -238,12 +237,12 @@ public class ScriptBuilderController extends BaseCloudController {
      * @throws PortalServiceException
      */
     @RequestMapping("/secure/getProblems.do")
-    public ModelAndView getProblems(/*@AuthenticationPrincipal ANVGLUser user,*/
+    public ModelAndView getProblems(
             @RequestParam(value="field", required=false) String[] rawFields,
             @RequestParam(value="value", required=false) String[] rawValues,
             @RequestParam(value="type", required=false) String[] rawTypes,
             @RequestParam(value="comparison", required=false) String[] rawComparisons) throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (rawFields == null) {
             rawFields = new String[0];
         }

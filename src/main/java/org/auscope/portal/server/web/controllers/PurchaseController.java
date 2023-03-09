@@ -28,8 +28,8 @@ import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.server.vegl.VGLDataPurchase;
 import org.auscope.portal.server.vegl.VGLJobPurchase;
 import org.auscope.portal.server.vegl.VglDownload;
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.VGLPurchaseService;
 
@@ -63,7 +63,7 @@ public class PurchaseController extends BasePortalController {
     private String erddapServiceUrl;
     
     @Autowired
-    private ANVGLUserService userService;
+    private PortalUserService userService;
     
     @Autowired
     private VGLPurchaseService purchaseService;
@@ -166,7 +166,7 @@ public class PurchaseController extends BasePortalController {
         }
         
         // confirm that user is logged in
-        ANVGLUser user = userService.getLoggedInUser();
+        PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             JsonObject err = new JsonObject();
             err.addProperty("message",
@@ -343,7 +343,7 @@ public class PurchaseController extends BasePortalController {
         }
         
         // confirm that user is logged in
-        ANVGLUser user = userService.getLoggedInUser();
+        PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             JsonObject err = new JsonObject();
             err.addProperty("message",
@@ -421,7 +421,7 @@ public class PurchaseController extends BasePortalController {
      */
     @RequestMapping("/getDataPurchases.do")
     public ModelAndView getPurchases() throws PortalServiceException {
-        ANVGLUser user = userService.getLoggedInUser();
+        PortalUser user = userService.getLoggedInUser();
         List<VGLDataPurchase> purchases = purchaseService.getDataPurchasesByUser(user);
         return generateJSONResponseMAV(true, purchases, "");
     }

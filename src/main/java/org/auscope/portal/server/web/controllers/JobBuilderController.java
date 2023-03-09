@@ -44,9 +44,9 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.VglParameter.ParameterType;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.ScmEntryService;
@@ -88,7 +88,7 @@ public class JobBuilderController extends BaseCloudController {
     private String adminEmail = null;
     private String defaultToolbox = null;
     private CloudSubmissionService cloudSubmissionService;
-    private ANVGLUserService userService;
+    private PortalUserService userService;
     
     @Autowired
     private NCIDetailsService nciDetailsService;
@@ -130,7 +130,7 @@ public class JobBuilderController extends BaseCloudController {
             @Value("${cloud.vm.sh}") String vmSh, @Value("${cloud.vm-shutdown.sh}") String vmShutdownSh,
             CloudStorageService[] cloudStorageServices,
             CloudComputeService[] cloudComputeServices,
-            ANVGLUserService userService,
+            PortalUserService userService,
             VGLJobStatusChangeHandler vglJobStatusChangeHandler,
             ScmEntryService scmEntryService, ANVGLProvenanceService anvglProvenanceService,
             CloudSubmissionService cloudSubmissionService) {
@@ -159,7 +159,7 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/getJobObject.do")
     public ModelAndView getJobObject(@RequestParam("jobId") String jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         try {
             VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
             if (job == null) {
@@ -196,7 +196,7 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/stagedJobFiles.do")
     public ModelAndView stagedJobFiles(@RequestParam("jobId") String jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Lookup our job
         VEGLJob job = null;
         try {
@@ -242,7 +242,7 @@ public class JobBuilderController extends BaseCloudController {
             HttpServletResponse response,
             @RequestParam("jobId") String jobId,
             @RequestParam("filename") String filename) throws Exception {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Lookup our job and download the specified files (any exceptions will return a HTTP 503)
         VEGLJob job = attemptGetJob(Integer.parseInt(jobId), user);
         if (job == null) {
@@ -267,7 +267,7 @@ public class JobBuilderController extends BaseCloudController {
     public ModelAndView uploadFile(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") String jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Lookup our job
         VEGLJob job = null;
         try {
@@ -309,7 +309,7 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/secure/deleteFiles.do")
     public ModelAndView deleteFiles(@RequestParam("jobId") String jobId,
             @RequestParam("fileName") String[] fileNames) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLJob job = null;
         try {
             job = attemptGetJob(Integer.parseInt(jobId), user);
@@ -342,7 +342,7 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/secure/deleteDownloads.do")
     public ModelAndView deleteDownloads(@RequestParam("jobId") String jobId,
             @RequestParam("downloadId") Integer[] downloadIds) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLJob job = null;
         try {
             job = attemptGetJob(Integer.parseInt(jobId), user);
@@ -388,7 +388,7 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/getJobStatus.do")
     public ModelAndView getJobStatus(@RequestParam("jobId") String jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Get our job
         VEGLJob job = null;
         try {
@@ -415,7 +415,7 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/cancelSubmission.do")
     public ModelAndView cancelSubmission(@RequestParam("jobId") String jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Get our job
         VEGLJob job = null;
         try {
@@ -473,7 +473,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="walltime", required=false) Integer walltime,
             @RequestParam(value="annotations", required=false) String[] annotations,
             HttpServletRequest request) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Get our job
         VEGLJob job = null;
         try {
@@ -598,7 +598,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(value="folderName", required=true) String folderName, //Name of the folder to move to
             HttpServletRequest request/*,
             @AuthenticationPrincipal ANVGLUser user*/) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Get our job
         VEGLJob job = null;
         Integer seriesId=null;
@@ -660,7 +660,7 @@ public class JobBuilderController extends BaseCloudController {
             @RequestParam(required=false, name="eastBoundLongitude") Double[] eastBoundLongitudes,
             @RequestParam(required=false, name="southBoundLatitude") Double[] southBoundLatitudes,
             @RequestParam(required=false, name="westBoundLongitude") Double[] westBoundLongitudes) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         boolean append = Boolean.parseBoolean(appendString);
 
         List<VglDownload> parsedDownloads = new ArrayList<>();
@@ -737,7 +737,7 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/getJobDownloads.do")
     public ModelAndView getJobDownloads(@RequestParam("jobId") Integer jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Lookup the job
         VEGLJob job;
         try {
@@ -816,7 +816,7 @@ public class JobBuilderController extends BaseCloudController {
     public ModelAndView submitJob(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") String jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         boolean succeeded = false;
         String oldJobStatus = null, errorDescription = null, errorCorrection = null;
         VEGLJob curJob = null;
@@ -964,7 +964,7 @@ public class JobBuilderController extends BaseCloudController {
      * @param email
      * @return
      */
-    private VEGLJob initialiseVEGLJob(HttpSession session, ANVGLUser user) throws PortalServiceException {
+    private VEGLJob initialiseVEGLJob(HttpSession session, PortalUser user) throws PortalServiceException {
         VEGLJob job = new VEGLJob();
 
         //Start by saving our job to set its ID
@@ -1093,9 +1093,8 @@ public class JobBuilderController extends BaseCloudController {
             HttpServletRequest request,
             @RequestParam("computeServiceId") String computeServiceId,
             @RequestParam(value="jobId", required=false) Integer jobId,
-            @RequestParam(value="solutions", required=false) List<String> solutions/*,
-            @AuthenticationPrincipal ANVGLUser user*/) {
-    	ANVGLUser user = userService.getLoggedInUser();
+            @RequestParam(value="solutions", required=false) List<String> solutions) {
+    	PortalUser user = userService.getLoggedInUser();
         try {
             Map<String, Set<MachineImage>> imageProviders = null;
 
@@ -1181,7 +1180,7 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/secure/getComputeServices.do")
     public ModelAndView getComputeServices(@RequestParam(value="jobId", required=false) final Integer jobId) throws PortalServiceException {
     	
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         Set<String> jobCCSIds;
         try {
             jobCCSIds = scmEntryService.getJobProviders(jobId, user);
@@ -1238,7 +1237,7 @@ public class JobBuilderController extends BaseCloudController {
      */
     @RequestMapping("/secure/getAllJobInputs.do")
     public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLJob job = null;
         try {
             job = attemptGetJob(jobId, user);
@@ -1297,7 +1296,7 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/secure/getComputeServicesForSolutions.do")
     public ModelAndView getComputeServicesForSolutions(@RequestParam(value="solutions", required=false) List<String> solutions) 
     		throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
 
     	
         Set<String> configuredServiceIds = new HashSet<String>();

@@ -12,8 +12,8 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.ScmEntryService;
 import org.auscope.portal.server.web.service.ScriptBuilderService;
 import org.auscope.portal.server.web.service.TemplateLintService;
@@ -36,9 +36,9 @@ public class TestScriptBuilderController extends PortalTestClass {
     private CloudStorageService[] mockCloudStorageServices = new CloudStorageService[] {context.mock(CloudStorageService.class)};
     private CloudComputeService[] mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
     
-    private ANVGLUserService mockUserService = context.mock(ANVGLUserService.class);
+    private PortalUserService mockUserService = context.mock(PortalUserService.class);
     
-    private ANVGLUser user;
+    private PortalUser user;
 
     private static final String VM_SH = "vm.sh";
     private static final String VM_SHUTDOWN_SH = "vm-shutdown.sh";
@@ -47,7 +47,7 @@ public class TestScriptBuilderController extends PortalTestClass {
     public void setup() {
         // Object Under Test
         controller = new ScriptBuilderController(mockSbService, mockUserService, mockJobManager, mockScmEntryService, mockTemplateLintService, mockCloudStorageServices, mockCloudComputeServices, VM_SH, VM_SHUTDOWN_SH/*, nciDetailsDao*/);
-        user = new ANVGLUser();
+        user = new PortalUser();
         user.setId("456");
         user.setEmail("user@example.com");
         context.checking(new Expectations() {{

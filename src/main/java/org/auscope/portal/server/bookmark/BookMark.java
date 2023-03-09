@@ -1,4 +1,4 @@
-package org.auscope.portal.server.vegl;
+package org.auscope.portal.server.bookmark;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "bookmarks")
-public class VGLBookMark  implements Serializable {	
+public class BookMark  implements Serializable {	
    
 	private static final long serialVersionUID = 8620093753366974702L;
 	 /** The primary key for this book mark*/
@@ -45,18 +45,18 @@ public class VGLBookMark  implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private ANVGLUser parent;
+    private PortalUser parent;
     /** A List of download options associated with the bookmark */
     @OneToMany(mappedBy = "parent", cascade=CascadeType.ALL, orphanRemoval=true)
-    private List<VGLBookMarkDownload> bookMarkDownloads;
+    private List<BookMarkDownload> bookMarkDownloads;
     
     
-    public VGLBookMark() {
+    public BookMark() {
     	super();
     	this.bookMarkDownloads =  new ArrayList<>();
     }
     
-    public VGLBookMark(String fileIdentifier, String serviceId, ANVGLUser user) {
+    public BookMark(String fileIdentifier, String serviceId, PortalUser user) {
         super();
         this.setFileIdentifier(fileIdentifier);
         this.setServiceId(serviceId);
@@ -67,7 +67,7 @@ public class VGLBookMark  implements Serializable {
     *
     * @param id The primary key for this book mark
     */
-   public VGLBookMark(Integer id) {
+   public BookMark(Integer id) {
        super();
        this.id = id;
    }
@@ -110,7 +110,7 @@ public class VGLBookMark  implements Serializable {
      * User that owns the bookmarks
      * @return
      */
-    public ANVGLUser getParent() {
+    public PortalUser getParent() {
         return parent;
     }
 
@@ -118,7 +118,7 @@ public class VGLBookMark  implements Serializable {
      * User that owns the book marks
      * @param parent
      */
-    public void setParent(ANVGLUser parent) {
+    public void setParent(PortalUser parent) {
         this.parent = parent;
     }
    
@@ -127,21 +127,21 @@ public class VGLBookMark  implements Serializable {
      * @return
      */
 
-	public List<VGLBookMarkDownload> getBookMarkDownloads() {
-		return (bookMarkDownloads != null) ? bookMarkDownloads : new ArrayList<VGLBookMarkDownload>();
+	public List<BookMarkDownload> getBookMarkDownloads() {
+		return (bookMarkDownloads != null) ? bookMarkDownloads : new ArrayList<BookMarkDownload>();
 	}
 	/**
 	 * sets the list of download options for the book mark
 	 * @param bookMarks
 	 */
 
-	public void setBookMarkDownloads(List<VGLBookMarkDownload> bookMarkDownloads) {
+	public void setBookMarkDownloads(List<BookMarkDownload> bookMarkDownloads) {
 		if(this.bookMarkDownloads == null) {
 			this.bookMarkDownloads = bookMarkDownloads;
 		} else {
 			this.bookMarkDownloads.clear();
 			if(bookMarkDownloads != null) {
-				for (VGLBookMarkDownload downloadOption : bookMarkDownloads) {
+				for (BookMarkDownload downloadOption : bookMarkDownloads) {
 					downloadOption.setParent(this);
 					this.bookMarkDownloads.add(downloadOption);
 		        }

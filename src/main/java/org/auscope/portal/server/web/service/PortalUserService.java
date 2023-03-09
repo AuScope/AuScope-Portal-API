@@ -2,9 +2,9 @@ package org.auscope.portal.server.web.service;
 
 import java.util.Map;
 
-import org.auscope.portal.server.web.repositories.ANVGLUserRepository;
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.VGLUserPrincipal;
+import org.auscope.portal.server.web.repositories.PortalUserRepository;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.security.PortalUserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,12 +19,12 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class ANVGLUserService {
+public class PortalUserService {
 
 	@Autowired
-	private ANVGLUserRepository userRepository;
+	private PortalUserRepository userRepository;
 	
-	public ANVGLUser getLoggedInUser() {
+	public PortalUser getLoggedInUser() {
 		Authentication userAuth = SecurityContextHolder.getContext().getAuthentication();
 		String userEmail = "";
 		// Google/Github OAuth2
@@ -36,7 +36,7 @@ public class ANVGLUserService {
 			}
 			// Github
 			else {
-				userEmail = ((VGLUserPrincipal)((OAuth2AuthenticationToken)userAuth).getPrincipal()).getEmail();
+				userEmail = ((PortalUserPrincipal)((OAuth2AuthenticationToken)userAuth).getPrincipal()).getEmail();
 			}
 		}
 		// Only other supported Authentication is AAFAuthentication, where
@@ -47,24 +47,24 @@ public class ANVGLUserService {
 		return getByEmail(userEmail);
 	}
 	
-	public ANVGLUser getById(String id) {
-		ANVGLUser user = userRepository.findById(id).orElse(null);
+	public PortalUser getById(String id) {
+		PortalUser user = userRepository.findById(id).orElse(null);
 		return user;
 	}
 	
-	public ANVGLUser getByEmail(String email) {
+	public PortalUser getByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
 	
-	public ANVGLUser getByFullName(String fullName) {
+	public PortalUser getByFullName(String fullName) {
 		return userRepository.findByFullName(fullName);
 	}
 	
-	public void saveUser(ANVGLUser user) {
+	public void saveUser(PortalUser user) {
 		userRepository.save(user);
 	}
 
-	public void deleteUser(ANVGLUser user) {
+	public void deleteUser(PortalUser user) {
 		userRepository.delete(user);
 	}
 

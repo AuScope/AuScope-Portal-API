@@ -6,10 +6,10 @@ import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
-import org.auscope.portal.server.web.service.ANVGLUserDetailsService;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.security.PortalUser.AuthenticationFramework;
+import org.auscope.portal.server.web.service.PortalUserDetailsService;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -33,10 +33,10 @@ public class JWTManagement {
     static private String AAF_TEST = "https://rapid.test.aaf.edu.au";
 
     @Autowired
-    private ANVGLUserDetailsService userDetailsService;
+    private PortalUserDetailsService userDetailsService;
 
     @Autowired
-    private ANVGLUserService userService;
+    private PortalUserService userService;
 
     @Value("${spring.security.jwt.aaf.jwtsecret}")
     private String jwtSecret;
@@ -104,15 +104,15 @@ public class JWTManagement {
                 + "token already exists, so this is probably a replay attack.");
              }
              */
-            ANVGLUser anvglUser = registerAAFUser(token.attributes);
+            PortalUser anvglUser = registerAAFUser(token.attributes);
             return new AAFAuthentication(anvglUser, token.attributes, token, true);
         } catch (Exception e) {
             throw new AuthenticationServiceException(e.getLocalizedMessage());
         }
     }
 
-    private ANVGLUser registerAAFUser(AAFAttributes attributes) {
-        ANVGLUser anvglUser = userService.getByEmail(attributes.email);
+    private PortalUser registerAAFUser(AAFAttributes attributes) {
+        PortalUser anvglUser = userService.getByEmail(attributes.email);
         if (anvglUser == null) {
             Map<String, String> userAttributes = new HashMap<String, String>();
             userAttributes.put("email", attributes.email);
@@ -120,7 +120,7 @@ public class JWTManagement {
                 userAttributes.put("name", attributes.displayName);
             else
                 userAttributes.put("name", attributes.email);
-            anvglUser = (ANVGLUser) userDetailsService.createNewUser(attributes.email, AuthenticationFramework.AAF,
+            anvglUser = (PortalUser) userDetailsService.createNewUser(attributes.email, AuthenticationFramework.AAF,
                     userAttributes);
         }
         return anvglUser;

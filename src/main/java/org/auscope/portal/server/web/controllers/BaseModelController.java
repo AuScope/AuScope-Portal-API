@@ -4,7 +4,7 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VEGLSeries;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -29,7 +29,7 @@ public class BaseModelController extends BasePortalController {
      * @param jobId
      * @return The VEGLJob object on success or null otherwise.
      */
-    protected VEGLJob attemptGetJob(Integer jobId, ANVGLUser user) {
+    protected VEGLJob attemptGetJob(Integer jobId, PortalUser user) {
         log.trace("Getting job with ID " + jobId);
         VEGLJob job = null;
 
@@ -74,7 +74,7 @@ public class BaseModelController extends BasePortalController {
      * @param jobId
      * @return The VEGLSeries object on success or null otherwise.
      */
-    protected VEGLSeries attemptGetSeries(Integer seriesId, ANVGLUser user) {
+    protected VEGLSeries attemptGetSeries(Integer seriesId, PortalUser user) {
         VEGLSeries series = null;
 
         //Check we have a user email

@@ -9,7 +9,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.FileStagingService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VEGLJob;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class TestScriptBuilderService extends PortalTestClass {
     @Test
     public void testSaveScript() throws Exception {
         String script = "#a pretend script\n";
-        ANVGLUser user = new ANVGLUser();
+        PortalUser user = new PortalUser();
         ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
 
         context.checking(new Expectations() {{
@@ -53,7 +53,7 @@ public class TestScriptBuilderService extends PortalTestClass {
     @Test(expected=PortalServiceException.class)
     public void testSaveScript_Exception() throws Exception {
         String script = "#a pretend script\n";
-        ANVGLUser user = new ANVGLUser();
+        PortalUser user = new PortalUser();
 
         context.checking(new Expectations() {
             {
@@ -72,7 +72,7 @@ public class TestScriptBuilderService extends PortalTestClass {
     @Test
     public void testLoadScript() throws Exception {
         String script = "#a pretend script\n";
-        ANVGLUser user = new ANVGLUser();
+        PortalUser user = new PortalUser();
 
         context.checking(new Expectations() {{
             oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
@@ -88,7 +88,7 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test
     public void testLoadEmptyScript() throws Exception {
-        ANVGLUser user = new ANVGLUser();
+        PortalUser user = new PortalUser();
 
         context.checking(new Expectations() {{
             oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);
@@ -104,7 +104,7 @@ public class TestScriptBuilderService extends PortalTestClass {
      */
     @Test(expected=PortalServiceException.class)
     public void testLoadScriptError() throws Exception {
-        ANVGLUser user = new ANVGLUser();
+        PortalUser user = new PortalUser();
 
         context.checking(new Expectations() {{
             oneOf(mockFileStagingService).readFile(mockJob, ScriptBuilderService.SCRIPT_FILE_NAME);

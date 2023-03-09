@@ -3,7 +3,7 @@ package org.auscope.portal.server.web.security.github;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.auscope.portal.server.web.security.VGLOAuth2UserInfo;
+import org.auscope.portal.server.web.security.PortalOAuth2UserInfo;
 
 
 /**
@@ -12,7 +12,7 @@ import org.auscope.portal.server.web.security.VGLOAuth2UserInfo;
  * @author woo392
  *
  */
-public class GithubUserInfo extends VGLOAuth2UserInfo {
+public class GithubUserInfo extends PortalOAuth2UserInfo {
 
     public GithubUserInfo(Map<String, Object> attributes) {
     	super(attributes);

@@ -16,7 +16,7 @@ import org.auscope.portal.server.web.security.aaf.AAFAuthenticationFilter;
 import org.auscope.portal.server.web.security.aaf.AAFAuthenticationProvider;
 import org.auscope.portal.server.web.security.aaf.AAFAuthenticationSuccessHandler;
 import org.auscope.portal.server.web.security.google.GoogleOidcUserService;
-import org.auscope.portal.server.web.service.ANVGLUserDetailsService;
+import org.auscope.portal.server.web.service.PortalUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +34,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
-public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
+public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Value("${frontEndUrl}")
 	private String frontEndUrl;
@@ -51,7 +51,7 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Lazy
 	@Autowired
-	VGLOAuth2UserService oauth2UserService;
+	PortalOAuth2UserService oauth2UserService;
 
 	@Autowired
 	AAFAuthenticationSuccessHandler aafSuccessHandler;
@@ -103,13 +103,13 @@ public class VEGLSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	@Bean
-	public ANVGLUserDetailsService userDetailsService() {
+	public PortalUserDetailsService userDetailsService() {
 		Map<String, List<String>> rolesByUser = new HashMap<String, List<String>>();
 		List<String> roles = new ArrayList<String>();
 		roles.add("ROLE_ADMINISTRATOR");
 		roles.add("ROLE_UBC");
 		rolesByUser.put("105810302719127403909", roles);
-		ANVGLUserDetailsService userDetailsService = new ANVGLUserDetailsService("ROLE_USER", rolesByUser);
+		PortalUserDetailsService userDetailsService = new PortalUserDetailsService("ROLE_USER", rolesByUser);
 		return userDetailsService;
 	}
 	

@@ -1,6 +1,6 @@
 package org.auscope.portal.server.web.security.aaf;
 
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,9 +17,9 @@ public class AAFAuthentication implements Authentication {
     private final AAFAttributes attributes;
     private final AAFJWT jwt;
     private boolean isVoid = false;    
-    private ANVGLUser principal; 
+    private PortalUser principal; 
 
-    public AAFAuthentication(ANVGLUser principal, AAFAttributes attributes, AAFJWT jwt, boolean valid) {
+    public AAFAuthentication(PortalUser principal, AAFAttributes attributes, AAFJWT jwt, boolean valid) {
         this.attributes = attributes;
         this.jwt = jwt;
         if (!valid) isVoid = true;
@@ -37,7 +37,7 @@ public class AAFAuthentication implements Authentication {
     }
 
     @Override
-    public ANVGLUser getPrincipal() {
+    public PortalUser getPrincipal() {
         return principal;
     }
     

@@ -17,7 +17,7 @@ import org.auscope.portal.core.services.cloud.CloudStorageServiceJClouds;
 import org.auscope.portal.core.util.TextUtil;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Value;
@@ -106,7 +106,7 @@ public abstract class BaseCloudController extends BaseModelController {
      * @return
      * @throws PortalServiceException
      */
-    protected List<CloudComputeService> getConfiguredComputeServices(ANVGLUser user, NCIDetailsService nciDetailsService) throws PortalServiceException {
+    protected List<CloudComputeService> getConfiguredComputeServices(PortalUser user, NCIDetailsService nciDetailsService) throws PortalServiceException {
         return getConfiguredComputeServices(user, nciDetailsService, cloudComputeServices);
     }
 
@@ -117,7 +117,7 @@ public abstract class BaseCloudController extends BaseModelController {
      * @return
      * @throws PortalServiceException
      */
-    public static List<CloudComputeService> getConfiguredComputeServices(ANVGLUser user, NCIDetailsService nciDetailsService, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
+    public static List<CloudComputeService> getConfiguredComputeServices(PortalUser user, NCIDetailsService nciDetailsService, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
         List<CloudComputeService> configuredServices = new ArrayList<CloudComputeService>(cloudComputeServices.length);
         for (CloudComputeService ccs : cloudComputeServices) {
 

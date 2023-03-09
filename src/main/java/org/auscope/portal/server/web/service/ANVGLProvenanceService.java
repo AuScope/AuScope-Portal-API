@@ -26,7 +26,7 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VglDownload;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.service.scm.Solution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -110,7 +110,7 @@ public class ANVGLProvenanceService {
      *            should be just about to execute, but not yet have started.
      * @return The TURTLE text.
      */
-    public String createActivity(final VEGLJob job, final Set<Solution> solutions, ANVGLUser user) {
+    public String createActivity(final VEGLJob job, final Set<Solution> solutions, PortalUser user) {
         String jobURL = jobURL(job, serverURL());
         Activity anvglJob = null;
         Set<Entity> inputs = createEntitiesForInputs(job, solutions, user);
@@ -216,7 +216,7 @@ public class ANVGLProvenanceService {
      *            The virtual labs job we want to examine the inputs of.
      * @return An array of PROV-O entities. May be empty, but won't be null.
      */
-    public Set<Entity> createEntitiesForInputs(final VEGLJob job, final Set<Solution> solutions, ANVGLUser user) {
+    public Set<Entity> createEntitiesForInputs(final VEGLJob job, final Set<Solution> solutions, PortalUser user) {
         Set<Entity> inputs = new HashSet<>();
         // Downloads first
         try {
@@ -291,7 +291,7 @@ public class ANVGLProvenanceService {
     /**
      * Takes a completed job and finishes creating the provenance record, and
      * uploads it to the cloud. The job *must* have had
-     * {@link #createActivity(ANVGLJob, Solution, ANVGLUser) createActivity}
+     * {@link #createActivity(ANVGLJob, Solution, PortalUser) createActivity}
      * called with it already. Otherwise it can't collect the relevant
      * information, and won't do anything.
      * 

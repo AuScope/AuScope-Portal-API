@@ -2,7 +2,7 @@ package org.auscope.portal.server.web.service;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.web.repositories.NCIDetailsEncRepository;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.security.NCIDetailsEnc;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +16,13 @@ public class NCIDetailsService {
 	NCIDetailsEncRepository nciEncRepository;
 	
 	@Autowired
-	ANVGLUserService userService;
+	PortalUserService userService;
 
 	@Lazy
     @Autowired
 	private VGLCryptoService encryptionService;
 	
-	public NCIDetails getByUser(ANVGLUser user) throws PortalServiceException {
+	public NCIDetails getByUser(PortalUser user) throws PortalServiceException {
 		NCIDetailsEnc encRes = nciEncRepository.findByUser(user);
         NCIDetails res = new NCIDetails();
         if(encRes != null) {
@@ -59,7 +59,7 @@ public class NCIDetailsService {
         this.encryptionService=encryptionService;
     }
     
-    public NCIDetails getByUser(ANVGLUser user) throws PortalServiceException {
+    public NCIDetails getByUser(PortalUser user) throws PortalServiceException {
         List<?> resList = getHibernateTemplate().findByNamedParam("from NCIDetailsEnc d where d.user =:p", "p", user);
         if(resList.isEmpty()) return null;
         NCIDetailsEnc encRes = (NCIDetailsEnc) resList.get(0);

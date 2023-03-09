@@ -6,7 +6,7 @@ import java.util.List;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.VEGLJobService;
@@ -83,7 +83,7 @@ public class TestVEGLJobManager extends PortalTestClass {
         final int seriesId = 1;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
         final List<VEGLJob> jobList = Arrays.asList(mockJob);
-        final ANVGLUser user = new ANVGLUser();
+        final PortalUser user = new PortalUser();
 
         context.checking(new Expectations() {{
             oneOf(mockJobService).getJobsOfSeries(seriesId, user);will(returnValue(jobList));
@@ -102,7 +102,7 @@ public class TestVEGLJobManager extends PortalTestClass {
         final int jobId1 = 1;
         final int jobId2 = 2;
         final VEGLJob mockJob = context.mock(VEGLJob.class);
-        final ANVGLUser user = new ANVGLUser();
+        final PortalUser user = new PortalUser();
         final NCIDetails nciDetails = new NCIDetails();
 
         nciDetails.setKey("mykey");

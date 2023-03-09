@@ -2,13 +2,13 @@ package org.auscope.portal.server.web.repositories;
 
 import java.util.List;
 
-import org.auscope.portal.server.vegl.VGLJobPurchase;
+import org.auscope.portal.server.bookmark.BookMark;
 import org.auscope.portal.server.web.security.PortalUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VGLJobPurchaseRepository extends JpaRepository<VGLJobPurchase, Integer> {
+public interface BookMarkRepository extends JpaRepository<BookMark, Integer> {
 
-	List<VGLJobPurchase> findByParent(PortalUser user);
+	List<BookMark> findByParent(PortalUser user);
 }

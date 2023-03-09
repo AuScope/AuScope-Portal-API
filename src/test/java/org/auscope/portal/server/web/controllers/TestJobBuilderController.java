@@ -36,10 +36,10 @@ import org.auscope.portal.server.vegl.VglDownload;
 import org.auscope.portal.server.vegl.VglMachineImage;
 import org.auscope.portal.server.vegl.VglParameter;
 import org.auscope.portal.server.vegl.mail.JobMailSender;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.ScmEntryService;
@@ -72,10 +72,10 @@ public class TestJobBuilderController {
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
     private HttpSession mockSession;
-    private ANVGLUser mockPortalUser;
+    private PortalUser mockPortalUser;
     private VGLJobStatusChangeHandler vglJobStatusChangeHandler;
     private CloudSubmissionService mockCloudSubmissionService;
-    private ANVGLUserService mockUserService;
+    private PortalUserService mockUserService;
     private ANVGLProvenanceService mockAnvglProvenanceService;
     private ANVGLFileStagingService mockFileStagingService;
     
@@ -90,7 +90,7 @@ public class TestJobBuilderController {
     private final String vmSh = "http://example2.org";
     private final String vmShutdownSh = "http://example2.org";
 
-    private ANVGLUser user;
+    private PortalUser user;
     private VEGLJob job;
     private final String jobId = "123";
     private final String userId = "456";
@@ -103,7 +103,7 @@ public class TestJobBuilderController {
         //Mock objects required for Object Under Test
         mockJobManager = context.mock(VEGLJobManager.class);
         mockFileStagingService = context.mock(ANVGLFileStagingService.class);
-        mockPortalUser = context.mock(ANVGLUser.class);
+        mockPortalUser = context.mock(PortalUser.class);
         mockCloudStorageServices = new CloudStorageServiceJClouds[] {context.mock(CloudStorageServiceJClouds.class)};
         mockCloudComputeServices = new CloudComputeService[] {context.mock(CloudComputeService.class)};
         mockRequest = context.mock(HttpServletRequest.class);
@@ -116,7 +116,7 @@ public class TestJobBuilderController {
         mockJobMailSender = context.mock(JobMailSender.class);
         mockVGLJobStatusAndLogReader = context.mock(VGLJobStatusAndLogReader.class);
         
-        mockUserService = context.mock(ANVGLUserService.class);
+        mockUserService = context.mock(PortalUserService.class);
 
         mockAnvglProvenanceService = context.mock(ANVGLProvenanceService.class);
         mockScmEntryService = context.mock(ScmEntryService.class);
@@ -145,7 +145,7 @@ public class TestJobBuilderController {
                                      mockCloudSubmissionService);
                                      //mockNciDetailsDao);
 
-        user = new ANVGLUser();
+        user = new PortalUser();
         user.setEmail("user@example.com");
         user.setId(userId);
         job = new VEGLJob();
@@ -1412,7 +1412,7 @@ public class TestJobBuilderController {
 
         context.checking(new Expectations() {{
             allowing(mockPortalUser).getEmail();will(returnValue(user.getEmail()));
-            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), new ANVGLUser());will(returnValue(mockJob));
+            oneOf(mockJobManager).getJobById(Integer.parseInt(jobId), new PortalUser());will(returnValue(mockJob));
             oneOf(mockJobManager).querySeries(user.getEmail(),folderName, null);will(returnValue(series));
 
         }});
