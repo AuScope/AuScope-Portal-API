@@ -596,8 +596,7 @@ public class JobBuilderController extends BaseCloudController {
     @RequestMapping("/secure/updateJobSeries.do")
     public ModelAndView updateJobSeries(@RequestParam(value="id", required=true) Integer id,  //The integer ID if not specified will trigger job creation
             @RequestParam(value="folderName", required=true) String folderName, //Name of the folder to move to
-            HttpServletRequest request/*,
-            @AuthenticationPrincipal ANVGLUser user*/) {
+            HttpServletRequest request) {
     	PortalUser user = userService.getLoggedInUser();
         //Get our job
         VEGLJob job = null;
