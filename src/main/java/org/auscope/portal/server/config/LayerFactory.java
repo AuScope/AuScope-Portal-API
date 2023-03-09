@@ -267,6 +267,9 @@ public class LayerFactory {
                         case "order":
                             layer.setOrder(value);
                             break;
+                        case "legendImg":
+                        	layer.setLegendImg(value);
+                        	break;
                         case "stackdriverServiceGroup":
                             layer.setStackdriverServiceGroup(value);
                             break;
