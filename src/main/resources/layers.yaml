@@ -183,8 +183,8 @@
 
 # CSIRO Mafic-Ultramafic Geochemical Data Collection
 "csiro-maf-geochem":
-        name: "Mafic-Ultramafic Geochemical Data Collection"
-        group: "CSIRO Mafic-Ultramafic Geochemical Data"
+        name: "CSIRO Mafic-Ultramafic Geochemical Data Collection"
+        group: "Geochemistry"
         description: "The CSIRO mafic-ultramafic package includes whole-rock geochemical data and mineral chemistry data collected from CSIRO research projects from the mid-1980s to 2021."
         order: "405"
         supportsCsvDownloads: true
