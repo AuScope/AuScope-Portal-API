@@ -73,7 +73,7 @@ import org.auscope.portal.server.web.CatalogServicesHealthIndicator;
 import org.auscope.portal.server.web.SearchHttpServiceCaller;
 import org.auscope.portal.server.web.service.ANVGLFileStagingService;
 import org.auscope.portal.server.web.service.ANVGLProvenanceService;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.VGLCryptoService;
@@ -176,7 +176,7 @@ public class AppContext {
         private VEGLJobManager jobManager;
 
         @Autowired
-        private ANVGLUserService userService;
+        private PortalUserService userService;
         
         @Autowired
         private NCIDetailsService nciDetailsService;

@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.auscope.portal.server.web.repositories.ANVGLUserRepository;
-import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
-import org.auscope.portal.server.web.service.ANVGLUserDetailsService;
+import org.auscope.portal.server.web.repositories.PortalUserRepository;
+import org.auscope.portal.server.web.security.PortalUser.AuthenticationFramework;
+import org.auscope.portal.server.web.service.PortalUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,13 +30,13 @@ import org.springframework.web.client.RestTemplate;
  *
  */
 @Service
-public class VGLOAuth2UserService extends DefaultOAuth2UserService {
+public class PortalOAuth2UserService extends DefaultOAuth2UserService {
 
     @Autowired
-    private ANVGLUserRepository userRepository;
+    private PortalUserRepository userRepository;
 	
 	@Autowired
-	ANVGLUserDetailsService userDetailsService;
+	PortalUserDetailsService userDetailsService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -72,7 +72,7 @@ public class VGLOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
-        VGLOAuth2UserInfo oAuth2UserInfo = VGLOAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getClientName(), oAuth2User.getAttributes());
+        PortalOAuth2UserInfo oAuth2UserInfo = PortalOAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getClientName(), oAuth2User.getAttributes());
         String email = "";
         if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             email = requestEmailAddressFromGithub(oAuth2UserRequest, oAuth2User.getAttributes());
@@ -80,29 +80,29 @@ public class VGLOAuth2UserService extends DefaultOAuth2UserService {
         	email = oAuth2UserInfo.getEmail();
         }
         // Note, this would be findById except we're not persisting authentication framework used to first log in
-        ANVGLUser user = userRepository.findByEmail(email);
+        PortalUser user = userRepository.findByEmail(email);
         if (user != null) {
         	// Reimplement this if we want to overwrite Google login with same email address, but might change name
 	        //user = updateExistingUser(user, oAuth2UserInfo);
         } else {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo, email);
         }
-        return VGLUserPrincipal.create(user);
+        return PortalUserPrincipal.create(user);
     }
 
-    private ANVGLUser registerNewUser(OAuth2UserRequest oAuth2UserRequest, VGLOAuth2UserInfo oAuth2UserInfo, String email) {
+    private PortalUser registerNewUser(OAuth2UserRequest oAuth2UserRequest, PortalOAuth2UserInfo oAuth2UserInfo, String email) {
     	Map<String, String> attributes = new HashMap<String, String>();
     	attributes.put("name", oAuth2UserInfo.getName());
     	attributes.put("email", email);
     	final AuthenticationFramework authFramework = oAuth2UserRequest.getClientRegistration().getClientName().equalsIgnoreCase("github") ?
     			AuthenticationFramework.GITHUB : AuthenticationFramework.GOOGLE;
-    	ANVGLUser user = userDetailsService.createNewUser(oAuth2UserInfo.getId(), authFramework, attributes);
+    	PortalUser user = userDetailsService.createNewUser(oAuth2UserInfo.getId(), authFramework, attributes);
     	return user;
     }
 
     /*
     // Reimplement this if we want to overwrite Google login with same email address
-    private ANVGLUser updateExistingUser(ANVGLUser existingUser, VGLOAuth2UserInfo oAuth2UserInfo) {
+    private PortalUser updateExistingUser(PortalUser existingUser, VGLOAuth2UserInfo oAuth2UserInfo) {
         existingUser.setFullName(oAuth2UserInfo.getName());
         return userRepository.save(existingUser);
     }

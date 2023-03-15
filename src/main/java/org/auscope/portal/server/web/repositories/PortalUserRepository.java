@@ -1,14 +1,14 @@
 package org.auscope.portal.server.web.repositories;
 
-import java.util.List;
-
-import org.auscope.portal.server.vegl.VGLJobPurchase;
 import org.auscope.portal.server.web.security.PortalUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface VGLJobPurchaseRepository extends JpaRepository<VGLJobPurchase, Integer> {
 
-	List<VGLJobPurchase> findByParent(PortalUser user);
+@Repository
+public interface PortalUserRepository extends JpaRepository<PortalUser, String> {
+
+    PortalUser findByEmail(String email);
+    boolean existsByEmail(String email);
+    PortalUser findByFullName(String fullName);
 }

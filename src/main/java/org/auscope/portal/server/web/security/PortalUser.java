@@ -15,20 +15,20 @@ import javax.persistence.Transient;
 
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
-import org.auscope.portal.server.vegl.VGLBookMark;
+import org.auscope.portal.server.bookmark.BookMark;
 import org.auscope.portal.server.web.controllers.BaseCloudController;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * Represents a persisted ANVGLUser
+ * Represents a persisted PortalUser
  * @author Josh Vote (CSIRO)
  *
  */
 @Entity
 @Table(name = "users")
-public class ANVGLUser implements UserDetails {
+public class PortalUser implements UserDetails {
 
 	private static final long serialVersionUID = -8923427161200232245L;
 
@@ -41,7 +41,7 @@ public class ANVGLUser implements UserDetails {
     private String email;
     
     @OneToMany(mappedBy = "parent", cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<ANVGLAuthority> authorities;
+    private List<PortalAuthority> authorities;
     
     private String arnExecution;
     private String arnStorage;
@@ -57,15 +57,15 @@ public class ANVGLUser implements UserDetails {
     
     /** A List of book marks associated with the user */
     @OneToMany(mappedBy = "parent",	cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<VGLBookMark> bookMarks;
+    private List<BookMark> bookMarks;
 
-    public ANVGLUser() {
+    public PortalUser() {
         this.authorities = new ArrayList<>();
         this.bookMarks =  new ArrayList<>();
     }
 
-    public ANVGLUser(String id, String fullName, String email,
-    		List<ANVGLAuthority> authorities, List<VGLBookMark> bookMarks) {
+    public PortalUser(String id, String fullName, String email,
+    		List<PortalAuthority> authorities, List<BookMark> bookMarks) {
         super();
         this.id = id;
         this.fullName = fullName;
@@ -197,21 +197,21 @@ public class ANVGLUser implements UserDetails {
 		String fnStr = fullName == null ? "null" : fullName;
 		String authStr = authorities == null ? "null" : authorities.toString();
 		
-        return "ANVGLUser [id=" + strId + ", fullName=" + fnStr + ", authorities=" + authStr + "]";
+        return "PortalUser [id=" + strId + ", fullName=" + fnStr + ", authorities=" + authStr + "]";
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return (authorities != null) ? authorities : new ArrayList<ANVGLAuthority>();
+        return (authorities != null) ? authorities : new ArrayList<PortalAuthority>();
     }
 
-    public void setAuthorities(List<ANVGLAuthority> authorities) {
+    public void setAuthorities(List<PortalAuthority> authorities) {
     	if(this.authorities == null) {
     		this.authorities = authorities;
     	} else {
 	        this.authorities.clear();
 	        if(authorities != null) {
-		        for (ANVGLAuthority auth : authorities) {
+		        for (PortalAuthority auth : authorities) {
 		            auth.setParent(this);
 		            this.authorities.add(auth);
 		        }
@@ -256,8 +256,8 @@ public class ANVGLUser implements UserDetails {
      * @return
      */
 
-	public List<VGLBookMark> getBookMarks() {
-		return (bookMarks != null) ? bookMarks : new ArrayList<VGLBookMark>();
+	public List<BookMark> getBookMarks() {
+		return (bookMarks != null) ? bookMarks : new ArrayList<BookMark>();
 	}
 	
 	/**
@@ -265,12 +265,12 @@ public class ANVGLUser implements UserDetails {
 	 * @param bookMarks
 	 */
 
-	public void setBookMarks(List<VGLBookMark> bookMarks) {
+	public void setBookMarks(List<BookMark> bookMarks) {
 		if(this.bookMarks == null) {
 			this.bookMarks = bookMarks;
 		} else {
 			this.bookMarks.clear();
-			for (VGLBookMark bookmark : bookMarks) {
+			for (BookMark bookmark : bookMarks) {
 				bookmark.setParent(this);
 				this.bookMarks.add(bookmark);
 	        }
@@ -278,7 +278,7 @@ public class ANVGLUser implements UserDetails {
 	}
 
     /**
-     * Returns true iff this ANVGLUser instance has accepted the latest version of the terms and conditions.
+     * Returns true iff this PortalUser instance has accepted the latest version of the terms and conditions.
      */
     // Carsten VGL-208: this method can not be named isAcceptedTermsConditions() or hasAcceptedTermsConditions()
     //                  as this can non-deterministicly cause hibernate to think it is a boolean - which causes all kinds of
@@ -291,7 +291,7 @@ public class ANVGLUser implements UserDetails {
     }
 
     /**
-     * Returns true iff this ANVGLUser instance has at least 1 compute service
+     * Returns true iff this PortalUser instance has at least 1 compute service
      * which has been properly configured.
      *
      * @param nciDetailsService

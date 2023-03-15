@@ -7,7 +7,7 @@ import org.auscope.portal.server.vegl.VGLDataPurchase;
 import org.auscope.portal.server.vegl.VGLJobPurchase;
 import org.auscope.portal.server.web.repositories.VGLDataPurchaseRepository;
 import org.auscope.portal.server.web.repositories.VGLJobPurchaseRepository;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class VGLPurchaseService {
      * Retrieves the data purchases for a user
      * @param user 
      */
-    public List<VGLDataPurchase> getDataPurchasesByUser(final ANVGLUser user) {
+    public List<VGLDataPurchase> getDataPurchasesByUser(final PortalUser user) {
     	return dataPurchaseRepository.findByParentOrderByDateDesc(user);
     }
     
@@ -42,7 +42,7 @@ public class VGLPurchaseService {
      * Retrieves the data purchases for a user
      * @param user 
      */
-    public List<VGLJobPurchase> getJobPurchasesByUser(final ANVGLUser user) {
+    public List<VGLJobPurchase> getJobPurchasesByUser(final PortalUser user) {
         return jobPurchaseRepository.findByParent(user);
     }
     

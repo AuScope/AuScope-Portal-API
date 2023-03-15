@@ -13,7 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -78,7 +78,7 @@ public class VGLDataPurchase implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private ANVGLUser parent;
+    private PortalUser parent;
     
     public VGLDataPurchase() {
         super();
@@ -86,7 +86,7 @@ public class VGLDataPurchase implements Serializable {
     
     public VGLDataPurchase(Date date, Float amount, String downloadUrl, String cswRecord, String onlineResourceType, String url, String localPath, String name, String description, 
             Double northBoundLatitude, Double southBoundLatitude, Double eastBoundLongitude, Double westBoundLongitude, String paymentRecord, 
-            ANVGLUser user) {
+            PortalUser user) {
         super();
         this.date = date;
         this.amount = amount;
@@ -229,7 +229,7 @@ public class VGLDataPurchase implements Serializable {
      * User that made the purchases
      * @return
      */
-    public ANVGLUser getParent() {
+    public PortalUser getParent() {
         return parent;
     }
 
@@ -237,7 +237,7 @@ public class VGLDataPurchase implements Serializable {
      * User that made the purchases
      * @param parent
      */
-    public void setParent(ANVGLUser parent) {
+    public void setParent(PortalUser parent) {
         this.parent = parent;
     }
    

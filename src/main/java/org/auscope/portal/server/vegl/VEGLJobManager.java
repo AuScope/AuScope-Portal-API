@@ -7,7 +7,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.PortalServiceException;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.security.NCIDetails;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.auscope.portal.server.web.service.VEGLJobService;
@@ -43,12 +43,12 @@ public class VEGLJobManager {
     	return seriesService.query(user, name, desc);
     }
 
-    public List<VEGLJob> getSeriesJobs(int seriesId, ANVGLUser user) throws PortalServiceException {
+    public List<VEGLJob> getSeriesJobs(int seriesId, PortalUser user) throws PortalServiceException {
     	List<VEGLJob> jobs = jobService.getJobsOfSeries(seriesId, user);
         return applyNCIDetails(jobs, user);
     }
 
-    public List<VEGLJob> getUserJobs(ANVGLUser user) throws PortalServiceException {
+    public List<VEGLJob> getUserJobs(PortalUser user) throws PortalServiceException {
     	List<VEGLJob> jobs = jobService.getJobsOfUser(user);
         return applyNCIDetails(jobs, user);
     }
@@ -61,7 +61,7 @@ public class VEGLJobManager {
     	return jobService.getInQueueJobs();
     }
 
-    public VEGLJob getJobById(int jobId, ANVGLUser user) throws PortalServiceException {
+    public VEGLJob getJobById(int jobId, PortalUser user) throws PortalServiceException {
     	return applyNCIDetails(jobService.get(jobId, user), user);
     }
 
@@ -179,14 +179,14 @@ public class VEGLJobManager {
         return job;
     }
 
-    private VEGLJob applyNCIDetails(VEGLJob job, ANVGLUser user) throws PortalServiceException {
+    private VEGLJob applyNCIDetails(VEGLJob job, PortalUser user) throws PortalServiceException {
         if (job == null) {
             return null;
         }
         return applyNCIDetails(job, nciDetailsService.getByUser(user));
     }
 
-    private List<VEGLJob> applyNCIDetails(List<VEGLJob> jobs, ANVGLUser user) throws PortalServiceException {
+    private List<VEGLJob> applyNCIDetails(List<VEGLJob> jobs, PortalUser user) throws PortalServiceException {
     	NCIDetails nciDetails = nciDetailsService.getByUser(user);
 
         if (nciDetails != null) {

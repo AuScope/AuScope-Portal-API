@@ -13,7 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -51,14 +51,14 @@ public class VGLJobPurchase implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private ANVGLUser parent;
+    private PortalUser parent;
     
     public VGLJobPurchase() {
         super();
     }
     
     public VGLJobPurchase(Date date, Float amount, Integer jobId, String jobName,
-           String paymentRecord, ANVGLUser user) {
+           String paymentRecord, PortalUser user) {
         super();
         this.date = date;
         this.amount = amount;
@@ -120,7 +120,7 @@ public class VGLJobPurchase implements Serializable {
      * User that made the purchases
      * @return
      */
-    public ANVGLUser getParent() {
+    public PortalUser getParent() {
         return parent;
     }
 
@@ -128,7 +128,7 @@ public class VGLJobPurchase implements Serializable {
      * User that made the purchases
      * @param parent
      */
-    public void setParent(ANVGLUser parent) {
+    public void setParent(PortalUser parent) {
         this.parent = parent;
     }
    

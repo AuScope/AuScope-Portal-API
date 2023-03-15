@@ -8,9 +8,9 @@ import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.core.services.cloud.monitor.JobStatusMonitor;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -35,7 +35,7 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
 
     private VEGLJobManager jobManager;
     private JobStatusMonitor jobStatusMonitor;
-    private ANVGLUserService jobUserService;
+    private PortalUserService jobUserService;
     private NCIDetailsService nciDetailsService;
     
     
@@ -44,7 +44,7 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
         this.nciDetailsService = nciDetailsService;
     }
 
-    public void setJobUserService(ANVGLUserService jobUserService) {
+    public void setJobUserService(PortalUserService jobUserService) {
         this.jobUserService = jobUserService;
     }
     
@@ -71,7 +71,7 @@ public class VGLJobStatusMonitor extends QuartzJobBean {
         try {
             List<VEGLJob> jobs = jobManager.getPendingOrActiveJobs();
             for (VEGLJob veglJob : jobs) {
-                ANVGLUser user = jobUserService.getByEmail(veglJob.getEmailAddress());
+                PortalUser user = jobUserService.getByEmail(veglJob.getEmailAddress());
                 veglJob.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
                 veglJob.setProperty(CloudJob.PROPERTY_CLIENT_SECRET, user.getAwsSecret());
                 NCIDetails nciDetails = nciDetailsService.getByUser(user);

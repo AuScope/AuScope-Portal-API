@@ -9,8 +9,8 @@ import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.web.controllers.JobBuilderController;
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.jmock.Expectations;
 import org.junit.Before;
@@ -28,7 +28,7 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
     private JobExecutionContext mockJobExecCtx;
     private VEGLJobManager mockJobManager;
     private JobStatusMonitor mockJobStatusMonitor;
-    private ANVGLUserService mockUserService;
+    private PortalUserService mockUserService;
     private NCIDetailsService mockNciService;
     
     @Before
@@ -37,7 +37,7 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
         mockJobExecCtx = context.mock(JobExecutionContext.class);
         mockJobManager = context.mock(VEGLJobManager.class);
         mockJobStatusMonitor = context.mock(JobStatusMonitor.class);
-        mockUserService = context.mock(ANVGLUserService.class);
+        mockUserService = context.mock(PortalUserService.class);
         mockNciService = context.mock(NCIDetailsService.class);
         
         //Component under test
@@ -64,7 +64,7 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
         job2.setStatus(JobBuilderController.STATUS_ACTIVE);
         
         final List<VEGLJob> pendingActiveJobs = Arrays.asList(job1, job2);
-        final ANVGLUser user = new ANVGLUser();
+        final PortalUser user = new PortalUser();
         
         context.checking(new Expectations() {{
             oneOf(mockJobManager).getPendingOrActiveJobs();will(returnValue(pendingActiveJobs));
@@ -92,7 +92,7 @@ public class TestVGLJobStatusMonitor extends PortalTestClass {
         job2.setStatus(JobBuilderController.STATUS_ACTIVE);
         
         final List<VEGLJob> pendingActiveJobs = Arrays.asList(job1, job2);
-        final ANVGLUser user = new ANVGLUser();
+        final PortalUser user = new PortalUser();
         
         context.checking(new Expectations() {{
             allowing(mockJobManager).getPendingOrActiveJobs();will(returnValue(pendingActiveJobs));

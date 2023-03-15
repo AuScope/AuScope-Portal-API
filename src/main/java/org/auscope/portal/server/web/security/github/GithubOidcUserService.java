@@ -2,10 +2,10 @@ package org.auscope.portal.server.web.security.github;
 
 import java.util.HashMap;
 
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
-import org.auscope.portal.server.web.service.ANVGLUserDetailsService;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.security.PortalUser.AuthenticationFramework;
+import org.auscope.portal.server.web.service.PortalUserDetailsService;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -25,10 +25,10 @@ import org.springframework.stereotype.Service;
 public class GithubOidcUserService extends OidcUserService {
 
 	@Autowired
-	private ANVGLUserService userService;
+	private PortalUserService userService;
 	
 	@Autowired
-	private ANVGLUserDetailsService userDetailsService;
+	private PortalUserDetailsService userDetailsService;
 
 	@Override
 	public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
@@ -42,7 +42,7 @@ public class GithubOidcUserService extends OidcUserService {
 
 	private OidcUser processOidcUser(OidcUserRequest userRequest, OidcUser oidcUser) {
 		GithubUserInfo githubUserInfo = new GithubUserInfo(oidcUser.getAttributes());
-		ANVGLUser userOptional = userService.getByEmail(githubUserInfo.getEmail());
+		PortalUser userOptional = userService.getByEmail(githubUserInfo.getEmail());
 		if (userOptional == null) {
 			createNewUser(githubUserInfo);
 		}
@@ -50,12 +50,12 @@ public class GithubOidcUserService extends OidcUserService {
 	}
 
 	/**
-	 * Create and persist an ANVGLUSer
+	 * Create and persist a PortalUser
 	 * 
 	 * @param githubUserInfo the Github info from which to build the user
-	 * @return an ANVGLUser created from the Github info
+	 * @return a PortalUser created from the Github info
 	 */
-	public ANVGLUser createNewUser(GithubUserInfo githubUserInfo) {
+	public PortalUser createNewUser(GithubUserInfo githubUserInfo) {
 		HashMap<String, String> userDetails = new HashMap<String, String>();
 		userDetails.put("name", githubUserInfo.getName());
 		userDetails.put("email", githubUserInfo.getEmail());

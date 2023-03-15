@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-public class VGLUserPrincipal implements OAuth2User, UserDetails {
+public class PortalUserPrincipal implements OAuth2User, UserDetails {
 	
 	private static final long serialVersionUID = -9084922278465837675L;
 	
@@ -20,18 +20,18 @@ public class VGLUserPrincipal implements OAuth2User, UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    public VGLUserPrincipal(String id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public PortalUserPrincipal(String id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
 
-    public static VGLUserPrincipal create(ANVGLUser user) {
+    public static PortalUserPrincipal create(PortalUser user) {
         List<GrantedAuthority> authorities = Collections.
                 singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
-        return new VGLUserPrincipal(
+        return new PortalUserPrincipal(
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
@@ -39,8 +39,8 @@ public class VGLUserPrincipal implements OAuth2User, UserDetails {
         );
     }
 
-    public static VGLUserPrincipal create(ANVGLUser user, Map<String, Object> attributes) {
-        VGLUserPrincipal userPrincipal = VGLUserPrincipal.create(user);
+    public static PortalUserPrincipal create(PortalUser user, Map<String, Object> attributes) {
+        PortalUserPrincipal userPrincipal = PortalUserPrincipal.create(user);
         userPrincipal.setAttributes(attributes);
         return userPrincipal;
     }

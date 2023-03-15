@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.auscope.portal.server.web.security.ANVGLAuthority;
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.security.ANVGLUser.AuthenticationFramework;
+import org.auscope.portal.server.web.security.PortalAuthority;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.security.PortalUser.AuthenticationFramework;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,37 +23,37 @@ import org.springframework.util.StringUtils;
  * @author woo392
  *
  */
-public class ANVGLUserDetailsService implements UserDetailsService {
+public class PortalUserDetailsService implements UserDetailsService {
 	
 	public static final int SECRET_LENGTH = 32;
 	private static char[] BUCKET_NAME_WHITELIST = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 	
 	@Autowired
-	private ANVGLUserService userService;
+	private PortalUserService userService;
 	
 	protected SecureRandom random;
 	protected String defaultRole;
 	protected Map<String, List<String>> rolesByUser;
 	
 	/**
-	 * Creates a new ANVGLUserDetalsService that will assign defaultRole to every
+	 * Creates a new PortalUserDetalsService that will assign defaultRole to every
 	 * user as a granted authority.
 	 *
 	 * @param defaultRole the default role to apply to the user
 	 */
-	public ANVGLUserDetailsService(String defaultRole) {
+	public PortalUserDetailsService(String defaultRole) {
 		this(defaultRole, null);
 	}
 
 	/**
-	 * Creates a new ANVGLUserDetailsService that will assign defaultRole to every
+	 * Creates a new PortalUserDetailsService that will assign defaultRole to every
 	 * user AND any authorities found in rolesByUser if the ID matches the current
 	 * user ID
 	 *
 	 * @param defaultRole the default role to apply to the user
 	 * @param rolesByUser a list of roles to apply the user
 	 */
-	public ANVGLUserDetailsService(String defaultRole, Map<String, List<String>> rolesByUser) {
+	public PortalUserDetailsService(String defaultRole, Map<String, List<String>> rolesByUser) {
 		this.defaultRole = defaultRole;
 		this.rolesByUser = new HashMap<>();
 		this.random = new SecureRandom();
@@ -79,15 +79,15 @@ public class ANVGLUserDetailsService implements UserDetailsService {
 	}
 	
 	/**
-	 * Create and persist an ANVGLUSer
+	 * Create and persist an PortalUser
 	 * 
 	 * @param googleUserInfo the Google info from which to build the user
-	 * @return an ANVGLUser created from the Google info
+	 * @return an PortalUser created from the Google info
 	 */
-	public ANVGLUser createNewUser(String id,
+	public PortalUser createNewUser(String id,
 			AuthenticationFramework authFramework,
 			Map<String, String> userDetails) {
-		ANVGLUser newUser = new ANVGLUser();
+		PortalUser newUser = new PortalUser();
 		newUser.setId(id);
 		newUser.setEmail(userDetails.get("email"));
 		newUser.setFullName(userDetails.get("name"));
@@ -101,15 +101,15 @@ public class ANVGLUserDetailsService implements UserDetailsService {
 			newUser.setS3Bucket(bucketName);
 		}
 		// Authorities
-		List<ANVGLAuthority> authorities = new ArrayList<>();
-		ANVGLAuthority defaultAuth = new ANVGLAuthority(defaultRole);
+		List<PortalAuthority> authorities = new ArrayList<>();
+		PortalAuthority defaultAuth = new PortalAuthority(defaultRole);
 		defaultAuth.setParent(newUser);
 		authorities.add(defaultAuth);
 		if (rolesByUser != null) {
 			List<String> additionalAuthorities = rolesByUser.get(newUser.getId());
 			if (additionalAuthorities != null) {
 				for (String authority : additionalAuthorities) {
-					ANVGLAuthority auth = new ANVGLAuthority(authority);
+					PortalAuthority auth = new PortalAuthority(authority);
 					auth.setParent(newUser);
 					authorities.add(auth);
 				}

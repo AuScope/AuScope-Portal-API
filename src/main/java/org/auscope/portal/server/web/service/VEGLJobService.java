@@ -4,7 +4,7 @@ import java.util.List;
 import org.auscope.portal.core.cloud.CloudJob;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.web.repositories.VEGLJobRepository;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.security.NCIDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,7 +24,7 @@ public class VEGLJobService {
      * @param seriesID the ID of the series
      * @param user
      */
-    public List<VEGLJob> getJobsOfSeries(final int seriesId, ANVGLUser user) {
+    public List<VEGLJob> getJobsOfSeries(final int seriesId, PortalUser user) {
         List<VEGLJob> res = jobRepository.findBySeriesIdAndEmail(seriesId, user.getEmail());
         for (VEGLJob job : res) {
             job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
@@ -41,7 +41,7 @@ public class VEGLJobService {
      * @param user
      * @return
      */
-    public List<VEGLJob> getJobsOfUser(ANVGLUser user) {
+    public List<VEGLJob> getJobsOfUser(PortalUser user) {
     	List<VEGLJob> res = jobRepository.findByEmail(user.getEmail());
         for (VEGLJob job : res) {
             job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
@@ -76,7 +76,7 @@ public class VEGLJobService {
      * Retrieves the job with given ID.
      * @param user
      */
-    public VEGLJob get(final int id, ANVGLUser user) {
+    public VEGLJob get(final int id, PortalUser user) {
     	VEGLJob job = jobRepository.findById(id).orElse(null);
         if(job != null) {
 	        job.setProperty(CloudJob.PROPERTY_STS_ARN, user.getArnExecution());
