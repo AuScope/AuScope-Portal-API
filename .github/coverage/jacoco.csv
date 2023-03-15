@@ -61,23 +61,25 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new 
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new IterableNamespace() {...},66,0,0,0,12,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.mscl,MSCLWFSService,110,0,4,0,18,0,7,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.vegl.mail,JobCompletionMailSender,27,333,8,8,9,72,13,14,5,14
-AuScope-Portal-API,org.auscope.portal.server.web.security,VEGLSecurityConfig.new AuthenticationFailureHandler() {...},18,0,0,0,3,0,2,0,2,0
-AuScope-Portal-API,org.auscope.portal.server.web.security,ANVGLUser.AuthenticationFramework,21,0,0,0,1,0,1,0,1,0
-AuScope-Portal-API,org.auscope.portal.server.web.security,VGLOAuth2UserInfoFactory,35,0,4,0,6,0,4,0,2,0
-AuScope-Portal-API,org.auscope.portal.server.web.security,VGLOAuth2UserInfo,9,0,0,0,4,0,2,0,2,0
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalUser,238,30,26,0,65,11,44,6,31,6
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalOAuth2UserService,164,0,8,0,35,0,9,0,5,0
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalAuthority,40,0,0,0,17,0,9,0,9,0
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalOAuth2UserInfoFactory,35,0,4,0,6,0,4,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.security,NCIDetailsEnc,38,0,0,0,17,0,11,0,11,0
-AuScope-Portal-API,org.auscope.portal.server.web.security,ANVGLUser,238,30,26,0,65,11,44,6,31,6
-AuScope-Portal-API,org.auscope.portal.server.web.security,VEGLSecurityConfig,158,0,0,0,43,0,8,0,8,0
 AuScope-Portal-API,org.auscope.portal.server.web.security,NCIDetails,14,43,0,0,6,15,4,8,4,8
-AuScope-Portal-API,org.auscope.portal.server.web.security,ANVGLAuthority,40,0,0,0,17,0,9,0,9,0
-AuScope-Portal-API,org.auscope.portal.server.web.security,VGLUserPrincipal,74,0,0,0,28,0,15,0,15,0
-AuScope-Portal-API,org.auscope.portal.server.web.security,VGLOAuth2UserService,164,0,8,0,35,0,9,0,5,0
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalSecurityConfig,158,0,0,0,43,0,8,0,8,0
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalUser.AuthenticationFramework,21,0,0,0,1,0,1,0,1,0
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalSecurityConfig.new AuthenticationFailureHandler() {...},18,0,0,0,3,0,2,0,2,0
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalOAuth2UserInfo,9,0,0,0,4,0,2,0,2,0
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalUserPrincipal,74,0,0,0,28,0,15,0,15,0
 AuScope-Portal-API,org.auscope.portal.service.colorcoding,CapdfHydroChemColorCoding,21,0,0,0,6,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.service.colorcoding,ColorCodingConfig,179,0,4,0,32,0,10,0,8,0
 AuScope-Portal-API,org.auscope.portal.service.colorcoding,CapdfHydroChemColorCoding.ColorCoding,68,0,0,0,14,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.service.colorcoding,ColorCodingConfig.COLOR,377,0,0,0,11,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers.sessonobject,StringArrayToCustomRegistry.CustomRegistry,112,0,12,0,27,0,17,0,11,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers.sessonobject,StringArrayToCustomRegistry,9,0,0,0,2,0,2,0,2,0
+AuScope-Portal-API,org.auscope.portal.server.bookmark,BookMarkDownload,86,0,0,0,38,0,24,0,24,0
+AuScope-Portal-API,org.auscope.portal.server.bookmark,BookMark,96,0,8,0,33,0,17,0,13,0
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,Commodity,60,142,4,0,13,30,3,4,1,4
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrenceFilter,185,457,35,63,27,85,33,26,1,8
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrenceFilter.MeasureTypes,0,33,0,0,0,2,0,1,0,1
@@ -91,7 +93,7 @@ AuScope-Portal-API,org.auscope.portal.mineraloccurrence,CommodityFilter,40,0,2,0
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralTenementCCFilter,36,0,8,0,8,0,6,0,2,0
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MiningActivityFilter,19,157,1,13,4,42,2,9,1,3
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,CommodityVocabMethodMaker,45,0,0,0,8,0,3,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.web.service,ANVGLUserDetailsService,164,44,13,1,37,10,10,4,3,4
+AuScope-Portal-API,org.auscope.portal.server.web.service,PortalUserDetailsService,164,44,13,1,37,10,10,4,3,4
 AuScope-Portal-API,org.auscope.portal.server.web.service,ErmlVocabService,30,101,4,10,9,29,4,6,1,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,SeismicSurveyWMSService,0,52,0,0,0,14,0,2,0,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,ScriptBuilderService,3,100,0,2,1,25,1,5,1,4
@@ -107,7 +109,6 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService.Dataset
 AuScope-Portal-API,org.auscope.portal.server.web.service,SF0BoreholeService,43,52,0,2,8,10,4,3,4,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,TemplateLintService,314,0,20,0,73,0,14,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GeologicalProvincesService,29,0,2,0,9,0,4,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.web.service,VGLBookMarkService,41,0,0,0,11,0,7,0,7,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GenericService,28,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,VGLPurchaseService,31,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,CloudSubmissionService,65,112,2,0,15,25,6,8,5,8
@@ -116,6 +117,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,VGLJobAuditLogService,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,BoreholeService.Mark,56,0,0,0,11,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,ANVGLFileStagingService,27,0,0,0,8,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,VEGLJobService,208,0,20,0,40,0,19,0,9,0
+AuScope-Portal-API,org.auscope.portal.server.web.service,PortalUserService,69,0,4,0,19,0,9,0,7,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,RemanentAnomaliesAutoSearchService,27,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,LintResult,37,0,0,0,14,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,MineralOccurrenceService,71,0,2,0,15,0,7,0,6,0
@@ -128,8 +130,8 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,SimpleFeatureProperty,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,SimpleWfsService,76,103,4,2,16,22,5,3,3,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,SolutionResponse,27,0,0,0,8,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,ANVGLProvenanceService,446,355,27,9,84,64,18,12,2,10
-AuScope-Portal-API,org.auscope.portal.server.web.service,ANVGLUserService,69,0,4,0,19,0,9,0,7,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,MineralTenementService,42,0,2,0,12,0,5,0,4,0
+AuScope-Portal-API,org.auscope.portal.server.web.service,BookMarkService,41,0,0,0,11,0,7,0,7,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,AuScopeWMSService,180,0,18,0,34,0,11,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,CloudSubmissionService.SubmissionRunnable,65,292,2,10,8,57,2,6,0,2
 AuScope-Portal-API,org.auscope.portal.server.web.service.download,MineralOccurrenceDownloadService,19,0,2,0,7,0,3,0,2,0
@@ -151,9 +153,7 @@ AuScope-Portal-API,org.auscope.portal.server,MineralTenementServiceProviderType,
 AuScope-Portal-API,org.auscope.portal.server,PortalApplication,16,0,0,0,6,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server,CORSAdvice,43,0,0,0,11,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server,Initializer,10,47,1,5,3,14,1,5,0,3
-AuScope-Portal-API,org.auscope.portal.server.vegl,VGLBookMarkDownload,86,0,0,0,38,0,24,0,24,0
 AuScope-Portal-API,org.auscope.portal.server.vegl,VGLJobStatusAndLogReader,114,426,22,53,23,103,22,25,2,7
-AuScope-Portal-API,org.auscope.portal.server.vegl,VGLBookMark,96,0,8,0,33,0,17,0,13,0
 AuScope-Portal-API,org.auscope.portal.server.vegl,VLScmSnapshot,37,0,0,0,17,0,10,0,10,0
 AuScope-Portal-API,org.auscope.portal.server.vegl,VglParameter.ParameterType,0,15,0,0,0,3,0,1,0,1
 AuScope-Portal-API,org.auscope.portal.server.vegl,VGLDataPurchase,163,0,0,0,67,0,34,0,34,0
