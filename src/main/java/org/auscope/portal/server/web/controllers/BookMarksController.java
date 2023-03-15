@@ -37,14 +37,13 @@ public class BookMarksController extends BasePortalController {
     }
 
     /**
-     * adds a dataset as a book mark. Uses fileIdentifier and service id from csw record. 
+     * Adds a dataset as a book mark. Uses fileIdentifier and service id from CSW record.
      * @param fileIdentifier
      * @param serviceId
-     * @param user
      * @return
      * @throws PortalServiceException
      */
-	@RequestMapping("/addBookMark.do")
+	@RequestMapping("/secure/addBookMark.do")
     public ModelAndView addBookMark(@RequestParam(value="fileIdentifier") String fileIdentifier,
             @RequestParam(value="serviceId") String serviceId) throws PortalServiceException {
 		PortalUser user = userService.getLoggedInUser();
@@ -56,29 +55,26 @@ public class BookMarksController extends BasePortalController {
 		Integer id = bookmarkService.saveBookmark(bookMark);        
         return generateJSONResponseMAV(true, id, "");
     }
+
 	/**
 	 * Retrieves book information for a user.
-	 * @param user
 	 * @return
 	 * @throws PortalServiceException
 	 */
-	
-	@RequestMapping("/getBookMarks.do")
+	@RequestMapping("/secure/getBookMarks.do")
 	public ModelAndView getbookMarks() throws PortalServiceException {
 		PortalUser user = userService.getLoggedInUser();
 		List<BookMark> bookMarks = bookmarkService.getBookmarkByUser(user);
 		return generateJSONResponseMAV(true, bookMarks, "");
 	}
-	
+
 	/**
-	 * removes a book mark. Uses fileIdentifier and service id from csw record. 
-	 * @param fileIdentifier
-	 * @param serviceId
-	 * @param user
+	 * Removes a book mark.
+	 * @param id
 	 * @return
 	 * @throws PortalServiceException
 	 */
-	@RequestMapping("/deleteBookMark.do")
+	@RequestMapping("/secure/deleteBookMark.do")
 	public ModelAndView deleteBookMark(@RequestParam(value="id") Integer id) throws PortalServiceException {
 		PortalUser user = userService.getLoggedInUser();
 		BookMark bookMark = new BookMark();
@@ -87,31 +83,37 @@ public class BookMarksController extends BasePortalController {
 		bookmarkService.deleteBookmark(bookMark);
 		return generateJSONResponseMAV(true);
 	}
-		
+
 	/**
 	 * Retrieves download options stored for a book mark
-	 * @param bookMark
-	 * @param user
+	 * @param bookmarkId
 	 * @return
 	 * @throws PortalServiceException
 	 */
-	@RequestMapping("/getDownloadOptions.do")
+	@RequestMapping("/secure/getDownloadOptions.do")
     public ModelAndView getDownloadOptions(@RequestParam(value="bookmarkId") Integer bookmarkId) throws PortalServiceException {
 		BookMark bookmark = new BookMark();
 		bookmark.setId(bookmarkId);
 		List<BookMarkDownload> bookMarkDownloads = bookmarkService.getBookmarkDownloadsByBookMark(bookmark);		 
-		return generateJSONResponseMAV(true, bookMarkDownloads, "");
-		
+		return generateJSONResponseMAV(true, bookMarkDownloads, "");	
     }
-	
+
 	/**
 	 * Adds the download options for a book mark
-	 * @param bookMark
-	 * @param user
+	 * @param bookmarkId
+	 * @param bookmarkOptionName
+	 * @param url
+	 * @param localPath
+	 * @param name
+	 * @param description
+	 * @param northBoundLatitude
+	 * @param eastBoundLongitude
+	 * @param southBoundLatitude
+	 * @param westBoundLongitude
 	 * @return
 	 * @throws PortalServiceException
 	 */
-	@RequestMapping("/saveDownloadOptions.do")
+	@RequestMapping("/secure/saveDownloadOptions.do")
     public ModelAndView saveDownloadOptions(@RequestParam(value="bookmarkId") Integer bookmarkId,
 			@RequestParam(value="bookmarkOptionName") String bookmarkOptionName,    		
             @RequestParam(value="url") final String url,
@@ -140,16 +142,14 @@ public class BookMarksController extends BasePortalController {
 		Integer id = bookmarkService.saveBookmarkDownload(bookMarkDownload);
         return generateJSONResponseMAV(true, id, "");
     }
-	
+
 	/**
-	 * removes a download option stored as a book mark for the user.  
-	 * @param fileIdentifier
-	 * @param serviceId
-	 * @param user
+	 * Removes a download option stored as a book mark for the user.
+	 * @param id
 	 * @return
 	 * @throws PortalServiceException
 	 */
-	@RequestMapping("/deleteDownloadOptions.do")
+	@RequestMapping("/secure/deleteDownloadOptions.do")
 	public ModelAndView deleteDownloadOptions(@RequestParam(value="id") Integer id) throws PortalServiceException {
 		BookMarkDownload bookMarkDownload = new BookMarkDownload();	
 		bookMarkDownload.setId(id);
