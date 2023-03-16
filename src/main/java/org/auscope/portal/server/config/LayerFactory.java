@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.auscope.portal.core.uifilter.AbstractBaseFilter;
@@ -23,6 +25,7 @@ import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.view.knownlayer.WFSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSWFSSelector;
+import org.auscope.portal.core.view.knownlayer.KMLSelector;
 import org.auscope.portal.view.knownlayer.IRISSelector;
 
 /**
@@ -30,6 +33,9 @@ import org.auscope.portal.view.knownlayer.IRISSelector;
 *
 */
 public class LayerFactory {
+
+    /* Used for ogging exceptions */
+    private final Log log = LogFactory.getLog(getClass());
 
     private boolean layersLoaded = false;
 
@@ -166,9 +172,21 @@ public class LayerFactory {
         try {
             return new IRISSelector(networkCode, serviceEndPoint);
         } catch (MalformedURLException e) {
-            // TODO: Log exception??
+            log.error("Malformed URL for IRIS network code:" + networkCode + " and service point: " + serviceEndPoint);
         }
         return null;
+    }
+
+    /**
+     * knownTypeKMLSelector - The KMLSelector class provides functionality to determine the type of relationship,
+     *                         if any, that exists between a service endpoint and a CSWRecord.
+     *
+     * @param serviceEndpoint
+     *            The service endpoint that the instance of the selector is concerned with.
+     * @throws MalformedURLException
+     */
+    public KMLSelector knownTypeKMLSelector(String layerName) {
+            return new KMLSelector(layerName);
     }
 
     /**
@@ -249,6 +267,9 @@ public class LayerFactory {
                         case "order":
                             layer.setOrder(value);
                             break;
+                        case "legendImg":
+                        	layer.setLegendImg(value);
+                        	break;
                         case "stackdriverServiceGroup":
                             layer.setStackdriverServiceGroup(value);
                             break;
@@ -346,6 +367,17 @@ public class LayerFactory {
                             serviceEndPoint = attr[1];
                             // System.out.println("\tiris: "+networkCode+", "+serviceEndPoint);
                             layer.setKnownLayerSelector(knownTypeIRISSelector(networkCode, serviceEndPoint));
+                            break;
+                        }
+                        case "kml": {
+                            Map<String, Object> x = (Map<String, Object>) v1;
+                            for (Map.Entry<String, Object> entry : x.entrySet()) {
+                                if (entry.getKey().startsWith("selector")) {
+                                    String layerName = (String) entry.getValue();
+                                    layer.setKnownLayerSelector(knownTypeKMLSelector(layerName));
+                                    break;
+                                }
+                            }
                             break;
                         }
                         case "wms": {

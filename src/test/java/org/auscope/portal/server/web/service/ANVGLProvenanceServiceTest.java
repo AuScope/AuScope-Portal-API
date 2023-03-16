@@ -23,7 +23,7 @@ import org.auscope.portal.core.services.cloud.CloudStorageService;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VglDownload;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.jmock.Expectations;
 import org.junit.After;
 import org.junit.Before;
@@ -52,7 +52,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     final String PROMSURI = "http://ec2-54-213-205-234.us-west-2.compute.amazonaws.com/id/report/";
     final String mockUser = "jo@me.com";
     URI mockProfileUrl;
-    ANVGLUser mockPortalUser;
+    PortalUser mockPortalUser;
     
     List<VglDownload> downloads = new ArrayList<>();
     VEGLJob turtleJob;
@@ -85,7 +85,7 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
     @Before
     public void setUp() throws Exception {
         preparedJob = context.mock(VEGLJob.class);
-        mockPortalUser = context.mock(ANVGLUser.class);
+        mockPortalUser = context.mock(PortalUser.class);
         final CloudStorageService store = context.mock(CloudStorageService.class);
         final CloudStorageService[] storageServices = {store};
         final ANVGLFileStagingService fileServer = context.mock(ANVGLFileStagingService.class);

@@ -27,7 +27,7 @@ public class NCIDetailsEnc implements Serializable {
     private Integer id;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user")
-    private ANVGLUser user;
+    private PortalUser user;
     @Column(name="nci_username")
     private byte[] username;
     @Column(name="nci_project")
@@ -48,18 +48,18 @@ public class NCIDetailsEnc implements Serializable {
     }
 
     /**
-     * The associated ANVGLUSer
+     * The associated PortalUser
      * @return
      */
-    public ANVGLUser getUser() {
+    public PortalUser getUser() {
         return user;
     }
 
     /**
-     * The associated ANVGLUSer
+     * The associated PortalUser
      * @param user
      */
-    public void setUser(ANVGLUser user) {
+    public void setUser(PortalUser user) {
         this.user = user;
     }
 

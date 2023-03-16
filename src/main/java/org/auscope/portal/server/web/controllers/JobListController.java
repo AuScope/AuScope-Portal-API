@@ -48,8 +48,8 @@ import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.vegl.VGLJobAuditLog;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
 import org.auscope.portal.server.vegl.VglDownload;
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.CloudSubmissionService;
 import org.auscope.portal.server.web.service.VGLJobAuditLogService;
 import org.json.JSONArray;
@@ -92,7 +92,7 @@ public class JobListController extends BaseCloudController  {
     private JobStatusMonitor jobStatusMonitor;
     private CloudSubmissionService cloudSubmissionService;
     private VGLJobAuditLogService jobAuditLogService;
-    private ANVGLUserService userService;
+    private PortalUserService userService;
 
     private String adminEmail=null;
     
@@ -114,7 +114,7 @@ public class JobListController extends BaseCloudController  {
     @Autowired
     public JobListController(VEGLJobManager jobManager, CloudStorageService[] cloudStorageServices,
             FileStagingService fileStagingService, CloudComputeService[] cloudComputeServices,
-            ANVGLUserService userService, VGLJobStatusAndLogReader jobStatusLogReader,
+            PortalUserService userService, VGLJobStatusAndLogReader jobStatusLogReader,
             JobStatusMonitor jobStatusMonitor,
             @Value("${cloud.vm.sh}") String vmSh, @Value("${cloud.vm-shutdown.sh}") String vmShutdownSh,
             @Value("${portalAdminEmail}") String adminEmail,
@@ -168,7 +168,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView deleteJob(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         logger.info("Deleting job with ID " + jobId);
 
         VEGLJob job = attemptGetJob(jobId, user);
@@ -206,7 +206,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView deleteSeriesJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId) throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
             return generateJSONResponseMAV(false);
@@ -278,7 +278,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView killJob(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         logger.info("Cancelling job with ID "+jobId);
 
         VEGLJob job = attemptGetJob(jobId, user);
@@ -364,7 +364,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView killSeriesJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId) throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup series.");
@@ -408,7 +408,7 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/getCloudFileMetadata.do")
     public ModelAndView getCloudFileMetadata(@RequestParam("jobId") Integer jobId,
             @RequestParam("fileName") String fileName) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The requested job was not found.");
@@ -447,7 +447,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView jobCloudFiles(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The requested job was not found.");
@@ -481,7 +481,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView jobCloudDirectoriesAndFiles(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "The requested job was not found.");
@@ -520,7 +520,7 @@ public class JobListController extends BaseCloudController  {
             @RequestParam("jobId") Integer jobId,
             @RequestParam("filename") String fileName,
             @RequestParam("key") String key) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job object.");
@@ -573,7 +573,7 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @RequestParam("files") String filesParam) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Lookup our job and check input files
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -654,7 +654,7 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam(required=false, value="qSeriesName") String qName,
             @RequestParam(required=false, value="qSeriesDesc") String qDesc) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -684,7 +684,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView createFolder(HttpServletRequest request,
             @RequestParam("seriesName") String seriesName,
             @RequestParam("seriesDescription") String seriesDescription) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLSeries series = new VEGLSeries();
         series.setUser(user.getEmail());
         series.setName(seriesName);
@@ -715,7 +715,7 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam("seriesId") Integer seriesId,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh) throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLSeries series = attemptGetSeries(seriesId, user);
         if (series == null) {
             return generateJSONResponseMAV(false, null, "Unable to lookup job series.");
@@ -759,7 +759,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView setJobFolder(HttpServletRequest request,
             @RequestParam("jobIds") Integer[] jobIds,
             @RequestParam(required=false, value="seriesId") Integer seriesId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -793,7 +793,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView jobStatuses(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh) throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -839,7 +839,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView treeJobs(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam(required=false, value="forceStatusRefresh", defaultValue="false") boolean forceStatusRefresh) throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -943,7 +943,7 @@ public class JobListController extends BaseCloudController  {
             @RequestParam("sourceJobId") Integer sourceJobId,
             @RequestParam(required=false, value="fileKey") String[] fileKeys,
             @RequestParam(required=false, value="downloadId") Integer[] downloadIds) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLJob sourceJob = attemptGetJob(sourceJobId, user);
         VEGLJob targetJob = attemptGetJob(targetJobId, user);
 
@@ -1001,7 +1001,7 @@ public class JobListController extends BaseCloudController  {
             @RequestParam("jobId") Integer jobId,
             @RequestParam(required=false, value="file") String[] files) {
         logger.info("Duplicate a new job from job ID "+ jobId);
-        ANVGLUser user = userService.getLoggedInUser();
+        PortalUser user = userService.getLoggedInUser();
         //Lookup the job we are cloning
         VEGLJob oldJob;
         try {
@@ -1079,7 +1079,7 @@ public class JobListController extends BaseCloudController  {
     public ModelAndView getSectionedLogs(HttpServletRequest request,
             @RequestParam("jobId") Integer jobId,
             @RequestParam(value="file", required=false) String file) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Lookup the job whose logs we are accessing
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -1107,7 +1107,7 @@ public class JobListController extends BaseCloudController  {
     @RequestMapping("/secure/getRawInstanceLogs.do")
     public ModelAndView getRawInstanceLogs(HttpServletRequest request,
             @RequestParam("jobId") Integer jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Lookup the job whose logs we are accessing
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -1134,7 +1134,7 @@ public class JobListController extends BaseCloudController  {
             @RequestParam("jobId") Integer jobId,
             @RequestParam("file") String file,
             @RequestParam("maxSize") Integer maxSize) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
     	final int charactersPerMegabyte = 1048576;
         if (maxSize > 50 * charactersPerMegabyte) {
             maxSize = 50 * charactersPerMegabyte; //Don't allow us to burn GB's on previews
@@ -1171,7 +1171,7 @@ public class JobListController extends BaseCloudController  {
             HttpServletResponse response,
             @RequestParam("jobId") Integer jobId,
             @RequestParam("file") String file) throws Exception {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Lookup the job whose logs we are accessing
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -1201,7 +1201,7 @@ public class JobListController extends BaseCloudController  {
             @RequestParam("file") String file,
             @RequestParam("arrayPosition") Integer arrayPosition,
             @RequestParam("zip") Boolean zip) throws Exception {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         //Lookup the job whose logs we are accessing
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
@@ -1257,7 +1257,7 @@ public class JobListController extends BaseCloudController  {
      */
     @RequestMapping("/secure/getAuditLogsForJob.do")
     public ModelAndView getAuditLogsForJob(@RequestParam("jobId") Integer jobId) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         VEGLJob job = attemptGetJob(jobId, user);
         if (job == null) {
             return generateJSONResponseMAV(false,  null, "The specified job does not exist.");

@@ -21,8 +21,8 @@ import org.auscope.portal.core.services.CSWFilterService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.test.PortalTestClass;
 import org.auscope.portal.server.vegl.VGLDataPurchase;
-import org.auscope.portal.server.web.security.ANVGLUser;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.security.PortalUser;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.VGLPurchaseService;
 
@@ -43,7 +43,7 @@ public class TestPurchaseController extends PortalTestClass {
     private SimpleWfsService mockWfsService = context.mock(SimpleWfsService.class);
     private CSWFilterService mockCSWFilterService = context.mock(CSWFilterService.class);
     private HttpServletRequest mockRequest = context.mock(HttpServletRequest.class);
-    private ANVGLUserService mockUserService = context.mock(ANVGLUserService.class);
+    private PortalUserService mockUserService = context.mock(PortalUserService.class);
     private VGLPurchaseService mockPurchaseService = context.mock(VGLPurchaseService.class);
     
     private PurchaseController controller;
@@ -123,7 +123,7 @@ public class TestPurchaseController extends PortalTestClass {
      */
     @Test
     public void testGetPurchases() throws PortalServiceException {
-        final ANVGLUser user = new ANVGLUser();
+        final PortalUser user = new PortalUser();
         context.checking(new Expectations() {        	
             {
                 allowing(mockUserService).getLoggedInUser(); will(returnValue(user));

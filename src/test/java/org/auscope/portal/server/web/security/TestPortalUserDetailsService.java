@@ -3,13 +3,13 @@ package org.auscope.portal.server.web.security;
 import java.util.HashSet;
 
 import org.auscope.portal.core.test.PortalTestClass;
-import org.auscope.portal.server.web.service.ANVGLUserDetailsService;
+import org.auscope.portal.server.web.service.PortalUserDetailsService;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestANVGLUserDetailsService extends PortalTestClass {
+public class TestPortalUserDetailsService extends PortalTestClass {
 
-    private ANVGLUserDetailsService userDetailsService = new ANVGLUserDetailsService("TEST_DEFAULT");
+    private PortalUserDetailsService userDetailsService = new PortalUserDetailsService("TEST_DEFAULT");
 
     /**
      * Throwaway test to ensure that we get slightly random results (i.e. - noone completely stuffed the implementation) that are valid from Amazon's point of view.

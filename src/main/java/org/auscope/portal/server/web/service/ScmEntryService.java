@@ -25,7 +25,7 @@ import org.auscope.portal.server.vegl.VEGLJob;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VLScmSnapshot;
 import org.auscope.portal.server.web.repositories.VLScmSnapshotRepository;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.service.scm.Dependency;
 import org.auscope.portal.server.web.service.scm.Entries;
 import org.auscope.portal.server.web.service.scm.Entry;
@@ -121,10 +121,10 @@ public class ScmEntryService implements ScmLoader {
      *
      * @param jobId String job ID
      * @param solutionId String solution URL
-     * @param user Authenticated ANVGLUser
+     * @param user Authenticated PortalUser
      * @throws PortalServiceException
      */
-    public void updateJobForSolution(VEGLJob job, Set<String> solutions, ANVGLUser user)
+    public void updateJobForSolution(VEGLJob job, Set<String> solutions, PortalUser user)
             throws PortalServiceException {
         // Store the solutionId in the job
         job.setJobSolutions(solutions);
@@ -424,7 +424,7 @@ public class ScmEntryService implements ScmLoader {
      * @return Map<String, Set<String>> with images for job, or null.
      * @throws PortalServiceException
      */
-    public Map<String, Set<MachineImage>> getJobImages(Integer jobId, ANVGLUser user) throws PortalServiceException {
+    public Map<String, Set<MachineImage>> getJobImages(Integer jobId, PortalUser user) throws PortalServiceException {
         if (jobId == null) {
             return null;
         }
@@ -434,7 +434,7 @@ public class ScmEntryService implements ScmLoader {
         return getJobImages(job, user);
     }
     
-    public Map<String, Set<MachineImage>> getJobImages(VEGLJob job, ANVGLUser user) throws PortalServiceException {
+    public Map<String, Set<MachineImage>> getJobImages(VEGLJob job, PortalUser user) throws PortalServiceException {
         if (job == null) {
             return null;
         }               
@@ -442,7 +442,7 @@ public class ScmEntryService implements ScmLoader {
         return getJobImages(getJobSolutions(job), user);
     }
 
-    public Map<String, Set<MachineImage>> getJobImages(Collection<String> solutionIds, ANVGLUser user) throws PortalServiceException {
+    public Map<String, Set<MachineImage>> getJobImages(Collection<String> solutionIds, PortalUser user) throws PortalServiceException {
     	if (solutionIds == null) {
     		return null;
     	}
@@ -457,12 +457,12 @@ public class ScmEntryService implements ScmLoader {
      * provide for the solutions specified for the job.
      *  
      * @param solutions Set<Solution> solutions for the job in question
-     * @param user ANVGLUser currently logged in user
+     * @param user PortalUser currently logged in user
      * @return Map<String, Set<MachineImage>> mapping from compute service id to set of image(s) they can provide
      * @throws PortalServiceException
      */
     public Map<String, Set<MachineImage>> getJobImages(Set<Solution> solutions, 
-    												   ANVGLUser user) 
+    												   PortalUser user) 
     	throws PortalServiceException {
     	Map<String, Set<MachineImage>> images = new HashMap<>();
     	
@@ -494,7 +494,7 @@ public class ScmEntryService implements ScmLoader {
      * @return Set<String> of compute service ids for job, or null if jobId == null.
      * @throws PortalServiceException
      */
-    public Set<String> getJobProviders(Integer jobId, ANVGLUser user) throws PortalServiceException {
+    public Set<String> getJobProviders(Integer jobId, PortalUser user) throws PortalServiceException {
         Map<String, Set<MachineImage>> images = getJobImages(jobId, user);
         return (images != null) ? images.keySet() : null;
     }
@@ -504,7 +504,7 @@ public class ScmEntryService implements ScmLoader {
      * for running a job comprising the specified solutions.
      * 
      * @param solutionIds Collection<String> of ids for the job's solutions 
-     * @param user ANVGLUser with the current logged in user
+     * @param user PortalUser with the current logged in user
      * @return Set<String> of compute service id strings
      * @throws PortalServiceException
      */
@@ -547,11 +547,11 @@ public class ScmEntryService implements ScmLoader {
      * suitable for running a job comprising the specified solutions.
      * 
      * @param solutions Set<Solution> of solutions for the job in question
-     * @param user ANVGLUser currently logged in user
+     * @param user PortalUser currently logged in user
      * @return Set<String> of compute service ids
      * @throws PortalServiceException
      */
-    public Set<String> getJobProviders(Set<Solution> solutions, ANVGLUser user) throws PortalServiceException {
+    public Set<String> getJobProviders(Set<Solution> solutions, PortalUser user) throws PortalServiceException {
         Map<String, Set<MachineImage>> images = getJobImages(solutions, user);
         return (images != null) ? images.keySet() : null;
     }

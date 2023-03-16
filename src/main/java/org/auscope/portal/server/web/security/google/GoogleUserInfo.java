@@ -2,7 +2,7 @@ package org.auscope.portal.server.web.security.google;
 
 import java.util.Map;
 
-import org.auscope.portal.server.web.security.VGLOAuth2UserInfo;
+import org.auscope.portal.server.web.security.PortalOAuth2UserInfo;
 
 
 /**
@@ -11,7 +11,7 @@ import org.auscope.portal.server.web.security.VGLOAuth2UserInfo;
  * @author woo392
  *
  */
-public class GoogleUserInfo extends VGLOAuth2UserInfo {
+public class GoogleUserInfo extends PortalOAuth2UserInfo {
 
     public GoogleUserInfo(Map<String, Object> attributes) {
     	super(attributes);

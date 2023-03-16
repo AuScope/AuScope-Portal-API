@@ -17,9 +17,9 @@ import org.apache.velocity.app.VelocityEngine;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.cloud.CloudComputeService;
-import org.auscope.portal.server.web.security.ANVGLUser;
+import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.security.NCIDetails;
-import org.auscope.portal.server.web.service.ANVGLUserService;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ public class UserController extends BasePortalController {
     protected final Log logger = LogFactory.getLog(getClass());
 
     @Autowired
-    private ANVGLUserService userService;
+    private PortalUserService userService;
     
     @Autowired
     private NCIDetailsService nciDetailsService;
@@ -73,7 +73,7 @@ public class UserController extends BasePortalController {
      */
     @RequestMapping("/secure/getUser.do")
     public ModelAndView getUser() {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -103,7 +103,7 @@ public class UserController extends BasePortalController {
             @RequestParam(required=false, value="arnStorage") String arnStorage,
             @RequestParam(required=false, value="acceptedTermsConditions") Integer acceptedTermsConditions,
             @RequestParam(required=false, value="awsKeyName") String awsKeyName) {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -138,7 +138,7 @@ public class UserController extends BasePortalController {
 
     @RequestMapping("/getTermsConditions.do")
     public ModelAndView getTermsConditions() {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         try {
             String tcs = IOUtils.toString(this.getClass().getResourceAsStream("vl-termsconditions.html"), StandardCharsets.UTF_8);
 
@@ -158,7 +158,7 @@ public class UserController extends BasePortalController {
 
     @RequestMapping("/secure/getCloudFormationScript.do")
     public void getCloudFormationScript(HttpServletResponse response) throws IOException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             response.sendError(HttpStatus.UNAUTHORIZED.value());
             return;
@@ -186,7 +186,7 @@ public class UserController extends BasePortalController {
     
     @RequestMapping("/secure/getNCIDetails.do")
     public ModelAndView getNCIDetails() throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -210,7 +210,7 @@ public class UserController extends BasePortalController {
             @RequestParam(required=false, value="nciUsername") String username,
             @RequestParam(required=false, value="nciProject") String project,
             @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }
@@ -248,7 +248,7 @@ public class UserController extends BasePortalController {
     
     @RequestMapping("/secure/getHasConfiguredComputeServices.do")
     public ModelAndView getHasConfiguredComputeServices() throws PortalServiceException {
-    	ANVGLUser user = userService.getLoggedInUser();
+    	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
         }

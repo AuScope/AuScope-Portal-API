@@ -1,4 +1,4 @@
-package org.auscope.portal.server.vegl;
+package org.auscope.portal.server.bookmark;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "bookmark_download_options")
-public class VGLBookMarkDownload {
+public class BookMarkDownload {
 	
 	 /** The primary key for this bookmark download*/
 	@Id
@@ -43,10 +43,10 @@ public class VGLBookMarkDownload {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bookmarkId")
-    private VGLBookMark parent;
+    private BookMark parent;
     
     
-    public VGLBookMarkDownload() {
+    public BookMarkDownload() {
     	super();
     }
     
@@ -54,7 +54,7 @@ public class VGLBookMarkDownload {
     *
     * @param id The primary key for this book mark
     */
-   public VGLBookMarkDownload(Integer id) {
+   public BookMarkDownload(Integer id) {
        super();
        this.id = id;
    }
@@ -224,7 +224,7 @@ public class VGLBookMarkDownload {
     * data set having the bookmark for download options
     * @return
     */
-   public VGLBookMark getParent() {
+   public BookMark getParent() {
        return parent;
    }
 
@@ -232,7 +232,7 @@ public class VGLBookMarkDownload {
     * data set having the bookmark for download options
     * @param parent
     */
-   public void setParent(VGLBookMark parent) {
+   public void setParent(BookMark parent) {
        this.parent = parent;
    }
 

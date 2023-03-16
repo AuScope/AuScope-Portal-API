@@ -14,7 +14,7 @@ public class NCIDetails implements Serializable {
     public final static String PROPERTY_NCI_PROJECT = "nci_project";
 
     private Integer id;
-    private ANVGLUser user;
+    private PortalUser user;
     private String username;
     private String project;
     private String key;
@@ -32,18 +32,18 @@ public class NCIDetails implements Serializable {
     }
 
     /**
-     * The associated ANVGLUSer
+     * The associated PortalUser
      * @return
      */
-    public ANVGLUser getUser() {
+    public PortalUser getUser() {
         return user;
     }
 
     /**
-     * The associated ANVGLUSer
+     * The associated PortalUser
      * @param user
      */
-    public void setUser(ANVGLUser user) {
+    public void setUser(PortalUser user) {
         this.user = user;
     }
 

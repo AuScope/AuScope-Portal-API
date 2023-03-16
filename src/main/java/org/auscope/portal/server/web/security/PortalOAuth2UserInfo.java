@@ -2,10 +2,10 @@ package org.auscope.portal.server.web.security;
 
 import java.util.Map;
 
-public abstract class VGLOAuth2UserInfo {
+public abstract class PortalOAuth2UserInfo {
     protected Map<String, Object> attributes;
 
-    public VGLOAuth2UserInfo(Map<String, Object> attributes) {
+    public PortalOAuth2UserInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
 

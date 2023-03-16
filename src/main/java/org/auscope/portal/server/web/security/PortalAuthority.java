@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "authorities")
-public class ANVGLAuthority implements GrantedAuthority {
+public class PortalAuthority implements GrantedAuthority {
 
 	private static final long serialVersionUID = 5567656603347809418L;
 	
@@ -33,17 +33,17 @@ public class ANVGLAuthority implements GrantedAuthority {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private ANVGLUser parent;
+    private PortalUser parent;
 
-    public ANVGLAuthority() {
+    public PortalAuthority() {
         this(null, null);
     }
 
-    public ANVGLAuthority(String authority) {
+    public PortalAuthority(String authority) {
         this(null, authority);
     }
 
-    public ANVGLAuthority(Integer id, String authority) {
+    public PortalAuthority(Integer id, String authority) {
         super();
         this.id = id;
         this.authority = authority;
@@ -70,7 +70,7 @@ public class ANVGLAuthority implements GrantedAuthority {
      * User that owns this authority
      * @return
      */
-    public ANVGLUser getParent() {
+    public PortalUser getParent() {
         return parent;
     }
 
@@ -78,7 +78,7 @@ public class ANVGLAuthority implements GrantedAuthority {
      * User that owns this authority
      * @param parent
      */
-    public void setParent(ANVGLUser parent) {
+    public void setParent(PortalUser parent) {
         this.parent = parent;
     }
 }
