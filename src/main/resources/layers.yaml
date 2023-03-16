@@ -5,7 +5,7 @@
         group: "Earth Resources v1"
         proxyStyleUrl: "doMineFilterStyle.do"
         order: "10"
-        supportsCsvDownloads: true
+        supportsCsvDownloads: false
         stackdriverServiceGroup: "EarthResourcesLayers"
         wfs:
                selector: "gsml:MappedFeature"
@@ -23,7 +23,7 @@
         group: "Earth Resources v1"
         proxyStyleUrl: "doMineralOccurrenceFilterStyle.do"
         order: "11"
-        supportsCsvDownloads: true
+        supportsCsvDownloads: false
         stackdriverServiceGroup: "EarthResourcesLayers"
         wfs:
                selector: "gsml:MappedFeature"
@@ -39,7 +39,7 @@
         group: "Earth Resources v1"
         proxyStyleUrl: "doMiningActivityFilterStyle.do"
         order: "12"
-        supportsCsvDownloads: true
+        supportsCsvDownloads: false
         stackdriverServiceGroup: "EarthResourcesLayers"
         wfs:
                selector: "gsml:MappedFeature"
@@ -1554,7 +1554,7 @@
     group: "Geological Provinces"
     proxyStyleUrl: "getGeologicalProvincestyle.do"
     order: "provinces_01"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wmswfs:
          featureName: "gml:ProvinceFullExtent"
          layerName: "GeologicalProvinces"
