@@ -98,6 +98,9 @@ spring:
                github:
                   clientId: client-id-goes-here
                   clientSecret: client-secret-goes-here
+                  scope:
+                     - user:email
+                     - read:user
       jwt:
          aaf:
             loginUrl: AAF_LOGIN_URL
