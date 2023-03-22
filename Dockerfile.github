@@ -8,5 +8,6 @@ RUN rm -rf /usr/local/tomcat/webapps/ROOT \
   && apt update && apt install unzip \
   && unzip /usr/local/tomcat/webapps/AuScope-Portal-API.war -d /usr/local/tomcat/webapps/api \
   && rm /usr/local/tomcat/webapps/AuScope-Portal-API.war \
-  && cp /usr/local/tomcat/webapps/api/WEB-INF/classes/application.yaml.default /usr/local/tomcat/webapps/api/WEB-INF/classes/application.yaml
+  && cp /usr/local/tomcat/webapps/api/WEB-INF/classes/application.yaml.default /usr/local/tomcat/webapps/api/WEB-INF/classes/application.yaml \
+  && sed -i 's/<\/Host>/  <Valve className=\"org.apache.catalina.valves.RemoteIpValve\" remoteIpHeader=\"x-forwarded-for\" protocolHeader=\"x-forwarded-proto\" \/>\n\n      <\/Host>/' server.xml
 #  && sed 's/active: test/#active: test/' /usr/local/tomcat/webapps/api/WEB-INF/classes/application.yaml.default | sed 's/#active: prod/active: prod/' > /usr/local/tomcat/webapps/api/WEB-INF/classes/application.yaml
