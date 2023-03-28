@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.security.aaf;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -41,6 +42,11 @@ public class AAFAttributes implements UserDetails {
 
     @JsonProperty("surname")
     public String surname;
+    
+    // This is a new field, allowing to be null in case temporary
+    @JsonInclude(JsonInclude.Include.NON_NULL) 
+    @JsonProperty("organizationname")
+    public String organization;
 
     public String getUsername() {
         return this.email;
@@ -97,6 +103,7 @@ public class AAFAttributes implements UserDetails {
                 ", principalName='" + principalName + '\'' +
                 ", givenName='" + givenName + '\'' +
                 ", surname='" + surname + '\'' +
+                organization != null ? ", organization='" + organization + '\'' : "" +
                 '}';
     }
 
@@ -117,6 +124,7 @@ public class AAFAttributes implements UserDetails {
         if (scopedAffiliation != null ? !scopedAffiliation.equals(that.scopedAffiliation) : that.scopedAffiliation != null)
             return false;
         if (surname != null ? !surname.equals(that.surname) : that.surname != null) return false;
+        if (organization != null ? !organization.equals(that.organization) : that.organization != null) return false;
         return !(targetedID != null ? !targetedID.equals(that.targetedID) : that.targetedID != null);
     }
 
@@ -131,6 +139,7 @@ public class AAFAttributes implements UserDetails {
         result = 31 * result + (principalName != null ? principalName.hashCode() : 0);
         result = 31 * result + (givenName != null ? givenName.hashCode() : 0);
         result = 31 * result + (surname != null ? surname.hashCode() : 0);
+        result = 31 * result + (organization != null ? organization.hashCode() : 0);
         return result;
     }
 }
