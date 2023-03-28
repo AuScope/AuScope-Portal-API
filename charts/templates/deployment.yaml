@@ -42,8 +42,14 @@ spec:
             readOnly: false
           {{- if .Values.existingLayerConfigMap }}
           - name: "{{ .Values.existingLayerConfigMap }}"
-            mountPath: "/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/layers.yaml"
+            mountPath: "/usr/local/tomcat/webapps/api/WEB-INF/classes/layers.yaml"
             subPath: "{{ .Values.existingLayerConfigMapKey }}"
+            readOnly: true
+          {{- end }}
+          {{- if .Values.existingRegistriesConfigMap }}
+          - name: "{{ .Values.existingRegistriesConfigMap }}"
+            mountPath: "/usr/local/tomcat/webapps/api/WEB-INF/classes/application-registries.yaml"
+            subPath: "{{ .Values.existingRegistriesConfigMapKey }}"
             readOnly: true
           {{- end }}
           ports:
@@ -52,14 +58,14 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /actuator/health/liveness
+              path: /api/actuator/health/liveness
               port: http
             initialDelaySeconds: 300
             timeoutSeconds: 5
             periodSeconds: 60
           readinessProbe:
             httpGet:
-              path: /actuator/health/readiness
+              path: /api/actuator/health/readiness
               port: http
             initialDelaySeconds: 300
             timeoutSeconds: 5
@@ -79,6 +85,11 @@ spec:
       - name: {{ .Values.existingLayerConfigMap }}
         configMap:
           name: {{ .Values.existingLayerConfigMap }}
+      {{- end }}
+      {{- if .Values.existingRegistriesConfigMap }}
+      - name: {{ .Values.existingRegistriesConfigMap }}
+        configMap:
+          name: {{ .Values.existingRegistriesConfigMap }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
