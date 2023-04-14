@@ -15,7 +15,7 @@ spec:
   {{- range .Values.persistence.cswcacheDir.accessModes }}
     - {{ . | quote }}
   {{- end }}
-  {{ include "geoserver.cswcacheDir.storageClass" . }}
+  {{ include "portalapi.cswcacheDir.storageClass" . }}
   resources:
     requests:
       storage: {{ .Values.persistence.cswcacheDir.size | quote }}
