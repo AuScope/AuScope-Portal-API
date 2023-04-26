@@ -88,3 +88,15 @@ applicationconfig:
 extraPodEnv: |
   - name: spring.config.location
     value: "/workspace/config/application.yaml"
+
+persistence:
+  cswcacheDir:
+    enabled: true
+    existingClaim: false
+    mountPath: /cswcache
+    subPath: "cswcache"
+    size: 2Gi
+    storageClass: efs
+    accessModes:
+      - ReadWriteMany
+    annotations: {}

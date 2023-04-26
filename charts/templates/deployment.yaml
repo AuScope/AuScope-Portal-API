@@ -37,9 +37,12 @@ spec:
           - name: "{{ include "auscope-portal-api.fullname" . }}-config"
             mountPath: "/workspace/config/"
             readOnly: true
+          {{- if .Values.persistence.cswcacheDir.enabled }}
           - name: cswcache
-            mountPath: "/cswcache"
+            mountPath: {{ .Values.persistence.cswcacheDir.mountPath }}
+            subPath: {{ .Values.persistence.cswcacheDir.subPath }}
             readOnly: false
+          {{- end }}
           {{- if .Values.existingLayerConfigMap }}
           - name: "{{ .Values.existingLayerConfigMap }}"
             mountPath: "/usr/local/tomcat/webapps/api/WEB-INF/classes/layers.yaml"
@@ -80,7 +83,14 @@ spec:
       - name: {{ include "auscope-portal-api.fullname" . }}-config
         configMap:
           name: {{ include "auscope-portal-api.fullname" . }}-config
+      {{- if .Values.persistence.cswcacheDir.enabled }}
       - name: cswcache
+        persistentVolumeClaim:
+          claimName: {{ template "auscope-portal-api.fullname" . }}-cswcache-dir
+      {{- else if not .Values.persistence.cswcacheDir.enabled }}
+      - name: cswcache
+        emptyDir: {}
+      {{- end }}
       {{- if .Values.existingLayerConfigMap }}
       - name: {{ .Values.existingLayerConfigMap }}
         configMap:

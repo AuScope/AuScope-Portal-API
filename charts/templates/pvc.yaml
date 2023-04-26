@@ -1,0 +1,23 @@
+{{- if and .Values.persistence.cswcacheDir.enabled (not .Values.persistence.cswcacheDir.existingClaim) }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "auscope-portal-api.fullname" . }}-cswcache-dir
+{{- with .Values.persistence.cswcacheDir.annotations }}
+  annotations:
+  {{- range $key, $value := . }}
+    {{ $key }}: {{ $value }}
+  {{- end }}
+{{- end }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.cswcacheDir.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  {{ include "portalapi.cswcacheDir.storageClass" . }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.cswcacheDir.size | quote }}
+...
+{{- end }}

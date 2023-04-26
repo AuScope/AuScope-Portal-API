@@ -150,6 +150,20 @@ CREATE TABLE `nci_details` (
      ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE `states` (
+  `id` varchar(128) NOT NULL,
+  `userid` varchar(128) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `jsonState` text NOT NULL,
+  `creationDate` timestamp(0) NOT NULL,
+  `isPublic` boolean NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`userid`)
+     REFERENCES users(`id`)
+     ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE `bookmarks` (
   `fileIdentifier` varchar(128) NOT NULL,
   `serviceId` varchar(25) NOT NULL,

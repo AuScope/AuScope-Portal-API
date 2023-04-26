@@ -146,7 +146,6 @@ CREATE TABLE parameters (
   FOREIGN KEY (jobId)
         REFERENCES jobs(id)
         ON DELETE CASCADE--,
-  --KEY jobIdName (jobId,"name")
 );
 
 CREATE SEQUENCE nci_details_seq;
@@ -159,6 +158,20 @@ CREATE TABLE nci_details (
   nci_project bytea DEFAULT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY ("user")
+     REFERENCES users(id)
+     ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE states (
+  id varchar(128) NOT NULL,
+  "userid" varchar(128) DEFAULT NULL,
+  "name" varchar(255) DEFAULT NULL,
+  description varchar(255) DEFAULT NULL,
+  jsonState varchar NOT NULL,
+  creationDate timestamp(0) NOT NULL,
+  isPublic boolean NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY ("userid")
      REFERENCES users(id)
      ON DELETE CASCADE ON UPDATE CASCADE
 );
