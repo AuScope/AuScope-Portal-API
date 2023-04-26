@@ -52,6 +52,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,TIMAController,179,
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabController,102,235,6,6,14,43,6,9,2,7
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,BaseModelController,40,187,7,13,9,32,7,6,0,3
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,CustomKMLController,149,0,4,0,27,0,5,0,3,0
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,PortalStateController,170,0,20,0,40,0,16,0,6,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,NVCLController,1208,399,76,6,222,83,58,11,19,9
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,EarthResourcesFilterController,408,0,8,0,108,0,15,0,11,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabController.new Comparator() {...},0,16,0,0,0,2,0,2,0,2
@@ -109,6 +110,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService.Dataset
 AuScope-Portal-API,org.auscope.portal.server.web.service,SF0BoreholeService,43,52,0,2,8,10,4,3,4,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,TemplateLintService,314,0,20,0,73,0,14,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GeologicalProvincesService,29,0,2,0,9,0,4,0,3,0
+AuScope-Portal-API,org.auscope.portal.server.web.service,PortalStateService,27,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GenericService,28,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,VGLPurchaseService,31,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,CloudSubmissionService,65,112,2,0,15,25,6,8,5,8
@@ -149,6 +151,7 @@ AuScope-Portal-API,org.auscope.portal.server.config,ConversionConfig,29,0,0,0,9,
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.selRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,Registries,29,0,0,0,8,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.domain.xml,XMLStreamAttributeExtractor,29,78,5,7,8,16,6,5,2,3
+AuScope-Portal-API,org.auscope.portal.server.state,PortalState,52,0,0,0,22,0,15,0,15,0
 AuScope-Portal-API,org.auscope.portal.server,MineralTenementServiceProviderType,37,55,6,0,11,12,11,2,8,2
 AuScope-Portal-API,org.auscope.portal.server,PortalApplication,16,0,0,0,6,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server,CORSAdvice,43,0,0,0,11,0,2,0,2,0
