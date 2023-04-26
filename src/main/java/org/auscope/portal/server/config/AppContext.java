@@ -117,69 +117,69 @@ public class AppContext {
 
    protected final Log logger = LogFactory.getLog(getClass());
 
-        @Value("${cloud.aws.account:undefined}") 
-        private String awsAcct;
+    @Value("${cloud.aws.account:undefined}")
+    private String awsAcct;
 
-        @Bean public String awsAccount() {
-            return awsAcct;
-        }
+    @Bean public String awsAccount() {
+        return awsAcct;
+    }
 
-        @Value("${cloud.aws.accesskey:undefined}")
-        private String awsAccessKey;
+    @Value("${cloud.aws.accesskey:undefined}")
+    private String awsAccessKey;
 
-        @Value("${cloud.aws.secretkey:undefined}")
-        private String awsSecretKey;
+    @Value("${cloud.aws.secretkey:undefined}")
+    private String awsSecretKey;
 
-        @Value("${cloud.aws.sessionkey:undefined}")
-        private String awsSessionKey;
+    @Value("${cloud.aws.sessionkey:undefined}")
+    private String awsSessionKey;
 
-        @Value("${cloud.aws.stsrequirement:Mandatory}")
-        private String awsStsRequirement;
+    @Value("${cloud.aws.stsrequirement:Mandatory}")
+    private String awsStsRequirement;
 
-        @Value("${cloud.localStageInDir}")
-        private String stageInDirectory;
-        @Value("${localCacheDir:#{null}}")
-        private String localCacheDir;
+    @Value("${cloud.localStageInDir}")
+    private String stageInDirectory;
+    @Value("${localCacheDir:#{null}}")
+    private String localCacheDir;
 
-        @Value("${cloud.proms.report.url}")
-        private String promsUrl;
+    @Value("${cloud.proms.report.url}")
+    private String promsUrl;
 
-        @Value("${cloud.proms.reportingsystem.uri}")
-        private String promsReportingSystemUri;
+    @Value("${cloud.proms.reportingsystem.uri}")
+    private String promsReportingSystemUri;
 
-        @Value("${smtp.server}")
-        private String smtpServer;
+    @Value("${smtp.server}")
+    private String smtpServer;
 
-        @Value("${frontEndUrl}")
-        private String frontEndUrl;
+    @Value("${frontEndUrl}")
+    private String frontEndUrl;
 
-        @Value("${portalAdminEmail}")
-        private String portalAdminEmail;
-        
-        @Value("${knownLayersStartupDelay:1}")
-        private int knownLayersStartupDelay;
-        
-        @Value("${knownLayersCronExpression:0 0 3 * * ?}")
-        private String knownLayersCronExpression;
+    @Value("${portalAdminEmail}")
+    private String portalAdminEmail;
+    
+    @Value("${knownLayersStartupDelay:1}")
+    private int knownLayersStartupDelay;
+    
+    @Value("${knownLayersCronExpression:0 0 3 * * ?}")
+    private String knownLayersCronExpression;
 
-        @Value("${cloud.encryption.password}")
-        private String encryptionPassword;
+    @Value("${cloud.encryption.password}")
+    private String encryptionPassword;
 
-        @Value("${cloud.sssc.solutions.url}")
-        private String solutionsUrl;
+    @Value("${cloud.sssc.solutions.url}")
+    private String solutionsUrl;
 
-        // Active profile i.e. 'test' or 'prod'
-        @Value("${spring.profiles.active}")
-        private String activeProfile;
+    // Active profile i.e. 'test' or 'prod'
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
 
-        @Autowired
-        private VEGLJobManager jobManager;
+    @Autowired
+    private VEGLJobManager jobManager;
 
-        @Autowired
-        private PortalUserService userService;
-        
-        @Autowired
-        private NCIDetailsService nciDetailsService;
+    @Autowired
+    private PortalUserService userService;
+    
+    @Autowired
+    private NCIDetailsService nciDetailsService;
 
 
     @Autowired
