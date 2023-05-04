@@ -587,7 +587,7 @@
         order: "300"
         legendImg: "argon_map_legend.png"
         kml:
-               selector: "National Argon Map"
+               selector: "National Argon Map and GA Legacy Data"
 
 # GA Geophysical Survey (GADDS V2.0)
 "ga-geophysicalsurveys-all":
