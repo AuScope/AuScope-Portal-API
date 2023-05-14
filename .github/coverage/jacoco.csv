@@ -95,8 +95,8 @@ AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralTenementCCFilter,
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MiningActivityFilter,19,157,1,13,4,42,2,9,1,3
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,CommodityVocabMethodMaker,45,0,0,0,8,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalUserDetailsService,164,44,13,1,37,10,10,4,3,4
-AuScope-Portal-API,org.auscope.portal.server.web.service,SeismicSurveyWMSService,0,52,0,0,0,14,0,2,0,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,ErmlVocabService,30,101,4,10,9,29,4,6,1,2
+AuScope-Portal-API,org.auscope.portal.server.web.service,SeismicSurveyWMSService,0,52,0,0,0,14,0,2,0,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,ScriptBuilderService,3,100,0,2,1,25,1,5,1,4
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService,515,269,46,16,96,64,34,9,7,5
 AuScope-Portal-API,org.auscope.portal.server.web.service,NCIDetailsService,94,0,8,0,21,0,7,0,3,0
@@ -112,8 +112,8 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,TemplateLintService,314
 AuScope-Portal-API,org.auscope.portal.server.web.service,GeologicalProvincesService,29,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalStateService,27,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GenericService,28,0,2,0,9,0,4,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.web.service,VGLPurchaseService,31,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,CloudSubmissionService,65,112,2,0,15,25,6,8,5,8
+AuScope-Portal-API,org.auscope.portal.server.web.service,VGLPurchaseService,31,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GenericFilter2,50,0,0,0,8,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,VGLJobAuditLogService,24,0,0,0,5,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,BoreholeService.Mark,56,0,0,0,11,0,3,0,3,0
