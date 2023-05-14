@@ -60,18 +60,21 @@ public class SF0BoreholeController extends BasePortalController {
      *            the name of the mine to query for
      * @param request
      *            the HTTP client request
+     * @param skipGsmlpShapeProperty
+     *            if true, skip the gsmlp:shape property in the generated filter
      * @return a WFS response converted into KML
      * @throws Exception
      */
     @RequestMapping("/doBoreholeViewFilter.do")
     public ModelAndView doBoreholeFilter(String serviceUrl, String boreholeName, String custodian,
             String dateOfDrillingStart, String dateOfDrillingEnd, int maxFeatures, String bbox, String typeName,
-            @RequestParam(required=false, value="outputFormat") String outputFormat) throws Exception {
+            @RequestParam(required=false, value="outputFormat") String outputFormat,
+            @RequestParam(required=false, defaultValue="false") boolean skipGsmlpShapeProperty) throws Exception {
 
         try {
             FilterBoundingBox box = FilterBoundingBox.attemptParseFromJSON(bbox);
             WFSResponse response = this.boreholeService.getAllBoreholes(serviceUrl, boreholeName, custodian,
-                    dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, box, outputFormat, typeName);
+                    dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, box, outputFormat, typeName, skipGsmlpShapeProperty);
             return generateNamedJSONResponseMAV(true, "gml", response.getData(), response.getMethod());
         } catch (Exception e) {
             return this.generateExceptionResponse(e, serviceUrl);

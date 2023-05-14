@@ -90,7 +90,7 @@ public class TestSF0BoreholeService extends PortalTestClass {
         });
 
         WFSResponse result = service.getAllBoreholes(serviceUrl, boreholeName, custodian,
-                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, "gsmlp:BoreholeView");
+                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, "gsmlp:BoreholeView", false);
         Assert.assertNotNull(result);
         Assert.assertEquals(gmlString, result.getData());
         Assert.assertSame(mockMethod, result.getMethod());
@@ -127,7 +127,7 @@ public class TestSF0BoreholeService extends PortalTestClass {
         });
 
         WFSResponse result = service.getAllBoreholes(serviceUrl, boreholeName, custodian,
-                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, "gsmlp:BoreholeView");
+                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null, "gsmlp:BoreholeView", false);
         Assert.assertNotNull(result);
         Assert.assertEquals(gmlString, result.getData());
         Assert.assertSame(mockMethod, result.getMethod());
@@ -159,7 +159,7 @@ public class TestSF0BoreholeService extends PortalTestClass {
         });
 
         WFSResponse result = service.getAllBoreholes(serviceUrl, null, null,
-                null, null, maxFeatures, null, null, "gsmlp:MyBoreholeView");
+                null, null, maxFeatures, null, null, "gsmlp:MyBoreholeView", false);
         Assert.assertNotNull(result);
         Assert.assertEquals(gmlString, result.getData());
         Assert.assertSame(mockMethod, result.getMethod());
@@ -197,7 +197,7 @@ public class TestSF0BoreholeService extends PortalTestClass {
         });
 
         WFSResponse result = service.getAllBoreholes(serviceUrl, boreholeName, custodian,
-                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, null, null, "gsmlp:BoreholeView");
+                dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, null, null, "gsmlp:BoreholeView", false);
         Assert.assertNotNull(result);
         Assert.assertEquals(gmlString, result.getData());
         Assert.assertSame(mockMethod, result.getMethod());

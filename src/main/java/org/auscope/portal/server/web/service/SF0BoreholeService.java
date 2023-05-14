@@ -57,14 +57,15 @@ public class SF0BoreholeService extends BoreholeService {
      *            Set to the bounding box in which to fetch results, otherwise set it to null
      * @param restrictToIDList
      *            [Optional] A list of gml:id values that the resulting filter should restrict its search space to
+     * @param skipGsmlpName if true then skip the gsmlp:name property in the generated filter
      * @return
      * @throws Exception
      */
     public WFSResponse getAllBoreholes(String serviceUrl, String boreholeName, String custodian,
-            String dateOfDrillingStart,String dateOfDrillingEnd, int maxFeatures, FilterBoundingBox bbox, 
-            String outputFormat, String typeName) throws Exception {
+            String dateOfDrillingStart, String dateOfDrillingEnd, int maxFeatures, FilterBoundingBox bbox, 
+            String outputFormat, String typeName, Boolean skipGsmlpShapeProperty) throws Exception {
         String filterString;
-        SF0BoreholeFilter sf0BoreholeFilter = new SF0BoreholeFilter(boreholeName, custodian, dateOfDrillingStart,dateOfDrillingEnd, null, null,null,null);
+        SF0BoreholeFilter sf0BoreholeFilter = new SF0BoreholeFilter(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, null, null, null, null, skipGsmlpShapeProperty);
         if (bbox == null) {
             filterString = sf0BoreholeFilter.getFilterStringAllRecords();
         } else {
@@ -76,6 +77,8 @@ public class SF0BoreholeService extends BoreholeService {
             method = this.generateWFSRequest(serviceUrl, typeName, null, filterString, maxFeatures, null,
                     ResultType.Results, outputFormat);
             String responseGml = this.httpServiceCaller.getMethodResponseAsString(method);
+            
+            System.out.println(responseGml);
 
             return new WFSResponse(responseGml, method);
         } catch (Exception ex) {
