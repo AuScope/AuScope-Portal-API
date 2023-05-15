@@ -35,7 +35,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
           - name: "{{ include "auscope-portal-api.fullname" . }}-config"
-            mountPath: "/workspace/config/"
+            mountPath: "/workspace/config/application.yaml"
+            subPath: "application.yaml"
             readOnly: true
           {{- if .Values.persistence.cswcacheDir.enabled }}
           - name: cswcache
@@ -51,7 +52,7 @@ spec:
           {{- end }}
           {{- if .Values.existingRegistriesConfigMap }}
           - name: "{{ .Values.existingRegistriesConfigMap }}"
-            mountPath: "/usr/local/tomcat/webapps/api/WEB-INF/classes/application-registries.yaml"
+            mountPath: "/workspace/config/application-registries.yaml"
             subPath: "{{ .Values.existingRegistriesConfigMapKey }}"
             readOnly: true
           {{- end }}
