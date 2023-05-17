@@ -35,29 +35,19 @@ public class SF0BoreholeService extends BoreholeService {
 
     /**
      * Get all SF0 Boreholes from a given service url and return the response
-     *
+     * 
      * @param serviceUrl
+     * @param boreholeName
+     * @param custodian
+     * @param dateOfDrillingStart
+     * @param dateOfDrillingEnd
+     * @param maxFeatures
      * @param bbox
-     *            Set to the bounding box in which to fetch results, otherwise set it to null
-     * @param restrictToIDList
-     *            [Optional] A list of gml:id values that the resulting filter should restrict its search space to
-     * @return
-     * @throws Exception
-     */
-    /*public WFSResponse getAllBoreholes(String serviceUrl, String boreholeName, String custodian,
-            String dateOfDrillingStart,String dateOfDrillingEnd, int maxFeatures, FilterBoundingBox bbox) throws Exception {
-        return getAllBoreholes(serviceUrl, boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, null);
-    }*/
-
-    /**
-     * Get all SF0 Boreholes from a given service url and return the response
-     *
-     * @param serviceUrl
-     * @param bbox
-     *            Set to the bounding box in which to fetch results, otherwise set it to null
-     * @param restrictToIDList
-     *            [Optional] A list of gml:id values that the resulting filter should restrict its search space to
-     * @param skipGsmlpName if true then skip the gsmlp:name property in the generated filter
+     * 			Set to the bounding box in which to fetch results, otherwise set it to null
+     * @param outputFormat
+     * @param typeName
+     * @param skipGsmlpShapeProperty
+     * 			if true then skip the gsmlp:name property in the generated filter
      * @return
      * @throws Exception
      */
@@ -77,9 +67,6 @@ public class SF0BoreholeService extends BoreholeService {
             method = this.generateWFSRequest(serviceUrl, typeName, null, filterString, maxFeatures, null,
                     ResultType.Results, outputFormat);
             String responseGml = this.httpServiceCaller.getMethodResponseAsString(method);
-            
-            System.out.println(responseGml);
-
             return new WFSResponse(responseGml, method);
         } catch (Exception ex) {
             throw new PortalServiceException(method, ex);
