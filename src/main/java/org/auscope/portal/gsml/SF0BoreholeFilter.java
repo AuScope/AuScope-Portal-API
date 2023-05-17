@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class SF0BoreholeFilter extends BoreholeFilter {
     protected Boolean justNVCL;
     protected List<String> identifiers;
-    protected Boolean skipGsmlpShapeProperty = false;
+    protected Boolean omitGsmlpShapeProperty = false;
     // ----------------------------------------------------------- Constructors
 
     public SF0BoreholeFilter() {
@@ -42,11 +42,11 @@ public class SF0BoreholeFilter extends BoreholeFilter {
     }
     
     public SF0BoreholeFilter(String boreholeName, String custodian, String dateOfDrillingStart, String dateOfDrillingEnd,
-    		List<String> ids, List<String> identifiers, Boolean justNVCL, String optionalFilters, Boolean skipGsmlpShapeProperty) {
+    		List<String> ids, List<String> identifiers, Boolean justNVCL, String optionalFilters, Boolean omitGsmlpShapeProperty) {
         super(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, ids, optionalFilters);
         this.justNVCL = justNVCL;
         this.identifiers = identifiers;
-        this.skipGsmlpShapeProperty = skipGsmlpShapeProperty;
+        this.omitGsmlpShapeProperty = omitGsmlpShapeProperty;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -62,7 +62,7 @@ public class SF0BoreholeFilter extends BoreholeFilter {
         return this
                 .generateFilter(this.generateAndComparisonFragment(
                         this.generateBboxFragment(bbox,
-                                skipGsmlpShapeProperty ? null : "gsmlp:shape"),
+                                omitGsmlpShapeProperty ? null : "gsmlp:shape"),
                                 this.generateFilterFragment()));
     }
 

@@ -46,16 +46,16 @@ public class SF0BoreholeService extends BoreholeService {
      * 			Set to the bounding box in which to fetch results, otherwise set it to null
      * @param outputFormat
      * @param typeName
-     * @param skipGsmlpShapeProperty
-     * 			if true then skip the gsmlp:name property in the generated filter
+     * @param omitGsmlpShapeProperty
+     * 			if true the gsmlp:shape property will be excluded from the download filter (can cause problems with GADDS 2.0)
      * @return
      * @throws Exception
      */
     public WFSResponse getAllBoreholes(String serviceUrl, String boreholeName, String custodian,
             String dateOfDrillingStart, String dateOfDrillingEnd, int maxFeatures, FilterBoundingBox bbox, 
-            String outputFormat, String typeName, Boolean skipGsmlpShapeProperty) throws Exception {
+            String outputFormat, String typeName, Boolean omitGsmlpShapeProperty) throws Exception {
         String filterString;
-        SF0BoreholeFilter sf0BoreholeFilter = new SF0BoreholeFilter(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, null, null, null, null, skipGsmlpShapeProperty);
+        SF0BoreholeFilter sf0BoreholeFilter = new SF0BoreholeFilter(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, null, null, null, null, omitGsmlpShapeProperty);
         if (bbox == null) {
             filterString = sf0BoreholeFilter.getFilterStringAllRecords();
         } else {

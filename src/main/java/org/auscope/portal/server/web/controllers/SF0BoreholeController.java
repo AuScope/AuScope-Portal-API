@@ -60,8 +60,8 @@ public class SF0BoreholeController extends BasePortalController {
      *            the name of the mine to query for
      * @param request
      *            the HTTP client request
-     * @param skipGsmlpShapeProperty
-     *            if true, skip the gsmlp:shape property in the generated filter
+     * @param omitGsmlpShapeProperty
+     *            if true, omit the gsmlp:shape property from the generated filter (can cause problems with GADDS 2.0)
      * @return a WFS response converted into KML
      * @throws Exception
      */
@@ -69,12 +69,12 @@ public class SF0BoreholeController extends BasePortalController {
     public ModelAndView doBoreholeFilter(String serviceUrl, String boreholeName, String custodian,
             String dateOfDrillingStart, String dateOfDrillingEnd, int maxFeatures, String bbox, String typeName,
             @RequestParam(required=false, value="outputFormat") String outputFormat,
-            @RequestParam(required=false, defaultValue="false") boolean skipGsmlpShapeProperty) throws Exception {
+            @RequestParam(required=false, defaultValue="false") boolean omitGsmlpShapeProperty) throws Exception {
 
         try {
             FilterBoundingBox box = FilterBoundingBox.attemptParseFromJSON(bbox);
             WFSResponse response = this.boreholeService.getAllBoreholes(serviceUrl, boreholeName, custodian,
-                    dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, box, outputFormat, typeName, skipGsmlpShapeProperty);
+                    dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, box, outputFormat, typeName, omitGsmlpShapeProperty);
             return generateNamedJSONResponseMAV(true, "gml", response.getData(), response.getMethod());
         } catch (Exception e) {
             return this.generateExceptionResponse(e, serviceUrl);
