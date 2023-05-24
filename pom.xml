@@ -229,12 +229,12 @@
             <version>3.27.0-GA</version>
         </dependency>
 
-	<!-- This is a dummy database used for non-VGL deployments -->
-        <dependency>
+	    <!-- This is a dummy database used for development only -->
+	    <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>2.7.1</version>
-        </dependency>
+	    </dependency>
         
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -244,7 +244,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20201115</version>
+            <version>20230227</version>
         </dependency>
         
         <!-- Added for job monitoring -->
