@@ -100,6 +100,7 @@ spring:
                   clientSecret: GOOGLE_CLIENT_SECRET
                   accessTokenUri: https://www.googleapis.com/oauth2/v4/token
                   userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+                  redirectUri: ${portalUrl}/login/oauth2/code/google
                   clientAuthenticationScheme: form
                   scope:
                      - email
@@ -107,14 +108,15 @@ spring:
                github:
                   clientId: client-id-goes-here
                   clientSecret: client-secret-goes-here
+                  redirectUri: ${portalUrl}/login/oauth2/code/github
                   scope:
                      - user:email
                      - read:user
       jwt:
          aaf:
-            loginUrl: AAF_LOGIN_URL
-            callbackUrl: AAF_CALLBACK_URL
-            jwtsecret: AAF_SECRET
+            loginUrl: AAF_LOGIN_URL         # Supplied by AAF upon registration
+            callbackUrl: AAF_CALLBACK_URL   # Register at AAF with <portalUrl>/login/aaf/callback
+            jwtsecret: AAF_SECRET           # LC_CTYPE=C tr -dc '[[:alnum:][:punct:]]' < /dev/urandom
 
 # Cloud specific settings
 cloud:
