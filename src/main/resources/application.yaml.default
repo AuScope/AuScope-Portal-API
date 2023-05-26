@@ -114,9 +114,9 @@ spring:
                      - read:user
       jwt:
          aaf:
-            loginUrl: AAF_LOGIN_URL         # Supplied by AAF upon registration
-            callbackUrl: AAF_CALLBACK_URL   # Register at AAF with <portalUrl>/login/aaf/callback
-            jwtsecret: AAF_SECRET           # LC_CTYPE=C tr -dc '[[:alnum:][:punct:]]' < /dev/urandom
+            loginUrl: AAF_LOGIN_URL            # Supplied by AAF upon registration
+            callbackUrl: /login/aaf/callback   # Register at AAF with <portalUrl>/login/aaf/callback
+            jwtsecret: AAF_SECRET              # LC_CTYPE=C tr -dc '[[:alnum:][:punct:]]' < /dev/urandom
 
 # Cloud specific settings
 cloud:
