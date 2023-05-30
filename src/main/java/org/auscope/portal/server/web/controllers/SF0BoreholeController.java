@@ -23,9 +23,13 @@ import org.auscope.portal.server.web.service.NVCL2_0_DataService;
 import org.auscope.portal.server.web.service.SF0BoreholeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 /**
  * Controller for handling requests for the SF0 Borehole
@@ -33,7 +37,8 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Florence Tan
  *
  */
-@Controller
+@RestController
+@SecurityRequirement(name = "public")
 public class SF0BoreholeController extends BasePortalController {
 
     private SF0BoreholeService boreholeService;
@@ -63,7 +68,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @return a WFS response converted into KML
      * @throws Exception
      */
-    @RequestMapping("/doBoreholeViewFilter.do")
+    @GetMapping("/doBoreholeViewFilter.do")
     public ModelAndView doBoreholeFilter(String serviceUrl, String boreholeName, String custodian,
             String dateOfDrillingStart, String dateOfDrillingEnd, int maxFeatures, String bbox, String typeName,
             @RequestParam(required=false, value="outputFormat") String outputFormat) throws Exception {
@@ -91,7 +96,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @return a WFS response converted into CSV
      * @throws Exception
      */
-    @RequestMapping("/doNVCLBoreholeViewCSVDownload.do")
+    @GetMapping("/doNVCLBoreholeViewCSVDownload.do")
     public void doNVCLBoreholeViewCSVDownload(String serviceUrl,String typeName,
     		@RequestParam(required=false, value="bbox") String bbox,
             @RequestParam(required=false, value="outputFormat") String outputFormat,
@@ -145,7 +150,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @param maxFeatures
      * @throws Exception
      */
-    @RequestMapping("/doNvclV2Filter.do")
+    @GetMapping("/doNvclV2Filter.do")
     public void doNvclV2Filter(
             HttpServletResponse response,
             @RequestParam(required = false, value = "boreholeName", defaultValue = "") String boreholeName,
@@ -185,7 +190,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @param maxFeatures
      * @throws Exception
      */
-    @RequestMapping("/doNvclV2FilterStyle.do")
+    @GetMapping("/doNvclV2FilterStyle.do")
     public void doNvclV2FilterStyle(
             HttpServletResponse response,
             @RequestParam(required = false, value = "serviceUrl", defaultValue = "") String serviceUrl,
@@ -270,7 +275,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @param maxFeatures
      * @throws Exception
      */
-    @RequestMapping("/doBoreholeViewFilterStyle.do")
+    @GetMapping("/doBoreholeViewFilterStyle.do")
     public void doFilterStyle(
             HttpServletResponse response,
             @RequestParam(required = false, value = "serviceUrl", defaultValue = "") String serviceUrl,
@@ -384,7 +389,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @return
      */
 	/*
-    @RequestMapping("/updateGsmlpNSCache.do")
+    @RequesttMapping("/updateGsmlpNSCache.do")
     public ModelAndView updateGsmlpNSCache() throws Exception {
 	    try {
             if (gsmlpNameSpaceTable != null )

@@ -26,16 +26,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 /**
  * A controller class for accessing/modifying user metadata
  * @author Josh Vote
  */
-@Controller
+@RestController
+@SecurityRequirement(name = "public")
 public class UserController extends BasePortalController {
     private static final String CLOUD_FORMATION_RESOURCE = "org/auscope/portal/server/web/controllers/vl-cloudformation.json.tpl";
 
@@ -71,7 +76,7 @@ public class UserController extends BasePortalController {
      * @param user
      * @return
      */
-    @RequestMapping("/secure/getUser.do")
+    @GetMapping("/secure/getUser.do")
     public ModelAndView getUser() {
     	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
@@ -97,7 +102,7 @@ public class UserController extends BasePortalController {
      * @param acceptedTermsConditions
      * @return
      */
-    @RequestMapping("/secure/setUser.do")
+    @GetMapping("/secure/setUser.do")
     public ModelAndView setUser(
             @RequestParam(required=false, value="arnExecution") String arnExecution,
             @RequestParam(required=false, value="arnStorage") String arnStorage,
@@ -136,7 +141,7 @@ public class UserController extends BasePortalController {
         return generateJSONResponseMAV(true);
     }
 
-    @RequestMapping("/getTermsConditions.do")
+    @GetMapping("/getTermsConditions.do")
     public ModelAndView getTermsConditions() {
     	PortalUser user = userService.getLoggedInUser();
         try {
@@ -156,7 +161,7 @@ public class UserController extends BasePortalController {
         }
     }
 
-    @RequestMapping("/secure/getCloudFormationScript.do")
+    @GetMapping("/secure/getCloudFormationScript.do")
     public void getCloudFormationScript(HttpServletResponse response) throws IOException {
     	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
@@ -184,7 +189,7 @@ public class UserController extends BasePortalController {
         }
     }
     
-    @RequestMapping("/secure/getNCIDetails.do")
+    @GetMapping("/secure/getNCIDetails.do")
     public ModelAndView getNCIDetails() throws PortalServiceException {
     	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
@@ -205,7 +210,7 @@ public class UserController extends BasePortalController {
         return generateJSONResponseMAV(false);
     }
     
-    @RequestMapping("/secure/setNCIDetails.do")
+    @GetMapping("/secure/setNCIDetails.do")
     public ModelAndView setNCIDetails(
             @RequestParam(required=false, value="nciUsername") String username,
             @RequestParam(required=false, value="nciProject") String project,
@@ -246,7 +251,7 @@ public class UserController extends BasePortalController {
         return generateJSONResponseMAV(true);        
     }
     
-    @RequestMapping("/secure/getHasConfiguredComputeServices.do")
+    @GetMapping("/secure/getHasConfiguredComputeServices.do")
     public ModelAndView getHasConfiguredComputeServices() throws PortalServiceException {
     	PortalUser user = userService.getLoggedInUser();
         if (user == null) {

@@ -36,10 +36,12 @@ import org.auscope.portal.server.web.service.VGLPurchaseService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.JsonArray;
@@ -49,7 +51,10 @@ import com.stripe.Stripe;
 import com.stripe.exception.CardException;
 import com.stripe.model.Charge;
 
-@Controller
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+@RestController
+@SecurityRequirement(name = "public")
 public class PurchaseController extends BasePortalController {
 
     public static final String SESSION_DOWNLOAD_LIST = "jobDownloadList";
@@ -419,7 +424,7 @@ public class PurchaseController extends BasePortalController {
      * @return
      * @throws PortalServiceException
      */
-    @RequestMapping("/getDataPurchases.do")
+    @GetMapping("/getDataPurchases.do")
     public ModelAndView getPurchases() throws PortalServiceException {
         PortalUser user = userService.getLoggedInUser();
         List<VGLDataPurchase> purchases = purchaseService.getDataPurchasesByUser(user);

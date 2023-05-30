@@ -63,11 +63,15 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 /**
  * Controller for the job submission view.
@@ -76,7 +80,8 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Abdi Jama
  * @author Josh Vote
  */
-@Controller
+@RestController
+@SecurityRequirement(name = "public")
 public class JobBuilderController extends BaseCloudController {
 
     /** Logger for this class */
@@ -157,7 +162,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a data attribute containing a populated
      *         VEGLJob object and a success attribute.
      */
-    @RequestMapping("/secure/getJobObject.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/getJobObject.do"})
     public ModelAndView getJobObject(@RequestParam("jobId") String jobId) {
     	PortalUser user = userService.getLoggedInUser();
         try {
@@ -194,7 +199,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a files attribute which is an array of
      *         filenames.
      */
-    @RequestMapping("/secure/stagedJobFiles.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/stagedJobFiles.do"})
     public ModelAndView stagedJobFiles(@RequestParam("jobId") String jobId) {
     	PortalUser user = userService.getLoggedInUser();
         //Lookup our job
@@ -237,7 +242,7 @@ public class JobBuilderController extends BaseCloudController {
      *         failure.
      * @throws IOException
      */
-    @RequestMapping("/secure/downloadInputFile.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/downloadInputFile.do"})
     public ModelAndView downloadFile(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") String jobId,
@@ -263,7 +268,7 @@ public class JobBuilderController extends BaseCloudController {
      *
      * @return null
      */
-    @RequestMapping("/secure/uploadFile.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/uploadFile.do"})
     public ModelAndView uploadFile(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") String jobId) {
@@ -306,7 +311,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a success attribute that indicates whether
      *         the files were successfully deleted.
      */
-    @RequestMapping("/secure/deleteFiles.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/deleteFiles.do"}) // todo: RequestMethod.DELETE
     public ModelAndView deleteFiles(@RequestParam("jobId") String jobId,
             @RequestParam("fileName") String[] fileNames) {
     	PortalUser user = userService.getLoggedInUser();
@@ -339,7 +344,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a success attribute that indicates whether
      *         the downloads were successfully deleted.
      */
-    @RequestMapping("/secure/deleteDownloads.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/deleteDownloads.do"}) // todo: RequestMethod.DELETE
     public ModelAndView deleteDownloads(@RequestParam("jobId") String jobId,
             @RequestParam("downloadId") Integer[] downloadIds) {
     	PortalUser user = userService.getLoggedInUser();
@@ -386,7 +391,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a success attribute that indicates the status.
      *
      */
-    @RequestMapping("/secure/getJobStatus.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/getJobStatus.do"})
     public ModelAndView getJobStatus(@RequestParam("jobId") String jobId) {
     	PortalUser user = userService.getLoggedInUser();
         //Get our job
@@ -413,7 +418,7 @@ public class JobBuilderController extends BaseCloudController {
      *
      * @return null
      */
-    @RequestMapping("/secure/cancelSubmission.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/cancelSubmission.do"})
     public ModelAndView cancelSubmission(@RequestParam("jobId") String jobId) {
     	PortalUser user = userService.getLoggedInUser();
         //Get our job
@@ -456,7 +461,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      * @throws ParseException
      */
-    @RequestMapping("/secure/updateOrCreateJob.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/updateOrCreateJob.do"}) // todo: RequestMethod.POST
     public ModelAndView updateOrCreateJob(@RequestParam(value="id", required=false) Integer id,  //The integer ID if not specified will trigger job creation
             @RequestParam(value="name", required=false) String name,
             @RequestParam(value="description", required=false) String description,
@@ -593,7 +598,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      * @throws ParseException
      */
-    @RequestMapping("/secure/updateJobSeries.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/updateJobSeries.do"}) // todo: RequestMethod.PUT
     public ModelAndView updateJobSeries(@RequestParam(value="id", required=true) Integer id,  //The integer ID if not specified will trigger job creation
             @RequestParam(value="folderName", required=true) String folderName, //Name of the folder to move to
             HttpServletRequest request) {
@@ -648,7 +653,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      * @throws ParseException
      */
-    @RequestMapping("/secure/updateJobDownloads.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/updateJobDownloads.do"}) // todo: RequestMethod.PUT
     public ModelAndView updateJobDownloads(@RequestParam("id") Integer id,  //The integer ID is the only required value
             @RequestParam(required=false, value="append", defaultValue="false") String appendString,
             @RequestParam("name") String[] names,
@@ -734,7 +739,7 @@ public class JobBuilderController extends BaseCloudController {
      * @param jobId
      * @return
      */
-    @RequestMapping("/secure/getJobDownloads.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/getJobDownloads.do"})
     public ModelAndView getJobDownloads(@RequestParam("jobId") Integer jobId) {
     	PortalUser user = userService.getLoggedInUser();
         //Lookup the job
@@ -811,7 +816,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return A JSON object with a success attribute that indicates whether
      *         the job was successfully submitted.
      */
-    @RequestMapping("/secure/submitJob.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/submitJob.do"}) // todo: RequestMethod.POST
     public ModelAndView submitJob(HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam("jobId") String jobId) {
@@ -1065,7 +1070,7 @@ public class JobBuilderController extends BaseCloudController {
      * Request wrapper to get the default toolbox uri.
      *
      */
-    @RequestMapping("/getDefaultToolbox.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/getDefaultToolbox.do"})
     public ModelAndView doGetDefaultToolbox() {
         return generateJSONResponseMAV(true, new String[] {getDefaultToolbox()}, "");
     }
@@ -1087,7 +1092,7 @@ public class JobBuilderController extends BaseCloudController {
      * @param jobId (optional) id of a job to limit suitable images
      * @return
      */
-    @RequestMapping("/secure/getVmImagesForComputeService.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/getVmImagesForComputeService.do"})
     public ModelAndView getImagesForComputeService(
             HttpServletRequest request,
             @RequestParam("computeServiceId") String computeServiceId,
@@ -1144,7 +1149,7 @@ public class JobBuilderController extends BaseCloudController {
      *
      * @param computeServiceId
      */
-    @RequestMapping("/secure/getVmTypesForComputeService.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/getVmTypesForComputeService.do"})
     public ModelAndView getTypesForComputeService(HttpServletRequest request,
             @RequestParam("computeServiceId") String computeServiceId,
             @RequestParam("machineImageId") String machineImageId) {
@@ -1176,7 +1181,7 @@ public class JobBuilderController extends BaseCloudController {
      * @return
      * @throws PortalServiceException
      */
-    @RequestMapping("/secure/getComputeServices.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/getComputeServices.do"})
     public ModelAndView getComputeServices(@RequestParam(value="jobId", required=false) final Integer jobId) throws PortalServiceException {
     	
     	PortalUser user = userService.getLoggedInUser();
@@ -1211,7 +1216,7 @@ public class JobBuilderController extends BaseCloudController {
      * Gets a JSON list of id/name pairs for every available storage service
      * @return
      */
-    @RequestMapping("/secure/getStorageServices.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/getStorageServices.do"})
     public ModelAndView getStorageServices() {
         List<ModelMap> simpleStorageServices = new ArrayList<>();
 
@@ -1234,7 +1239,7 @@ public class JobBuilderController extends BaseCloudController {
      * @param jobId
      * @return
      */
-    @RequestMapping("/secure/getAllJobInputs.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/getAllJobInputs.do"})
     public ModelAndView getAllJobInputs(@RequestParam("jobId") Integer jobId) {
     	PortalUser user = userService.getLoggedInUser();
         VEGLJob job = null;
@@ -1292,7 +1297,7 @@ public class JobBuilderController extends BaseCloudController {
      * 
      * @throws PortalServiceException
      */
-    @RequestMapping("/secure/getComputeServicesForSolutions.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/secure/getComputeServicesForSolutions.do"})
     public ModelAndView getComputeServicesForSolutions(@RequestParam(value="solutions", required=false) List<String> solutions) 
     		throws PortalServiceException {
     	PortalUser user = userService.getLoggedInUser();

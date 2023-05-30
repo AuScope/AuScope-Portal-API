@@ -11,7 +11,11 @@ import org.auscope.portal.server.web.service.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 /**
  * Controller for handling requests for the borehole
@@ -19,7 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author Lingbo Jiang
  *
  */
-@Controller
+@RestController
+@SecurityRequirement(name = "internal")
 public class GenericController extends BasePortalController {
   private GenericService genericService;
     @Autowired
@@ -34,7 +39,7 @@ public class GenericController extends BasePortalController {
      * @param optionalFilters 
      * @throws Exception
      */
-    @RequestMapping("/doGenericFilter.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/doGenericFilter.do"})
     public void doGenericFilter(
             HttpServletResponse response,
             @RequestParam(required = false, value = "bbox") String bboxJson,
@@ -75,7 +80,7 @@ public class GenericController extends BasePortalController {
      * @param optionalFilters 
      * @throws Exception
      */
-    @RequestMapping("/doGenericFilterStyle.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/doGenericFilterStyle.do"})
     public void doGenericFilterStyle(
             HttpServletResponse response,
             @RequestParam(required = false, value = "layerName", defaultValue = "") String layerName,

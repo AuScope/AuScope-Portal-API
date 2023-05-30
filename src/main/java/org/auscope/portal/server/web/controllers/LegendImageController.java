@@ -13,12 +13,15 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 /**
  * Class for serving legend images. Layer legends are defined in layers.yaml using the legendImg property.
  */
-@Controller
-@RequestMapping(value = "/legend")
+@RestController
+@SecurityRequirement(name = "public")
 public class LegendImageController {
 	
 	private final String IMAGE_PATH = "classpath:images/legend/";
@@ -30,7 +33,7 @@ public class LegendImageController {
 	 * @param filename the name of the legend file
 	 * @return legend image
 	 */
-    @GetMapping("/{image}")
+    @GetMapping("/legend/{image}")
     public ResponseEntity<byte[]> getImage(@PathVariable("image") String filename) {
         byte[] image = new byte[0];
         try {

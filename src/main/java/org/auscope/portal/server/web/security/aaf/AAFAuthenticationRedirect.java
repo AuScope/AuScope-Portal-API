@@ -6,6 +6,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 /**
  * Redirect authentication request to the AAF login URL
@@ -13,7 +16,8 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @author woo392
  *
  */
-@Controller
+@RestController
+@SecurityRequirement(name = "public")
 public class AAFAuthenticationRedirect {
 	
 	@Value("${spring.security.jwt.aaf.loginUrl}")
@@ -23,5 +27,5 @@ public class AAFAuthenticationRedirect {
 	public String redirectToAAFLogin(HttpServletRequest request, HttpServletResponse response) {
 		return "redirect:" + aafLoginUrl;
 	}
-
+    
 }

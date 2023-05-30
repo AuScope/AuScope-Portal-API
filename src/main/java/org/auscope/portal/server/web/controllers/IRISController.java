@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -28,12 +30,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 /*
  *
  * Controller for handling IRIS (Incorporated Research Institutions for Seismology) services
  *
  */
-@Controller
+@RestController
+@SecurityRequirement(name = "public")
 public class IRISController extends BasePortalController {
     /**
      * The format with which to encode input stream.
@@ -118,7 +123,7 @@ public class IRISController extends BasePortalController {
      *            The network code that you're interested in.
      * @return a JSONResponseMAV containing KML points of each station.
      */
-    @RequestMapping("/getIRISStations.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/getIRISStations.do"})
     public ModelAndView getIRISStations(
             @RequestParam("serviceUrl") String serviceUrl,
             @RequestParam("networkCode") String networkCode) {
@@ -213,7 +218,7 @@ public class IRISController extends BasePortalController {
      *            The code of the station to interrogate.
      * @return a JSONResponseMAV containing the start and end dates of the site and a collection of channel codes.
      */
-    @RequestMapping("/getStationChannels.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/getStationChannels.do"})
     public ModelAndView getStationChannels(
             @RequestParam("serviceUrl") String serviceUrl,
             @RequestParam("networkCode") String networkCode,
@@ -270,7 +275,7 @@ public class IRISController extends BasePortalController {
      *
      * @return a JSONResponseMAV containing the time series data
      */
-    @RequestMapping("/getTimeseriesUrl.do")
+    @RequestMapping(method = RequestMethod.GET, value = {"/getTimeseriesUrl.do"})
     public ModelAndView getTimeseriesUrl(
             @RequestParam("serviceUrl") String serviceUrl,
             @RequestParam("networkCode") String networkCode,

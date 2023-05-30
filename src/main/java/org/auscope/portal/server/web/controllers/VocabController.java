@@ -13,8 +13,10 @@ import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.apache.jena.rdf.model.Property;
@@ -27,11 +29,13 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
 
 import au.gov.geoscience.portal.services.vocabularies.VocabularyLookup;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 /**
  * Controller that enables access to vocabulary services.
  */
-@Controller
+@RestController
+@SecurityRequirement(name = "public")
 public class VocabController extends BasePortalController {
 	
 	public static final String TIMESCALE_VOCABULARY_ID = "vocabularyGeologicTimescales";
@@ -66,7 +70,7 @@ public class VocabController extends BasePortalController {
      * @param label name of label
      * @return
      */
-    @RequestMapping("/getScalar.do")
+    @GetMapping("/getScalar.do")
     public ModelAndView getScalarQuery(@RequestParam("repository") final String repository,
                                        @RequestParam("label") final String label) throws Exception {
 
@@ -90,7 +94,7 @@ public class VocabController extends BasePortalController {
      *
      * @return vocabulary mapping in JSON format
      */
-    @RequestMapping("getAllCommodities.do")
+    @GetMapping("getAllCommodities.do")
     public ModelAndView getAllCommodities() {
         Map<String, String> vocabularyMappings = this.vocabularyFilterService.getVocabularyById(COMMODITY_VOCABULARY_ID);
 
@@ -103,7 +107,7 @@ public class VocabController extends BasePortalController {
      *
      * @return vocabulary mapping in JSON format
      */
-    @RequestMapping("getAllMineStatuses.do")
+    @GetMapping("getAllMineStatuses.do")
     public ModelAndView getAllMineStatuses() {
         Map<String, String> vocabularyMappings = this.vocabularyFilterService.getVocabularyById(MINE_STATUS_VOCABULARY_ID);
 
@@ -117,7 +121,7 @@ public class VocabController extends BasePortalController {
      *
      * @return vocabulary mapping in JSON format
      */
-    @RequestMapping("getAllJorcCategories.do")
+    @GetMapping("getAllJorcCategories.do")
     public ModelAndView getAllJorcCategories() {
 
         Property sourceProperty = DCTerms.source;
@@ -145,7 +149,7 @@ public class VocabController extends BasePortalController {
      *
      * @return vocublary mapping in JSON format
      */
-    @RequestMapping("getAllTimescales.do")
+    @GetMapping("getAllTimescales.do")
     public ModelAndView getAllTimescales() {
 
         String[] ranks = {"http://resource.geosciml.org/ontology/timescale/gts#Period",
@@ -168,7 +172,7 @@ public class VocabController extends BasePortalController {
      *
      * @return vocublary mapping in JSON format
      */
-    @RequestMapping("getTenementTypes.do")
+    @GetMapping("getTenementTypes.do")
     public ModelAndView getTenementTypes() {
         String[] topConcepts = {
                 "http://resource.geoscience.gov.au/classifier/ggic/tenementtype/production",
@@ -191,7 +195,7 @@ public class VocabController extends BasePortalController {
      *
      * @return vocublary mapping in JSON format
      */
-    @RequestMapping("getTenementStatuses.do")
+    @GetMapping("getTenementStatuses.do")
     public ModelAndView getTenementStatuses() {
         String[] topConcepts = {
                 "http://resource.geoscience.gov.au/classifier/ggic/tenement-status/granted",

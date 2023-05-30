@@ -41,11 +41,15 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 /**
  * Controller for the ScriptBuilder view.
@@ -54,7 +58,8 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Josh Vote - modified for usage with VEGL
  * @author Richard Goh
  */
-@Controller
+@RestController
+@SecurityRequirement(name = "public")
 public class ScriptBuilderController extends BaseCloudController {
 
     private final Log logger = LogFactory.getLog(getClass());
@@ -104,7 +109,7 @@ public class ScriptBuilderController extends BaseCloudController {
      * @param solution
      * @return A JSON encoded response with a success flag
      */
-    @RequestMapping("/secure/saveScript.do")
+    @GetMapping("/secure/saveScript.do")
     public ModelAndView saveScript(@RequestParam("jobId") String jobId,
                                    @RequestParam("sourceText") String sourceText,
                                    @RequestParam("solutions") Set<String> solutions) {
@@ -145,7 +150,7 @@ public class ScriptBuilderController extends BaseCloudController {
      * @param jobId
      * @return A JSON encoded response which contains the contents of a saved job's script file
      */
-    @RequestMapping("/getSavedScript.do")
+    @GetMapping("/getSavedScript.do")
     public ModelAndView getSavedScript(@RequestParam("jobId") String jobId) {
         logger.debug("getSavedScript with jobId: " + jobId);
         PortalUser user = userService.getLoggedInUser();
@@ -173,7 +178,7 @@ public class ScriptBuilderController extends BaseCloudController {
      * @return
      * @throws PortalServiceException
      */
-    @RequestMapping("/secure/getConfiguredComputeServices.do")
+    @GetMapping("/secure/getConfiguredComputeServices.do")
     public ModelAndView getComputeServices() throws PortalServiceException {
     	PortalUser user = userService.getLoggedInUser();
         List<CloudComputeService> configuredServices = getConfiguredComputeServices(user, nciDetailsService);
@@ -199,7 +204,7 @@ public class ScriptBuilderController extends BaseCloudController {
      * @param values Values to use in template for placeholders (corresponds 1-1 with keys)
      * @return
      */
-    @RequestMapping("/getTemplatedScript.do")
+    @GetMapping("/getTemplatedScript.do")
     public ModelAndView getTemplatedScript(@RequestParam("templateName") String templateName,
                                   @RequestParam(value="key", required=false) String[] keys,
                                   @RequestParam(value="value", required=false) String[] values) {
@@ -236,7 +241,7 @@ public class ScriptBuilderController extends BaseCloudController {
      * Return a JSON list of problems and their solutions.
      * @throws PortalServiceException
      */
-    @RequestMapping("/secure/getProblems.do")
+    @GetMapping("/secure/getProblems.do")
     public ModelAndView getProblems(
             @RequestParam(value="field", required=false) String[] rawFields,
             @RequestParam(value="value", required=false) String[] rawValues,
@@ -338,7 +343,7 @@ public class ScriptBuilderController extends BaseCloudController {
      * @param solutionId String solution id
      *
      */
-    @RequestMapping("/getSolution.do")
+    @GetMapping("/getSolution.do")
     public ModelAndView getSolution(String solutionId) {
         Solution solution = scmEntryService.getScmSolution(solutionId);
 
@@ -353,7 +358,7 @@ public class ScriptBuilderController extends BaseCloudController {
      * @param uris Collection<String> of uris to look up
      * @return List<Solution> solution objects
      */
-    @RequestMapping("/getSolutions.do")
+    @GetMapping("/getSolutions.do")
     public ModelAndView doGetSolutions(@RequestParam("uris") Set<String> uris) {
         ArrayList<Solution> solutions = new ArrayList<>();
         StringBuilder msg = new StringBuilder();
@@ -387,7 +392,7 @@ public class ScriptBuilderController extends BaseCloudController {
      * @param lang String identifying template language (default=python3)
      * @return List<LintResult> lint result objects
      */
-    @RequestMapping("/lintTemplate.do")
+    @GetMapping("/lintTemplate.do")
     public ModelAndView doLintTemplate(@RequestParam("template") String template,
                                        @RequestParam(value="lang",
                                                      required=false) String lang) {
