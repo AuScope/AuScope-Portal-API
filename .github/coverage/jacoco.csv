@@ -16,7 +16,7 @@ AuScope-Portal-API,org.auscope.portal.view.knownlayer,IRISSelector,63,0,8,0,14,0
 AuScope-Portal-API,org.auscope.portal.gsml,BoreholeFilter,6,221,7,23,1,56,6,13,0,4
 AuScope-Portal-API,org.auscope.portal.gsml,TIMAGeosampleFilter,82,0,12,0,14,0,9,0,3,0
 AuScope-Portal-API,org.auscope.portal.gsml,BoreholeWithConfigurableFilter,102,0,10,0,21,0,9,0,4,0
-AuScope-Portal-API,org.auscope.portal.gsml,SF0BoreholeFilter,149,167,29,15,24,43,21,7,2,4
+AuScope-Portal-API,org.auscope.portal.gsml,SF0BoreholeFilter,159,197,30,16,24,50,22,8,2,5
 AuScope-Portal-API,org.auscope.portal.server.web.service.scm,Solution.ProblemURIConverver,3,0,0,0,1,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.web.service.scm,Dependency.Type,27,0,0,0,5,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.web.service.scm,SsscImage,45,0,2,0,13,0,10,0,9,0
@@ -35,7 +35,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,UserController,431,
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,RemanentAnomaliesAutoSearchController,44,0,0,0,15,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,PurchaseController,1211,357,64,10,219,82,44,6,8,4
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,GsmlpNameSpaceTable,90,0,4,0,25,0,6,0,4,0
-AuScope-Portal-API,org.auscope.portal.server.web.controllers,SF0BoreholeController,639,0,34,0,128,0,23,0,6,0
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,SF0BoreholeController,641,0,34,0,129,0,23,0,6,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,ReprojectionController,0,270,2,36,0,46,2,22,0,5
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,JobListController,1581,1069,112,76,303,225,79,45,14,16
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,JobBuilderController,929,1618,69,113,156,369,65,60,8,25
@@ -107,7 +107,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService.Dataset
 AuScope-Portal-API,org.auscope.portal.server.web.service,LintResult.Location,15,0,0,0,6,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,VEGLSeriesService,86,0,10,0,21,0,10,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService.Dataset,6,0,0,0,1,0,1,0,1,0
-AuScope-Portal-API,org.auscope.portal.server.web.service,SF0BoreholeService,43,52,0,2,8,10,4,3,4,2
+AuScope-Portal-API,org.auscope.portal.server.web.service,SF0BoreholeService,43,53,0,2,8,10,4,3,4,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,TemplateLintService,314,0,20,0,73,0,14,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GeologicalProvincesService,29,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalStateService,27,0,0,0,7,0,5,0,5,0
