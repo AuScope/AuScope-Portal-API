@@ -19,24 +19,34 @@ import org.springframework.stereotype.Service;
 public class SF0BoreholeFilter extends BoreholeFilter {
     protected Boolean justNVCL;
     protected List<String> identifiers;
+    protected Boolean omitGsmlpShapeProperty = false;
     // ----------------------------------------------------------- Constructors
 
     public SF0BoreholeFilter() {
         // test
-        super(null, null, null, null, null,null);
+        super(null, null, null, null, null, null);
     }
     
         
     public SF0BoreholeFilter(Boolean justNVCL) {
         // test
-        super(null, null, null, null, null,null);
+        super(null, null, null, null, null, null);
         this.justNVCL = justNVCL;
     }
 
-    public SF0BoreholeFilter(String boreholeName, String custodian, String dateOfDrillingStart, String dateOfDrillingEnd,List<String> ids, List<String> identifiers,  Boolean justNVCL,String optionalFilters) {
-        super(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, ids,optionalFilters );
+    public SF0BoreholeFilter(String boreholeName, String custodian, String dateOfDrillingStart, String dateOfDrillingEnd,
+    		List<String> ids, List<String> identifiers, Boolean justNVCL, String optionalFilters) {
+        super(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, ids, optionalFilters);
         this.justNVCL = justNVCL;
         this.identifiers = identifiers;
+    }
+    
+    public SF0BoreholeFilter(String boreholeName, String custodian, String dateOfDrillingStart, String dateOfDrillingEnd,
+    		List<String> ids, List<String> identifiers, Boolean justNVCL, String optionalFilters, Boolean omitGsmlpShapeProperty) {
+        super(boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, ids, optionalFilters);
+        this.justNVCL = justNVCL;
+        this.identifiers = identifiers;
+        this.omitGsmlpShapeProperty = omitGsmlpShapeProperty;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -48,11 +58,11 @@ public class SF0BoreholeFilter extends BoreholeFilter {
 
     @Override
     public String getFilterStringBoundingBox(FilterBoundingBox bbox) {
-
+    	
         return this
                 .generateFilter(this.generateAndComparisonFragment(
                         this.generateBboxFragment(bbox,
-                                "gsmlp:shape"),
+                                omitGsmlpShapeProperty ? null : "gsmlp:shape"),
                                 this.generateFilterFragment()));
     }
 
@@ -140,7 +150,6 @@ public class SF0BoreholeFilter extends BoreholeFilter {
         } else {
             return this.generateAndComparisonFragment(parameterFragments.toArray(new String[parameterFragments.size()]));
         }
-
 
     }
 }
