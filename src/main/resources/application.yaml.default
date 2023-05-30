@@ -35,6 +35,9 @@ socket:
 connection-establish:
    timeout: 90
 
+server:
+   max-http-header-size: 20KB
+
 access:
    # set a whitelist for the request URL only from the Commonwealth Government or the State Governments or Universities or Octopus will pass
    whitelist: .gov.au .edu.au .octopusdata.org .csiro.au .gstatic.com
@@ -49,14 +52,26 @@ spring:
       # Make sure only one is present (or that one is commented)
       active: test
       #active: prod
-      # Use this for MySQL db
-      #datasource:
-      #   url: jdbc:mysql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true			# MySQL only
-      #   url: jdbc:postgresql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true	# PostgreSQL only
-      #   username: <db_user>
-      #   password: <db_password>
-      #   driver-class-name: com.mysql.cj.jdbc.Driver	# MySQL only
-      #   driver-class-name: org.postgresql.Driver		# PostgreSQL only
+
+   # Use this for DB connection
+   datasource:
+       # Use this for MySQL DB
+       # url: jdbc:mysql://<db_url>:3306/<db>?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+       # driver-class-name: com.mysql.cj.jdbc.Driver
+       # username: <mysql_db_user>
+       # password: <mysql_db_password>
+       #
+       # Use this for PostgreSQL
+       # url: jdbc:postgresql://<db_url>:5432/<db>?autoReconnect=true&useSSL=true&allowPublicKeyRetrieval=true
+       # driver-class-name: org.postgresql.Driver
+       # username: <postgres_db_user>
+       # password: <postgres_db_password>
+       #
+       # Use this in-memory db for development
+       url: jdbc:hsqldb:mem:dummyDB
+       driver-class-name: org.hsqldb.jdbc.JDBCDriver
+       username: sa
+       password: ""
 
    jpa:
       hibernate:
@@ -65,13 +80,7 @@ spring:
             physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       properties:
          hibernate:
-            # Set up an in memory DB using "in-process" mode
-            # i.e. can only be accessed within process
-            dialect: org.hibernate.dialect.HSQLDialect
-            connection:
-               url: "jdbc:hsqldb:mem:dummyDB"
-               username: "sa"
-               password: ""
+            dialect: org.hibernate.dialect.HSQLDialect # Development only
       #     dialect: org.hibernate.dialect.MySQL5InnoDBDialect # If using MySQL only
       #     dialect: org.hibernate.dialect.PostgreSQL81Dialect # If using PostgreSQL only
       #     format_sql: true      # FOR TESTING
@@ -91,6 +100,7 @@ spring:
                   clientSecret: GOOGLE_CLIENT_SECRET
                   accessTokenUri: https://www.googleapis.com/oauth2/v4/token
                   userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+                  redirectUri: ${portalUrl}/login/oauth2/code/google
                   clientAuthenticationScheme: form
                   scope:
                      - email
@@ -98,14 +108,15 @@ spring:
                github:
                   clientId: client-id-goes-here
                   clientSecret: client-secret-goes-here
+                  redirectUri: ${portalUrl}/login/oauth2/code/github
                   scope:
                      - user:email
                      - read:user
       jwt:
          aaf:
-            loginUrl: AAF_LOGIN_URL
-            callbackUrl: AAF_CALLBACK_URL
-            jwtsecret: AAF_SECRET
+            loginUrl: AAF_LOGIN_URL            # Supplied by AAF upon registration
+            callbackUrl: /login/aaf/callback   # Register at AAF with <portalUrl>/login/aaf/callback
+            jwtsecret: AAF_SECRET              # LC_CTYPE=C tr -dc '[[:alnum:][:punct:]]' < /dev/urandom
 
 # Cloud specific settings
 cloud:
