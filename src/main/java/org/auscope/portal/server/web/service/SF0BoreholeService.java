@@ -69,6 +69,7 @@ public class SF0BoreholeService extends BoreholeService {
             filterString = sf0BoreholeFilter.getFilterStringAllRecords();
         } else {
             filterString = sf0BoreholeFilter.getFilterStringBoundingBox(bbox);
+            System.out.println("filterString="+filterString);
         }
         HttpRequestBase method = null;
         try {

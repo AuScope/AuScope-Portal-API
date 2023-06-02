@@ -52,7 +52,7 @@ public class SF0BoreholeFilter extends BoreholeFilter {
         return this
                 .generateFilter(this.generateAndComparisonFragment(
                         this.generateBboxFragment(bbox,
-                                "gsmlp:shape"),
+                                "gsmlbh:referenceLocation/gsmlbh:OriginPosition/gsmlbh:location"),
                                 this.generateFilterFragment()));
     }
 

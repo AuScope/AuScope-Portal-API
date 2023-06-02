@@ -348,7 +348,7 @@
         proxyStyleUrl: ""
         proxyCountUrl: ""
         order: "201"
-        supportsCsvDownloads: false
+        supportsCsvDownloads: true
         wfs:
                selector: "gsmlbh:Borehole"
                feature:
