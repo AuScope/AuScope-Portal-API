@@ -36,7 +36,7 @@
         <powermock.version>2.0.5</powermock.version>
         <log4j.version>2.17.1</log4j.version>
         <geotools.version>2.6.5</geotools.version>
-        <portal.core.version>2.4.4-SNAPSHOT</portal.core.version>
+        <portal.core.version>2.4.5-SNAPSHOT</portal.core.version>
         <httpclient.version>4.5.13</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
     </properties>
@@ -45,7 +45,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.13</version>
+        <version>3.1.0</version>
     </parent>
     
     <!-- Repositories section -->
@@ -82,20 +82,22 @@
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
-                <version>4.9.1</version>
+                <version>4.11.0</version>
             </dependency>
+
             <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>1.9.4</version>
             </dependency>
-	    <dependency>
+
+            <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
                 <version>22.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
-	    </dependency>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -103,16 +105,17 @@
     <dependencies>
         <dependency>
             <groupId>com.google.cloud</groupId>
-	    <artifactId>google-cloud-storage</artifactId>
+            <artifactId>google-cloud-storage</artifactId>
             <version>2.6.2</version>
         </dependency>
+
         <dependency>
-	    <groupId>net.bytebuddy</groupId>
-	    <artifactId>byte-buddy</artifactId>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
         </dependency>
-	
-	<!-- Check if we need this if we use spring-boot-starter-web -->
-	<dependency>
+    
+        <!-- Check if we need this if we use spring-boot-starter-web -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
@@ -133,18 +136,22 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
         <dependency>
            <groupId>org.springframework.security</groupId>
            <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
@@ -192,7 +199,9 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <scope>compile</scope>
+            <version>4.5.14</version>
         </dependency>
+
         <dependency>
             <groupId>com.jhlabs</groupId>
             <artifactId>javaproj</artifactId>
@@ -205,16 +214,10 @@
             <version>1.2.5</version>
         </dependency>
 
-        <!-- Added for email templating -->
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>1.5</version>
-        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.8.0</version>
+            <version>2.12.0</version>
         </dependency>
 
         <dependency>
@@ -226,27 +229,28 @@
          <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.27.0-GA</version>
+            <version>3.29.2-GA</version>
         </dependency>
 
-	<!-- This is a dummy database used for non-VGL deployments -->
+        <!-- This is a dummy database used for non-VGL deployments -->
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>2.7.1</version>
         </dependency>
-        
+
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>5.7.1</version>
         </dependency>
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20201115</version>
+            <version>20230227</version>
         </dependency>
-        
+
         <!-- Added for job monitoring -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -262,16 +266,16 @@
         <!-- Added for email templating -->
         <dependency>
             <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-            <version>1.7</version>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.3</version>
         </dependency>
-        
+
         <dependency>
             <groupId>edu.ucar</groupId>
             <artifactId>netcdf4</artifactId>
             <version>5.3.3</version>
         </dependency>
-        
+
         <!-- Added for using PowerMock with JMock -->
         <dependency>
             <groupId>org.powermock</groupId>
@@ -279,6 +283,7 @@
             <version>${powermock.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
@@ -307,76 +312,81 @@
 <!--                     <artifactId>easymock</artifactId> -->
 <!--                 </exclusion> -->
 <!--                 <exclusion> -->
-<!--                 	<groupId>cglib</groupId> -->
-<!--                 	<artifactId>cglib-nodep</artifactId> -->
+<!--                     <groupId>cglib</groupId> -->
+<!--                     <artifactId>cglib-nodep</artifactId> -->
 <!--                 </exclusion> -->
 <!--             </exclusions> -->
         </dependency>
 
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-            <version>1.6.2</version>
-        </dependency>
+        <!-- <dependency>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>2.1.2</version>
+        </dependency> -->
 
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.28</version>
         </dependency>
-        
+
         <dependency>
-		    <groupId>org.postgresql</groupId>
-		    <artifactId>postgresql</artifactId>
-		    <scope>runtime</scope>
-		</dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.36.0</version>
+            <version>3.42.0.0</version>
          </dependency>
 
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
-            <version>4.2.0</version>
+            <version>4.8.0</version>
             <type>pom</type>
         </dependency>
+
         <dependency>
-          <groupId>com.google.inject</groupId>
-          <artifactId>guice</artifactId>
-          <version>5.0.1</version>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>5.0.1</version>
         </dependency>
+
         <dependency>
-          <groupId>com.google.inject.extensions</groupId>
-          <artifactId>guice-assistedinject</artifactId>
-          <version>5.0.1</version>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+            <version>5.0.1</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.jclouds</groupId>
             <artifactId>jclouds-all</artifactId>
             <version>2.4.0</version>
             <exclusions>
-              <exclusion>
-                <groupId>javax.annotation</groupId>
-                <artifactId>jsr250-api</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>com.google.inject</groupId>
-                <artifactId>guice</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>com.google.inject.extensions</groupId>
-                <artifactId>guice-assistedinject</artifactId>
-              </exclusion>
+                <exclusion>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>jsr250-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.inject</groupId>
+                    <artifactId>guice</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.inject.extensions</groupId>
+                    <artifactId>guice-assistedinject</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
         </dependency>
+
          <dependency>
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
@@ -399,33 +409,39 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.jmock</groupId>
             <artifactId>jmock-imposters</artifactId>
             <version>2.12.0</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
             <version>9.1</version>
         </dependency>
+
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-legacy</artifactId>
             <version>2.6.3</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
             <version>9.4.1</version>
         </dependency>
+
         <!-- TODO: Using this for search testing, remove for final commit -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -439,27 +455,31 @@
             <artifactId>selenium-java</artifactId>
             <scope>test</scope>
             <exclusions>
-              <exclusion>
-                <groupId>xml-apis</groupId>
-                <artifactId>xml-apis</artifactId>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
               </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
-           <groupId>com.fasterxml.jackson.core</groupId>
-           <artifactId>jackson-core</artifactId>
+             <groupId>com.fasterxml.jackson.core</groupId>
+             <artifactId>jackson-core</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>7.7.0</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-	  <artifactId>jackson-databind</artifactId>
-          <version>2.13.4.2</version>
-      </dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.4.2</version>
+        </dependency>
+
     </dependencies>
 
     <!-- Build section -->
@@ -469,13 +489,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-		    <fork>false</fork>
-		    <image>
+                    <fork>false</fork>
+                    <image>
                         <env>
                             <BP_JVM_VERSION>17.*</BP_JVM_VERSION>
                         </env>
                     </image>
-		</configuration>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -523,25 +543,25 @@
                     <commitIdGenerationMode>full</commitIdGenerationMode>
                 </configuration>
             </plugin>
-		
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.8</version>
-				<executions>
-					<execution>				
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+                <executions>
+                    <execution>                
                         <id>default-prepare-agent</id>
-						<goals>	
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>generate-code-coverage-report</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
+                        <goals>    
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>generate-code-coverage-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
                     <execution>
                         <id>report</id>
                         <phase>prepare-package</phase>
@@ -549,18 +569,18 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
-				</executions>
-			</plugin>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
     <!-- Deployment to github packages -->
     <distributionManagement>
-      <repository>
-        <id>github</id>
-        <name>GitHub Packages</name>
-	<url>https://maven.pkg.github.com/AuScope/Auscope-Portal-API</url>
-      </repository>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/AuScope/Auscope-Portal-API</url>
+        </repository>
     </distributionManagement>
-    
+
 </project>

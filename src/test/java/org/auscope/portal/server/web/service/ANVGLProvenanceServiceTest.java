@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseFactory;
 import org.apache.http.HttpVersion;
@@ -256,10 +256,8 @@ public class ANVGLProvenanceServiceTest extends PortalTestClass {
             
             System.out.println(turtle);
             
-            //Assert.assertTrue(turtle.contains(initialTurtle));
             Assert.assertTrue(turtle.contains(initialTurtle));
             Assert.assertTrue(turtle.contains(endedTurtle));
-            //Assert.assertTrue(turtle.contains(file1Turtle));
             Assert.assertTrue(turtle.contains(outputURL));
         }
     }

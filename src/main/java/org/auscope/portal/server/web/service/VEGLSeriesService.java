@@ -1,7 +1,7 @@
 package org.auscope.portal.server.web.service;
 
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.auscope.portal.server.vegl.VEGLSeries;
 import org.auscope.portal.server.web.repositories.VEGLSeriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;

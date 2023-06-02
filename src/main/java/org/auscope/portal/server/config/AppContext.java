@@ -98,7 +98,7 @@ import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+//import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 
 /**
@@ -677,10 +677,10 @@ public class AppContext {
         return ssscUrlBean;
     }
 
-    @Bean
+    /*@Bean
     public CommonsMultipartResolver multipartResolver() {
         return new CommonsMultipartResolver();
-    }
+    }*/
 
     @Bean
     public ErmlNamespaceContext ermlNamespaceContext() {

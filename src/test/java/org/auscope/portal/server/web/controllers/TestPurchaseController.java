@@ -9,12 +9,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
 
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.auscope.portal.core.services.CSWFilterService;
@@ -259,7 +259,7 @@ public class TestPurchaseController extends PortalTestClass {
 			return null;
 		}
 
-		@Override
+		/*@Override
 		public String encodeUrl(String url) {
 			// TODO Auto-generated method stub
 			return null;
@@ -269,7 +269,7 @@ public class TestPurchaseController extends PortalTestClass {
 		public String encodeRedirectUrl(String url) {
 			// TODO Auto-generated method stub
 			return null;
-		}
+		}*/
 
 		@Override
 		public void sendError(int sc, String msg) throws IOException {
@@ -331,11 +331,11 @@ public class TestPurchaseController extends PortalTestClass {
 			
 		}
 
-		@Override
+		/*@Override
 		public void setStatus(int sc, String sm) {
 			// TODO Auto-generated method stub
 			
-		}
+		}*/
 
 		@Override
 		public int getStatus() {

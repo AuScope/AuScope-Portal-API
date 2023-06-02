@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.MalformedURLException;
 import java.util.List;
+import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -106,7 +107,7 @@ public class SearchLayerTest {
         searchBox.sendKeys("tenement");
 
         // Find the first (and only) search button on the page and click it
-        WebElement searchIcon = new WebDriverWait(driver, 30).until(ExpectedConditions.visibilityOf(
+        WebElement searchIcon = new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOf(
                 driver.findElement(By.id("hh-searchfield-Featured-trigger-search"))));
 
         searchIcon.click();

@@ -3,7 +3,7 @@ package org.auscope.portal.server.web.controllers;
 import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.util.FileIOUtil;

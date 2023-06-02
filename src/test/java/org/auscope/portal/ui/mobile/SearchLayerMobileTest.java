@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.MalformedURLException;
 import java.util.List;
+import java.time.Duration;
 
 import org.auscope.portal.ui.SearchLayerTest;
 import org.openqa.selenium.By;
@@ -44,7 +45,7 @@ public class SearchLayerMobileTest extends SearchLayerTest {
         // open portal
         super.openPage();
         // bring up menu toggle
-        WebElement menuToggle = new WebDriverWait(driver, 30).until(ExpectedConditions.elementToBeClickable(
+        WebElement menuToggle = new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(
                 driver.findElement(By.cssSelector(".menu-icon-toggle"))));
         menuToggle.click();
         // bring up search box
@@ -57,7 +58,7 @@ public class SearchLayerMobileTest extends SearchLayerTest {
      */
     public void testSearchAndEnter() {
         // give 60s to load up search box 
-        WebElement searchBox = new WebDriverWait(driver, 60).until(ExpectedConditions.visibilityOf(
+        WebElement searchBox = new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.visibilityOf(
                 driver.findElement(By.id("main-search"))));
 
         // type "tenement" in search
@@ -73,7 +74,7 @@ public class SearchLayerMobileTest extends SearchLayerTest {
      */
     public void testSearchAndClickIcon() {
         // give 60s to load up search box 
-        WebElement searchBox = new WebDriverWait(driver, 60).until(ExpectedConditions.visibilityOf(
+        WebElement searchBox = new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.visibilityOf(
                 driver.findElement(By.id("main-search"))));
 
         // type "tenement" in search
