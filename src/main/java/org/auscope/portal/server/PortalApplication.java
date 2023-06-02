@@ -80,7 +80,7 @@ public class PortalApplication extends SpringBootServletInitializer {
     }
     
     OpenApiCustomiser openApiCustomiserPublic() {
-        return openApi -> openApi.getPaths().entrySet().removeIf(path -> path.getValue().readOperations().stream().peek(p -> System.out.println("path(public):" + p))
+        return openApi -> openApi.getPaths().entrySet().removeIf(path -> path.getValue().readOperations().stream()
                 .anyMatch(operation -> operation.getSecurity() != null && operation.getSecurity().stream()
                 .anyMatch(securityRequirement -> securityRequirement.containsKey("internal"))
                 ));
@@ -95,7 +95,7 @@ public class PortalApplication extends SpringBootServletInitializer {
     }
 
     private OpenApiCustomiser openApiCustomiserInternal() {
-        return openApi -> openApi.getPaths().entrySet().removeIf(path -> path.getValue().readOperations().stream().peek(p -> System.out.println("path(internal):" + p))
+        return openApi -> openApi.getPaths().entrySet().removeIf(path -> path.getValue().readOperations().stream()
             .anyMatch(operation -> operation.getSecurity() != null && operation.getSecurity().stream()
             .anyMatch(securityRequirement -> securityRequirement.containsKey("public"))
             ));
