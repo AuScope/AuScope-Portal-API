@@ -24,6 +24,7 @@ import org.auscope.portal.server.web.service.SF0BoreholeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -153,7 +154,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @param maxFeatures
      * @throws Exception
      */
-    @GetMapping("/doNvclV2Filter.do")
+    @PostMapping("/doNvclV2Filter.do")
     public void doNvclV2Filter(
             HttpServletResponse response,
             @RequestParam(required = false, value = "boreholeName", defaultValue = "") String boreholeName,
