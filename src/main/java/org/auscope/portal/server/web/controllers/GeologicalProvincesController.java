@@ -10,6 +10,7 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.web.service.GeologicalProvincesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,7 +40,7 @@ public class GeologicalProvincesController extends BasePortalController {
      * @param name
      * @throws Exception
      */
-    @RequestMapping(method = RequestMethod.GET, value = {"/getGeologicalProvincestyle.do"})
+    @PostMapping("/getGeologicalProvincestyle.do")
     public void getGeologicalProvincestyle(
             @RequestParam(required = false, value = "serviceUrl") String serviceUrl,
             @RequestParam(required = false, value = "name") String name,

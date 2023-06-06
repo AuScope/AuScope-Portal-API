@@ -10,6 +10,7 @@ import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.server.web.service.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -80,7 +81,7 @@ public class GenericController extends BasePortalController {
      * @param optionalFilters 
      * @throws Exception
      */
-    @RequestMapping(method = RequestMethod.GET, value = {"/doGenericFilterStyle.do"})
+    @PostMapping("/doGenericFilterStyle.do")
     public void doGenericFilterStyle(
             HttpServletResponse response,
             @RequestParam(required = false, value = "layerName", defaultValue = "") String layerName,

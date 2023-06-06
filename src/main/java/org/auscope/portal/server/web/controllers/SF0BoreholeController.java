@@ -100,7 +100,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @return a WFS response converted into CSV
      * @throws Exception
      */
-    @GetMapping("/doNVCLBoreholeViewCSVDownload.do")
+    @PostMapping("/doNVCLBoreholeViewCSVDownload.do")
     public void doNVCLBoreholeViewCSVDownload(String serviceUrl,String typeName,
     		@RequestParam(required=false, value="bbox") String bbox,
             @RequestParam(required=false, value="outputFormat") String outputFormat,
@@ -194,7 +194,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @param maxFeatures
      * @throws Exception
      */
-    @GetMapping("/doNvclV2FilterStyle.do")
+    @PostMapping("/doNvclV2FilterStyle.do")
     public void doNvclV2FilterStyle(
             HttpServletResponse response,
             @RequestParam(required = false, value = "serviceUrl", defaultValue = "") String serviceUrl,
@@ -279,7 +279,7 @@ public class SF0BoreholeController extends BasePortalController {
      * @param maxFeatures
      * @throws Exception
      */
-    @GetMapping("/doBoreholeViewFilterStyle.do")
+    @PostMapping("/doBoreholeViewFilterStyle.do")
     public void doFilterStyle(
             HttpServletResponse response,
             @RequestParam(required = false, value = "serviceUrl", defaultValue = "") String serviceUrl,
