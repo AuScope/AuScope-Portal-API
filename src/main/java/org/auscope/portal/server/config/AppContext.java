@@ -393,6 +393,7 @@ public class AppContext {
 
     /* This is the core threadpool shared by object instances throughout the portal */
     @Bean
+    @Primary
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExec = new ThreadPoolTaskExecutor();
         taskExec.setCorePoolSize(5);
