@@ -1,0 +1,9 @@
+# set label filter to the correct env and envregistries
+spring:
+  cloud:
+    azure:
+      appconfiguration:
+        stores:
+          - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING}
+            enabled: false
+
