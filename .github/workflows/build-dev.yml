@@ -46,7 +46,8 @@ jobs:
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push image
+      - name: Push image to repository only if its the master branch
+        if: contains(github.ref, 'master')
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/$IMAGE_NAME
 
