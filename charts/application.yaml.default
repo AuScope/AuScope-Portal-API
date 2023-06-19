@@ -37,7 +37,7 @@ connection-establish:
 
 access:
    # set a whitelist for the request URL only from the Commonwealth Government or the State Governments or Universities or Octopus will pass
-   whitelist: .gov.au .edu.au .octopusdata.org .csiro.au
+   whitelist: .gov.au .edu.au .octopusdata.org .csiro.au 13.211.217.129
 
 spring:
    # Include the registry definitions from application-registries.yaml
