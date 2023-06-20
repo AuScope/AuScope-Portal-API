@@ -56,8 +56,8 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,PortalStateControll
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,NVCLController,1208,399,76,6,222,83,58,11,19,9
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,EarthResourcesFilterController,408,0,8,0,108,0,15,0,11,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabController.new Comparator() {...},0,16,0,0,0,2,0,2,0,2
-AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabularyCacheController,48,0,0,0,12,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController.new IterableNamespace() {...},0,12,0,0,0,3,0,1,0,1
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabularyCacheController,48,0,0,0,12,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new Comparator() {...},16,0,0,0,2,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new IterableNamespace() {...},66,0,0,0,12,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.mscl,MSCLWFSService,110,0,4,0,18,0,7,0,5,0
@@ -112,8 +112,8 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,TemplateLintService,314
 AuScope-Portal-API,org.auscope.portal.server.web.service,GeologicalProvincesService,29,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalStateService,27,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GenericService,28,0,2,0,9,0,4,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.web.service,VGLPurchaseService,31,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,CloudSubmissionService,65,112,2,0,15,25,6,8,5,8
+AuScope-Portal-API,org.auscope.portal.server.web.service,VGLPurchaseService,31,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GenericFilter2,50,0,0,0,8,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,VGLJobAuditLogService,24,0,0,0,5,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,ANVGLFileStagingService,27,0,0,0,8,0,2,0,2,0
