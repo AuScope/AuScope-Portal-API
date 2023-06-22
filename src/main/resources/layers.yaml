@@ -1227,6 +1227,7 @@
     wfs:
         selector: "gsnsw:dw_surfassay"
 "nsw-field-observations":
+    hidden: true
     name: "Nsw Field Observations"
     group: "Geological Survey NSW"
     description: ""
@@ -1307,6 +1308,7 @@
     wfs:
         selector: "gsnsw:bl_histels"
 "nsw-map-block-graticule":
+    hidden: true
     name: "Nsw Map Block Graticule"
     group: "Geological Survey NSW"
     description: ""
@@ -1315,6 +1317,7 @@
     wfs:
         selector: "gsnsw:bl_mapblock"
 "bl-localaboriginallandcouncil":
+    hidden: true
     name: "Bl Localaboriginallandcouncil"
     group: "Geological Survey NSW"
     description: ""
@@ -1339,6 +1342,7 @@
     wfs:
         selector: "gsnsw:bl_mapsheet100k"
 "nsw-fossicking-districts":
+    hidden: true
     name: "Nsw Fossicking Districts"
     group: "Geological Survey NSW"
     description: "Fossicking is the small scale search for and collection of minerals, gemstones o"
@@ -1355,6 +1359,7 @@
     wfs:
         selector: "gsnsw:dw_photo"
 "geop-tota-magn-inte-rtp-tmi-rtp-tilt-filt":
+    hidden: true
     name: "Geophysics Total Magnetic Intensity Rtp Tmi Rtp Tilt Filter"
     group: "Geological Survey NSW"
     description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  To"
@@ -1363,6 +1368,7 @@
     wfs:
         selector: "geophys:MagRTPtilt"
 "nsw-seismic":
+    hidden: true
     name: "Nsw Seismic"
     group: "Geological Survey NSW"
     description: ""
@@ -1379,6 +1385,7 @@
     wfs:
         selector: "gsnsw:bl_title"
 "geop-tota-magn-inte-1st-deri-redu-to-pole":
+    hidden: true
     name: "Geophysics Total Magnetic Intensity 1St Derivative Reduced To Pole"
     group: "Geological Survey NSW"
     description: ""
@@ -1395,6 +1402,7 @@
     wfs:
         selector: "gsnsw:dw_spectral"
 "geop-tern-radi-pota":
+    hidden: true
     name: "Geophysics Ternary Radioelement Potassium K Thorium Th Uranium U "
     group: "Geological Survey NSW"
     description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Te"
@@ -1403,6 +1411,7 @@
     wfs:
         selector: "geophys:Radio"
 "nsw-drillholes-csg":
+    hidden: true
     name: "Nsw Drillholes Csg"
     group: "Geological Survey NSW"
     description: "The coal seam gas drillholes dataset stores information about CSG sites within N"
@@ -1427,6 +1436,7 @@
     wfs:
         selector: "gsnsw:dw_opmines"
 "geophysics-elevation":
+    hidden: true
     name: "Geophysics Elevation"
     group: "Geological Survey NSW"
     description: "Elevation is a pseudocolour layer with a histogram-equalised colour-stretch. Coo"
@@ -1443,6 +1453,7 @@
     wfs:
         selector: "gsnsw:ge_geology15m_bdy"
 "blocks-and-units-graticule":
+    hidden: true
     name: "Blocks And Units Graticule"
     group: "Geological Survey NSW"
     description: "Layer-Group type layer: gsnsw:Map Blocks and Units"
@@ -1451,6 +1462,7 @@
     wfs:
         selector: gsnsw:Map Blocks and Units""
 "nsw-map-unit-graticule":
+    hidden: true
     name: "Nsw Map Unit Graticule"
     group: "Geological Survey NSW"
     description: ""
@@ -1467,6 +1479,7 @@
     wfs:
         selector: "gsnsw:dw_geochron"
 "geophysics-isostatic-bouger-gravity":
+    hidden: true
     name: "Geophysics Isostatic Bouger Gravity"
     group: "Geological Survey NSW"
     description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Is"
@@ -1475,6 +1488,7 @@
     wfs:
         selector: "geophys:IsoGrav"
 "geop-tota-magn-inte-redu-to-pole":
+    hidden: true
     name: "Geophysics Total Magnetic Intensity Reduced To Pole"
     group: "Geological Survey NSW"
     description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  To"
@@ -1499,6 +1513,7 @@
     wfs:
         selector: "gsnsw:dw_geochemistry"
 "nsw-titles":
+    hidden: true
     name: "Nsw Titles"
     group: "Geological Survey NSW"
     description: "Layer-Group type layer: gsnsw:Titles"
@@ -1507,6 +1522,7 @@
     wfs:
         selector: "gsnsw:Titles"
 "nsw-geology":
+    hidden: true
     name: "Nsw Geology"
     group: "Geological Survey NSW"
     description: "Layer-Group type layer: gsnsw:NSW_Geology"
@@ -1515,6 +1531,7 @@
     wfs:
         selector: "gsnsw:NSW_Geology"
 "geop-isos-grav-over-tmi-rtp-tilt":
+    hidden: true
     name: "Geophysics Isostatic Gravity Over Tmi Rtp Tilt"
     group: "Geological Survey NSW"
     description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Bo"
@@ -1531,6 +1548,7 @@
     wfs:
         selector: "gsnsw:dw_lithhole"
 "nsw-base":
+    hidden: true
     name: "Nsw Base"
     group: "Geological Survey NSW"
     description: "Layer-Group type layer: gsnsw:NSW_Base"

@@ -47,7 +47,8 @@ public class ProfilePortalProduction {
             String id = k.toString();
             //if (counter[0] <= 181) { // 180
                 System.out.println(counter[0] + ", Key = " + id + ", Value = " + v);
-                knownLayers.add(knownType(id));
+                KnownLayer l =  knownType(id);
+                if (!l.isHidden()) knownLayers.add(knownType(id));
             //}
         });
 
