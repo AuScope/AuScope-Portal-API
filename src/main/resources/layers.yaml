@@ -1049,6 +1049,7 @@
     
 # Mineral Resources Tasmania
 "cate-3-expl-lice-poly-of-tasm-min-reso-tasm":
+    hidden: true
     name: "Category 3 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
     group: "Mineral Resources Tasmania"
     description: "Category 3 Exploration Licence polygons and Exploration Release Areas across Tas"
