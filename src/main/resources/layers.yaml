@@ -1,4 +1,4 @@
-# Earth Resources old v1
+## Earth Resources old v1
 "erml-mine":
         name: "Earth Resource Mine"
         description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:Mine"
