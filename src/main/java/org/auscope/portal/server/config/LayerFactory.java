@@ -276,6 +276,9 @@ public class LayerFactory {
                         case "supportsCsvDownloads":
                             layer.setSupportsCsvDownloads(Boolean.valueOf(value));
                             break;
+                        case "hidden":
+                            layer.setHidden(Boolean.valueOf(value));
+                            break;
                         case "wfs": {
                             wfs.feature.clear();
                             wfs.endPoints.clear();
