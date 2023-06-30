@@ -1,0 +1,8 @@
+# set label filter to the correct env and envregistries
+spring:
+  cloud:
+    azure:
+      appconfiguration:
+        enabled: false
+
+

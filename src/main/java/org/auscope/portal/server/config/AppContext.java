@@ -63,7 +63,6 @@ import org.auscope.portal.core.view.ViewKnownLayerFactory;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.xslt.GmlToHtml;
 import org.auscope.portal.core.xslt.WfsToKmlTransformer;
-import org.auscope.portal.core.services.admin.StateService;
 import org.auscope.portal.mscl.MSCLWFSService;
 import org.auscope.portal.server.vegl.VEGLJobManager;
 import org.auscope.portal.server.vegl.VGLJobStatusAndLogReader;
@@ -393,6 +392,7 @@ public class AppContext {
 
     /* This is the core threadpool shared by object instances throughout the portal */
     @Bean
+    @Primary
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExec = new ThreadPoolTaskExecutor();
         taskExec.setCorePoolSize(5);
@@ -750,12 +750,6 @@ public class AppContext {
     @Bean
     public CatalogServicesHealthIndicator CatalogServicesHealthIndicator() {
         return new CatalogServicesHealthIndicator(cswCacheService(), cswKnownLayerService(), cswServiceList);
-    }
-    
-    @Bean
-    public StateService stateServiceFactory() { // This service is used to store permanent links in a database
-        final int DB_LIMIT = 100000; // Maximum number of permanent links in database
-        return new StateService(localCacheDir, DB_LIMIT);
     }
     
     @Bean SearchService searchService() {
