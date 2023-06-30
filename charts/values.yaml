@@ -88,6 +88,8 @@ applicationconfig:
 extraPodEnv: |
   - name: spring.config.location
     value: "/workspace/config/application.yaml"
+  - name: spring.cloud.bootstrap.location
+    value: "/usr/local/tomcat/webapps/api/WEB-INF/classes/bootstrap.yaml"
 
 persistence:
   cswcacheDir:
