@@ -1050,7 +1050,7 @@
 # Mineral Resources Tasmania
 "cate-3-expl-lice-poly-of-tasm-min-reso-tasm":
     hidden: true
-    name: "Category 3 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    name: "Category 3 Exploration Licence Polygons Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Category 3 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_43"
@@ -1058,7 +1058,7 @@
     wfs:
         selector: "mrtwfs:LicenceCategory3"
 "cate-1-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 1 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    name: "Category 1 Exploration Licence Polygons Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Category 1 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_44"
@@ -1066,7 +1066,7 @@
     wfs:
         selector: "mrtwfs:LicenceCategory1"
 "proc-land-area-of-tasm-min-reso-tasm":
-    name: "Proclaimed Landslip Areas Of Tasmania Mineral Resources Tasmania "
+    name: "Proclaimed Landslip Areas Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Proclaimed Landslip Areas A and B) of Tasmania, which are defined under the Min"
     order: "Registered_45"
@@ -1074,7 +1074,7 @@
     wfs:
         selector: "mrtwfs:ProclaimedAreasPoly"
 "airb-geop-surv-of-tasm-min-reso-tasm":
-    name: "Airborne Geophysical Surveys Of Tasmania Mineral Resources Tasmania "
+    name: "Airborne Geophysical Surveys Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Spatial index of open file airborne geophysical surveys for which digital data i"
     order: "Registered_46"
@@ -1082,7 +1082,7 @@
     wfs:
         selector: "mrtwfs:AirborneSurveys"
 "land-poin-of-tasm-min-reso-tasm":
-    name: "Landslide Points Of Tasmania Mineral Resources Tasmania "
+    name: "Landslide Points Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Landslide features across Tasmania as representative points, with summary landsl"
     order: "Registered_47"
@@ -1090,7 +1090,7 @@
     wfs:
         selector: "mrtwfs:LandSlidePoint"
 "mine-occu-poin-of-tasm-min-reso-tasm":
-    name: "Mineral Occurrence Points Of Tasmania Mineral Resources Tasmania "
+    name: "Mineral Occurrence Points Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Mineral occurrences, including operating and abandoned mines, located in Tasmani"
     order: "Registered_48"
@@ -1098,7 +1098,7 @@
     wfs:
         selector: "mrtwfs:MineralOccurences"
 "land-line-of-tasm-min-reso-tasm":
-    name: "Landslide Lines Of Tasmania Mineral Resources Tasmania "
+    name: "Landslide Lines Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Linear landslide components of landslide features mapped across Tasmania, with s"
     order: "Registered_49"
@@ -1106,7 +1106,7 @@
     wfs:
         selector: "mrtwfs:LandSlideLine"
 "land-dama-poly-of-tasm-min-reso-tasm":
-    name: "Landslide Damage Polygons Of Tasmania Mineral Resources Tasmania "
+    name: "Landslide Damage Polygons Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Polygons of structures or property known to be damaged by a landslide in Tasmani"
     order: "Registered_50"
@@ -1114,7 +1114,7 @@
     wfs:
         selector: "mrtwfs:DamagePoly"
 "cate-4-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 4 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    name: "Category 4 Exploration Licence Polygons Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Category 4 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_51"
@@ -1122,7 +1122,7 @@
     wfs:
         selector: "mrtwfs:LicenceCategory4"
 "cate-6-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 6 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    name: "Category 6 Exploration Licence Polygons Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Category 6 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_52"
@@ -1130,7 +1130,7 @@
     wfs:
         selector: "mrtwfs:LicenceCategory6"
 "mini-leas-poly-of-tasm-min-reso-tasm":
-    name: "Mining Lease Polygons Of Tasmania Mineral Resources Tasmania "
+    name: "Mining Lease Polygons Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Mining Lease polygons and production licence polygons for all mineral categories"
     order: "Registered_53"
@@ -1138,7 +1138,7 @@
     wfs:
         selector: "mrtwfs:Leases"
 "cate-2-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 2 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania "
+    name: "Category 2 Exploration Licence Polygons Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Category 2 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_54"
@@ -1146,7 +1146,7 @@
     wfs:
         selector: "mrtwfs:LicenceCategory2"
 "grav-meas-of-tasm-min-reso-tasm":
-    name: "Gravity Measurements Of Tasmania Mineral Resources Tasmania "
+    name: "Gravity Measurements Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Primary and derived i.e. Bouguer anomaly) gravity observation points stations)"
     order: "Registered_55"
@@ -1154,7 +1154,7 @@
     wfs:
         selector: "mrtwfs:GravityMeasurements"
 "cate-5-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 5 Exploration Licence Polygons Of Tasmania Mineral Resources Tasmania"
+    name: "Category 5 Exploration Licence Polygons Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Category 5 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_56"
@@ -1162,7 +1162,7 @@
     wfs:
         selector: "mrtwfs:LicenceCategory5"
 "land-dama-poin-of-tasm-min-reso-tasm":
-    name: "Landslide Damage Points Of Tasmania Mineral Resources Tasmania "
+    name: "Landslide Damage Points Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Point locations of known damage to structures or property caused by a landslide "
     order: "Registered_57"
@@ -1170,7 +1170,7 @@
     wfs:
         selector: "mrtwfs:DamagePoint"
 "grav-base-stat-of-tasm-min-reso-tasm":
-    name: "Gravity Base Stations Of Tasmania Mineral Resources Tasmania "
+    name: "Gravity Base Stations Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Precise locations where the absolute value of gravity is known."
     order: "Registered_58"
@@ -1178,7 +1178,7 @@
     wfs:
         selector: "mrtwfs:GravityBaseStations"
 "bore-poin-of-tasm-min-reso-tasm":
-    name: "Borehole Points Of Tasmania Mineral Resources Tasmania "
+    name: "Borehole Points Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Borehole features across Tasmania derived from the Borehole Database, administer"
     order: "Registered_59"
@@ -1194,7 +1194,7 @@
     wfs:
         selector: "mrtwfs:StrategicProspectivityZones"
 "land-poly-of-tasm-min-reso-tasm":
-    name: "Landslide Polygons Of Tasmania Mineral Resources Tasmania "
+    name: "Landslide Polygons Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: "Landslide component polygons of landslide features mapped across Tasmania, with "
     order: "Registered_61"
@@ -1202,7 +1202,7 @@
     wfs:
         selector: "mrtwfs:LandSlidePoly"
 "bore-trac-of-tasm-min-reso-tasm":
-    name: "Borehole Traces Of Tasmania Mineral Resources Tasmania "
+    name: "Borehole Traces Of Tasmania"
     group: "Mineral Resources Tasmania"
     description: ""
     order: "Registered_62"
