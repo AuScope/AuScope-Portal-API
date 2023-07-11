@@ -57,11 +57,10 @@ public class PortalStateController extends BasePortalController {
     		return generateJSONResponseMAV(false);
     	}
 		return generateJSONResponseMAV(true, state, "");
-    	
 	}
 	
 	/**
-	 * Add a new state
+	 * Add a new state for an anonymous user
 	 *
 	 * @param id state id
 	 * @param name name of state
@@ -88,6 +87,36 @@ public class PortalStateController extends BasePortalController {
     	if (user != null) {
     		state.setParent(user);
     	}
+    	String newId = stateService.savePortalState(state);        
+        return generateJSONResponseMAV(true, newId, "");
+	}
+	
+	/**
+	 * Add a new state for an authenticated user
+	 *
+	 * @param id state id
+	 * @param name name of state
+	 * @param description a brief description of the state (optional)
+	 * @param jsonState the state as a JSON string
+	 * @return integer ID of the state in the DB if successful
+	 * @throws PortalServiceException
+	 */
+	@RequestMapping("/secure/savePortalState.do")
+    public ModelAndView addPortalStateForAuthenticatedUser(
+    		@RequestParam(value="id") String id,
+    		@RequestParam(value="name") String name,
+    		@RequestParam(value="description", required=false) String description,
+    		@RequestParam(value="jsonState") String jsonState,
+    		@RequestParam(value="isPublic") boolean isPublic) throws PortalServiceException {
+    	PortalUser user = userService.getLoggedInUser();
+    	PortalState state = new PortalState();
+    	state.setId(id);
+    	state.setName(name);
+    	state.setDescription(description);
+    	state.setCreationDate(new Date());
+    	state.setJsonState(jsonState);
+    	state.setIsPublic(isPublic);
+    	state.setParent(user);
     	String newId = stateService.savePortalState(state);        
         return generateJSONResponseMAV(true, newId, "");
 	}
