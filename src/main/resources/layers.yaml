@@ -576,6 +576,7 @@
         group: "Passive Seismic"
         description: "The Onshore Seismic Data of Australia is a collection of all land seismic traverses cross the Australian continent and its margins. The data includes raw and processed data in SEGY format. The metadata includes acquisition reports, processing reports, processed images, logs, and so on. The data acquisition was carried out in Australia from 1949-2012 by Geoscience Australia and various partners. The set of reflection and refraction data comprises over 12,000 km of coverage, and provides an insight into the variations in crustal architecture in the varied geological domains. The complete processed dataset was first available for public access in Oct 2013 (http://www.ga.gov.au/minerals/projects/current-projects/seismic-acquisition-processing.html ). The location of seismic traverses is shown by the Gallery link on the webpage. The new survey data will be updated on the webpage by the official data release date. The attribute structure of the dataset has also been revised to be more compatible with the GeoSciML data standard, published by the IUGS Commission for Geoscience Information. The onshore seismic data were collected with partner organizations: Australian Geodynamics Cooperative Research Centre, National Research Facility for Earth Sounding, Australian Nuclear Science and Technology Organisation, Cooperative Research Centre for Greenhouse Gas Technologies, Curtin University of Technology, Geological Survey of New South Wales, NSW Department of Mineral Resources, NSW Department of Primary Industries Mineral Resources, An organisation for a National Earth Science Infrastructure Program, Geological Survey Western Australia, Northern Territory Geological Survey, Primary Industries and Resources South Australia, Predictive Mineral Discovery Cooperative Research Centre, Queensland Geological Survey, GeoScience Victoria Department of Primary Industries, Tasmania Development and Resources, University of Western Australia."
         order: "275"
+        serverType: "ESRI"
         wms:
                selector: "Onshore_Seismic_Surveys"
 
@@ -1956,17 +1957,7 @@
     order: "grace01"
     supportsCsvDownloads: false
     wms:
-        selector: "grace:grace_view"
-    
-"world-boundaries":
-    id: "Countries_WSG84"
-    name: "World Boundaries"
-    group: "GRACE"
-    description: "World boundaries"
-    order: "grace02"
-    supportsCsvDownloads: true
-    wms:
-        selector: "grace:Countries_WGS84"
+        selector: "grace:grace_view"    
 
 # Loop3D
 "2_5m_interpgeop15":
@@ -2203,3 +2194,188 @@
     supportsCsvDownloads: true
     wfs:
         selector: "isotope:isotopes_rbsr"
+
+# GA Geophysical Grids - Radiometrics
+"Radiometrics_U2Th_ratio_filtered_2015":
+    name: "Radiometrics U2/Th Ratio"
+    description: "Ratio of U-squared over Th derived from the filtered U and Th grids. The Radiometric Map of Australia dataset comprises grids of potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid01"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics_U2Th_ratio_filtered_2015"
+"Radiometrics_UTh_ratio_filtered_2015":
+    name: "Radiometrics U/Th Ratio"
+    description: "Ratio of U over Th derived from the filtered U and Th grids. The Radiometric Map of Australia dataset comprises grids of potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid02"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics_UTh_ratio_filtered_2015"
+"Radiometrics_UK_ratio_filtered_2015":
+    name: "Radiometrics U/K Ratio"
+    description: "Ratio of U over K derived from the filtered U and K grids. The Radiometric Map of Australia dataset comprises grids of potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid03"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics_UK_ratio_filtered_2015"
+"Radiometrics_ThK_ratio_filtered_2015":
+    name: "Radiometrics Th/K Ratio"
+    description: "Ratio of Th over K derived from the filtered Th and K grids. The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid04"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics_ThK_ratio_filtered_2015"
+"Radiometrics2015_filtered_ppmU":
+    name: "Radiometrics Filtered U ppm"
+    description: "Low-pass filtered U element concentration (ppm eU). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid05"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics2015_filtered_ppmU"
+"Radiometrics2015_unfiltered_ppmU":
+    name: "Radiometrics Unfiltered U ppm"
+    description: "Unfiltered uranium element concentrations (ppm eU). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid06"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics2015_unfiltered_ppmU"
+"Radiometrics2015_filtered_ppmTh":
+    name: "Radiometrics Filtered Th ppm"
+    description: "Low-pass filtered Th element concentration (ppm eTh). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid07"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics2015_filtered_ppmTh"
+"Radiometrics2015_unfiltered_ppmTh":
+    name: "Radiometrics Unfiltered Th ppm"
+    description: "Unfiltered Thorium element concentrations (ppm eTh). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid08"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics2015_unfiltered_ppmTh"
+"Radiometrics2015_filtered_pcK":
+    name: "Radiometrics Filtered K percent"
+    description: "Low-pass filtered K element concentration (percent K). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid09"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics2015_filtered_pcK"
+"Radiometrics2015_unfiltered_pcK":
+    name: "Radiometrics Unfiltered K percent"
+    description: "Unfiltered Potassium element concentrations (percent K). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid10"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics2015_unfiltered_pcK"
+"Radiometrics2015_filtered_dose":
+    name: "Radiometrics Filtered Dose"
+    description: "Terrestrial dose rate derived as a linear combination of the filtered K, U and Th grids described above (see Minty et al., 2009). Unit of measure = nG/h. The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid11"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics2015_filtered_dose"
+"Radiometrics2015_unfiltered_dose":
+    name: "Radiometrics Unfiltered Dose"
+    description: "Unfiltered terrestrial dose rate derived as a linear combination of the unfiltered K, U and Th grids (Minty et al., 2009). Unit of measure: nG/h. The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid12"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics2015_unfiltered_dose"
+"Radiometrics2015_ternary_KThU":
+    name: "Radiometrics Ternary KThU"
+    description: "The national ternary radiometric image (2015 edition) shows the concentrations of the radioelements potassium (K), uranium (U) and thorium (Th) at the Earth's surface as measured using the airborne gamma-ray spectrometric method."
+    group: "Geophysical Grid - Radiometrics"
+    order: "geogrid13"
+    serverType: "ESRI"
+    wms:
+        selector: "Radiometrics2015_ternary_KThU"
+
+# GA Geophysical Grids - Gravity
+"GravityAnomaly2010_HSI":
+    name: "Gravity Anomaly - HSI colour"
+    description: "Hue-Saturation-Intensity (HSI) colour image of the national Gravity Anomaly grid, 2010. This image is made from a grid that represents gravity anomalies of the Australian region."
+    group: "Geophysical Grid - Gravity"
+    order: "geogrid14"
+    serverType: "ESRI"
+    wms:
+        selector: "GravityAnomaly2010_HSI"
+"GravityAnomaly2010_greyscale":
+    name: "Gravity Anomaly - Greyscale"
+    description: "The gravity anomaly grid (2010) represents gravity anomalies of the Australian continent and surrounding region."
+    group: "Geophysical Grid - Gravity"
+    order: "geogrid15"
+    serverType: "ESRI"
+    wms:
+        selector: "GravityAnomaly2010_greyscale"
+"GravityBouguerOnshore2010_greyscale":
+    name: "Gravity Bouguer Onshore - Greyscale"
+    description: "The onshore Bouguer gravity grid (2010) represents gravity anomalies of the Australian continent and surrounding region."
+    group: "Geophysical Grid - Gravity"
+    order: "geogrid16"
+    serverType: "ESRI"
+    wms:
+        selector: "GravityBouguerOnshore2010_greyscale"
+
+# GA Geophysical Grids - Magnetics
+"TotalMagneticIntensityVRTP2015_greyscale":
+    name: "Total Magnetic Intensity Variable Reduction to Pole (VRTP)"
+    description: "The file is an image created from magmap_v6_2015_VRTP, a Variable Reduction to Pole TMI grid of the Australian region with a grid cell spacing of ~3 seconds of arc (approximately 80 m)."
+    group: "Geophysical Grid - Magnetics"
+    order: "geogrid17"
+    serverType: "ESRI"
+    wms:
+        selector: "TotalMagneticIntensityVRTP2015_greyscale"
+"TotalMagneticIntensity2015_HSI":
+    name: "Total Magnetic Intensity - HSI Colour"
+    description: "The Total Magnetic Intensity (greyscale) image is created from a composite TMI grid of the Australian region with a grid cell spacing of ~3 seconds of arc (approximately 80 m)."
+    group: "Geophysical Grid - Magnetics"
+    order: "geogrid18"
+    serverType: "ESRI"
+    wms:
+        selector: "TotalMagneticIntensity2015_HSI"
+"TotalMagneticIntensity2015_greyscale":
+    name: "Total Magnetic Intensity - Greyscale"
+    description: "The Total Magnetic Intensity (greyscale) image is created from a composite TMI grid of the Australian region with a grid cell spacing of ~3 seconds of arc (approximately 80 m)."
+    group: "Geophysical Grid - Magnetics"
+    order: "geogrid19"
+    serverType: "ESRI"
+    wms:
+        selector: "TotalMagneticIntensity2015_greyscale"
+"AirborneSurveys2014":
+    name: "Airborne Geophysical Surveys"
+    description: "This layer provides the outlines and specifications of 1085 airborne geophysical surveys conducted by or for the Australian, State and Territory governments."
+    group: "Geophysical Grid - Magnetics"
+    order: "geogrid19"
+    serverType: "ESRI"
+    wms:
+        selector: "AirborneSurveys2014"
+        
+# Boundaries
+"world-boundaries":
+    id: "Countries_WSG84"
+    name: "World Boundaries"
+    group: "Boundaries"
+    description: "World boundaries"
+    order: "bound01"
+    supportsCsvDownloads: true
+    wms:
+        selector: "grace:Countries_WGS84"
+"Coastline1M":
+    name: "Australian Coastline"
+    description: "Coastline of Australia, sourced from the 1:1M scale Surface Geology of Australia dataset (2012 edition)."
+    group: "Boundaries"
+    order: "bound02"
+    serverType: "ESRI"
+    wms:
+        selector: "Coastline1M"
