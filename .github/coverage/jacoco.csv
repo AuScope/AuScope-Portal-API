@@ -120,8 +120,8 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,BoreholeService.Mark,56
 AuScope-Portal-API,org.auscope.portal.server.web.service,ANVGLFileStagingService,27,0,0,0,8,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,VEGLJobService,208,0,20,0,40,0,19,0,9,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalUserService,69,0,4,0,19,0,9,0,7,0
-AuScope-Portal-API,org.auscope.portal.server.web.service,LintResult,37,0,0,0,14,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,RemanentAnomaliesAutoSearchService,27,0,2,0,9,0,4,0,3,0
+AuScope-Portal-API,org.auscope.portal.server.web.service,LintResult,37,0,0,0,14,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,MineralOccurrenceService,71,0,2,0,15,0,7,0,6,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCL2_0_DataService,740,1038,68,66,138,195,53,35,11,10
 AuScope-Portal-API,org.auscope.portal.server.web.service,BoreholeService,632,269,23,15,127,52,21,11,7,6
@@ -207,8 +207,8 @@ AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AlgorithmOut
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,BinnedCSVResponse,3,14,0,0,1,6,1,4,1,4
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,JWTManagement,258,0,24,0,46,0,18,0,6,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFAttributes,416,0,88,0,41,0,56,0,12,0
-AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFAuthentication,153,0,18,0,32,0,21,0,12,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFJWT,46,0,0,0,3,0,2,0,2,0
+AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFAuthentication,153,0,18,0,32,0,21,0,12,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFAuthenticationProvider,48,0,0,0,14,0,7,0,7,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,UnixTimestampDeserializer,40,0,0,0,7,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFAuthenticationToken,29,0,2,0,12,0,6,0,5,0
