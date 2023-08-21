@@ -184,9 +184,9 @@
         wfs:
             selector: "mt:nth_aus_AusLAMP_siteloc"
 
-# CSIRO Mafic-Ultramafic Geochemical Data Collection
+# CSIRO Mafic-Ultramafic Geochemical Dataset
 "csiro-maf-geochem":
-        name: "CSIRO Mafic-Ultramafic Geochemical Data Collection"
+        name: "CSIRO Mafic-Ultramafic Geochemical Dataset"
         group: "Geochemistry"
         description: "The CSIRO mafic-ultramafic package includes whole-rock geochemical data and mineral chemistry data collected from CSIRO research projects from the mid-1980s to 2021."
         order: "405"
