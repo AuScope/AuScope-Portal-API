@@ -1,6 +1,6 @@
 FROM tomcat:9-jdk17-temurin-focal
 
-ARG war_file=target/auscope-portal-api-6.2.0-SNAPSHOT.war
+ARG war_file=target/auscope-portal-api-6.3.0-SNAPSHOT.war
 
 ADD ${war_file} /usr/local/tomcat/webapps/AuScope-Portal-API.war
 
