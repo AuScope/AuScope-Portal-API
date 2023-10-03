@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
