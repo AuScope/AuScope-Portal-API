@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -209,7 +209,7 @@ public class UserController extends BasePortalController {
     public ModelAndView setNCIDetails(
             @RequestParam(required=false, value="nciUsername") String username,
             @RequestParam(required=false, value="nciProject") String project,
-            @RequestParam(required=false, value="nciKey") CommonsMultipartFile key) throws PortalServiceException {
+            @RequestParam(required=false, value="nciKey") MultipartFile key) throws PortalServiceException {
     	PortalUser user = userService.getLoggedInUser();
         if (user == null) {
             return generateJSONResponseMAV(false);
@@ -230,7 +230,8 @@ public class UserController extends BasePortalController {
                 modified = true;
             }
             if (key != null ) {
-                String keyString = key.getFileItem().getString();
+                //String keyString = key.getFileItem().getString();
+            	String keyString = new String(key.getBytes());
                 if (!StringUtils.isEmpty(keyString) || !StringUtils.equals(details.getKey(), keyString)) {            
                     details.setKey(keyString);
                     modified = true;

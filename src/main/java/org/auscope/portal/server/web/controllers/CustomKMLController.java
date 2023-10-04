@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.auscope.portal.core.server.controllers.BasePortalController;
@@ -19,7 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
@@ -47,7 +47,7 @@ public class CustomKMLController extends BasePortalController {
     public @ResponseBody String addKMLLayer(FileUploadBean uploadItem, BindingResult result,
             HttpServletResponse response) {
         try {
-            CommonsMultipartFile file = uploadItem.getFile();
+            MultipartFile file = uploadItem.getFile();
             ModelMap model = new ModelMap();
             model.put("success", true);
             model.put("file", IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8));
