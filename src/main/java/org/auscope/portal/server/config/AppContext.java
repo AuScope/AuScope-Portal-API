@@ -97,7 +97,7 @@ import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 
 /**
@@ -678,8 +678,8 @@ public class AppContext {
     }
 
     @Bean
-    public CommonsMultipartResolver multipartResolver() {
-        return new CommonsMultipartResolver();
+    public StandardServletMultipartResolver multipartResolver() {
+        return new StandardServletMultipartResolver();
     }
 
     @Bean

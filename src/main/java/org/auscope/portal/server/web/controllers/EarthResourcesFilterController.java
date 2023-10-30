@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.util.Hashtable;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
