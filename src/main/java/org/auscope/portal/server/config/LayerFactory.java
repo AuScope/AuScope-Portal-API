@@ -336,14 +336,14 @@ public class LayerFactory {
                                 String cswKey = entry.getKey();
                                 // NB: Assumes all fields in 'csw:' are lists
                                 String[] cswVals = ((List<String>) entry.getValue()).toArray(new String[0]);
-                                if (cswKey.startsWith("keyword")) {
+                                if (cswKey.startsWith("keywords")) {
                                     keywords = cswVals;
                                 }
                                 else if (cswKey.startsWith("ids")) {
-                                   recordIds = cswVals;
+                                    recordIds = cswVals;
                                 }
                                 else if (cswKey.startsWith("serviceNames")) {
-                                   serviceNames = cswVals;
+                                    serviceNames = cswVals;
                                 }
                             };
 
