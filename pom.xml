@@ -13,7 +13,7 @@
     <version>6.4.0-SNAPSHOT</version>
     <name>AuScope-Portal-API</name>
     <description>AuScope's flagship portal</description>
-    <url>http://portal.auscope.org</url>
+    <url>https://portal.auscope.org.au</url>
     <issueManagement>
         <system>Jira</system>
         <url>https://jira.csiro.au/browse/AUS</url>
