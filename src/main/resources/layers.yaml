@@ -618,7 +618,7 @@
 "ga-geophysicalsurveys-mag":
         name: "Geophysical Surveys - Magnetic"
         group: "GA Geophysical Survey Datasets"
-        description: "Total magnetic intensity (TMI) data measures variations in the intensity of the Earth's magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust. Magnetic anomalies can be either positive (field stronger than normal) or negative (field weaker) depending on the susceptibility of the rock. "
+        description: "Total magnetic intensity (TMI) data measures variations in the intensity of the Earth's magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust. Magnetic anomalies can be either positive (field stronger than normal) or negative (field weaker) depending on the susceptibility of the rock."
         order: "313"
         supportsCsvDownloads: true
         wfs:
@@ -924,80 +924,80 @@
 
 # Victorian Geology Maps, WFS is not available
 "gsv-geological-unit-250k-":
-    name: "Gsv Geological Unit 250K "
-    group: "Victorian Geology Maps"
+    name: "Vic Geological Unit 250K"
+    group: "Geological Maps"
     description: "Geological units represented as two dimensional polygons, designed for portrayal at 1:250 000 scale."
     order: "Registered_1"
     supportsCsvDownloads: false
     wms:
         selector: "erdd:GSV_SG_250K_GEOLUNIT"
 "gsv-geological-unit-contact-250k-":
-    name: "Gsv Geological Unit Contact 250K "
-    group: "Victorian Geology Maps"
+    name: "Vic Geological Unit Contact 250K"
+    group: "Geological Maps"
     description: "Geological boundaries represented as two dimensional lines, designed for portrayal at 1:250 000 scale."
     order: "Registered_2"
     supportsCsvDownloads: false
     wms:
         selector: "erdd:GSV_SG_250K_GEOLUNITCONTACT"
 "gsv-geological-unit-contact-50k-":
-    name: "Gsv Geological Unit Contact 50K "
-    group: "Victorian Geology Maps"
+    name: "Vic Geological Unit Contact 50K"
+    group: "Geological Maps"
     description: "Geological boundaries represented as two dimensional lines, designed for portrayal at 1:50 000 scale."
     order: "Registered_3"
     supportsCsvDownloads: false
     wms:
         selector: "erdd:GSV_SG_50K_GEOLUNITCONTACT"
 "gsv-geological-unit-250k-age":
-    name: "Gsv Geological Unit 250K Age"
-    group: "Victorian Geology Maps"
+    name: "Vic Geological Unit 250K Age"
+    group: "Geological Maps"
     description: "Geological units represented as two dimensional polygons, designed for portrayal at 1:250 000 scale."
     order: "Registered_4"
     supportsCsvDownloads: false
     wms:
         selector: "erdd:GSV_SG_250K_GEOLUNIT_AGE"
 "gsv-shear-displacement-structure-250k-":
-    name: "Gsv Shear Displacement Structure 250K "
-    group: "Victorian Geology Maps"
+    name: "Vic Shear Displacement Structure 250K"
+    group: "Geological Maps"
     description: "Shear displacement structures faults) represented as two dimensional lines, designed for portrayal at 1:250 000 scale."
     order: "Registered_5"
     supportsCsvDownloads: false
     wms:
         selector: "erdd:GSV_SG_250K_SHEARDISPSTRUCTURE"
 "gsv-geological-unit-250k-lithology":
-    name: "Gsv Geological Unit 250K Lithology"
-    group: "Victorian Geology Maps"
+    name: "Vic Geological Unit 250K Lithology"
+    group: "Geological Maps"
     description: "Geological units represented as two dimensional polygons, designed for portrayal at 1:250 000 scale."
     order: "Registered_6"
     supportsCsvDownloads: false
     wms:
         selector: "erdd:GSV_SG_250K_GEOLUNIT_LITHOLOGY"
 "gsv-geological-unit-50k-lithology":
-    name: "Gsv Geological Unit 50K Lithology"
-    group: "Victorian Geology Maps"
+    name: "Vic Geological Unit 50K Lithology"
+    group: "Geological Maps"
     description: "Geological units represented as two dimensional polygons, designed for portrayal at 1:50 000 scale."
     order: "Registered_7"
     supportsCsvDownloads: false
     wms:
         selector: "erdd:GSV_SG_50K_GEOLUNIT_LITHOLOGY"
 "gsv-geological-unit-50k-":
-    name: "Gsv Geological Unit 50K "
-    group: "Victorian Geology Maps"
+    name: "Vic Geological Unit 50K"
+    group: "Geological Maps"
     description: "Geological units represented as two dimensional polygons, designed for portrayal at 1:50 000 scale."
     order: "Registered_8"
     supportsCsvDownloads: false
     wms:
         selector: "erdd:GSV_SG_50K_GEOLUNIT"
 "gsv-shear-displacement-structure-50k-":
-    name: "Gsv Shear Displacement Structure 50K "
-    group: "Victorian Geology Maps"
+    name: "Vic Shear Displacement Structure 50K"
+    group: "Geological Maps"
     description: "Shear displacement structures faults) represented as two dimensional lines, designed for portrayal at 1:50 000 scale."
     order: "Registered_9"
     supportsCsvDownloads: false
     wms:
         selector: "erdd:GSV_SG_50K_SHEARDISPSTRUCTURE"
 "gsv-geological-unit-50k-age":
-    name: "Gsv Geological Unit 50K Age"
-    group: "Victorian Geology Maps"
+    name: "Vic Geological Unit 50K Age"
+    group: "Geological Maps"
     description: "Geological units represented as two dimensional polygons, designed for portrayal at 1:50 000 scale."
     order: "Registered_10"
     supportsCsvDownloads: false
@@ -1013,7 +1013,7 @@
     csw:
         id: "a05f7892-ee53-7506-e044-00144fdd4fa6"
 "are-ther-any-sand-uran-syst-in-the-erom-basi":
-    name: "Are There Any Sandstone Hosted Uranium Systems In The Eromanga Basin "
+    name: "Are There Any Sandstone Hosted Uranium Systems In The Eromanga Basin"
     group: "Geoscience Australia Reports"
     description: "As part of Geoscience Australia's Onshore Energy Security Program the authors ha"
     order: "Registered_15"
@@ -1022,14 +1022,14 @@
 "l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga":
     name: "L164 Curnamona Seismic Survey Sa 2003 2004 Stacked And Migrated Seismic Data And Images For Lines 03Ga Cu1"
     group: "Geoscience Australia Reports"
-    description: "A seismic survey using the Australian National Seismic Imaging Resource ANSIR) "
+    description: "A seismic survey using the Australian National Seismic Imaging Resource ANSIR)"
     order: "Registered_16"
     csw:
         id: "cd697530-5b75-3811-e044-00144fdd4fa6"
 "lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis":
     name: "Lawn Hill Platform And Leichhardt River Fault Trough Measured Stratigraphic Section Online Gis"
     group: "Geoscience Australia Reports"
-    description: "This GIS web browser contains stratigraphic information from the southern flank "
+    description: "This GIS web browser contains stratigraphic information from the southern flank"
     order: "Registered_17"
     csw:
         id: "a05f7892-b7a0-7506-e044-00144fdd4fa6"
@@ -1043,7 +1043,7 @@
 "fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004":
     name: "Final Report 3D Geological Models Of The Eastern Yilgarn Craton Project Pmd Crc Y2 September 2001 December 2004"
     group: "Geoscience Australia Reports"
-    description: "The pmd*CRC Y2 project operated for a little over three years, and in this time "
+    description: "The pmd*CRC Y2 project operated for a little over three years, and in this time"
     order: "Registered_19"
     csw:
         id: "a05f7892-ccc9-7506-e044-00144fdd4fa6"
@@ -1052,31 +1052,31 @@
 "cate-3-expl-lice-poly-of-tasm-min-reso-tasm":
     hidden: true
     name: "Category 3 Exploration Licence Polygons Of Tasmania"
-    group: "Mineral Resources Tasmania"
-    description: "Category 3 Exploration Licence polygons and Exploration Release Areas across Tas"
+    group: "Exploration and Mining Titles"
+    description: "Category 3 Exploration Licence polygons and Exploration Release Areas across Tasmania."
     order: "Registered_43"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:LicenceCategory3"
 "cate-1-expl-lice-poly-of-tasm-min-reso-tasm":
     name: "Category 1 Exploration Licence Polygons Of Tasmania"
-    group: "Mineral Resources Tasmania"
-    description: "Category 1 Exploration Licence polygons and Exploration Release Areas across Tas"
+    group: "Exploration and Mining Titles"
+    description: "Category 1 Exploration Licence polygons and Exploration Release Areas across Tasmania."
     order: "Registered_44"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:LicenceCategory1"
 "proc-land-area-of-tasm-min-reso-tasm":
     name: "Proclaimed Landslip Areas Of Tasmania"
-    group: "Mineral Resources Tasmania"
-    description: "Proclaimed Landslip Areas A and B) of Tasmania, which are defined under the Min"
+    group: "Boundaries"
+    description: "Proclaimed Landslip Areas (A and B) of Tasmania, which are defined under the Mineral Resources Development Act 1995, administered by Mineral Resources Tasmania. These areas prohibit or restrict building and other activities in particular areas of unstable land, as specified under the Building Act 2000."
     order: "Registered_45"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:ProclaimedAreasPoly"
 "airb-geop-surv-of-tasm-min-reso-tasm":
     name: "Airborne Geophysical Surveys Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Geophysics"
     description: "Spatial index of open file airborne geophysical surveys for which digital data i"
     order: "Registered_46"
     supportsCsvDownloads: true
@@ -1084,7 +1084,7 @@
         selector: "mrtwfs:AirborneSurveys"
 "land-poin-of-tasm-min-reso-tasm":
     name: "Landslide Points Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Boundaries"
     description: "Landslide features across Tasmania as representative points, with summary landsl"
     order: "Registered_47"
     supportsCsvDownloads: true
@@ -1092,7 +1092,7 @@
         selector: "mrtwfs:LandSlidePoint"
 "mine-occu-poin-of-tasm-min-reso-tasm":
     name: "Mineral Occurrence Points Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Mineral Deposits"
     description: "Mineral occurrences, including operating and abandoned mines, located in Tasmani"
     order: "Registered_48"
     supportsCsvDownloads: true
@@ -1100,7 +1100,7 @@
         selector: "mrtwfs:MineralOccurences"
 "land-line-of-tasm-min-reso-tasm":
     name: "Landslide Lines Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Boundaries"
     description: "Linear landslide components of landslide features mapped across Tasmania, with s"
     order: "Registered_49"
     supportsCsvDownloads: true
@@ -1108,7 +1108,7 @@
         selector: "mrtwfs:LandSlideLine"
 "land-dama-poly-of-tasm-min-reso-tasm":
     name: "Landslide Damage Polygons Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Boundaries"
     description: "Polygons of structures or property known to be damaged by a landslide in Tasmani"
     order: "Registered_50"
     supportsCsvDownloads: true
@@ -1116,7 +1116,7 @@
         selector: "mrtwfs:DamagePoly"
 "cate-4-expl-lice-poly-of-tasm-min-reso-tasm":
     name: "Category 4 Exploration Licence Polygons Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Exploration and Mining Titles"
     description: "Category 4 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_51"
     supportsCsvDownloads: true
@@ -1124,7 +1124,7 @@
         selector: "mrtwfs:LicenceCategory4"
 "cate-6-expl-lice-poly-of-tasm-min-reso-tasm":
     name: "Category 6 Exploration Licence Polygons Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Exploration and Mining Titles"
     description: "Category 6 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_52"
     supportsCsvDownloads: true
@@ -1132,7 +1132,7 @@
         selector: "mrtwfs:LicenceCategory6"
 "mini-leas-poly-of-tasm-min-reso-tasm":
     name: "Mining Lease Polygons Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Exploration and Mining Titles"
     description: "Mining Lease polygons and production licence polygons for all mineral categories"
     order: "Registered_53"
     supportsCsvDownloads: true
@@ -1140,7 +1140,7 @@
         selector: "mrtwfs:Leases"
 "cate-2-expl-lice-poly-of-tasm-min-reso-tasm":
     name: "Category 2 Exploration Licence Polygons Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Exploration and Mining Titles"
     description: "Category 2 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_54"
     supportsCsvDownloads: true
@@ -1148,7 +1148,7 @@
         selector: "mrtwfs:LicenceCategory2"
 "grav-meas-of-tasm-min-reso-tasm":
     name: "Gravity Measurements Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Geophysics"
     description: "Primary and derived i.e. Bouguer anomaly) gravity observation points stations)"
     order: "Registered_55"
     supportsCsvDownloads: true
@@ -1156,7 +1156,7 @@
         selector: "mrtwfs:GravityMeasurements"
 "cate-5-expl-lice-poly-of-tasm-min-reso-tasm":
     name: "Category 5 Exploration Licence Polygons Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Exploration and Mining Titles"
     description: "Category 5 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_56"
     supportsCsvDownloads: true
@@ -1164,65 +1164,49 @@
         selector: "mrtwfs:LicenceCategory5"
 "land-dama-poin-of-tasm-min-reso-tasm":
     name: "Landslide Damage Points Of Tasmania"
-    group: "Mineral Resources Tasmania"
-    description: "Point locations of known damage to structures or property caused by a landslide "
+    group: "Boundaries"
+    description: "Point locations of known damage to structures or property caused by a landslide"
     order: "Registered_57"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:DamagePoint"
 "grav-base-stat-of-tasm-min-reso-tasm":
     name: "Gravity Base Stations Of Tasmania"
-    group: "Mineral Resources Tasmania"
+    group: "Geophysics"
     description: "Precise locations where the absolute value of gravity is known."
     order: "Registered_58"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:GravityBaseStations"
-"bore-poin-of-tasm-min-reso-tasm":
-    name: "Borehole Points Of Tasmania"
-    group: "Mineral Resources Tasmania"
-    description: "Borehole features across Tasmania derived from the Borehole Database, administer"
-    order: "Registered_59"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "mrtwfs:Boreholes"
 "strategic-prospectivity-zones":
-    name: "Strategic Prospectivity Zones"
-    group: "Mineral Resources Tasmania"
-    description: ""
+    name: "Strategic Prospectivity Zones of Tasmania"
+    group: "Exploration and Mining Titles"
+    description: "The Mining (Strategic Prospectivity Zones) Act 1993 recognises the high mineral prospectivity of many areas of Tasmania.  Within the Strategic Prospectivity Zones (SPZ) there are restrictions on changes of the status of parcels of Crown Land."
     order: "Registered_60"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:StrategicProspectivityZones"
 "land-poly-of-tasm-min-reso-tasm":
     name: "Landslide Polygons Of Tasmania"
-    group: "Mineral Resources Tasmania"
-    description: "Landslide component polygons of landslide features mapped across Tasmania, with "
+    group: "Boundaries"
+    description: "Landslide component polygons of landslide features mapped across Tasmania"
     order: "Registered_61"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:LandSlidePoly"
 "bore-trac-of-tasm-min-reso-tasm":
     name: "Borehole Traces Of Tasmania"
-    group: "Mineral Resources Tasmania"
-    description: ""
+    group: "Boreholes"
+    description: "Borehole features across Tasmania derived from the Borehole Database, derived from the Mineral Occurrence Database, which is a component of the Tasmanian Information on Geoscience and Exploration Resources (TIGER) system; administered by Mineral Resources Tasmania (MRT). Borehole features are shown subdivided into several individual categories (Engineering Geology, Fuels, Geothermal, Groundwater, Metallic Minerals, Non Metallic Minerals and Stratigraphic) which define the main purpose of the borehole."
     order: "Registered_62"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:BoreholeTrace"
 
 # NSW Geological Survey
-"nsw-drillhole":
-    name: "Nsw Drillhole"
-    group: "Geological Survey NSW"
-    description: "This is the full NSW drilling dataset available from Geoscientific Data Warehous"
-    order: "Registered_68"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:dw_drillhole"
 "nsw-assay-surface":
-    name: "Nsw Assay Surface"
-    group: "Geological Survey NSW"
+    name: "NSW Assay Surface"
+    group: "Geochemistry"
     description: "This dataset contains geochemical assay data collected by companies exploring in"
     order: "Registered_69"
     supportsCsvDownloads: true
@@ -1230,337 +1214,120 @@
         selector: "gsnsw:dw_surfassay"
 "nsw-field-observations":
     hidden: true
-    name: "Nsw Field Observations"
-    group: "Geological Survey NSW"
-    description: ""
+    name: "NSW Field Observations"
+    group: "Field Observations"
+    description: "The Field Observations (FieldObs) database stores observations and measurements of rocks collected by the Geological Survey of NSW. Includes location information, stratigraphic unit, links to mineral occurrence and drill hole data, photo and sketch captions, structural measurements and observations, lithology and rock descriptions, sample collection information, and petrophysical measurements (magnetic susceptibility, radioelement and density)."
     order: "Registered_70"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:dw_fieldobs_full"
 "nsw-downhole-assay-samples":
-    name: "Nsw Downhole Assay Samples"
-    group: "Geological Survey NSW"
-    description: ""
+    name: "NSW Downhole Assay Samples"
+    group: "Geochemistry"
+    description: "Drillhole sample geochemistry that has been reported by title holders to the department as part of the mineral exploration reporting requirements. The data is provided annually in the form of exploration data files and stored with the relevant tenement report in DIGS. Data mining of digital exploration data files stored in DIGS is largely complete for the period 2001 to present. Data mining continues for DIGS reports earlier than 2001 using OCR (optical character recognition) software to convert raster data into digital files for loading. Validation of data is an ongoing process. Data available to the public and industry is restricted to DIGS open file reports."
     order: "Registered_71"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:dw_assayhole"
-"nsw-drillhole-all":
-    name: "Nsw Drillhole All"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_72"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:dw_drillhole_full"
-"nsw-drillholes-coal":
-    name: "Nsw Drillholes Coal"
-    group: "Geological Survey NSW"
-    description: "This is the coal subset of the NSW drilling dataset available from Geoscientific"
-    order: "Registered_73"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:dw_drillhole_full_coal"
 "nsw-geological-field-observations":
-    name: "Nsw Geological Field Observations"
-    group: "Geological Survey NSW"
-    description: "The Field Observations FieldObs) database stores observations and measurements "
+    name: "NSW Geological Field Observations"
+    group: "Field Observations"
+    description: "The Field Observations (FieldObs) database stores observations and measurements of rocks collected by the Geological Survey of NSW. Includes location information, stratigraphic unit, links to mineral occurrence and drill hole data, photo and sketch captions, structural measurements and observations, lithology and rock descriptions, sample collection information, and petrophysical measurements (magnetic susceptibility, radioelement and density)."
     order: "Registered_74"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:dw_fieldobs"
-"nsw-drillholes-minerals":
-    name: "Nsw Drillholes Minerals"
-    group: "Geological Survey NSW"
-    description: "This is the mineral subset of the NSW drilling dataset available from Geoscienti"
-    order: "Registered_75"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:dw_drillhole_full_min"
-"nsw-geology-simplified":
-    name: "Nsw Geology Simplified"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_76"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:ge_geology15m"
-"nsw-drillholes-petroleum":
-    name: "Nsw Drillholes Petroleum"
-    group: "Geological Survey NSW"
-    description: "The petroleum drillholes dataset stores information about conventional petroleum"
-    order: "Registered_77"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:dw_drillhole_full_pet"
-"mineral-occurence-industry-full":
-    name: "Mineral Occurence Industry Full"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_78"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:dw_mineraloccurrence_full"
-"nsw-historic-exploration-titles":
-    name: "Nsw Historic Exploration Titles"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_79"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:bl_histels"
-"nsw-map-block-graticule":
-    hidden: true
-    name: "Nsw Map Block Graticule"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_80"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:bl_mapblock"
-"bl-localaboriginallandcouncil":
-    hidden: true
-    name: "Bl Localaboriginallandcouncil"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_81"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:bl_localaboriginallandcouncil"
 "nsw-mineral-occurrence-industry":
-    name: "Nsw Mineral Occurrence Industry"
-    group: "Geological Survey NSW"
-    description: ""
+    name: "NSW Mineral Occurrence Industry"
+    group: "Mineral Deposits"
+    description: "This spatial dataset is a derivative product of the New South Wales Mineral Occurence Database (also known as New South Wales MetIndEx). It records over 31,000 known mineral occurrences throughout NSW. These records have been compiled from resource and production data compiled from both historic and current mining operations records held by the Geological Survey of NSW"
     order: "Registered_82"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:dw_metindustry"
-"nsw-100k-map-sheet-extents":
-    name: "Nsw 100K Map Sheet Extents"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_83"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:bl_mapsheet100k"
-"nsw-fossicking-districts":
-    hidden: true
-    name: "Nsw Fossicking Districts"
-    group: "Geological Survey NSW"
-    description: "Fossicking is the small scale search for and collection of minerals, gemstones o"
-    order: "Registered_84"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:bl_fossicking"
 "nsw-geological-field-observations-photo":
-    name: "Nsw Geological Field Observations Photo"
-    group: "Geological Survey NSW"
-    description: ""
+    name: "NSW Geological Field Observations Photo"
+    group: "Field Observations"
+    description: "The Field Observations (FieldObs) database stores observations and measurements of rocks collected by the Geological Survey of NSW. Includes location information, stratigraphic unit, links to mineral occurrence and drill hole data, photo and sketch captions, structural measurements and observations, lithology and rock descriptions, sample collection information, and petrophysical measurements (magnetic susceptibility, radioelement and density)."
     order: "Registered_85"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:dw_photo"
-"geop-tota-magn-inte-rtp-tmi-rtp-tilt-filt":
-    hidden: true
-    name: "Geophysics Total Magnetic Intensity Rtp Tmi Rtp Tilt Filter"
-    group: "Geological Survey NSW"
-    description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  To"
+"nsw-curr-mini-and-expl-titl":
+    name: "NSW Current Mining And Exploration Titles"
+    group: "Exploration and Mining Titles"
+    description: "Areas in NSW where a company or individual has the right to explore for or extract resources including petroleum, minerals and coal. All current titles for mineral and energy resource exploration, assessment and production."
     order: "Registered_86"
     supportsCsvDownloads: true
     wfs:
-        selector: "geophys:MagRTPtilt"
-"nsw-seismic":
-    hidden: true
-    name: "Nsw Seismic"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_87"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "geophys:MagRTPtilt"
-"nsw-curr-mini-and-expl-titl":
-    name: "Nsw Current Mining And Exploration Titles"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_88"
-    supportsCsvDownloads: true
-    wfs:
         selector: "gsnsw:bl_title"
-"geop-tota-magn-inte-1st-deri-redu-to-pole":
-    hidden: true
-    name: "Geophysics Total Magnetic Intensity 1St Derivative Reduced To Pole"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_89"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "geophys:TMI_RTP_1st"
 "nsw-geological-spectral-samples":
-    name: "Nsw Geological Spectral Samples"
-    group: "Geological Survey NSW"
-    description: ""
+    name: "NSW Geological Spectral Samples"
+    group: "Spectral Samples"
+    description: "Spectral Samples"
     order: "Registered_90"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:dw_spectral"
 "geop-tern-radi-pota":
-    hidden: true
-    name: "Geophysics Ternary Radioelement Potassium K Thorium Th Uranium U "
-    group: "Geological Survey NSW"
-    description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Te"
+    name: "NSW Ternary Radioelement K/Th/U"
+    group: "Geophysics"
+    description: "This dataset is part of the Geological Survey NSW Geophysics dataset series. Ternary radioelement potassium(K)-thorium(Th)-uranium(U) channel data. The image was generated by merging many individual airborne surveys and is a red-green-blue (RGB) composite using a histogram-equalised colour-stretch for each of the three channels. The red, green and blue channels represent K, Th and U respectively. Mixed compositions are indicated by the proportional blend of the corresponding additive primary colours (e.g. yellow indicates the presence of both K and Th, magenta the presence of K and U while aqua indicates the presence of Th and U). Black indicates low concentrations and white represents high concentrations for all three radioelements. The distribution of radioelements reflects the geochemistry and mineralogy of the near-surface, which may constitute either bedrock or regolith materials. The NSW statewide grid DVD set includes K values in percent(%), Th values in parts per million (ppm) and U values in parts per million (ppm)."
     order: "Registered_91"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "geophys:Radio"
-"nsw-drillholes-csg":
-    hidden: true
-    name: "Nsw Drillholes Csg"
-    group: "Geological Survey NSW"
-    description: "The coal seam gas drillholes dataset stores information about CSG sites within N"
-    order: "Registered_92"
-    supportsCsvDownloads: true
-    wfs:
+    supportsCsvDownloads: false
+    wms:
         selector: "geophys:Radio"
 "nsw-current-mining-applications":
-    name: "Nsw Current Mining Applications"
-    group: "Geological Survey NSW"
-    description: ""
+    name: "NSW Current Mining Applications"
+    group: "Exploration and Mining Titles"
+    description: "All current applications for mineral and energy resource exploration, assessment and production titles."
     order: "Registered_93"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:bl_titleappl"
 "nsw-operating-mineral-mines":
-    name: "Nsw Operating Mineral Mines"
-    group: "Geological Survey NSW"
-    description: ""
+    name: "NSW Operating Mineral Mines"
+    group: "Exploration and Mining Titles"
+    description: "Major operating mines in NSW, including locations, names and the resource being mined."
     order: "Registered_94"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:dw_opmines"
-"geophysics-elevation":
-    hidden: true
-    name: "Geophysics Elevation"
-    group: "Geological Survey NSW"
-    description: "Elevation is a pseudocolour layer with a histogram-equalised colour-stretch. Coo"
-    order: "Registered_95"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "geophys:DEM"
-"nsw-geol-simp-rock-unit-boun":
-    name: "Nsw Geology Simplified Rock Unit Boundary"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_96"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:ge_geology15m_bdy"
-"blocks-and-units-graticule":
-    hidden: true
-    name: "Blocks And Units Graticule"
-    group: "Geological Survey NSW"
-    description: "Layer-Group type layer: gsnsw:Map Blocks and Units"
-    order: "Registered_97"
-    supportsCsvDownloads: true
-    wfs:
-        selector: gsnsw:Map Blocks and Units""
-"nsw-map-unit-graticule":
-    hidden: true
-    name: "Nsw Map Unit Graticule"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_98"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:bl_mapunit"
 "nsw-geochronology":
-    name: "Nsw Geochronology"
-    group: "Geological Survey NSW"
+    name: "NSW Geochronology"
+    group: "Geochronology"
     description: "The radiogenic isotope database contains geochronological data managed by the Ge"
     order: "Registered_99"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:dw_geochron"
 "geophysics-isostatic-bouger-gravity":
-    hidden: true
     name: "Geophysics Isostatic Bouger Gravity"
-    group: "Geological Survey NSW"
+    group: "Geophysics"
     description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Is"
     order: "Registered_100"
-    supportsCsvDownloads: true
-    wfs:
+    supportsCsvDownloads: false
+    wms:
         selector: "geophys:IsoGrav"
-"geop-tota-magn-inte-redu-to-pole":
-    hidden: true
-    name: "Geophysics Total Magnetic Intensity Reduced To Pole"
-    group: "Geological Survey NSW"
-    description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  To"
-    order: "Registered_101"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "geophys:MagRTP"
-"nsw-core-library-samples":
-    name: "Nsw Core Library Samples"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_102"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:dw_corelibhole"
 "nsw-geochemistry-samples":
-    name: "Nsw Geochemistry Samples"
-    group: "Geological Survey NSW"
+    name: "NSW Geochemistry Samples"
+    group: "Geochemistry"
     description: "The Geochemistry Whole Rock) dataset contains information about the chemistry o"
     order: "Registered_103"
     supportsCsvDownloads: true
     wfs:
         selector: "gsnsw:dw_geochemistry"
-"nsw-titles":
-    hidden: true
-    name: "Nsw Titles"
-    group: "Geological Survey NSW"
-    description: "Layer-Group type layer: gsnsw:Titles"
-    order: "Registered_104"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:Titles"
-"nsw-geology":
-    hidden: true
-    name: "Nsw Geology"
-    group: "Geological Survey NSW"
-    description: "Layer-Group type layer: gsnsw:NSW_Geology"
-    order: "Registered_105"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:NSW_Geology"
 "geop-isos-grav-over-tmi-rtp-tilt":
-    hidden: true
     name: "Geophysics Isostatic Gravity Over Tmi Rtp Tilt"
-    group: "Geological Survey NSW"
+    group: "Geophysics"
     description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Bo"
     order: "Registered_106"
-    supportsCsvDownloads: true
-    wfs:
+    supportsCsvDownloads: false
+    wms:
         selector: "geophys:IsoGravTilt"
-"nsw-lithology-samples":
-    name: "Nsw Lithology Samples"
-    group: "Geological Survey NSW"
-    description: ""
-    order: "Registered_107"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:dw_lithhole"
-"nsw-base":
-    hidden: true
-    name: "Nsw Base"
-    group: "Geological Survey NSW"
-    description: "Layer-Group type layer: gsnsw:NSW_Base"
-    order: "Registered_108"
-    supportsCsvDownloads: true
-    wfs:
-        selector: "gsnsw:NSW_Base"
 "nsw-mineral-occurrence-commodity":
-    name: "Nsw Mineral Occurrence Commodity"
-    group: "Geological Survey NSW"
+    name: "NSW Mineral Occurrence Commodity"
+    group: "Mineral Deposits"
     description: "This spatial dataset is a derivative product of the New South Wales Mineral Occu"
     order: "Registered_109"
     supportsCsvDownloads: true
@@ -1571,7 +1338,7 @@
 "geological-provinces":
     name: "Geological Provinces"
     description: "Geological Provinces provided by GA"
-    group: "Geological Provinces"
+    group: "Boundaries"
     proxyStyleUrl: "getGeologicalProvincestyle.do"
     order: "provinces_01"
     supportsCsvDownloads: true
