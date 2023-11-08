@@ -147,14 +147,14 @@ public class LayerFactory {
      * @param id            matches a CSWRecord by an exact matching record id
      * @param serviceName   the service name string to search for in CSW records
      */
-    public CSWRecordSelector knownTypeCSWSelector(String keyword, String id, String serviceName) {
+    public CSWRecordSelector knownTypeCSWSelector(String[] keywords, String[] ids, String[] serviceNames) {
         CSWRecordSelector cswSelector = new CSWRecordSelector();
-        if (keyword != null)
-            cswSelector.setDescriptiveKeyword(keyword);
-        if (id != null)
-            cswSelector.setRecordId(id);
-        if (serviceName != null)
-            cswSelector.setServiceName(serviceName);
+        if (keywords != null)
+            cswSelector.setDescriptiveKeywords(keywords);
+        if (ids != null)
+            cswSelector.setRecordIds(ids);
+        if (serviceNames != null)
+            cswSelector.setServiceNames(serviceNames);
         return cswSelector;
     }
 
@@ -327,29 +327,28 @@ public class LayerFactory {
                             break;
                         }
                         case "csw": {
-                            String keyword = null;
-                            String recordId = null;
-                            String serviceName = null;
+                            String[] keywords = null;
+                            String[] recordIds = null;
+                            String[] serviceNames = null;
 
                             Map<String, Object> x = (Map<String, Object>) v1;
-                            String[] arr = { null, null, null };
-                            x.forEach((sk1, sv1) -> {
-                                if (sk1.startsWith("keyword")) {
-                                    arr[0] = (String) sv1;
+                            for (Map.Entry<String, Object> entry : x.entrySet()) {
+                                String cswKey = entry.getKey();
+                                // NB: Assumes all fields in 'csw:' are lists
+                                String[] cswVals = ((List<String>) entry.getValue()).toArray(new String[0]);
+                                if (cswKey.startsWith("keywords")) {
+                                    keywords = cswVals;
                                 }
-                                if (sk1.startsWith("id")) {
-                                    arr[1] = (String) sv1;
+                                else if (cswKey.startsWith("ids")) {
+                                    recordIds = cswVals;
                                 }
-                                if (sk1.startsWith("serviceName")) {
-                                    arr[2] = (String) sv1;
+                                else if (cswKey.startsWith("serviceNames")) {
+                                    serviceNames = cswVals;
                                 }
-                            });
-                            keyword = arr[0];
-                            recordId = arr[1];
-                            serviceName = arr[2];
+                            };
 
-                            // System.out.println("\tcsw: "+keyword+", "+recordId+", "+serviceName);
-                            layer.setKnownLayerSelector(knownTypeCSWSelector(keyword, recordId, serviceName));
+                            // System.out.println("\tcsw: "+keywords+", "+recordIds+", "+serviceNames);
+                            layer.setKnownLayerSelector(knownTypeCSWSelector(keywords, recordIds, serviceNames));
                             break;
                         }
                         case "iris": {
