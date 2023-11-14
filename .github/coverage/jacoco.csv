@@ -141,7 +141,7 @@ AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.mandRec,16,0,0,
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext.new Runnable() {...},11,0,0,0,3,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext,1072,0,2,0,213,0,71,0,70,0
 AuScope-Portal-API,org.auscope.portal.server.config,ExtraVocabularies,111,0,0,0,13,0,13,0,13,0
-AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1463,0,133,0,346,0,112,0,36,0
+AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1448,0,135,0,344,0,112,0,35,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.wfsRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalTest,79,0,2,0,18,0,5,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.filterCtl,6,0,0,0,1,0,1,0,1,0
