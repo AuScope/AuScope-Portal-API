@@ -25,13 +25,20 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-
+      
+      - name: Set Release versions from tag and pom
+        run: |
+          echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_ENV"
+          echo "WAR_VERSION=$(echo "${{  github.ref_name }}" | sed 's/v//')" >> "$GITHUB_ENV"
+      - name: Check version numbers match
+        if: ${{ env.WAR_VERSION}} != ${{ env.RELEASE_VERSION }}
+        run: exit 1
       - name: Build with Maven, then with docker 
         run: |
           mvn -B package --file pom.xml
           ls -lR target
-          echo "WAR_VERSION=$(echo "${{  github.ref_name }}" | sed 's/v//')" >> "$GITHUB_ENV"
-          docker build . --file Dockerfile.github --tag $IMAGE_NAME --build-arg war_file=target/auscope-portal-api-$WAR_VERSION.war
+          
+          docker build . --file Dockerfile.github --tag $IMAGE_NAME --build-arg war_file=target/auscope-portal-api-${{ env.WAR_VERSION }}.war
           
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -42,7 +49,7 @@ jobs:
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           
-          VERSION=${{ github.event.inputs.api-buildtag }}
+          VERSION=${{ env.WAR_VERSION }}
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
