@@ -605,7 +605,7 @@
         iris:
                selector: [ "3G","https://auspass.edu.au" ]
 "passive-seismic":
-        name: "Passive Seismic Sites"
+        name: "AuScope Passive Seismic Sites"
         group: "Passive Seismic"
         description: "Passive Seismic Sites"
         order: "274"
@@ -966,7 +966,7 @@
     wfs:
         selector: "RemAnomAutoSearch:AutoSearchAnomalies"
 "remanent-anomaliesTMI":
-    name: "AUS5 - Total Magnetic Intensity"
+    name: "Geophyscial Grid Magnetics - TMI - HSI colour"
     description: "Total Magnetic Intensity from Magnetic Anomaly Map of Australia fifth edition), Geoscience Australia and other sources"
     group: "Magnetics"
     order: "82"
@@ -2220,3 +2220,101 @@
     serverType: "ESRI"
     wms:
         selector: "Coastline1M"
+"MSL-New Magnetotellurics":
+    name: "Magnetotelluric Site Locations"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics01"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "mt:mt_site_locations"
+
+"CDR-New Magnetotellurics 10m":
+    name: "Curnamona and Delamerian Region 10m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics02"
+    supportsCsvDownloads: true
+    wms:
+        selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_000000-000010"
+
+"CDR-New Magnetotellurics 2630m":
+    name: "Curnamona and Delamerian Region 2630m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics03"
+    supportsCsvDownloads: true
+    wms:
+        selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_002430-002630"
+
+"CDR-New Magnetotellurics 48430m":
+    name: "Curnamona and Delamerian Region 48430m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics04"
+    supportsCsvDownloads: true
+    wms:
+        selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_044780-048430"
+
+"CDR-New Magnetotellurics 77680m":
+    name: "Curnamona and Delamerian Region 77680m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics05"
+    supportsCsvDownloads: true
+    wms:
+        selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_071780-077680"
+
+"CDR-New Magnetotellurics 125180m":
+    name: "Curnamona and Delamerian Region 125180m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics06"
+    supportsCsvDownloads: true
+    wms:
+        selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_115180-125180"
+
+"WQA-New Magnetotellurics 1280m":
+    name: "Western Queensland AusLAMP 1280m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics07"
+    supportsCsvDownloads: true
+    wms:
+        selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_000000-001280"
+
+"WQA-New Magnetotellurics 2655m":
+    name: "Western Queensland AusLAMP 2655m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics08"
+    supportsCsvDownloads: true
+    wms:
+        selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_002000-002655"
+
+"WQA-New Magnetotellurics 68610m":
+    name: "Western Queensland AusLAMP 68610m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics09"
+    supportsCsvDownloads: true
+    wms:
+        selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_063310-068610"
+
+"WQA-New Magnetotellurics 182460m":
+    name: "Western Queensland AusLAMP 182460m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics10"
+    supportsCsvDownloads: true
+    wms:
+        selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_168060-182460"
+
+"WQA-New Magnetotellurics 298760m":
+    name: "Western Queensland AusLAMP 298760m"
+    description: "New Magnetotellurics"
+    group: "New Magnetotellurics"
+    order: "New Magnetotellurics11"
+    supportsCsvDownloads: true
+    wms:
+        selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_275160-298760"
