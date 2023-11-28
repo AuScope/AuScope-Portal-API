@@ -62,7 +62,7 @@
 
 # Mineral Tenements
 "mineral-tenements":
-        name: "Mineral Tenements"
+        name: "Australian Mineral Tenements"
         description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for mt:Mineral Tenement"
         group: "Tenements"
         proxyStyleUrl: "getMineralTenementStyle.do"
@@ -185,36 +185,36 @@
             selector: "mt:nth_aus_AusLAMP_siteloc"
 
 "auscope-mt-collection-1":
-        name: "AuScope MT Collection: MT Broadband Surveys of W & NW Tas"
+        name: "AuScope MT: W/NW Tas Broadband"
         group: "Magnetotellurics"
-        description: "This forms part of the AuScope Magnetotelluric Collection, created by the GeoPhysics 2030 Project. Two broadband MT traverses were acquired for shallower investigations of the lithosphere beneath western and north western Tasmania. These surveys transected major crustal boundaries between Precambrian Tyennan basement and the highly metalliferous Cambrian to Devonian Dundas-Fossey Trough."
+        description: "This forms part of the AuScope Magnetotelluric Collection, created by the GeoPhysics 2030 Project, hosted by NCI. Two broadband MT traverses were acquired for shallower investigations of the lithosphere beneath western and north western Tasmania. These surveys transected major crustal boundaries between Precambrian Tyennan basement and the highly metalliferous Cambrian to Devonian Dundas-Fossey Trough."
         order: "403"
         csw:
             serviceNames:
               - "Magnetotelluric Broadband Surveys of Western and North-Western Tasmania, 2016"
 
 "auscope-mt-collection-2":
-        name: "AuScope MT Collection: East Antarctica surveys taken by The University of Adelaide"
+        name: "AuScope MT: East Antarctica surveys"
         group: "Magnetotellurics"
-        description: "This forms part of the AuScope Magnetotelluric Collection, sourced from The University of Adelaide, created by the GeoPhysics 2030 Project. The Vestfold Hills and Rauer Group in East Antarctica have contrasting Archean to Neoproterozoic geological histories and are believed to be juxtaposed along a suture zone that now lies beneath the Sørsdal Glacier. Exact location and age of this suture zone are unknown, as is its relationship to regional deformation associated with the amalgamation of East Gondwana. To image the suture zone, magnetotelluric (MT) data were collected in Prydz Bay, East Antarctica, mainly along a profile crossing the Sørsdal Glacier and regions inland of the Vestfold Hills and Rauer Group islands."
+        description: "This forms part of the AuScope Magnetotelluric Collection, sourced from The University of Adelaide, created by the GeoPhysics 2030 Project, hosted by NCI. The Vestfold Hills and Rauer Group in East Antarctica have contrasting Archean to Neoproterozoic geological histories and are believed to be juxtaposed along a suture zone that now lies beneath the Sørsdal Glacier. Exact location and age of this suture zone are unknown, as is its relationship to regional deformation associated with the amalgamation of East Gondwana. To image the suture zone, magnetotelluric (MT) data were collected in Prydz Bay, East Antarctica, mainly along a profile crossing the Sørsdal Glacier and regions inland of the Vestfold Hills and Rauer Group islands."
         order: "404"
         csw:
             serviceNames:
               - "Magnetotelluric investigation of the Vestfold Hills and Rauer Group, East Antarctica (time series)"
 
 "auscope-mt-collection-3":
-        name: "AuScope MT Collection: AusLAMP Surveys"
+        name: "AuScope MT: AusLAMP Surveys"
         group: "Magnetotellurics"
-        description: "This forms part of the AuScope Magnetotelluric Collection, created by the GeoPhysics 2030 Project. Magnetotelluric surveys conducted as part of the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP)"
+        description: "This forms part of the AuScope Magnetotelluric Collection, created by the GeoPhysics 2030 Project, hosted by NCI. Magnetotelluric surveys conducted as part of the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP)"
         order: "405"
         csw:
             serviceNames:
               - "Magnetotelluric surveys from the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP)"
 
 "auscope-mt-collection-4":
-        name: "AuScope MT Collection: The University of Adelaide"
+        name: "AuScope MT: Uni of Adelaide Legacy"
         group: "Magnetotellurics"
-        description: "Magnetotelluric survey data taken from the University of Adelaide Legacy Collection, created by the GeoPhysics 2030 Project. The collection contains individual survey grids of MT data derived conducted by The University of Adelaide or associated contractors. The datasets were collected predominantly under various grants/projects including: AuScope, AWAGS, AGOS, ARC LIEF, AusLAMP and NCRIS."
+        description: "Magnetotelluric survey data taken from the University of Adelaide Legacy Collection, created by the GeoPhysics 2030 Project, hosted by NCI. The collection contains individual survey grids of MT data derived conducted by The University of Adelaide or associated contractors. The datasets were collected predominantly under various grants/projects including: AuScope, AWAGS, AGOS, ARC LIEF, AusLAMP and NCRIS."
         order: "406"
         csw:
            serviceNames:
@@ -226,7 +226,7 @@
 
 # CSIRO Mafic-Ultramafic Geochemical Dataset
 "csiro-maf-geochem":
-        name: "CSIRO Mafic-Ultramafic Geochemical Dataset"
+        name: "CSIRO Mafic-Ultramafic Dataset"
         group: "Geochemistry"
         description: "The CSIRO mafic-ultramafic package includes whole-rock geochemical data and mineral chemistry data collected from CSIRO research projects from the mid-1980s to 2021."
         order: "405"
@@ -286,7 +286,7 @@
 # W.A. Geosample mineralogy
 "tima-geosample":
         name: "W.A. Mineralogy"
-        group: "Geosample Mineralogy"
+        group: "Mineralogy - Geosample"
         description: "A collection of the results published from TIMA"
         proxyUrl: "doTIMAGeoSample.do"
         proxyDownloadUrl: "doTIMAGeoSampleCSVDownload.do"
@@ -303,8 +303,8 @@
 # W.A. Geosample Geochronology
 "tima-shrimp-geosample":
         name: "W.A. Geochronology"
-        group: "Geosample Geochronology"
-        description: "A collection of the results published from SHRIMP U-Pb mass spectrometer"
+        group: "Geochronology"
+        description: "Locations and dataset download URLs of samples that have been analysed by SHRIMP U-Pb mass spectrometer at Curtin University"
         proxyUrl: "doSHRIMPGeoSample.do"
         proxyDownloadUrl: "doSHRIMPGeoSampleCSVDownload.do"
         proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:view_shrimp_geochronology_result"
@@ -607,7 +607,7 @@
 "passive-seismic":
         name: "AuScope Passive Seismic Sites"
         group: "Passive Seismic"
-        description: "Passive Seismic Sites"
+        description: "The locations, dates, station names and network codes of passive seismic surveys conducted at various sites around Australia. Surveys were at least partially funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
         order: "274"
         supportsCsvDownloads: true
         wfs:
@@ -624,7 +624,7 @@
 # National Argon Map
 "national-argon-map":
         name: "National Argon Map & GA Legacy"
-        group: "Argon Geochronology"
+        group: "Geochronology"
         description: "The National Argon Map (NAM) is an AuScope Opportunity supported Project with ANU Argon team, an Oversight Committee, and the Australian Argon Laboratories Network: ANU, Melbourne University, University of Queensland and Curtin University. Having the argon laboratories working as a network has been key to AuScope. NAM is providing an opportunity for researchers, students, and industry to explore 40Ar/39Ar as a geochronometer. Allowing the scientific community the opportunity to be exposed to a wide variation of scientific scenarios that this geochronometer can provide. The information provided by NAM is extensive in the geological context, the sample characterisation and report."
         order: "300"
         legendImg: "argon_map_legend.png"
@@ -634,7 +634,7 @@
 # GA Geophysical Survey (GADDS V2.0)
 "ga-geophysicalsurveys-all":
         name: "Geophysical Surveys - All"
-        group: "GA Geophysical Survey Datasets"
+        group: "Geophysical Survey Datasets (GADDS)"
         description: "Descriptions of geophysical datasets, their associated surveys, and the methods used for delivery of those datasets. Includes datasets collected from airborne, land, and marine surveys conducted or managed by Geoscience Australia and its predecessor agencies, as well as data and surveys from State and Territory geological survey agencies."
         order: "310"
         supportsCsvDownloads: true
@@ -642,7 +642,7 @@
                selector: "gadds:geophysical_survey_datasets"
 "ga-geophysicalsurveys-grav":
         name: "Geophysical Surveys - Gravity"
-        group: "GA Geophysical Survey Datasets"
+        group: "Geophysical Survey Datasets (GADDS)"
         description: "Gravity data measures small changes in gravity due to changes in the density of rocks beneath the Earth's surface."
         order: "311"
         supportsCsvDownloads: true
@@ -650,7 +650,7 @@
                selector: "gadds:geophysical_datasets_gravity"
 "ga-geophysicalsurveys-radio":
         name: "Geophysical Surveys - Radiometric"
-        group: "GA Geophysical Survey Datasets"
+        group: "Geophysical Survey Datasets (GADDS)"
         description: "The radiometric, or gamma-ray spectrometric method, measures the natural variations in the gamma-rays detected near the Earth's surface as the result of the natural radioactive decay of potassium (K), uranium (U) and thorium (Th). Radiometrics can tell us about the distribution of certain soils and rocks."
         order: "312"
         supportsCsvDownloads: true
@@ -658,7 +658,7 @@
                selector: "gadds:geophysical_datasets_radiometric"
 "ga-geophysicalsurveys-mag":
         name: "Geophysical Surveys - Magnetic"
-        group: "GA Geophysical Survey Datasets"
+        group: "Geophysical Survey Datasets (GADDS)"
         description: "Total magnetic intensity (TMI) data measures variations in the intensity of the Earth's magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust. Magnetic anomalies can be either positive (field stronger than normal) or negative (field weaker) depending on the susceptibility of the rock."
         order: "313"
         supportsCsvDownloads: true
@@ -666,7 +666,7 @@
                selector: "gadds:geophysical_datasets_magnetic"
 "ga-geophysicalsurveys-elev":
         name: "Geophysical Surveys - Elevation"
-        group: "GA Geophysical Survey Datasets"
+        group: "Geophysical Survey Datasets (GADDS)"
         description: "Digital Elevation data record the terrain height variations from the processed point-located data recorded during a geophysical survey."
         order: "314"
         supportsCsvDownloads: true
@@ -677,7 +677,7 @@
 "ga-geophys-1":
     name: "Bouguer Gravity Anomaly Grid of Onshore Australia 2016"
     description: "This gravity anomaly grid is derived from observations stored in the Australian National Gravity Database ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "351"
     csw:
         ids:
@@ -685,7 +685,7 @@
 "ga-geophys-2":
     name: "Complete Bouguer Gravity Anomaly Grid of Onshore Australia 2016"
     description: "This gravity anomaly grid is derived from observations stored in the Australian National Gravity Database ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "352"
     csw:
         serviceNames:
@@ -693,7 +693,7 @@
 "ga-geophys-3":
     name: "Isostatic Residual Gravity Anomaly Grid of Onshore Australia 2016"
     description: "This grid is derived from gravity observations stored in the Australian National Gravity Database ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "353"
     csw:
         ids:
@@ -701,7 +701,7 @@
 "ga-geophys-4":
     name: "Radiometric Grid of Australia Radmap) v4 2019 filtered pct potassium grid"
     description: "The filtered potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "354"
     csw:
         serviceNames:
@@ -709,7 +709,7 @@
 "ga-geophys-5":
     name: "Radiometric Grid of Australia Radmap) v4 2019 filtered ppm thorium"
     description: "The filtered thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "355"
     csw:
         serviceNames:
@@ -717,7 +717,7 @@
 "ga-geophys-6":
     name: "Radiometric Grid of Australia Radmap) v4 2019 filtered ppm uranium"
     description: "The filtered uranium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "356"
     csw:
         serviceNames:
@@ -725,7 +725,7 @@
 "ga-geophys-7":
     name: "Radiometric Grid of Australia Radmap) v4 2019 filtered terrestrial dose rate"
     description: "The filtered terrestrial dose rate grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia, made of a combination of over 600 individual survey grids."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "357"
     csw:
         serviceNames:
@@ -733,7 +733,7 @@
 "ga-geophys-8":
     name: "Radiometric Grid of Australia Radmap) v4 2019 ratio thorium over potassium"
     description: "The thorium over potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "358"
     csw:
         serviceNames:
@@ -741,7 +741,7 @@
 "ga-geophys-9":
     name: "Radiometric Grid of Australia Radmap) v4 2019 ratio uranium over potassium"
     description: "The uranium over potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia comprising over 600 airborne gamma-ray spectrometric surveys."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "359"
     csw:
         serviceNames:
@@ -749,7 +749,7 @@
 "ga-geophys-10":
     name: "Radiometric Grid of Australia Radmap) v4 2019 ratio uranium over thorium"
     description: "The uranium over thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "360"
     csw:
         serviceNames:
@@ -757,7 +757,7 @@
 "ga-geophys-11":
     name: "Radiometric Grid of Australia Radmap) v4 2019 ratio uranium squared over thorium"
     description: "The uranium squared over thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "361"
     csw:
         serviceNames:
@@ -765,7 +765,7 @@
 "ga-geophys-12":
     name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered pct potassium"
     description: "The unfiltered potassium grid is a derivative of the 2019 radiometric grid of Australia."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "362"
     csw:
         serviceNames:
@@ -773,7 +773,7 @@
 "ga-geophys-13":
     name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered ppm thorium"
     description: "The unfiltered thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "363"
     csw:
         serviceNames:
@@ -781,7 +781,7 @@
 "ga-geophys-14":
     name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered ppm uranium"
     description: "The unfiltered uranium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "364"
     csw:
         serviceNames:
@@ -789,7 +789,7 @@
 "ga-geophys-15":
     name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered terrestrial dose rate"
     description: "The unfiltered terrestrial dose rate grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia, which is a merge of over 600 individual gamma-ray spectrometric surveys."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "365"
     csw:
         serviceNames:
@@ -797,7 +797,7 @@
 "ga-geophys-16":
     name: "Total Magnetic Intensity TMI) Grid of Australia 2019 - seventh edition - 40 m cell size"
     description: "Total magnetic intensity TMI) data measures variations in the intensity of the Earth magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "366"
     csw:
         serviceNames:
@@ -805,7 +805,7 @@
 "ga-geophys-17":
     name: "Total Magnetic Intensity TMI) Grid of Australia 2019 - seventh edition - 80 m cell size"
     description: "Total magnetic intensity TMI) data measures variations in the intensity of the Earth magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "367"
     csw:
         serviceNames: 
@@ -813,7 +813,7 @@
 "ga-geophys-18":
     name: "Total Magnetic Intensity TMI) Grid of Australia with Variable Reduction to Pole VRTP) 2019 - seventh edition"
     description: "The 2019 Total magnetic Intensity TMI) grid of Australia with variable reduction to pole VRTP) has a grid cell size of ~3 seconds of arc approximately 80 m). This grid only includes airborne-derived TMI data for onshore and near-offshore continental areas."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "368"
     csw:
         serviceNames:
@@ -821,7 +821,7 @@
 "ga-geophys-19":
     name: "Total Magnetic Intensity Grid of Australia 2019 - First Vertical Derivative 1VD)"
     description: " The first vertical derivative 1VD) grid is derived from the 2019 Total magnetic Intensity TMI) grid of Australia which has a grid cell size of ~3 seconds of arc approximately 80 m)."
-    group: "GA/NCI National Geophysical Compilations"
+    group: "Geophysics - National Geophysical Compilation"
     order: "369"
     csw:
         serviceNames:
@@ -831,7 +831,7 @@
 "aster-aloh":
     name: "AlOH group composition"
     description: "1. Band ratio: B5/B7Blue is well ordered kaolinite, Al-rich muscovite/illite, paragonite, pyrophyllite Red is Al-poor Si-rich) muscovite phengite)"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_020"
     csw:
         ids:
@@ -839,7 +839,7 @@
 "aster-ferrous":
     name: "Ferrous iron index"
     description: "1. Band ratio: B5/B4Blue is low abundance, Red is high abundance"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_030"
     csw:
         ids:
@@ -847,7 +847,7 @@
 "aster-opaque":
     name: "Opaque index"
     description: "1. Band ratio: B1/B4Blue is low abundance, Red is high abundancepotentially includes  carbon black e.g. ash), magnetite, Mn oxides, and sulphides in unoxidised envornments"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_040"
     csw:
         ids:
@@ -855,7 +855,7 @@
 "aster-ferric-oxide-content":
     name: "Ferric oxide content"
     description: "1. Band ratio: B4/B3Blue is low abundance, Red is high abundance"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_050"
     csw:
         ids:
@@ -863,7 +863,7 @@
 "aster-feoh":
     name: "FeOH group content"
     description: "1. Band ratio: (B6+B8)/B7Blue is low content, Red is high contentpotentially includes: chlorite, epidote, jarosite, nontronite, gibbsite, gypsum, opal-chalcedony)"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_060"
     csw:
         ids:
@@ -871,7 +871,7 @@
 "aster-ferric-oxide-comp":
     name: "Ferric oxide composition"
     description: "1. Band ratio: B2/B1Blue-cyan is goethite rich, Green is hematite-goethite, Red-yellow is hematite-rich"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_070"
     csw:
         ids:
@@ -879,7 +879,7 @@
 "aster-group-index":
     name: "Kaolin group index"
     description: "B6/B5(potential includes: pyrophyllite, alunite, well-ordered kaolinite)Blue is low content, Red is high content"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_080"
     csw:
         ids:
@@ -887,7 +887,7 @@
 "aster-quartz-index":
     name: "TIR Quartz index"
     description: "1. Band ratio: B11/(B10+B12)Blue is low quartz contentRed is high quartz content"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_090"
     csw:
         ids:
@@ -895,7 +895,7 @@
 "aster-mgoh-content":
     name: "MgOH group content"
     description: "1. Band ratio: (B6+B9/(B7+B8)Blue is low content, Red is high contentpotentially includes: calcite, dolomite, magnesite, chlorite, epidote, amphibole, talc, serpentine)"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_100"
     csw:
         ids:
@@ -903,7 +903,7 @@
 "aster-green-veg":
     name: "Green vegetation content"
     description: "Band ratio: B3/B2 Blue is low contentRed is high content"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_110"
     csw:
         ids:
@@ -911,7 +911,7 @@
 "aster-ferr-carb":
     name: "Ferrous iron content in MgOH/carbonate"
     description: "1. Band ratio: B5/B4Blue is low ferrous iron content in carbonate and MgOH minerals like talc and tremolite.Red is high ferrous iron content in carbonate and MgOH minerals like chlorite and actinolite."
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_120"
     csw:
         ids:
@@ -919,7 +919,7 @@
 "aster-mgoh-group-comp":
     name: "MgOH group composition"
     description: "1. Band ratio: B7/B8Blue-cyan is magnesite-dolomite, amphibole, chlorite\tRed is calcite, epidote, amphibole"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_130"
     csw:
         ids:
@@ -927,7 +927,7 @@
 "aster-aloh-group-content":
     name: "AlOH group content"
     description: "1. Band ratio: (B5+B7)/B6Blue is low abundance, Red is high abundance potentially includes: phengite, muscovite, paragonite, lepidolite, illite, brammalite, montmorillonite, beidellite, kaolinite, dickite"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_160"
     csw:
         ids:
@@ -935,7 +935,7 @@
 "aster-silica-content":
     name: "TIR Silica index"
     description: "1. Band ratio: B13/B10Blue is low silica contentRed is high silica content(potentially includes Si-rich minerals, such as quartz, feldspars, Al-clays)"
-    group: "ASTER Maps"
+    group: "ASTER Mineral Maps"
     order: "30_ASTER Maps_180"
     csw:
         ids:
@@ -966,7 +966,7 @@
     wfs:
         selector: "RemAnomAutoSearch:AutoSearchAnomalies"
 "remanent-anomaliesTMI":
-    name: "Geophyscial Grid Magnetics - TMI - HSI colour"
+    name: "Geophysical Grid Mag TMI HSI colour"
     description: "Total Magnetic Intensity from Magnetic Anomaly Map of Australia fifth edition), Geoscience Australia and other sources"
     group: "Magnetics"
     order: "82"
@@ -1081,7 +1081,7 @@
 # GA Reports
 "l180-mt-isa-deep-crus-seis-surv-qld-2006-stac-and-migr-data-and-imag-for-line-06ga-to-06ga":
     name: "L180 Mt Isa Deep Crustal Seismic Survey Qld 2006 Stacked And Migrated Data And Images For Lines 06Ga M1 To 06Ga M6"
-    group: "Geoscience Australia Reports"
+    group: "Reports - Geoscience Australia"
     description: "Processed seismic data SEG-Y format) and TIFF images for the 2006 Mt Isa Deep C"
     order: "Registered_14"
     csw:
@@ -1089,7 +1089,7 @@
             - "a05f7892-ee53-7506-e044-00144fdd4fa6"
 "are-ther-any-sand-uran-syst-in-the-erom-basi":
     name: "Are There Any Sandstone Hosted Uranium Systems In The Eromanga Basin"
-    group: "Geoscience Australia Reports"
+    group: "Reports - Geoscience Australia"
     description: "As part of Geoscience Australia's Onshore Energy Security Program the authors ha"
     order: "Registered_15"
     csw:
@@ -1097,7 +1097,7 @@
             - "a05f7892-f9c4-7506-e044-00144fdd4fa6"
 "l164-curn-seis-surv-sa-2003-2004-stac-and-migr-seis-data-and-imag-for-line-03ga":
     name: "L164 Curnamona Seismic Survey Sa 2003 2004 Stacked And Migrated Seismic Data And Images For Lines 03Ga Cu1"
-    group: "Geoscience Australia Reports"
+    group: "Reports - Geoscience Australia"
     description: "A seismic survey using the Australian National Seismic Imaging Resource ANSIR)"
     order: "Registered_16"
     csw:
@@ -1105,7 +1105,7 @@
             - "cd697530-5b75-3811-e044-00144fdd4fa6"
 "lawn-hill-plat-and-leic-rive-faul-trou-meas-stra-sect-onli-gis":
     name: "Lawn Hill Platform And Leichhardt River Fault Trough Measured Stratigraphic Section Online Gis"
-    group: "Geoscience Australia Reports"
+    group: "Reports - Geoscience Australia"
     description: "This GIS web browser contains stratigraphic information from the southern flank"
     order: "Registered_17"
     csw:
@@ -1113,7 +1113,7 @@
             - "a05f7892-b7a0-7506-e044-00144fdd4fa6"
 "pred-mine-disc-in-the-east-yilg-crat-an-exam-of-dist-targ-of-an-orog-gold-mine-syst":
     name: "Predictive Mineral Discovery In The Eastern Yilgarn Craton An Example Of District Scale Targeting Of An Orogenic Gold Mineral System"
-    group: "Geoscience Australia Reports"
+    group: "Reports - Geoscience Australia"
     description: "Predictive mineral discovery is concerned with the application of a whole of sys"
     order: "Registered_18"
     csw:
@@ -1121,7 +1121,7 @@
             - "a05f7892-eafd-7506-e044-00144fdd4fa6"
 "fina-repo-3d-geol-mode-of-the-east-yilg-crat-proj-pmd-y2-sept-2001-dece-2004":
     name: "Final Report 3D Geological Models Of The Eastern Yilgarn Craton Project Pmd Crc Y2 September 2001 December 2004"
-    group: "Geoscience Australia Reports"
+    group: "Reports - Geoscience Australia"
     description: "The pmd*CRC Y2 project operated for a little over three years, and in this time"
     order: "Registered_19"
     csw:
@@ -1131,16 +1131,16 @@
 # Mineral Resources Tasmania
 "cate-3-expl-lice-poly-of-tasm-min-reso-tasm":
     hidden: true
-    name: "Category 3 Exploration Licence Polygons Of Tasmania"
-    group: "Exploration and Mining Titles"
+    name: "Cat 3 Exploration Licences Of Tasmania"
+    group: "Tenements"
     description: "Category 3 Exploration Licence polygons and Exploration Release Areas across Tasmania."
     order: "Registered_43"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:LicenceCategory3"
 "cate-1-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 1 Exploration Licence Polygons Of Tasmania"
-    group: "Exploration and Mining Titles"
+    name: "Cat 1 Exploration Licences Of Tasmania"
+    group: "Tenements"
     description: "Category 1 Exploration Licence polygons and Exploration Release Areas across Tasmania."
     order: "Registered_44"
     supportsCsvDownloads: true
@@ -1195,16 +1195,16 @@
     wfs:
         selector: "mrtwfs:DamagePoly"
 "cate-4-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 4 Exploration Licence Polygons Of Tasmania"
-    group: "Exploration and Mining Titles"
+    name: "Cat 4 Exploration Licences Of Tasmania"
+    group: "Tenements"
     description: "Category 4 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_51"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:LicenceCategory4"
 "cate-6-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 6 Exploration Licence Polygons Of Tasmania"
-    group: "Exploration and Mining Titles"
+    name: "Cat 6 Exploration Licences Of Tasmania"
+    group: "Tenements"
     description: "Category 6 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_52"
     supportsCsvDownloads: true
@@ -1212,15 +1212,15 @@
         selector: "mrtwfs:LicenceCategory6"
 "mini-leas-poly-of-tasm-min-reso-tasm":
     name: "Mining Lease Polygons Of Tasmania"
-    group: "Exploration and Mining Titles"
+    group: "Tenements"
     description: "Mining Lease polygons and production licence polygons for all mineral categories"
     order: "Registered_53"
     supportsCsvDownloads: true
     wfs:
         selector: "mrtwfs:Leases"
 "cate-2-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 2 Exploration Licence Polygons Of Tasmania"
-    group: "Exploration and Mining Titles"
+    name: "Cat 2 Exploration Licences Of Tasmania"
+    group: "Tenements"
     description: "Category 2 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_54"
     supportsCsvDownloads: true
@@ -1235,8 +1235,8 @@
     wfs:
         selector: "mrtwfs:GravityMeasurements"
 "cate-5-expl-lice-poly-of-tasm-min-reso-tasm":
-    name: "Category 5 Exploration Licence Polygons Of Tasmania"
-    group: "Exploration and Mining Titles"
+    name: "Cat 5 Exploration Licences Of Tasmania"
+    group: "Tenements"
     description: "Category 5 Exploration Licence polygons and Exploration Release Areas across Tas"
     order: "Registered_56"
     supportsCsvDownloads: true
@@ -1260,7 +1260,7 @@
         selector: "mrtwfs:GravityBaseStations"
 "strategic-prospectivity-zones":
     name: "Strategic Prospectivity Zones of Tasmania"
-    group: "Exploration and Mining Titles"
+    group: "Tenements"
     description: "The Mining (Strategic Prospectivity Zones) Act 1993 recognises the high mineral prospectivity of many areas of Tasmania.  Within the Strategic Prospectivity Zones (SPZ) there are restrictions on changes of the status of parcels of Crown Land."
     order: "Registered_60"
     supportsCsvDownloads: true
@@ -1335,7 +1335,7 @@
         selector: "gsnsw:dw_photo"
 "nsw-curr-mini-and-expl-titl":
     name: "NSW Current Mining And Exploration Titles"
-    group: "Exploration and Mining Titles"
+    group: "Tenements"
     description: "Areas in NSW where a company or individual has the right to explore for or extract resources including petroleum, minerals and coal. All current titles for mineral and energy resource exploration, assessment and production."
     order: "Registered_86"
     supportsCsvDownloads: true
@@ -1359,7 +1359,7 @@
         selector: "geophys:Radio"
 "nsw-current-mining-applications":
     name: "NSW Current Mining Applications"
-    group: "Exploration and Mining Titles"
+    group: "Tenements"
     description: "All current applications for mineral and energy resource exploration, assessment and production titles."
     order: "Registered_93"
     supportsCsvDownloads: true
@@ -1367,7 +1367,7 @@
         selector: "gsnsw:bl_titleappl"
 "nsw-operating-mineral-mines":
     name: "NSW Operating Mineral Mines"
-    group: "Exploration and Mining Titles"
+    group: "Tenements"
     description: "Major operating mines in NSW, including locations, names and the resource being mined."
     order: "Registered_94"
     supportsCsvDownloads: true
@@ -1382,7 +1382,7 @@
     wfs:
         selector: "gsnsw:dw_geochron"
 "geophysics-isostatic-bouger-gravity":
-    name: "Geophysics Isostatic Bouger Gravity"
+    name: "NSW Isostatic Bouger Gravity"
     group: "Geophysics"
     description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Is"
     order: "Registered_100"
@@ -1398,7 +1398,7 @@
     wfs:
         selector: "gsnsw:dw_geochemistry"
 "geop-isos-grav-over-tmi-rtp-tilt":
-    name: "Geophysics Isostatic Gravity Over Tmi Rtp Tilt"
+    name: "NSW Isostatic Gravity Over Tmi Rtp Tilt"
     group: "Geophysics"
     description: "This dataset is part of the Geological Survey NSW Geophysics dataset series.  Bo"
     order: "Registered_106"
@@ -1434,7 +1434,7 @@
 # Octopus CRN Australia
 "Octopus-Crn-Aus-Basins":
     name: "CRN Australia: River Basins"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "CRN Australian Collection: River Basins"
     order: "Octopus_01"
     supportsCsvDownloads: true
@@ -1443,7 +1443,7 @@
 
 "Octopus-Crn-Aus-Outlets":
     name: "CRN Australia: Sample Sites"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "CRN Australian Collection: Sample Sites"
     order: "Octopus_02"
     supportsCsvDownloads: true
@@ -1453,7 +1453,7 @@
 # Octopus CRN Global 
 "Octopus-Crn-Int-Basins":
     name: "CRN Global: River Basins"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "CRN Global Collection: River Basins"
     order: "Octopus_03"
     supportsCsvDownloads: true
@@ -1462,7 +1462,7 @@
 
 "Octopus-Crn-Int-Outlets":
     name: "CRN Global: Sample Sites"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "CRN International Collection: Sample Sites"
     order: "Octopus_04"
     supportsCsvDownloads: true
@@ -1472,7 +1472,7 @@
 # Octopus CRN Large Basins
 "Octopus-Crn-XXL-Basins":
     name: "CRN Large Basins: River Basins"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "CRN Large Basins: River Basins"
     order: "Octopus_05"
     supportsCsvDownloads: true
@@ -1481,7 +1481,7 @@
 
 "Octopus-Crn-XXL-Outlets":
     name: "CRN Large Basins: Sample Sites"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "CRN Large Basins: Sample Sites"
     order: "Octopus_06"
     supportsCsvDownloads: true
@@ -1491,7 +1491,7 @@
 # Octopus CRN Basin Bounding boxes 
 "Octopus-Crn-Basin-BBoxes":
     name: "CRN Basin Bounding Boxes"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "CRN Basin Bounding Boxes"
     order: "Octopus_07"
     supportsCsvDownloads: true
@@ -1501,7 +1501,7 @@
 # Octopus Sahul Archaeology
 "Octopus-Sahul-Arch-Radicarbon":
     name: "Sahul Archaeology Radiocarbon"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "Sahul Archaeology: Radiocarbon collection"
     order: "Octopus_08"
     supportsCsvDownloads: true
@@ -1510,7 +1510,7 @@
 
 "Octopus-Sahul-Arch-OSL":
     name: "Sahul Archaeology OSL"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "Sahul Archaeology: optically stimulated luminescence (OSL) collection"
     order: "Octopus_09"
     supportsCsvDownloads: true
@@ -1519,7 +1519,7 @@
 
 "Octopus-Sahul-Arch-TL":
     name: "Sahul Archaeology TL"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "Sahul Archaeology: thermoluminescence (TL) collection"
     order: "Octopus_10"
     supportsCsvDownloads: true
@@ -1529,7 +1529,7 @@
 # Octopus Sahul Sedimentary Archives
 "Octopus-Sahul-Sed-Archives-Aeolian-Osl":
     name: "Sahul Sed Archives Aeolian OSL"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Aeolian optically stimulated luminescence (OSL)"
     order: "Octopus_11"
     supportsCsvDownloads: true
@@ -1538,7 +1538,7 @@
 
 "Octopus-Sahul-Sed-Archives-Aeolian-Tl":
     name: "Sahul Sed Archives Aeolian TL"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Aeolian thermoluminescence (TL)"
     order: "Octopus_12"
     supportsCsvDownloads: true
@@ -1547,7 +1547,7 @@
 
 "Octopus-Sahul-Sed-Archives-Fluvial-Osl":
     name: "Sahul Sed Archives Fluvial OSL"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Fluvial optically stimulated luminescence (OSL)"
     order: "Octopus_13"
     supportsCsvDownloads: true
@@ -1556,7 +1556,7 @@
 
 "Octopus-Sahul-Sed-Archives-Fluvial-Tl":
     name: "Sahul Sed Archives Fluvial TL"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Fluvial thermoluminescence (TL)"
     order: "Octopus_14"
     supportsCsvDownloads: true
@@ -1565,7 +1565,7 @@
 
 "Octopus-Sahul-Sed-Archives-Lacustrine-Osl":
     name: "Sahul Sed Archives Lacustrine OSL"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Lacustrine optically stimulated luminescence (OSL)"
     order: "Octopus_15"
     supportsCsvDownloads: true
@@ -1574,7 +1574,7 @@
 
 "Octopus-Sahul-Sed-Archives-Lacustrine-Tl":
     name: "Sahul Sed Archives Lacustrine TL"
-    group: "OCTOPUS (Cosmogenic DB)"
+    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
     description: "Sahul Sedimentary Archives: Lacustrine thermoluminescence (TL)"
     order: "Octopus_16"
     supportsCsvDownloads: true
@@ -1582,7 +1582,7 @@
         selector: "be10-denude:sahulsed_lacustrine_tl"
 
 "igsn-sample":
-    name: "igsn-csiro-sample"
+    name: "CSIRO Samples"
     group: "IGSN"
     description: "A collection of igsn-csiro-sample"
     proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=igsn:sample"
@@ -1594,7 +1594,7 @@
         textbox: 
             - [ "IGSN Identifier", "igsn", null, "ISLIKE" ]
 "igsn-ga-sample":
-    name: "igsn-ga-sample"
+    name: "GA Samples"
     group: "IGSN"
     description: "A collection of igsn-ga-sample"
     proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0x00FF00&layerName=igsn:igsn_ga_sample"
@@ -1606,7 +1606,7 @@
         textbox: 
             - [ "IGSN Identifier", "identifier", null, "ISLIKE" ]
 "igsn-ardc-sample":
-    name: "igsn-ardc-sample"
+    name: "ARDC Samples"
     group: "IGSN"
     description: "A collection of igsn-ardc-sample"
     proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0x0000FF&layerName=igsn:igsn_ands_sample"
@@ -1631,7 +1631,7 @@
 # PMD*CRC Reports with geographical bounding boxes
 "pmd-crc-project-a1-presentations":
     name: "Project A1 Presentations"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project A1 Presentations"
     order: "pmdcrc01"
     csw:
@@ -1640,7 +1640,7 @@
 
 "pmd-crc-project-c1-final-report":
     name: "Project C1 Final Report - Curnamona"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project C1 Final Report - Curnamona"
     order: "pmdcrc02"
     csw:
@@ -1649,7 +1649,7 @@
 
 "pmd-crc-project-c2-final-report":
     name: "Project C2 Final Report - Curnamona"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project C2 Final Report - Curnamona ASTER"
     order: "pmdcrc03"
     csw:
@@ -1658,7 +1658,7 @@
 
 "pmd-crc-project-c6-final-report":
     name: "Project C6 Final Report - Broken Hill"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project C6 Final Report - Broken Hill Geological Modelling Project Using 3D-WEG Geological Editor"
     order: "pmdcrc04"
     csw:
@@ -1667,7 +1667,7 @@
 
 "pmd-crc-project-c7-final-report":
     name: "Project C7 Final Report - Curnamona"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project C7 Final Report - Curnamona Craton Deep Seismic Reflection Survey"
     order: "pmdcrc05"
     csw:
@@ -1676,7 +1676,7 @@
 
 "pmd-crc-project-i1-appendix1":
     name: "Project I1 Appendix 1 - Mt Isa"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project I1 Appendix 1 Materials"
     order: "pmdcrc06"
     csw:
@@ -1685,7 +1685,7 @@
 
 "pmd-crc-project-i1-appendix5":
     name: "Project I1 Appendix 5 - Mt Isa"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project I1 Appendix 5 Materials"
     order: "pmdcrc07"
     csw:
@@ -1694,7 +1694,7 @@
 
 "pmd-crc-project-i2-presentations":
     name: "Project I2 Presentations and Posters"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project I2 Presentations and Posters"
     order: "pmdcrc08"
     csw:
@@ -1703,7 +1703,7 @@
 
 "pmd-crc-project-i5-final-report":
     name: "Project I5 Final Report - Batten Trough"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project I5 Final Report - Batten Trough Deep Seismic Reflection Traverses"
     order: "pmdcrc09"
     csw:
@@ -1712,7 +1712,7 @@
 
 "pmd-crc-project-i6-final-report":
     name: "Project I6 Final Report - Batten Trough"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project I6 Final Report - Batten Trough Seismic Survey -North South Traverse"
     order: "pmdcrc10"
     csw:
@@ -1721,7 +1721,7 @@
 
 "pmd-crc-project-i9-final-report":
     name: "Project I9 Final Report - Mt Isa"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project I9 Final Report - Final Report Geological Applications of new hyperspectral data in the Mt Isa area" 
     order: "pmdcrc11"
     csw:
@@ -1730,7 +1730,7 @@
 
 "pmd-crc-project-t1-final-report":
     name: "Project T1 Final Report - Western Victoria"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project T1 Final Report - Targeting new mineral deposits in western Victoria"
     order: "pmdcrc12"
     csw:
@@ -1739,7 +1739,7 @@
 
 "pmd-crc-project-t3-final-report":
     name: "Project T3 Final Report - Tasmania"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project T3 Final Report - Tasmania Mineral Province Geoscientific database, 3D Geological Modeling, Mines and Mineral Prospectivity"
     order: "pmdcrc13"
     csw:
@@ -1748,7 +1748,7 @@
 
 "pmd-crc-project-t67-final-report":
     name: "Project T6+7 Final Report - Victoria"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project T6 and T7 Final Report"
     order: "pmdcrc14"
     csw:
@@ -1757,7 +1757,7 @@
 
 "pmd-crc-project-t11-final-report":
     name: "Project T11 Final Report - Lachlan & Cobar"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Project T11 Final Report - 3D Architecture and Predictive Mineral System Analysis of the Central Lachlan Subprovince and Cobar Basin, New South Wales"
     order: "pmdcrc15"
     csw:
@@ -1765,7 +1765,7 @@
             - "T11 Report 3D Architecture and Predictive Mineral System Analysis of the Central Lachlan Subprovince and Cobar Basin, New South Wales"
 "pmd-crc-project-y2-appendix":
     name: "Project Y2 Appendix 2 - Yilgarn"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Reports Project Y2 Appendix 2"
     order: "pmdcrc16"
     csw:
@@ -1774,7 +1774,7 @@
 
 "pmd-crc-project-y4-final-report":
     name: "Project Y4 Report - Yilgarn"
-    group: "PMD*CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "PMD*CRC Y4 Report - Deliverable #4 Report on likely geodynamic models of the Yilgarn, with appropriate tests and possible analogues"
     order: "pmdcrc17"
     csw:
@@ -1784,7 +1784,7 @@
 # LEME CRC Reports
 "leme-crc-maps":
     name: "CRC LEME Regolith Maps"
-    group: "LEME CRC Reports"
+    group: "Reports - PMD*CRC and LEME CRC"
     description: "Regolith landform maps CRC LEME"
     order: "lemecrc01"
     csw:
@@ -1794,7 +1794,7 @@
 # GRACE
 "grace-mascons":
     name: "GRACE Mascons"
-    group: "GRACE"
+    group: "Gravity - GRACE"
     description: "GRACE/GRACE-FO mascons"
     order: "grace01"
     supportsCsvDownloads: false
@@ -1804,7 +1804,7 @@
 # Loop3D
 "2_5m_interpgeop15":
     name: "2.5m Interpgeop 15 4326"
-    group: "Loop3D"
+    group: "Modelling - Loop3D"
     description: "1:2 500 000 Interpreted Bedrock Geological map of Western Australia, (https://catalogue.data.wa.gov.au/dataset/1-2-500-000-state-interpreted-bedrock-geology-dmirs-014) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop01"
     supportsCsvDownloads: true
@@ -1812,7 +1812,7 @@
         selector: "loop:2_5m_interpgeop15_4326"
 "2m_linear_structures":
     name: "2m Linear Structures"
-    group: "Loop3D"
+    group: "Modelling - Loop3D"
     description: "Generalised Linear Geology Regions, BioRegional Assessment Program (https://data.gov.au/data/dataset/ffacd84c-8cd9-49d8-8562-e0d8e59220f6) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop02"
     supportsCsvDownloads: true
@@ -1820,7 +1820,7 @@
         selector: "SA:2m_linear_structures"
 "500k_faults_4326":
     name: "500k Faults 4326"
-    group: "Loop3D"
+    group: "Modelling - Loop3D"
     description: "1:500 000 State linear structures layer (https://catalogue.data.wa.gov.au/dataset/1-500-000-state-linear-structures-layer-dmirs-015) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop03"
     supportsCsvDownloads: true
@@ -1828,7 +1828,7 @@
         selector: "loop:500k_faults_4326"
 "500k_geol_28350":
     name: "500k Geol 28350"
-    group: "Loop3D"
+    group: "Modelling - Loop3D"
     description: "1:500 000 State interpreted bedrock geology (https://catalogue.data.wa.gov.au/dataset/1-500-000-state-interpreted-bedrock-geology-dmirs-016) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop04"
     supportsCsvDownloads: true
@@ -1836,7 +1836,7 @@
         selector: "loop:500k_geol_28350"
 "500k_geol_4326":
     name: "500k Geol 4326"
-    group: "Loop3D"
+    group: "Modelling - Loop3D"
     description: "1:500 000 State interpreted bedrock geology (https://catalogue.data.wa.gov.au/dataset/1-500-000-state-interpreted-bedrock-geology-dmirs-016) Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop05"
     supportsCsvDownloads: true
@@ -1844,7 +1844,7 @@
         selector: "loop:500k_geol_4326"
 "bulkdensitypoint_4326":
     name: "Bulk Density Point 4326"
-    group: "Loop3D"
+    group: "Modelling - Loop3D"
     description: "A compilation of bulk rock density petrophysics data from various sources: Geoscience Australia, Geological Survey Victoria, Mineral Resources Tasmania and Northern Territory Geological Survey. Part of a collection of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop06"
     supportsCsvDownloads: true
@@ -1852,7 +1852,7 @@
         selector: "loop:bulkdensitypoint_4326"
 "waroxi_wa_4326_bed":
     name: "Waroxi WA 4326 Bed"
-    group: "Loop3D"
+    group: "Modelling - Loop3D"
     description: "A compilation of Geological Survey of Western Australia WAROX datasets (https://geodocsget.dmirs.wa.gov.au/api/GeoDocsGet?filekey=4fc69b2e-853c-4715-b45a-580ec04b5895-ccowu056xeclcsf0w3y5x3jjg999kl2fbsv92r87) Part of a collecion of datasets from Work Package 2 of Loop3D project (https://loop3d.github.io/)"
     order: "loop07"
     supportsCsvDownloads: true
@@ -1861,7 +1861,7 @@
 
 # Geochronology and Isotopes, there are no WFS services for "Grid" layers so downloads are disabled for those
 "interpreted_age_samples_all_geochronology":
-    name: "All Geochronology"
+    name: "GA All Geochronology"
     group: "Geochronology"
     description: "A compilation of publicly-available radiometric age results from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Full analytical data tables are not available through the service. Complete analytical data for GA results are available from Geochron Delivery: http://www.ga.gov.au/geochron-sapub-web/."
     order: "geochron01"
@@ -1869,7 +1869,7 @@
     wfs:
         selector: "isotope:interpreted_age_samples_all_geochronology"
 "interpreted_age_samples_igneous_crystallisation":
-    name: "Igneous Crystallisation Age Data"
+    name: "GA Igneous Crystallisation Age Data"
     group: "Geochronology"
     description: "A subset of the All Geochronology layer, comprising summary radiometric age results interpreted as constraining the crystallisation of igneous rocks, with data derived from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Full datasets, including inheritance data, are not available through this service. Complete analytical data for GA results are available from Geochron Delivery: http://www.ga.gov.au/geochron-sapub-web/."
     order: "geochron02"
@@ -1877,7 +1877,7 @@
     wfs:
         selector: "isotope:interpreted_age_samples_igneous_crystallisation"
 "geochron_magmatic_age_grid":
-    name: "Igneous Crystallisation Age Grid"
+    name: "GA Igneous Crystallisation Age Grid"
     group: "Geochronology"
     description: "This grid is an interpolation of magmatic (igneous crystallisation) age point data held in the Isotopic Atlas as of February 2021. Data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Igneous Crystallisation Age Data layer (classification 2)."
     order: "geochron03"
@@ -1885,7 +1885,7 @@
     wms:
         selector: "isotope:geochron_magmatic_age_grid"
 "interpreted_age_samples_metamorphism":
-    name: "Deformation/Metamorphism/Alteration Age Data"
+    name: "GA Deform/Metamorph/Alter Age Data"
     group: "Geochronology"
     description: "A subset of the All Geochronology layer, comprising summary radiometric age results interpreted as constraining deformation, metamorphism and alteration processes affecting pre-existing rocks, with data derived from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Full analytical data for GA results are available from Geochron Delivery: http://www.ga.gov.au/geochron-sapub-web/."
     order: "geochron04"
@@ -1893,7 +1893,7 @@
     wfs:
         selector: "isotope:interpreted_age_samples_metamorphism"
 "geochron_metamorphic_age_grid":
-    name: "Deformation/Metamorphism/Alteration Age Grid"
+    name: "GA Deforma/Metamorph/Alter Age Grid"
     group: "Geochronology"
     description: "This grid is an interpolation of deformation/metamorphism/alteration age point data held in the Isotopic Atlas as of February 2021. Data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Deformation/Metamorphism/Alteration Age Data layer (classification 2)."
     order: "geochron05"
@@ -1901,7 +1901,7 @@
     wms:
         selector: "isotope:geochron_metamorphic_age_grid"
 "interpreted_age_samples_sedimentary_processes":
-    name: "Sedimentary Processes Age Data"
+    name: "GA Sedimentary Processes Age Data"
     group: "Geochronology"
     description: "A subset of the All Geochronology layer, comprising summary radiometric age results relating to sedimentary processes, with data derived from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. A large proportion constrain the youngest detrital mineral component in order to provide a maximum estimate for the age of sediment deposition. These rarely reflect the true depositional age of sediments and sedimentary rocks. Full detrital provenance results are not available through this service. Complete analytical data for GA results are available from Geochron Delivery: http://www.ga.gov.au/geochron-sapub-web/."
     order: "geochron06"
@@ -1909,7 +1909,7 @@
     wfs:
         selector: "isotope:interpreted_age_samples_sedimentary_processes"
 "geochron_maxdep_age_grid":
-    name: "Maximum Depositional Age Grid"
+    name: "GA Maximum Depositional Age Grid"
     group: "Geochronology"
     description: "This grid is an interpolation of maximum depositional age point data held in the Isotopic Atlas as of February 2021. Data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Sedimentary Processes Age Data layer (classification 2)."
     order: "geochron07"
@@ -1917,7 +1917,7 @@
     wms:
         selector: "isotope:geochron_maxdep_age_grid"
 "isotopes_smnd":
-    name: "Sm-Nd Isotope Data"
+    name: "GA Sm-Nd Isotope Data"
     group: "Isotopes"
     description: "A compilation of full analytical data tables for publicly-available Sm-Nd isotope data from Geoscience Australia (GA), State and Geological Surveys, and from literature-compiled sources. Each result links to information about the sample (including unit name, lithology and age), sample collection site, method of analysis, analytical errors, associated Reference Standards and analytical values, and references for location, age data, and the source publication information. Refer to Champion (2013) for further details: http://pid.geoscience.gov.au/dataset/ga/77772. Note that intervals used for the T2DM, Residence Age and Crystallisation Age are rounded to the nearest 100 Ma."
     order: "isotopes01"
@@ -1925,7 +1925,7 @@
     wfs:
         selector: "isotope:isotopes_smnd"
 "smnd_t2dm_grid":
-    name: "Sm-Nd Model Age (T2DM) Grid (felsic igneous rocks)"
+    name: "GA Sm-Nd Model Age (T2DM) Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Nd two-stage model ages, based on whole-rock Nd isotopic analyses from felsic magmatic rocks, particularly focusing on I- and A-type granites and volcanic rocks. The data provides an estimate of the timing of extraction from the mantle of the middle to lower crustal source regions from which the felsic melts were generated. The point data used for the interpolation is the “felsic igneous rock” subset of the Sm-Nd data held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same nine-class interval binning and colour scheme applied to the source point data in the Sm-Nd Isotope Data layer (classification 2)."
     order: "isotopes02"
@@ -1933,7 +1933,7 @@
     wms:
         selector: "isotope:smnd_t2dm_grid"
 "smnd_epsilon_grid":
-    name: "Sm-Nd Epsilon Grid (felsic igneous rocks)"
+    name: "GA Sm-Nd Epsilon Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Sm-Nd epsilon values, based on whole-rock Nd isotopic analyses from felsic magmatic rocks, particularly focusing on I- and A-type granites and volcanic rocks. The point data used for the interpolation is the “felsic igneous rock” subset of the Sm-Nd data held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Sm-Nd Isotope Data layer (classification 2)."
     order: "isotopes03"
@@ -1941,7 +1941,7 @@
     wms:
         selector: "isotope:smnd_epsilon_grid"
 "smnd_residence_time_grid":
-    name: "Sm-Nd Residence Time Grid (felsic igneous rocks)"
+    name: "GA Sm-Nd Residence Time Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Nd residence time values, based on whole-rock Nd isotopic analyses from felsic magmatic rocks, particularly focusing on I- and A-type granites and volcanic rocks. The data provides an estimate of the duration for material residing in the crust prior to its last melting event. The point data used for the interpolation is the “felsic igneous rock” subset of the Sm-Nd data held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same nine-class interval binning and colour scheme applied to the source point data in the Sm-Nd Isotope Data layer (classification 2)."
     order: "isotopes04"
@@ -1949,7 +1949,7 @@
     wms:
         selector: "isotope:smnd_residence_time_grid"
 "isotopes_hf":
-    name: "Lu-Hf Isotopes: Summary Data"
+    name: "GA Lu-Hf Isotopes: Summary Data"
     group: "Isotopes"
     description: "A compilation of summary information for publicly-available Lu-Hf isotope and associated O-isotope data from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Full analytical data tables are available through the complementary service. Refer to Waltenberg et al (2021) for further details: http://dx.doi.org/10.11636/Record.2021.016."
     order: "isotopes05"
@@ -1957,7 +1957,7 @@
     wfs:
         selector: "isotope:isotopes_hf"
 "luhf_t2dm_grid":
-    name: "Lu-Hf Model Age (T2DM) Grid (igneous)"
+    name: "GA Lu-Hf Model Age (T2DM) Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Lu-Hf two-stage model ages, based on (primarily zircon) Lu-Hf isotopic analyses from igneous rocks. The data provides an estimate of the timing of extraction from the mantle of the middle to lower crustal source regions from which the melts were generated. The point data used for the interpolation is the median magmatic T2DM data of the summary Lu-Hf dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same three-class interval binning and colour scheme applied to the source point data in the Lu-Hf Isotopes - Summary Data layer (classification 2)."
     order: "isotopes06"
@@ -1965,7 +1965,7 @@
     wms:
         selector: "isotope:luhf_t2dm_grid"
 "luhf_magmatic_ehft_grid":
-    name: "Lu-Hf Epsilon-Hf Grid (igneous)"
+    name: "GA Lu-Hf Epsilon-Hf Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Lu-Hf epsilon values, based on (primarily zircon) Lu-Hf isotopic analyses from igneous rocks. The point data used for the interpolation is the median magmatic epsilon Hf data from the summary Lu-Hf dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same eight-class interval binning and colour scheme applied to the source point data in the Lu-Hf Isotopes - Summary Data layer (classification 2)."
     order: "isotopes07"
@@ -1973,7 +1973,7 @@
     wms:
         selector: "isotope:luhf_magmatic_ehft_grid"
 "luhf_residence_time_grid":
-    name: "Lu-Hf Residence Time Grid (igneous)"
+    name: "GA Lu-Hf Residence Time Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Lu-Hf residence time estimates, based on (primarily zircon) Lu-Hf isotopic analyses from igneous rocks. The data provides an estimate of the duration for material residing in the crust prior to its last melting event. The point data used for the interpolation is the median magmatic residence time data from the summary Lu-Hf dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Lu-Hf Isotopes - Summary Data layer (classification 2)."
     order: "isotopes08"
@@ -1981,7 +1981,7 @@
     wms:
         selector: "isotope:luhf_residence_time_grid"
 "isotopes_hf_all":
-    name: "Lu-Hf Isotopes: Full Analytical Data"
+    name: "GA Lu-Hf Isotopes: Full Analytical Data"
     group: "Isotopes"
     description: "A compilation of full analytical data tables for publicly-available Lu-Hf isotope and associated O-isotope data from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample (including unit name, lithology and age), sample collection site, method of analysis, analytical errors, associated Reference Standards and analytical values, and source publication information. Refer to Waltenberg et al (2021) for further details: http://dx.doi.org/10.11636/Record.2021.016."
     order: "isotopes09"
@@ -1989,7 +1989,7 @@
     wfs:
         selector: "isotope:isotopes_hf_all"
 "isotopes_pbpb":
-    name: "Pb-Pb Isotope Data"
+    name: "GA Pb-Pb Isotope Data"
     group: "Isotopes"
     description: "A compilation of full analytical data tables for publicly-available Pb-Pb isotope data from both Geoscience Australia (GA) and literature-compiled sources. Each result links to information about the sample, sample collection site, method of analysis, and the source publication information. Refer to Huston (2019) for further details: http://pid.geoscience.gov.au/dataset/ga/127263."
     order: "isotopes10"
@@ -1997,7 +1997,7 @@
     wfs:
         selector: "isotope:isotopes_pbpb"
 "pbpb_mu_grid":
-    name: "Pb-Pb Mu Grid (ores)"
+    name: "GA Pb-Pb Mu Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Pb-Pb μ (mu, 238U/204Pb) data from primarily ore-related rocks and minerals. The point data used for the interpolation is from the Pb-Pb dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Pb-Pb Isotope Data layer (classification 2)."
     order: "isotopes11"
@@ -2005,7 +2005,7 @@
     wms:
         selector: "isotope:pbpb_mu_grid"
 "pbpb_kappa_grid":
-    name: "Pb-Pb Kappa Grid (ores)"
+    name: "GA Pb-Pb Kappa Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Pb-Pb κ (kappa, 232Th/238U) data from primarily ore-related rocks and minerals. The point data used for the interpolation is from the Pb-Pb dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Pb-Pb Isotope Data layer (classification 2)."
     order: "isotopes12"
@@ -2013,7 +2013,7 @@
     wms:
         selector: "isotope:pbpb_kappa_grid"
 "pbpb_omega_grid":
-    name: "Pb-Pb Omega Grid (ores)"
+    name: "GA Pb-Pb Omega Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Pb-Pb ω (omega, 232Th/204Pb) data from primarily ore-related rocks and minerals. The point data used for the interpolation is from the Pb-Pb dataset held in the Isotopic Atlas as of February 2021. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same seven-class interval binning and colour scheme applied to the source point data in the Pb-Pb Isotope Data layer (classification 2)."
     order: "isotopes13"
@@ -2021,7 +2021,7 @@
     wms:
         selector: "isotope:pbpb_omega_grid"
 "pbpb_model_age_grid":
-    name: "Pb-Pb Model Age Grid (ores)"
+    name: "GA Pb-Pb Model Age Grid"
     group: "Isotopes"
     description: "This is an interpolated grid of Pb-Pb model age data from primarily ore-related rocks and minerals. The point data used for the interpolation is from the Pb-Pb dataset held in the Isotopic Atlas as of February 2021, and the model ages are calculated using Stacey and Kramers (1975) Pb-evolution model. Point data added to the Isotopic Atlas after February 2021 is not represented in this grid. The grid was generated with Esri's ArcMap Spatial Analyst interpolation tool using the Natural Neighbor algorithm and 0.01 degree cell size. Two classifications are provided for this grid; a Jenks natural breaks classification with ten classes (classification 1) as per Champion (2013) http://pid.geoscience.gov.au/dataset/ga/77772, and; the same six-class interval binning and colour scheme applied to the source point data in the Pb-Pb Isotope Data layer (classification 2)."
     order: "isotopes14"
@@ -2029,7 +2029,7 @@
     wms:
         selector: "isotope:pbpb_model_age_grid"
 "isotopes_rbsr":
-    name: "Rb-Sr Isotope Data"
+    name: "GA Rb-Sr Isotope Data"
     group: "Isotopes"
     description: "Analytical data tables for publicly-available Sr-isotope data from Geoscience Australia (GA). Each result links to information about the sample, analytical metadata, and the source publication. Refer to de Caritat et al. (2022) for further details: http://pid.geoscience.gov.au/dataset/ga/71912."
     order: "isotopes15"
@@ -2041,7 +2041,7 @@
 "Radiometrics_U2Th_ratio_filtered_2015":
     name: "Radiometrics U2/Th Ratio"
     description: "Ratio of U-squared over Th derived from the filtered U and Th grids. The Radiometric Map of Australia dataset comprises grids of potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid01"
     serverType: "ESRI"
     wms:
@@ -2049,7 +2049,7 @@
 "Radiometrics_UTh_ratio_filtered_2015":
     name: "Radiometrics U/Th Ratio"
     description: "Ratio of U over Th derived from the filtered U and Th grids. The Radiometric Map of Australia dataset comprises grids of potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid02"
     serverType: "ESRI"
     wms:
@@ -2057,7 +2057,7 @@
 "Radiometrics_UK_ratio_filtered_2015":
     name: "Radiometrics U/K Ratio"
     description: "Ratio of U over K derived from the filtered U and K grids. The Radiometric Map of Australia dataset comprises grids of potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid03"
     serverType: "ESRI"
     wms:
@@ -2065,7 +2065,7 @@
 "Radiometrics_ThK_ratio_filtered_2015":
     name: "Radiometrics Th/K Ratio"
     description: "Ratio of Th over K derived from the filtered Th and K grids. The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid04"
     serverType: "ESRI"
     wms:
@@ -2073,7 +2073,7 @@
 "Radiometrics2015_filtered_ppmU":
     name: "Radiometrics Filtered U ppm"
     description: "Low-pass filtered U element concentration (ppm eU). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid05"
     serverType: "ESRI"
     wms:
@@ -2081,7 +2081,7 @@
 "Radiometrics2015_unfiltered_ppmU":
     name: "Radiometrics Unfiltered U ppm"
     description: "Unfiltered uranium element concentrations (ppm eU). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid06"
     serverType: "ESRI"
     wms:
@@ -2089,7 +2089,7 @@
 "Radiometrics2015_filtered_ppmTh":
     name: "Radiometrics Filtered Th ppm"
     description: "Low-pass filtered Th element concentration (ppm eTh). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid07"
     serverType: "ESRI"
     wms:
@@ -2097,7 +2097,7 @@
 "Radiometrics2015_unfiltered_ppmTh":
     name: "Radiometrics Unfiltered Th ppm"
     description: "Unfiltered Thorium element concentrations (ppm eTh). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid08"
     serverType: "ESRI"
     wms:
@@ -2105,7 +2105,7 @@
 "Radiometrics2015_filtered_pcK":
     name: "Radiometrics Filtered K percent"
     description: "Low-pass filtered K element concentration (percent K). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid09"
     serverType: "ESRI"
     wms:
@@ -2113,7 +2113,7 @@
 "Radiometrics2015_unfiltered_pcK":
     name: "Radiometrics Unfiltered K percent"
     description: "Unfiltered Potassium element concentrations (percent K). The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid10"
     serverType: "ESRI"
     wms:
@@ -2121,7 +2121,7 @@
 "Radiometrics2015_filtered_dose":
     name: "Radiometrics Filtered Dose"
     description: "Terrestrial dose rate derived as a linear combination of the filtered K, U and Th grids described above (see Minty et al., 2009). Unit of measure = nG/h. The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid11"
     serverType: "ESRI"
     wms:
@@ -2129,7 +2129,7 @@
 "Radiometrics2015_unfiltered_dose":
     name: "Radiometrics Unfiltered Dose"
     description: "Unfiltered terrestrial dose rate derived as a linear combination of the unfiltered K, U and Th grids (Minty et al., 2009). Unit of measure: nG/h. The Radiometric Map of Australia dataset comprises gridsof potassium (K), uranium (U) and thorium (Th) element concentrations, and derivatives of these grids."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid12"
     serverType: "ESRI"
     wms:
@@ -2137,7 +2137,7 @@
 "Radiometrics2015_ternary_KThU":
     name: "Radiometrics Ternary KThU"
     description: "The national ternary radiometric image (2015 edition) shows the concentrations of the radioelements potassium (K), uranium (U) and thorium (Th) at the Earth's surface as measured using the airborne gamma-ray spectrometric method."
-    group: "Geophysical Grid - Radiometrics"
+    group: "Geophysical Grid"
     order: "geogrid13"
     serverType: "ESRI"
     wms:
@@ -2147,7 +2147,7 @@
 "GravityAnomaly2010_HSI":
     name: "Gravity Anomaly - HSI colour"
     description: "Hue-Saturation-Intensity (HSI) colour image of the national Gravity Anomaly grid, 2010. This image is made from a grid that represents gravity anomalies of the Australian region."
-    group: "Geophysical Grid - Gravity"
+    group: "Geophysical Grid"
     order: "geogrid14"
     serverType: "ESRI"
     wms:
@@ -2155,7 +2155,7 @@
 "GravityAnomaly2010_greyscale":
     name: "Gravity Anomaly - Greyscale"
     description: "The gravity anomaly grid (2010) represents gravity anomalies of the Australian continent and surrounding region."
-    group: "Geophysical Grid - Gravity"
+    group: "Geophysical Grid"
     order: "geogrid15"
     serverType: "ESRI"
     wms:
@@ -2163,7 +2163,7 @@
 "GravityBouguerOnshore2010_greyscale":
     name: "Gravity Bouguer Onshore - Greyscale"
     description: "The onshore Bouguer gravity grid (2010) represents gravity anomalies of the Australian continent and surrounding region."
-    group: "Geophysical Grid - Gravity"
+    group: "Geophysical Grid"
     order: "geogrid16"
     serverType: "ESRI"
     wms:
@@ -2171,9 +2171,9 @@
 
 # GA Geophysical Grids - Magnetics
 "TotalMagneticIntensityVRTP2015_greyscale":
-    name: "Total Magnetic Intensity Variable Reduction to Pole (VRTP)"
+    name: "Total Magnetic Intensity VRTP"
     description: "The file is an image created from magmap_v6_2015_VRTP, a Variable Reduction to Pole TMI grid of the Australian region with a grid cell spacing of ~3 seconds of arc (approximately 80 m)."
-    group: "Geophysical Grid - Magnetics"
+    group: "Geophysical Grid"
     order: "geogrid17"
     serverType: "ESRI"
     wms:
@@ -2181,7 +2181,7 @@
 "TotalMagneticIntensity2015_HSI":
     name: "Total Magnetic Intensity - HSI Colour"
     description: "The Total Magnetic Intensity (greyscale) image is created from a composite TMI grid of the Australian region with a grid cell spacing of ~3 seconds of arc (approximately 80 m)."
-    group: "Geophysical Grid - Magnetics"
+    group: "Geophysical Grid"
     order: "geogrid18"
     serverType: "ESRI"
     wms:
@@ -2189,7 +2189,7 @@
 "TotalMagneticIntensity2015_greyscale":
     name: "Total Magnetic Intensity - Greyscale"
     description: "The Total Magnetic Intensity (greyscale) image is created from a composite TMI grid of the Australian region with a grid cell spacing of ~3 seconds of arc (approximately 80 m)."
-    group: "Geophysical Grid - Magnetics"
+    group: "Geophysical Grid"
     order: "geogrid19"
     serverType: "ESRI"
     wms:
@@ -2197,7 +2197,7 @@
 "AirborneSurveys2014":
     name: "Airborne Geophysical Surveys"
     description: "This layer provides the outlines and specifications of 1085 airborne geophysical surveys conducted by or for the Australian, State and Territory governments."
-    group: "Geophysical Grid - Magnetics"
+    group: "Geophysical Grid"
     order: "geogrid19"
     serverType: "ESRI"
     wms:
@@ -2212,7 +2212,7 @@
     supportsCsvDownloads: true
     wms:
         selector: "grace:Countries_WGS84"
-"Coastline1M":
+"coastline1m":
     name: "Australian Coastline"
     description: "Coastline of Australia, sourced from the 1:1M scale Surface Geology of Australia dataset (2012 edition)."
     group: "Boundaries"
@@ -2220,101 +2220,136 @@
     serverType: "ESRI"
     wms:
         selector: "Coastline1M"
-"MSL-New Magnetotellurics":
+
+# GA Magnetotellurics
+"msl-new-magnetotellurics":
     name: "Magnetotelluric Site Locations"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics01"
+    description: "Magnetotelluric Site Locations"
+    group: "Magnetotellurics"
+    order: "magnetotellurics01"
     supportsCsvDownloads: true
     wfs:
         selector: "mt:mt_site_locations"
 
-"CDR-New Magnetotellurics 10m":
-    name: "Curnamona and Delamerian Region 10m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics02"
+"cdr-new-magnetotellurics-10m":
+    name: "Curnamona and Delamerian 10m"
+    description: "10m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
+    group: "Magnetotellurics"
+    order: "magnetotellurics02"
     supportsCsvDownloads: true
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_000000-000010"
 
-"CDR-New Magnetotellurics 2630m":
-    name: "Curnamona and Delamerian Region 2630m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics03"
+"cdr-new-magnetotellurics-2630m":
+    name: "Curnamona and Delamerian 2630m"
+    description: "2630m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
+    group: "Magnetotellurics"
+    order: "magnetotellurics03"
     supportsCsvDownloads: true
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_002430-002630"
 
-"CDR-New Magnetotellurics 48430m":
-    name: "Curnamona and Delamerian Region 48430m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics04"
+"cdr-new-magnetotellurics-48430m":
+    name: "Curnamona and Delamerian 48430m"
+    description: "48430m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
+    group: "Magnetotellurics"
+    order: "magnetotellurics04"
     supportsCsvDownloads: true
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_044780-048430"
 
-"CDR-New Magnetotellurics 77680m":
-    name: "Curnamona and Delamerian Region 77680m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics05"
+"cdr-new-magnetotellurics-77680m":
+    name: "Curnamona and Delamerian 77680m"
+    description: "77680m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
+    group: "Magnetotellurics"
+    order: "magnetotellurics05"
     supportsCsvDownloads: true
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_071780-077680"
 
-"CDR-New Magnetotellurics 125180m":
-    name: "Curnamona and Delamerian Region 125180m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics06"
+"cdr-new-magnetotellurics-125180m":
+    name: "Curnamona and Delamerian 125180m"
+    description: "125180m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
+    group: "Magnetotellurics"
+    order: "magnetotellurics06"
     supportsCsvDownloads: true
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_115180-125180"
 
-"WQA-New Magnetotellurics 1280m":
+"wqa-new-magnetotellurics-1280m":
     name: "Western Queensland AusLAMP 1280m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics07"
+    description: "1280m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
+    group: "Magnetotellurics"
+    order: "magnetotellurics07"
     supportsCsvDownloads: true
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_000000-001280"
 
-"WQA-New Magnetotellurics 2655m":
+"wqa-new-magnetotellurics-2655m":
     name: "Western Queensland AusLAMP 2655m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics08"
+    description: "2655m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
+    group: "Magnetotellurics"
+    order: "magnetotellurics08"
     supportsCsvDownloads: true
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_002000-002655"
 
-"WQA-New Magnetotellurics 68610m":
+"wqa-new-magnetotellurics-68610m":
     name: "Western Queensland AusLAMP 68610m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics09"
+    description: "68610m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
+    group: "Magnetotellurics"
+    order: "magnetotellurics09"
     supportsCsvDownloads: true
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_063310-068610"
 
-"WQA-New Magnetotellurics 182460m":
+"wqa-new-magnetotellurics-182460m":
     name: "Western Queensland AusLAMP 182460m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics10"
+    description: "182460m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
+    group: "Magnetotellurics"
+    order: "magnetotellurics10"
     supportsCsvDownloads: true
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_168060-182460"
 
-"WQA-New Magnetotellurics 298760m":
+"wqa-new-magnetotellurics-298760m":
     name: "Western Queensland AusLAMP 298760m"
-    description: "New Magnetotellurics"
-    group: "New Magnetotellurics"
-    order: "New Magnetotellurics11"
+    description: "298760m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
+    group: "Magnetotellurics"
+    order: "magnetotellurics11"
     supportsCsvDownloads: true
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_275160-298760"
+
+# AusGeoChem - some layers are geochemistry others are geochronology
+"ausgeochem-upb":
+    name: "AusGeoChem U/Pb"
+    description: "Locations of samples which have undergone U-Pb analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from AusGeoChem portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
+    group: "Geochronology"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "public_data:lithodat_upb_samples"
+
+"ausgeochem-uthhe":
+    name: "AusGeoChem U-Th/He"
+    description: "Locations of samples which have undergone U-Th/He analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from AusGeoChem portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
+    group: "Geochronology"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "public_data:lithodat_he_samples"
+
+"ausgeochem-ft":
+    name: "AusGeoChem Fission Track"
+    description: "Locations of samples which have undergone fisson track analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from AusGeoChem portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
+    group: "Geochronology"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "public_data:lithodat_ft_samples"
+
+"ausgeochem-gc":
+    name: "AusGeoChem Geochemistry"
+    description: "Locations of samples which have undergone geochemistry analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from AusGeoChem portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "public_data:lithodat_gc_samples"
