@@ -1,4 +1,4 @@
-FROM tomcat:10-jdk17-temurin-focal
+FROM tomcat:10.1-jdk17-temurin-focal
 
 ARG war_file=target/auscope-portal-api.war
 
