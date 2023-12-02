@@ -1,4 +1,14 @@
 # Create a Docker build for a production release
+# To trigger a release:
+#    Update the version numbers in portal-core and portal API pom files
+#    Tag with v<POM_VERSION> e.g. v6.3.0
+#    This action will compare the pom version with the tag v# to ensure they match
+#    If they do it will build the new image and push it to the GitHub Container Registry tagged with that version
+#    Check the new image appears in the container registry and that the tags are correct
+# To Deploy:
+#    Goto Azure and make a new revision of portalapi-prod
+#    Select the new version number as the image tag name
+
 name: build-prod-release
 
 on:
@@ -26,19 +36,22 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       
+      - name: set application.yaml to default
+        run: |
+          mv ./src/main/resources/application.yaml.default ./src/main/resources/application.yaml
+      
       - name: Set Release versions from tag and pom
         run: |
           echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_ENV"
           echo "WAR_VERSION=$(echo "${{  github.ref_name }}" | sed 's/v//')" >> "$GITHUB_ENV"
+
       - name: Check version numbers match
         if: ${{ env.WAR_VERSION}} != ${{ env.RELEASE_VERSION }}
         run: exit 1
-      - name: Build with Maven, then with docker 
+        
+      - name: Build with Maven
         run: |
-          mvn -B package --file pom.xml
-          ls -lR target
-          
-          docker build . --file Dockerfile.github --tag $IMAGE_NAME --build-arg war_file=target/auscope-portal-api-${{ env.WAR_VERSION }}.war
+          mvn -B clean package spring-boot:build-image --file pom.xml
           
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -49,12 +62,17 @@ jobs:
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           
-          VERSION=${{ env.WAR_VERSION }}
+          VERSION=${{ env.RELEASE_VERSION }}
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
 
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker tag auscope-portal-api:$VERSION $IMAGE_ID:$VERSION
+          docker tag auscope-portal-api:$VERSION $IMAGE_ID:latest
           docker push --all-tags $IMAGE_ID
           
+      - name: Upload war PROD file artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: auscope-portal-api production release war file
+          path: ${{ env.WAR_FILE_NAME }}

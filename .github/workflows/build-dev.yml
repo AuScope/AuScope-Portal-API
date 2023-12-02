@@ -11,6 +11,7 @@ env:
   IMAGE_NAME: auscope-portal-api
 
 jobs:
+  # Push image to GitHub Packages.
   push:
     runs-on: ubuntu-latest
 
@@ -27,18 +28,19 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build with Maven
+      - name: set application.yaml to default
         run: |
-          mvn -B package --file pom.xml
+          mv ./src/main/resources/application.yaml.default ./src/main/resources/application.yaml
 
       - name: Set Release version env variable
         run: |
           echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_ENV"
           echo "WAR_FILE_NAME=target/auscope-portal-api-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout).war" >> "$GITHUB_ENV"
-           
-      - name: Build with Docker
+
+      - name: Build with Maven
         run: |
-          docker build . --file Dockerfile.github --tag $IMAGE_NAME --build-arg war_file=${{ env.WAR_FILE_NAME }}
+          mvn -B clean package spring-boot:build-image --file pom.xml
+
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
@@ -54,8 +56,8 @@ jobs:
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
 
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker tag auscope-portal-api:$VERSION $IMAGE_ID:$VERSION
+          docker tag auscope-portal-api:$VERSION $IMAGE_ID:latest
           docker push --all-tags $IMAGE_ID
         
       - name: Upload war file artifact
