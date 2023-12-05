@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.auscope.portal.core.services.CSWCacheService;
+import org.auscope.portal.core.services.ESSearchService;
 import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.PortalServiceException;
-import org.auscope.portal.core.services.SearchService;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
 import org.auscope.portal.core.services.responses.csw.CSWOnlineResourceImpl;
@@ -126,8 +126,8 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
         }});
 
 
-        knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4), 
-                new ViewKnownLayerFactory(), new ViewCSWRecordFactory(), new ViewGetCapabilitiesFactory(), new WMSService(null, null), new SearchService(null)) {
+        knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4), mockCacheService, 
+                new ViewKnownLayerFactory(), new ViewCSWRecordFactory(), new ViewGetCapabilitiesFactory(), new WMSService(null, null), new ESSearchService()) {
                     @Override
                     public KnownLayerGrouping groupKnownLayerRecords() {
                         return knownLayerGroupingMock;
