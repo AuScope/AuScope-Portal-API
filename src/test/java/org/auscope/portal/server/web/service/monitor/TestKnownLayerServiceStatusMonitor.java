@@ -126,13 +126,14 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
         }});
 
 
-        knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4), mockCacheService, 
+        knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4), 
                 new ViewKnownLayerFactory(), new ViewCSWRecordFactory(), new ViewGetCapabilitiesFactory(), new WMSService(null, null), new SearchService(null)) {
                     @Override
                     public KnownLayerGrouping groupKnownLayerRecords() {
                         return knownLayerGroupingMock;
                     }
         };
+        knownLayerService.setCSWCacheService(mockCacheService);
         knownLayerService.setCachedService(mockStackDriverService);
     }
 
