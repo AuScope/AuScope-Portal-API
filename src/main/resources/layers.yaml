@@ -278,6 +278,8 @@
                textbox:
                     - [ "Name", "gsmlp:name", null, "ISLIKE" ]
                     - [ "Identifier", "gsmlp:identifier", null, "ISLIKE" ]
+                    - [ "Length (greater than)", "gsmlp:boreholeLength_m",null, "BIGGER_THAN" ]
+                    - [ "Length (less than)", "gsmlp:boreholeLength_m",null, "SMALLER_THAN" ]
                polygonbox:
                     - [ "Polygon BBox - Clipboard", "gsmlp:shape", null, "ISEQUAL" ]
                checkbox:
