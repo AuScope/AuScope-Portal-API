@@ -123,6 +123,8 @@ public class IRISController extends BasePortalController {
             @RequestParam("serviceUrl") String serviceUrl,
             @RequestParam("networkCode") String networkCode) {
         serviceUrl = ensureTrailingForwardslash(serviceUrl);
+        
+        System.out.println("]getIRISStations] serviceUrl ="+serviceUrl+",networkCode ="+networkCode);
 
         try {
             Document irisDoc = getDocumentFromURL(serviceUrl + "fdsnws/station/1/query?net=" + networkCode + "&level=channel");

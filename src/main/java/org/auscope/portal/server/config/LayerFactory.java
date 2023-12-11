@@ -22,11 +22,13 @@ import org.auscope.portal.core.uifilter.optional.xpath.UIPolygonBBox;
 import org.auscope.portal.core.uifilter.optional.xpath.UITextBox;
 import org.auscope.portal.core.view.knownlayer.CSWRecordSelector;
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
+import org.auscope.portal.core.view.knownlayer.VMFSelector;
 import org.auscope.portal.core.view.knownlayer.WFSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSWFSSelector;
 import org.auscope.portal.core.view.knownlayer.KMLSelector;
 import org.auscope.portal.view.knownlayer.IRISSelector;
+import org.json.JSONArray;
 
 /**
 * creates a known layer object using a definition within the layers.yaml file
@@ -173,6 +175,23 @@ public class LayerFactory {
             return new IRISSelector(networkCode, serviceEndPoint);
         } catch (MalformedURLException e) {
             log.error("Malformed URL for IRIS network code:" + networkCode + " and service point: " + serviceEndPoint);
+        }
+        return null;
+    }
+
+    /**
+     * knownTypeVMFSelector - The VMFSelector class provides functionality to determine the type of relationship,
+     *                         if any, that exists between a service endpoint and a CSWRecord.
+     *  
+     * @param serviceEndpoint
+     *            The service endpoint that the instance of the selector is concerned with.
+     * @throws MalformedURLException
+     */
+    public VMFSelector knownTypeVMFSelector(String layerName, String serviceEndPoint, JSONArray polygonGeoJson) {
+        try {
+            return new VMFSelector(layerName, serviceEndPoint, polygonGeoJson);
+        } catch (MalformedURLException e) {
+            log.error("Malformed URL for VMF service point: " + serviceEndPoint);
         }
         return null;
     }
@@ -369,6 +388,51 @@ public class LayerFactory {
                             serviceEndPoint = attr[1];
                             // System.out.println("\tiris: "+networkCode+", "+serviceEndPoint);
                             layer.setKnownLayerSelector(knownTypeIRISSelector(networkCode, serviceEndPoint));
+                            break;
+                        }
+                        // vector map format
+                        case "vmf": {
+                            String layerName = null;
+                            String serviceEndPoint = null;
+                            JSONArray polygonGeoJson = new JSONArray();
+
+                            Map<String, Object> x = (Map<String, Object>) v1;
+                            String[] attr = new String[2];
+                            x.forEach((sk1, sv1) -> {
+                                if (sk1.startsWith("selector")) {
+                                    attr[1] = (String) sv1;
+                                }
+                                if (sk1.startsWith("endPoint")) {
+                                    attr[0] = (String) sv1;
+                                }
+                                if (sk1.startsWith("polygon_geojson")) {
+                                    
+                                    Double[] lon = new Double[1];
+                                    Double[] lat = new Double[1];
+
+                                    ArrayList x2 = (ArrayList) sv1;
+                                    x2.forEach((item) -> {
+                                        ArrayList itemCoord = (ArrayList) item;
+                                        int[] index = {0};
+                                        itemCoord.forEach((coord) -> {
+                                            if (index[0]==0) { lon[0] = (Double) coord; }
+                                            if (index[0]==1) { lat[0] = (Double) coord; }
+                                            index[0]=index[0]+1;
+                                        });                                           
+                                        JSONArray coordNode = new JSONArray();
+                                        coordNode.put(lon[0]);
+                                        coordNode.put(lat[0]);
+                                        polygonGeoJson.put(coordNode);                                        
+                                    });
+                                }
+                            });
+                            layerName = attr[1];
+                            serviceEndPoint = attr[0];
+
+                            layer.setEndPoint(serviceEndPoint);
+                            layer.setPolygon(polygonGeoJson);
+                            
+                            layer.setKnownLayerSelector(knownTypeVMFSelector(layerName,serviceEndPoint,polygonGeoJson));
                             break;
                         }
                         case "kml": {
