@@ -2238,7 +2238,7 @@
     description: "10m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
     group: "Magnetotellurics"
     order: "magnetotellurics02"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_000000-000010"
 
@@ -2247,7 +2247,7 @@
     description: "2630m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
     group: "Magnetotellurics"
     order: "magnetotellurics03"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_002430-002630"
 
@@ -2256,7 +2256,7 @@
     description: "48430m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
     group: "Magnetotellurics"
     order: "magnetotellurics04"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_044780-048430"
 
@@ -2265,7 +2265,7 @@
     description: "77680m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
     group: "Magnetotellurics"
     order: "magnetotellurics05"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_071780-077680"
 
@@ -2274,7 +2274,7 @@
     description: "125180m depth slice from the 3-D resistivity model derived from magnetotelluric (MT) data collected from 231 sites in the Curnamona and Delamerian Region. The resistivity model can be used to enhance the understanding of the geodynamics and mineral potential in the Curnamona Province and Delamerian Orogen."
     group: "Magnetotellurics"
     order: "magnetotellurics06"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "mt:Curnamona_Delamerian_Region_Depth_Slice_115180-125180"
 
@@ -2283,7 +2283,7 @@
     description: "1280m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
     group: "Magnetotellurics"
     order: "magnetotellurics07"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_000000-001280"
 
@@ -2292,7 +2292,7 @@
     description: "2655m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
     group: "Magnetotellurics"
     order: "magnetotellurics08"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_002000-002655"
 
@@ -2301,7 +2301,7 @@
     description: "68610m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
     group: "Magnetotellurics"
     order: "magnetotellurics09"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_063310-068610"
 
@@ -2310,7 +2310,7 @@
     description: "182460m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
     group: "Magnetotellurics"
     order: "magnetotellurics10"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_168060-182460"
 
@@ -2319,7 +2319,7 @@
     description: "298760m depth slice from the 3-D resistivity model derived from long-period magnetotelluric (MT) data collected from 162 sites in the western Queensland region. The data were collected for the Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) under Geoscience Australia's Exploring for the Future (EFTF) program with contributions from the Geological Survey of Queensland. The resistivity model maps the electrical resistivity structures in the region and provides information about the lithospheric architecture and geodynamic processes, as well as valuable precompetitive data for resource exploration in this region."
     group: "Magnetotellurics"
     order: "magnetotellurics11"
-    supportsCsvDownloads: true
+    supportsCsvDownloads: false
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_275160-298760"
 
