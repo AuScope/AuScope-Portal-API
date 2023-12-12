@@ -2355,3 +2355,12 @@
     supportsCsvDownloads: true
     wfs:
         selector: "public_data:lithodat_gc_samples"
+"indigenous-nativeland":
+    name: "Indigenous - Native Land"
+    description: "Indigenous map description"
+    group: "Indigenous"
+    order: "ind01"
+    vmf:
+        selector: "Indigenous Map"
+        endPoint: "https://native-land.ca/wp-json/nativeland/v1/api/index.php"
+        polygon_geojson:  [[111.64,-17.61],[132.45,-8.23],[146.26,-10.53],[159.37,-24.57],[147.95,-45.25],[110.29,-34.29]]
