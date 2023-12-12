@@ -677,7 +677,7 @@
 
 # GA/NCI National Geophysical Compilations
 "ga-geophys-1":
-    name: "Bouguer Gravity Anomaly Grid of Onshore Australia 2016"
+    name: "Bouguer Gravity Anomaly 2016"
     description: "This gravity anomaly grid is derived from observations stored in the Australian National Gravity Database ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey."
     group: "Geophysics - National Geophysical Compilation"
     order: "351"
@@ -685,15 +685,15 @@
         ids:
             - "f0886_1142_1614_4044"
 "ga-geophys-2":
-    name: "Complete Bouguer Gravity Anomaly Grid of Onshore Australia 2016"
+    name: "Complete Bouguer Gravity Anomaly 2016"
     description: "This gravity anomaly grid is derived from observations stored in the Australian National Gravity Database ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey."
     group: "Geophysics - National Geophysical Compilation"
     order: "352"
     csw:
-        serviceNames:
-            - "Complete Bouguer Gravity Anomaly Grid of Onshore Australia 2016"
+        ids:
+            - "f2848_9429_6275_5590"
 "ga-geophys-3":
-    name: "Isostatic Residual Gravity Anomaly Grid of Onshore Australia 2016"
+    name: "Isostatic Residual Gravity Anomaly 2016"
     description: "This grid is derived from gravity observations stored in the Australian National Gravity Database ANGD) as at February 2016 as well as data from the 2013 New South Wales Riverina gravity survey."
     group: "Geophysics - National Geophysical Compilation"
     order: "353"
@@ -701,133 +701,133 @@
         ids:
             - "f4523_7439_0612_0991"
 "ga-geophys-4":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 filtered pct potassium grid"
-    description: "The filtered potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    name: "Radmap v4 2019 filtered pct K"
+    description: "Radiometric Grid of Australia (Radmap). The filtered potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
     group: "Geophysics - National Geophysical Compilation"
     order: "354"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 filtered pct potassium grid"
+        ids:
+            - "f4273_6870_1273_8584"
 "ga-geophys-5":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 filtered ppm thorium"
-    description: "The filtered thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    name: "Radmap v4 2019 filtered ppm Th"
+    description: "Radiometric Grid of Australia (Radmap). The filtered thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
     group: "Geophysics - National Geophysical Compilation"
     order: "355"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm thorium"
+        ids:
+            - "f1561_4208_1403_5295"
 "ga-geophys-6":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 filtered ppm uranium"
-    description: "The filtered uranium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    name: "Radmap v4 2019 filtered ppm U"
+    description: "Radiometric Grid of Australia (Radmap). The filtered uranium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
     group: "Geophysics - National Geophysical Compilation"
     order: "356"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 filtered ppm uranium"
+        ids:
+            - "f6888_9004_5632_3885"
 "ga-geophys-7":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 filtered terrestrial dose rate"
-    description: "The filtered terrestrial dose rate grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia, made of a combination of over 600 individual survey grids."
+    name: "Radmap v4 2019 filtered terrestrial dose"
+    description: "Radiometric Grid of Australia (Radmap). The filtered terrestrial dose rate grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia, made of a combination of over 600 individual survey grids."
     group: "Geophysics - National Geophysical Compilation"
     order: "357"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 filtered terrestrial dose rate"
+        ids:
+            - "f5953_4510_9151_5863"
 "ga-geophys-8":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 ratio thorium over potassium"
-    description: "The thorium over potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    name: "Radmap v4 2019 ratio Th over K"
+    description: "Radiometric Grid of Australia (Radmap). The thorium over potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
     group: "Geophysics - National Geophysical Compilation"
     order: "358"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 ratio thorium over potassium"
+        ids:
+            - "f2210_8669_1800_1509"
 "ga-geophys-9":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 ratio uranium over potassium"
-    description: "The uranium over potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia comprising over 600 airborne gamma-ray spectrometric surveys."
+    name: "Radmap v4 2019 ratio U over K"
+    description: "Radiometric Grid of Australia (Radmap). The uranium over potassium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia comprising over 600 airborne gamma-ray spectrometric surveys."
     group: "Geophysics - National Geophysical Compilation"
     order: "359"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over potassium"
+        ids:
+            - "f9189_0688_3212_0438"
 "ga-geophys-10":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 ratio uranium over thorium"
-    description: "The uranium over thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
+    name: "Radmap v4 2019 ratio U over Th"
+    description: "Radiometric Grid of Australia (Radmap). The uranium over thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
     group: "Geophysics - National Geophysical Compilation"
     order: "360"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium over thorium"
+        ids:
+            - "f9579_3543_8291_8425"
 "ga-geophys-11":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 ratio uranium squared over thorium"
-    description: "The uranium squared over thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
+    name: "Radmap v4 2019 ratio U squared over Th"
+    description: "Radiometric Grid of Australia (Radmap). The uranium squared over thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia."
     group: "Geophysics - National Geophysical Compilation"
     order: "361"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 ratio uranium squared over thorium"
+        ids:
+            - "f3034_0097_7804_7204"
 "ga-geophys-12":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered pct potassium"
-    description: "The unfiltered potassium grid is a derivative of the 2019 radiometric grid of Australia."
+    name: "Radmap v4 2019 unfiltered pct K"
+    description: "Radiometric Grid of Australia (Radmap). The unfiltered potassium grid is a derivative of the 2019 radiometric grid of Australia."
     group: "Geophysics - National Geophysical Compilation"
     order: "362"
     csw:
-        serviceNames:
-           - "Radiometric Grid of Australia (Radmap) v4 2019 unfiltered pct potassium"
+        ids:
+           - "f8632_6815_9330_9517"
 "ga-geophys-13":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered ppm thorium"
-    description: "The unfiltered thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
+    name: "Radmap v4 2019 unfiltered ppm Th"
+    description: "Radiometric Grid of Australia (Radmap). The unfiltered thorium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
     group: "Geophysics - National Geophysical Compilation"
     order: "363"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm thorium"
+        ids:
+            - "f3649_2022_0071_1839"
 "ga-geophys-14":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered ppm uranium"
-    description: "The unfiltered uranium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
+    name: "Radmap v4 2019 unfiltered ppm U"
+    description: "Radiometric Grid of Australia (Radmap). The unfiltered uranium grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia which is a merge of over 600 individual gamma-ray spectrometric surveys."
     group: "Geophysics - National Geophysical Compilation"
     order: "364"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 unfiltered ppm uranium"
+        ids:
+            - "f7724_7680_1270_9708"
 "ga-geophys-15":
-    name: "Radiometric Grid of Australia Radmap) v4 2019 unfiltered terrestrial dose rate"
-    description: "The unfiltered terrestrial dose rate grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia, which is a merge of over 600 individual gamma-ray spectrometric surveys."
+    name: "Radmap v4 2019 unfiltered terrestrial dose"
+    description: "Radiometric Grid of Australia (Radmap). The unfiltered terrestrial dose rate grid is a derivative of the 2019 radiometric or gamma-ray grid of Australia, which is a merge of over 600 individual gamma-ray spectrometric surveys."
     group: "Geophysics - National Geophysical Compilation"
     order: "365"
     csw:
-        serviceNames:
-            - "Radiometric Grid of Australia (Radmap) v4 2019 unfiltered terrestrial dose rate"
+        ids:
+            - "f5627_6492_9944_1058"
 "ga-geophys-16":
-    name: "Total Magnetic Intensity TMI) Grid of Australia 2019 - seventh edition - 40 m cell size"
-    description: "Total magnetic intensity TMI) data measures variations in the intensity of the Earth magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust."
+    name: "TMI Grid of Aust, 2019 - 7th ed. 40 m cell"
+    description: "Total magnetic intensity (TMI) data measures variations in the intensity of the Earth magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust."
     group: "Geophysics - National Geophysical Compilation"
     order: "366"
     csw:
-        serviceNames:
-            - "Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 40 m cell size"
+        ids:
+            - "f1214_0762_6293_4170"
 "ga-geophys-17":
-    name: "Total Magnetic Intensity TMI) Grid of Australia 2019 - seventh edition - 80 m cell size"
-    description: "Total magnetic intensity TMI) data measures variations in the intensity of the Earth magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust."
+    name: "TMI Grid of Aust, 2019 - 7th ed. 80 m cell"
+    description: "Total magnetic intensity (TMI) data measures variations in the intensity of the Earth magnetic field caused by the contrasting content of rock-forming minerals in the Earth crust."
     group: "Geophysics - National Geophysical Compilation"
     order: "367"
     csw:
-        serviceNames: 
-            - "Total Magnetic Intensity (TMI) Grid of Australia 2019 - seventh edition - 80 m cell size"
+        ids:
+            - "f4282_0088_0223_5551"
 "ga-geophys-18":
-    name: "Total Magnetic Intensity TMI) Grid of Australia with Variable Reduction to Pole VRTP) 2019 - seventh edition"
-    description: "The 2019 Total magnetic Intensity TMI) grid of Australia with variable reduction to pole VRTP) has a grid cell size of ~3 seconds of arc approximately 80 m). This grid only includes airborne-derived TMI data for onshore and near-offshore continental areas."
+    name: "TMI Grid of Aust. 2019 - VRTP 7th ed."
+    description: "The 2019 Total magnetic Intensity (TMI) grid of Australia with variable reduction to pole (VRTP) has a grid cell size of ~3 seconds of arc (approximately 80 m). This grid only includes airborne-derived TMI data for onshore and near-offshore continental areas."
     group: "Geophysics - National Geophysical Compilation"
     order: "368"
     csw:
-        serviceNames:
-            - "Total Magnetic Intensity (TMI) Grid of Australia with Variable Reduction to Pole (VRTP) 2019 - seventh edition"
+        ids:
+            - "f3019_9432_3181_9424"
 "ga-geophys-19":
-    name: "Total Magnetic Intensity Grid of Australia 2019 - First Vertical Derivative 1VD)"
-    description: " The first vertical derivative 1VD) grid is derived from the 2019 Total magnetic Intensity TMI) grid of Australia which has a grid cell size of ~3 seconds of arc approximately 80 m)."
+    name: "TMI Grid of Aust. 2019 - 1VD"
+    description: "The first vertical derivative (1VD) grid is derived from the 2019 Total magnetic Intensity (TMI) grid of Australia which has a grid cell size of ~3 seconds of arc (approximately 80 m)."
     group: "Geophysics - National Geophysical Compilation"
     order: "369"
     csw:
-        serviceNames:
-            - "Total Magnetic Intensity Grid of Australia 2019 - First Vertical Derivative (1VD)"
+        ids:
+            - "f2640_4876_3438_2505"
 
 # ASTER Satellite Datasets
 "aster-aloh":
