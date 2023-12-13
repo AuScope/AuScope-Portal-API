@@ -37,6 +37,8 @@ connection-establish:
 
 server:
    max-http-header-size: 20KB
+   servlet:
+      context-path: /api
 
 access:
    # set a whitelist for the request URL only from the Commonwealth Government or the State Governments or Universities or Octopus or Loop3D will pass

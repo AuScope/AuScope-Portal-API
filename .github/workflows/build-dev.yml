@@ -14,7 +14,6 @@ jobs:
   # Push image to GitHub Packages.
   push:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v2
@@ -28,21 +27,20 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Checkout portal-core
-        uses: actions/checkout@v2.3.4
-        with:
-          repository: AuScope/portal-core
-          ref: master
-          path: portal-core
-      - name: Build portal-core 
+
+      - name: set application.yaml to default
         run: |
-          cd portal-core
-          mvn clean install
-      - name: Build with Maven, then with docker 
+          mv ./src/main/resources/application.yaml.default ./src/main/resources/application.yaml
+
+      - name: Set Release version env variable
         run: |
-          mvn -B package --file pom.xml
-          docker build . --file Dockerfile.github --tag $IMAGE_NAME
-          
+          echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_ENV"
+          echo "WAR_FILE_NAME=target/auscope-portal-api-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout).war" >> "$GITHUB_ENV"
+
+      - name: Build with Maven
+        run: |
+          mvn -B clean package spring-boot:build-image --file pom.xml
+
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
@@ -50,21 +48,23 @@ jobs:
         if: contains(github.ref, 'master')
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/$IMAGE_NAME
-
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-          # Always the latest version
-          VERSION=latest
+          VERSION=${{ env.RELEASE_VERSION }}
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
 
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
-          
+          docker tag auscope-portal-api:$VERSION $IMAGE_ID:$VERSION
+          docker tag auscope-portal-api:$VERSION $IMAGE_ID:latest
+          docker push --all-tags $IMAGE_ID
+        
       - name: Upload war file artifact
+        if: contains(github.ref, 'master')
         uses: actions/upload-artifact@v2
         with:
           name: auscope-portal-api war file
-          path: target/auscope-portal-api-6.2.0-SNAPSHOT.war
+          path: ${{ env.WAR_FILE_NAME }}
+          
+

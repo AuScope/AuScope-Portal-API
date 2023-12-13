@@ -589,7 +589,7 @@ public class AppContext {
 
     @Bean
     public KnownLayerService cswKnownLayerService() {
-        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService(), searchService());
+        return new KnownLayerService(knownTypes, viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService(), searchService());
     }
 
     @Bean
