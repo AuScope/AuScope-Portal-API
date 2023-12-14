@@ -46,7 +46,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,LegendImageControll
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,JobDownloadController,184,442,17,21,33,102,17,13,2,9
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,RemanentAnomaliesController,87,0,5,0,26,0,7,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,GeologicalProvincesController,48,0,0,0,15,0,3,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController,138,241,3,5,28,49,5,7,3,5
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController,138,246,3,5,28,50,5,7,3,5
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController,333,0,32,0,72,0,20,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,TIMAController,179,0,10,0,38,0,9,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabController,102,235,6,6,14,43,6,9,2,7
@@ -141,11 +141,11 @@ AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.mandRec,16,0,0,
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext.new Runnable() {...},11,0,0,0,3,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext,1070,0,2,0,213,0,71,0,70,0
 AuScope-Portal-API,org.auscope.portal.server.config,ExtraVocabularies,111,0,0,0,13,0,13,0,13,0
-AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1448,0,135,0,344,0,112,0,35,0
+AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1607,0,146,0,382,0,122,0,39,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.wfsRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalTest,79,0,2,0,18,0,5,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.filterCtl,6,0,0,0,1,0,1,0,1,0
-AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalProduction,87,0,2,0,19,0,5,0,4,0
+AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalProduction,79,0,2,0,18,0,5,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,AuscopeRegistries,18,0,0,0,6,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,ConversionConfig,29,0,0,0,9,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.selRec,16,0,0,0,3,0,1,0,1,0
