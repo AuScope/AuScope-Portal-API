@@ -46,7 +46,7 @@ jobs:
           echo "WAR_VERSION=$(echo "${{  github.ref_name }}" | sed 's/v//')" >> "$GITHUB_ENV"
 
       - name: Check version numbers match
-        if: ${{ env.WAR_VERSION}} != ${{ env.RELEASE_VERSION }}
+        if: ${{ env.WAR_VERSION != env.RELEASE_VERSION }}
         run: exit 1
         
       - name: Build with Maven
