@@ -298,6 +298,27 @@ public class LayerFactory {
                         case "hidden":
                             layer.setHidden(Boolean.valueOf(value));
                             break;
+                        // display layer when first added using given bounding box
+                        case "initialBBox": {
+                            JSONArray bboxGeoJson = new JSONArray();
+                            
+                            ArrayList x2 = (ArrayList) v1;
+                            ArrayList x3 = (ArrayList) ((ArrayList) v1).get(0);
+                            int len = x3.size();
+                            if (len == 4) {
+                                JSONArray coordNode = new JSONArray();
+                                coordNode.put(x3.get(0));
+                                coordNode.put(x3.get(1));
+                                bboxGeoJson.put(coordNode);
+                                coordNode = new JSONArray();
+                                coordNode.put(x3.get(2));
+                                coordNode.put(x3.get(3));
+                                bboxGeoJson.put(coordNode);
+
+                                layer.setBBox(bboxGeoJson);
+                            }
+                            break;
+                        }
                         case "wfs": {
                             wfs.feature.clear();
                             wfs.endPoints.clear();
