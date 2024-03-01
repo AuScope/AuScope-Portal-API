@@ -43,6 +43,7 @@ jobs:
       - name: Set Release versions from tag and pom
         run: |
           echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_ENV"
+          echo "ARTIFACTID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> "$GITHUB_ENV"
           echo "WAR_VERSION=$(echo "${{  github.ref_name }}" | sed 's/v//')" >> "$GITHUB_ENV"
 
       - name: Check version numbers match
@@ -72,7 +73,7 @@ jobs:
           docker push --all-tags $IMAGE_ID
           
       - name: Upload war PROD file artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: auscope-portal-api production release war file
-          path: ${{ env.WAR_FILE_NAME }}
+          path: 'target/${{ env.ARTIFACTID }}-${{ env.RELEASE_VERSION }}.war'
