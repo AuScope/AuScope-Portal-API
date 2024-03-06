@@ -67,4 +67,15 @@ jobs:
           name: auscope-portal-api war file
           path: ${{ env.WAR_FILE_NAME }}
           
-
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            rev=$(az containerapp revision list -n ${{ secrets.AZURE_DEVCONTAINERNAME }} -g ${{ secrets.AZURE_DEVRG }} | ConvertFrom-Json)
+            az containerapp revision restart --ids rev.id --revision rev.name 
