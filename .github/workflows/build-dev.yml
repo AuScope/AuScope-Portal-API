@@ -10,6 +10,10 @@ env:
   # Auscope-Portal-API docker image name
   IMAGE_NAME: auscope-portal-api
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   # Push image to GitHub Packages.
   push:
