@@ -94,7 +94,7 @@ public class VocabController extends BasePortalController {
     public ModelAndView getAllCommodities() {
         Map<String, String> vocabularyMappings = this.vocabularyFilterService.getVocabularyById(COMMODITY_VOCABULARY_ID);
 
-        return getVocabularyMappings(vocabularyMappings);
+        return getErl2VocabularyMappings(vocabularyMappings);
     }
 
 
@@ -160,7 +160,7 @@ public class VocabController extends BasePortalController {
         }
         Map<String, String> vocabularyMappings = this.vocabularyFilterService.getVocabularyById(TIMESCALE_VOCABULARY_ID, selectors);
 
-        return getVocabularyMappings(vocabularyMappings);
+        return getErl2VocabularyMappings(vocabularyMappings);
     }
 
     /**
@@ -234,5 +234,29 @@ public class VocabController extends BasePortalController {
         return generateJSONResponseMAV(true, dataItems, "");
     }
 
+        /**
+     * @param erl2VocabularyMappings
+     * @return
+     */
+    private ModelAndView getErl2VocabularyMappings(Map<String, String> vocabularyMappings) {
+        List<String[]> dataItems = new ArrayList<String[]>();
+        // Turn our map of urns -> labels into an array of arrays for the view
+        for (String urn : vocabularyMappings.keySet()) {
+            String label = vocabularyMappings.get(urn);
+            String[] tableRow = new String[2];
+            tableRow[0] = label;
+            tableRow[1] = label;
+            dataItems.add(tableRow);
+        }
+        // Alphabetically sort the result by label
+        Collections.sort(dataItems, new Comparator<String[]>() {
+            @Override
+            public int compare(
+              String[] o1, String[] o2) {
+                return o1[1].toLowerCase().compareTo(o2[1].toLowerCase());
+            }
+        });
+        return generateJSONResponseMAV(true, dataItems, "");
+    }
     
 }
