@@ -82,7 +82,7 @@ jobs:
       - name: Azure CLI script
         uses: azure/CLI@v2
         with:
-          azcliversion: 2.30.0
+          azcliversion: latest
           inlineScript: |
             revname=$(az containerapp revision list -n ${{ secrets.AZURE_DEVCONTAINERNAME }} -g ${{ secrets.AZURE_DEVRG }} --query "[].name" --output tsv)
             az containerapp revision restart --revision $revname -g ${{ secrets.AZURE_DEVRG }}
