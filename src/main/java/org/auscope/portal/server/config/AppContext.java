@@ -25,7 +25,7 @@ import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.server.http.download.FileDownloadService;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.CSWFilterService;
-import org.auscope.portal.core.services.ESSearchService;
+import org.auscope.portal.core.services.ElasticsearchService;
 import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.OpendapService;
@@ -452,7 +452,7 @@ public class AppContext {
     @Bean
     public CSWCacheService cswCacheService() {
         CSWCacheService cacheService = new CSWCacheService(
-                taskExecutor(), cswCacheHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory(), esSearchService());
+                taskExecutor(), cswCacheHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory(), elasticsearchService());
         cacheService.setForceGetMethods(true);
         return cacheService;
     }
@@ -589,8 +589,8 @@ public class AppContext {
 
     @Bean
     public KnownLayerService cswKnownLayerService() {
-        return new KnownLayerService(knownTypes, cswCacheService(), viewFactory, viewCSWRecordFactory,
-        							 viewGetCapabilitiesFactory, wmsService(), esSearchService());
+        return new KnownLayerService(knownTypes, viewFactory, viewCSWRecordFactory,
+        							 viewGetCapabilitiesFactory, wmsService(), elasticsearchService());
     }
 
     @Bean
@@ -754,8 +754,8 @@ public class AppContext {
     }
     
     @Bean
-    ESSearchService esSearchService() {
-    	return new ESSearchService();
+    ElasticsearchService elasticsearchService() {
+    	return new ElasticsearchService(searchHttpServiceCaller());
     }
 
 }

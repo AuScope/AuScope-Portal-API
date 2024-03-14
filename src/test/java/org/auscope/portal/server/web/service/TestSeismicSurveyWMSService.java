@@ -52,7 +52,7 @@ public class TestSeismicSurveyWMSService extends PortalTestClass {
         Assert.assertEquals("Canberra", record.getContact().getContactInfo().getAddressCity());
         Assert.assertEquals("ACT", record.getContact().getContactInfo().getAddressAdministrativeArea());
         Assert.assertEquals("c523c6bc-29be-21dd-e044-00144fdd4fa6", record.getFileIdentifier());
-        Assert.assertEquals(22, record.getOnlineResources().length);
+        Assert.assertEquals(22, record.getOnlineResources().size());
 
     }
 

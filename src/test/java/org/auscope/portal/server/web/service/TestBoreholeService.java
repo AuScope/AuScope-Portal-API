@@ -242,13 +242,13 @@ public class TestBoreholeService extends PortalTestClass {
                 will(returnValue(Arrays.asList(mockRecord1, mockRecord2, mockRecord3)));
 
                 oneOf(mockRecord1).getOnlineResourcesByType(hostFilter, OnlineResourceType.WFS);
-                will(returnValue(new AbstractCSWOnlineResource[] {mockRecord1Resource1, mockRecord1Resource2}));
+                will(returnValue(Arrays.asList(mockRecord1Resource1, mockRecord1Resource2)));
 
                 oneOf(mockRecord2).getOnlineResourcesByType(hostFilter, OnlineResourceType.WFS);
-                will(returnValue(new AbstractCSWOnlineResource[] {mockRecord2Resource1}));
+                will(returnValue(Arrays.asList(mockRecord2Resource1)));
 
                 oneOf(mockRecord3).getOnlineResourcesByType(hostFilter, OnlineResourceType.WFS);
-                will(returnValue(new AbstractCSWOnlineResource[] {}));
+                will(returnValue(Arrays.asList()));
 
                 oneOf(mockMethodMaker).makeGetMethod(mockRecord1Resource2.getLinkage().toString(),
                         mockRecord1Resource2.getName(), (Integer) null, null);
@@ -289,10 +289,10 @@ public class TestBoreholeService extends PortalTestClass {
                 will(returnValue(Arrays.asList(mockRecord1, mockRecord2)));
 
                 oneOf(mockRecord1).getOnlineResourcesByType(hostFilter, OnlineResourceType.WFS);
-                will(returnValue(new AbstractCSWOnlineResource[] {mockRecord1Resource1}));
+                will(returnValue(Arrays.asList(mockRecord1Resource1)));
 
                 oneOf(mockRecord2).getOnlineResourcesByType(hostFilter, OnlineResourceType.WFS);
-                will(returnValue(new AbstractCSWOnlineResource[] {mockRecord2Resource1}));
+                will(returnValue(Arrays.asList(mockRecord2Resource1)));
 
                 oneOf(mockMethodMaker).makeGetMethod(mockRecord1Resource1.getLinkage().toString(),
                         mockRecord1Resource1.getName(), (Integer) null, null);
@@ -345,13 +345,13 @@ public class TestBoreholeService extends PortalTestClass {
                 will(returnValue(Arrays.asList(mockRecord1, mockRecord2, mockRecord3)));
 
                 oneOf(mockRecord1).getOnlineResourcesByType(hostFilter, OnlineResourceType.WFS);
-                will(returnValue(new AbstractCSWOnlineResource[] {mockRecord1Resource1, mockRecord1Resource2}));
+                will(returnValue(Arrays.asList(mockRecord1Resource1, mockRecord1Resource2)));
 
                 oneOf(mockRecord2).getOnlineResourcesByType(hostFilter, OnlineResourceType.WFS);
-                will(returnValue(new AbstractCSWOnlineResource[] {mockRecord2Resource1}));
+                will(returnValue(Arrays.asList(mockRecord2Resource1)));
 
                 oneOf(mockRecord3).getOnlineResourcesByType(hostFilter, OnlineResourceType.WFS);
-                will(returnValue(new AbstractCSWOnlineResource[] {}));
+                will(returnValue(Arrays.asList()));
 
                 oneOf(mockMethodMaker).makeGetMethod(mockRecord1Resource2.getLinkage().toString(),
                         mockRecord1Resource2.getName(), (Integer) null, null);
