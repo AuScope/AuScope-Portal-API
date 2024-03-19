@@ -170,6 +170,9 @@ public class AppContext {
     // Active profile i.e. 'test' or 'prod'
     @Value("${spring.profiles.active}")
     private String activeProfile;
+    
+    @Value("${spring.data.elasticsearch.manualUpdateOnly:false}")
+    private boolean manualUpdateOnly;
 
     @Autowired
     private VEGLJobManager jobManager;
@@ -382,7 +385,7 @@ public class AppContext {
         scheduler.schedule(new Runnable() {
             @Override
             public void run() {
-            	cswKnownLayerService().updateKnownLayersCache();
+            	cswKnownLayerService().updateKnownLayersCache(!manualUpdateOnly);
             }
         }, knownLayersStartupDelay, TimeUnit.MINUTES);
         scheduler.shutdown();

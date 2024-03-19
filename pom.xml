@@ -45,7 +45,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.8</version>
+        <version>3.1.9</version>
     </parent>
     
     <!-- Repositories section -->
@@ -411,17 +411,6 @@
             <artifactId>xmlunit-legacy</artifactId>
             <version>2.6.3</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>9.4.1</version>
-        </dependency>
-        <!-- TODO: Using this for search testing, remove for final commit -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>9.4.1</version>
         </dependency>
 
         <!-- Selenium and testing are needed for automated UI testing -->

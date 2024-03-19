@@ -56,7 +56,7 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 			.connectedTo(new InetSocketAddress(clusterNodesUrl, port))
 			.usingSsl()
 			.withDefaultHeaders(headers)
-			.withSocketTimeout(15000)
+			.withSocketTimeout(60000)
 			.build();
 	}
 	
