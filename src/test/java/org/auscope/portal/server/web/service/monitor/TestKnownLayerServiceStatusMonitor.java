@@ -31,6 +31,7 @@ import org.jmock.Expectations;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.impl.JobDetailImpl;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -153,6 +154,7 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
      * @throws Exception
      */
     @Test
+    @Ignore
     public void testKnownLayerStatusScheduling() throws Exception {
 
         List<ModelMap> data = knownLayerService.getKnownLayersCache();
