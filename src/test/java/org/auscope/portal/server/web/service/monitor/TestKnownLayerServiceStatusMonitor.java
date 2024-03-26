@@ -7,11 +7,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
+import org.auscope.portal.core.services.ElasticsearchService;
 import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.PortalServiceException;
-import org.auscope.portal.core.services.SearchService;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
 import org.auscope.portal.core.services.responses.csw.CSWOnlineResourceImpl;
@@ -47,7 +48,8 @@ import org.springframework.ui.ModelMap;
 public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
 
     private GoogleCloudMonitoringCachedService mockStackDriverService = context.mock(GoogleCloudMonitoringCachedService.class);
-
+    private HttpServiceCaller mockHttpServiceCaller = context.mock(HttpServiceCaller.class);
+    private ElasticsearchService mockElasticsearchService = context.mock(ElasticsearchService.class);
     private KnownLayerService knownLayerService;
 
     /**
@@ -62,10 +64,11 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
         CSWOnlineResourceImpl or3 = new CSWOnlineResourceImpl(new URL("http://host.name.3"), null, "Host Name 3", null);
         CSWOnlineResourceImpl or4 = new CSWOnlineResourceImpl(new URL("http://host.name.4"), null, "Host Name 4", null);
 
-
+        // Not actually mock...
         CSWRecord mockBelongingRecord = new CSWRecord();
+        mockBelongingRecord.setFileIdentifier("csw-001");
 
-        mockBelongingRecord.setOnlineResources(new AbstractCSWOnlineResource[] {or1, or2, or3, or4});
+        mockBelongingRecord.setOnlineResources(Arrays.asList(or1, or2, or3, or4));
 
         KnownLayer kl1 = new KnownLayer("kl1", new KnownLayerSelector() {
             @Override
@@ -123,11 +126,13 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
             oneOf(mockStackDriverService).getStatuses("NVCL");will(returnValue(servGroup2Response));
             oneOf(mockStackDriverService).getStatuses("Tenements");will(throwException(new PortalServiceException("tenements error")));
             oneOf(knownLayerGroupingMock).getKnownLayers();will(returnValue(knownLayers));
+            allowing(mockElasticsearchService).updateCSWRecords(Arrays.asList(new CSWRecord[]{mockBelongingRecord}));
         }});
 
 
-        knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4), 
-                new ViewKnownLayerFactory(), new ViewCSWRecordFactory(), new ViewGetCapabilitiesFactory(), new WMSService(null, null), new SearchService(null)) {
+        knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4),
+                new ViewKnownLayerFactory(), new ViewCSWRecordFactory(), new ViewGetCapabilitiesFactory(),
+                new WMSService(null, null), mockElasticsearchService) {
                     @Override
                     public KnownLayerGrouping groupKnownLayerRecords() {
                         return knownLayerGroupingMock;

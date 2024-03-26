@@ -2,6 +2,7 @@ package org.auscope.portal.view.knownlayer;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource.OnlineResourceType;
@@ -64,9 +65,9 @@ public class IRISSelector implements KnownLayerSelector {
      */
     @Override
     public RelationType isRelatedRecord(CSWRecord record) {
-        AbstractCSWOnlineResource[] onlineResources = record.getOnlineResourcesByType(OnlineResourceType.IRIS);
+        List<AbstractCSWOnlineResource> onlineResources = record.getOnlineResourcesByType(OnlineResourceType.IRIS);
 
-        if (onlineResources.length > 0) {
+        if (onlineResources.size() > 0) {
             for (AbstractCSWOnlineResource onlineResource : onlineResources) {
                 if (networkCode.equals(onlineResource.getName())) {
                     if (serviceEndpoint.sameFile(onlineResource.getLinkage())) {

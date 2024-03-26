@@ -10,7 +10,7 @@
     <groupId>org.auscope.portal</groupId>
     <artifactId>auscope-portal-api</artifactId>
     <packaging>war</packaging>
-    <version>6.5.0-SNAPSHOT</version>
+    <version>6.5.1-SNAPSHOT</version>
     <name>AuScope-Portal-API</name>
     <description>AuScope's flagship portal</description>
     <url>https://portal.auscope.org.au</url>
@@ -36,7 +36,7 @@
         <powermock.version>2.0.5</powermock.version>
         <log4j.version>2.17.1</log4j.version>
         <geotools.version>2.6.5</geotools.version>
-        <portal.core.version>2.7.0-SNAPSHOT</portal.core.version>
+        <portal.core.version>2.7.1-SNAPSHOT</portal.core.version>
         <httpclient.version>4.5.13</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
     </properties>
@@ -45,7 +45,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.5</version>
+        <version>3.1.9</version>
     </parent>
     
     <!-- Repositories section -->
@@ -145,6 +145,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
@@ -407,17 +411,6 @@
             <artifactId>xmlunit-legacy</artifactId>
             <version>2.6.3</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>9.4.1</version>
-        </dependency>
-        <!-- TODO: Using this for search testing, remove for final commit -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>9.4.1</version>
         </dependency>
 
         <!-- Selenium and testing are needed for automated UI testing -->

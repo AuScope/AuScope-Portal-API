@@ -25,11 +25,11 @@ import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.server.http.download.FileDownloadService;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.CSWFilterService;
+import org.auscope.portal.core.services.ElasticsearchService;
 import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.PortalServiceException;
-import org.auscope.portal.core.services.SearchService;
 import org.auscope.portal.core.services.VocabularyCacheService;
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.services.WCSService;
@@ -114,7 +114,7 @@ import org.springframework.web.multipart.support.StandardServletMultipartResolve
 @Configuration
 public class AppContext {
 
-   protected final Log logger = LogFactory.getLog(getClass());
+    protected final Log logger = LogFactory.getLog(getClass());
 
     @Value("${cloud.aws.account:undefined}")
     private String awsAcct;
@@ -170,6 +170,9 @@ public class AppContext {
     // Active profile i.e. 'test' or 'prod'
     @Value("${spring.profiles.active}")
     private String activeProfile;
+    
+    @Value("${spring.data.elasticsearch.manualUpdateOnly:false}")
+    private boolean manualUpdateOnly;
 
     @Autowired
     private VEGLJobManager jobManager;
@@ -382,7 +385,7 @@ public class AppContext {
         scheduler.schedule(new Runnable() {
             @Override
             public void run() {
-            	cswKnownLayerService().updateKnownLayersCache();
+            	cswKnownLayerService().updateKnownLayersCache(!manualUpdateOnly);
             }
         }, knownLayersStartupDelay, TimeUnit.MINUTES);
         scheduler.shutdown();
@@ -452,7 +455,7 @@ public class AppContext {
     @Bean
     public CSWCacheService cswCacheService() {
         CSWCacheService cacheService = new CSWCacheService(
-                taskExecutor(), cswCacheHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory(), localCacheDir);
+                taskExecutor(), cswCacheHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory(), elasticsearchService());
         cacheService.setForceGetMethods(true);
         return cacheService;
     }
@@ -589,7 +592,8 @@ public class AppContext {
 
     @Bean
     public KnownLayerService cswKnownLayerService() {
-        return new KnownLayerService(knownTypes, viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory, wmsService(), searchService());
+        return new KnownLayerService(knownTypes, viewFactory, viewCSWRecordFactory,
+        							 viewGetCapabilitiesFactory, wmsService(), elasticsearchService());
     }
 
     @Bean
@@ -752,8 +756,9 @@ public class AppContext {
         return new CatalogServicesHealthIndicator(cswCacheService(), cswKnownLayerService(), cswServiceList);
     }
     
-    @Bean SearchService searchService() {
-    	return new SearchService(localCacheDir);
+    @Bean
+    ElasticsearchService elasticsearchService() {
+    	return new ElasticsearchService(searchHttpServiceCaller());
     }
 
 }
