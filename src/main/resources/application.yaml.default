@@ -120,6 +120,23 @@ spring:
             callbackUrl: /login/aaf/callback   # Register at AAF with <portalUrl>/login/aaf/callback
             jwtsecret: AAF_SECRET              # LC_CTYPE=C tr -dc '[[:alnum:][:punct:]]' < /dev/urandom
 
+
+   data:
+      elasticsearch:
+         repositories:
+            enabled: true
+         cluster-nodes: 
+         port: 443
+         apiKey: 
+         cswRecordIndex: dev-auscope-api-cswrecord
+         cswSuggestionIndex: dev-auscope-api-cswsuggestion
+         manualUpdateOnly: true
+         #max-connection-idle-time: 15000 # 15 seconds
+         read-timeout: 7000 # 7 seconds
+         socket-timeout: 60000 # 60 seconds
+         #connection-timeout: 4000 # 4 seconds
+
+
 # Cloud specific settings
 cloud:
    localStageInDir: C:\\temp\\vegl-portal-temp

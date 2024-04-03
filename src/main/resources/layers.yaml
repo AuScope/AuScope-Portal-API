@@ -1005,6 +1005,8 @@
     description: "Geological units represented as two dimensional polygons, designed for portrayal at 1:250 000 scale."
     order: "Registered_1"
     supportsCsvDownloads: false
+    initialBBox:
+        - [ 140.0,-38.5,151.0,-34.5 ]
     wms:
         selector: "erdd:GSV_SG_250K_GEOLUNIT"
 "gsv-geological-unit-contact-250k-":

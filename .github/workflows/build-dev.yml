@@ -10,6 +10,11 @@ env:
   # Auscope-Portal-API docker image name
   IMAGE_NAME: auscope-portal-api
 
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+
 jobs:
   # Push image to GitHub Packages.
   push:
@@ -67,4 +72,17 @@ jobs:
           name: auscope-portal-api war file
           path: ${{ env.WAR_FILE_NAME }}
           
-
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    
+      - name: Azure CLI script
+        uses: azure/CLI@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            revname=$(az containerapp revision list -n ${{ secrets.AZURE_DEVCONTAINERNAME }} -g ${{ secrets.AZURE_DEVRG }} --query "[].name" --output tsv)
+            az containerapp revision restart --revision $revname -g ${{ secrets.AZURE_DEVRG }}

@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
@@ -17,7 +18,11 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  * @author Carsten Friedrich, CSIRO
  *
  */
-public class KnownLayerStatusMonitor extends QuartzJobBean{
+public class KnownLayerStatusMonitor extends QuartzJobBean {
+	
+	@Value("${spring.data.elasticsearch.manualUpdateOnly:false}")
+    private boolean manualUpdateOnly;
+	
     private final Log LOG = LogFactory.getLog(getClass());
 
     private KnownLayerService cswKnownLayerService;
@@ -33,7 +38,7 @@ public class KnownLayerStatusMonitor extends QuartzJobBean{
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         try {
-            cswKnownLayerService.updateKnownLayersCache();
+            cswKnownLayerService.updateKnownLayersCache(!manualUpdateOnly);
         } catch (Exception ex) {
             LOG.info(String.format("Error updating status of known layers: %1$s", ex.getMessage()));
             LOG.debug("Exception:", ex);
