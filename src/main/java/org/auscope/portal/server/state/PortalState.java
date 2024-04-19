@@ -34,7 +34,7 @@ public class PortalState implements Serializable {
 	@Column(nullable=false)
 	private Date creationDate;
 	
-	@Column(nullable=false)
+	@Column(nullable=false, length=500000)
 	private String jsonState;
 	
 	@Column(nullable=false)

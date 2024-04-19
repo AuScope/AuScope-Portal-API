@@ -351,7 +351,7 @@ public class NVCLDataService {
             if (index > 0 ) {
                 boreholeURI = boreholeURI.substring( index +2);
             }            
-            String bhDatasetName = mapDatasetCollection.get(boreholeURI);
+            String bhDatasetName = mapDatasetCollection.get(boreholeURI.toLowerCase());
             String tsgFileCacheURL="";
 
             if (bhDatasetName == null) {
@@ -399,7 +399,7 @@ public class NVCLDataService {
             if (index > 0 ) {
                 boreholeURI = boreholeURI.substring( index +2);
             }  
-            mapDatasetCollection.put(boreholeURI, dataset.datasetName);
+            mapDatasetCollection.put(boreholeURI.toLowerCase(), dataset.datasetName);
             //System.out.println(boreholeURI +  ',' + dataset.datasetName);
         }
         System.out.println("getDatasetCollectionMap:" + mapDatasetCollection.size());
