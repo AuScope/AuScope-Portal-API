@@ -2360,7 +2360,7 @@
 "indigenous-nativeland":
     name: "Map of Indigenous Australia"
     description: "Native Land Digital strives to create and foster conversations about the history of colonialism, Indigenous ways of knowing, and settler-Indigenous relations, through educational resources such as our map and Territory Acknowledgement Guide. We strive to go beyond old ways of talking about Indigenous people and to develop a platform where Indigenous communities can represent themselves and their histories on their own terms. In doing so, Native Land Digital creates spaces where non-Indigenous people can be invited and challenged to learn more about the lands they inhabit, the history of those lands, and how to actively be part of a better future going forward together."
-    group: "Indigenous"
+    group: "Indigenous Data"
     order: "ind01"
     vmf:
         selector: "Indigenous Map"
