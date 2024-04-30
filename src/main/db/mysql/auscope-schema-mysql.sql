@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS `job_purchases`;
 DROP TABLE IF EXISTS `job_annotations`;
 DROP TABLE IF EXISTS `jobs`;
 DROP TABLE IF EXISTS `series`;
+DROP TABLE IF EXISTS `hashmap_params`;
 DROP TABLE IF EXISTS `bookmark_download_options`;
 DROP TABLE IF EXISTS `bookmarks`;
 DROP TABLE IF EXISTS `data_purchases`;
@@ -163,6 +164,11 @@ CREATE TABLE `states` (
      REFERENCES users(`id`)
      ON DELETE CASCADE ON UPDATE CASCADE
 );
+CREATE TABLE `hashmap_params` (
+  `key` varchar(128) NOT NULL,
+  `value` varchar(1000000) NOT NULL,
+  PRIMARY KEY (`key`)
+); 
 
 CREATE TABLE `bookmarks` (
   `fileIdentifier` varchar(128) NOT NULL,
