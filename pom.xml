@@ -466,6 +466,11 @@
                             <BP_JVM_VERSION>17.*</BP_JVM_VERSION>
                         </env>
                     </image>
+                    <jvmArguments>
+                    --add-opens java.base/java.net=ALL-UNNAMED
+                    --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED
+                    --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED
+                    </jvmArguments>
 		</configuration>
                 <executions>
                     <execution>
