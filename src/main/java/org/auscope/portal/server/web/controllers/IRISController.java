@@ -147,6 +147,7 @@ public class IRISController extends BasePortalController {
                 Node station = stations.item(i);
                 Node staCode = station.getAttributes().getNamedItem("code");
                 Node startDate = station.getAttributes().getNamedItem("startDate");
+                Node endDate = station.getAttributes().getNamedItem("endDate");
                 XPathExpression azimuthExpression = DOMUtil.compileXPathExpr("default:Azimuth /text()", nc);
                 XPathExpression dipExpression = DOMUtil.compileXPathExpr("default:Dip /text()", nc);
                 XPathExpression sampleRateExpression = DOMUtil.compileXPathExpr("default:SampleRate /text()", nc);
@@ -179,8 +180,9 @@ public class IRISController extends BasePortalController {
                             				"<Data name=\"Country\"><value>%s</value></Data>"+
                                             "<Data name=\"Code\"><value>%s</value></Data>" +
                             				"<Data name=\"StartDate\"><value>%s</value></Data>"+
+                                            "<Data name=\"EndDate\"><value>%s</value></Data>"+
                             			"</ExtendedData>"+
-                                        "<Channels>%s</Channels>"+	
+                                        "<Channels>%s</Channels>"+
                             	"</Placemark>",
                                 nameExpression.evaluate(station, XPathConstants.STRING),
                                 staCode.getTextContent(),
@@ -190,6 +192,7 @@ public class IRISController extends BasePortalController {
                                 countryExpression.evaluate(station, XPathConstants.STRING),
                                 staCode.getTextContent(),
                                 startDate.getTextContent(),
+                                endDate.getTextContent(),
                                 channelExpr
                                 ));
             }
