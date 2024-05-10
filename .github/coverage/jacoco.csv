@@ -48,7 +48,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,LegendImageControll
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,JobDownloadController,184,442,17,21,33,102,17,13,2,9
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,RemanentAnomaliesController,87,0,5,0,26,0,7,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,GeologicalProvincesController,48,0,0,0,15,0,3,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController,138,246,3,5,28,50,5,7,3,5
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController,138,256,3,5,28,52,5,7,3,5
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController,333,0,32,0,72,0,20,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,TIMAController,179,0,10,0,38,0,9,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabController,102,235,6,6,14,43,6,9,2,7
