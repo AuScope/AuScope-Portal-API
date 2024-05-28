@@ -224,16 +224,6 @@
                 - "Magnetotelluric surveys in Victoria"
                 - "Magnetotelluric surveys in Western Australia"
 
-# CSIRO Mafic-Ultramafic Geochemical Dataset
-"csiro-maf-geochem":
-        name: "CSIRO Mafic-Ultramafic Dataset"
-        group: "Geochemistry"
-        description: "The CSIRO mafic-ultramafic package includes whole-rock geochemical data and mineral chemistry data collected from CSIRO research projects from the mid-1980s to 2021."
-        order: "405"
-        supportsCsvDownloads: true
-        wfs:
-            selector: "csiro_whole_rock_geochem"
-
 # 3D Geological Models
 "portal-geo-models":
         name: "3D Geological Models"
