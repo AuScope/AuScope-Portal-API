@@ -50,7 +50,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push image to repository only if its the master branch
-        if: contains(github.ref, 'master')
+        if: github.ref == 'refs/heads/master'
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/$IMAGE_NAME
           # Change all uppercase to lowercase
@@ -66,13 +66,14 @@ jobs:
           docker push --all-tags $IMAGE_ID
         
       - name: Upload war file artifact
-        if: contains(github.ref, 'master')
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v2
         with:
           name: auscope-portal-api war file
           path: ${{ env.WAR_FILE_NAME }}
           
       - name: Azure Login
+        if: github.ref == 'refs/heads/master'
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -80,6 +81,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     
       - name: Azure CLI script
+        if: github.ref == 'refs/heads/master'
         uses: azure/CLI@v2
         with:
           azcliversion: latest
