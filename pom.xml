@@ -461,11 +461,14 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
 		    <fork>false</fork>
-		    <image>
-                        <env>
-                            <BP_JVM_VERSION>17.*</BP_JVM_VERSION>
-                        </env>
-                    </image>
+		        <image>
+                    <env>
+                        <BP_JVM_VERSION>17.*</BP_JVM_VERSION>
+                    </env>
+                    <bindings>
+                        <binding>${basedir}/bindings/ca-certificates:/platform/bindings/ca-certificates</binding>
+                    </bindings>
+                </image>
                     <jvmArguments>
                     --add-opens java.base/java.net=ALL-UNNAMED
                     --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED
