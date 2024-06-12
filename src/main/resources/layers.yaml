@@ -193,14 +193,14 @@
             serviceNames:
               - "Magnetotelluric Broadband Surveys of Western and North-Western Tasmania, 2016"
 
-"auscope-mt-collection-2":
-        name: "AuScope MT: East Antarctica surveys"
-        group: "Magnetotellurics"
-        description: "This forms part of the AuScope Magnetotelluric Collection, sourced from The University of Adelaide, created by the GeoPhysics 2030 Project, hosted by NCI. The Vestfold Hills and Rauer Group in East Antarctica have contrasting Archean to Neoproterozoic geological histories and are believed to be juxtaposed along a suture zone that now lies beneath the Sørsdal Glacier. Exact location and age of this suture zone are unknown, as is its relationship to regional deformation associated with the amalgamation of East Gondwana. To image the suture zone, magnetotelluric (MT) data were collected in Prydz Bay, East Antarctica, mainly along a profile crossing the Sørsdal Glacier and regions inland of the Vestfold Hills and Rauer Group islands."
-        order: "404"
-        csw:
-            serviceNames:
-              - "Magnetotelluric investigation of the Vestfold Hills and Rauer Group, East Antarctica (time series)"
+# AUS-4188 "auscope-mt-collection-2":
+#         name: "AuScope MT: East Antarctica surveys"
+#         group: "Magnetotellurics"
+#         description: "This forms part of the AuScope Magnetotelluric Collection, sourced from The University of Adelaide, created by the GeoPhysics 2030 Project, hosted by NCI. The Vestfold Hills and Rauer Group in East Antarctica have contrasting Archean to Neoproterozoic geological histories and are believed to be juxtaposed along a suture zone that now lies beneath the Sørsdal Glacier. Exact location and age of this suture zone are unknown, as is its relationship to regional deformation associated with the amalgamation of East Gondwana. To image the suture zone, magnetotelluric (MT) data were collected in Prydz Bay, East Antarctica, mainly along a profile crossing the Sørsdal Glacier and regions inland of the Vestfold Hills and Rauer Group islands."
+#         order: "404"
+#         csw:
+#             serviceNames:
+#               - "Magnetotelluric investigation of the Vestfold Hills and Rauer Group, East Antarctica (time series)"
 
 "auscope-mt-collection-3":
         name: "AuScope MT: AusLAMP Surveys"
@@ -1445,43 +1445,43 @@
     wms:
         selector: "be10-denude:crn_aus_outlets"
  
-# Octopus CRN Global 
-"Octopus-Crn-Int-Basins":
-    name: "CRN Global: River Basins"
-    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
-    description: "CRN Global Collection: River Basins"
-    order: "Octopus_03"
-    supportsCsvDownloads: true
-    wms:
-        selector: "be10-denude:crn_int_basins"
+# AUS-4188 Octopus CRN Global 
+# "Octopus-Crn-Int-Basins":
+#     name: "CRN Global: River Basins"
+#     group: "Geochronology - OCTOPUS (Cosmogenic DB)"
+#     description: "CRN Global Collection: River Basins"
+#     order: "Octopus_03"
+#     supportsCsvDownloads: true
+#     wms:
+#         selector: "be10-denude:crn_int_basins"
 
-"Octopus-Crn-Int-Outlets":
-    name: "CRN Global: Sample Sites"
-    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
-    description: "CRN International Collection: Sample Sites"
-    order: "Octopus_04"
-    supportsCsvDownloads: true
-    wms:
-        selector: "be10-denude:crn_int_outlets"
+# AUS-4188 "Octopus-Crn-Int-Outlets":
+#     name: "CRN Global: Sample Sites"
+#     group: "Geochronology - OCTOPUS (Cosmogenic DB)"
+#     description: "CRN International Collection: Sample Sites"
+#     order: "Octopus_04"
+#     supportsCsvDownloads: true
+#     wms:
+#         selector: "be10-denude:crn_int_outlets"
 
-# Octopus CRN Large Basins
-"Octopus-Crn-XXL-Basins":
-    name: "CRN Large Basins: River Basins"
-    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
-    description: "CRN Large Basins: River Basins"
-    order: "Octopus_05"
-    supportsCsvDownloads: true
-    wms:
-        selector: "be10-denude:crn_xxl_basins"
+# AUS-4188 Octopus CRN Large Basins
+# "Octopus-Crn-XXL-Basins":
+#     name: "CRN Large Basins: River Basins"
+#     group: "Geochronology - OCTOPUS (Cosmogenic DB)"
+#     description: "CRN Large Basins: River Basins"
+#     order: "Octopus_05"
+#     supportsCsvDownloads: true
+#     wms:
+#         selector: "be10-denude:crn_xxl_basins"
 
-"Octopus-Crn-XXL-Outlets":
-    name: "CRN Large Basins: Sample Sites"
-    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
-    description: "CRN Large Basins: Sample Sites"
-    order: "Octopus_06"
-    supportsCsvDownloads: true
-    wms:
-        selector: "be10-denude:crn_xxl_outlets"
+# AUS-4188 "Octopus-Crn-XXL-Outlets":
+#     name: "CRN Large Basins: Sample Sites"
+#     group: "Geochronology - OCTOPUS (Cosmogenic DB)"
+#     description: "CRN Large Basins: Sample Sites"
+#     order: "Octopus_06"
+#     supportsCsvDownloads: true
+#     wms:
+#         selector: "be10-denude:crn_xxl_outlets"
 
 # Octopus CRN Basin Bounding boxes 
 "Octopus-Crn-Basin-BBoxes":
