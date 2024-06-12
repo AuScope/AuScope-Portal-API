@@ -951,7 +951,7 @@
             - [ "Remanent Anomaly Name", "RemAnom:AnomalyName", null, "ISLIKE" ]
 "remanent-anomalies-AutoSearch":
     name: "AUS5 - AutoSearch Anomalies"
-    description: "A collection of services publishing magnetic anomalies"
+    description: "A collection of CSIRO services publishing magnetic anomalies"
     group: "Magnetics"
     proxyStyleUrl: "getRemanentAnomaliesAutoSearchStyle.do"
     order: "81"
@@ -959,15 +959,15 @@
     wfs:
         selector: "RemAnomAutoSearch:AutoSearchAnomalies"
 "remanent-anomaliesTMI":
-    name: "Geophysical Grid Mag TMI HSI colour"
-    description: "Total Magnetic Intensity from Magnetic Anomaly Map of Australia fifth edition), Geoscience Australia and other sources"
+    name: "AUS5 - Total Magnetic Intensity"
+    description: "From a collection of CSIRO services publishing magnetic anomalies. This layer represents total magnetic intensities."
     group: "Magnetics"
     order: "82"
     wms:
         selector: "mag:australia_tmihires2a"
 "remanent-anomalies-EMAG":
     name: "EMAG2 - Remanent Anomalies"
-    description: "A collection of services publishing magnetic anomalies from the EMAG2 layer"
+    description: "A collection of CSIRO services publishing magnetic anomalies from the EMAG2 model. https://geomag.org/models/emag2.html"
     group: "Magnetics"
     proxyStyleUrl: "getRemanentAnomaliesStyle.do"
     order: "83"
@@ -981,7 +981,7 @@
             - [ "Remanent Anomaly Name", "RemAnom:AnomalyName", null, "ISLIKE" ]
 "remanent-anomalies-EMAGTMI":
     name: "EMAG2 - Total Magnetic Intensity"
-    description: "Total Magnetic Intensity from the EMAG2 datasource. http://www.geomag.org/models/emag2.html"
+    description: "Total Magnetic Intensity from the EMAG2 model. https://geomag.org/models/emag2.html"
     group: "Magnetics"
     order: "84"
     wms:
