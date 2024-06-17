@@ -404,14 +404,15 @@
                     - [ "Name", "gml:name", null, "ISLIKE" ]
 
 # AusPASS - passive seismic
-"seismology-in-schools-site":
-        name: "Seismographs in Schools Network"
-        description: "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server."
-        group: "Passive Seismic"
-        proxyUrl: "getIRISStations.do"
-        order: "250"
-        iris:
-               selector: [ "S1", "https://auspass.edu.au" ]
+# Removed until AUS-4193 is fixed
+#"seismology-in-schools-site":
+#        name: "Seismographs in Schools Network"
+#        description: "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server."
+#        group: "Passive Seismic"
+#        proxyUrl: "getIRISStations.do"
+#        order: "250"
+#        iris:
+#               selector: [ "S1", "https://auspass.edu.au" ]
 "seismology-skippy":
         name: "SKIPPY"
         description: "The SKIPPY seismic array feed from AusPass: the Australian Passive Seismic Server."
