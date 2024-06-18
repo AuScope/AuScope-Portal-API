@@ -124,7 +124,7 @@ public class IRISController extends BasePortalController {
             @RequestParam("networkCode") String networkCode) {
         serviceUrl = ensureTrailingForwardslash(serviceUrl);
         
-        System.out.println("]getIRISStations] serviceUrl ="+serviceUrl+",networkCode ="+networkCode);
+        // System.out.println("[getIRISStations] serviceUrl ="+serviceUrl+",networkCode ="+networkCode);
 
         try {
             Document irisDoc = getDocumentFromURL(serviceUrl + "fdsnws/station/1/query?net=" + networkCode + "&level=channel");
@@ -154,7 +154,7 @@ public class IRISController extends BasePortalController {
 
                 Element staElement = (Element)station;
                 NodeList channels =staElement.getElementsByTagName("Channel");
-                StringBuilder channelExpr = new StringBuilder();   
+                StringBuilder channelExpr = new StringBuilder();
                 // For each channel:
                 for (int j = 0; j < channels.getLength(); j++) {
                     Node channel = channels.item(j);
@@ -171,19 +171,14 @@ public class IRISController extends BasePortalController {
                                     dipExpression.evaluate(channel, XPathConstants.STRING),
                                     sampleRateExpression.evaluate(channel, XPathConstants.STRING)));                                   
                 }
-                kml.append(
-                		String.format(
-                				"<Placemark><name>%s</name>"+
-                				        "<description>IRIS layer for station: %s></description>" +
-                				        "<MultiGeometry><Point><coordinates>%s,%s,%s</coordinates></Point></MultiGeometry>"+
-                				        "<ExtendedData>" +
-                            				"<Data name=\"Country\"><value>%s</value></Data>"+
-                                            "<Data name=\"Code\"><value>%s</value></Data>" +
-                            				"<Data name=\"StartDate\"><value>%s</value></Data>"+
-                                            "<Data name=\"EndDate\"><value>%s</value></Data>"+
-                            			"</ExtendedData>"+
-                                        "<Channels>%s</Channels>"+
-                            	"</Placemark>",
+                String xmlStr = String.format(
+                    "<Placemark><name>%s</name>"+
+                            "<description>IRIS layer for station: %s></description>" +
+                            "<MultiGeometry><Point><coordinates>%s,%s,%s</coordinates></Point></MultiGeometry>"+
+                            "<ExtendedData>" +
+                                "<Data name=\"Country\"><value>%s</value></Data>"+
+                                "<Data name=\"Code\"><value>%s</value></Data>" +
+                                "<Data name=\"StartDate\"><value>%s</value></Data>",
                                 nameExpression.evaluate(station, XPathConstants.STRING),
                                 staCode.getTextContent(),
                                 lonExpression.evaluate(station, XPathConstants.STRING),
@@ -191,12 +186,19 @@ public class IRISController extends BasePortalController {
                                 elevationExpression.evaluate(station, XPathConstants.STRING),
                                 countryExpression.evaluate(station, XPathConstants.STRING),
                                 staCode.getTextContent(),
-                                startDate.getTextContent(),
-                                endDate.getTextContent(),
+                                startDate.getTextContent());
+                // Skip end date as some AusPASS projects have not ended yet
+                if (endDate != null) {
+                    xmlStr += String.format("<Data name=\"EndDate\"><value>%s</value></Data>", endDate.getTextContent());
+                }
+                xmlStr += String.format(
+                            "</ExtendedData>"+
+                            "<Channels>%s</Channels>"+
+                            "</Placemark>",
                                 channelExpr
-                                ));
+                );
+                kml.append(xmlStr);
             }
-
             kml.append("</Document></kml>");
 
             return generateJSONResponseMAV(true, "gml", kml.toString(), null);
