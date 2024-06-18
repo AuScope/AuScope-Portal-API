@@ -404,7 +404,6 @@
                     - [ "Name", "gml:name", null, "ISLIKE" ]
 
 # AusPASS - passive seismic
-# Removed until AUS-4193 is fixed
 "seismology-in-schools-site":
         name: "Seismographs in Schools Network"
         description: "Seismographs in Schools data feed from AusPass: the Australian Passive Seismic Server."
