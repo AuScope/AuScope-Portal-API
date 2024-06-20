@@ -2212,7 +2212,7 @@
     description: "Australian States and Territories - 2021."
     group: "Boundaries"
     order: "bound02"
-    supportsCsvDownloads: false
+    supportsCsvDownloads: true
     wms:
         selector: "auscope:States-and-Territories"
 
