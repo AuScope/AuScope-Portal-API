@@ -2041,14 +2041,14 @@
     supportsCsvDownloads: true
     wms:
         selector: "grace:Countries_WGS84"
-"coastline1m":
+"Australian-coastline":
     name: "Australian Coastline"
-    description: "Coastline of Australia, sourced from the 1:1M scale Surface Geology of Australia dataset (2012 edition)."
+    description: "Australian States and Territories - 2021."
     group: "Boundaries"
     order: "bound02"
-    serverType: "ESRI"
+    supportsCsvDownloads: true
     wms:
-        selector: "Coastline1M"
+        selector: "auscope:States-and-Territories"
 
 # GA Magnetotellurics
 "msl-new-magnetotellurics":
