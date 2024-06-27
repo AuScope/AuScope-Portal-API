@@ -255,6 +255,7 @@
                     - "https://gs.geoscience.nsw.gov.au/geoserver/wfs"
                     - "https://sarigdata.pir.sa.gov.au/geoserver/wfs"
                     - "https://geology-uat.information.qld.gov.au/geoserver/wfs"
+                    - "https://resources-geoserver-prd-gba9andfctdbbnhz.z01.azurefd.net/geoserver/wfs"
                     - "https://geology.information.qld.gov.au/geoserver/wfs"
                     - "https://geology.data.vic.gov.au/nvcl/wfs" 
         filters:
