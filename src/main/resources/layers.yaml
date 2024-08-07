@@ -862,6 +862,8 @@
     csw:
         ids:
             - "f8711_1072_0979_6939"
+    initialBBox:
+        - [ 143.1,-43.9,149.0,-39.3 ]
 "aster-ferric-oxide-comp":
     name: "Ferric oxide composition"
     description: "1. Band ratio: B2/B1Blue-cyan is goethite rich, Green is hematite-goethite, Red-yellow is hematite-rich"
@@ -918,6 +920,8 @@
     csw:
         ids:
             - "f4127_0310_8856_3869"
+    initialBBox:
+        - [ 143.1,-43.9,149.0,-39.3 ]
 "aster-aloh-group-content":
     name: "AlOH group content"
     description: "1. Band ratio: (B5+B7)/B6Blue is low abundance, Red is high abundance potentially includes: phengite, muscovite, paragonite, lepidolite, illite, brammalite, montmorillonite, beidellite, kaolinite, dickite"
