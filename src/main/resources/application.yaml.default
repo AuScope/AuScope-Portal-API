@@ -120,7 +120,6 @@ spring:
             callbackUrl: /login/aaf/callback   # Register at AAF with <portalUrl>/login/aaf/callback
             jwtsecret: AAF_SECRET              # LC_CTYPE=C tr -dc '[[:alnum:][:punct:]]' < /dev/urandom
 
-
    data:
       elasticsearch:
          repositories:
@@ -135,42 +134,6 @@ spring:
          read-timeout: 7000 # 7 seconds
          socket-timeout: 60000 # 60 seconds
          #connection-timeout: 4000 # 4 seconds
-
-
-# Cloud specific settings
-cloud:
-   localStageInDir: C:\\temp\\vegl-portal-temp
-   sssc:
-      solutions:
-         url: https://sssc-vgl.geoanalytics.csiro.au/
-      defaultToolbox: http://ec2-54-206-9-187.ap-southeast-2.compute.amazonaws.com/scm/toolbox/3
-   proms:
-      report:
-         url: http://proms-dev1-vc.it.csiro.au/id/report/
-      reportingsystem:
-         uri: http://proms-dev1-vc.it.csiro.au/rs
-
-   # Gives us separation from real DB passwords.
-   encryption:
-      password: ABCdefGHI
-
-   # AWS keys to be used for dev only. Production system to use AWS roles for authorization
-   aws:
-      account: AWS_ACCOUNT
-      accesskey: AWS_ACCESS_KEY
-      secretkey: AWS_SECRET_KEY
-      sessionkey: AWS_SESSION_KEY
-      stsrequirement: Mandatory
-
-   # Cloud VM files
-   vm:
-      sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl.sh
-   vm-shutdown:
-      sh: https://raw.githubusercontent.com/AuScope/ANVGL-Portal/master/vm/vl-shutdown.sh
-
-   erddapservice:
-      url: http://siss2.anu.edu.au/erddap/griddap/
-   stripeApiKey: STRIPE_API_KEY
 
 env:
    stackdriver:

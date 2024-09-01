@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.auscope.portal.server.web.security.PortalAuthority;
 import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.security.PortalUser.AuthenticationFramework;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.util.StringUtils;
 
 /**
  * Service for creating new users
@@ -24,9 +23,6 @@ import org.springframework.util.StringUtils;
  *
  */
 public class PortalUserDetailsService implements UserDetailsService {
-	
-	public static final int SECRET_LENGTH = 32;
-	private static char[] BUCKET_NAME_WHITELIST = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 	
 	@Autowired
 	private PortalUserService userService;
@@ -67,13 +63,13 @@ public class PortalUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		if(StringUtils.isEmpty(username)) 
+		if(StringUtils.isBlank(username)) 
             throw new UsernameNotFoundException("User name is empty");
 		return this.userService.getById(username);
 	}
 	
 	public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
-		if(StringUtils.isEmpty(email)) 
+		if(StringUtils.isBlank(email)) 
             throw new UsernameNotFoundException("Email is empty");
 		return this.userService.getByEmail(email);
 	}
@@ -93,13 +89,6 @@ public class PortalUserDetailsService implements UserDetailsService {
 		newUser.setFullName(userDetails.get("name"));
 		newUser.setAuthentication(authFramework);
 		userService.saveUser(newUser);
-		// AWS secret and bucketname
-		synchronized (this.random) {
-			String randomSecret = RandomStringUtils.random(SECRET_LENGTH, 0, 0, true, true, null, this.random);
-			newUser.setAwsSecret(randomSecret);
-			String bucketName = generateRandomBucketName();
-			newUser.setS3Bucket(bucketName);
-		}
 		// Authorities
 		List<PortalAuthority> authorities = new ArrayList<>();
 		PortalAuthority defaultAuth = new PortalAuthority(defaultRole);
@@ -120,12 +109,4 @@ public class PortalUserDetailsService implements UserDetailsService {
 		return newUser;
 	}
 	
-	/**
-	 * Generate a random bucket name for the user
-	 * 
-	 * @return a random string preceeded with "vgl-"
-	 */
-	public String generateRandomBucketName() {
-        return "vgl-" + RandomStringUtils.random(32, 0, 0, false, false, BUCKET_NAME_WHITELIST, this.random);
-    }
 }
