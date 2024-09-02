@@ -6,18 +6,12 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
-import org.auscope.portal.core.services.PortalServiceException;
-import org.auscope.portal.core.services.cloud.CloudComputeService;
 import org.auscope.portal.server.bookmark.BookMark;
-import org.auscope.portal.server.web.controllers.BaseCloudController;
-import org.auscope.portal.server.web.service.NCIDetailsService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -43,14 +37,7 @@ public class PortalUser implements UserDetails {
     @OneToMany(mappedBy = "parent", cascade=CascadeType.ALL, orphanRemoval = true)
     private List<PortalAuthority> authorities;
     
-    private String arnExecution;
-    private String arnStorage;
-    private String s3Bucket;
-    private String awsSecret;
-    private String awsKeyName;
     private Integer acceptedTermsConditions;
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private NCIDetailsEnc nciDetailsEnc;
     
     @Transient
     private AuthenticationFramework authentication;
@@ -74,7 +61,6 @@ public class PortalUser implements UserDetails {
         this.bookMarks = bookMarks;
     } 
     
-
     /**
      * Gets the ID as reported by the remote authentication service (Probably google).
      * AAF doesn't return a unique ID so we use the user's email address in this case.
@@ -91,22 +77,6 @@ public class PortalUser implements UserDetails {
      */
     public void setId(String id) {
         this.id = id;
-    }
-
-    /**
-     * The name of the AWS S3 bucket where this user's job data will be written
-     * @return
-     */
-    public String getS3Bucket() {
-        return s3Bucket;
-    }
-
-    /**
-     * The name of the AWS S3 bucket where this user's job data will be written
-     * @param s3Bucket
-     */
-    public void setS3Bucket(String s3Bucket) {
-        this.s3Bucket = s3Bucket;
     }
 
     /**
@@ -144,22 +114,6 @@ public class PortalUser implements UserDetails {
     }
 
     /**
-     * The keyname to be used for VMs started by this user (can be null)
-     * @return
-     */
-    public String getAwsKeyName() {
-        return awsKeyName;
-    }
-
-    /**
-     * The keyname to be used for VMs started by this user (can be null)
-     * @param awsKeyName
-     */
-    public void setAwsKeyName(String awsKeyName) {
-        this.awsKeyName = awsKeyName;
-    }
-
-    /**
      * The version of the T&Cs that the user has last accepted (or null if none)
      * @return
      */
@@ -174,22 +128,6 @@ public class PortalUser implements UserDetails {
     public void setAcceptedTermsConditions(Integer acceptedTermsConditions) {
         this.acceptedTermsConditions = acceptedTermsConditions;
     }
-
-    /**
-     * 
-     * @return
-     */
-    public NCIDetailsEnc getNciDetailsEnc() {
-		return nciDetailsEnc;
-	}
-
-    /**
-     * 
-     * @param nciDetails
-     */
-	public void setNciDetailsEnc(NCIDetailsEnc nciDetails) {
-		this.nciDetailsEnc = nciDetails;
-	}
 
 	@Override
     public String toString() {
@@ -217,30 +155,6 @@ public class PortalUser implements UserDetails {
 		        }
 	        }
     	}
-    }
-
-    public String getArnExecution() {
-        return arnExecution;
-    }
-
-    public void setArnExecution(String arnExecution) {
-        this.arnExecution = arnExecution;
-    }
-
-    public String getArnStorage() {
-        return arnStorage;
-    }
-
-    public void setArnStorage(String arnStorage) {
-        this.arnStorage = arnStorage;
-    }
-
-    public String getAwsSecret() {
-        return awsSecret;
-    }
-
-    public void setAwsSecret(String awsSecret) {
-        this.awsSecret = awsSecret;
     }
 
     public AuthenticationFramework getAuthentication() {
@@ -288,19 +202,6 @@ public class PortalUser implements UserDetails {
         // Carsten
         return acceptedTermsConditions != null &&
                 acceptedTermsConditions > 0;
-    }
-
-    /**
-     * Returns true iff this PortalUser instance has at least 1 compute service
-     * which has been properly configured.
-     *
-     * @param nciDetailsService
-     * @param cloudComputeServices
-     * @return
-     * @throws PortalServiceException
-     */
-    public boolean configuredServicesStatus(NCIDetailsService nciDetailsService, CloudComputeService[] cloudComputeServices) throws PortalServiceException {
-        return !BaseCloudController.getConfiguredComputeServices(this, nciDetailsService, cloudComputeServices).isEmpty();
     }
 
     @Override

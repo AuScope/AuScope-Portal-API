@@ -10,7 +10,7 @@
     <groupId>org.auscope.portal</groupId>
     <artifactId>auscope-portal-api</artifactId>
     <packaging>war</packaging>
-    <version>6.6.0-SNAPSHOT</version>
+    <version>6.6.1-SNAPSHOT</version>
     <name>AuScope-Portal-API</name>
     <description>AuScope's flagship portal</description>
     <url>https://portal.auscope.org.au</url>
@@ -36,7 +36,7 @@
         <powermock.version>2.0.5</powermock.version>
         <log4j.version>2.17.1</log4j.version>
         <geotools.version>2.6.5</geotools.version>
-        <portal.core.version>2.8.0-SNAPSHOT</portal.core.version>
+        <portal.core.version>2.8.1-SNAPSHOT</portal.core.version>
         <httpclient.version>4.5.13</httpclient.version>
         <mysql.version>8.0.14</mysql.version>
     </properties>
@@ -77,42 +77,17 @@
     <!-- Dependency Management -->
     <dependencyManagement>
         <dependencies>
-    <!-- This is used to ensure we use up to date versions in         -->
-    <!-- 3rd party dependencies to avoid security issues              -->
             <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
-                <version>4.10.0</version>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.33</version>
             </dependency>
-            <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>1.9.4</version>
-            </dependency>
-	    <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>libraries-bom</artifactId>
-                <version>22.0.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-	    </dependency>
         </dependencies>
     </dependencyManagement>
 
     <!-- Dependencies section -->
     <dependencies>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-	    <artifactId>google-cloud-storage</artifactId>
-            <version>2.22.5</version>
-        </dependency>
-        <dependency>
-	    <groupId>net.bytebuddy</groupId>
-	    <artifactId>byte-buddy</artifactId>
-        </dependency>
-	
-	<!-- Check if we need this if we use spring-boot-starter-web -->
-	<dependency>
+		<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
@@ -154,18 +129,6 @@
             <artifactId>spring-context-support</artifactId>
         </dependency>
         <dependency>
-                <groupId>com.jcraft</groupId>
-                <artifactId>jsch</artifactId>
-                <version>0.1.55</version>
-        </dependency>
-
-        <dependency>
-            <groupId>proms-client-java</groupId>
-            <artifactId>proms-client-java</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.auscope.portal</groupId>
             <artifactId>portal-core</artifactId>
             <version>${portal.core.version}</version>
@@ -197,36 +160,6 @@
             <version>1.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.taglibs</groupId>
-            <artifactId>taglibs-standard-impl</artifactId>
-            <version>1.2.5</version>
-        </dependency>
-
-        <!-- Added for email templating -->
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>1.5</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.8.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-            <version>4.4</version>
-        </dependency>
-
-         <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.27.0-GA</version>
-        </dependency>
-
 	    <!-- This is a dummy database used for development only -->
 	    <dependency>
             <groupId>org.hsqldb</groupId>
@@ -239,6 +172,7 @@
             <artifactId>opencsv</artifactId>
             <version>5.7.1</version>
         </dependency>
+        
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -257,121 +191,23 @@
             </exclusions>
         </dependency>
 
-        <!-- Added for email templating -->
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-            <version>1.7</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>edu.ucar</groupId>
-            <artifactId>netcdf4</artifactId>
-            <version>5.3.3</version>
-        </dependency>
-        
-        <!-- Added for using PowerMock with JMock -->
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-support</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!--
-            We depend on the EasyMock API but exclude the EasyMock dependency. The reason
-            is that PowerMock Whitebox needs a "org.powermock.reflect.spi.ProxyFramework"
-            implementation in order to work correctly. This implementation is provided by
-            the extension API:s. Since JMock uses CGLib it can reuse the
-            "org.powermock.api.extension.proxyframework.ProxyFrameworkImpl" in the
-            PowerMock EasyMock API. An alternative to depend on this class would be to simply copy
-            the class it into your code (remember that the class must be named
-            org.powermock.api.extension.proxyframework.ProxyFrameworkImpl).
-        -->
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-<!--             <exclusions> -->
-<!--                 <exclusion> -->
-<!--                     <groupId>org.easymock</groupId> -->
-<!--                     <artifactId>easymock</artifactId> -->
-<!--                 </exclusion> -->
-<!--                 <exclusion> -->
-<!--                 	<groupId>cglib</groupId> -->
-<!--                 	<artifactId>cglib-nodep</artifactId> -->
-<!--                 </exclusion> -->
-<!--             </exclusions> -->
-        </dependency>
-
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-            <version>1.6.2</version>
-        </dependency>
-
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.28</version>
         </dependency>
+        
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <version>4.10.0</version>
             <type>pom</type>
-        </dependency>
-        <dependency>
-          <groupId>com.google.inject</groupId>
-          <artifactId>guice</artifactId>
-          <version>5.0.1</version>
-        </dependency>
-        <dependency>
-          <groupId>com.google.inject.extensions</groupId>
-          <artifactId>guice-assistedinject</artifactId>
-          <version>5.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jclouds</groupId>
-            <artifactId>jclouds-all</artifactId>
-            <version>2.4.0</version>
-            <exclusions>
-              <exclusion>
-                <groupId>javax.annotation</groupId>
-                <artifactId>jsr250-api</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>com.google.inject</groupId>
-                <artifactId>guice</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>com.google.inject.extensions</groupId>
-                <artifactId>guice-assistedinject</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
-        </dependency>
-         <dependency>
-            <groupId>com.stripe</groupId>
-            <artifactId>stripe-java</artifactId>
-            <version>20.41.0</version>
         </dependency>
 
         <dependency>
@@ -390,17 +226,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        
         <dependency>
             <groupId>org.jmock</groupId>
             <artifactId>jmock-imposters</artifactId>
             <version>2.12.0</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>9.1</version>
-        </dependency>
+        
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
@@ -412,44 +245,21 @@
             <version>2.6.3</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- Selenium and testing are needed for automated UI testing -->
-       <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>4.9.1</version>
-            <scope>test</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>xml-apis</groupId>
-                <artifactId>xml-apis</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
+        
         <dependency>
            <groupId>com.fasterxml.jackson.core</groupId>
            <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>7.7.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
 	  <artifactId>jackson-databind</artifactId>
           <version>2.13.4.2</version>
       </dependency>
+      
       <dependency>
         <groupId>com.azure.spring</groupId>
         <artifactId>spring-cloud-azure-appconfiguration-config</artifactId>
         <version>5.5.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>okhttp</artifactId>
-        <version>4.12.0</version>
       </dependency>
     </dependencies>
 
@@ -484,20 +294,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M9</version>
-                <configuration>
-                    <parallel>methods</parallel>
-                    <threadCount>10</threadCount>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <!-- Exclude selenium tests by default -->
-                    <excludes>
-                        <exclude>org/auscope/portal/ui/*</exclude>
-                        <exclude>org/auscope/portal/ui/mobile/*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
+            
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
