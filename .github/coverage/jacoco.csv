@@ -32,8 +32,8 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,EarthResourcesFilte
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,ReprojectionController,0,264,2,36,0,46,2,22,0,5
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabController.new Comparator() {...},0,16,0,0,0,2,0,2,0,2
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,GenericController,188,0,12,0,54,0,12,0,5,0
-AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabularyCacheController,48,0,0,0,12,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController.new IterableNamespace() {...},0,12,0,0,0,3,0,1,0,1
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabularyCacheController,48,0,0,0,12,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new Comparator() {...},16,0,0,0,2,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new IterableNamespace() {...},66,0,0,0,12,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MineralTenementController,421,0,17,0,91,0,16,0,7,0
@@ -51,10 +51,23 @@ AuScope-Portal-API,org.auscope.portal.service.colorcoding,CapdfHydroChemColorCod
 AuScope-Portal-API,org.auscope.portal.service.colorcoding,ColorCodingConfig,179,0,4,0,32,0,10,0,8,0
 AuScope-Portal-API,org.auscope.portal.service.colorcoding,CapdfHydroChemColorCoding.ColorCoding,68,0,0,0,14,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.service.colorcoding,ColorCodingConfig.COLOR,377,0,0,0,11,0,4,0,4,0
-AuScope-Portal-API,org.auscope.portal.server.web.controllers.sessonobject,StringArrayToCustomRegistry,9,0,0,0,2,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers.sessonobject,StringArrayToCustomRegistry.CustomRegistry,100,0,12,0,27,0,17,0,11,0
+AuScope-Portal-API,org.auscope.portal.server.web.controllers.sessonobject,StringArrayToCustomRegistry,9,0,0,0,2,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.bookmark,BookMarkDownload,86,0,0,0,38,0,24,0,24,0
 AuScope-Portal-API,org.auscope.portal.server.bookmark,BookMark,96,0,8,0,33,0,17,0,13,0
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrenceNamespaceContext,0,69,0,0,0,13,0,1,0,1
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,Commodity,54,118,4,0,13,30,3,4,1,4
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrenceFilter,137,395,35,63,27,85,33,26,1,8
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MinOccurViewFilter,24,73,4,12,4,12,5,6,1,2
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrenceFilter.MeasureTypes,0,33,0,0,0,2,0,1,0,1
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,CommodityFilter,40,0,2,0,9,0,4,0,3,0
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralTenementCCFilter,36,0,8,0,8,0,6,0,2,0
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineFilter,43,29,6,4,8,7,5,3,1,2
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MiningActivityFilter,19,157,1,13,4,42,2,9,1,3
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,CommodityVocabMethodMaker,45,0,0,0,8,0,3,0,3,0
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralTenementFilter,24,86,2,4,4,16,3,4,1,3
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,Mine,122,84,8,2,31,18,7,3,2,3
+AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrence,10,141,1,5,4,37,1,7,0,5
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalUserService,69,0,4,0,19,0,9,0,7,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalUserDetailsService,160,0,14,0,39,0,12,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,ErmlVocabService,30,101,4,10,9,29,4,6,1,2
@@ -82,30 +95,17 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,BookMarkService,41,0,0,
 AuScope-Portal-API,org.auscope.portal.server.web.service,GenericFilter2,50,0,0,0,8,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,AuScopeWMSService,180,0,18,0,34,0,11,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,BoreholeService.Mark,56,0,0,0,11,0,3,0,3,0
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrenceNamespaceContext,0,69,0,0,0,13,0,1,0,1
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,Commodity,54,118,4,0,13,30,3,4,1,4
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrenceFilter,137,395,35,63,27,85,33,26,1,8
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MinOccurViewFilter,24,73,4,12,4,12,5,6,1,2
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrenceFilter.MeasureTypes,0,33,0,0,0,2,0,1,0,1
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,CommodityFilter,40,0,2,0,9,0,4,0,3,0
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralTenementCCFilter,36,0,8,0,8,0,6,0,2,0
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineFilter,43,29,6,4,8,7,5,3,1,2
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MiningActivityFilter,19,157,1,13,4,42,2,9,1,3
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,CommodityVocabMethodMaker,45,0,0,0,8,0,3,0,3,0
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralTenementFilter,24,86,2,4,4,16,3,4,1,3
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,Mine,122,84,8,2,31,18,7,3,2,3
-AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrence,10,141,1,5,4,37,1,7,0,5
 AuScope-Portal-API,org.auscope.portal.server.web.service.download,MineralOccurrenceDownloadService,19,0,2,0,7,0,3,0,2,0
-AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.mandRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,ExtraVocabularies,111,0,0,0,13,0,13,0,13,0
+AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.mandRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext.new Runnable() {...},18,0,2,0,3,0,3,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext,601,0,2,0,109,0,48,0,47,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1670,0,149,0,397,0,124,0,39,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.wfsRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalTest,79,0,2,0,18,0,5,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,ElasticsearchConfig,65,0,2,0,18,0,4,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.filterCtl,6,0,0,0,1,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalProduction,79,0,2,0,18,0,5,0,4,0
+AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.filterCtl,6,0,0,0,1,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,AuscopeRegistries,18,0,0,0,6,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,ConversionConfig,29,0,0,0,9,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.selRec,16,0,0,0,3,0,1,0,1,0
@@ -146,8 +146,8 @@ AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,TrayThumbNai
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,GetDatasetCollectionResponse,12,21,0,0,6,8,3,4,3,4
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AlgorithmVersion,11,15,0,0,6,6,3,3,3,3
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,GetLogCollectionResponse,12,21,0,0,6,8,3,4,3,4
-AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,CSVDownloadResponse,5,0,0,0,2,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,ImageTrayDepthResponse,33,0,0,0,14,0,7,0,7,0
+AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,CSVDownloadResponse,5,0,0,0,2,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AlgorithmOutputClassification,15,21,0,0,8,8,4,4,4,4
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AlgorithmOutputResponse,19,27,0,0,10,10,5,5,5,5
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,TSGStatusResponse,5,0,0,0,2,0,1,0,1,0
