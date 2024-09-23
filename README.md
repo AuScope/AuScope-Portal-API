@@ -14,7 +14,7 @@ mvn clean install
 ### To run:
 
 ```
-java -jar --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED .\target\auscope-portal-api-6.5.1-SNAPSHOT.war
+java -jar --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED .\target\auscope-portal-api-6.6.1-SNAPSHOT.war
 ```
 
 ### IMPORTANT NOTES:
