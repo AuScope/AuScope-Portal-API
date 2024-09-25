@@ -2194,3 +2194,16 @@
         selector: "Indigenous Map"
         endPoint: "https://native-land.ca/wp-json/nativeland/v1/api/index.php"
         polygon_geojson:  [[111.64,-17.61],[132.45,-8.23],[146.26,-10.53],[159.37,-24.57],[147.95,-45.25],[110.29,-34.29]]
+
+"regolith-depth-layer":
+    name: "Soil and Landscape Grid National Soil Attribute Maps - Depth of Regolith"
+    description: "This is Version 2 of the Depth of Regolith product of the Soil and Landscape Grid of Australia (produced 2015-06-01)."
+    group: "Regolith"
+    order: "regolith_01"
+    supportsCsvDownloads: false
+    onlineResourceOrder: 
+        - [ "DER_000_999_EV_N_P_AU_NAT_C", 1]
+        - [ "DER_000_999_95_N_P_AU_NAT_C", 2]
+        - [ "DER_000_999_05_N_P_AU_NAT_C", 3]
+    wms:
+        selector: "DER_000_999_EV_N_P_AU_NAT_C"

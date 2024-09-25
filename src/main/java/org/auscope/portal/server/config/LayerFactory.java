@@ -319,6 +319,27 @@ public class LayerFactory {
                             }
                             break;
                         }
+                        // parse the online resource order parameter array [ onlineResourceName, orderIndex ]
+                        case "onlineResourceOrder": {
+                            ArrayList resourceList = (ArrayList) v1;
+                            JSONArray resourceOrderList = new JSONArray();
+                            resourceList.forEach((resource) -> {
+                                int len = ((ArrayList<Object>) resource).size();
+                                if (len == 2) {
+                                    String resourceName = (String) ((ArrayList) resource).get(0);
+                                    int resourceOrder = (int) ((ArrayList) resource).get(1);
+                                    
+                                    JSONArray resourceOrderItem = new JSONArray();
+                                    resourceOrderItem.put(resourceName);
+                                    resourceOrderItem.put(resourceOrder);
+                                    
+                                    resourceOrderList.put(resourceOrderItem);
+                                    
+                                }
+                            });
+                            layer.setOnlineResourceOrder(resourceOrderList);
+                            break;
+                        }
                         case "wfs": {
                             wfs.feature.clear();
                             wfs.endPoints.clear();
