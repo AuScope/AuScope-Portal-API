@@ -64,66 +64,63 @@ public class PortalSecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-			.csrf().disable()
-			.formLogin().disable()
-			.authorizeRequests()
-				.requestMatchers("/secure/**")
-					.authenticated()
-				.requestMatchers("/**")
+			.csrf(c -> c.disable())
+			.formLogin(f -> f.disable())
+			.authorizeHttpRequests(auth -> auth
+					.requestMatchers("/secure/**")
+					.hasAnyRole("ADMINISTRATOR", "USER")
+					.requestMatchers("/**")
 					.permitAll()
-			.and()
-				.securityContext().requireExplicitSave(false)	// Required in Spring Boot 3.0 for AAF
-			.and()
-				.exceptionHandling()
-				.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
-			.and()
-				.logout()
+			)
+			.oauth2Login(o -> o
+					.loginPage(frontEndUrl + "/login")
+		    		.defaultSuccessUrl(frontEndUrl + "/login/loggedIn")
+		    		.userInfoEndpoint(u -> u
+		    				.userService(oauth2UserService)))
+			.userDetailsService(userDetailsService())
+			.logout(l -> l
 					.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 					// Disable auto-redirect from back-end, let front-end handle it
 					.logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
 					    httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-					})
-					.permitAll()
-			.and()
-				.addFilterBefore(ssoFilterAAF(), BasicAuthenticationFilter.class)
-				.userDetailsService(userDetailsService())
-	    	.oauth2Login()
-	    		.loginPage(frontEndUrl + "/login")
-	    		.defaultSuccessUrl(frontEndUrl + "/login/loggedIn")
-	    		.userInfoEndpoint()
-	    			.userService(oauth2UserService);
-			return http.build();
-		}
+					}))
+			.exceptionHandling(e -> e
+					.authenticationEntryPoint(new Http403ForbiddenEntryPoint()))
+			.securityContext(s -> s
+					.requireExplicitSave(false))  // Required in Spring Boot 3.0 for AAF
+			.addFilterBefore(ssoFilterAAF(), BasicAuthenticationFilter.class);
+		return http.build();
+	}	
 	
-		@Bean
-		public PortalUserDetailsService userDetailsService() {
-			Map<String, List<String>> rolesByUser = new HashMap<String, List<String>>();
-			List<String> roles = new ArrayList<String>();
-			roles.add("ROLE_ADMINISTRATOR");
-			roles.add("ROLE_UBC");
-			rolesByUser.put("105810302719127403909", roles);
-			PortalUserDetailsService userDetailsService = new PortalUserDetailsService("ROLE_USER", rolesByUser);
-			return userDetailsService;
-		}
-		
-		@Bean
-		public AuthenticationManager authenticationManager() {
-			return new ProviderManager(Arrays.asList(aafAuthenticationProvider));
-		}
-		
-		private Filter ssoFilterAAF() {
-			AAFAuthenticationFilter aafFilter = new AAFAuthenticationFilter(this.authenticationManager(), aafCallbackUrl);
-			aafFilter.setAuthenticationSuccessHandler(aafSuccessHandler);
-			// Failure handler used only for testing at the moment
-			aafFilter.setAuthenticationFailureHandler(new AuthenticationFailureHandler() {
-				@Override
-				public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-						AuthenticationException exception) throws IOException, ServletException {
-					System.out.println("AAF Authentication failed: " + exception.getLocalizedMessage());
-					
-				}
-			});
-			return aafFilter;
-		}
+	@Bean
+	public PortalUserDetailsService userDetailsService() {
+		Map<String, List<String>> rolesByUser = new HashMap<String, List<String>>();
+		List<String> roles = new ArrayList<String>();
+		roles.add("ROLE_ADMINISTRATOR");
+		roles.add("ROLE_UBC");
+		rolesByUser.put("105810302719127403909", roles);
+		PortalUserDetailsService userDetailsService = new PortalUserDetailsService("ROLE_USER", rolesByUser);
+		return userDetailsService;
+	}
+	
+	@Bean
+	public AuthenticationManager authenticationManager() {
+		return new ProviderManager(Arrays.asList(aafAuthenticationProvider));
+	}
+	
+	private Filter ssoFilterAAF() {
+		AAFAuthenticationFilter aafFilter = new AAFAuthenticationFilter(this.authenticationManager(), aafCallbackUrl);
+		aafFilter.setAuthenticationSuccessHandler(aafSuccessHandler);
+		// Failure handler used only for testing at the moment
+		aafFilter.setAuthenticationFailureHandler(new AuthenticationFailureHandler() {
+			@Override
+			public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+					AuthenticationException exception) throws IOException, ServletException {
+				System.out.println("AAF Authentication failed: " + exception.getLocalizedMessage());
+				
+			}
+		});
+		return aafFilter;
+	}
 
 }
