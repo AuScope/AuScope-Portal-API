@@ -100,7 +100,7 @@ AuScope-Portal-API,org.auscope.portal.server.config,ExtraVocabularies,111,0,0,0,
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.mandRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext.new Runnable() {...},18,0,2,0,3,0,3,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext,601,0,2,0,109,0,48,0,47,0
-AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1670,0,149,0,397,0,124,0,39,0
+AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1722,0,152,0,411,0,127,0,40,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.wfsRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalTest,79,0,2,0,18,0,5,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,ElasticsearchConfig,65,0,2,0,18,0,4,0,3,0
