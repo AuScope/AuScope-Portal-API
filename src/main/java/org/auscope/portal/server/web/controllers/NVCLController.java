@@ -31,7 +31,6 @@ import org.auscope.portal.server.domain.nvcldataservice.AbstractStreamResponse;
 import org.auscope.portal.server.domain.nvcldataservice.AlgorithmOutputClassification;
 import org.auscope.portal.server.domain.nvcldataservice.AlgorithmOutputResponse;
 import org.auscope.portal.server.domain.nvcldataservice.AnalyticalJobResults;
-import org.auscope.portal.server.domain.nvcldataservice.AnalyticalJobStatus;
 import org.auscope.portal.server.domain.nvcldataservice.BinnedCSVResponse;
 import org.auscope.portal.server.domain.nvcldataservice.CSVDownloadResponse;
 import org.auscope.portal.server.domain.nvcldataservice.GetDatasetCollectionResponse;
