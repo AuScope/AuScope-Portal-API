@@ -760,49 +760,6 @@ public class NVCLController extends BasePortalController {
         }
     }
 
-
-    /**
-     * Downloads results of NVCL processing job
-     * @param jobId
-     *            job id NVCL processing job
-     * @param returns results as a byte stream encoded in zip format, containing csv files
-     * @throws Exception
-     */     
-    @RequestMapping("/downloadNVCLProcessingResults.do")
-    public void downloadNVCLProcessingResults(@RequestParam("jobId") String jobId, HttpServletResponse response) throws Exception {
-        AnalyticalJobResults results = this.dataService2_0.getProcessingResults(jobId);
-
-        response.setContentType("application/zip");
-        response.setHeader("Content-Disposition","inline; filename=nvclanalytics-" + jobId + ".zip;");
-        ZipOutputStream zout = new ZipOutputStream(response.getOutputStream());
-
-        try{
-            zout.putNextEntry(new ZipEntry("passIds.csv"));
-            for (String id : results.getPassBoreholes()) {
-                zout.write((id + '\n').getBytes());
-            }
-            zout.closeEntry();
-
-            zout.putNextEntry(new ZipEntry("failIds.csv"));
-            for (String id : results.getFailBoreholes()) {
-                zout.write((id + '\n').getBytes());
-            }
-            zout.closeEntry();
-
-            zout.putNextEntry(new ZipEntry("errorIds.csv"));
-            for (String id : results.getErrorBoreholes()) {
-                zout.write((id + '\n').getBytes());
-            }
-            zout.closeEntry();
-
-            zout.finish();
-            zout.flush();
-        } finally {
-            zout.close();
-        }
-    }
-
-
     /**
      * Requests the image tray depth from NVCL services
      *
