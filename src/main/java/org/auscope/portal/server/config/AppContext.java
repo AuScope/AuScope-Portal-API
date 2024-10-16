@@ -28,7 +28,6 @@ import org.auscope.portal.core.services.OpendapService;
 import org.auscope.portal.core.services.VocabularyCacheService;
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.services.WCSService;
-import org.auscope.portal.core.services.WFSGml32Service;
 import org.auscope.portal.core.services.WFSService;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
@@ -137,19 +136,6 @@ public class AppContext {
     @Bean
     public WFSService wfsService() {
         return new WFSService(httpServiceCallerApp(), methodMaker(), new GmlToHtml());
-    }
-
-    @Bean
-    public WFSGml32Service wfsGml32Service() {
-        WFSGetFeatureMethodMaker methodMaker = new WFSGetFeatureMethodMaker();
-        // give it a ERML 2.0 namespace context
-        methodMaker.setNamespaces(new ErmlNamespaceContext("2.0"));
-        // HttpServiceCaller will ignore SSL errors if the test profile is active (locally signed SSL certs)
-        return new WFSGml32Service(new HttpServiceCaller(900000, activeProfile.contains("test")),
-                methodMaker,
-                // can instantiate with a different XSLT for GML 32 mapping?
-                new GmlToHtml()
-                );
     }
 
     /***
