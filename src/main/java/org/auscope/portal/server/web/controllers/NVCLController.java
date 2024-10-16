@@ -744,23 +744,6 @@ public class NVCLController extends BasePortalController {
     }
 
     /**
-     * Returns an array of JSON AnalyticalJobStatus objects describing job status responses for a given email
-     * @param email
-     * @return
-     */
-    @RequestMapping("/checkNVCLProcessingJob.do")
-    public ModelAndView checkNVCLProcessingJob(@RequestParam("email") String email) {
-        try {
-            List<AnalyticalJobStatus> statuses = this.dataService2_0.checkProcessingJobs(email);
-            return generateJSONResponseMAV(true, statuses, "");
-        } catch (Exception ex) {
-            log.error("Unable to check NVCL processing jobs: " + ex.getMessage());
-            log.debug("Exception: ", ex);
-            return generateJSONResponseMAV(false);
-        }
-    }
-
-    /**
      * Returns an object containing passing, failing and erroring borehole ID's for a given processing job
      * @param jobid
      *            requested job id
