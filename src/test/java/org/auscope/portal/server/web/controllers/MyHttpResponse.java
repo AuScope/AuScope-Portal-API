@@ -12,7 +12,6 @@ import org.apache.http.message.BasicStatusLine;
 import org.apache.http.params.HttpParams;
 import org.auscope.portal.core.server.http.HttpClientResponse;
 
-@SuppressWarnings("deprecation")
 public class MyHttpResponse extends HttpClientResponse {
     InputStream content;
     int statusCode;

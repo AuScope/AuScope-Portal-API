@@ -116,6 +116,7 @@ public class SF0BoreholeController extends BasePortalController {
                 filterString = filter;
                 result = wfsService.downloadCSVByPolygonFilter(serviceUrl, typeName, filterString, maxFeatures);
                 // LJ filtering out records of nvclCollection == false
+                @SuppressWarnings("unused")
                 int totalReturnLine = nvclDataService.nvclCollectionFilter(result, outputStream);
                 //System.out.print(totalReturnLine);
             } else {
