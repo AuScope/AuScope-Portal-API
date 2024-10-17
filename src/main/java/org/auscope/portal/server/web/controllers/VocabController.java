@@ -164,52 +164,6 @@ public class VocabController extends BasePortalController {
     }
 
     /**
-     * Queries the vocabulary service for a list of mineral tenement types
-     *
-     * @return vocublary mapping in JSON format
-     */
-    @RequestMapping("getTenementTypes.do")
-    public ModelAndView getTenementTypes() {
-        String[] topConcepts = {
-                "http://resource.geoscience.gov.au/classifier/ggic/tenementtype/production",
-                "http://resource.geoscience.gov.au/classifier/ggic/tenementtype/exploration"
-        };
-
-        Selector[] selectors = new Selector[topConcepts.length];
-
-        for (int i = 0; i < topConcepts.length; i++) {
-            selectors[i] = new SimpleSelector(ResourceFactory.createResource(topConcepts[i]), null, (RDFNode) null);
-        }
-
-        Map<String, String> vocabularyMappings = this.vocabularyFilterService.getVocabularyById(TENEMENT_TYPE_VOCABULARY_ID, selectors);
-
-        return getVocabularyMappings(vocabularyMappings);
-    }
-
-    /**
-     * Queries the vocabulary service for a list of the different kinds of mineral tenement status
-     *
-     * @return vocublary mapping in JSON format
-     */
-    @RequestMapping("getTenementStatuses.do")
-    public ModelAndView getTenementStatuses() {
-        String[] topConcepts = {
-                "http://resource.geoscience.gov.au/classifier/ggic/tenement-status/granted",
-                "http://resource.geoscience.gov.au/classifier/ggic/tenement-status/application"
-        };
-
-        Selector[] selectors = new Selector[topConcepts.length];
-
-        for (int i = 0; i < topConcepts.length; i++) {
-            selectors[i] = new SimpleSelector(ResourceFactory.createResource(topConcepts[i]), null, (RDFNode) null);
-        }
-
-        Map<String, String> vocabularyMappings = this.vocabularyFilterService.getVocabularyById(TENEMENT_STATUS_VOCABULARY_ID, selectors);
-
-        return getVocabularyMappings(vocabularyMappings);
-    }
-
-    /**
      * @param vocabularyMappings
      * @return
      */
