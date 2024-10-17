@@ -2207,3 +2207,15 @@
         - [ "DER_000_999_05_N_P_AU_NAT_C", 3]
     wms:
         selector: "DER_000_999_EV_N_P_AU_NAT_C"
+        
+"alirt-level-01-decimated-data":
+    name: "ALIRT-001 Level 1 Decimated Data"
+    description: "Distributed Acoustic Sensing (DAS) provides a new, non-invasive mean for high resolution subsurface imaging in urban, developed environments by repurposing existing telecommunication cables. This DAS dataset is collected over 3 months between December 2021 and April 2022 at a fibre optic network dedicated to research, i.e., ALIRT (Australian Lightwave Infrastructure Research Testbed) in Melbourne, Australia. In this deployment, a 25 km long fibre optic cable is transformed into 6252 channels at 4 m spacing, starting from Melbourne Central Business District running west to east. Silixa iDAS interrogator is used, which measures strain-rate at 1 kHz with a fixed gauge length of 10 m. The time series recorded is decimated to 62.5 Hz. This dataset represents the ALIRT-001 Level 1 Decimated Data outputs."
+    group: "Distributed Acoustic Sensing"
+    order: "alirt_01"
+    supportsCsvDownloads: false
+    csw:
+        serviceNames:
+            - "Australian Lightwave Infrastructure Research Testbed Dataset (ALIRT-001) - Level 1 Decimated Data"
+    initialBBox:
+        - [ 144.8,-37.9,145.3,-37.7 ]
