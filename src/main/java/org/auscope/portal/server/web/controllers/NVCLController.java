@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.ServletException;
@@ -30,7 +28,6 @@ import org.auscope.portal.core.util.MimeUtil;
 import org.auscope.portal.server.domain.nvcldataservice.AbstractStreamResponse;
 import org.auscope.portal.server.domain.nvcldataservice.AlgorithmOutputClassification;
 import org.auscope.portal.server.domain.nvcldataservice.AlgorithmOutputResponse;
-import org.auscope.portal.server.domain.nvcldataservice.AnalyticalJobResults;
 import org.auscope.portal.server.domain.nvcldataservice.BinnedCSVResponse;
 import org.auscope.portal.server.domain.nvcldataservice.CSVDownloadResponse;
 import org.auscope.portal.server.domain.nvcldataservice.GetDatasetCollectionResponse;
@@ -737,24 +734,6 @@ public class NVCLController extends BasePortalController {
             return generateJSONResponseMAV(result);
         } catch (Exception ex) {
             log.error("Unable to submit processing job: " + ex.getMessage());
-            log.debug("Exception: ", ex);
-            return generateJSONResponseMAV(false);
-        }
-    }
-
-    /**
-     * Returns an object containing passing, failing and erroring borehole ID's for a given processing job
-     * @param jobid
-     *            requested job id
-     * @return
-     */
-    @RequestMapping("/getNVCLProcessingResults.do")
-    public ModelAndView getNVCLProcessingResults(@RequestParam("jobId") String jobId) {
-        try {
-            AnalyticalJobResults results = this.dataService2_0.getProcessingResults(jobId);
-            return generateJSONResponseMAV(true, Arrays.asList(results), "");
-        } catch (Exception ex) {
-            log.error("Unable to check NVCL processing jobs: " + ex.getMessage());
             log.debug("Exception: ", ex);
             return generateJSONResponseMAV(false);
         }
