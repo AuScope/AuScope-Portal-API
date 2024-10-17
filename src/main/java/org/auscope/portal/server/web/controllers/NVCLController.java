@@ -16,8 +16,6 @@ import org.json.JSONArray;
 
 import org.apache.http.HttpStatus;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.auscope.portal.core.server.controllers.BasePortalController;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.csw.CSWRecordsHostFilter;
@@ -40,7 +38,6 @@ import org.auscope.portal.server.domain.nvcldataservice.TrayThumbNailResponse;
 import org.auscope.portal.server.web.service.BoreholeService;
 import org.auscope.portal.server.web.service.NVCL2_0_DataService;
 import org.auscope.portal.server.web.service.NVCLDataService;
-import org.auscope.portal.server.web.service.SF0BoreholeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,7 +65,6 @@ public class NVCLController extends BasePortalController {
     private NVCLDataService dataService;
     private NVCL2_0_DataService dataService2_0;
     private CSWCacheService cswService;
-    private SF0BoreholeService sf0BoreholeService;
     private HttpServiceCaller serviceCaller;
     private ServiceConfiguration serviceConfiguration;
 
@@ -80,7 +76,6 @@ public class NVCLController extends BasePortalController {
             CSWCacheService cswService,
             NVCLDataService dataService,
             NVCL2_0_DataService dataService2_0,
-            SF0BoreholeService sf0BoreholeService,
             HttpServiceCaller serviceCaller,
             ServiceConfiguration serviceConfiguration) {
 
@@ -88,7 +83,6 @@ public class NVCLController extends BasePortalController {
         this.cswService = cswService;
         this.dataService = dataService;
         this.dataService2_0 = dataService2_0;
-        this.sf0BoreholeService = sf0BoreholeService;
         this.serviceCaller = serviceCaller;
         this.serviceConfiguration = serviceConfiguration;
     }
