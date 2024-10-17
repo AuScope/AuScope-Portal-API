@@ -53,7 +53,6 @@ import org.auscope.portal.core.xslt.WfsToKmlTransformer;
 import org.auscope.portal.mscl.MSCLWFSService;
 import org.auscope.portal.server.web.CatalogServicesHealthIndicator;
 import org.auscope.portal.server.web.SearchHttpServiceCaller;
-import org.auscope.portal.server.web.service.SimpleWfsService;
 import org.auscope.portal.server.web.service.monitor.KnownLayerStatusMonitor;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -294,11 +293,6 @@ public class AppContext {
 
     @Autowired
     VocabularyServiceItem vocabularyGeologicTimescales;
-
-    @Bean
-    public SimpleWfsService simpleWfsService() {
-        return new SimpleWfsService(httpServiceCallerApp(), wfsMethodMaker());
-    }
 
     @Autowired
     VocabularyServiceItem vocabularyCommodities;
