@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.auscope.portal.core.configuration.ServiceConfigurationItem;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.csw.CSWRecordsFilterVisitor;
@@ -29,7 +28,6 @@ import org.auscope.portal.server.domain.nvcldataservice.ImageTrayDepthResponse;
 import org.auscope.portal.server.web.service.BoreholeService;
 import org.auscope.portal.server.web.service.NVCL2_0_DataService;
 import org.auscope.portal.server.web.service.NVCLDataService;
-import org.auscope.portal.server.web.service.SF0BoreholeService;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -64,8 +62,6 @@ public class TestNVCLController extends PortalTestClass {
     /** The nvcl controller. */
     private NVCLController nvclController;
 
-    private SF0BoreholeService mockSF0Service;
-
     private HttpServiceCaller mockServiceCaller;
 
     private ServiceConfiguration mockServiceConfiguration;
@@ -79,11 +75,10 @@ public class TestNVCLController extends PortalTestClass {
         this.mockCSWService = context.mock(CSWCacheService.class);
         this.mockDataService = context.mock(NVCLDataService.class);
         this.mock2_0_DataService = context.mock(NVCL2_0_DataService.class);
-        this.mockSF0Service = context.mock(SF0BoreholeService.class);
         this.mockServiceCaller = context.mock(HttpServiceCaller.class);
         this.mockServiceConfiguration = context.mock(ServiceConfiguration.class);  
         this.nvclController = new NVCLController(this.mockBoreholeService, this.mockCSWService, this.mockDataService,
-                this.mock2_0_DataService, this.mockSF0Service, this.mockServiceCaller, this.mockServiceConfiguration );
+                this.mock2_0_DataService, this.mockServiceCaller, this.mockServiceConfiguration );
     }
 
     /**

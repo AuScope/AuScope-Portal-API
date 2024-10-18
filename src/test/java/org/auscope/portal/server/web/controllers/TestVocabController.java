@@ -1,29 +1,22 @@
 package org.auscope.portal.server.web.controllers;
 
-import java.util.Arrays;
+
 import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 import java.util.ArrayList;
 
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.test.PortalTestClass;
-import org.auscope.portal.server.web.controllers.VocabController;
+
 import org.hamcrest.Matcher;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.ui.ModelMap;
+
 import org.springframework.web.servlet.ModelAndView;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Selector;
 import org.apache.jena.rdf.model.SimpleSelector;
-import org.auscope.portal.core.services.PortalServiceException;
 import org.apache.jena.vocabulary.SKOS;
 
 import au.gov.geoscience.portal.services.vocabularies.VocabularyLookup;

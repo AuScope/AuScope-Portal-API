@@ -302,7 +302,6 @@ public class LayerFactory {
                         case "initialBBox": {
                             JSONArray bboxGeoJson = new JSONArray();
                             
-                            ArrayList x2 = (ArrayList) v1;
                             ArrayList x3 = (ArrayList) ((ArrayList) v1).get(0);
                             int len = x3.size();
                             if (len == 4) {
@@ -564,9 +563,6 @@ public class LayerFactory {
                                         if (sk2.startsWith("options")) {
                                             ArrayList x2 = (ArrayList) sv2;
                                             x2.forEach((item) -> {
-                                                ArrayList x3 = (ArrayList) item;
-                                                String i1 = (String) x3.get(0);
-                                                String i2 = (String) x3.get(1);
                                                 filter.selectlist.options.add(item);
                                             });
                                         }
@@ -585,9 +581,6 @@ public class LayerFactory {
                                         if (sk2.startsWith("options")) {
                                             ArrayList x2 = (ArrayList) sv2;
                                             x2.forEach((item) -> {
-                                                ArrayList x3 = (ArrayList) item;
-                                                String i1 = (String) x3.get(0);
-                                                String i2 = (String) x3.get(1);
                                                 filter.mandatorylist.options.add(item);
                                             });
                                         }
