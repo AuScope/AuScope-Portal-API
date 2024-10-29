@@ -1,6 +1,7 @@
 package org.auscope.portal.server.web.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.auscope.portal.server.bookmark.BookMark;
 import org.auscope.portal.server.bookmark.BookMarkDownload;
@@ -26,6 +27,14 @@ public class BookMarkService {
      */
     public List<BookMark> getBookmarkByUser(final PortalUser user) {// throws PortalServiceException {
     	return bookmarkRepository.findByParent(user);
+    }
+    
+    /**
+     * Retrieves the bookmarks by id
+     * @param id 
+     */
+    public Optional<BookMark> getBookmarkById(final Integer id) {// throws PortalServiceException {
+        return bookmarkRepository.findById(id);
     }
     
     
