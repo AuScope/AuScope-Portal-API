@@ -123,12 +123,10 @@ public class IRISController extends BasePortalController {
             @RequestParam("serviceUrl") String serviceUrl,
             @RequestParam("networkCode") String networkCode) {
         serviceUrl = ensureTrailingForwardslash(serviceUrl);
-        
-        // System.out.println("[getIRISStations] serviceUrl ="+serviceUrl+",networkCode ="+networkCode);
 
         try {
             Document irisDoc = getDocumentFromURL(serviceUrl + "fdsnws/station/1/query?net=" + networkCode + "&level=channel");
-
+          
             //TODO VT: As part of the review for AGOS-15 , we should be following the same architecture as the rest of portal and
             // create a xslt file to do the transformation from xml to kml
             NodeList stations = irisDoc.getDocumentElement().getElementsByTagName("Station");
@@ -201,7 +199,9 @@ public class IRISController extends BasePortalController {
             }
             kml.append("</Document></kml>");
 
-            return generateJSONResponseMAV(true, "gml", kml.toString(), null);
+            // & character needs to be escaped i.e. &amp
+            String irisResponse = kml.toString().replaceAll("&(?!amp;|apos;|quot;|lt;|gt;)", "&amp;");
+            return generateJSONResponseMAV(true, "gml", irisResponse, null);
         } catch (Exception e) {
             return generateJSONResponseMAV(false, e.getMessage(), "Failed.");
         }
