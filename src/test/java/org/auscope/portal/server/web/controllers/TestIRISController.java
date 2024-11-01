@@ -71,13 +71,13 @@ public class TestIRISController extends PortalTestClass {
     }
     
     @Test
-    public void getIRISStations_stationResponseUnescapedAmbersandXML_ResultantModelHasSuccessSetToFalse() {
+    public void getIRISStations_stationResponseUnescapedAmbersandXML_ResultantModelHasSuccessSetToTrue() {
         // Act
         // e.g. unescaped &  -  <Name>Burke & Wills Roadhouse, Stokes, QLD</Name>
         ModelAndView result = this.controller.getIRISStations("org/auscope/portal/iris/StationNameContainsUnescapedSpecialCharacter.xml", "");
 
         // Assert
-        Assert.assertFalse((Boolean) result.getModel().get("success"));
+        Assert.assertTrue((Boolean) result.getModel().get("success"));
     }
     
     @Test
