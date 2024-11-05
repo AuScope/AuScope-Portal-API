@@ -154,12 +154,6 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>com.jhlabs</groupId>
-            <artifactId>javaproj</artifactId>
-            <version>1.0</version>
-        </dependency>
-
 	    <!-- This is a dummy database used for development only -->
 	    <dependency>
             <groupId>org.hsqldb</groupId>
@@ -270,7 +264,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-		    <fork>false</fork>
 		        <image>
                     <env>
                         <BP_JVM_VERSION>17.*</BP_JVM_VERSION>

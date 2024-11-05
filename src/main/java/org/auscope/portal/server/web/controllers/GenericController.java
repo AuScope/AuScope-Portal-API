@@ -26,41 +26,7 @@ public class GenericController extends BasePortalController {
     public GenericController(GenericService genericService) {
         this.genericService = genericService;
     }
-    /**
-     * Handles getting the filter of the generic borehole queries. (If the bbox elements are specified, they will limit the output response to 200 records
-     * implicitly)
-     *
-     * @param bbox
-     * @param optionalFilters 
-     * @throws Exception
-     */
-    @RequestMapping("/doGenericFilter.do")
-    public void doGenericFilter(
-            HttpServletResponse response,
-            @RequestParam(required = false, value = "bbox") String bboxJson,
-            @RequestParam(required = true, value = "optionalFilters") String optionalFilters)
 
-                    throws Exception {
-
-        FilterBoundingBox bbox = FilterBoundingBox.attemptParseFromJSON(bboxJson);
-        response.setContentType("text/xml");
-        String filter = "";
-        if (optionalFilters != null) {
-          filter = this.genericService.getFilter(bbox,optionalFilters);
-          filter = filter.replace("<ogc:Filter>","<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\">");
-
-          //<ogc:PropertyIsLike escapeChar="!" singleChar="#" matchCase="false" wildCard="*" ><ogc:PropertyName>DOCUMENT_SPEC_ID</ogc:PropertyName><ogc:Literal>*PR4535*</ogc:Literal></ogc:PropertyIsLike>
-          // remove matchCase from propertyIsLike because getFeature don't like it.
-          filter = filter.replace("PropertyIsLike escapeChar=\"!\" singleChar=\"#\" matchCase=\"false\"","PropertyIsLike escapeChar=\"!\" singleChar=\"#\" ");
-        }
-        ByteArrayInputStream styleStream = new ByteArrayInputStream(filter.getBytes());
-        OutputStream outputStream = response.getOutputStream();
-
-        FileIOUtil.writeInputToOutputStream(styleStream, outputStream, 1024, false);
-
-        styleStream.close();
-        outputStream.close();
-    }
     /**
      * Handles getting the style of the generic borehole filter queries. (If the bbox elements are specified, they will limit the output response to 200 records
      * implicitly)
@@ -118,7 +84,7 @@ public class GenericController extends BasePortalController {
      * @param styleColor 1-1 correspondance with filters - The CSS color for each filter to be symbolised with
      * @return
      */    
-    public String getStyle(String filter, String layerName, String spatialPropertyName, String styleType, String styleColor) {
+    private String getStyle(String filter, String layerName, String spatialPropertyName, String styleType, String styleColor) {
       String header = "<sld:StyledLayerDescriptor version=\"1.0.0\" xmlns:gsmlp=\"http://xmlns.geosciml.org/geosciml-portrayal/4.0\" xsi:schemaLocation=\"http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gsml=\"urn:cgi:xmlns:CGI:GeoSciML:2.0\" xmlns:sld=\"http://www.opengis.net/sld\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
           + "<sld:NamedLayer>" + "<sld:Name>" + layerName + "</sld:Name>" + "<sld:UserStyle>" + "<sld:Name>portal-style</sld:Name>"
           + "<sld:FeatureTypeStyle>";
@@ -158,7 +124,7 @@ public class GenericController extends BasePortalController {
      * @param styleColor 1-1 correspondance with filters - The CSS color for each filter to be symbolised with
      * @return
      */    
-    public String getStyleWithLabel(String filter, String layerName, String spatialPropertyName, String styleType, String styleColor, String labelProperty) {
+    private String getStyleWithLabel(String filter, String layerName, String spatialPropertyName, String styleType, String styleColor, String labelProperty) {
       String header = "<sld:StyledLayerDescriptor version=\"1.0.0\" xmlns:gsmlp=\"http://xmlns.geosciml.org/geosciml-portrayal/4.0\" xsi:schemaLocation=\"http://www.opengis.net/sld StyledLayerDescriptor.xsd\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gsml=\"urn:cgi:xmlns:CGI:GeoSciML:2.0\" xmlns:sld=\"http://www.opengis.net/sld\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
           + "<sld:NamedLayer>" + "<sld:Name>" + layerName + "</sld:Name>" + "<sld:UserStyle>" + "<sld:Name>portal-style</sld:Name>"
           + "<sld:FeatureTypeStyle>";

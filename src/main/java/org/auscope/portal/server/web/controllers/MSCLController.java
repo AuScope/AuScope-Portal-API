@@ -57,38 +57,6 @@ public class MSCLController extends BasePortalController {
     public MSCLController(MSCLWFSService msclWfsService) {
         this.msclWfsService = msclWfsService;
     }
-
-    /**
-     * Retrieves MCSL observations in JSON format
-     *
-     * @param serviceUrl
-     *            The URL of the WFS's endpoint. It should be of the form: http://{domain}:{port}/{path}/wfs
-     * @param featureType
-     *            The name of the feature type you wish to request (including its prefix if necessary).
-     * @param featureId
-     *            The ID of the feature you want to return.
-     * @return A ModelAndView object encapsulating the WFS response along with an indicator of success or failure.
-     * @throws Exception
-     */
-    @RequestMapping("/getMsclObservations.do")
-    public ModelAndView getMsclObservations(
-            @RequestParam("serviceUrl") final String serviceUrl,
-            @RequestParam("typeName") final String featureType,
-            @RequestParam("featureId") final String featureId) {
-
-        try {
-            String wfsResponse = msclWfsService.getWFSReponse(serviceUrl,
-                    featureType, featureId);
-
-            // I have to wrap this response in a 'gml' JSON tag in order 
-            // to keep the "Download Feature" part happy.
-            ModelMap data = new ModelMap();
-            data.put("gml", wfsResponse);
-            return generateJSONResponseMAV(true, data, null);
-        } catch (Exception e) {
-            return generateJSONResponseMAV(false, null, e.getMessage());
-        }
-    }
     
     /**
      * Retrieves MCSL observations in JSON format for use in a graph

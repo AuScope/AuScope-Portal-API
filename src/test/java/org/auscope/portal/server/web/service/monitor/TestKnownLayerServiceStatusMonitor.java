@@ -7,14 +7,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.ElasticsearchService;
 import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.core.services.WMSService;
-import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
 import org.auscope.portal.core.services.responses.csw.CSWOnlineResourceImpl;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
 import org.auscope.portal.core.services.responses.stackdriver.ServiceStatusResponse;
@@ -49,7 +47,6 @@ import org.springframework.ui.ModelMap;
 public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
 
     private GoogleCloudMonitoringCachedService mockStackDriverService = context.mock(GoogleCloudMonitoringCachedService.class);
-    private HttpServiceCaller mockHttpServiceCaller = context.mock(HttpServiceCaller.class);
     private ElasticsearchService mockElasticsearchService = context.mock(ElasticsearchService.class);
     private KnownLayerService knownLayerService;
 

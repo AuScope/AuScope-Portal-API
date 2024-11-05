@@ -116,6 +116,7 @@ public class SF0BoreholeController extends BasePortalController {
                 filterString = filter;
                 result = wfsService.downloadCSVByPolygonFilter(serviceUrl, typeName, filterString, maxFeatures);
                 // LJ filtering out records of nvclCollection == false
+                @SuppressWarnings("unused")
                 int totalReturnLine = nvclDataService.nvclCollectionFilter(result, outputStream);
                 //System.out.print(totalReturnLine);
             } else {
@@ -379,26 +380,4 @@ public class SF0BoreholeController extends BasePortalController {
         styleStream.close();
         outputStream.close();
     }
-
-    /**
-     * NOT CURRENTLY USED
-	 * This controller method is for forcing the internal cache of GsmlpNameSpaceTable to invalidate and update.
-     *
-     * @return
-     */
-	/*
-    @RequestMapping("/updateGsmlpNSCache.do")
-    public ModelAndView updateGsmlpNSCache() throws Exception {
-	    try {
-            if (gsmlpNameSpaceTable != null )
-                gsmlpNameSpaceTable.clearCache();
-            return generateJSONResponseMAV(true);
-        } catch (Exception e) {
-            log.warn(String.format("Error updating GsmlpNS cache: %1$s", e));
-            log.debug("Exception:", e);
-            return generateJSONResponseMAV(false);
-        }
-		
-    }
-	*/
 }
