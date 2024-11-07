@@ -2206,8 +2206,10 @@
     order: "ind01"
     vmf:
         selector: "Indigenous Map"
-        endPoint: "https://native-land.ca/wp-json/nativeland/v1/api/index.php"
-        polygon_geojson:  [[111.64,-17.61],[132.45,-8.23],[146.26,-10.53],[159.37,-24.57],[147.95,-45.25],[110.29,-34.29]]
+        endPoint: "https://native-land.ca/api/index.php"
+        polygon_geojson:  [[146.26, -10.53], [132.45, -8.23], [111.64, -17.61], [110.29, -34.29], [147.95, -45.25], [159.37, -24.57], [146.26, -10.53]]
+        apikey: "_7AyXpOSiefzoaCbUaPOM"
+        maps: "territories"
 
 "regolith-depth-layer":
     name: "Soil and Landscape Grid National Soil Attribute Maps - Depth of Regolith"
