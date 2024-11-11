@@ -187,9 +187,9 @@ public class LayerFactory {
      *            The service endpoint that the instance of the selector is concerned with.
      * @throws MalformedURLException
      */
-    public VMFSelector knownTypeVMFSelector(String layerName, String serviceEndPoint, JSONArray polygonGeoJson) {
+    public VMFSelector knownTypeVMFSelector(String layerName, String serviceEndPoint, JSONArray polygonGeoJson, String apikey, String maps) {
         try {
-            return new VMFSelector(layerName, serviceEndPoint, polygonGeoJson);
+            return new VMFSelector(layerName, serviceEndPoint, polygonGeoJson, apikey, maps);
         } catch (MalformedURLException e) {
             log.error("Malformed URL for VMF service point: " + serviceEndPoint);
         }
@@ -435,16 +435,24 @@ public class LayerFactory {
                         case "vmf": {
                             String layerName = null;
                             String serviceEndPoint = null;
+                            String apikey = null;
+                            String maps = null;
                             JSONArray polygonGeoJson = new JSONArray();
 
                             Map<String, Object> x = (Map<String, Object>) v1;
-                            String[] attr = new String[2];
+                            String[] attr = new String[4];
                             x.forEach((sk1, sv1) -> {
                                 if (sk1.startsWith("selector")) {
                                     attr[1] = (String) sv1;
                                 }
                                 if (sk1.startsWith("endPoint")) {
                                     attr[0] = (String) sv1;
+                                }
+                                if (sk1.startsWith("apikey")) {
+                                    attr[2] = (String) sv1;
+                                }
+                                if (sk1.startsWith("maps")) {
+                                    attr[3] = (String) sv1;
                                 }
                                 if (sk1.startsWith("polygon_geojson")) {
                                     
@@ -469,11 +477,15 @@ public class LayerFactory {
                             });
                             layerName = attr[1];
                             serviceEndPoint = attr[0];
+                            apikey = attr[2];
+                            maps = attr[3];
 
                             layer.setEndPoint(serviceEndPoint);
                             layer.setPolygon(polygonGeoJson);
+                            layer.setApikey(apikey);
+                            layer.setMaps(maps);
                             
-                            layer.setKnownLayerSelector(knownTypeVMFSelector(layerName,serviceEndPoint,polygonGeoJson));
+                            layer.setKnownLayerSelector(knownTypeVMFSelector(layerName,serviceEndPoint,polygonGeoJson,apikey,maps));
                             break;
                         }
                         case "kml": {

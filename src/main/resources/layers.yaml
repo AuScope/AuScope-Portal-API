@@ -3,7 +3,8 @@
         name: "Earth Resource Mine"
         description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:Mine"
         group: "Earth Resources v1"
-        proxyStyleUrl: "doMineFilterStyle.do"
+        # proxyStyleUrl: "doMineFilterStyle.do"
+        proxyStyleUrl: ""
         order: "10"
         supportsCsvDownloads: false
         stackdriverServiceGroup: "EarthResourcesLayers"
@@ -21,7 +22,8 @@
         name: "Earth Resource Mineral Occurrence"
         description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:MineralOccurence"
         group: "Earth Resources v1"
-        proxyStyleUrl: "doMineralOccurrenceFilterStyle.do"
+        # proxyStyleUrl: "doMineralOccurrenceFilterStyle.do"
+        proxyStyleUrl: ""
         order: "11"
         supportsCsvDownloads: false
         stackdriverServiceGroup: "EarthResourcesLayers"
@@ -37,7 +39,8 @@
         name: "Earth Resource Mining Activity"
         description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for er:MiningActivity"
         group: "Earth Resources v1"
-        proxyStyleUrl: "doMiningActivityFilterStyle.do"
+        # proxyStyleUrl: "doMiningActivityFilterStyle.do"
+        proxyStyleUrl: ""
         order: "12"
         supportsCsvDownloads: false
         stackdriverServiceGroup: "EarthResourcesLayers"
@@ -53,7 +56,8 @@
         name: "Mineral Occurrence View"
         description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for mo:MinOccView"
         group: "Earth Resources v1"
-        proxyStyleUrl: "doMinOccurViewFilterStyle.do"
+        # proxyStyleUrl: "doMinOccurViewFilterStyle.do"
+        proxyStyleUrl: ""
         order: "13"
         supportsCsvDownloads: true
         stackdriverServiceGroup: "EarthResourcesLayers"
@@ -65,7 +69,8 @@
         name: "Australian Mineral Tenements"
         description: "A collection of services that implement the AuScope EarthResourceML v1 Profile for mt:Mineral Tenement"
         group: "Tenements"
-        proxyStyleUrl: "getMineralTenementStyle.do"
+        # proxyStyleUrl: "getMineralTenementStyle.do"
+        proxyStyleUrl: ""
         proxyDownloadUrl: "doMineralTenementCSVDownload.do"
         order: "150"
         supportsCsvDownloads: true
@@ -110,7 +115,8 @@
         name: "Mine View"
         description: "Earth ResourceML Lite Mine"
         group: "Earth Resources Lite v2"
-        proxyStyleUrl: "getErlMineViewStyle.do"
+        # proxyStyleUrl: "getErlMineViewStyle.do"
+        proxyStyleUrl: ""
         order: "160"
         supportsCsvDownloads: true
         stackdriverServiceGroup: "EarthResourcesLayers"
@@ -129,7 +135,8 @@
         name: "Mineral Occurrence"
         description: "Earth ResourceML Lite Mineral Occurrence View"
         group: "Earth Resources Lite v2"
-        proxyStyleUrl: "getErlMineralOccurrenceViewStyle.do"
+        # proxyStyleUrl: "getErlMineralOccurrenceViewStyle.do"
+        proxyStyleUrl: ""
         order: "160"
         supportsCsvDownloads: true
         stackdriverServiceGroup: "EarthResourcesLayers"
@@ -149,7 +156,8 @@
         name: "Commodity Resource"
         description: "Earth ResourceML Lite Commodity Resource View"
         group: "Earth Resources Lite v2"
-        proxyStyleUrl: "getErlCommodityResourceViewStyle.do"
+        # proxyStyleUrl: "getErlCommodityResourceViewStyle.do"
+        proxyStyleUrl: ""
         order: "160"
         supportsCsvDownloads: true
         stackdriverServiceGroup: "EarthResourcesLayers"
@@ -241,7 +249,8 @@
         description: "A collection of services implementing the National Virtual Core Library Profile v2 for gsml:Borehole and a collection of observations"
         proxyUrl: "doBoreholeViewFilter.do"
         proxyDownloadUrl: "doNVCLBoreholeViewCSVDownload.do"
-        proxyStyleUrl: "doNvclV2FilterStyle.do"
+        # proxyStyleUrl: "doNvclV2FilterStyle.do"
+        proxyStyleUrl: ""
         order: "51"
         supportsCsvDownloads: true
         stackdriverServiceGroup: "NVCLBoreholeViewLayer"
@@ -314,7 +323,8 @@
         group: "Boreholes"
         description: "A collection of services implementing the GeoSciML Portrayal Borehole View (gsmlp:BoreholeView)"
         proxyUrl: "doBoreholeViewFilter.do"
-        proxyStyleUrl: "doBoreholeViewFilterStyle.do"
+        # proxyStyleUrl: "doBoreholeViewFilterStyle.do"
+        proxyStyleUrl: ""
         order: "52"
         supportsCsvDownloads: true
         stackdriverServiceGroup: "BoreholeViewLayer"
@@ -942,7 +952,8 @@
     name: "AUS5 - Remanent Anomalies"
     description: "A collection of services publishing magnetic anomalies"
     group: "Magnetics"
-    proxyStyleUrl: "getRemanentAnomaliesStyle.do"
+    # proxyStyleUrl: "getRemanentAnomaliesStyle.do"
+    proxyStyleUrl: ""
     order: "80"
     supportsCsvDownloads: true
     wfs:
@@ -956,7 +967,8 @@
     name: "AUS5 - AutoSearch Anomalies"
     description: "A collection of CSIRO services publishing magnetic anomalies"
     group: "Magnetics"
-    proxyStyleUrl: "getRemanentAnomaliesAutoSearchStyle.do"
+    # proxyStyleUrl: "getRemanentAnomaliesAutoSearchStyle.do"
+    proxyStyleUrl: ""
     order: "81"
     supportsCsvDownloads: true
     wfs:
@@ -972,7 +984,8 @@
     name: "EMAG2 - Remanent Anomalies"
     description: "A collection of CSIRO services publishing magnetic anomalies from the EMAG2 model. https://geomag.org/models/emag2.html"
     group: "Magnetics"
-    proxyStyleUrl: "getRemanentAnomaliesStyle.do"
+    # proxyStyleUrl: "getRemanentAnomaliesStyle.do"
+    proxyStyleUrl: ""
     order: "83"
     supportsCsvDownloads: true
     wfs:
@@ -1417,7 +1430,8 @@
     name: "Geological Provinces"
     description: "Geological Provinces provided by GA"
     group: "Boundaries"
-    proxyStyleUrl: "getGeologicalProvincestyle.do"
+    # proxyStyleUrl: "getGeologicalProvincestyle.do"
+    proxyStyleUrl: ""
     order: "provinces_01"
     supportsCsvDownloads: true
     wmswfs:
@@ -2192,8 +2206,10 @@
     order: "ind01"
     vmf:
         selector: "Indigenous Map"
-        endPoint: "https://native-land.ca/wp-json/nativeland/v1/api/index.php?maps=territories"
-        polygon_geojson:  [[111.64,-17.61],[132.45,-8.23],[146.26,-10.53],[159.37,-24.57],[147.95,-45.25],[110.29,-34.29]]
+        endPoint: "https://native-land.ca/api/index.php"
+        polygon_geojson:  [[146.26, -10.53], [132.45, -8.23], [111.64, -17.61], [110.29, -34.29], [147.95, -45.25], [159.37, -24.57], [146.26, -10.53]]
+        apikey: "_7AyXpOSiefzoaCbUaPOM"
+        maps: "territories"
 
 "regolith-depth-layer":
     name: "Soil and Landscape Grid National Soil Attribute Maps - Depth of Regolith"
