@@ -1,0 +1,647 @@
+<FDSNStationXML xmlns="http://www.fdsn.org/xml/station/1" schemaVersion="1.2">
+	<Source>SeisComP</Source>
+	<Sender>ANU-RSES</Sender>
+	<Created>2024-10-30T21:23:37.341286Z</Created>
+	<Network code="ZR" startDate="2009-06-16T03:41:59Z"
+		endDate="2011-04-01T23:18:50.4Z" restrictedStatus="open">
+		<Description>MINQ (Mount Isa Northern Queensland)</Description>
+		<Comment id="0">
+			<Value>https://doi.org/10.7914/SN/ZR_2009</Value>
+		</Comment>
+		<Comment id="1">
+			<Value>Kennett, B., & McQueen, H. (2009). Mt Isa Norther Queensland
+				- AuScope [Data set]. Australian Passive Seismic Server.</Value>
+		</Comment>
+		<Station code="MA01" startDate="2009-09-10T02:30:59Z"
+			endDate="2010-06-07T16:10:46.2Z" restrictedStatus="open">
+			<Latitude>-20.5874</Latitude>
+			<Longitude>139.6215</Longitude>
+			<Elevation>357</Elevation>
+			<Site>
+				<Name>West Leichhardt Station, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-09-10T02:30:59Z</CreationDate>
+		</Station>
+		<Station code="MA11" startDate="2009-06-19T08:39:59Z"
+			endDate="2010-11-26T22:34:57.92Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>Site destroyed/rebuilt 5-9-2009</Value>
+			</Comment>
+			<Latitude>-19.035</Latitude>
+			<Longitude>138.7867</Longitude>
+			<Elevation>189</Elevation>
+			<Site>
+				<Name>Riversleigh HS, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-19T08:39:59Z</CreationDate>
+		</Station>
+		<Station code="MA13" startDate="2009-06-19T04:03:59Z"
+			endDate="2010-07-31T19:06:44.52Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>Site destroyed/rebuilt 6-9-2009</Value>
+			</Comment>
+			<Latitude>-18.7786</Latitude>
+			<Longitude>139.872</Longitude>
+			<Elevation>52</Elevation>
+			<Site>
+				<Name>Nardoo St Solar Panels, Coongoola, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-19T04:03:59Z</CreationDate>
+		</Station>
+		<Station code="MA14" startDate="2010-04-30T04:46:59Z"
+			endDate="2011-02-18T12:43:01.76Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>Receiver changed (unknown SN) due to poor performance of
+					previous</Value>
+				<BeginEffectiveTime>2010-04-30T04:47:00Z</BeginEffectiveTime>
+			</Comment>
+			<Latitude>-18.7259</Latitude>
+			<Longitude>140.3837</Longitude>
+			<Elevation>52</Elevation>
+			<Site>
+				<Name>Donors Hill, Stokes, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-04-30T04:46:59Z</CreationDate>
+		</Station>
+		<Station code="MA21" startDate="2009-06-19T07:25:59Z"
+			endDate="2010-07-29T08:08:05.16Z" restrictedStatus="open">
+			<Latitude>-19.5585</Latitude>
+			<Longitude>138.8232</Longitude>
+			<Elevation>209</Elevation>
+			<Site>
+				<Name>Thorntonia Stn, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-19T07:25:59Z</CreationDate>
+		</Station>
+		<Station code="MA22" startDate="2009-06-16T03:41:59Z"
+			endDate="2010-08-12T09:06:44.56Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>GPS ant changed 3-9-2009</Value>
+			</Comment>
+			<Latitude>-19.4985</Latitude>
+			<Longitude>139.3762</Longitude>
+			<Elevation>222</Elevation>
+			<Site>
+				<Name>Mount Oxide, Mount Oxide, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-16T03:41:59Z</CreationDate>
+		</Station>
+		<Station code="MA23" startDate="2009-06-19T01:42:59Z"
+			endDate="2010-08-04T01:37:39.24Z" restrictedStatus="open">
+			<Latitude>-19.3301</Latitude>
+			<Longitude>139.8825</Longitude>
+			<Elevation>80</Elevation>
+			<Site>
+				<Name>Kamileroi HS, Four Ways, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-19T01:42:59Z</CreationDate>
+		</Station>
+		<Station code="MA24" startDate="2009-06-18T23:55:59Z"
+			endDate="2010-07-16T05:53:46.84Z" restrictedStatus="open">
+			<Latitude>-19.2177</Latitude>
+			<Longitude>140.3343</Longitude>
+			<Elevation>77</Elevation>
+			<Site>
+				<Name>Burke & Wills Roadhouse, Stokes, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-18T23:55:59Z</CreationDate>
+		</Station>
+		<Station code="MA32" startDate="2009-06-16T06:35:59Z"
+			endDate="2010-08-19T16:06:44.6Z" restrictedStatus="open">
+			<Latitude>-19.9014</Latitude>
+			<Longitude>139.3505</Longitude>
+			<Elevation>271</Elevation>
+			<Site>
+				<Name>Carlton Hills Road, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-16T06:35:59Z</CreationDate>
+		</Station>
+		<Station code="MA33" startDate="2009-06-18T04:37:59Z"
+			endDate="2010-08-15T11:53:46.96Z" restrictedStatus="open">
+			<Latitude>-19.8278</Latitude>
+			<Longitude>139.944</Longitude>
+			<Elevation>163</Elevation>
+			<Site>
+				<Name>Dobbyn, Dobbyn, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-18T04:37:59Z</CreationDate>
+		</Station>
+		<Station code="MA41" startDate="2009-06-17T02:48:59Z"
+			endDate="2010-05-04T12:34:57.6Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>Site flooded, restarted 28-4-2010</Value>
+			</Comment>
+			<Latitude>-20.5162</Latitude>
+			<Longitude>138.8323</Longitude>
+			<Elevation>288</Elevation>
+			<Site>
+				<Name>Matador Dam, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-17T02:48:59Z</CreationDate>
+		</Station>
+		<Station code="MA42" startDate="2009-06-16T08:17:59Z"
+			endDate="2010-07-12T08:06:44.44Z" restrictedStatus="open">
+			<Latitude>-20.3856</Latitude>
+			<Longitude>139.3104</Longitude>
+			<Elevation>388</Elevation>
+			<Site>
+				<Name>29 Mile Bore, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-16T08:17:59Z</CreationDate>
+		</Station>
+		<Station code="MA43" startDate="2009-06-18T02:45:59Z"
+			endDate="2011-02-19T12:40:20.48Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>Recorder changed (SN also unknown, possibly 253)</Value>
+			</Comment>
+			<Comment id="1">
+				<Value>Recorder changed (SN also unknown, possibly 253)</Value>
+				<BeginEffectiveTime>2010-09-04T07:16:00Z</BeginEffectiveTime>
+			</Comment>
+			<Latitude>-20.3385</Latitude>
+			<Longitude>139.8113</Longitude>
+			<Elevation>278</Elevation>
+			<Site>
+				<Name>Leichhard West, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-18T02:45:59Z</CreationDate>
+		</Station>
+		<Station code="MA44" startDate="2009-06-18T08:13:59Z"
+			endDate="2010-08-21T19:26:54.2Z" restrictedStatus="open">
+			<Latitude>-20.2064</Latitude>
+			<Longitude>140.3468</Longitude>
+			<Elevation>167</Elevation>
+			<Site>
+				<Name>Jessie Vale Property, Conclurry Shire, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-18T08:13:59Z</CreationDate>
+		</Station>
+		<Station code="MA51" startDate="2009-06-20T02:49:59Z"
+			endDate="2010-08-19T23:55:07.64Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>No data recorded until 29-4-2010</Value>
+			</Comment>
+			<Latitude>-21.0857</Latitude>
+			<Longitude>138.7876</Longitude>
+			<Elevation>238</Elevation>
+			<Site>
+				<Name>Oban Station, Boulia Shire, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-20T02:49:59Z</CreationDate>
+		</Station>
+		<Station code="MA52" startDate="2009-06-20T05:22:59Z"
+			endDate="2010-08-15T21:51:05.68Z" restrictedStatus="open">
+			<Latitude>-20.9537</Latitude>
+			<Longitude>139.3953</Longitude>
+			<Elevation>411</Elevation>
+			<Site>
+				<Name>Carter's Bore, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-20T05:22:59Z</CreationDate>
+		</Station>
+		<Station code="MA54" startDate="2009-06-17T06:54:59Z"
+			endDate="2011-02-23T00:45:43.04Z" restrictedStatus="open">
+			<Latitude>-20.6982</Latitude>
+			<Longitude>140.4047</Longitude>
+			<Elevation>263</Elevation>
+			<Site>
+				<Name>Chumvale, Conclurry Shire, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-17T06:54:59Z</CreationDate>
+		</Station>
+		<Station code="MA62" startDate="2009-06-20T03:14:59Z"
+			endDate="2010-07-20T18:21:31.52Z" restrictedStatus="open">
+			<Latitude>-21.356</Latitude>
+			<Longitude>139.2527</Longitude>
+			<Elevation>313</Elevation>
+			<Site>
+				<Name>Waverly Creek, Boulia Shire</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-20T03:14:59Z</CreationDate>
+		</Station>
+		<Station code="MA63" startDate="2009-06-17T00:47:59Z"
+			endDate="2010-08-02T22:45:43.08Z" restrictedStatus="open">
+			<Latitude>-21.3088</Latitude>
+			<Longitude>139.8809</Longitude>
+			<Elevation>364</Elevation>
+			<Site>
+				<Name>Duchess, Conclurry Shire, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-17T00:47:59Z</CreationDate>
+		</Station>
+		<Station code="MA64" startDate="2009-06-17T04:19:59Z"
+			endDate="2011-02-14T19:48:24.32Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>Replaced recorder</Value>
+			</Comment>
+			<Comment id="1">
+				<Value>Replaced recorder</Value>
+				<BeginEffectiveTime>2009-09-02T03:58:00Z</BeginEffectiveTime>
+			</Comment>
+			<Comment id="2">
+				<Value>Replaced recorder (again)</Value>
+				<BeginEffectiveTime>2010-09-02T04:00:00Z</BeginEffectiveTime>
+			</Comment>
+			<Latitude>-21.1958</Latitude>
+			<Longitude>140.3605</Longitude>
+			<Elevation>295</Elevation>
+			<Site>
+				<Name>Devoncourt Station, Conclurry Shire, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-17T04:19:59Z</CreationDate>
+		</Station>
+		<Station code="MA65" startDate="2009-06-21T02:29:59Z"
+			endDate="2010-08-13T22:21:31.6Z" restrictedStatus="open">
+			<Latitude>-21.1336</Latitude>
+			<Longitude>140.8525</Longitude>
+			<Elevation>236</Elevation>
+			<Site>
+				<Name>Maronan, McKinlay Shire, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-21T02:29:59Z</CreationDate>
+		</Station>
+		<Station code="MB11" startDate="2010-09-09T06:14:59Z"
+			endDate="2011-04-01T23:18:50.4Z" restrictedStatus="open">
+			<Latitude>-18.6462</Latitude>
+			<Longitude>140.8949</Longitude>
+			<Elevation>83</Elevation>
+			<Site>
+				<Name>Wondoola, Stokes, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-09T06:14:59Z</CreationDate>
+		</Station>
+		<Station code="MB12" startDate="2010-09-13T00:44:59Z"
+			endDate="2011-01-15T20:17:29.44Z" restrictedStatus="open">
+			<Latitude>-18.5367</Latitude>
+			<Longitude>141.3564</Longitude>
+			<Elevation>79</Elevation>
+			<Site>
+				<Name>Vena Park, Claraville, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-13T00:44:59Z</CreationDate>
+		</Station>
+		<Station code="MB13" startDate="2010-09-12T07:57:59Z"
+			endDate="2011-02-08T12:53:46.84Z" restrictedStatus="open">
+			<Latitude>-18.4669</Latitude>
+			<Longitude>141.9001</Longitude>
+			<Elevation>125</Elevation>
+			<Site>
+				<Name>Mittagong West, Croydon, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-12T07:57:59Z</CreationDate>
+		</Station>
+		<Station code="MB21" startDate="2010-09-09T04:03:59Z"
+			endDate="2010-12-02T12:00:42Z" restrictedStatus="open">
+			<Latitude>-19.1513</Latitude>
+			<Longitude>140.8842</Longitude>
+			<Elevation>101</Elevation>
+			<Site>
+				<Name>Canoble, Four Ways, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-09T04:03:59Z</CreationDate>
+		</Station>
+		<Station code="MB22" startDate="2010-09-13T03:13:59Z"
+			endDate="2011-03-09T09:21:31.56Z" restrictedStatus="open">
+			<Latitude>-19.0656</Latitude>
+			<Longitude>141.3205</Longitude>
+			<Elevation>105</Elevation>
+			<Site>
+				<Name>Iffley, Fielding, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-13T03:13:59Z</CreationDate>
+		</Station>
+		<Station code="MB31" startDate="2010-09-09T23:36:59Z"
+			endDate="2011-03-01T09:16:09Z" restrictedStatus="open">
+			<Latitude>-19.627</Latitude>
+			<Longitude>140.8692</Longitude>
+			<Elevation>127</Elevation>
+			<Site>
+				<Name>Canoble, Four Ways, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-09T23:36:59Z</CreationDate>
+		</Station>
+		<Station code="MB32" startDate="2010-11-30T07:21:59Z"
+			endDate="2011-01-21T07:36:18.44Z" restrictedStatus="open">
+			<Latitude>-19.5594</Latitude>
+			<Longitude>141.3561</Longitude>
+			<Elevation>117</Elevation>
+			<Site>
+				<Name>Arizona, Taldora, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-11-30T07:21:59Z</CreationDate>
+		</Station>
+		<Station code="MB33" startDate="2010-09-12T01:27:59Z"
+			endDate="2011-01-04T01:39:00.48Z" restrictedStatus="open">
+			<Latitude>-19.3572</Latitude>
+			<Longitude>141.9646</Longitude>
+			<Elevation>170</Elevation>
+			<Site>
+				<Name>Cooredine, Savannah, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-12T01:27:59Z</CreationDate>
+		</Station>
+		<Station code="MB34" startDate="2010-09-12T01:53:59Z"
+			endDate="2011-03-20T10:44:22.52Z" restrictedStatus="open">
+			<Latitude>-19.445</Latitude>
+			<Longitude>142.4772</Longitude>
+			<Elevation>244</Elevation>
+			<Site>
+				<Name>Pelham, Malpas-Trenton, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-12T01:53:59Z</CreationDate>
+		</Station>
+		<Station code="MB41" startDate="2010-09-07T02:50:59Z"
+			endDate="2011-03-07T13:22:52.24Z" restrictedStatus="open">
+			<Latitude>-20.1081</Latitude>
+			<Longitude>140.859</Longitude>
+			<Elevation>161</Elevation>
+			<Site>
+				<Name>Byrimine, Taldora, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-07T02:50:59Z</CreationDate>
+		</Station>
+		<Station code="MB42" startDate="2010-09-09T02:21:59Z"
+			endDate="2011-03-19T22:49:45.04Z" restrictedStatus="open">
+			<Latitude>-20.0754</Latitude>
+			<Longitude>141.4108</Longitude>
+			<Elevation>144</Elevation>
+			<Site>
+				<Name>Cabanda, Taldora, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-09T02:21:59Z</CreationDate>
+		</Station>
+		<Station code="MB43" startDate="2010-09-11T04:23:59Z"
+			endDate="2010-12-29T18:09:26.36Z" restrictedStatus="open">
+			<Latitude>-20.0136</Latitude>
+			<Longitude>141.9433</Longitude>
+			<Elevation>174</Elevation>
+			<Site>
+				<Name>Bow Park, Malpas-Trenton, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-11T04:23:59Z</CreationDate>
+		</Station>
+		<Station code="MB51" startDate="2010-09-08T06:50:59Z"
+			endDate="2011-03-22T13:16:09.08Z" restrictedStatus="open">
+			<Latitude>-20.6493</Latitude>
+			<Longitude>140.9055</Longitude>
+			<Elevation>184</Elevation>
+			<Site>
+				<Name>Cooyal, Cloncurry, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-08T06:50:59Z</CreationDate>
+		</Station>
+		<Station code="MB52" startDate="2010-09-08T03:11:59Z"
+			endDate="2011-01-16T01:12:06.92Z" restrictedStatus="open">
+			<Latitude>-20.5795</Latitude>
+			<Longitude>141.4167</Longitude>
+			<Elevation>119</Elevation>
+			<Site>
+				<Name>Clifton Park, Julia Creek, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-08T03:11:59Z</CreationDate>
+		</Station>
+		<Station code="MB53" startDate="2010-09-08T06:53:59Z"
+			endDate="2011-03-27T19:45:43.16Z" restrictedStatus="open">
+			<Latitude>-20.4782</Latitude>
+			<Longitude>141.9607</Longitude>
+			<Elevation>145</Elevation>
+			<Site>
+				<Name>Lindfield, Julia Creek, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-08T06:53:59Z</CreationDate>
+		</Station>
+		<Station code="MB62" startDate="2010-09-06T08:45:59Z"
+			endDate="2011-03-24T06:41:41.24Z" restrictedStatus="open">
+			<Latitude>-21.0839</Latitude>
+			<Longitude>141.4303</Longitude>
+			<Elevation>187</Elevation>
+			<Site>
+				<Name>Glenbede, McKinlay, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-06T08:45:59Z</CreationDate>
+		</Station>
+		<Station code="MB63" startDate="2010-09-11T00:32:59Z"
+			endDate="2011-03-29T19:47:03.84Z" restrictedStatus="open">
+			<Latitude>-20.9343</Latitude>
+			<Longitude>141.95</Longitude>
+			<Elevation>198</Elevation>
+			<Site>
+				<Name>Yorkshire Downs, Kynuna, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-11T00:32:59Z</CreationDate>
+		</Station>
+		<Station code="MB64" startDate="2010-12-01T01:07:59Z"
+			endDate="2011-03-11T16:06:44.52Z" restrictedStatus="open">
+			<Latitude>-20.9077</Latitude>
+			<Longitude>142.4972</Longitude>
+			<Elevation>195</Elevation>
+			<Site>
+				<Name>Scottsburn, Maxwelton, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-12-01T01:07:59Z</CreationDate>
+		</Station>
+		<Station code="MIJ1" startDate="2010-09-08T04:26:59Z"
+			endDate="2011-03-25T22:36:18.68Z" restrictedStatus="open">
+			<Latitude>-20.5619</Latitude>
+			<Longitude>141.6179</Longitude>
+			<Elevation>152</Elevation>
+			<Site>
+				<Name>Eddington, Julia Creek, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-08T04:26:59Z</CreationDate>
+		</Station>
+		<Station code="MIJ2" startDate="2010-09-08T01:42:59Z"
+			endDate="2011-04-01T06:05:23.98Z" restrictedStatus="open">
+			<Latitude>-20.537</Latitude>
+			<Longitude>141.7451</Longitude>
+			<Elevation>166</Elevation>
+			<Site>
+				<Name>Argyle, Julia Creek, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-08T01:42:59Z</CreationDate>
+		</Station>
+		<Station code="MIJ3" startDate="2010-09-10T07:57:59Z"
+			endDate="2011-02-08T21:37:39.16Z" restrictedStatus="open">
+			<Latitude>-20.549</Latitude>
+			<Longitude>141.8707</Longitude>
+			<Elevation>185</Elevation>
+			<Site>
+				<Name>Lindfield, Julia Creek, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-10T07:57:59Z</CreationDate>
+		</Station>
+		<Station code="MIL3" startDate="2010-09-07T05:31:59Z"
+			endDate="2011-02-26T00:43:01.78Z" restrictedStatus="open">
+			<Latitude>-19.9079</Latitude>
+			<Longitude>140.9373</Longitude>
+			<Elevation>146</Elevation>
+			<Site>
+				<Name>Ouchy, Taldora, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-07T05:31:59Z</CreationDate>
+		</Station>
+		<Station code="MIL4" startDate="2010-09-07T05:30:59Z"
+			endDate="2011-03-02T04:55:07.56Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>Sensor power cable not plugged in</Value>
+			</Comment>
+			<Comment id="1">
+				<Value>Receiver replaced</Value>
+				<BeginEffectiveTime>2010-11-26T02:25:00Z</BeginEffectiveTime>
+			</Comment>
+			<Latitude>-19.8955</Latitude>
+			<Longitude>141.0151</Longitude>
+			<Elevation>122</Elevation>
+			<Site>
+				<Name>Ouchy, Taldora, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-07T05:30:59Z</CreationDate>
+		</Station>
+		<Station code="MIL5" startDate="2010-09-07T07:37:59Z"
+			endDate="2011-03-21T02:36:18.66Z" restrictedStatus="open">
+			<Latitude>-19.8383</Latitude>
+			<Longitude>141.1039</Longitude>
+			<Elevation>135</Elevation>
+			<Site>
+				<Name>Wallacooloobie, Taldora, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-07T07:37:59Z</CreationDate>
+		</Station>
+		<Station code="MIL6" startDate="2010-09-09T06:01:59Z"
+			endDate="2010-12-28T22:55:07.32Z" restrictedStatus="open">
+			<Latitude>-19.7921</Latitude>
+			<Longitude>141.18</Longitude>
+			<Elevation>121</Elevation>
+			<Site>
+				<Name>Etta Plains, Taldora, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-09T06:01:59Z</CreationDate>
+		</Station>
+		<Station code="MIL7" startDate="2010-09-09T07:31:59Z"
+			endDate="2011-03-11T16:32:16.7Z" restrictedStatus="open">
+			<Latitude>-19.7364</Latitude>
+			<Longitude>141.2428</Longitude>
+			<Elevation>132</Elevation>
+			<Site>
+				<Name>Etta Plains, Taldora, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-09T07:31:59Z</CreationDate>
+		</Station>
+		<Station code="MA12" startDate="2009-09-06T01:55:59Z"
+			endDate="2010-08-20T12:28:14.8Z" restrictedStatus="open">
+			<Latitude>-18.8585</Latitude>
+			<Longitude>139.3428</Longitude>
+			<Elevation>148</Elevation>
+			<Site>
+				<Name>Fiery Creek, Gregoy, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-09-06T01:55:59Z</CreationDate>
+		</Station>
+		<Station code="MA31" startDate="2009-09-05T01:59:59Z"
+			endDate="2010-08-04T08:08:05.16Z" restrictedStatus="open">
+			<Latitude>-19.959</Latitude>
+			<Longitude>138.7794</Longitude>
+			<Elevation>308</Elevation>
+			<Site>
+				<Name>Flora Downs, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-09-05T01:59:59Z</CreationDate>
+		</Station>
+		<Station code="MA34" startDate="2009-06-18T08:38:59Z"
+			endDate="2010-08-22T13:02:42.68Z" restrictedStatus="open">
+			<Comment id="0">
+				<Value>First occupation accidentally unpowered</Value>
+			</Comment>
+			<Latitude>-19.7149</Latitude>
+			<Longitude>140.3226</Longitude>
+			<Elevation>126</Elevation>
+			<Site>
+				<Name>Gleesome HS, Cusack\'s Bore, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-18T08:38:59Z</CreationDate>
+		</Station>
+		<Station code="MA53" startDate="2009-06-18T04:49:59Z"
+			endDate="2009-12-26T13:22:52.24Z" restrictedStatus="open">
+			<Latitude>-20.7962</Latitude>
+			<Longitude>139.8169</Longitude>
+			<Elevation>390</Elevation>
+			<Site>
+				<Name>Rosebud Property, Mount Isa, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2009-06-18T04:49:59Z</CreationDate>
+		</Station>
+		<Station code="MB44" startDate="2010-09-11T01:11:59Z"
+			endDate="2010-12-03T19:57:49.16Z" restrictedStatus="open">
+			<Latitude>-19.9004</Latitude>
+			<Longitude>142.4848</Longitude>
+			<Elevation>240</Elevation>
+			<Site>
+				<Name>Saxby Downs, Saxby, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-11T01:11:59Z</CreationDate>
+		</Station>
+		<Station code="MIL2" startDate="2010-09-07T03:49:59Z"
+			endDate="2011-03-19T11:45:43.16Z" restrictedStatus="open">
+			<Latitude>-19.9507</Latitude>
+			<Longitude>140.874</Longitude>
+			<Elevation>140</Elevation>
+			<Site>
+				<Name>Clonagh, Three Rivers, QLD</Name>
+				<Country>Australia</Country>
+			</Site>
+			<CreationDate>2010-09-07T03:49:59Z</CreationDate>
+		</Station>
+	</Network>
+</FDSNStationXML>

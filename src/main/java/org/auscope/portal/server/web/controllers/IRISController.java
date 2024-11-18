@@ -201,7 +201,9 @@ public class IRISController extends BasePortalController {
             }
             kml.append("</Document></kml>");
 
-            return generateJSONResponseMAV(true, "gml", kml.toString(), null);
+            // & character needs to be escaped i.e. &amp
+            String irisResponse = kml.toString().replaceAll("&(?!amp;|apos;|quot;|lt;|gt;)", "&amp;");
+            return generateJSONResponseMAV(true, "gml", irisResponse, null);
         } catch (Exception e) {
             return generateJSONResponseMAV(false, e.getMessage(), "Failed.");
         }
