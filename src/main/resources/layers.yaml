@@ -518,14 +518,14 @@
         iris:
                selector: [ "1F","https://auspass.edu.au" ]
 # Removed until AUS-4069 is fixed
-#"seismology-minq":
-#        name: "MINQ: Mount Isa Northern Queensland"
-#        description: "The MINQ seismic array feed from AusPass: the Australian Passive Seismic Server."
-#        group: "Passive Seismic"
-#        proxyUrl: "getIRISStations.do"
-#        order: "263"
-#        iris:
-#               selector: [ "ZR","https://auspass.edu.au" ]
+"seismology-minq":
+        name: "MINQ: Mount Isa Northern Queensland"
+        description: "The MINQ seismic array feed from AusPass: the Australian Passive Seismic Server."
+        group: "Passive Seismic"
+        proxyUrl: "getIRISStations.do"
+        order: "263"
+        iris:
+               selector: [ "ZR","https://auspass.edu.au" ]
 "seismology-eal1":
         name: "EAL1: Eastern Australia Linkage"
         description: "The EAL1 seismic array feed from AusPass: the Australian Passive Seismic Server."
