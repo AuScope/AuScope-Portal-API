@@ -19,13 +19,13 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.rdf.model.Selector;
-import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
 
 import au.gov.geoscience.portal.services.vocabularies.VocabularyLookup;
+
+import org.auscope.portal.core.util.structure.RDFTriple;
 
 /**
  * Controller that enables access to vocabulary services.
@@ -121,28 +121,26 @@ public class VocabController extends BasePortalController {
 
         Property sourceProperty = DCTerms.source;
 
-        Selector selector = new SimpleSelector(null, sourceProperty, "CRIRSCO Code; JORC 2004", "en");
+        RDFTriple triple = new RDFTriple(null, sourceProperty, "CRIRSCO Code; JORC 2004", "en");
 
 
         Map<String, String> jorcCategoryMappings = new HashMap<String, String>();
         jorcCategoryMappings.put(VocabularyLookup.RESERVE_CATEGORY.uri(), "any reserves");
         jorcCategoryMappings.put(VocabularyLookup.RESOURCE_CATEGORY.uri(), "any resources");
 
-        Map<String, String> resourceCategoryMappings = this.vocabularyFilterService.getVocabularyById(RESOURCE_VOCABULARY_ID, selector);
-        Map<String, String> reserveCategoryMappings = this.vocabularyFilterService.getVocabularyById(RESERVE_VOCABULARY_ID, selector);
+        Map<String, String> resourceCategoryMappings = this.vocabularyFilterService.getVocabularyById(RESOURCE_VOCABULARY_ID, triple);
+        Map<String, String> reserveCategoryMappings = this.vocabularyFilterService.getVocabularyById(RESERVE_VOCABULARY_ID, triple);
         jorcCategoryMappings.putAll(resourceCategoryMappings);
         jorcCategoryMappings.putAll(reserveCategoryMappings);
 
         return getVocabularyMappings(jorcCategoryMappings);
-
-
     }
 
 
     /**
      * Queries the vocabulary service for a list of time scales
      *
-     * @return vocublary mapping in JSON format
+     * @return vocubulary mapping in JSON format
      */
     @RequestMapping("getAllTimescales.do")
     public ModelAndView getAllTimescales() {
@@ -153,11 +151,11 @@ public class VocabController extends BasePortalController {
 
         Property typeProperty = RDF.type;
 
-        Selector[] selectors = new Selector[ranks.length];
+        RDFTriple[] triples = new RDFTriple[ranks.length];
         for (int i = 0; i < ranks.length; i++) {
-            selectors[i] = new SimpleSelector(null, typeProperty, ResourceFactory.createResource(ranks[i]));
+            triples[i] = new RDFTriple(null, typeProperty, ResourceFactory.createResource(ranks[i]));
         }
-        Map<String, String> vocabularyMappings = this.vocabularyFilterService.getVocabularyById(TIMESCALE_VOCABULARY_ID, selectors);
+        Map<String, String> vocabularyMappings = this.vocabularyFilterService.getVocabularyById(TIMESCALE_VOCABULARY_ID, triples);
 
         return getVocabularyMappings(vocabularyMappings);
     }
