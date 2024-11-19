@@ -9,53 +9,38 @@ import org.auscope.portal.core.services.PortalServiceException;
 import org.auscope.portal.server.bookmark.BookMark;
 import org.auscope.portal.server.bookmark.BookMarkDownload;
 import org.auscope.portal.server.web.security.PortalUser;
-import org.auscope.portal.server.web.service.PortalUserService;
 import org.auscope.portal.server.web.service.BookMarkService;
+import org.auscope.portal.server.web.service.PortalUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.Id;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.Explode;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.enums.ParameterStyle;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-//import io.swagger.v3.oas.models.media.Schema;
-import org.springframework.http.MediaType;
 
 
 /**
  * A controller class for accessing/modifying bookmark information for a user
  * @author san239
  */
-//@Tag(name = "bookmarks", description="Manage Bookmarks and the download options")
 @RestController
 @SecurityRequirement(name = "public")
 @Tag(
         name= "bookmarks",
         description = "Alows the user to manage bookmarks for layers"
     )
-//@RequestMapping(consumes = "application/json", produces = "application/json")
-@Controller
 public class BookMarksController extends BasePortalController {
 	
 	@Autowired
@@ -76,10 +61,22 @@ public class BookMarksController extends BasePortalController {
      * @return
      * @throws PortalServiceException
      */
-    @Operation(summary = "Adds a dataset as a bookmark.",
-            description = "Uses fileIdentifier and service id from CSW record.")
     @PostMapping("/bookmarks")
-    public ModelAndView postBookMark(@RequestBody Map<String, Object> bm) throws PortalServiceException {
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content( 
+                    schema = @Schema(
+                        implementation = bookmark.class
+                    ),
+                    mediaType = "application/json",
+                    examples = {
+                        @ExampleObject(
+                            name = "list of bookmarks for the current user",
+                            summary = "bookmarks example",
+                            value = "{\"fileIdentifier\": \"remanent-anomalies\"," 
+                                    + "\"serviceId\": \"\"}"
+                        )
+        }))
+    public ModelAndView postBookMark(@org.springframework.web.bind.annotation.RequestBody() Map<String, Object> bm) throws PortalServiceException {
         PortalUser user = userService.getLoggedInUser();
         BookMark bookMark = new BookMark();
         bookMark.setParent(userService.getLoggedInUser());
@@ -91,6 +88,7 @@ public class BookMarksController extends BasePortalController {
     }
 
 
+    // BookMark.class without the user (which is not passed fromt he frontend)
     static class bookmark {
         public int id;
         public String fileIdentifier;
@@ -141,9 +139,9 @@ public class BookMarksController extends BasePortalController {
      */
     @Operation(summary = "Retrieves a bookmark.")
     @GetMapping("/bookmarks/{id}")
-    @Id
+    @ApiResponse( content = @Content( mediaType = "application/json" ) )
     public ModelAndView getbookMarks(@PathVariable(value="id") Integer id) throws PortalServiceException {
-        Optional<BookMark> bookmark = bookmarkService.getBookmarkById(id); 
+        Optional<BookMark> bookmark = bookmarkService.getBookmarkById(id);
 
         return generateJSONResponseMAV(true, bookmark, "");    
     }
@@ -156,6 +154,7 @@ public class BookMarksController extends BasePortalController {
      */
     @Operation(summary = "Removes a bookmark.")
     @DeleteMapping("/bookmarks/{id}")
+    @ApiResponse( content = @Content( mediaType = "application/json" ) )
     public ModelAndView deleteBookMark(@PathVariable(value="id") Integer id) throws PortalServiceException {
         PortalUser user = userService.getLoggedInUser();
         BookMark bookMark = new BookMark();
@@ -173,6 +172,7 @@ public class BookMarksController extends BasePortalController {
      */
     @Operation(summary = "Retrieves download options stored for a bookmark.")
     @GetMapping("/bookmarks/{id}/downloadOptions")
+    @ApiResponse( content = @Content( mediaType = "application/json" ) )
     public ModelAndView getDownloadOptions(@PathVariable(value="id") Integer bookmarkId) throws PortalServiceException {
         BookMark bookmark = new BookMark();
         bookmark.setId(bookmarkId);
@@ -197,14 +197,24 @@ public class BookMarksController extends BasePortalController {
      */
     @Operation(summary = "Adds the download options for a bookmark.")
     @PostMapping("/booksmarks/{id}/downloadOptions")
-    @Parameter(name = "params",
-    in = ParameterIn.QUERY,
-    required = true,
-    schema = @Schema(type = "object", additionalProperties = Schema.AdditionalPropertiesValue.TRUE, 
-        ref = "#/components/schemas/ParameterMap"),
-    style = ParameterStyle.FORM,
-    explode = Explode.TRUE)
-    public ModelAndView saveDownloadOptions(@PathVariable(value="id") Integer bookmarkId, @RequestBody Map<String, Object> bm) throws PortalServiceException {
+    @ApiResponse( content = @Content( mediaType = "application/json" ) )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content( 
+                    schema = @Schema(
+                        implementation = BookMarkDownload.class
+                    ),
+                    mediaType = "application/json",
+                    examples = {
+                        @ExampleObject(
+                            name = "list of bookmarks for the current user",
+                            summary = "bookmarks example",
+                            value = "{\"id\": 59,"
+                                    + "\"fileIdentifier\": \"remanent-anomalies\"," 
+                                    + "\"serviceId\": \"\","
+                                    + "\"bookMarkDownloads\": [ ]}"
+                        )
+        }))
+    public ModelAndView saveDownloadOptions(@PathVariable(value="id") Integer bookmarkId, @org.springframework.web.bind.annotation.RequestBody Map<String, Object> bm) throws PortalServiceException {
         if (!bm.containsKey("bookmarkId")) {
             bm.put("bookmarkId", bookmarkId);
         }
@@ -235,6 +245,7 @@ public class BookMarksController extends BasePortalController {
      */
     @Operation(summary = "Removes a download option stored as a bookmark for the user.")
     @DeleteMapping("/bookmarks/{id}/downloadOptions")
+    @ApiResponse( content = @Content( mediaType = "application/json" ) )
     public ModelAndView deleteDownloadOptions(@RequestParam(value="id") Integer id) throws PortalServiceException {
         BookMarkDownload bookMarkDownload = new BookMarkDownload(); 
         bookMarkDownload.setId(id);
