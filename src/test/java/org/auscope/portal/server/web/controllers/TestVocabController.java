@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.test.PortalTestClass;
+import org.auscope.portal.core.util.structure.RDFTriple;
 
 import org.hamcrest.Matcher;
 import org.jmock.Expectations;
@@ -16,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.web.servlet.ModelAndView;
-import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.vocabulary.SKOS;
 
 import au.gov.geoscience.portal.services.vocabularies.VocabularyLookup;
@@ -102,23 +102,6 @@ public class TestVocabController extends PortalTestClass {
                 serviceResult.size());
     }
 
-//    /**
-//     * @throws Exception
-//     */
-//    @Test
-//    public void testGetAllCommoditiesError() throws Exception {
-//        context.checking(new Expectations() {
-//            {
-//                oneOf(mockVocabularyFilterService).getVocabularyById(VocabularyController.COMMODITY_VOCABULARY_ID);
-//                will(throwException(new PortalServiceException("")));
-//            }
-//        });
-//
-//        ModelAndView mav = vocabularyController.getAllCommodities();
-//        Assert.assertNotNull(mav);
-//        Assert.assertFalse((Boolean) mav.getModel().get("success"));
-//    }
-
     /**
      * @throws Exception
      */
@@ -161,23 +144,6 @@ public class TestVocabController extends PortalTestClass {
                 serviceResult.size());
     }
 
-//    /**
-//     * @throws Exception
-//     */
-//    @Test
-//    public void testGetAllMineStatusesError() throws Exception {
-//        context.checking(new Expectations() {
-//            {
-//                oneOf(mockVocabularyFilterService).getVocabularyById(VocabularyController.MINE_STATUS_VOCABULARY_ID);
-//                will(throwException(new PortalServiceException("")));
-//            }
-//        });
-//
-//        ModelAndView mav = vocabularyController.getAllMineStatuses();
-//        Assert.assertNotNull(mav);
-//        Assert.assertFalse((Boolean) mav.getModel().get("success"));
-//    }
-
     /**
      * @throws Exception
      */
@@ -202,10 +168,10 @@ public class TestVocabController extends PortalTestClass {
 
         context.checking(new Expectations() {
             {
-                Matcher<SimpleSelector[]> anySelectorArray = anything();
-                oneOf(mockVocabularyFilterService).getVocabularyById(with(same(VocabController.RESOURCE_VOCABULARY_ID)),with(anySelectorArray));
+                Matcher<RDFTriple[]> anyTripleArray = anything();
+                oneOf(mockVocabularyFilterService).getVocabularyById(with(same(VocabController.RESOURCE_VOCABULARY_ID)),with(anyTripleArray));
                 will(returnValue(serviceResult1));
-                oneOf(mockVocabularyFilterService).getVocabularyById(with(same(VocabController.RESERVE_VOCABULARY_ID)),with(anySelectorArray));
+                oneOf(mockVocabularyFilterService).getVocabularyById(with(same(VocabController.RESERVE_VOCABULARY_ID)),with(anyTripleArray));
                 will(returnValue(serviceResult2));
             }
         });
@@ -238,27 +204,6 @@ public class TestVocabController extends PortalTestClass {
     /**
      * @throws Exception
      */
-//    @Test
-//    public void testGetAllJorcCategoriesError() throws Exception {
-//        context.checking(new Expectations() {
-//            {
-//                oneOf(mockVocabularyFilterService).getFilteredVocabularyById(VocabularyController.RESOURCE_VOCABULARY_ID);
-//
-//                oneOf(mockVocabularyFilterService).getFilteredVocabularyById(VocabularyController.RESERVE_VOCABULARY_ID);
-//
-//                will(throwException(new PortalServiceException("")));
-//
-//            }
-//        });
-//
-//        ModelAndView mav = vocabularyController.getAllJorcCategories();
-//        Assert.assertNotNull(mav);
-//        Assert.assertFalse((Boolean) mav.getModel().get("success"));
-//    }
-
-    /**
-     * @throws Exception
-     */
     @Test
     public void testGetAllTimescales() throws Exception {
         final Map<String, String> serviceResult = new HashMap<String, String>();
@@ -268,8 +213,8 @@ public class TestVocabController extends PortalTestClass {
 
         context.checking(new Expectations() {
             {
-                Matcher<SimpleSelector[]> anySelectorArray = anything();
-                oneOf(mockVocabularyFilterService).getVocabularyById(with(same(VocabController.TIMESCALE_VOCABULARY_ID)),with(anySelectorArray));
+                Matcher<RDFTriple[]> anyRDFTripleArray = anything();
+                oneOf(mockVocabularyFilterService).getVocabularyById(with(same(VocabController.TIMESCALE_VOCABULARY_ID)),with(anyRDFTripleArray));
                 will(returnValue(serviceResult));
             }
         });
@@ -298,25 +243,5 @@ public class TestVocabController extends PortalTestClass {
         Assert.assertEquals("Service result contains items that were NOT included in the JSON array response", 0,
                 serviceResult.size());
     }
-
-//    /**
-//     * @throws Exception
-//     */
-//    @Test
-//    public void testGetAllTimescalesError() throws Exception {
-//
-//        context.checking(new Expectations() {
-//            {
-//                Matcher<SimpleSelector[]> anySelectorArray = anything();
-//                oneOf(mockVocabularyFilterService).getFilteredVocabularyById(with(same(VocabularyController.TIMESCALE_VOCABULARY_ID)),with(anySelectorArray));
-//                will(throwException(new PortalServiceException("")));
-//            }
-//        });
-//
-//
-//        ModelAndView mav = vocabularyController.getAllTimescales();
-//        Assert.assertNotNull(mav);
-//        Assert.assertFalse((Boolean) mav.getModel().get("success"));
-//    }
 
 }
