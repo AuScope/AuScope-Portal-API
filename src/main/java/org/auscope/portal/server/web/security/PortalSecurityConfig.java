@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,6 +33,11 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -67,10 +73,9 @@ public class PortalSecurityConfig {
 			.csrf(c -> c.disable())
 			.formLogin(f -> f.disable())
 			.authorizeHttpRequests(auth -> auth
-					.requestMatchers("/secure/**")
-					.hasAnyRole("ADMINISTRATOR", "USER")
-					.requestMatchers("/**")
-					.permitAll()
+	                .requestMatchers("/secure/**").hasAnyRole("ADMINISTRATOR", "USER")
+	                .requestMatchers("/bookmarks/**").hasAnyRole("ADMINISTRATOR", "USER")
+	                .requestMatchers("/**").permitAll()
 			)
 			.oauth2Login(o -> o
 					.loginPage(frontEndUrl + "/login")
