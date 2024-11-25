@@ -2198,7 +2198,7 @@
         maps: "territories"
 
 "regolith-depth-layer":
-    name: "Soil and Landscape Grid National Soil Attribute Maps - Depth of Regolith"
+    name: "Depth of Regolith - Soil and Landscape Grid National Soil Attribute Maps"
     description: "This is Version 2 of the Depth of Regolith product of the Soil and Landscape Grid of Australia (produced 2015-06-01)."
     group: "Regolith"
     order: "regolith_01"
