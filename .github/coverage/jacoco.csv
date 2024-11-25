@@ -15,7 +15,7 @@ AuScope-Portal-API,org.auscope.portal.server.params,HashmapParams,26,0,0,0,12,0,
 AuScope-Portal-API,org.auscope.portal.mscl,MSCLWFSService,110,0,4,0,18,0,7,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,RemanentAnomaliesController,87,0,5,0,26,0,7,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,GeologicalProvincesController,48,0,0,0,15,0,3,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.web.controllers,BookMarksController,168,0,0,0,44,0,8,0,8,0
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,BookMarksController,224,0,2,0,48,0,10,0,9,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,UserController,136,0,10,0,34,0,9,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,RemanentAnomaliesAutoSearchController,44,0,0,0,15,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController,138,274,4,6,28,54,6,7,3,5
@@ -34,10 +34,11 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController.new 
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabularyCacheController,48,0,0,0,12,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new Comparator() {...},16,0,0,0,2,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MSCLController.new IterableNamespace() {...},66,0,0,0,12,0,1,0,1,0
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,BookMarksController.bookmark,3,0,0,0,1,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,MineralTenementController,421,0,17,0,91,0,16,0,7,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,LegendImageController,34,0,0,0,10,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.security,PortalUser,202,0,24,0,57,0,36,0,24,0
-AuScope-Portal-API,org.auscope.portal.server.web.security,PortalSecurityConfig,178,0,0,0,38,0,14,0,14,0
+AuScope-Portal-API,org.auscope.portal.server.web.security,PortalSecurityConfig,197,0,0,0,37,0,14,0,14,0
 AuScope-Portal-API,org.auscope.portal.server.web.security,PortalOAuth2UserService,158,0,8,0,35,0,9,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.security,PortalUser.AuthenticationFramework,21,0,0,0,1,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.web.security,PortalSecurityConfig.new AuthenticationFailureHandler() {...},12,0,0,0,3,0,2,0,2,0
@@ -75,7 +76,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,GeologicalProvincesServ
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalStateService,27,0,0,0,7,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GenericService,28,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,MineralTenementService,42,0,2,0,12,0,5,0,4,0
-AuScope-Portal-API,org.auscope.portal.server.web.service,BookMarkService,41,0,0,0,11,0,7,0,7,0
+AuScope-Portal-API,org.auscope.portal.server.web.service,BookMarkService,46,0,0,0,12,0,8,0,8,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,GenericFilter2,50,0,0,0,8,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,AuScopeWMSService,180,0,18,0,34,0,11,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,BoreholeService.Mark,56,0,0,0,11,0,3,0,3,0
@@ -111,7 +112,7 @@ AuScope-Portal-API,org.auscope.portal.server.domain.xml,XMLStreamAttributeExtrac
 AuScope-Portal-API,org.auscope.portal.server.state,PortalState,52,0,0,0,22,0,15,0,15,0
 AuScope-Portal-API,org.auscope.portal.server,CORSAdvice,43,0,0,0,11,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server,MineralTenementServiceProviderType,37,55,6,0,11,12,11,2,8,2
-AuScope-Portal-API,org.auscope.portal.server,PortalApplication,16,0,0,0,6,0,4,0,4,0
+AuScope-Portal-API,org.auscope.portal.server,PortalApplication,59,0,0,0,10,0,5,0,5,0
 AuScope-Portal-API,org.auscope.portal.server,Initializer,10,47,1,5,3,14,1,5,0,3
 AuScope-Portal-API,org.auscope.portal.server.web,NVCLDataServiceMethodMaker.PlotScalarGraphType,21,0,0,0,4,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.web,CatalogServicesHealthIndicator,160,0,10,0,40,0,7,0,2,0
