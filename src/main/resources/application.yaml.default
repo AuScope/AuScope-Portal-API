@@ -44,6 +44,18 @@ access:
    # set a whitelist for the request URL only from the Commonwealth Government or the State Governments or Universities or Octopus or Loop3D will pass
    whitelist: .gov.au .edu.au .octopusdata.org .csiro.au .gstatic.com 13.211.217.129
 
+springdoc:
+   version: '1.6.15' # can't seem to parse pom.xml for this value project.properties -> '"@springdoc.version@"
+   model-and-view-allowed: true
+   swagger-ui:
+      enabled: true
+      #defaultModelsExpandDepth: 0
+      doc-expansion: none 
+      tagsSorter: alpha
+   api-docs:
+      path: /api-docs
+   writer-with-order-by-keys: true
+
 spring:
    # Include the registry definitions from application-registries.yaml
    profiles:
