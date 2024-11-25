@@ -2209,7 +2209,156 @@
         - [ "DER_000_999_05_N_P_AU_NAT_C", 3]
     wms:
         selector: "DER_000_999_EV_N_P_AU_NAT_C"
-        
+
+# SLIP Geology and Soils
+"1-500-000-state-cenozoic-geology":
+    name: "WA 1:500 000 State Cenozoic Geology"
+    group: "Geological Maps"
+    description: "The digital '1:500 000 State interpreted bedrock geology of Western Australia' comprises three layers: the primary 1:500 000 State interpreted bedrock geology, the 1:500 000 State Cenozoic geology and the 1:500 000 State linear structures layer."
+    order: "Registered_120"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "a438fc72-0210-4a11-b744-c5ed0c1f1188"
+"1-2-500-000-state-cenozoic-geology":
+    name: "WA 1:2 500 000 State Cenozoic Geology"
+    group: "Geological Maps"
+    description: "The digital '1:2 500 000 geological map of Western Australia' comprises four layers: the primary 1:2 500 000 State interpreted bedrock geology, the 1:2 500 000 State Cenozoic geology, the 1:2 500 000 State interpreted dyke suites, and the 1:2 500 000 State interpreted bedrock geology structural lines."
+    order: "Registered_121"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "96468153-0654-4d13-920b-8855adc2eea0"
+"regolith-of-wa-1300-metre-grid":
+    name: "Regolith of WA - 1300 Metre Grid"
+    group: "Geological Maps"
+    description: ""
+    order: "Registered_122"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "623bba62-54e5-4c77-96a0-daf4ace7b926"
+"regolith-of-wa-500-metre-grid":
+    name: "Regolith of WA - 500 Metre Grid"
+    group: "Geological Maps"
+    description: ""
+    order: "Registered_123"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "b8db708c-df72-4344-9561-bcca46a3d464"
+"1-500-000-state-interpreted-bedrock-geology":
+    name: "WA 1:500 000 State Interpreted Bedrock Geology"
+    group: "Geological Maps"
+    description: ""
+    order: "Registered_124"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "60e56910-128b-4eda-835b-c83d8fe5e6cf"
+"1-2-500-000-state-interpreted-bedrock-geology":
+    name: "WA 1:2 500 000 State Interpreted Bedrock Geology"
+    group: "Geological Maps"
+    description: ""
+    order: "Registered_125"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "0135aa9b-2c8a-4422-9554-7222c9f55a34"
+"1-2-500-000-state-interpreted-bedrock-geology-structural-lines":
+    name: "WA 1:2 500 000 State Interpreted Bedrock Geology Structural Lines"
+    group: "Geological Maps"
+    description: ""
+    order: "Registered_126"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "1eeb67bc-0ca0-4103-a56d-addfd94ff348"
+"1-500-000-state-linear-structures-layer":
+    name: "WA 1:500 000 State Linear Structures Layer"
+    group: "Geological Maps"
+    description: ""
+    order: "Registered_127"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "90e25ab9-7c48-42b8-840e-b3fae9439590"
+"1-2-500-000-state-interpreted-dyke-suites":
+    name: "WA 1:2 500 000 State Interpreted Dyke Suites"
+    group: "Geological Maps"
+    description: "The digital '1:2 500 000 geological map of Western Australia' comprises four layers: the primary 1:2 500 000 State interpreted bedrock geology, the 1:2 500 000 State Cenozoic geology, the 1:2 500 000 State interpreted dyke suites, and the 1:2 500 000 State interpreted bedrock geology structural lines."
+    order: "Registered_128"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "525e9ce0-a62f-4aa0-9559-274f340b25d1"
+"linear-structures-1-100-000":
+    name: "WA Linear Structures 1:100 000"
+    group: "Geological Maps"
+    description: "The digital ‘1:100 000 State interpreted bedrock geology of Western Australia’ comprises three layers: the primary 1:100 000 State interpreted bedrock geology, the 1:100 000 State interpreted bedrock geology lines , and the 1:100 000 State linear structure layer."
+    order: "Registered_129"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "2ac763b0-678b-4058-9edf-69b6fb9ba2b2"
+
+"aso-sample-collections-point":
+    name: "WA ASO Sample Collections Point"
+    group: "Tenements"
+    description: ""
+    order: "Registered_130"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "2878b2c5-78b1-449a-b450-0c2bccc1da9d"
+"clay-sample-analyses":
+    name: "WA Clay Sample Analyses"
+    group: "Tenements"
+    description: "Clay sample analyses contains geoscientific and analytical data from clay samples collected during fieldwork. The data are held in GDA 94"
+    order: "Registered_131"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "d77d9a25-40a4-454b-991c-58e4c1e8bcbb"
+"sand-and-gravel-sample-analyses":
+    name: "WA Sand and Gravel Sample Analyses"
+    group: "Tenements"
+    description: "Sand and gravel sample analyses contain geoscientific and particle size distribution data from sand and gravel samples collected during fieldwork. The data are held in GDA 94"
+    order: "Registered_132"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "18c83f57-ace8-4f59-a0b6-f1201412b8d4"
+"Lime sample analyses":
+    name: "WA Lime Sample Analyses"
+    group: "Tenements"
+    description: "Lime sample analyses contains geoscientific and analytical data from calcrete, dolomite, limesand and limestone samples collected during fieldwork. The data are held in GDA 94"
+    order: "Registered_133"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "4b3c3170-c3cd-4f4d-8954-e774f32ddc69"
+
+"gswa-geochemistry":
+    name: "GSWA Geochemistry"
+    group: "Geochemistry"
+    description: "The WACHEM database is a compilation of multi-element geochemistry of rocks unconsolidated surface material (regolith) and drill core collected by the Geological Survey of Western Australia."
+    order: "Registered_134"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "dfbba304-bd7c-4745-a9de-ecf1b894072e"
+
+"GSWA Geochronology":
+    name: "GSWA Geochronology"
+    group: "Geochronology"
+    description: "Isotopic age determinations (U–Pb, Ar–Ar, and K–Ar mineral and whole-rock methods) obtained from geological samples throughout Western Australia."
+    order: "Registered_135"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "72f551ed-7ab4-409f-a126-6581eb3350bb"
+
 "alirt-level-01-decimated-data":
     name: "ALIRT-001 Level 1 Decimated Data"
     description: "Distributed Acoustic Sensing (DAS) provides a new, non-invasive mean for high resolution subsurface imaging in urban, developed environments by repurposing existing telecommunication cables. This DAS dataset is collected over 3 months between December 2021 and April 2022 at a fibre optic network dedicated to research, i.e., ALIRT (Australian Lightwave Infrastructure Research Testbed) in Melbourne, Australia. In this deployment, a 25 km long fibre optic cable is transformed into 6252 channels at 4 m spacing, starting from Melbourne Central Business District running west to east. Silixa iDAS interrogator is used, which measures strain-rate at 1 kHz with a fixed gauge length of 10 m. The time series recorded is decimated to 62.5 Hz. This dataset represents the ALIRT-001 Level 1 Decimated Data outputs."
