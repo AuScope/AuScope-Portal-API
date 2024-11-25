@@ -2231,7 +2231,7 @@
             - "96468153-0654-4d13-920b-8855adc2eea0"
 "regolith-of-wa-1300-metre-grid":
     name: "Regolith of WA - 1300 Metre Grid"
-    group: "Geological Maps"
+    group: "Regolith"
     description: ""
     order: "Registered_122"
     supportsCsvDownloads: false
@@ -2240,7 +2240,7 @@
             - "623bba62-54e5-4c77-96a0-daf4ace7b926"
 "regolith-of-wa-500-metre-grid":
     name: "Regolith of WA - 500 Metre Grid"
-    group: "Geological Maps"
+    group: "Regolith"
     description: ""
     order: "Registered_123"
     supportsCsvDownloads: false
