@@ -2370,3 +2370,24 @@
             - "Australian Lightwave Infrastructure Research Testbed Dataset (ALIRT-001) - Level 1 Decimated Data"
     initialBBox:
         - [ 144.8,-37.9,145.3,-37.7 ]
+
+"cloncurry-metal":
+    name: "Cloncurry METAL: Integrated Dataset"
+    description: "Cloncurry Multi Element Toolkit and Laboratory (METAL) aims to shift the “Big Data” paradigm in mineral system science by developing a quantitative, fully integrated, multi-modal, scale-consistent methodology for system characterisation. The data comprises collocated petrophysical-mineralogical-geochemical-structural-metasomatic characterisation of 23 deposits from a highly complex mineral system. This approach allows translation of mineral system processes into physics, providing a framework for smarter geophysics-based exploration."
+    group: "Integrated Geoscience Dataset"
+    order: "IDG01"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "eda39b66-11ed-490b-9aa6-21f5653bf27f"
+
+"unsw-groundwater-levels":
+    name: "UNSW Raw Groundwater Levels"
+    description: "The Groundwater Infrastructure Program aims to enable long-term groundwater resource research in a variable and changing climate to inform sustainable groundwater management. This dataset contains the groundwater levels and temperature (plus corresponding manual dip measurements) across selected NCRIS sites in New South Wales collected by the Groundwater Research at UNSW"
+    group: "Groundwater"
+    order: "GW01"
+    supportsCsvDownloads: false
+    csw:
+        ids:
+            - "70e0b9ef-a26a-4eaf-bf0e-6777556279f2"
+
