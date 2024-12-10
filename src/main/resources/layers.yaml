@@ -264,8 +264,6 @@
                     - [ "Drilling Start To", "gsmlp:drillStartDate", null, "SMALLER_THAN" ]
                     - [ "Drilling End From", "gsmlp:drillEndDate", null, "BIGGER_THAN" ]
                     - [ "Drilling End To", "gsmlp:drillEndDate", null, "SMALLER_THAN" ]
-               mandatorytextbox:
-                    - [ "Analytics Job Id", "analyticsJobId", "" ]
                textbox:
                     - [ "Name", "gsmlp:name", null, "ISLIKE" ]
                     - [ "Identifier", "gsmlp:identifier", null, "ISLIKE" ]
@@ -321,8 +319,6 @@
         wfs:
                selector: "gsmlp:BoreholeView"
         filters:
-               mandatorytextbox:
-                    - [ "Analytics Job Id", "analyticsJobId", "" ]
                textbox:
                     - [ "Name", "gsmlp:name", null, "ISLIKE" ]
                date:
