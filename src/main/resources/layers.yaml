@@ -139,7 +139,6 @@
             textbox:
                  - [ "Name", "erl:name", null, "ISLIKE" ]
             dropdownremote:
-                 - [ "Commodity", "erl:representativeCommodity_uri", null, "ISEQUAL", "getAllCommodities.do" ]
                  - [ "Geologic Timescale", "erl:representativeAge_uri", null, "ISEQUAL", "getAllTimescales.do" ]
             checkbox:
                  - [ "Provider", null ]
