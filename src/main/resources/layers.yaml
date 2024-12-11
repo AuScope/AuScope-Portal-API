@@ -175,14 +175,15 @@
         supportsCsvDownloads: true
         wfs:
             selector: "mt:magnetotelluric"
-"auslamp":
-        name: "GA: Northern Australia AusLAMP Stations"
-        group: "Magnetotellurics"
-        description: "Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) Stations."
-        order: "402"
-        supportsCsvDownloads: true
-        wfs:
-            selector: "mt:nth_aus_AusLAMP_siteloc"
+# AUS-4319: Removed until GA fixes it
+#"auslamp":
+#        name: "GA: Northern Australia AusLAMP Stations"
+#        group: "Magnetotellurics"
+#        description: "Australian Lithospheric Architecture Magnetotelluric Project (AusLAMP) Stations."
+#        order: "402"
+#        supportsCsvDownloads: true
+#        wfs:
+#            selector: "mt:nth_aus_AusLAMP_siteloc"
 
 "auscope-mt-collection-1":
         name: "AuScope MT: W/NW Tas Broadband"
