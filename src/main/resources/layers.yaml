@@ -1052,6 +1052,8 @@
     description: "Geological units represented as two dimensional polygons, designed for portrayal at 1:50 000 scale."
     order: "Registered_8"
     supportsCsvDownloads: false
+    initialBBox:
+        - [ 143.5,-38.5,144.5,-38.2 ]
     wms:
         selector: "erdd:GSV_SG_50K_GEOLUNIT"
 "gsv-shear-displacement-structure-50k-":
