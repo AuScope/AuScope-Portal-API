@@ -1175,6 +1175,8 @@
     description: "Mineral occurrences, including operating and abandoned mines, located in Tasmania"
     order: "Registered_48"
     supportsCsvDownloads: true
+    initialBBox:
+        - [ 143.19,-43.67,151.47,-39.98 ]
     wfs:
         selector: "mrtwfs:MineralOccurences"
 "land-line-of-tasm-min-reso-tasm":
