@@ -1147,12 +1147,14 @@
     description: "Proclaimed Landslip Areas (A and B) of Tasmania, which are defined under the Mineral Resources Development Act 1995, administered by Mineral Resources Tasmania. These areas prohibit or restrict building and other activities in particular areas of unstable land, as specified under the Building Act 2000."
     order: "Registered_45"
     supportsCsvDownloads: true
+    initialBBox:
+        - [ 147.0,-41.36,147.1,-41.31 ]
     wfs:
         selector: "mrtwfs:ProclaimedAreasPoly"
 "airb-geop-surv-of-tasm-min-reso-tasm":
     name: "Airborne Geophysical Surveys Of Tasmania"
     group: "Geophysics"
-    description: "Spatial index of open file airborne geophysical surveys for which digital data i"
+    description: "Spatial index of open file airborne geophysical surveys for which digital data is held"
     order: "Registered_46"
     supportsCsvDownloads: true
     wfs:
@@ -1160,15 +1162,17 @@
 "land-poin-of-tasm-min-reso-tasm":
     name: "Landslide Points Of Tasmania"
     group: "Boundaries"
-    description: "Landslide features across Tasmania as representative points, with summary landsl"
+    description: "Landslide features across Tasmania as representative points"
     order: "Registered_47"
     supportsCsvDownloads: true
+    initialBBox:
+        - [ 143.19,-43.67,151.47,-39.98 ]
     wfs:
         selector: "mrtwfs:LandSlidePoint"
 "mine-occu-poin-of-tasm-min-reso-tasm":
     name: "Mineral Occurrence Points Of Tasmania"
     group: "Mineral Deposits"
-    description: "Mineral occurrences, including operating and abandoned mines, located in Tasmani"
+    description: "Mineral occurrences, including operating and abandoned mines, located in Tasmania"
     order: "Registered_48"
     supportsCsvDownloads: true
     wfs:
@@ -1176,23 +1180,27 @@
 "land-line-of-tasm-min-reso-tasm":
     name: "Landslide Lines Of Tasmania"
     group: "Boundaries"
-    description: "Linear landslide components of landslide features mapped across Tasmania, with s"
+    description: "Linear landslide components of landslide features mapped across Tasmania"
     order: "Registered_49"
     supportsCsvDownloads: true
+    initialBBox:
+        - [ 147.0,-41.36,147.1,-41.31 ]
     wfs:
         selector: "mrtwfs:LandSlideLine"
 "land-dama-poly-of-tasm-min-reso-tasm":
     name: "Landslide Damage Polygons Of Tasmania"
     group: "Boundaries"
-    description: "Polygons of structures or property known to be damaged by a landslide in Tasmani"
+    description: "Polygons of structures or property known to be damaged by a landslide in Tasmania"
     order: "Registered_50"
     supportsCsvDownloads: true
+    initialBBox:
+        - [ 146.81944,-41.16386,146.82897,-41.15959 ]
     wfs:
         selector: "mrtwfs:DamagePoly"
 "cate-4-expl-lice-poly-of-tasm-min-reso-tasm":
     name: "Cat 4 Exploration Licences Of Tasmania"
     group: "Tenements"
-    description: "Category 4 Exploration Licence polygons and Exploration Release Areas across Tas"
+    description: "Category 4 Exploration Licence polygons and Exploration Release Areas across Tasmania"
     order: "Registered_51"
     supportsCsvDownloads: true
     wfs:
@@ -1200,7 +1208,7 @@
 "cate-6-expl-lice-poly-of-tasm-min-reso-tasm":
     name: "Cat 6 Exploration Licences Of Tasmania"
     group: "Tenements"
-    description: "Category 6 Exploration Licence polygons and Exploration Release Areas across Tas"
+    description: "Category 6 Exploration Licence polygons and Exploration Release Areas across Tasmania"
     order: "Registered_52"
     supportsCsvDownloads: true
     wfs:
@@ -1216,7 +1224,7 @@
 "cate-2-expl-lice-poly-of-tasm-min-reso-tasm":
     name: "Cat 2 Exploration Licences Of Tasmania"
     group: "Tenements"
-    description: "Category 2 Exploration Licence polygons and Exploration Release Areas across Tas"
+    description: "Category 2 Exploration Licence polygons and Exploration Release Areas across Tasmania"
     order: "Registered_54"
     supportsCsvDownloads: true
     wfs:
@@ -1224,7 +1232,7 @@
 "grav-meas-of-tasm-min-reso-tasm":
     name: "Gravity Measurements Of Tasmania"
     group: "Geophysics"
-    description: "Primary and derived i.e. Bouguer anomaly) gravity observation points stations)"
+    description: "Primary and derived (i.e. Bouguer anomaly) gravity observation points (stations) in Tasmania"
     order: "Registered_55"
     supportsCsvDownloads: true
     wfs:
@@ -1232,7 +1240,7 @@
 "cate-5-expl-lice-poly-of-tasm-min-reso-tasm":
     name: "Cat 5 Exploration Licences Of Tasmania"
     group: "Tenements"
-    description: "Category 5 Exploration Licence polygons and Exploration Release Areas across Tas"
+    description: "Category 5 Exploration Licence polygons and Exploration Release Areas across Tasmania"
     order: "Registered_56"
     supportsCsvDownloads: true
     wfs:
@@ -1240,15 +1248,17 @@
 "land-dama-poin-of-tasm-min-reso-tasm":
     name: "Landslide Damage Points Of Tasmania"
     group: "Boundaries"
-    description: "Point locations of known damage to structures or property caused by a landslide"
+    description: "Point locations of known damage to structures or property caused by a landslide in Tasmania"
     order: "Registered_57"
     supportsCsvDownloads: true
+    initialBBox:
+        - [ 143.19,-43.67,151.47,-39.98 ]
     wfs:
         selector: "mrtwfs:DamagePoint"
 "grav-base-stat-of-tasm-min-reso-tasm":
     name: "Gravity Base Stations Of Tasmania"
     group: "Geophysics"
-    description: "Precise locations where the absolute value of gravity is known."
+    description: "Precise locations across Tasmania where the absolute value of gravity is known."
     order: "Registered_58"
     supportsCsvDownloads: true
     wfs:
@@ -1267,6 +1277,8 @@
     description: "Landslide component polygons of landslide features mapped across Tasmania"
     order: "Registered_61"
     supportsCsvDownloads: true
+    initialBBox:
+        - [ 146.9,-41.43,147.3,-41.25 ]
     wfs:
         selector: "mrtwfs:LandSlidePoly"
 "bore-trac-of-tasm-min-reso-tasm":
