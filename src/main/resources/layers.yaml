@@ -280,7 +280,7 @@
         group: "Mineralogy - Geosample"
         description: "A collection of the results published from TIMA"
         proxyDownloadUrl: "doTIMAGeoSampleCSVDownload.do"
-        proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:geosample_and_mineralogy"
+        # proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:geosample_and_mineralogy"
         order: "180"
         supportsCsvDownloads: true
         wfs:
@@ -296,7 +296,7 @@
         group: "Geochronology"
         description: "Locations and dataset download URLs of samples that have been analysed by SHRIMP U-Pb mass spectrometer at Curtin University"
         proxyDownloadUrl: "doSHRIMPGeoSampleCSVDownload.do"
-        proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:view_shrimp_geochronology_result"
+        # proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:view_shrimp_geochronology_result"
         order: "180"
         supportsCsvDownloads: true
         wfs:
@@ -1594,7 +1594,7 @@
     name: "CSIRO Samples"
     group: "IGSN"
     description: "A collection of igsn-csiro-sample"
-    proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=igsn:sample"
+    # proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=igsn:sample"
     order: "50"
     supportsCsvDownloads: true
     wfs:
@@ -1606,7 +1606,7 @@
     name: "GA Samples"
     group: "IGSN"
     description: "A collection of igsn-ga-sample"
-    proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0x00FF00&layerName=igsn:igsn_ga_sample"
+    # proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0x00FF00&layerName=igsn:igsn_ga_sample"
     order: "51"
     supportsCsvDownloads: true
     wfs:
@@ -1618,7 +1618,7 @@
     name: "ARDC Samples"
     group: "IGSN"
     description: "A collection of igsn-ardc-sample"
-    proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0x0000FF&layerName=igsn:igsn_ands_sample"
+    # proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0x0000FF&layerName=igsn:igsn_ands_sample"
     order: "52"
     supportsCsvDownloads: true
     wfs:
