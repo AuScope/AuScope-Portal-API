@@ -1497,16 +1497,6 @@
 #     wms:
 #         selector: "be10-denude:crn_xxl_outlets"
 
-# Octopus CRN Basin Bounding boxes 
-"Octopus-Crn-Basin-BBoxes":
-    name: "CRN Basin Bounding Boxes"
-    group: "Geochronology - OCTOPUS (Cosmogenic DB)"
-    description: "CRN Basin Bounding Boxes"
-    order: "Octopus_07"
-    supportsCsvDownloads: true
-    wms:
-        selector: "be10-denude:publications"
-
 # Octopus Sahul Archaeology
 "Octopus-Sahul-Arch-Radicarbon":
     name: "Sahul Archaeology Radiocarbon"
