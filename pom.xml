@@ -60,8 +60,8 @@
         </repository>
         <repository>
             <id>portal-core</id>
-            <name>GitHub portal-core repo</name>
-      	    <url>https://maven.pkg.github.com/AuScope/portal-core</url>
+            <id>auscope-mvn</id>
+            <url>https://pkgs.dev.azure.com/CSIROMineralResources/8244f127-6c7b-4d82-91f9-6208b7f5b796/_packaging/auscope-mvn/maven/v1</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
