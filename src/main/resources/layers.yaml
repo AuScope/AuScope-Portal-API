@@ -2154,34 +2154,34 @@
     wms:
         selector: "w_qld_mt:West_Qld_AusLAMP_Depth_Slice_275160-298760"
 
-# AusGeoChem - some layers are geochemistry others are geochronology
-"ausgeochem-upb":
-    name: "AusGeoChem U/Pb"
-    description: "Locations of samples which have undergone U-Pb analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from AusGeoChem portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
+# EarthBank (was AusGeoChem) - some layers are geochemistry others are geochronology
+"earthbank-upb":
+    name: "EarthBank U/Pb"
+    description: "Locations of samples which have undergone U-Pb analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from EarthBank portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
     group: "Geochronology"
     supportsCsvDownloads: true
     wfs:
         selector: "public_data:lithodat_upb_samples"
 
-"ausgeochem-uthhe":
-    name: "AusGeoChem U-Th/He"
-    description: "Locations of samples which have undergone U-Th/He analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from AusGeoChem portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
+"earthbank-uthhe":
+    name: "EarthBank U-Th/He"
+    description: "Locations of samples which have undergone U-Th/He analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from EarthBank portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
     group: "Geochronology"
     supportsCsvDownloads: true
     wfs:
         selector: "public_data:lithodat_he_samples"
 
-"ausgeochem-ft":
-    name: "AusGeoChem Fission Track"
-    description: "Locations of samples which have undergone fisson track analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from AusGeoChem portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
+"earthbank-ft":
+    name: "EarthBank Fission Track"
+    description: "Locations of samples which have undergone fisson track analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from EarthBank portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
     group: "Geochronology"
     supportsCsvDownloads: true
     wfs:
         selector: "public_data:lithodat_ft_samples"
 
-"ausgeochem-gc":
-    name: "AusGeoChem Geochemistry"
-    description: "Locations of samples which have undergone geochemistry analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from AusGeoChem portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
+"earthbank-gc":
+    name: "EarthBank Geochemistry"
+    description: "Locations of samples which have undergone geochemistry analysis. Samples were taken by members of the AuScope Geochemistry Network (AGN) https://www.auscope.org.au/agn. The sample data can be accessed from EarthBank portal https://ausgeochem.auscope.org.au/#/ which is hosted by Lithodat Pty Ltd. Projects were funded by AuScope Pty Ltd. https://ror.org/04s1m4564"
     group: "Geochemistry"
     supportsCsvDownloads: true
     wfs:
