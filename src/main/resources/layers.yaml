@@ -2402,7 +2402,7 @@
         - [ 134.8,-27.9,154.3,-17.7 ]
 "qld-magnetic-image":
     name: "Queensland Magnetic Image"
-    group: "Geophysics"
+    group: "Magnetics"
     description: "Image of merged grid of all available magnetic data available in Queensland"
     order: "GSQ-magnetic-image"
     wms:
@@ -2562,19 +2562,19 @@
 "sa-tmi":
     name: "SA Total Magnetic Intensity"
     description: "South Australia State Total Magnetic Intensity"
-    group: "Geophysics"
+    group: "Magnetics"
     wms:
         selector: "tmi"
 "sa-tmi-vrtp":
     name: "SA Total Magnetic Intensity VRTP"
     description: "South Australia State Total Magnetic Intensity Variable Reduction to Pole"
-    group: "Geophysics"
+    group: "Magnetics"
     wms:
         selector: "tmi_vrtp"
 "sa-tmi-vrtp-1vd":
     name: "SA Total Magnetic Intensity VRTP 1VD"
     description: "South Australia State Total Magnetic Intensity variable reduction to pole, first vertical derivative"
-    group: "Geophysics"
+    group: "Magnetics"
     wms:
         selector: "tmi_vrtp_1vd"
 "sa-rad-rgb":
