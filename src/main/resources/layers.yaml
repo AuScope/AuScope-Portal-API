@@ -2391,3 +2391,231 @@
         ids:
             - "70e0b9ef-a26a-4eaf-bf0e-6777556279f2"
 
+"qld-gravity-image":
+    name: "Queensland Gravity Image"
+    group: "Geophysics"
+    description: "Image of merged grid of all available gravity data in Queensland"
+    order: "GSQ-gravity-image"
+    wms:
+        selector: "Qld_Gravity_Image19541"
+    initialBBox:
+        - [ 134.8,-27.9,154.3,-17.7 ]
+"qld-magnetic-image":
+    name: "Queensland Magnetic Image"
+    group: "Geophysics"
+    description: "Image of merged grid of all available magnetic data available in Queensland"
+    order: "GSQ-magnetic-image"
+    wms:
+        selector: "Qld_Magnetic_Image12413"
+    initialBBox:
+        - [ 134.8,-27.9,154.3,-17.7 ]
+"qld-radiometric-image":
+    name: "Queensland Radiometric Image"
+    group: "Geophysics"
+    description: "Image of merged grid of all all available radiometric data available in Queensland"
+    order: "GSQ-radiometric-image"
+    wms:
+        selector: "Qld_Radiometric_Image46094"
+    initialBBox:
+        - [ 134.8,-27.9,154.3,-17.7 ]
+"qld-geological-map":
+    name: "Qld State Surface Geology"
+    group: "Geological Maps"
+    description: "Queensland State Surface Geology Map"
+    wms:
+        selector: "State_Surface_Geology55055"
+    initialBBox:
+        - [ 134.8,-27.9,154.3,-17.7 ]
+"qld-state-folds":
+    name: "Qld State Folds"
+    group: "Geological Maps"
+    description: "A map of Queensland's geological folds"
+    wms:
+        selector: "State_Folds17704"
+    initialBBox:
+        - [ 139.0,-23.0,148.0,-18.0 ]
+"qld-state-faults":
+    name: "Qld State Faults"
+    group: "Geological Maps"
+    description: "A map of Queensland's geological faults"
+    wms:
+        selector: "State_Faults58347"
+    initialBBox:
+        - [ 139.0,-23.0,148.0,-18.0 ]
+"qld-state-geological-boundaries":
+    name: "Qld State Geological Boundaries"
+    group: "Geological Maps"
+    description: "A map of Queensland's geological boundaries"
+    wms:
+        selector: "State_Geological_Boundaries34026"
+    initialBBox:
+        - [ 141.3,-21.2,144.5,-19.6 ]
+"sa-surface-geology-7m":
+    name: "SA Surface Geology 7M"
+    group: "Geological Maps"
+    description: "7M Surface Geology"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "geology:surface_geology_7m"
+"sa-geochronology":
+    name: "SA Geochronology"
+    group: "Geochronology"
+    description: "Radiogenic and stable isotope geochronology and geochemistry are used to determine the age and origins of rocks and minerals. The data provides information about rock relationships, and the timing of geological events."
+    supportsCsvDownloads: true
+    wfs:
+        selector: "sampling_analyses:geochronology"
+"sa-field-observation-sites":
+    name: "SA Field Observation Sites"
+    group: "Field Observations"
+    description: "The Field Observation (SAGeodata - Module) comprises of the mapping and field work observations held by the Geological Survey of South Australia, including Field Notes, Lithology, Structure and Sample Information."
+    supportsCsvDownloads: true
+    wfs:
+        selector: "sampling_analyses:geochronology"
+"sa-downhole-geochem-zinc":
+    name: "SA Max Downhole Geochem Zinc"
+    group: "Geochemistry"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum zinc value from each drill hole has then been selected and displayed on SARIG."
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_zn"
+"sa-downhole-geochem-uranium":
+    name: "SA Max Downhole Geochem Uranium"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum uranium value from each drill hole has then been selected and displayed on SARIG."
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_u"
+"sa-downhole-geochem-copper":
+    name: "SA Max Downhole Geochem Copper"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum copper value from each drill hole has then been selected and displayed on SARIG."
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_cu"
+"sa-downhole-geochem-lithium":
+    name: "SA Max Downhole Geochem Lithium"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum lithium value from each drill hole has then been selected and displayed on SARIG."
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_li"
+"sa-downhole-geochem-gold":
+    name: "SA Max Downhole Geochem Gold"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum gold value from each drill hole has then been selected and displayed on SARIG."
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_au"
+"sa-downhole-geochem-silver":
+    name: "SA Max Downhole Geochem Silver"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum silver value from each drill hole has then been selected and displayed on SARIG."
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_ag"
+"sa-downhole-geochem-cobalt":
+    name: "SA Max Downhole Geochem Cobalt"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum cobalt value from each drill hole has then been selected and displayed on SARIG."
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_co"
+"sa-downhole-geochem-lead":
+    name: "SA Max Downhole Geochem Lead"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum lead value from each drill hole has then been selected and displayed on SARIG."
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_pb"
+"sa-downhole-geochem-iron":
+    name: "SA Max Downhole Geochem Iron"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum iron value from each drill hole has then been selected and displayed on SARIG."
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_fe"
+"sa-downhole-geochem-nickel":
+    name: "SA Max Downhole Geochem Nickel"
+    description: "The Geological Survey of South Australia has used SA Geodata to compile cleaned datasets of selected maximum downhole geochemistry for state-wide display on SARIG. Geochemical maps consist of drill hole locations, and sampled geochemical data transformed from single element values (obtained from whole rock ppm/ppb conversion) normalised to times average crustal abundance. The maximum nickel value from each drill hole has then been selected and displayed on SARIG."
+    group: "Geochemistry"
+    supportsCsvDownloads: true
+    wfs:
+        selector: "south_australian_maxdh_geochemistry:geochem_maxdh_ni"
+"sa-gravity":
+    name: "SA Gravity"
+    description: "South Australia State Gravity"
+    group: "Geophysics"
+    wms:
+        selector: "grav"
+"sa-gravity-1vd":
+    name: "SA Gravity First Vertical Derivative"
+    description: "South Australia State Gravity first vertical derivative"
+    group: "Geophysics"
+    wms:
+        selector: "grav_1vd"
+"sa-gravity-uc1000-res":
+    name: "SA Gravity 1000m Upward Continuation Res"
+    description: "South Australia State Gravity upward continued 1000m"
+    group: "Geophysics"
+    wms:
+        selector: "grav_uc1000_res"
+"sa-tmi":
+    name: "SA Total Magnetic Intensity"
+    description: "South Australia State Total Magnetic Intensity"
+    group: "Geophysics"
+    wms:
+        selector: "tmi"
+"sa-tmi-vrtp":
+    name: "SA Total Magnetic Intensity VRTP"
+    description: "South Australia State Total Magnetic Intensity Variable Reduction to Pole"
+    group: "Geophysics"
+    wms:
+        selector: "tmi_vrtp"
+"sa-tmi-vrtp-1vd":
+    name: "SA Total Magnetic Intensity VRTP 1VD"
+    description: "South Australia State Total Magnetic Intensity variable reduction to pole, first vertical derivative"
+    group: "Geophysics"
+    wms:
+        selector: "tmi_vrtp_1vd"
+"sa-rad-rgb":
+    name: "SA Radiometry Ternary KThU RGB"
+    description: "South Australia State Radiometry  Potassium-Thorium-Uranium (KThU) Ternary RGB"
+    group: "Geophysics"
+    wms:
+        selector: "rad_rgb"
+"sa-rad-rgb-lns":
+    name: "SA Radiometry Ternary KThU RGB"
+    description: "South Australia State Radiometry Potassium-Thorium-Uranium (KThU) Log Normalised Scaled Ternary RGB"
+    group: "Geophysics"
+    wms:
+        selector: "rad_rgb_lns"
+"sa-rad-k":
+    name: "SA Radiometry K"
+    description: "South Australia State Radiometry Potassium (K)"
+    group: "Geophysics"
+    wms:
+        selector: "rad_k"
+"sa-rad-th":
+    name: "SA Radiometry Th"
+    description: "South Australia State Radiometry Thporium (Th)"
+    group: "Geophysics"
+    wms:
+        selector: "rad_th"
+"sa-rad-u":
+    name: "SA Radiometry U"
+    description: "South Australia State Radiometry Uranium (U)"
+    group: "Geophysics"
+    wms:
+        selector: "rad_u"
+"sa-rad-u2th":
+    name: "SA Radiometry U2Th"
+    description: "South Australia State Radiometry Uranium squared/Thorium (U2Th)"
+    group: "Geophysics"
+    wms:
+        selector: "rad_u2th"
+"sa-rad-tc":
+    name: "SA Radiometry Total Count"
+    description: "South Australia State Radiometry Total Count"
+    group: "Geophysics"
+    wms:
+        selector: "rad_tc"
