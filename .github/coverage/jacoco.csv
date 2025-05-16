@@ -58,8 +58,8 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,PortalUserService,69,0,
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalUserDetailsService,160,0,14,0,39,0,12,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,SeismicSurveyWMSService,0,52,0,0,0,14,0,2,0,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,ErmlVocabService,30,101,4,10,9,29,4,6,1,2
-AuScope-Portal-API,org.auscope.portal.server.web.service,RemanentAnomaliesAutoSearchService,27,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,LintResult,37,0,0,0,14,0,3,0,3,0
+AuScope-Portal-API,org.auscope.portal.server.web.service,RemanentAnomaliesAutoSearchService,27,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,MineralOccurrenceService,71,0,2,0,15,0,7,0,6,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCL2_0_DataService,734,1032,68,66,138,195,53,35,11,10
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService,457,269,46,16,96,64,34,9,7,5
@@ -68,8 +68,8 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,RemanentAnomaliesServic
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService.DatasetCollection,6,0,0,0,1,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,LintResult.Location,15,0,0,0,6,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,LintResult.Severity,15,0,0,0,3,0,1,0,1,0
-AuScope-Portal-API,org.auscope.portal.server.web.service,SimpleFeatureProperty,63,0,0,0,26,0,13,0,13,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService.Dataset,6,0,0,0,1,0,1,0,1,0
+AuScope-Portal-API,org.auscope.portal.server.web.service,SimpleFeatureProperty,63,0,0,0,26,0,13,0,13,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,PortalParamsService,22,0,0,0,6,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,SF0BoreholeService,43,53,0,2,8,10,4,3,4,2
 AuScope-Portal-API,org.auscope.portal.server.web.service,GeologicalProvincesService,29,0,2,0,9,0,4,0,3,0
@@ -94,16 +94,16 @@ AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralTenementFilter,24
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,Mine,122,84,8,2,31,18,7,3,2,3
 AuScope-Portal-API,org.auscope.portal.mineraloccurrence,MineralOccurrence,10,141,1,5,4,37,1,7,0,5
 AuScope-Portal-API,org.auscope.portal.server.web.service.download,MineralOccurrenceDownloadService,19,0,2,0,7,0,3,0,2,0
-AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.mandRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,ExtraVocabularies,111,0,0,0,13,0,13,0,13,0
+AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.mandRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext.new Runnable() {...},18,0,2,0,3,0,3,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext,567,0,2,0,105,0,46,0,45,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1733,0,156,0,414,0,129,0,40,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.wfsRec,16,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalTest,79,0,2,0,18,0,5,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,ElasticsearchConfig,65,0,2,0,18,0,4,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.filterCtl,6,0,0,0,1,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalProduction,79,0,2,0,18,0,5,0,4,0
+AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.filterCtl,6,0,0,0,1,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,AuscopeRegistries,18,0,0,0,6,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,ConversionConfig,29,0,0,0,9,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.selRec,16,0,0,0,3,0,1,0,1,0
@@ -144,13 +144,13 @@ AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,TrayThumbNai
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,GetDatasetCollectionResponse,12,21,0,0,6,8,3,4,3,4
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AlgorithmVersion,11,15,0,0,6,6,3,3,3,3
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,GetLogCollectionResponse,12,21,0,0,6,8,3,4,3,4
-AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,CSVDownloadResponse,5,0,0,0,2,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,ImageTrayDepthResponse,33,0,0,0,14,0,7,0,7,0
+AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,CSVDownloadResponse,5,0,0,0,2,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AlgorithmOutputClassification,15,21,0,0,8,8,4,4,4,4
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AlgorithmOutputResponse,19,27,0,0,10,10,5,5,5,5
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,TSGStatusResponse,5,0,0,0,2,0,1,0,1,0
-AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AnalyticalJobStatus,18,55,0,0,6,26,6,15,6,15
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,BinnedCSVResponse,3,14,0,0,1,6,1,4,1,4
+AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AnalyticalJobStatus,18,55,0,0,6,26,6,15,6,15
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,UnixTimestampDeserializer,28,0,0,0,7,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFAuthenticationToken,29,0,2,0,12,0,6,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFAuthenticationRedirect,7,0,0,0,2,0,2,0,2,0
