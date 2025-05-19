@@ -105,43 +105,6 @@ public class EarthResourcesFilterController extends BasePortalController {
     }
 
     /**
-     * Handles getting the style of the Earth Resource Mine filter queries. (If the bbox elements are specified, they will limit the output response to 200
-     * records implicitly)
-     *
-     * @param mineName
-     *            the name of the mine to query for
-     * @param bbox
-     * @param maxFeatures
-     * @throws Exception
-     */
-    @RequestMapping("/doMineFilterStyle.do")
-    public void doMineFilterStyle(
-            HttpServletResponse response,
-            @RequestParam(required = true, value = "serviceUrl", defaultValue = "") String serviceUrl,
-            @RequestParam(required = false, value = "mineName", defaultValue = "") String mineName,
-            @RequestParam(required = false, value = "bbox", defaultValue = "") String bboxJson,
-            @RequestParam(required = false, value = "optionalFilters") String optionalFilters,
-            @RequestParam(required = false, value = "maxFeatures", defaultValue = "0") int maxFeatures)
-                    throws Exception {
-        // Get the mining activities
-        GenericFilterAdapter filterObject = new GenericFilterAdapter(optionalFilters,"shape");
-        String filter = filterObject.getFilterStringAllRecords();
-
-        String style = this.getStyle(serviceUrl, filter, "er:MiningFeatureOccurrence", "#AA0078");
-
-        response.setContentType("text/xml");
-
-        ByteArrayInputStream styleStream = new ByteArrayInputStream(
-                style.getBytes());
-        OutputStream outputStream = response.getOutputStream();
-
-        FileIOUtil.writeInputToOutputStream(styleStream, outputStream, 1024, false);
-
-        styleStream.close();
-        outputStream.close();
-    }
-    
-    /**
      * Handles getting the style of the Earth Resource Lite Mine View filter queries. (If the bbox elements are specified, they will limit the output response to 200
      * records implicitly)
      *
