@@ -5,7 +5,6 @@ import org.auscope.portal.core.services.BaseWFSService;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.methodmakers.filter.IFilter;
-import org.auscope.portal.remanentanomalies.RemanentAnomaliesFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,12 +43,5 @@ public class RemanentAnomaliesService extends BaseWFSService {
 
         return filterString;
     }
-
-    public String getRemanentAnomaliesFilter(String name, Float ARRAMin, Float ARRAMax, Float decMin, Float decMax, Float incMin, Float incMax, Integer modelCountMin, Integer modelCountMax, Boolean modelsfilter, String optionalFilters, FilterBoundingBox bbox)
-            throws Exception {
-        RemanentAnomaliesFilter filter = new RemanentAnomaliesFilter(name, ARRAMin, ARRAMax, decMin, decMax, incMin, incMax, modelCountMin, modelCountMax,modelsfilter, optionalFilters);
-        return generateFilterString(filter, bbox);
-    }
-
 
 }
