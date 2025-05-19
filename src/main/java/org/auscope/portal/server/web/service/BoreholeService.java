@@ -382,10 +382,6 @@ public class BoreholeService extends BaseWFSService {
         return sb.toString();
     }
 
-    public boolean namespaceSupportsHyloggerFilter(String namespace) {
-        return namespace.equals("http://xmlns.geosciml.org/geosciml-portrayal/4.0");
-    }
-
     public String getTypeName() {
         return "gsml:Borehole";
     }

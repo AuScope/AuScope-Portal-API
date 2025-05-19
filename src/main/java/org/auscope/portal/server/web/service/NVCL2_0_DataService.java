@@ -26,7 +26,6 @@ import org.auscope.portal.core.util.DOMUtil;
 import org.auscope.portal.server.domain.nvcldataservice.AlgorithmOutputClassification;
 import org.auscope.portal.server.domain.nvcldataservice.AlgorithmOutputResponse;
 import org.auscope.portal.server.domain.nvcldataservice.AlgorithmVersion;
-import org.auscope.portal.server.domain.nvcldataservice.AnalyticalJobResults;
 import org.auscope.portal.server.domain.nvcldataservice.AnalyticalJobStatus;
 import org.auscope.portal.server.domain.nvcldataservice.BinnedCSVResponse;
 import org.auscope.portal.server.domain.nvcldataservice.BinnedCSVResponse.Bin;
@@ -689,47 +688,6 @@ public class NVCL2_0_DataService {
 
         return parsedStatuses;
     }
-
-    /**
-     * Queries for the results of a given job.
-     * @param jobId
-     * @return
-     * @throws Exception
-     */
-    public AnalyticalJobResults getProcessingResults(String jobId) throws Exception {
-        HttpRequestBase method = nvclMethodMaker.getProcessingJobResults(analyticalServicesUrl, jobId);
-        String responseText = httpServiceCaller.getMethodResponseAsString(method);
-        JSONObject response = new JSONObject(responseText);
-
-        AnalyticalJobResults results = new AnalyticalJobResults(response.getString("jobid"));
-        results.setJobDescription(response.optString("jobDescription"));
-        results.setEmail(response.optString("email"));
-
-
-        JSONArray successes = response.getJSONArray("boreholes");
-        List<String> successIds = new ArrayList<String>(successes.length());
-        for (int i = 0; i < successes.length(); i++) {
-            successIds.add(successes.getJSONObject(i).getString("id"));
-        }
-        results.setPassBoreholes(successIds);
-
-        JSONArray fails = response.getJSONArray("failedBoreholes");
-        List<String> failIds = new ArrayList<String>(fails.length());
-        for (int i = 0; i < fails.length(); i++) {
-            failIds.add(fails.getJSONObject(i).getString("id"));
-        }
-        results.setFailBoreholes(failIds);
-
-        JSONArray errors = response.getJSONArray("errorBoreholes");
-        List<String> errorIds = new ArrayList<String>(errors.length());
-        for (int i = 0; i < errors.length(); i++) {
-            errorIds.add(errors.getJSONObject(i).getString("id"));
-        }
-        results.setErrorBoreholes(errorIds);
-
-        return results;
-    }
-
 
 
     public String getTsgAlgorithms(String tsgAlgName) throws Exception {

@@ -35,22 +35,6 @@ public class GsmlpNameSpaceTable {
     }
 
     /**
-     * Get gsmlp namespace based on the serviceUrl
-     * 
-     * @param serviceUrl
-     *            The serviceUrl
-     * @return string of gsmlp namespace
-     */
-    public String getGsmlpNameSpace(String serviceUrl) {
-        String gsmlpNameSpace = gsmlpNameSpaceCache.get(serviceUrl);
-        if (gsmlpNameSpace == null) {
-            gsmlpNameSpace = getOnlineGsmlpNameSpace(serviceUrl);
-            gsmlpNameSpaceCache.put(serviceUrl, gsmlpNameSpace);            
-        }
-        return gsmlpNameSpace;
-    }
-
-    /**
      * Clear cache of gsmlpNameSpaceCache 
      * @return void
      */
@@ -58,32 +42,4 @@ public class GsmlpNameSpaceTable {
         gsmlpNameSpaceCache.clear();        
     }
 
-    /**
-     * Get gsmlp namespace from online request of the serviceUrl
-     * 
-     * @param serviceUrl
-     *            The serviceUrl
-     * @return string of gsmlp namespace
-     */
-    private String getOnlineGsmlpNameSpace(String serviceUrl) {
-        HttpRequestBase method = null;
-        String gsmlpNameSpace = "http://xmlns.geosciml.org/geosciml-portrayal/4.0"; // "http://www.opengis.net/gsml/4.1/geosciml-lite";
-        try {
-            method = wfsMethodMaker.makeGetCapabilitiesMethod(serviceUrl);
-            String responseString = httpServiceCaller.getMethodResponseAsString(method);
-            Document responseDoc = DOMUtil.buildDomFromString(responseString);
-            Element elem = responseDoc.getDocumentElement();
-            gsmlpNameSpace = elem.getAttribute("xmlns:gsmlp");
-
-            //XPathExpression exprWFS_Cap = DOMUtil.compileXPathExpr("wfs:WFS_Capabilities");
-            //Element elem2 = (Element) exprWFS_Cap.evaluate(responseDoc, XPathConstants.STRING); 
-        } catch (Exception ex) {
-            log.warn(String.format("Get onlineGsmlpNameSpace for '%s' failed", serviceUrl));
-        } finally {
-            if (method != null) {
-                method.releaseConnection();
-            }
-        }
-        return gsmlpNameSpace;
-    }
 }
