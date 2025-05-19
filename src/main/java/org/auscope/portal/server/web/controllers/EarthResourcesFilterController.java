@@ -115,40 +115,6 @@ public class EarthResourcesFilterController extends BasePortalController {
         outputStream.close();
     }
     
-    /**
-     * Handles getting the style of the Earth Resource Lite Commodity Resource filter queries. (If the bbox elements are specified, they will limit the output response to 200
-     * records implicitly)
-     *
-     * @param optionalFilters 
-     *            
-     * @param maxFeatures
-     * @throws Exception
-     */
-    @RequestMapping("/getErlCommodityResourceViewStyle.do")
-    public void getErlCommodityResourceViewStyle(
-            HttpServletResponse response,
-            @RequestParam(required = false, value = "optionalFilters") String optionalFilters,
-            @RequestParam(required = false, value = "maxFeatures", defaultValue = "0") int maxFeatures)
-                    throws Exception {
-        // Get the mining activities
-        GenericFilterAdapter filterObject = new GenericFilterAdapter(optionalFilters,"shape"); 
-        String filter = filterObject.getFilterStringAllRecords();
-
-        String style = this.getErLStyle(filter, "erl:CommodityResourceView", "#940ea3");
-
-        response.setContentType("text/xml");
-
-        ByteArrayInputStream styleStream = new ByteArrayInputStream(
-                style.getBytes());
-        OutputStream outputStream = response.getOutputStream();
-
-        FileIOUtil.writeInputToOutputStream(styleStream, outputStream, 1024, false);
-
-        styleStream.close();
-        outputStream.close();
-    }
-                    
-                    
 
     
     public String getErLStyle(String filter, String name, String color) throws IOException{
