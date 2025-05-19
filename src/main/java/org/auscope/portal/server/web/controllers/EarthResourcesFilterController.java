@@ -10,11 +10,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.configuration.ServiceConfigurationItem;
 import org.auscope.portal.core.server.controllers.BasePortalController;
-import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.uifilter.GenericFilterAdapter;
 import org.auscope.portal.core.util.FileIOUtil;
 import org.auscope.portal.core.util.SLDLoader;
-import org.auscope.portal.server.web.service.MineralOccurrenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,15 +37,11 @@ public class EarthResourcesFilterController extends BasePortalController {
 
     // ----------------------------------------------------- Instance variables
 
-    private MineralOccurrenceService mineralOccurrenceService;
-
     private ServiceConfiguration serviceConfig;
     // ----------------------------------------------------------- Constructors
 
     @Autowired
-    public EarthResourcesFilterController(MineralOccurrenceService mineralOccurrenceService, 
-            ServiceConfiguration serviceConfig) {
-        this.mineralOccurrenceService = mineralOccurrenceService;
+    public EarthResourcesFilterController(ServiceConfiguration serviceConfig) {
         this.serviceConfig = serviceConfig;
     }
     
@@ -55,53 +49,6 @@ public class EarthResourcesFilterController extends BasePortalController {
 
     // ------------------------------------------- Property Setters and Getters
 
-    /**
-     * Handles Mining Activity Style request queries Returns WFS response converted into KML.
-     *
-     * @param mineName
-     * @param startDate
-     * @param endDate
-     * @param oreProcessed
-     * @param producedMaterial
-     * @param cutOffGrade
-     * @param production
-     * @param bbox
-     * @param maxFeatures
-     */
-    @RequestMapping("/doMiningActivityFilterStyle.do")
-    public void doMiningActivityFilterStyle(
-            HttpServletResponse response,
-            @RequestParam(required = true, value = "serviceUrl", defaultValue = "") String serviceUrl,
-            @RequestParam(required = false, value = "mineName", defaultValue = "") String mineName,
-            @RequestParam(required = false, value = "startDate", defaultValue = "") String startDate,
-            @RequestParam(required = false, value = "endDate", defaultValue = "") String endDate,
-            @RequestParam(required = false, value = "oreProcessed", defaultValue = "") String oreProcessed,
-            @RequestParam(required = false, value = "producedMaterial", defaultValue = "") String producedMaterial,
-            @RequestParam(required = false, value = "cutOffGrade", defaultValue = "") String cutOffGrade,
-            @RequestParam(required = false, value = "production", defaultValue = "") String production,
-            @RequestParam(required = false, value = "bbox", defaultValue = "") String bboxJson,
-            @RequestParam(required = false, value = "maxFeatures", defaultValue = "0") int maxFeatures)
-                    throws Exception {
-        FilterBoundingBox bbox = null;
-        // Get the mining activities
-        // VT: Currently not working as GeoServer is returning strange error for this filer
-        String filter = this.mineralOccurrenceService.getMiningActivityFilter(
-                mineName, startDate, endDate, oreProcessed, producedMaterial,
-                cutOffGrade, production, bbox);
-
-        String style = this.getStyle(serviceUrl, filter, "er:MiningFeatureOccurrence", "#FF9900");
-
-        response.setContentType("text/xml");
-
-        ByteArrayInputStream styleStream = new ByteArrayInputStream(
-                style.getBytes());
-        OutputStream outputStream = response.getOutputStream();
-
-        FileIOUtil.writeInputToOutputStream(styleStream, outputStream, 1024, false);
-
-        styleStream.close();
-        outputStream.close();
-    }
 
     /**
      * Handles getting the style of the Earth Resource Lite Mine View filter queries. (If the bbox elements are specified, they will limit the output response to 200

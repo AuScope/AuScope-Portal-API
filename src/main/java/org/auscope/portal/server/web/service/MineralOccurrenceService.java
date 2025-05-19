@@ -56,16 +56,6 @@ public class MineralOccurrenceService extends BaseWFSService {
     }
 
 
-	public String getMiningActivityFilter(String mineName, String startDate,
-            String endDate, String oreProcessed, String producedMaterial,
-            String cutOffGrade, String production,
-            FilterBoundingBox bbox) {
-        MiningActivityFilter filter = new MiningActivityFilter(mineName,
-                startDate, endDate, oreProcessed, producedMaterial,
-                cutOffGrade, production);
-        return generateFilterString(filter, bbox);
-    }
-
     public String getMineFilter(String mineName, FilterBoundingBox bbox, String optionalFilters) {
         MineFilter filter = new MineFilter(mineName, optionalFilters);
         return generateFilterString(filter, bbox);
