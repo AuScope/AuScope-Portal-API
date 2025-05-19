@@ -3,7 +3,6 @@ package org.auscope.portal.server.web.controllers;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URLDecoder;
 import java.util.Hashtable;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -203,47 +202,6 @@ public class EarthResourcesFilterController extends BasePortalController {
     }
                     
                     
-
-    /**
-     * Handles counting the results of an Earth Resource Mineral Occurrence style request query.
-     *
-     * @param commodityName
-     * @param bbox
-     * @param maxFeatures
-     *
-     * @throws Exception
-     */
-    @RequestMapping("/doMineralOccurrenceFilterStyle.do")
-    public void doMineralOccurrenceFilterStyle(
-            HttpServletResponse response,
-            @RequestParam(required = true, value = "serviceUrl", defaultValue = "") String serviceUrl,
-            @RequestParam(value = "commodityName", required = false) String commodityName,
-            @RequestParam(required = false, value = "bbox") String bboxJson,
-            @RequestParam(required = false, defaultValue="", value = "optionalFilters") String optionalFilters,
-            @RequestParam(required = false, value = "maxFeatures", defaultValue = "0") int maxFeatures)
-                    throws Exception {
-        FilterBoundingBox bbox = null;
-        // Get the mining activities
-        String unescapeCommodityName = "";
-        if (commodityName != null) {
-            unescapeCommodityName = URLDecoder.decode(commodityName, "UTF-8");
-        }
-        String filter = this.mineralOccurrenceService.getMineralOccurrenceFilter(unescapeCommodityName,
-                bbox,optionalFilters);
-
-        String style = this.getStyle(serviceUrl, filter, "gsml:MappedFeature", "#8C489F");
-
-        response.setContentType("text/xml");
-
-        ByteArrayInputStream styleStream = new ByteArrayInputStream(
-                style.getBytes());
-        OutputStream outputStream = response.getOutputStream();
-
-        FileIOUtil.writeInputToOutputStream(styleStream, outputStream, 1024, false);
-
-        styleStream.close();
-        outputStream.close();
-    }
 
     
     public String getErLStyle(String filter, String name, String color) throws IOException{
