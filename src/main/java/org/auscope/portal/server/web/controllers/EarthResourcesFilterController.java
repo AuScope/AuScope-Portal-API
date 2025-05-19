@@ -282,49 +282,6 @@ public class EarthResourcesFilterController extends BasePortalController {
         outputStream.close();
     }
 
-    /**
-     * Handles counting the results of an Earth Resource Mineral Occurrence SF0 view style request query.
-     *
-     * @param commodityName
-     * @param bbox
-     * @param maxFeatures
-     *
-     * @throws Exception
-     */
-    @RequestMapping("/doMinOccurViewFilterStyle.do")
-    public void doMinOccurViewFilterStyle(
-            HttpServletResponse response,
-            @RequestParam(required = true, value = "serviceUrl", defaultValue = "") String serviceUrl,
-            @RequestParam(value = "commodityName", required = false) String commodityName,
-            @RequestParam(required = false, value = "size") String size,
-            @RequestParam(required = false, value = "minOreAmount") String minOreAmount,
-            @RequestParam(required = false, value = "minReserves") String minReserves,
-            @RequestParam(required = false, value = "minResources") String minResources,
-            @RequestParam(required = false, value = "bbox") String bboxJson,
-            @RequestParam(required = false, value = "maxFeatures", defaultValue = "0") int maxFeatures)
-                    throws Exception {
-        FilterBoundingBox bbox = null;
-        // Get the mining activities
-        String unescapeCommodityName = "";
-        if (commodityName != null) {
-            unescapeCommodityName = URLDecoder.decode(commodityName, "UTF-8");
-        }
-        String filter = this.mineralOccurrenceService.getMinOccurViewFilter(unescapeCommodityName, minOreAmount,
-                minReserves, minResources, bbox);
-
-        String style = this.getStyle(serviceUrl, filter, MIN_OCCUR_VIEW_TYPE, "#ed9c38");
-
-        response.setContentType("text/xml");
-
-        ByteArrayInputStream styleStream = new ByteArrayInputStream(
-                style.getBytes());
-        OutputStream outputStream = response.getOutputStream();
-
-        FileIOUtil.writeInputToOutputStream(styleStream, outputStream, 1024, false);
-
-        styleStream.close();
-        outputStream.close();
-    }
     
     public String getErLStyle(String filter, String name, String color) throws IOException{
     	 Hashtable<String,String> valueMap = new Hashtable<String,String>();
