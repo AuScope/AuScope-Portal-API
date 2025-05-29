@@ -5,8 +5,8 @@ AuScope-Portal-API,org.auscope.portal.server.web.service.monitor,KnownLayerStatu
 AuScope-Portal-API,org.auscope.portal.remanentanomalies,RemanentAnomaliesFilter,203,0,30,0,39,0,18,0,3,0
 AuScope-Portal-API,org.auscope.portal.remanentanomalies,RemanentAnomaliesAutoSearchFilter,45,0,0,0,8,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.view.knownlayer,IRISSelector,58,0,8,0,15,0,8,0,4,0
-AuScope-Portal-API,org.auscope.portal.gsml,SF0BoreholeFilter,153,197,30,16,24,50,22,8,2,5
-AuScope-Portal-API,org.auscope.portal.gsml,BoreholeFilter,6,215,7,23,1,56,6,13,0,4
+AuScope-Portal-API,org.auscope.portal.gsml,SF0BoreholeFilter,153,207,30,16,24,52,22,8,2,5
+AuScope-Portal-API,org.auscope.portal.gsml,BoreholeFilter,6,225,7,23,1,58,6,13,0,4
 AuScope-Portal-API,org.auscope.portal.gsml,TIMAGeosampleFilter,82,0,12,0,14,0,9,0,3,0
 AuScope-Portal-API,org.auscope.portal.gsml,BoreholeWithConfigurableFilter,96,0,10,0,21,0,9,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.google,GoogleOidcUserService,65,0,2,0,14,0,5,0,4,0
@@ -23,7 +23,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.controllers,SF0BoreholeControll
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabController,10,235,2,6,2,43,2,9,0,7
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,PortalParamsController,114,0,10,0,29,0,10,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,PortalStateController,212,0,20,0,51,0,17,0,7,0
-AuScope-Portal-API,org.auscope.portal.server.web.controllers,NVCLController,794,378,56,6,164,82,43,11,14,9
+AuScope-Portal-API,org.auscope.portal.server.web.controllers,NVCLController,775,376,55,5,162,81,42,11,14,9
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,VocabController.new Comparator() {...},0,16,0,0,0,2,0,2,0,2
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,GenericController,143,0,10,0,41,0,10,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.web.controllers,IRISController.new IterableNamespace() {...},0,12,0,0,0,3,0,1,0,1
@@ -59,7 +59,7 @@ AuScope-Portal-API,org.auscope.portal.server.web.service,RemanentAnomaliesAutoSe
 AuScope-Portal-API,org.auscope.portal.server.web.service,MineralOccurrenceService,29,0,2,0,9,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCL2_0_DataService,734,909,68,60,138,173,53,31,11,9
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService,457,269,46,16,96,64,34,9,7,5
-AuScope-Portal-API,org.auscope.portal.server.web.service,BoreholeService,556,264,23,15,126,53,20,11,6,6
+AuScope-Portal-API,org.auscope.portal.server.web.service,BoreholeService,545,211,22,14,123,44,19,10,6,5
 AuScope-Portal-API,org.auscope.portal.server.web.service,RemanentAnomaliesService,19,0,2,0,7,0,3,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,NVCLDataService.DatasetCollection,6,0,0,0,1,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.web.service,LintResult.Location,15,0,0,0,6,0,3,0,3,0
