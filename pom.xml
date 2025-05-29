@@ -45,7 +45,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.11</version>
+        <version>3.4.6</version>
     </parent>
     
     <!-- Repositories section -->
@@ -116,6 +116,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
+	        <version>6.1.20</version>
         </dependency>
         <dependency>
             <groupId>org.auscope.portal</groupId>
@@ -221,6 +222,7 @@
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
+            <version>2.10.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -244,7 +246,7 @@
         <dependency>
             <groupId>com.azure.spring</groupId>
             <artifactId>spring-cloud-azure-appconfiguration-config</artifactId>
-            <version>5.14.0</version>
+            <version>5.20.0</version>
         </dependency>
     </dependencies>
 

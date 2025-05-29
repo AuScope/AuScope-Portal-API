@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.uifilter.GenericFilter;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Tannu Gupta
@@ -80,20 +80,22 @@ public class BoreholeFilter extends GenericFilter {
                     && dateOfDrillingEnd != null && !dateOfDrillingEnd.isEmpty()) {
                 // AUS-2595 Due to the date compare does not like the
                 // PropertyIsLike, it was change to use PropertyIsGreaterThan & PropertyIsLessThan.
-                DateTimeFormatter formatter = DateTimeFormat
-                        .forPattern("yyyy-MM-dd");
-                DateTime dtStart = formatter
-                        .parseDateTime(this.dateOfDrillingStart);
-                DateTime dtEnd = formatter.parseDateTime(this.dateOfDrillingEnd);
+                DateTimeFormatter formatter = DateTimeFormatter
+                        .ofPattern("yyyy-MM-dd");
+                LocalDate dStart = LocalDate
+                        .parse(this.dateOfDrillingStart, formatter);
+                LocalDate dEnd = LocalDate.parse(this.dateOfDrillingEnd, formatter);
                 // LJ: Need to minus 1 second for startDate to cover the time of
                 // 00:00:00
                 // Need to plus 1 second for endDate to cover the time of 00:00:00
+                LocalDateTime dtStart = dStart.atTime(0,0);
                 dtStart = dtStart.minusSeconds(1);
+                LocalDateTime dtEnd = dEnd.atTime(0,0);
                 dtEnd = dtEnd.plusSeconds(1);
-                DateTimeFormatter outFormatter = DateTimeFormat
-                        .forPattern("yyyy-MM-dd HH:mm:ss");
-                String utcDateofDrillingStart = outFormatter.print(dtStart);
-                String utcDateofDrillingEnd = outFormatter.print(dtEnd);
+                DateTimeFormatter outFormatter = DateTimeFormatter
+                        .ofPattern("yyyy-MM-dd HH:mm:ss");
+                String utcDateofDrillingStart = outFormatter.format(dtStart);
+                String utcDateofDrillingEnd = outFormatter.format(dtEnd);
                 parameterFragments.add(this.generateDatePropertyIsGreaterThan(
                         "gsml:indexData/gsml:BoreholeDetails/gsml:dateOfDrilling",false,
                         this.generateFunctionDateParse(utcDateofDrillingStart)));
