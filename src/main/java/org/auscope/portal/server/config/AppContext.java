@@ -213,7 +213,6 @@ public class AppContext {
     // Primary (default) HttpServiceCaller bean
     // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
     @Bean
-    @Autowired
     @Primary
     public HttpServiceCaller httpServiceCallerApp() {
         return new HttpServiceCaller(900000, activeProfile.contains("test"));

@@ -103,7 +103,7 @@ public class NVCLController extends BasePortalController {
      */
     public ModelAndView doBoreholeFilter(String serviceUrl, String boreholeName, String custodian,
             String dateOfDrillingStart,String dateOfDrillingEnd, int maxFeatures, FilterBoundingBox bbox,
-            boolean onlyHylogger, String outputFormat, boolean countOnly,String optionalFilters) throws Exception {
+            boolean onlyHylogger, String outputFormat,String optionalFilters) throws Exception {
         List<String> hyloggerBoreholeIDs = null;
         if (onlyHylogger) {
             try {
@@ -124,14 +124,10 @@ public class NVCLController extends BasePortalController {
         }
 
         try {
-            if (countOnly) {
-                int count = this.boreholeService.countAllBoreholes(serviceUrl, boreholeName, custodian, dateOfDrillingStart, dateOfDrillingEnd, maxFeatures, bbox, hyloggerBoreholeIDs);
-                return generateJSONResponseMAV(true, count, "");
-            } else {
-                WFSResponse response = this.boreholeService.getAllBoreholes(serviceUrl, boreholeName, custodian,
-                        dateOfDrillingStart,dateOfDrillingEnd, maxFeatures, bbox, hyloggerBoreholeIDs, outputFormat,optionalFilters);
-                return generateNamedJSONResponseMAV(true, "gml", response.getData(), null);
-            }
+            WFSResponse response = this.boreholeService.getAllBoreholes(serviceUrl, boreholeName, custodian,
+                    dateOfDrillingStart,dateOfDrillingEnd, maxFeatures, bbox, hyloggerBoreholeIDs, outputFormat,optionalFilters);
+            return generateNamedJSONResponseMAV(true, "gml", response.getData(), null);
+
         } catch (Exception e) {
             log.info("Error performing borehole filter: ", e);
             return this.generateExceptionResponse(e, serviceUrl);
