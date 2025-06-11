@@ -1166,17 +1166,17 @@
     order: "Registered_47"
     supportsCsvDownloads: true
     initialBBox:
-        - [ 143.19,-43.67,151.47,-39.98 ]
+        - [ 144.19,-42.67,148.47,-40.98 ]
     wfs:
         selector: "mrtwfs:LandSlidePoint"
 "mine-occu-poin-of-tasm-min-reso-tasm":
     name: "Mineral Occurrence Points Of Tasmania"
-    group: "Mineral Deposits"
+    group: "Earth Resources"
     description: "Mineral occurrences, including operating and abandoned mines, located in Tasmania"
     order: "Registered_48"
     supportsCsvDownloads: true
     initialBBox:
-        - [ 143.19,-43.67,151.47,-39.98 ]
+        - [ 144.19,-42.67,148.47,-40.98 ]
     wfs:
         selector: "mrtwfs:MineralOccurences"
 "land-line-of-tasm-min-reso-tasm":
@@ -1254,7 +1254,7 @@
     order: "Registered_57"
     supportsCsvDownloads: true
     initialBBox:
-        - [ 143.19,-43.67,151.47,-39.98 ]
+        - [ 144.19,-42.67,148.47,-40.98 ]
     wfs:
         selector: "mrtwfs:DamagePoint"
 "grav-base-stat-of-tasm-min-reso-tasm":
@@ -1328,7 +1328,7 @@
         selector: "gsnsw:dw_fieldobs"
 "nsw-mineral-occurrence-industry":
     name: "NSW Mineral Occurrence Industry"
-    group: "Mineral Deposits"
+    group: "Earth Resources"
     description: "This spatial dataset is a derivative product of the New South Wales Mineral Occurence Database (also known as New South Wales MetIndEx). It records over 31,000 known mineral occurrences throughout NSW. These records have been compiled from resource and production data compiled from both historic and current mining operations records held by the Geological Survey of NSW"
     order: "Registered_82"
     supportsCsvDownloads: true
@@ -1416,7 +1416,7 @@
         selector: "geophys:IsoGravTilt"
 "nsw-mineral-occurrence-commodity":
     name: "NSW Mineral Occurrence Commodity"
-    group: "Mineral Deposits"
+    group: "Earth Resources"
     description: "This spatial dataset is a derivative product of the New South Wales Mineral Occu"
     order: "Registered_109"
     supportsCsvDownloads: true
