@@ -45,10 +45,4 @@ public class GeologicalProvincesService extends BaseWFSService {
         return filterString;
     }
 
-    public String getGeologicalProvincesFilter(String name, String optionalFilters)
-                    throws Exception {
-    	GeologicalProvincesFilter filter = new GeologicalProvincesFilter(name,optionalFilters);
-        return generateFilterString(filter, null);
-    }
-
 }

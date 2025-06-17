@@ -115,7 +115,7 @@ public class TestNVCLController extends PortalTestClass {
         });
 
         ModelAndView response = this.nvclController.doBoreholeFilter(serviceUrl, nameFilter, custodianFilter,
-                filterDateStart, filterDateEnd, maxFeatures, bbox, onlyHylogger, outputFormat, false,"");
+                filterDateStart, filterDateEnd, maxFeatures, bbox, onlyHylogger, outputFormat, "");
         Assert.assertTrue((Boolean) response.getModel().get("success"));
 
         Map data = (Map) response.getModel().get("data");
@@ -161,7 +161,7 @@ public class TestNVCLController extends PortalTestClass {
         });
 
         ModelAndView response = this.nvclController.doBoreholeFilter(serviceUrl, nameFilter, custodianFilter,
-                filterDateStart, filterDateEnd, maxFeatures, bbox, onlyHylogger, outputFormat, false,"");
+                filterDateStart, filterDateEnd, maxFeatures, bbox, onlyHylogger, outputFormat, "");
         Assert.assertTrue((Boolean) response.getModel().get("success"));
 
         Map data = (Map) response.getModel().get("data");
@@ -201,7 +201,7 @@ public class TestNVCLController extends PortalTestClass {
         });
 
         ModelAndView response = this.nvclController.doBoreholeFilter(serviceUrl, nameFilter, custodianFilter,
-                filterDateStart, filterDateEnd, maxFeatures, bbox, onlyHylogger, outputFormat, false,"");
+                filterDateStart, filterDateEnd, maxFeatures, bbox, onlyHylogger, outputFormat, "");
         Assert.assertFalse((Boolean) response.getModel().get("success"));
     }
 
@@ -237,7 +237,7 @@ public class TestNVCLController extends PortalTestClass {
         });
 
         ModelAndView response = this.nvclController.doBoreholeFilter(serviceUrl, nameFilter, custodianFilter,
-                filterDateStart, filterDateEnd, maxFeatures, bbox, onlyHylogger, outputFormat, false,"");
+                filterDateStart, filterDateEnd, maxFeatures, bbox, onlyHylogger, outputFormat, "");
         Assert.assertFalse((Boolean) response.getModel().get("success"));
     }
 

@@ -5,7 +5,6 @@ import org.auscope.portal.core.services.BaseWFSService;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
 import org.auscope.portal.core.services.methodmakers.filter.FilterBoundingBox;
 import org.auscope.portal.core.services.methodmakers.filter.IFilter;
-import org.auscope.portal.mineraloccurrence.MinOccurViewFilter;
 import org.auscope.portal.mineraloccurrence.MineFilter;
 import org.auscope.portal.mineraloccurrence.MineralOccurrenceFilter;
 import org.auscope.portal.mineraloccurrence.MiningActivityFilter;
@@ -57,31 +56,8 @@ public class MineralOccurrenceService extends BaseWFSService {
     }
 
 
-	public String getMiningActivityFilter(String mineName, String startDate,
-            String endDate, String oreProcessed, String producedMaterial,
-            String cutOffGrade, String production,
-            FilterBoundingBox bbox) {
-        MiningActivityFilter filter = new MiningActivityFilter(mineName,
-                startDate, endDate, oreProcessed, producedMaterial,
-                cutOffGrade, production);
-        return generateFilterString(filter, bbox);
-    }
-
     public String getMineFilter(String mineName, FilterBoundingBox bbox, String optionalFilters) {
         MineFilter filter = new MineFilter(mineName, optionalFilters);
         return generateFilterString(filter, bbox);
     }
-    
-
-    public String getMineralOccurrenceFilter(String commodityName, FilterBoundingBox bbox,String optionalFilters) {
-        MineralOccurrenceFilter filter = new MineralOccurrenceFilter(commodityName, "", "", "", "", "",optionalFilters);
-        return generateFilterString(filter, bbox);
-    }
-
-    public String getMinOccurViewFilter(String commodityName, String minOreAmount, String minReserves,
-            String minResources, FilterBoundingBox bbox) {
-        MinOccurViewFilter filter = new MinOccurViewFilter(commodityName, minOreAmount, minReserves, minResources);
-        return generateFilterString(filter, bbox);
-    }
-
 }
