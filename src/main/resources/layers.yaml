@@ -105,6 +105,18 @@
                     - [ "Expires After", "mt:expireDate", null, "BIGGER_THAN" ]
                     - [ "Expires Before", "mt:expireDate", null, "SMALLER_THAN" ]
 
+"mineral-tenements-qld":
+        name: "Queensland Mineral Tenements"
+        description: "Queensland Mineral Tenements"
+        group: "Tenements"
+        order: "151"
+        supportsCsvDownloads: false
+        stackdriverServiceGroup: "TenementsLayers"
+        wms:
+            selector: "MineralTenement"
+        initialBBox:
+            - [ 138.0,-26.0,153.0,-18.0 ]
+
 # Earth Resources Lite v2
 "erl-mineview":
         name: "Mine View"
