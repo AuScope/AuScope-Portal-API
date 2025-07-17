@@ -105,6 +105,18 @@
                     - [ "Expires After", "mt:expireDate", null, "BIGGER_THAN" ]
                     - [ "Expires Before", "mt:expireDate", null, "SMALLER_THAN" ]
 
+"mineral-tenements-qld":
+        name: "Queensland Mineral Tenements"
+        description: "Queensland Mineral Tenements"
+        group: "Tenements"
+        order: "151"
+        supportsCsvDownloads: false
+        stackdriverServiceGroup: "TenementsLayers"
+        wms:
+            selector: "MineralTenement"
+        initialBBox:
+            - [ 138.0,-26.0,153.0,-18.0 ]
+
 # Earth Resources Lite v2
 "erl-mineview":
         name: "Mine View"
@@ -276,9 +288,9 @@
 
 # W.A. Geosample mineralogy
 "tima-geosample":
-        name: "W.A. Mineralogy"
+        name: "W.A. TIMA Mineralogy"
         group: "Mineralogy - Geosample"
-        description: "A collection of the results published from TIMA"
+        description: "A collection of the results published from TIMA at Curtin University"
         proxyDownloadUrl: "doTIMAGeoSampleCSVDownload.do"
         # proxyStyleUrl: "doGenericFilterStyle.do?styleType=POINT&color=0xFF0000&layerName=tima:geosample_and_mineralogy"
         order: "180"
@@ -292,7 +304,7 @@
 
 # W.A. Geosample Geochronology
 "tima-shrimp-geosample":
-        name: "W.A. Geochronology"
+        name: "W.A. SHRIMP Geochronology"
         group: "Geochronology"
         description: "Locations and dataset download URLs of samples that have been analysed by SHRIMP U-Pb mass spectrometer at Curtin University"
         proxyDownloadUrl: "doSHRIMPGeoSampleCSVDownload.do"
@@ -1352,8 +1364,8 @@
         selector: "gsnsw:bl_title"
 "nsw-geological-spectral-samples":
     name: "NSW Geological Spectral Samples"
-    group: "Spectral Samples"
-    description: "Spectral Samples"
+    group: "Boreholes"
+    description: "In-hole Spectral Samples taken by Geological Survey of NSW"
     order: "Registered_90"
     supportsCsvDownloads: true
     wfs:
@@ -2302,18 +2314,9 @@
         ids:
             - "2ac763b0-678b-4058-9edf-69b6fb9ba2b2"
 
-"aso-sample-collections-point":
-    name: "WA ASO Sample Collections Point"
-    group: "Tenements"
-    description: ""
-    order: "Registered_130"
-    supportsCsvDownloads: false
-    csw:
-        ids:
-            - "2878b2c5-78b1-449a-b450-0c2bccc1da9d"
 "clay-sample-analyses":
     name: "WA Clay Sample Analyses"
-    group: "Tenements"
+    group: "Soil Chemistry"
     description: "Clay sample analyses contains geoscientific and analytical data from clay samples collected during fieldwork. The data are held in GDA 94"
     order: "Registered_131"
     supportsCsvDownloads: false
@@ -2322,7 +2325,7 @@
             - "d77d9a25-40a4-454b-991c-58e4c1e8bcbb"
 "sand-and-gravel-sample-analyses":
     name: "WA Sand and Gravel Sample Analyses"
-    group: "Tenements"
+    group: "Soil Chemistry"
     description: "Sand and gravel sample analyses contain geoscientific and particle size distribution data from sand and gravel samples collected during fieldwork. The data are held in GDA 94"
     order: "Registered_132"
     supportsCsvDownloads: false
@@ -2331,7 +2334,7 @@
             - "18c83f57-ace8-4f59-a0b6-f1201412b8d4"
 "Lime sample analyses":
     name: "WA Lime Sample Analyses"
-    group: "Tenements"
+    group: "Soil Chemistry"
     description: "Lime sample analyses contains geoscientific and analytical data from calcrete, dolomite, limesand and limestone samples collected during fieldwork. The data are held in GDA 94"
     order: "Registered_133"
     supportsCsvDownloads: false
