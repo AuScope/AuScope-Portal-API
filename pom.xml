@@ -119,7 +119,7 @@
 	        <version>6.1.20</version>
         </dependency>
         <dependency>
-            <groupId>org.auscope.portal</groupId>
+            <groupId>io.github.auscope</groupId>
             <artifactId>portal-core</artifactId>
             <version>${portal.core.version}</version>
             <exclusions>
@@ -131,7 +131,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.auscope.portal</groupId>
+            <groupId>io.github.auscope</groupId>
             <artifactId>portal-core</artifactId>
             <version>${portal.core.version}</version>
             <type>test-jar</type>
