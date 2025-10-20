@@ -145,8 +145,8 @@ AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,ImageTrayDep
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AlgorithmOutputClassification,15,21,0,0,8,8,4,4,4,4
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AlgorithmOutputResponse,19,27,0,0,10,10,5,5,5,5
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,TSGStatusResponse,5,0,0,0,2,0,1,0,1,0
-AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AnalyticalJobStatus,18,55,0,0,6,26,6,15,6,15
 AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,BinnedCSVResponse,3,14,0,0,1,6,1,4,1,4
+AuScope-Portal-API,org.auscope.portal.server.domain.nvcldataservice,AnalyticalJobStatus,18,55,0,0,6,26,6,15,6,15
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,UnixTimestampDeserializer,28,0,0,0,7,0,2,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFAuthenticationToken,29,0,2,0,12,0,6,0,5,0
 AuScope-Portal-API,org.auscope.portal.server.web.security.aaf,AAFAuthenticationRedirect,7,0,0,0,2,0,2,0,2,0
