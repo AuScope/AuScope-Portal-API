@@ -283,9 +283,6 @@ public class LayerFactory {
                             setupIcon(layer);
                             break;
                         }
-                        case "order":
-                            layer.setOrder(value);
-                            break;
                         case "legendImg":
                         	layer.setLegendImg(value);
                         	break;
@@ -295,6 +292,24 @@ public class LayerFactory {
                         case "supportsCsvDownloads":
                             layer.setSupportsCsvDownloads(Boolean.valueOf(value));
                             break;
+                        case "sldParam": {
+                            ArrayList<Object> sldSelectorList = (ArrayList<Object>)v1;
+                            JSONArray sldSelecList = new JSONArray();
+                            sldSelectorList.forEach((sldSelec) -> {
+                                ArrayList<Object> sldTuple = (ArrayList<Object>)sldSelec;
+                                int len = ((ArrayList<Object>) sldTuple).size();
+                                if (len == 2) {
+                                    String sldSelector = (String) (sldTuple).get(0);
+                                    String sldName = (String) (sldTuple).get(1);
+                                    JSONArray sldSelecItems = new JSONArray();
+                                    sldSelecItems.put(sldSelector);
+                                    sldSelecItems.put(sldName);
+                                    sldSelecList.put(sldSelecItems);
+                                }
+                            });
+                            layer.setLayerSldParameter(sldSelecList);
+                            break;
+                        }
                         case "hidden":
                             layer.setHidden(Boolean.valueOf(value));
                             break;
