@@ -1,5 +1,6 @@
 package org.auscope.portal.server.web.security.aaf;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,7 @@ import java.util.Collection;
 /**
  * Created by wis056 on 7/04/2015.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AAFAttributes implements UserDetails {
 
     private static final long serialVersionUID = -7842095359474432151L;
