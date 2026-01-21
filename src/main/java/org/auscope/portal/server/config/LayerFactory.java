@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.logging.Log;
@@ -321,12 +322,12 @@ public class LayerFactory {
                             int len = x3.size();
                             if (len == 4) {
                                 JSONArray coordNode = new JSONArray();
-                                coordNode.put(x3.get(0));
-                                coordNode.put(x3.get(1));
+                                coordNode.put(realNumber(x3.get(0)));
+                                coordNode.put(realNumber(x3.get(1)));
                                 bboxGeoJson.put(coordNode);
                                 coordNode = new JSONArray();
-                                coordNode.put(x3.get(2));
-                                coordNode.put(x3.get(3));
+                                coordNode.put(realNumber(x3.get(2)));
+                                coordNode.put(realNumber(x3.get(3)));
                                 bboxGeoJson.put(coordNode);
 
                                 layer.setBBox(bboxGeoJson);
@@ -736,5 +737,17 @@ public class LayerFactory {
 
         }
         return layer;
+    }
+
+    /*
+     * convert an object from an integer (i.e no decimal point) to a double (add a .0)
+     * e.g. 143 -> 143.0
+     */
+    private Object realNumber(Object numObj) {
+        if (numObj.toString().indexOf(".") == -1) {
+            double newObj = (int)numObj; //.doubleValue();
+            numObj = newObj; 
+        }
+        return numObj;
     }
 }
