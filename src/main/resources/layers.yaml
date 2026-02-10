@@ -2125,6 +2125,24 @@
         ids:
             - "eda39b66-11ed-490b-9aa6-21f5653bf27f"
 
+"calperum-heat-needle":
+    name: "Calperum Observatory Heat Needle Monitoring Program"
+    description: "The dataset is ground temperature and thermal conductivity data recorded at the Calperum Critical Zone observatory with AuScope Heat Needle devices."
+    group: "Temperature"
+    supportsCsvdownloads: false
+    csw:
+        ids:
+            - "d73d2881-e518-4311-8373-423b5bc8d7ae"
+
+"gippsland-murray-basin-dts-study":
+    name: "Gippsland and Murray Basin Fiber Optic DTS Study"
+    description: "This dataset contains both raw and processed data files. The data consists of temperature-depth profiles collected from boreholes using an AP Sensing N4386B and Silixa XT-DTS Distributed Temperature Sensing (DTS) instruments. The purpose of this data collection was to conduct a comparative study between DTS and conventional thermistor-based wireline logging methods."
+    group: "Temperature"
+    supportsCsvdownloads: false
+    csw:
+        ids:
+            - "3779805a-a887-4e98-ac0a-3aea733d5a87"
+
 "unsw-groundwater-levels":
     name: "UNSW Raw Groundwater Levels"
     description: "The Groundwater Infrastructure Program aims to enable long-term groundwater resource research in a variable and changing climate to inform sustainable groundwater management. This dataset contains the groundwater levels and temperature (plus corresponding manual dip measurements) across selected NCRIS sites in New South Wales collected by the Groundwater Research at UNSW"
