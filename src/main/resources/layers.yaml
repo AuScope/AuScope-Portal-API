@@ -246,6 +246,7 @@
                     - "https://geology.data.vic.gov.au/nvcl/wfs"
         sldParam:
                - [".sa.gov.au", "Borehole_NVCL"]
+               - [".nsw.gov.au", "gsmlp:borehole-nvcl"]
         filters:
                date:
                     - [ "Drilling Start From", "gsmlp:drillStartDate", null, "BIGGER_THAN" ]
@@ -302,6 +303,7 @@
                selector: "gsmlp:BoreholeView"
         sldParam:
                - [".sa.gov.au", "Borehole_AuScope"]
+               - [".nsw.gov.au", "gsmlp:borehole-auscope"]
         filters:
                textbox:
                     - [ "Name", "gsmlp:name", null, "ISLIKE" ]
