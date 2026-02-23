@@ -12,6 +12,7 @@ import org.auscope.portal.core.services.ElasticsearchService;
 import org.auscope.portal.core.services.GoogleCloudMonitoringCachedService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.PortalServiceException;
+import org.auscope.portal.core.services.WFSService;
 import org.auscope.portal.core.services.WMSService;
 import org.auscope.portal.core.services.responses.csw.CSWOnlineResourceImpl;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
@@ -130,7 +131,7 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
 
         knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4),
                 new ViewKnownLayerFactory(), new ViewCSWRecordFactory(), new ViewGetCapabilitiesFactory(),
-                new WMSService(null, null), mockElasticsearchService) {
+                new WMSService(null, null), new WFSService(null, null, null), mockElasticsearchService) {
                     @Override
                     public KnownLayerGrouping groupKnownLayerRecords() {
                         return knownLayerGroupingMock;

@@ -368,7 +368,8 @@ public class AppContext {
     @Bean
     public KnownLayerService cswKnownLayerService() {
         return new KnownLayerService(knownTypes, viewFactory, viewCSWRecordFactory,
-        							 viewGetCapabilitiesFactory, wmsService(), elasticsearchService());
+        							 viewGetCapabilitiesFactory, wmsService(), wfsService(),
+        							 elasticsearchService());
     }
 
     @Bean

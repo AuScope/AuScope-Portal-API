@@ -4,9 +4,12 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.lang.reflect.Array;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -231,17 +234,37 @@ public class LayerFactory {
     }
 
     /**
-     * creates a known layer object, from the yamlLayers object
-     * this is done by iterating other the attributes of a layer as defined in the yaml file
-     * and creating the corresponding attribute(s) for the KnownLayer object 
+     * Creates a KnownLayer object from YAML
      *
-     * @param id the id of the layer,as per yaml file
-     */
+     * @param id the id of the layer
+     */    
+    private void flattenYamlObjectToSet(Object obj, Set<String> out) {
+        if (obj == null) return;
+        if (obj instanceof String) {
+            String s = ((String) obj).trim();
+            if (!s.isEmpty()) out.add(s);
+            return;
+        }
+        if (obj instanceof Iterable) {
+            for (Object o : (Iterable<?>) obj) {
+                flattenYamlObjectToSet(o, out);
+            }
+            return;
+        }
+        if (obj.getClass().isArray()) {
+            int len = Array.getLength(obj);
+            for (int i = 0; i < len; i++) {
+                flattenYamlObjectToSet(Array.get(obj, i), out);
+            }
+            return;
+        }
+        String s = obj.toString().trim();
+        if (!s.isEmpty()) out.add(s);
+    }
+
     KnownLayer annotateLayer(String id) {
         KnownLayer layer = new KnownLayer(id, null);
-
         if (layersLoaded) {
-
             yamlLayers.forEach((k, v) -> {
                 if (k.toString().equalsIgnoreCase(id)) {
                     ((Map<String, Object>) yamlLayers.get(k)).forEach((k1, v1) -> {
@@ -293,6 +316,32 @@ public class LayerFactory {
                         case "supportsCsvDownloads":
                             layer.setSupportsCsvDownloads(Boolean.valueOf(value));
                             break;
+                        case "searchKeywordFields": {
+                            Set<String> searchKeywordFields = new HashSet<>();
+                            // v1 can be a String, a Collection (possibly nested), or an array.
+                            if (v1 instanceof String) {
+                                String[] parts = ((String) v1).split(",");
+                                for (String p : parts) {
+                                    String t = p.trim();
+                                    if (!t.isEmpty()) searchKeywordFields.add(t);
+                                }
+                            } else if (v1 instanceof Iterable) {
+                                flattenYamlObjectToSet(v1, searchKeywordFields);
+                            } else if (v1 != null && v1.getClass().isArray()) {
+                                int len = Array.getLength(v1);
+                                for (int i = 0; i < len; i++) {
+                                    flattenYamlObjectToSet(Array.get(v1, i), searchKeywordFields);
+                                }
+                            } else if (v1 != null) {
+                                String[] parts = v1.toString().split(",");
+                                for (String p : parts) {
+                                    String t = p.trim();
+                                    if (!t.isEmpty()) searchKeywordFields.add(t);
+                                }
+                            }
+                            layer.setSearchKeywordFields(searchKeywordFields);
+                            break;
+                        }
                         case "sldParam": {
                             ArrayList<Object> sldSelectorList = (ArrayList<Object>)v1;
                             JSONArray sldSelecList = new JSONArray();

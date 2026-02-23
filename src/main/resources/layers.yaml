@@ -231,6 +231,7 @@
         proxyDownloadUrl: "doNVCLBoreholeViewCSVDownload.do"
         supportsCsvDownloads: true
         stackdriverServiceGroup: "NVCLBoreholeViewLayer"
+        searchKeywordFields: ["gsmlp:name"]
         wfs:
                selector: "gsmlp:BoreholeView"
                endPoints:
