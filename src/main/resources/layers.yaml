@@ -2390,8 +2390,8 @@
 
         filters:
                textbox:
-		           - [ "DatasetName", "nmm:datasetname", null, "ISLIKE" ]			   
-			       - [ "BoreholeURI", "nmm:boreholeuri", null, "ISLIKE" ]		
+                   - [ "DatasetName", "nmm:datasetname", null, "ISLIKE" ]               
+                   - [ "BoreholeURI", "nmm:boreholeuri", null, "ISLIKE" ]        
                    - [ "countSum (greater than)", "nmm:countsum",null, "BIGGER_THAN" ]
                    - [ "countSum (less than)", "nmm:countsum",null, "SMALLER_THAN" ]
                polygonbox:
@@ -2407,8 +2407,8 @@
 
         filters:
                textbox:
-					- [ "DatasetName", "nmm:datasetname", null, "ISLIKE" ]			   
-					- [ "BoreholeURI", "nmm:boreholeuri", null, "ISLIKE" ]		
+                    - [ "DatasetName", "nmm:datasetname", null, "ISLIKE" ]               
+                    - [ "BoreholeURI", "nmm:boreholeuri", null, "ISLIKE" ]        
                     - [ "countSum (greater than)", "nmm:countsum",null, "BIGGER_THAN" ]
                     - [ "countSum (less than)", "nmm:countsum",null, "SMALLER_THAN" ]
                polygonbox:
