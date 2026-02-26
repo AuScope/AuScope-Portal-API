@@ -2379,3 +2379,37 @@
     group: "Geophysics"
     wms:
         selector: "rad_tc"
+        
+"amm-tir-mineral-quartz":
+        name: "Quartz Mineral Map"
+        group: "Australian Mineral Maps"
+        description: "Australian Quartz Mineral Map"
+        supportsCsvDownloads: true
+        wfs:
+               selector: "nmm:tir_mineral_quartz"
+
+        filters:
+               textbox:
+		           - [ "DatasetName", "nmm:datasetname", null, "ISLIKE" ]			   
+			       - [ "BoreholeURI", "nmm:boreholeuri", null, "ISLIKE" ]		
+                   - [ "countSum (greater than)", "nmm:countsum",null, "BIGGER_THAN" ]
+                   - [ "countSum (less than)", "nmm:countsum",null, "SMALLER_THAN" ]
+               polygonbox:
+                   - [ "Polygon BBox - Clipboard", "nmm:shape", null, "ISEQUAL" ]
+
+"amm-tir-mineral-olivine":
+        name: "Olivine Mineral Map"
+        group: "Australian Mineral Maps"
+        description: "Australian Olivine Mineral Map"
+        supportsCsvDownloads: true
+        wfs:
+               selector: "nmm:tir_mineral_olivine"
+
+        filters:
+               textbox:
+					- [ "DatasetName", "nmm:datasetname", null, "ISLIKE" ]			   
+					- [ "BoreholeURI", "nmm:boreholeuri", null, "ISLIKE" ]		
+                    - [ "countSum (greater than)", "nmm:countsum",null, "BIGGER_THAN" ]
+                    - [ "countSum (less than)", "nmm:countsum",null, "SMALLER_THAN" ]
+               polygonbox:
+                    - [ "Polygon BBox - Clipboard", "nmm:shape", null, "ISEQUAL" ]        
