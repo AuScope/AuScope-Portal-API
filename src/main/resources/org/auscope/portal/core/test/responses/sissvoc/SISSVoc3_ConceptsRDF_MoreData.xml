@@ -1,0 +1,58 @@
+<rdf:RDF
+    xmlns:elda="http://www.epimorphics.com/vocabularies/lda#"
+    xmlns:sparql="http://purl.org/net/opmv/types/sparql#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:doap="http://usefulinc.com/ns/doap#"
+    xmlns:gtrs="http://resource.geosciml.org/schema/cgi/trs/3.0/"
+    xmlns:os="http://a9.com/-/spec/opensearch/1.1/"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:api="http://purl.org/linked-data/api/vocab#"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:gts="http://resource.geosciml.org/schema/cgi/gts/3.0/"
+    xmlns:isc="http://resource.geosciml.org/classifier/ics/ischart/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:opmv="http://purl.org/net/opmv/types/common#"
+    xmlns:xhv="http://www.w3.org/1999/xhtml/vocab#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+  <api:Page rdf:about="http://auscope-services-test.arrc.csiro.au/sissvoc/api/commodity-vocab/concept.rdf?_sort=-prefLabel&amp;_pageSize=1000&amp;_page=0">
+    <os:startIndex rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1</os:startIndex>
+    <api:definition rdf:resource="http://auscope-services-test.arrc.csiro.au/sissvoc/api/meta/commodity-vocab/concept.rdf?_sort=-prefLabel&amp;_page=0&amp;_pageSize=1000"/>
+    <dcterms:isPartOf>
+      <api:ListEndpoint rdf:about="http://auscope-services-test.arrc.csiro.au/sissvoc/api/commodity-vocab/concept.rdf?_sort=-prefLabel">
+        <api:definition rdf:resource="http://auscope-services-test.arrc.csiro.au/sissvoc/api/meta/commodity-vocab/concept.rdf?_sort=-prefLabel&amp;_page=0&amp;_pageSize=1000"/>
+        <dcterms:hasPart rdf:resource="http://auscope-services-test.arrc.csiro.au/sissvoc/api/commodity-vocab/concept.rdf?_sort=-prefLabel&amp;_pageSize=1000&amp;_page=0"/>
+      </api:ListEndpoint>
+    </dcterms:isPartOf>
+    <api:page rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+    >0</api:page>
+    <os:itemsPerPage rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+    >5</os:itemsPerPage>
+    <xhv:first rdf:resource="http://auscope-services-test.arrc.csiro.au/sissvoc/api/commodity-vocab/concept.rdf?_sort=-prefLabel&amp;_pageSize=1000&amp;_page=0"/>
+    <api:extendedMetadataVersion rdf:resource="http://auscope-services-test.arrc.csiro.au/sissvoc/api/commodity-vocab/concept.rdf?_sort=-prefLabel&amp;_pageSize=1000&amp;_page=0&amp;_metadata=all"/>
+    <api:items rdf:parseType="Collection">
+      <rdf:Description rdf:about="http://resource.auscope.org/classifier/AuScope/commodity/Energy">
+        <skos:prefLabel xml:lang="fr">source d'energie</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">energy source</skos:prefLabel>
+      </rdf:Description>
+      <rdf:Description rdf:about="http://resource.auscope.org/classifier/GA/commodity/Au">
+        <skos:prefLabel xml:lang="en">gold</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">or</skos:prefLabel>
+      </rdf:Description>
+      <rdf:Description rdf:about="http://resource.auscope.org/classifier/AuScope/commodity/IndustrialMineral">
+        <skos:prefLabel xml:lang="en">industrial minerals</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">mineraux industriels</skos:prefLabel>
+      </rdf:Description>
+      <rdf:Description rdf:about="http://resource.auscope.org/classifier/AuScope/commodity/PreciousMetal">
+        <skos:prefLabel xml:lang="fr">metaux precieux</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">precious metals</skos:prefLabel>
+      </rdf:Description>
+      <rdf:Description rdf:about="http://resource.auscope.org/classifier/AuScope/commodity/OtherMetal">
+        <skos:prefLabel xml:lang="fr">metaux autres</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">other metals</skos:prefLabel>
+      </rdf:Description>
+    </api:items>
+    <xhv:next rdf:resource="http://auscope-services-test.arrc.csiro.au/sissvoc/api/commodity-vocab/concept.rdf?_sort=-prefLabel&amp;_pageSize=1000&amp;_page=1"/>
+  </api:Page>
+</rdf:RDF>
