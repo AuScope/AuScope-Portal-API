@@ -63,3 +63,11 @@ CREATE TABLE `bookmark_download_options` (
   KEY `ID_BOOKMARKS` (`bookmarkId`),
   CONSTRAINT `ID_BOOKMARKS` FOREIGN KEY (`bookmarkId`) REFERENCES `bookmarks` (`id`) ON DELETE CASCADE
 );
+
+CREATE TABLE `shorturl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT, 
+  'timestamp' varchar(19), 
+  `name` varchar(30) NOT NULL, 
+  'url' varchar(255) NOT NULL, 
+  'persist' boolean DEFAULT TRUE, 
+  
