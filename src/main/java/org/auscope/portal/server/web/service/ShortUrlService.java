@@ -8,6 +8,12 @@ import org.auscope.portal.server.web.repositories.ShortUrlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * A utility class which provides methods for a shortend url service
+ *
+ * @author pet22a
+ *
+ */
 @Service
 public class ShortUrlService {
 
@@ -18,7 +24,7 @@ public class ShortUrlService {
 	private ShortUrlRepository shorturlRepository;
     
     /**
-     * Retrieves the short urls by id
+     * Retrieves the short url by id
      * @param id 
      */
     public ShortUrl getShorturlById(final String id) {// throws PortalServiceException {
@@ -28,6 +34,7 @@ public class ShortUrlService {
     
     /**
      * Saves a short url.
+     * @param shorturl object
      */
     public Integer saveShorturl(final ShortUrl shorturl)  throws PortalServiceException {
         ShortUrl savedShorturl = null;
@@ -45,7 +52,7 @@ public class ShortUrlService {
 
     /**
      * Delete the given short url by id
-     * @param id 
+     * @param shorturl 
      */
     public Boolean deleteShorturl(final ShortUrl shorturl) {
         Boolean status = true;
@@ -60,7 +67,7 @@ public class ShortUrlService {
 
     /**
      * get the given short url by name
-     * @param id 
+     * @param name 
      */
     public ShortUrl getShorturlByName(String name) {
         ShortUrl shorturlRec = shorturlRepository.findByName(name);
@@ -68,15 +75,25 @@ public class ShortUrlService {
     }
 
 
+    /**
+     * returns a list of all shorturls
+     */
     public List<ShortUrl> getShortUrls() {
         return (List<ShortUrl>) shorturlRepository.findAll();
     }
 
-
+    /**
+     * returns a list of "ids" for "expired" shorturls (i.e. dates older than the cutoff date)
+     * @param cutoff date
+     */
     public List<Integer> findExpired(LocalDateTime cutoff) {
         return shorturlRepository.findExpired(cutoff);
     }
 
+    /**
+     * deletes shorturls that have a timestamp before the cutoff date
+     * @param cutoff date
+     */
     public Integer deleteExpired(LocalDateTime cutoff) {
         return shorturlRepository.deleteExpired(cutoff);
     }
