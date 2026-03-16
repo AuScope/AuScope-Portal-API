@@ -157,11 +157,6 @@ public class ShortUrlController extends BasePortalController {
     }
         
 
-    private void getExpiredShorturls(Integer rollDays) {
-        // TODO Auto-generated method stub
-        
-    }
-
     /**
      * getUniqueName to get a unique combination of two five letter words
      *

@@ -10,8 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * Simple class that stores information(file identifier, service id) about a dataset that is ShortUrl'ed by a user
- * @author san239
+ * Simple class that stores information(file identifier,url,name,timestamp,persist flag) about a url that is ShortUrl'ed
+ * @author pet22a
  *
  */
 @Entity
