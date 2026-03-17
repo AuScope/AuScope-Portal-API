@@ -99,6 +99,7 @@ spring:
       #     dialect: org.hibernate.dialect.PostgreSQL81Dialect # If using PostgreSQL only
       #     format_sql: true      # FOR TESTING
       #show-sql: true              # FOR TESTING
+      ddl-auto: update
 
    mvc:
       servlet:

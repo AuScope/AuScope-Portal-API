@@ -71,3 +71,14 @@ CREATE TABLE bookmark_download_options (
 );
 
 CREATE INDEX ID_BOOKMARKS ON bookmark_download_options (bookmarkId);
+
+CREATE SEQUENCE shorturl_seq;
+
+CREATE TABLE shorturl (
+  id int NOT NULL DEFAULT NEXTVAL ('shorturl_seq'), 
+  timestamp char(19), 
+  name varchar(30) NOT NULL, 
+  url varchar(255) NOT NULL, 
+  persist boolean DEFAULT TRUE, 
+  PRIMARY KEY (id)
+);
