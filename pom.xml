@@ -244,6 +244,7 @@
 
         <dependency>
             <groupId>com.azure.spring</groupId>
+            <optional>true</optional> 
             <artifactId>spring-cloud-azure-appconfiguration-config</artifactId>
             <version>5.23.0</version>
         </dependency>
