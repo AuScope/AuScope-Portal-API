@@ -1,6 +1,9 @@
 package org.auscope.portal.server.config;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -21,36 +24,48 @@ public class ProfilePortalProduction {
     private boolean layersLoaded = false;
 
     Map<String, Object> yamlLayers;
-    
+
     public KnownLayer knownType(String id) {
-        
+
         LayerFactory lf = new LayerFactory(yamlLayers, layersLoaded);
         KnownLayer layer = lf.annotateLayer(id);
 
         return layer;
     }
 
-
-    
     @Bean
     public ArrayList<KnownLayer> knownTypes() {
         ArrayList<KnownLayer> knownLayers = new ArrayList<KnownLayer>();
 
         layersLoaded = true;
         Yaml yaml = new Yaml();
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("layers.yaml");
-        yamlLayers = yaml.load(inputStream);
+        // InputStream inputStream =
+        // this.getClass().getClassLoader().getResourceAsStream("layers.yaml");
+        URL yamlUrl;
+        try {
+            yamlUrl = new URL("https://drdzuf3dxzz1h.cloudfront.net/layers.yaml");
+            try (InputStream inputStream = yamlUrl.openStream()) {
+                yamlLayers = yaml.load(inputStream);
 
-        int[] counter = new int[1];
-        yamlLayers.forEach((k, v) -> {
-            counter[0]++;
-            String id = k.toString();
-            //if (counter[0] <= 181) { // 180
-                //System.out.println(counter[0] + ", Key = " + id + ", Value = " + v);
-                KnownLayer l =  knownType(id);
-                if (!l.isHidden()) knownLayers.add(knownType(id));
-            //}
-        });
+                int[] counter = new int[1];
+                yamlLayers.forEach((k, v) -> {
+                    counter[0]++;
+                    String id = k.toString();
+                    // if (counter[0] <= 181) { // 180
+                    // System.out.println(counter[0] + ", Key = " + id + ", Value = " + v);
+                    KnownLayer l = knownType(id);
+                    if (!l.isHidden())
+                        knownLayers.add(knownType(id));
+                });
+
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading from URL or processing stream: " + e.getMessage());
+            e.printStackTrace();
+        }
 
         return knownLayers;
     }

@@ -239,7 +239,7 @@ public class LayerFactory {
      */
     KnownLayer annotateLayer(String id) {
         KnownLayer layer = new KnownLayer(id, null);
-
+ 
         if (layersLoaded) {
 
             yamlLayers.forEach((k, v) -> {
@@ -287,6 +287,9 @@ public class LayerFactory {
                         case "legendImg":
                         	layer.setLegendImg(value);
                         	break;
+                        case "previewImg":
+                            layer.setPreviewImg(value);
+                            break;
                         case "stackdriverServiceGroup":
                             layer.setStackdriverServiceGroup(value);
                             break;

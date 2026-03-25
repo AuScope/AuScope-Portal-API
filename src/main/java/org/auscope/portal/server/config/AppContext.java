@@ -1,7 +1,14 @@
 package org.auscope.portal.server.config;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +18,8 @@ import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,6 +78,7 @@ import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
+import org.yaml.snakeyaml.Yaml;
 
 
 /**
@@ -114,6 +124,7 @@ public class AppContext {
 
     @Autowired
     private ArrayList<KnownLayer> knownTypes;
+ 
     
     @Bean
     public MailSender mailSender() {
@@ -196,7 +207,100 @@ public class AppContext {
         }, knownLayersStartupDelay, TimeUnit.MINUTES);
         scheduler.shutdown();
         
+        // Periodic Polling, check for changes to layers.yaml in the S3 bucket
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleAtFixedRate(() -> {
+            try {
+                if (remoteFileChanged()) {
+                    loadYaml();
+                }
+            } catch (Exception e) {
+                System.err.println("[AppContext]schedulerFactoryBean()Error - remoteFileChanged() : " + e.getMessage());
+            }
+        }, 0, 60, TimeUnit.SECONDS); // Check every minute
+        
         return schedulerFactory;
+    }
+
+    private void loadYaml() {
+        System.out.println(ZonedDateTime.now()+"[AppContext]loadYamlConfig()...");
+    }
+
+    @Autowired private LayerChecksumService layerChecksumService;
+    
+    /*
+    private boolean layersLoaded = false;
+    Map<String, Object> yamlLayers;
+    
+    public KnownLayer knownType(String id) {
+
+        LayerFactory lf = new LayerFactory(yamlLayers, layersLoaded);
+        KnownLayer layer = lf.annotateLayer(id);
+
+        return layer;
+    }
+    */
+    
+    @Value("${cloud.aws.portalS3Bucket}")
+    private String portalS3Bucket;
+        
+    private boolean remoteFileChanged() {
+        //System.out.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged()...");
+        
+        //ArrayList<KnownLayer> knownLayers = new ArrayList<KnownLayer>();
+        
+        Boolean fileChanged = false;
+        
+        Yaml yaml = new Yaml();
+        Map<String, Object> yamlLayers;
+        
+        try {
+            //URL yamlUrl = new URL(portalS3Bucket+"/layers.yaml");
+            URL yamlUrl = new URI(portalS3Bucket+"/layers.yaml").toURL();
+            //URL yamlUrl = new URL("https://drdzuf3dxzz1h.cloudfront.net/layers.yaml");
+            //URLConnection conn = yamlUrl.openConnection();
+            
+            // Sets the time (in milliseconds since epoch) for If-Modified-Since
+            // Example: Only download if modified in the last 24 hours
+            //long oneDayAgo = new Date().getTime() - (24 * 60 * 60 * 1000);
+            //conn.setIfModifiedSince(oneDayAgo);
+            
+            // If the server supports it, it will return 304 if unchanged
+            //System.out.println("[AppContext]remoteFileChanged() Connecting...");
+            
+            InputStream yamlInputStream = yamlUrl.openStream();
+            CheckedInputStream checkedInputStream = new CheckedInputStream(yamlInputStream, new CRC32());
+            yamlLayers = yaml.load(checkedInputStream);
+            Long checksum = checkedInputStream.getChecksum().getValue();
+            Long oldChecksum = layerChecksumService.getChecksum();
+
+            //System.out.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged() checksum (old) = " + oldChecksum.toString() + ", new = " + checksum.toString());
+            if (!checksum.equals(oldChecksum)) {
+                fileChanged = true;
+                layerChecksumService.setChecksum(checksum);
+                System.out.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged() checksum (old) = " + oldChecksum.toString() + ", new = " + checksum.toString());
+                System.out.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged().yamlLayers="+yamlLayers.toString());
+                
+                /*
+                int[] counter = new int[1];
+                yamlLayers.forEach((k, v) -> {
+                    counter[0]++;
+                    String id = k.toString();
+                    // if (counter[0] <= 181) { // 180
+                    // System.out.println(counter[0] + ", Key = " + id + ", Value = " + v);
+                    KnownLayer l = knownType(id);
+                    if (!l.isHidden())
+                        knownLayers.add(knownType(id));
+                });
+                cswService.updateCache((List<String>) null, 3, 15000);
+                */
+            }
+        } catch (IOException | URISyntaxException e) {
+            System.err.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged()Error reading from URL or processing stream: " + e.getMessage());
+            //e.printStackTrace();
+        }
+        
+        return fileChanged;
     }
 
     /* This is the core threadpool shared by object instances throughout the portal */
