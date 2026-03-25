@@ -89,6 +89,9 @@ public class KnownLayer implements Serializable {
 
     /** Filename for a canned legend graphic residing on the server (optional) */
     private String legendImg;
+    
+    /** Filename for a canned preview graphic residing on the server (optional) */
+    private String previewImg;
 
     private FilterCollection filterCollection;
 
@@ -428,6 +431,15 @@ public class KnownLayer implements Serializable {
 
     public void setLegendImg(String legendImg) {
         this.legendImg = legendImg;
+    }
+    
+    public String getPreviewImg() {
+        return previewImg;
+    }
+    
+    public void setPreviewImg(String previewImg) {
+        
+        this.previewImg = previewImg;
     }
 
     public void setStackdriverServiceGroup(String serviceGroup) {

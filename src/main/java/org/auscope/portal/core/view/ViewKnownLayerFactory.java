@@ -54,6 +54,7 @@ public class ViewKnownLayerFactory {
         obj.put("feature_count", k.getFeature_count());
         obj.put("singleTile", k.getSingleTile());
         obj.put("legendImg", k.getLegendImg());
+        obj.put("previewImg", k.getPreviewImg());
 
         String group = "Others";
         if (k.getGroup() != null && !k.getGroup().isEmpty()) {
