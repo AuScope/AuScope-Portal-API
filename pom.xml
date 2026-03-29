@@ -10,7 +10,7 @@
     <groupId>org.auscope.portal</groupId>
     <artifactId>auscope-portal-api</artifactId>
     <packaging>war</packaging>
-    <version>6.8.1</version>
+    <version>6.8.2</version>
     <name>AuScope-Portal-API</name>
     <description>AuScope's flagship portal</description>
     <url>https://portal.auscope.org.au</url>
