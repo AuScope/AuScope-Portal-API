@@ -30,8 +30,10 @@ import org.auscope.portal.server.shorturl.ShortUrl;
 import org.auscope.portal.server.web.controllers.BookMarksController.bookmark;
 import org.auscope.portal.server.web.security.PortalUser;
 import org.auscope.portal.server.web.service.ShortUrlService;
+import org.auscope.portal.server.web.service.UniqueNameService;
 import org.auscope.portal.server.web.service.PortalUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -75,6 +77,9 @@ import jakarta.servlet.http.HttpServletResponse;
         description = "Alows the user to manage shortened urls"
     )
 public class ShortUrlController extends BasePortalController {
+    
+    @Autowired
+    UniqueNameService uniqueNameService;
 
     private static final Integer EXPIRY_HOURS = 240 ; // how long non persistant shorurls stay in the db table
 	
@@ -142,7 +147,7 @@ public class ShortUrlController extends BasePortalController {
         String urlName = "";
 
         try {
-            urlName = getUniqueName();
+            urlName = uniqueNameService.get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,39 +160,10 @@ public class ShortUrlController extends BasePortalController {
             return generateJSONResponseMAV(false, null, "unable to generate unique name");
         }
     }
-        
-
-    /**
-     * getUniqueName to get a unique combination of two five letter words
-     *
-     * @return
-     * @throws Exception
-     */
-    public String getUniqueName() throws Exception {
-        String serviceUrl = "https://random-word-api.herokuapp.com/word";
-        HttpGet method = new HttpGet();
-        URIBuilder builder = new URIBuilder(serviceUrl);
-        builder.addParameter("number", "2");
-        builder.addParameter("length", "5");
-        //builder.addParameter("diff", "2");
-        method.setURI(builder.build());
-
-        HttpServiceCaller httpServiceCaller = new HttpServiceCaller(90000);
-        String response = httpServiceCaller.getMethodResponseAsString(method);
-
-        String[] r = response.split(",");
-        String n1 = StringUtils.capitalize(r[0].substring(2, r[0].length()-1));
-        String n2 = StringUtils.capitalize(r[1].substring(1, r[1].length()-2));
-        
-        String urlName=n1+n2;
-        
-        return urlName;
-    }
-    
 
 
     /**
-     * Retrieves a  list of short url 
+     * Retrieves a list of short url 
      * @return
      * @throws PortalServiceException
      */
