@@ -36,7 +36,7 @@ connection-establish:
    timeout: 90
 
 server:
-   max-http-header-size: 20KB
+   max-http-request-header-size: 20KB
    servlet:
       context-path: /api
 
