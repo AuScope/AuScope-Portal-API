@@ -6,7 +6,6 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -228,26 +227,13 @@ public class AppContext {
 
     @Autowired private LayerChecksumService layerChecksumService;
     
-    /*
-    private boolean layersLoaded = false;
-    Map<String, Object> yamlLayers;
-    
-    public KnownLayer knownType(String id) {
-
-        LayerFactory lf = new LayerFactory(yamlLayers, layersLoaded);
-        KnownLayer layer = lf.annotateLayer(id);
-
-        return layer;
-    }
-    */
-    
     @Value("${cloud.aws.portalS3Bucket}")
     private String portalS3Bucket;
         
+    /*
+     * check if the layers.yaml file in the S3 bucket has changed
+     */
     private boolean remoteFileChanged() {
-        //System.out.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged()...");
-        
-        //ArrayList<KnownLayer> knownLayers = new ArrayList<KnownLayer>();
         
         Boolean fileChanged = false;
         
@@ -255,18 +241,7 @@ public class AppContext {
         Map<String, Object> yamlLayers;
         
         try {
-            //URL yamlUrl = new URL(portalS3Bucket+"/layers.yaml");
             URL yamlUrl = new URI(portalS3Bucket+"/layers.yaml").toURL();
-            //URL yamlUrl = new URL("https://drdzuf3dxzz1h.cloudfront.net/layers.yaml");
-            //URLConnection conn = yamlUrl.openConnection();
-            
-            // Sets the time (in milliseconds since epoch) for If-Modified-Since
-            // Example: Only download if modified in the last 24 hours
-            //long oneDayAgo = new Date().getTime() - (24 * 60 * 60 * 1000);
-            //conn.setIfModifiedSince(oneDayAgo);
-            
-            // If the server supports it, it will return 304 if unchanged
-            //System.out.println("[AppContext]remoteFileChanged() Connecting...");
             
             InputStream yamlInputStream = yamlUrl.openStream();
             CheckedInputStream checkedInputStream = new CheckedInputStream(yamlInputStream, new CRC32());
@@ -274,30 +249,12 @@ public class AppContext {
             Long checksum = checkedInputStream.getChecksum().getValue();
             Long oldChecksum = layerChecksumService.getChecksum();
 
-            //System.out.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged() checksum (old) = " + oldChecksum.toString() + ", new = " + checksum.toString());
             if (!checksum.equals(oldChecksum)) {
                 fileChanged = true;
                 layerChecksumService.setChecksum(checksum);
-                System.out.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged() checksum (old) = " + oldChecksum.toString() + ", new = " + checksum.toString());
-                System.out.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged().yamlLayers="+yamlLayers.toString());
-                
-                /*
-                int[] counter = new int[1];
-                yamlLayers.forEach((k, v) -> {
-                    counter[0]++;
-                    String id = k.toString();
-                    // if (counter[0] <= 181) { // 180
-                    // System.out.println(counter[0] + ", Key = " + id + ", Value = " + v);
-                    KnownLayer l = knownType(id);
-                    if (!l.isHidden())
-                        knownLayers.add(knownType(id));
-                });
-                cswService.updateCache((List<String>) null, 3, 15000);
-                */
             }
         } catch (IOException | URISyntaxException e) {
-            System.err.println(ZonedDateTime.now()+"[AppContext]remoteFileChanged()Error reading from URL or processing stream: " + e.getMessage());
-            //e.printStackTrace();
+            System.err.println("[AppContext]remoteFileChanged()Error reading from URL or processing stream: " + e.getMessage());
         }
         
         return fileChanged;

@@ -6,20 +6,18 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
+import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.yaml.snakeyaml.Yaml;
-
-import org.auscope.portal.core.view.knownlayer.KnownLayer;
 
 /**
  * Definitions for all known layers
@@ -50,12 +48,8 @@ public class ProfilePortalTest {
 
         layersLoaded = true;
         Yaml yaml = new Yaml();
-        // InputStream inputStream =
-        // this.getClass().getClassLoader().getResourceAsStream("layers.yaml");
         URL yamlUrl;
         try {
-            //yamlUrl = new URL("https://drdzuf3dxzz1h.cloudfront.net/layers.yaml");
-            //yamlUrl = new URL(portalS3Bucket+"/layers.yaml");
             yamlUrl = new URI(portalS3Bucket+"/layers.yaml").toURL();
             try (InputStream yamlInputStream = yamlUrl.openStream()) {
                 CheckedInputStream checkedInputStream = new CheckedInputStream(yamlInputStream, new CRC32());
@@ -74,16 +68,12 @@ public class ProfilePortalTest {
 
                 Long checksum = checkedInputStream.getChecksum().getValue();
                 layerChecksumService.setChecksum(checksum);
-                //System.out.println(ZonedDateTime.now()+"[ProfilePortalTest]knownTypes().yamlLayers="+yamlLayers.toString());
-                System.out.println(ZonedDateTime.now()+"[ProfilePortalTest]knownTypes(old) checksum = " + checksum.toString());
-                layerChecksumService.setChecksum(checksum);
                 
             } catch (MalformedURLException e) {
-                System.err.println("ZonedDateTime.now()+[ProfilePortalTest]knownTypes() Error reading from URL or processing stream: " + e.getMessage());
+                System.err.println("[ProfilePortalTest]knownTypes() Error malformed URL: " + e.getMessage());
             }
         } catch (IOException | URISyntaxException e) {
-            System.err.println("ZonedDateTime.now()+[ProfilePortalTest]knownTypes() Error reading from URL or processing stream: " + e.getMessage());
-            //e.printStackTrace();
+            System.err.println("[ProfilePortalTest]knownTypes() Error reading from URL or processing stream: " + e.getMessage());
         }
 
         return knownLayers;
