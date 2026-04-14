@@ -1,7 +1,13 @@
 package org.auscope.portal.server.config;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.UnknownHostException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +17,8 @@ import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,6 +77,7 @@ import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
+import org.yaml.snakeyaml.Yaml;
 
 
 /**
@@ -114,6 +123,7 @@ public class AppContext {
 
     @Autowired
     private ArrayList<KnownLayer> knownTypes;
+ 
     
     @Bean
     public MailSender mailSender() {
@@ -196,7 +206,58 @@ public class AppContext {
         }, knownLayersStartupDelay, TimeUnit.MINUTES);
         scheduler.shutdown();
         
+        // Periodic Polling, check for changes to layers.yaml in the S3 bucket
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleAtFixedRate(() -> {
+            try {
+                if (remoteFileChanged()) {
+                    loadYaml();
+                }
+            } catch (Exception e) {
+                System.err.println("[AppContext]schedulerFactoryBean()Error - remoteFileChanged() : " + e.getMessage());
+            }
+        }, 0, 60, TimeUnit.SECONDS); // Check every minute
+        
         return schedulerFactory;
+    }
+
+    private void loadYaml() {
+        System.out.println(ZonedDateTime.now()+"[AppContext]loadYamlConfig()...");
+    }
+
+    @Autowired private LayerChecksumService layerChecksumService;
+    
+    @Value("${cloud.aws.portalS3Bucket}")
+    private String portalS3Bucket;
+        
+    /*
+     * check if the layers.yaml file in the S3 bucket has changed
+     */
+    private boolean remoteFileChanged() {
+        
+        Boolean fileChanged = false;
+        
+        Yaml yaml = new Yaml();
+        Map<String, Object> yamlLayers;
+        
+        try {
+            URL yamlUrl = new URI(portalS3Bucket+"/layers.yaml").toURL();
+            
+            InputStream yamlInputStream = yamlUrl.openStream();
+            CheckedInputStream checkedInputStream = new CheckedInputStream(yamlInputStream, new CRC32());
+            yamlLayers = yaml.load(checkedInputStream);
+            Long checksum = checkedInputStream.getChecksum().getValue();
+            Long oldChecksum = layerChecksumService.getChecksum();
+
+            if (!checksum.equals(oldChecksum)) {
+                fileChanged = true;
+                layerChecksumService.setChecksum(checksum);
+            }
+        } catch (IOException | URISyntaxException e) {
+            System.err.println("[AppContext]remoteFileChanged()Error reading from URL or processing stream: " + e.getMessage());
+        }
+        
+        return fileChanged;
     }
 
     /* This is the core threadpool shared by object instances throughout the portal */
