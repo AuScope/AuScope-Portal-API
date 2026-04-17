@@ -110,7 +110,7 @@ public class AppContext {
     
     @Value("${knownLayersCronExpression:0 0 3 * * ?}")
     private String knownLayersCronExpression;
-
+    
     // Active profile i.e. 'test' or 'prod'
     @Value("${spring.profiles.active}")
     private String activeProfile;
