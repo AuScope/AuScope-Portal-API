@@ -1,10 +1,19 @@
 package org.auscope.portal.server.config;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 import org.auscope.portal.core.view.knownlayer.KnownLayer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -21,16 +30,18 @@ public class ProfilePortalProduction {
     private boolean layersLoaded = false;
 
     Map<String, Object> yamlLayers;
-    
+
     public KnownLayer knownType(String id) {
-        
+
         LayerFactory lf = new LayerFactory(yamlLayers, layersLoaded);
         KnownLayer layer = lf.annotateLayer(id);
 
         return layer;
     }
+    
+    @Autowired private LayerChecksumService layerChecksumService;
 
-
+    @Value("${cloud.aws.portalS3Bucket}") private String portalS3Bucket;
     
     @Bean
     public ArrayList<KnownLayer> knownTypes() {
@@ -38,19 +49,33 @@ public class ProfilePortalProduction {
 
         layersLoaded = true;
         Yaml yaml = new Yaml();
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("layers.yaml");
-        yamlLayers = yaml.load(inputStream);
+        URL yamlUrl;
+        try {
+            yamlUrl = new URI(portalS3Bucket+"/layers.yaml").toURL();
+            try (InputStream yamlInputStream = yamlUrl.openStream()) {
+                CheckedInputStream checkedInputStream = new CheckedInputStream(yamlInputStream, new CRC32());
+                yamlLayers = yaml.load(checkedInputStream);
 
-        int[] counter = new int[1];
-        yamlLayers.forEach((k, v) -> {
-            counter[0]++;
-            String id = k.toString();
-            //if (counter[0] <= 181) { // 180
-                //System.out.println(counter[0] + ", Key = " + id + ", Value = " + v);
-                KnownLayer l =  knownType(id);
-                if (!l.isHidden()) knownLayers.add(knownType(id));
-            //}
-        });
+                int[] counter = new int[1];
+                yamlLayers.forEach((k, v) -> {
+                    counter[0]++;
+                    String id = k.toString();
+                    // if (counter[0] <= 181) { // 180
+                    // System.out.println(counter[0] + ", Key = " + id + ", Value = " + v);
+                    KnownLayer l = knownType(id);
+                    if (!l.isHidden())
+                        knownLayers.add(knownType(id));
+                });
+
+                Long checksum = checkedInputStream.getChecksum().getValue();
+                layerChecksumService.setChecksum(checksum);
+                
+            } catch (MalformedURLException e) {
+                System.err.println("[ProfilePortalProduction]knownTypes() Error malformed URL: " + e.getMessage());
+            }
+        } catch (IOException | URISyntaxException e) {
+            System.err.println("[ProfilePortalProduction]knownTypes() Error reading from URL or processing stream: " + e.getMessage());
+        }
 
         return knownLayers;
     }
