@@ -130,11 +130,9 @@ public class PortalXSLTTransformer {
      * @return Xml output string
      */
     public String convert(StreamSource xml, Properties stylesheetParams) {
-        System.out.println("[PortalXSLTTransformer]convert(start).xsltResourceName="+xsltResourceName);
         StringWriter sw = new StringWriter();
         try (InputStream xslt = getClass().getResourceAsStream(xsltResourceName)) {
             try {
-                System.out.println("[PortalXSLTTransformer]convert(getResourceAsStream).xslt="+xslt);
                 Transformer transformer = createTransformer(xslt, stylesheetParams);
                 transformer.transform(xml, new StreamResult(sw));
             } catch (TransformerConfigurationException tce) {

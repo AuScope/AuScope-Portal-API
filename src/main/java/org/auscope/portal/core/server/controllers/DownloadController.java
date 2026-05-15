@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.stream.Stream;
 import java.net.URL;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
@@ -65,9 +66,14 @@ import org.auscope.portal.core.services.PortalServiceException;
  * User: Mathew Wyatt Date: 02/09/2009 Time: 12:33:48 PM
  */
 
+
 @Controller
 public class DownloadController extends BasePortalController {
 	
+    // Special handling required for this WMS http://geoscience.nt.gov.au/erdas-iws/ogc/wms/
+    private final static String ERDAS_Domain="geoscience.nt.gov.au";
+    private final static String ERDAS_PathName="erdas-iws";
+
     private final Log logger = LogFactory.getLog(getClass());
     // Minimum number of lines we expect a download to be (header file plus at least one data row)
     private final static Integer MINIMUM_NUMBER_OF_LINES = 2;
@@ -296,6 +302,8 @@ public class DownloadController extends BasePortalController {
 	        // Return if not on whitelist
 	        if (!isTrue) return;
     	}
+    	
+    	Boolean ERDAS_Flag = false; // is the WMS ERDAS
 
     	// Determine content-type from filename if applicable
     	String filename = FilenameUtils.getName(url);
@@ -304,6 +312,8 @@ public class DownloadController extends BasePortalController {
         	response.addHeader("Content-Type", contentType);
         }
 
+        ERDAS_Flag = ERDAS(url);
+        
         // Assemble method depending on the incoming request's method
         HttpRequestBase method;
         if (request.getMethod().equals("POST") || usePost) {
@@ -314,6 +324,21 @@ public class DownloadController extends BasePortalController {
                 if (!entry.getKey().equalsIgnoreCase("url") && !entry.getKey().equalsIgnoreCase("usewhitelist")) {
                     for(String val: entry.getValue()) {
                         nvpList.add(new BasicNameValuePair(entry.getKey(), val));
+                        if (ERDAS_Flag) {
+                            String value = val.toString();
+                            String key = entry.getKey().toString();
+                            if (entry.getKey().toLowerCase().startsWith("version")) {
+                                value = "1.1.1"; // not working for 1.3.0
+                            }
+                            if (entry.getKey().toLowerCase().startsWith("crs")) {
+                                key = "srs"; // change from crs to srs
+                                value = "EPSG:4326"; // not working for CRS:84
+                            }
+                            if (entry.getKey().toLowerCase().startsWith("format")) {
+                                contentType = value; // should be image/png not application/octet-stream
+                            }
+                            url = url + "%26" + key+"="+value;
+                        }
                     }
                 }
             }
@@ -333,6 +358,9 @@ public class DownloadController extends BasePortalController {
         
         HttpClientInputStream result = serviceCaller.getMethodResponseAsStream(method);
         response.addHeader("Cache-Control", "public, max-age=604800, must-revalidate, no-transform");
+        if (ERDAS_Flag) {
+            response.addHeader("content-type",contentType); // "image/png"
+        }
         try (OutputStream outputStream = response.getOutputStream();) {
             IOUtils.copy(result, outputStream);
         } catch (IOException e) {
@@ -340,4 +368,20 @@ public class DownloadController extends BasePortalController {
         }
     }
 
+    // check for a url like this: http://geoscience.nt.gov.au/erdas-iws/ogc/wms/?service=WMS
+    private Boolean ERDAS(String url) throws URISyntaxException {
+        Boolean status = false;
+        
+        URI uri = new URI(url);
+        String host = uri.getHost();
+
+        if (host.toLowerCase().startsWith(ERDAS_Domain)) {
+            String urlPart[] = url.split(ERDAS_Domain);
+            String urlPath[] = urlPart[1].split("/");
+            if (urlPath[1].toLowerCase().startsWith(ERDAS_PathName)) {
+                status = true;
+            }
+        }
+        return status;
+    }
 }

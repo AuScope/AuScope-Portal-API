@@ -252,9 +252,7 @@ public class WFSController extends BasePortalController {
         WFSTransformedResponse htmlResponse = null;
         WFSService service = wfsService;
         try {
-            System.out.println("[WFSController]transformToHtml().gml="+gml.toString());
             htmlResponse = service.transformToHtml(gml, null, portalUrl);
-            System.out.println("[WFSController]transformToHtml().htmlResponse="+htmlResponse.toString());
             outputStream.write(htmlResponse.getTransformed().getBytes());
         } catch (Exception ex) {
             log.warn(String.format("Internal error requesting/writing popup for '%1$s': %3$s", gml, ex));
