@@ -23,6 +23,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: 1.21
+          distribution: microsoft
           
       - name: Cache Maven packages
         uses: actions/cache@v5
