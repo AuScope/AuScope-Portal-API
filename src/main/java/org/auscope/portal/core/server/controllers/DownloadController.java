@@ -285,7 +285,8 @@ public class DownloadController extends BasePortalController {
             HttpServletRequest request,
             @RequestParam("url") String url,
             @RequestParam(required = false, value = "usepostafterproxy", defaultValue = "false") boolean usePost,
-            @RequestParam(required = false, value = "usewhitelist", defaultValue = "true") boolean useWhitelist)
+            @RequestParam(required = false, value = "usewhitelist", defaultValue = "true") boolean useWhitelist,
+            @RequestParam(required = false, value = "erdas", defaultValue = "false") boolean isERDAS_WMS) // is it an ERDAS APOLLO WMS, eg NT
             		throws PortalServiceException, OperationNotSupportedException, URISyntaxException, IOException {    	
         // Check whitelist
     	if (useWhitelist) {
@@ -302,8 +303,6 @@ public class DownloadController extends BasePortalController {
 	        // Return if not on whitelist
 	        if (!isTrue) return;
     	}
-    	
-    	Boolean ERDAS_Flag = false; // is the WMS ERDAS
 
     	// Determine content-type from filename if applicable
     	String filename = FilenameUtils.getName(url);
@@ -311,8 +310,6 @@ public class DownloadController extends BasePortalController {
     	if (StringUtils.isNotBlank(contentType)) {
         	response.addHeader("Content-Type", contentType);
         }
-
-        ERDAS_Flag = ERDAS(url);
         
         // Assemble method depending on the incoming request's method
         HttpRequestBase method;
@@ -324,19 +321,9 @@ public class DownloadController extends BasePortalController {
                 if (!entry.getKey().equalsIgnoreCase("url") && !entry.getKey().equalsIgnoreCase("usewhitelist")) {
                     for(String val: entry.getValue()) {
                         nvpList.add(new BasicNameValuePair(entry.getKey(), val));
-                        if (ERDAS_Flag) {
+                        if (isERDAS_WMS) { // add params to the url rather than in the body
                             String value = val.toString();
                             String key = entry.getKey().toString();
-                            if (entry.getKey().toLowerCase().startsWith("version")) {
-                                value = "1.1.1"; // not working for 1.3.0
-                            }
-                            if (entry.getKey().toLowerCase().startsWith("crs")) {
-                                key = "srs"; // change from crs to srs
-                                value = "EPSG:4326"; // not working for CRS:84
-                            }
-                            if (entry.getKey().toLowerCase().startsWith("format")) {
-                                contentType = value; // should be image/png not application/octet-stream
-                            }
                             url = url + "%26" + key+"="+value;
                         }
                     }
@@ -358,9 +345,6 @@ public class DownloadController extends BasePortalController {
         
         HttpClientInputStream result = serviceCaller.getMethodResponseAsStream(method);
         response.addHeader("Cache-Control", "public, max-age=604800, must-revalidate, no-transform");
-        if (ERDAS_Flag) {
-            response.addHeader("content-type",contentType); // "image/png"
-        }
         try (OutputStream outputStream = response.getOutputStream();) {
             IOUtils.copy(result, outputStream);
         } catch (IOException e) {
@@ -368,20 +352,4 @@ public class DownloadController extends BasePortalController {
         }
     }
 
-    // check for a url like this: http://geoscience.nt.gov.au/erdas-iws/ogc/wms/?service=WMS
-    private Boolean ERDAS(String url) throws URISyntaxException {
-        Boolean status = false;
-        
-        URI uri = new URI(url);
-        String host = uri.getHost();
-
-        if (host.toLowerCase().startsWith(ERDAS_Domain)) {
-            String urlPart[] = url.split(ERDAS_Domain);
-            String urlPath[] = urlPart[1].split("/");
-            if (urlPath[1].toLowerCase().startsWith(ERDAS_PathName)) {
-                status = true;
-            }
-        }
-        return status;
-    }
 }

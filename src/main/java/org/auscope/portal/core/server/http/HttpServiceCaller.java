@@ -372,7 +372,6 @@ public class HttpServiceCaller {
             	String responseBody = responseToString(response.getEntity().getContent());
                 log.trace("Returned response body: " + responseBody);
             }
-            // The IOException contains the error code.
             throw new IOException(Integer.toString(statusCode));
         } else {
             return response;
