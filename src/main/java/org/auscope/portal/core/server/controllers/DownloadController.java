@@ -285,9 +285,10 @@ public class DownloadController extends BasePortalController {
             HttpServletRequest request,
             @RequestParam("url") String url,
             @RequestParam(required = false, value = "usepostafterproxy", defaultValue = "false") boolean usePost,
+            @RequestParam(required = false, value = "usegetafterproxy", defaultValue = "false") boolean useGet,
             @RequestParam(required = false, value = "usewhitelist", defaultValue = "true") boolean useWhitelist,
-            @RequestParam(required = false, value = "erdas", defaultValue = "false") boolean isERDAS_WMS) // is it an ERDAS APOLLO WMS, eg NT
-            		throws PortalServiceException, OperationNotSupportedException, URISyntaxException, IOException {    	
+            @RequestParam(required = false, value = "erdas", defaultValue = "") String isERDAS_WMS) // is it an ERDAS APOLLO WMS, eg NT or TAS
+            		throws PortalServiceException, OperationNotSupportedException, URISyntaxException, IOException {  
         // Check whitelist
     	if (useWhitelist) {
 	        boolean isTrue = false;
@@ -313,7 +314,7 @@ public class DownloadController extends BasePortalController {
         
         // Assemble method depending on the incoming request's method
         HttpRequestBase method;
-        if (request.getMethod().equals("POST") || usePost) {
+        if (!useGet && (request.getMethod().equals("POST") || usePost)) {
             // Use old request parameters to assemble new request
             Map<String, String[]> pMap = request.getParameterMap();
             List<NameValuePair> nvpList = new ArrayList<>(pMap.size());
@@ -321,11 +322,6 @@ public class DownloadController extends BasePortalController {
                 if (!entry.getKey().equalsIgnoreCase("url") && !entry.getKey().equalsIgnoreCase("usewhitelist")) {
                     for(String val: entry.getValue()) {
                         nvpList.add(new BasicNameValuePair(entry.getKey(), val));
-                        if (isERDAS_WMS) { // add params to the url rather than in the body
-                            String value = val.toString();
-                            String key = entry.getKey().toString();
-                            url = url + "%26" + key+"="+value;
-                        }
                     }
                 }
             }
@@ -340,6 +336,21 @@ public class DownloadController extends BasePortalController {
             ((HttpPost)method).setEntity(entity);
         } else {
             // Use an HTTP GET request
+            Map<String, String[]> pMap = request.getParameterMap();
+            for (Map.Entry<String, String[]> entry : pMap.entrySet()) {
+                if (!entry.getKey().equalsIgnoreCase("url") && !entry.getKey().equalsIgnoreCase("usewhitelist")) {
+                    for(String val: entry.getValue()) {
+                        if (isERDAS_WMS.length() > 0) { // add params to the url rather than in the body
+                            String value = val.toString();
+                            String key = entry.getKey().toString();
+                            String delim = "%26"; // default,NT
+                            if (isERDAS_WMS.startsWith("TAS")) { delim = "&"; } 
+                            // add params to the url rather than in the body
+                            url = url + delim + key+"="+value;
+                        }
+                    }
+                }
+            }    
             method = new HttpGet(url);
         }
         
