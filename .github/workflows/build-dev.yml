@@ -83,7 +83,7 @@ jobs:
     
       - name: Azure CLI script
         if: github.ref == 'refs/heads/master'
-        uses: azure/CLI@v2
+        uses: azure/CLI@v3
         with:
           azcliversion: latest
           inlineScript: |
