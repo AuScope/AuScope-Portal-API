@@ -34,7 +34,6 @@ public class GmlToHtml extends PortalXSLTTransformer {
      * @return html output string
      */
     public String convert(String wfs, ErmlNamespaceContext namespaces, String baseURL) {
-        System.out.println("[GmlToHtml]convert(start)");
     	Properties stylesheetParams = new Properties();
 
         stylesheetParams.setProperty("portalBaseURL", baseURL);
