@@ -45,12 +45,12 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 	
 	@Override
 	public ClientConfiguration clientConfiguration() {
-		
 		HttpHeaders headers = new HttpHeaders();
 		if (StringUtils.isNotBlank(apiKey)) {
 			headers.add("Authorization", "ApiKey " + apiKey);
 		}
 		headers.add("Content-Type", "application/json");
+		headers.add("Accept", "application/json");
 		
 		return ClientConfiguration.builder()
 			.connectedTo(new InetSocketAddress(clusterNodesUrl, port))
@@ -59,5 +59,4 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 			.withSocketTimeout(60000)
 			.build();
 	}
-	
 }
