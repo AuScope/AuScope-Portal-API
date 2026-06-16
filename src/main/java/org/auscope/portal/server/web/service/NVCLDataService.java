@@ -3,6 +3,7 @@ package org.auscope.portal.server.web.service;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import com.opencsv.CSVReaderBuilder;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.services.methodmakers.WFSGetFeatureMethodMaker;
 import org.auscope.portal.core.util.DOMUtil;
@@ -49,6 +52,7 @@ import org.apache.http.client.utils.URIBuilder;
  */
 @Service
 public class NVCLDataService {
+    protected final Log log = LogFactory.getLog(getClass());
     @Autowired
     private MailSender mailSender;
     private HttpServiceCaller httpServiceCaller;
@@ -438,9 +442,16 @@ public class NVCLDataService {
                 if (defaultUrl != null) {
                     cacheUrl = cacheUrl.replace("$DEFAULT",defaultUrl);
                 }
-
+                HashMap<String, String> datasetCollectionMap;
+                // Recover if a 'getDatasetCollection.html' request to a state/territory provider fails
+                try {
+                    datasetCollectionMap = this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all");
+                } catch (IOException e) {
+                    log.warn("An NVCL 'getDatasetCollection.html' call to "+ endpoint + " failed. Error: " + e.getMessage());
+                    continue;
+                } 
                 this.mapTsgCachePath.put(endpoint,cacheUrl);
-                this.mapEndpoint.put(endpoint,this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all"));
+                this.mapEndpoint.put(endpoint,datasetCollectionMap);
             }
 
         } catch (Exception e) {
