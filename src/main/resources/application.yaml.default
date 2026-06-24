@@ -166,7 +166,7 @@ env:
 cloud:
    aws:
       # S3 bucket reference - via CloudFront
-      portalS3Bucket: ENTER_BUCKET_URL
+      portalS3Bucket: https://raw.githubusercontent.com/AuScope/AuScope-Portal-Layer-Configs/refs/heads/AuScopePortalDev
 
 # Server management, health, metrics, etc.
 management:
