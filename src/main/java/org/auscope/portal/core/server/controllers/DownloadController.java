@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.stream.Stream;
 import java.net.URL;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
@@ -65,9 +66,14 @@ import org.auscope.portal.core.services.PortalServiceException;
  * User: Mathew Wyatt Date: 02/09/2009 Time: 12:33:48 PM
  */
 
+
 @Controller
 public class DownloadController extends BasePortalController {
 	
+    // Special handling required for this WMS http://geoscience.nt.gov.au/erdas-iws/ogc/wms/
+    private final static String ERDAS_Domain="geoscience.nt.gov.au";
+    private final static String ERDAS_PathName="erdas-iws";
+
     private final Log logger = LogFactory.getLog(getClass());
     // Minimum number of lines we expect a download to be (header file plus at least one data row)
     private final static Integer MINIMUM_NUMBER_OF_LINES = 2;
@@ -279,8 +285,10 @@ public class DownloadController extends BasePortalController {
             HttpServletRequest request,
             @RequestParam("url") String url,
             @RequestParam(required = false, value = "usepostafterproxy", defaultValue = "false") boolean usePost,
-            @RequestParam(required = false, value = "usewhitelist", defaultValue = "true") boolean useWhitelist)
-            		throws PortalServiceException, OperationNotSupportedException, URISyntaxException, IOException {    	
+            @RequestParam(required = false, value = "usegetafterproxy", defaultValue = "false") boolean useGet,
+            @RequestParam(required = false, value = "usewhitelist", defaultValue = "true") boolean useWhitelist,
+            @RequestParam(required = false, value = "erdas", defaultValue = "") String isERDAS_WMS) // is it an ERDAS APOLLO WMS, eg NT or TAS
+            		throws PortalServiceException, OperationNotSupportedException, URISyntaxException, IOException {  
         // Check whitelist
     	if (useWhitelist) {
 	        boolean isTrue = false;
@@ -303,10 +311,10 @@ public class DownloadController extends BasePortalController {
     	if (StringUtils.isNotBlank(contentType)) {
         	response.addHeader("Content-Type", contentType);
         }
-
+        
         // Assemble method depending on the incoming request's method
         HttpRequestBase method;
-        if (request.getMethod().equals("POST") || usePost) {
+        if (!useGet && (request.getMethod().equals("POST") || usePost)) {
             // Use old request parameters to assemble new request
             Map<String, String[]> pMap = request.getParameterMap();
             List<NameValuePair> nvpList = new ArrayList<>(pMap.size());
@@ -328,6 +336,21 @@ public class DownloadController extends BasePortalController {
             ((HttpPost)method).setEntity(entity);
         } else {
             // Use an HTTP GET request
+            Map<String, String[]> pMap = request.getParameterMap();
+            for (Map.Entry<String, String[]> entry : pMap.entrySet()) {
+                if (!entry.getKey().equalsIgnoreCase("url") && !entry.getKey().equalsIgnoreCase("usewhitelist")) {
+                    for(String val: entry.getValue()) {
+                        if (isERDAS_WMS.length() > 0) { // add params to the url rather than in the body
+                            String value = val.toString();
+                            String key = entry.getKey().toString();
+                            String delim = "%26"; // default,NT
+                            if (isERDAS_WMS.startsWith("TAS")) { delim = "&"; } 
+                            // add params to the url rather than in the body
+                            url = url + delim + key+"="+value;
+                        }
+                    }
+                }
+            }    
             method = new HttpGet(url);
         }
         

@@ -101,7 +101,6 @@ public class WFSService extends BaseWFSService {
 	 * @return HTML converted response
 	 */
     public WFSTransformedResponse transformToHtml(String wfs, HttpRequestBase method, String baseUrl) {
-        System.out.println("[WFSService]transformToHtml(start)");
     	ErmlNamespaceContext erml;
         if (wfs.contains("http://xmlns.earthresourceml.org/EarthResource/2.0")) {
         	// Tell the XSLT which ERML version to use
@@ -109,16 +108,7 @@ public class WFSService extends BaseWFSService {
         } else {
         	erml = new ErmlNamespaceContext();
         }
-        System.out.println("[WFSService]transformToHtml().method=");
-        //System.out.println("[WFSService]transformToHtml().method="+method.toString());
-        System.out.println("[WFSService]transformToHtml().wfs=");
-        System.out.println("[WFSService]transformToHtml().wfs="+wfs.toString());
-        System.out.println("[WFSService]transformToHtml().erml=");
-        System.out.println("[WFSService]transformToHtml().erml="+erml.toString());
-        System.out.println("[WFSService]transformToHtml().baseUrl=");
-        System.out.println("[WFSService]transformToHtml().baseUrl="+baseUrl.toString());
     	String html = this.gmlToHtml.convert(wfs, erml, baseUrl);
-        System.out.println("[WFSService]transformToHtml().html="+html.toString());
     	return new WFSTransformedResponse(wfs, html, method);
     }
 
