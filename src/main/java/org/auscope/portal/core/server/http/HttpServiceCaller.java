@@ -366,7 +366,6 @@ public class HttpServiceCaller {
         int statusCode = statusLine.getStatusCode();
         String statusCodeText = statusLine.getReasonPhrase();
         log.trace("Status code text: '" + statusCodeText + "'");
-        log.trace("Status code text: '" + statusCodeText + "'");
 
         // Try again if moved permanently or temporarily
         // It is assumed that the method and body remain unchanged as per spec.
