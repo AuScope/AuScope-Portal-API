@@ -556,7 +556,7 @@ public class LayerFactory {
                                 }
                             });
                             layerName = attr[0];
-                            layer.setKnownLayerSelector(knownTypeWMTSSelector(layerName, endPointList));
+                            layer.setKnownLayerSelector(knownTypeWMSSelector(layerName, endPointList));
                             break;
                         }
                         case "wmts": {
