@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.Header;
 import org.apache.http.client.CredentialsProvider;
@@ -32,6 +33,8 @@ import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 
 
 /**
@@ -331,9 +334,35 @@ public class HttpServiceCaller {
             }
         }
 
+        // Add a clean browser-like user agent to bypass firewall drop filters
+        method.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+
+        HttpResponse response = null;
+        StatusLine statusLine = null;
+        try {
         // Make the call
-        HttpResponse response = client.execute(method);
-        StatusLine statusLine = response.getStatusLine();
+         response = client.execute(method);
+         statusLine = response.getStatusLine();
+        } catch (java.net.SocketException e) {
+            System.err.println("CRITICAL PROXY ERROR: Remote map server reset the connection handshake: " + e.getMessage());
+            e.printStackTrace();
+            
+            // 3. Fallback: Generate a valid HttpResponse indicating a Bad Gateway (502)
+            HttpResponse errorResponse = new BasicHttpResponse(
+                new BasicStatusLine(HttpVersion.HTTP_1_1, 502, "Bad Gateway: Remote Server Connection Reset")
+            );
+            return errorResponse;
+            
+        } catch (java.io.IOException e) {
+            System.err.println("I/O Network error occurred during proxy transmission: " + e.getMessage());
+            e.printStackTrace();
+            
+            // 4. Fallback: Generate a valid HttpResponse indicating an Internal Server Error (500)
+            HttpResponse errorResponse = new BasicHttpResponse(
+                new BasicStatusLine(HttpVersion.HTTP_1_1, 500, "Internal Server Error: Proxy Pipeline Failed")
+            );
+            return errorResponse;
+        }
         int statusCode = statusLine.getStatusCode();
         String statusCodeText = statusLine.getReasonPhrase();
         log.trace("Status code text: '" + statusCodeText + "'");
