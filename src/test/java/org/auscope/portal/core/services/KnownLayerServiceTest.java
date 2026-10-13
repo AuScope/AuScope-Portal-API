@@ -49,7 +49,7 @@ public class KnownLayerServiceTest {
     private KnownLayerService buildKnownLayerServiceWithWMSSelectorsAndKnownLayerIdOf(String knownLayerId) {
         knownLayer = new KnownLayer(knownLayerId, wmsSelectors);
 
-        knownLayerService = new KnownLayerService(Lists.newArrayList(knownLayer), null, null, null, null, null);
+        knownLayerService = new KnownLayerService((ArrayList<KnownLayer>) Lists.newArrayList(knownLayer), null, null, null, null, null, null);
         return knownLayerService;
     }
 
@@ -61,7 +61,15 @@ public class KnownLayerServiceTest {
             KnownLayer knownLayerLocal = new KnownLayer(knownLayerId, selector);
             knownLayersListLocal.add(knownLayerLocal);
         }
-        knownLayerService = new KnownLayerService(knownLayersListLocal, null, null, null, null, null);
+        knownLayerService = new KnownLayerService(
+                null, // 1. @Qualifier("knownTypes")
+                null, // 2. ProfilePortalTest
+                null, // 3. ViewKnownLayerFactory
+                null, // 4. ViewCSWRecordFactory
+                null, // 5. ViewGetCapabilitiesFactory
+                null, // 6. WMSService
+                null  // 7. ElasticsearchService
+        );
         knownLayer = knownLayersListLocal.get(0);
 
         return knownLayerService;

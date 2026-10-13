@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -64,6 +63,7 @@ import org.auscope.portal.server.web.SearchHttpServiceCaller;
 import org.auscope.portal.server.web.service.monitor.KnownLayerStatusMonitor;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -159,7 +159,7 @@ public class AppContext {
         JobDetailFactoryBean jobDetail = new JobDetailFactoryBean();
         jobDetail.setJobClass(KnownLayerStatusMonitor.class);
         Map<String, Object> jobData = new HashMap<String, Object>();
-        jobData.put("cswKnownLayerService", this.cswKnownLayerService());
+        jobData.put("cswKnownLayerService", this.cswKnownLayerService(knownTypes, null, viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory));
         jobDetail.setJobDataAsMap(jobData);        
         return jobDetail;
     }
@@ -186,6 +186,12 @@ public class AppContext {
         trigger.setTimeZone(TimeZone.getTimeZone("Australia/Melbourne"));
         return trigger;
     }
+
+    @Lazy // This breaks the circular dependency loop!
+    @Autowired private KnownLayerService knownLayerService;
+    
+    @Autowired
+    private AbstractBasePortalProfile portalProfile;
     
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
@@ -201,37 +207,69 @@ public class AppContext {
         scheduler.schedule(new Runnable() {
             @Override
             public void run() {
-            	cswKnownLayerService().updateKnownLayersCache(!manualUpdateOnly);
+                // Route through your lazy-wired managed bean instance
+                if (knownLayerService != null) {
+                    knownLayerService.updateKnownLayersCache(!manualUpdateOnly);
+                }
             }
         }, knownLayersStartupDelay, TimeUnit.MINUTES);
         scheduler.shutdown();
         
-        // Periodic Polling, check for changes to layers.yaml in the S3 bucket
+        // Periodic Polling, check for changes to layers.yaml
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.scheduleAtFixedRate(() -> {
             try {
                 if (remoteFileChanged()) {
-                    loadYaml();
+                    System.out.println("[AppContext] Local manifest change detected.");
+                    
+                    // Periodic Polling, check for changes to layers.yaml
+                    if (portalS3Bucket != null && portalS3Bucket.startsWith("file:")) {
+                        System.out.println("[AppContext] Running in local file mode. Synchronizing configuration targets...");
+                        
+                        // Tell the profile class to reload the configuration file from your local disk
+                        if (portalProfile != null) {
+                            portalProfile.reloadLayers();
+                        }
+
+                        // Process the modified layer definitions 
+                        knownLayerService.updateKnownLayersCache(true); 
+                        
+                        // Wipe out the view cache container safely
+                        knownLayerService.evictLayersCache();
+                        
+                        System.out.println("[AppContext] Local cache synchronization step executed. Clean state committed.");
+                    } else {
+                        // Production environment path (S3 / GitHub) uses the background task runner
+                        java.util.concurrent.ExecutorService networkWorker = Executors.newSingleThreadExecutor();
+                        java.util.concurrent.Future<?> networkTask = networkWorker.submit(() -> {
+                            knownLayerService.refreshKnownLayers();
+                        });
+                        
+                        try {
+                            networkTask.get(15, TimeUnit.SECONDS);
+                        } catch (java.util.concurrent.TimeoutException e) {
+                            System.err.println("[AppContext] Remote harvesting timed out for external environment.");
+                            networkTask.cancel(true);
+                        } finally {
+                            networkWorker.shutdown();
+                        }
+                    }
                 }
             } catch (Exception e) {
                 System.err.println("[AppContext]schedulerFactoryBean()Error - remoteFileChanged() : " + e.getMessage());
             }
-        }, 0, 60, TimeUnit.SECONDS); // Check every minute
+        }, 0, 5, TimeUnit.MINUTES); // 5-minute synchronization cycle
         
         return schedulerFactory;
     }
-
-    private void loadYaml() {
-        System.out.println(ZonedDateTime.now()+"[AppContext]loadYamlConfig()...");
-    }
-
+    
     @Autowired private LayerChecksumService layerChecksumService;
     
     @Value("${cloud.aws.portalS3Bucket}")
     private String portalS3Bucket;
         
     /*
-     * check if the layers.yaml file in the S3 bucket has changed
+     * check if the layers.yaml file has changed
      */
     private boolean remoteFileChanged() {
         
@@ -241,17 +279,28 @@ public class AppContext {
         Map<String, Object> yamlLayers;
         
         try {
-            URL yamlUrl = new URI(portalS3Bucket+"/layers.yaml").toURL();
+            InputStream yamlInputStream;
+            String fullPath = portalS3Bucket.endsWith("/") ? portalS3Bucket + "layers.yaml" : portalS3Bucket + "/layers.yaml";
             
-            InputStream yamlInputStream = yamlUrl.openStream();
-            CheckedInputStream checkedInputStream = new CheckedInputStream(yamlInputStream, new CRC32());
-            yamlLayers = yaml.load(checkedInputStream);
-            Long checksum = checkedInputStream.getChecksum().getValue();
-            Long oldChecksum = layerChecksumService.getChecksum();
+            // ✨ Route local testing files cleanly to prevent network stream timeouts
+            if (fullPath.startsWith("file:")) {
+                java.io.File localFile = new java.io.File(new URI(fullPath));
+                yamlInputStream = new java.io.FileInputStream(localFile);
+            } else {
+                // Production web targets (GitHub/S3) continue using standard web streams
+                URL yamlUrl = new URI(fullPath).toURL();
+                yamlInputStream = yamlUrl.openStream();
+            }
+            
+            try (CheckedInputStream checkedInputStream = new CheckedInputStream(yamlInputStream, new CRC32())) {
+                yamlLayers = yaml.load(checkedInputStream);
+                Long checksum = checkedInputStream.getChecksum().getValue();
+                Long oldChecksum = layerChecksumService.getChecksum();
 
-            if (!checksum.equals(oldChecksum)) {
-                fileChanged = true;
-                layerChecksumService.setChecksum(checksum);
+                if (!checksum.equals(oldChecksum)) {
+                    fileChanged = true;
+                    layerChecksumService.setChecksum(checksum);
+                }
             }
         } catch (IOException | URISyntaxException e) {
             System.err.println("[AppContext]remoteFileChanged()Error reading from URL or processing stream: " + e.getMessage());
@@ -427,8 +476,13 @@ public class AppContext {
     private ViewGetCapabilitiesFactory viewGetCapabilitiesFactory;
 
     @Bean
-    public KnownLayerService cswKnownLayerService() {
-        return new KnownLayerService(knownTypes, viewFactory, viewCSWRecordFactory,
+    public KnownLayerService cswKnownLayerService(
+            @Qualifier("knownTypes") ArrayList<KnownLayer> knownTypes, // 👈 1. Pass the bean by name
+            ProfilePortalTest config,                                  // 👈 2. Pass the config instance
+            ViewKnownLayerFactory viewFactory,
+            ViewCSWRecordFactory viewCSWRecordFactory,
+            ViewGetCapabilitiesFactory viewGetCapabilitiesFactory) {
+        return new KnownLayerService(knownTypes, config, viewFactory, viewCSWRecordFactory,
         							 viewGetCapabilitiesFactory, wmsService(), elasticsearchService());
     }
 
@@ -523,7 +577,7 @@ public class AppContext {
 
     @Bean
     public CatalogServicesHealthIndicator CatalogServicesHealthIndicator() {
-        return new CatalogServicesHealthIndicator(cswCacheService(), cswKnownLayerService(), cswServiceList);
+        return new CatalogServicesHealthIndicator(cswCacheService(), cswKnownLayerService(knownTypes, null, viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory), cswServiceList);
     }
     
     @Bean

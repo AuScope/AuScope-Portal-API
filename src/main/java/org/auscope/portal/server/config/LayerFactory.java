@@ -237,7 +237,7 @@ public class LayerFactory {
      *
      * @param id the id of the layer,as per yaml file
      */
-    KnownLayer annotateLayer(String id) {
+    public KnownLayer annotateLayer(String id) {
         KnownLayer layer = new KnownLayer(id, null);
  
         if (layersLoaded) {

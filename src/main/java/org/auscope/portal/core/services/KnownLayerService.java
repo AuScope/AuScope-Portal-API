@@ -1,6 +1,12 @@
 package org.auscope.portal.core.services;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,6 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 import java.util.Map.Entry;
 import javax.xml.xpath.XPathException;
 
@@ -27,11 +35,17 @@ import org.auscope.portal.core.view.knownlayer.KnownLayerGrouping;
 import org.auscope.portal.core.view.knownlayer.KnownLayerSelector;
 import org.auscope.portal.core.view.knownlayer.WMSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSSelectors;
+import org.auscope.portal.server.config.LayerChecksumService;
+import org.auscope.portal.server.config.LayerFactory;
+import org.auscope.portal.server.config.PortalConfigurationProfile;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * A service class performing that groups CSWRecord objects (from a CSWCacheService) according to a configured list of KnownLayers
@@ -39,6 +53,7 @@ import org.springframework.ui.ModelMap;
  * @author Josh Vote
  *
  */
+@Service
 public class KnownLayerService {
 	
 	@Value("${spring.data.elasticsearch.manualUpdateOnly:false}")
@@ -49,6 +64,8 @@ public class KnownLayerService {
     private CSWCacheService cswCacheService;
     private WMSService wmsService;
     private ElasticsearchService elasticsearchService;
+
+    private PortalConfigurationProfile config;
 
     private GoogleCloudMonitoringCachedService stackDriverService = null;
 
@@ -62,6 +79,8 @@ public class KnownLayerService {
         this.stackDriverService = service;
     }
 
+
+    
     /**
      * Creates a new instance of this class from an untyped list. All objects in knownTypes that can be cast into a KnownLayer will be included in the internal
      * known layer list
@@ -69,17 +88,23 @@ public class KnownLayerService {
      * @param knownTypes
      *            A list of objects, only KnownLayer subclasses will be used
      */
-    public KnownLayerService(@SuppressWarnings("rawtypes") List knownTypes,
+    @Autowired
+    public KnownLayerService(
+            @Qualifier("knownTypes") ArrayList<KnownLayer> knownTypes,
+            PortalConfigurationProfile config,
             ViewKnownLayerFactory viewFactory,
             ViewCSWRecordFactory viewCSWRecordFactory,
-            ViewGetCapabilitiesFactory viewGetCapabilitiesFactory, WMSService wmsService, ElasticsearchService elasticsearchService) {
-        this.knownLayers = new ArrayList<>();
-        for (Object obj : knownTypes) {
-            if (obj instanceof KnownLayer) {
-                this.knownLayers.add((KnownLayer) obj);
-            }
-        }
+            ViewGetCapabilitiesFactory viewGetCapabilitiesFactory, 
+            WMSService wmsService, 
+            ElasticsearchService elasticsearchService) {
+        
+        // Maintain a reference wrapper link to the mutable list bean
+        this.knownLayers = knownTypes; 
 
+        // Map the active system layout configurations
+        this.config = config;
+        
+        // Ensure all view factories are explicitly wired up!
         this.viewKnownLayerFactory = viewFactory;
         this.viewCSWRecordFactory = viewCSWRecordFactory;
         this.viewGetCapabilitiesFactory = viewGetCapabilitiesFactory;
@@ -331,10 +356,28 @@ public class KnownLayerService {
      */
     public List<ModelMap> getKnownLayersCache() {
         synchronized (knownLayersCache) {
+            if (knownLayersCache.isEmpty()) {
+                List<KnownLayer> activeLayers = this.config.getActiveLayers(); 
+                if (activeLayers != null && !activeLayers.isEmpty()) {
+                    this.knownLayers = activeLayers; 
+                    this.updateKnownLayersCache(true); 
+                    System.out.println("[KnownLayerService] Cache successfully backfilled with all deep layer metadata fields.");
+                }
+            }
             return new ArrayList<>(knownLayersCache);
         }
     }
 
+    public void evictLayersCache() {
+        synchronized (knownLayersCache) {
+            knownLayersCache.clear();
+            if (this.knownLayers != null) {
+                this.knownLayers.clear();
+            }
+            System.out.println("[KnownLayerService] Internal ModelMap cache explicitly evicted.");
+        }
+    }
+    
     /***
      * Updated the list of known layers depending on their status as obtained from StackDriver. This method is
      * threadsafe and can be called directly or from a background thread.
@@ -342,6 +385,11 @@ public class KnownLayerService {
      * To access the results of the update, call {@link KnownLayerService#getKnownLayersCache()}
      */
     public void updateKnownLayersCache(boolean updateCSWRecordsWithKnownLayerInfo) {
+        // Dynamically refresh your tracking pointer from config bean before recalculating!
+        if (this.config != null && this.config.getActiveLayers() != null) {
+            this.knownLayers = this.config.getActiveLayers();
+        }
+
         logger.info("Updating service status for KnownLayers");
         ArrayList<ModelMap> newKnownLayersCache = new ArrayList<>();
         
@@ -486,4 +534,26 @@ public class KnownLayerService {
         logger.info("Finished updating service status for KnownLayers. New size: " + knownLayers.size());
     }
   
+    
+
+    @Autowired private LayerChecksumService layerChecksumService;
+    
+    @Value("${cloud.aws.portalS3Bucket}")
+    private String portalS3Bucket;
+    
+
+    Map<String, Object> yamlLayers;
+    
+    public KnownLayer knownType(String id) {
+
+        LayerFactory lf = new LayerFactory(yamlLayers, true);
+        KnownLayer layer = lf.annotateLayer(id);
+
+        return layer;
+    }
+    
+    public void refreshKnownLayers() {
+        config.reloadLayers();
+        updateKnownLayersCache(true);
+    }
 }
