@@ -246,7 +246,7 @@ public class AppContext {
                         });
                         
                         try {
-                            networkTask.get(15, TimeUnit.SECONDS);
+                            networkTask.get(15, TimeUnit.MINUTES);
                         } catch (java.util.concurrent.TimeoutException e) {
                             System.err.println("[AppContext] Remote harvesting timed out for external environment.");
                             networkTask.cancel(true);
