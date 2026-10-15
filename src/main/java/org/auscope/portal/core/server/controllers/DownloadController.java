@@ -50,6 +50,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -297,13 +298,15 @@ public class DownloadController extends BasePortalController {
         /*
         // if a 'body' is passed in as a POST
         String postBody = "";
-        try (BufferedReader reader = request.getReader()) {
-            postBody = reader.lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            // Handle stream reading exceptions here
-            e.printStackTrace();
+        
+        String contentType = request.getContentType();
+        if (contentType == null || !contentType.toLowerCase().startsWith("multipart/")) {
+            try (BufferedReader reader = request.getReader()) {
+                postBody = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            }
         }
-         */
+        */
+
         // Check whitelist
         if (useWhitelist) {
             boolean isTrue = false;
@@ -324,9 +327,9 @@ public class DownloadController extends BasePortalController {
 
         // Determine content-type from filename if applicable
         String filename = FilenameUtils.getName(url);
-        String contentType = new MimetypesFileTypeMap().getContentType(filename);
-        if (StringUtils.isNotBlank(contentType)) {
-            response.addHeader("Content-Type", contentType);
+        String fileContentType = new MimetypesFileTypeMap().getContentType(filename);
+        if (StringUtils.isNotBlank(fileContentType)) {
+            response.addHeader("Content-Type", fileContentType);
         }
         
         // Assemble method depending on the incoming request's method
