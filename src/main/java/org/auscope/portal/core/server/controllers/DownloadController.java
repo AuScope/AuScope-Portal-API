@@ -293,6 +293,7 @@ public class DownloadController extends BasePortalController {
             }
         }
 
+        /*
         // if a 'body' is passed in as a POST
         String postBody = "";
         try (BufferedReader reader = request.getReader()) {
@@ -301,7 +302,7 @@ public class DownloadController extends BasePortalController {
             // Handle stream reading exceptions here
             e.printStackTrace();
         }
-
+         */
         // Check whitelist
         if (useWhitelist) {
             boolean isTrue = false;
@@ -330,7 +331,7 @@ public class DownloadController extends BasePortalController {
         // Assemble method depending on the incoming request's method
         HttpRequestBase method;
         if (!useGet && (request.getMethod().equals("POST") || usePost)) {
-
+            /*
             if (postBody.length() > 0) {
                 // Wrap it in a StringEntity with UTF-8 encoding
                 StringEntity entity = new StringEntity(postBody, StandardCharsets.UTF_8);
@@ -340,6 +341,7 @@ public class DownloadController extends BasePortalController {
                 ((HttpPost) method).setEntity(entity);
 
             } else {
+                */
 
                 // Use old request parameters to assemble new request
                 Map<String, String[]> pMap = request.getParameterMap();
@@ -361,7 +363,7 @@ public class DownloadController extends BasePortalController {
                     throw new URISyntaxException(e.getMessage(), "Error parsing UrlEncodedFormEntity");
                 }
                 ((HttpPost) method).setEntity(entity);
-            }
+            //}
 
         } else {
             // Use an HTTP GET request

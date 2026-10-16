@@ -478,7 +478,7 @@ public class AppContext {
     @Bean
     public KnownLayerService cswKnownLayerService(
             @Qualifier("knownTypes") ArrayList<KnownLayer> knownTypes, // 👈 1. Pass the bean by name
-            ProfilePortalTest config,                                  // 👈 2. Pass the config instance
+            AbstractBasePortalProfile config,                                  // 👈 2. Pass the config instance
             ViewKnownLayerFactory viewFactory,
             ViewCSWRecordFactory viewCSWRecordFactory,
             ViewGetCapabilitiesFactory viewGetCapabilitiesFactory) {
