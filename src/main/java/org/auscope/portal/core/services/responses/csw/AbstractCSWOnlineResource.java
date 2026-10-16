@@ -1,6 +1,7 @@
 package org.auscope.portal.core.services.responses.csw;
 
 import java.net.URL;
+import java.util.List;
 
 import org.auscope.portal.core.services.csw.CSWRecordsFilterVisitor;
 
@@ -31,6 +32,14 @@ public abstract class AbstractCSWOnlineResource {
          * OGC Web Map Service.
          */
         WMS,
+        /**
+         * OGC Web Map Tile Service.
+         */
+        WMTS,
+        /**
+         * OGC Web Map Tile Service GetCapabilities.
+         */
+        WMTSCapabilities,
         /**
          * OGC Web Feature Service.
          */
@@ -122,18 +131,71 @@ public abstract class AbstractCSWOnlineResource {
     public abstract String getApplicationProfile();
 
     /**
-     * provide the protocol version if possible. eg WMS 1.1.1 vs 1.3.0
+     * Gets the protocol version if possible. eg WMS 1.1.1 vs 1.3.0
      * 
      * @return version if possible
      */
     public abstract String getVersion();
     
     /**
-     * provide the protocol request if possible
+     * Gets the protocol request if possible
      * 
      * @return protocol request if possible
      */
     public abstract String getProtocolRequest();
+    
+    /**
+     * Gets the WMTS GetCapabilities URL if possible (WMTS Only)
+     * @return WMTS GetCapabilities URL if possible
+     */
+    public abstract String getWmtsCapabilitiesUrl();
+    
+    /**
+     * Gets the WMTS access method if possible (WMTS Only).
+     * Note that unlike WMS we can't always imply the URL from the service endpoint,
+     * it may not use KVP but instead have a REST endpoint, hence this field
+     * @return WMTS access method if possible
+     */
+    public abstract String getWmtsAccessMethod();
+    
+    /**
+     * Gets the WMTS tile template if possible (WMTS Only).
+     * Access method will be "REST" or "KVP".
+     * @return WMTS tile template if possible
+     */
+    public abstract String getWmtsTileTemplate();
+    
+    /**
+     * Gets the WMTS style if possible (WMTS Only)
+     * @return WMTS style if possible
+     */
+    public abstract String getWmtsStyle();
+
+    /**
+     * Gets the WMTS tileMatrixSet if possible (WMTS Only)
+     * @return WMTS tileMatrixSet if possible
+     */
+    public abstract String getWmtsTileMatrixSet();
+
+    /**
+     * Gets the WMTS format if possible (WMTS Only)
+     * @return WMTS format if possible
+     */
+    public abstract String getWmtsFormat();
+
+    /**
+     * Gets the WMTS tile matrix labels list if possible (WMTS Only)
+     * 
+     * @return
+     */
+    public abstract List<String> getWmtsTileMatrixLabels();
+
+    /**
+     * Gets the WMTS tile matrix set list if possible (WMTS Only)
+     * 
+     * @return
+     */
+    public abstract List<String> getWmtsTileMatrixSets();
 
     /**
      * Gets a simplification of the protocol that this online resource represents.
@@ -145,22 +207,28 @@ public abstract class AbstractCSWOnlineResource {
         if (lowerProtocol == null) {
             return OnlineResourceType.Unsupported;
         }
-
         lowerProtocol = lowerProtocol.toLowerCase();
         if (lowerProtocol.contains("wfs")) {
             return OnlineResourceType.WFS;
         } else if (lowerProtocol.contains("wms")) {
             return OnlineResourceType.WMS;
+        } else if (lowerProtocol.contains("wmts")) {
+            // We expect WMTS GetCapabilities to be something like
+            // "OGC:WMTS-1.0.0-get-capabilities"
+            if (lowerProtocol.contains("get-capabilities") || lowerProtocol.contains("getcapabilities")
+                    || lowerProtocol.contains("wmtscapabilities")) {
+                return OnlineResourceType.WMTSCapabilities;
+            }
+            return OnlineResourceType.WMTS;
         } else if (lowerProtocol.contains("wcs")) {
             return OnlineResourceType.WCS;
         } else if (lowerProtocol.contains("www:link-1.0-http--link")
                 || lowerProtocol.contains("www:download-1.0-http--download")) {
-            //Dap is currently hacked in
+            // DAP is currently hacked in
             String name = getDescription();
             if ((name != null) && name.equals("HACK-OPENDAP")) {
                 return OnlineResourceType.OPeNDAP;
             }
-
             return OnlineResourceType.WWW;
         } else if (lowerProtocol.contains("ogc:sos-")) {
             return OnlineResourceType.SOS;

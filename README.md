@@ -3,7 +3,7 @@
 
 # AuScope-Portal-API
 
-Back-end API server for AuScope Portal (http://portal.auscope.org.au)
+Back-end API server for AuScope Portal (https://portal.auscope.org.au)
 
 ### To build and test:
 
@@ -14,8 +14,10 @@ mvn clean install
 ### To run:
 
 ```
-java -jar --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED .\target\auscope-portal-api-6.9.2-SNAPSHOT.war
+java -jar --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED .\target\auscope-portal-api-6.11.0-SNAPSHOT.war
 ```
+
+NB: Use forward slashes in the .war file path for Linux
 
 ### IMPORTANT NOTES:
 

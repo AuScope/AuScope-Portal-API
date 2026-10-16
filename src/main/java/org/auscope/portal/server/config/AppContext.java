@@ -37,6 +37,7 @@ import org.auscope.portal.core.services.VocabularyFilterService;
 import org.auscope.portal.core.services.WCSService;
 import org.auscope.portal.core.services.WFSService;
 import org.auscope.portal.core.services.WMSService;
+import org.auscope.portal.core.services.WMTSService;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
 import org.auscope.portal.core.services.csw.GriddedCSWRecordTransformerFactory;
 import org.auscope.portal.core.services.csw.ViewGriddedCSWRecordFactory;
@@ -277,11 +278,9 @@ public class AppContext {
         
         Yaml yaml = new Yaml();
         Map<String, Object> yamlLayers;
-        
         try {
             InputStream yamlInputStream;
             String fullPath = portalS3Bucket.endsWith("/") ? portalS3Bucket + "layers.yaml" : portalS3Bucket + "/layers.yaml";
-            
             // ✨ Route local testing files cleanly to prevent network stream timeouts
             if (fullPath.startsWith("file:")) {
                 java.io.File localFile = new java.io.File(new URI(fullPath));
@@ -368,9 +367,15 @@ public class AppContext {
     }
     
     @Bean
+    public WMTSService wmtsService() {
+        return new WMTSService(httpServiceCallerApp());
+    }
+    
+    @Bean
     public CSWCacheService cswCacheService() {
         CSWCacheService cacheService = new CSWCacheService(
-                taskExecutor(), cswCacheHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory(), elasticsearchService());
+                taskExecutor(), cswCacheHttpServiceCaller(), cswServiceList, griddedCswTransformerFactory(),
+                elasticsearchService(), wmtsService());
         cacheService.setForceGetMethods(true);
         return cacheService;
     }

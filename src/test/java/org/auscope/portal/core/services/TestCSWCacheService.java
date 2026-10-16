@@ -43,6 +43,7 @@ public class TestCSWCacheService extends PortalTestClass {
     private BasicThreadExecutor threadExecutor;
     
     private ElasticsearchService mockElasticsearchService = context.mock(ElasticsearchService.class);
+    private WMTSService mockWmtsService = context.mock(WMTSService.class);
 
     private static final String serviceUrlFormatString = "http://cswservice.%1$s.url/";
 
@@ -73,7 +74,7 @@ public class TestCSWCacheService extends PortalTestClass {
             }
         });
         
-        this.cswCacheService = new CSWCacheService(threadExecutor, httpServiceCaller, serviceUrlList, mockElasticsearchService);
+        this.cswCacheService = new CSWCacheService(threadExecutor, httpServiceCaller, serviceUrlList, mockElasticsearchService, mockWmtsService);
     }
 
     @After

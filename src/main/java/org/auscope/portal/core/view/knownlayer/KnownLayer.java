@@ -130,6 +130,9 @@ public class KnownLayer implements Serializable {
     /** layerSld - use this as SLD parameter in OGC WMS requests */
     private JSONArray layerSldParameter;
     
+    /** Additional WMTS information for WMTS layers only **/
+    private WMTSLayerInfo wmtsLayerInfo;
+    
     /**
      * Creates a new KnownLayer
      *
@@ -438,7 +441,6 @@ public class KnownLayer implements Serializable {
     }
     
     public void setPreviewImg(String previewImg) {
-        
         this.previewImg = previewImg;
     }
 
@@ -619,7 +621,6 @@ public class KnownLayer implements Serializable {
             newCoordNode.put(oldCoordNode.get(0));
             newCoordNode.put(oldCoordNode.get(1));
             this.polygon.put(newCoordNode);
-
         }
 
     }
@@ -640,7 +641,6 @@ public class KnownLayer implements Serializable {
             newCoordNode.put(oldCoordNode.get(0));
             newCoordNode.put(oldCoordNode.get(1));
             this.bbox.put(newCoordNode);
-
         }
 
     }
@@ -662,7 +662,6 @@ public class KnownLayer implements Serializable {
             newResourceOrder.put(oldResourceOrder.get(0)); // online reosurce name
             newResourceOrder.put(oldResourceOrder.get(1)); // online resource order - numeric - starting at 1
             this.onlineResourceOrder.put(newResourceOrder);
-
         }
 
     }
@@ -686,5 +685,22 @@ public class KnownLayer implements Serializable {
         }
     }
 
+    /**
+     * Get WMTS layer info for WMTS layers
+     * 
+     * @return WMTS layer info
+     */
+    public WMTSLayerInfo getWmtsLayerInfo() {
+        return wmtsLayerInfo;
+    }
+
+    /**
+     * Set WMTS layer info
+     * 
+     * @param wmtsLayerInfo the WMTS layer info for WMTS layers
+     */
+    public void setWmtsLayerInfo(WMTSLayerInfo wmtsLayerInfo) {
+        this.wmtsLayerInfo = wmtsLayerInfo;
+    }
 }
 

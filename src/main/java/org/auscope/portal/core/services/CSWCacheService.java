@@ -83,6 +83,9 @@ public class CSWCacheService {
     
     // Provides access to CSWRecord index
     protected ElasticsearchService elasticsearchService;
+    
+    // Records with WMTS info require additional WMTS info
+    protected WMTSService wmtsService;
 
     // KnownLayerService needs to be informed when indexing is finished, must be @Lazy loaded to avoid circular dependencies   
     @Autowired
@@ -102,8 +105,9 @@ public class CSWCacheService {
     public CSWCacheService(Executor executor,
             HttpServiceCaller serviceCaller,
             @SuppressWarnings("rawtypes") ArrayList cswServiceList,
-            ElasticsearchService elasticsearchService) {
-        this(executor, serviceCaller, cswServiceList, new CSWRecordTransformerFactory(), elasticsearchService);
+            ElasticsearchService elasticsearchService,
+            WMTSService wmtsService) {
+        this(executor, serviceCaller, cswServiceList, new CSWRecordTransformerFactory(), elasticsearchService, wmtsService);
     }
 
     /**
@@ -121,7 +125,8 @@ public class CSWCacheService {
             HttpServiceCaller serviceCaller,
             @SuppressWarnings("rawtypes") ArrayList cswServiceList,
             CSWRecordTransformerFactory transformerFactory,
-            ElasticsearchService elasticsearchService) {
+            ElasticsearchService elasticsearchService,
+            WMTSService wmtsService) {
         this.updateRunning = false;
         this.executor = executor;
         this.serviceCaller = serviceCaller;
@@ -131,6 +136,7 @@ public class CSWCacheService {
         this.cswRecordCache = new HashMap<String, Map<String, CSWRecord>>();
         this.transformerFactory = transformerFactory;
         this.elasticsearchService = elasticsearchService;
+        this.wmtsService = wmtsService;
         this.cswServiceList = new CSWServiceItem[cswServiceList.size()];
         for (int i = 0; i < cswServiceList.size(); i++) {
             this.cswServiceList[i] = (CSWServiceItem) cswServiceList.get(i);
@@ -427,6 +433,15 @@ public class CSWCacheService {
      */
     public List<CSWRecord> getWMSRecords() {
         return getFilteredRecords(OnlineResourceType.WMS);
+    }
+    
+    /**
+     * Returns only WMTS data records
+     *
+     * @return
+     */
+    public List<CSWRecord> getWMTSRecords() {
+        return getFilteredRecords(OnlineResourceType.WMTS);
     }
 
     /**
@@ -898,11 +913,13 @@ public class CSWCacheService {
                 threadLog.info("Updating CSW cache for: " + cswServiceUrl);
                 if (this.endpoint.getNoCache()) {
                 	this.addDummyCacheRecord();
-                }
-                else {
+                } else {
                 	// Fetch new records from the endpoint
                 	Map<String, CSWRecord> cswRecordMap = fetchAllRecordsFromEndpoint();
                 	if (cswRecordMap != null && !cswRecordMap.isEmpty()) {
+                		// Any WMTS online resources will require additional info
+                		wmtsService.enrichRecords(cswRecordMap.values());
+                		
                 		// Normalize record map to ensure key integrity
                 		Map<String, CSWRecord> normalizedNewMap = new HashMap<>();
                 	    for (Map.Entry<String, CSWRecord> e : cswRecordMap.entrySet()) {

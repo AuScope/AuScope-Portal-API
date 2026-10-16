@@ -179,6 +179,7 @@ public class KnownLayerService {
                 	if (relation == KnownLayerSelector.RelationType.NotRelated) {
                 	    List<AbstractCSWOnlineResource> onlineResources = record.getOnlineResourcesByType(
                 	            AbstractCSWOnlineResource.OnlineResourceType.WMS,
+                	            AbstractCSWOnlineResource.OnlineResourceType.WMTS,
                 	            AbstractCSWOnlineResource.OnlineResourceType.WFS);
 
                 	    // We need to recurse each resource. A nicer (but harder) way to do this would be to create

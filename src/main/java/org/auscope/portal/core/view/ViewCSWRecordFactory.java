@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource;
+import org.auscope.portal.core.services.responses.csw.AbstractCSWOnlineResource.OnlineResourceType;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicBoundingBox;
 import org.auscope.portal.core.services.responses.csw.CSWGeographicElement;
 import org.auscope.portal.core.services.responses.csw.CSWRecord;
@@ -79,11 +80,15 @@ public class ViewCSWRecordFactory {
         }
         obj.put("authors", authors);
 
-
         // Online resources
         List<Map<String, Object>> onlineResources = new ArrayList<>();
         if (record.getOnlineResources() != null) {
             for (AbstractCSWOnlineResource res : record.getOnlineResources()) {
+                // Skip WMTSCapabilities resources, front-end will only ever need the URL
+                // and that's added to AbstractCSWOnlineResource's wmtsCapabilitiesUrl
+                if (res.getType() == OnlineResourceType.WMTSCapabilities) {
+                    continue;
+                }
                 if (res.getLinkage() != null) {
                     onlineResources.add(this.toView(res));
                 }
@@ -217,6 +222,20 @@ public class ViewCSWRecordFactory {
         obj.put("version", res.getVersion());
         obj.put("applicationProfile", res.getApplicationProfile());
         obj.put("protocolRequest", res.getProtocolRequest());
+        
+        // WMTS specific fields
+        if (res.getType() == OnlineResourceType.WMTS) {
+            ModelMap wmts = new ModelMap();
+            wmts.put("wmtsCapabilitiesUrl", res.getWmtsCapabilitiesUrl());
+            wmts.put("wmtsAccessMethod", res.getWmtsAccessMethod());
+            wmts.put("wmtsTileTemplate", res.getWmtsTileTemplate());
+            wmts.put("wmtsStyle", res.getWmtsStyle());
+            wmts.put("wmtsTileMatrixSet", res.getWmtsTileMatrixSet());
+            wmts.put("wmtsFormat", res.getWmtsFormat());
+            wmts.put("wmtsTileMatrixLabels", res.getWmtsTileMatrixLabels());
+            wmts.put("wmtsTileMatrixSets", res.getWmtsTileMatrixSets());
+            obj.put("wmts", wmts);
+        }
         return obj;
     }
 

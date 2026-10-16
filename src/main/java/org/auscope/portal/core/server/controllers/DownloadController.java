@@ -72,6 +72,7 @@ import org.auscope.portal.core.services.PortalServiceException;
  * User: Mathew Wyatt Date: 02/09/2009 Time: 12:33:48 PM
  */
 
+
 @Controller
 public class DownloadController extends BasePortalController {
 
@@ -327,7 +328,7 @@ public class DownloadController extends BasePortalController {
         if (StringUtils.isNotBlank(contentType)) {
             response.addHeader("Content-Type", contentType);
         }
-
+        
         // Assemble method depending on the incoming request's method
         HttpRequestBase method;
         if (!useGet && (request.getMethod().equals("POST") || usePost)) {

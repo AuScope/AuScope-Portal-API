@@ -406,8 +406,16 @@
                             <xsl:value-of select="concat(./gsmlp:boreholeLength_m, ' (m)')"/>
                         </xsl:if>
                     </td>
-                 </tr>
-                 <tr>
+                </tr>
+                <tr>
+                    <td class="our_row header">Elevation:</td>
+                    <td class="our_row">
+                        <xsl:if test="./gsmlp:elevation_m">                            
+                            <xsl:value-of select="concat(./gsmlp:elevation_m, ' (m)')"/>
+                        </xsl:if>
+                    </td>
+                </tr>
+                <tr>
                     <td class="our_row header">Elevation SRS:</td>
                     <td class="our_row">
                         <xsl:call-template name="make-popup-url">

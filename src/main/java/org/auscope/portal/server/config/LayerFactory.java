@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.logging.Log;
@@ -26,7 +25,9 @@ import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.view.knownlayer.VMFSelector;
 import org.auscope.portal.core.view.knownlayer.WFSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSSelector;
+import org.auscope.portal.core.view.knownlayer.WMTSSelector;
 import org.auscope.portal.core.view.knownlayer.WMSWFSSelector;
+import org.auscope.portal.core.view.knownlayer.WMTSLayerInfo;
 import org.auscope.portal.core.view.knownlayer.KMLSelector;
 import org.auscope.portal.view.knownlayer.IRISSelector;
 import org.json.JSONArray;
@@ -37,7 +38,7 @@ import org.json.JSONArray;
 */
 public class LayerFactory {
 
-    /* Used for ogging exceptions */
+    /* Used for logging exceptions */
     private final Log log = LogFactory.getLog(getClass());
 
     private boolean layersLoaded = false;
@@ -214,19 +215,39 @@ public class LayerFactory {
      *
      * @param layerName
      *            The layerName that identifies which WMS this KnownLayer is identifying
-     * @param serviceEndpoints
-     *            A list of the end points that will either be included or excluded from the WMS, depending on the value of includeEndpoints
+     * @param endPointsList
+     *            A list of the end points that will either be included or excluded from the WMS, depending on the value of endPointsList
      */
-    public WMSSelector knownTypeWMSSelector(String LayerName, ArrayList<String> endPointsList) {
+    public WMSSelector knownTypeWMSSelector(String layerName, ArrayList<String> endPointsList) {
         WMSSelector f = null;
         if (endPointsList.size() > 0) {
             String[] endPoints = new String[endPointsList.size()];
             for (int i = 0; i < endPointsList.size(); i++)
                 endPoints[i] = endPointsList.get(i);
-            f = new WMSSelector(LayerName, endPoints, true);
+            f = new WMSSelector(layerName, endPoints, true);
         } else
-            f = new WMSSelector(LayerName);
+            f = new WMSSelector(layerName);
 
+        return f;
+    }
+    
+    /**
+     * knownTypeWMTSSelector
+     *
+     * @param layerName
+     *            The layerName that identifies which WMTS this KnownLayer is identifying
+     * @param endPointsList
+     *            A list of the end points that will either be included or excluded from the WMTS, depending on the value of endPointsList
+     */
+    public WMTSSelector knownTypeWMTSSelector(String layerName, List<String> endPointsList) {
+        WMTSSelector f = null;
+        if (endPointsList != null && endPointsList.size() > 0) {
+            String[] endPoints = new String[endPointsList.size()];
+            for (int i = 0; i < endPointsList.size(); i++)
+                endPoints[i] = endPointsList.get(i);
+            f = new WMTSSelector(layerName, endPoints, true);
+        } else
+            f = new WMTSSelector(layerName);
         return f;
     }
 
@@ -486,11 +507,11 @@ public class LayerFactory {
                                             if (index[0]==0) { lon[0] = (Double) coord; }
                                             if (index[0]==1) { lat[0] = (Double) coord; }
                                             index[0]=index[0]+1;
-                                        });                                           
+                                        });
                                         JSONArray coordNode = new JSONArray();
                                         coordNode.put(lon[0]);
                                         coordNode.put(lat[0]);
-                                        polygonGeoJson.put(coordNode);                                        
+                                        polygonGeoJson.put(coordNode);
                                     });
                                 }
                             });
@@ -535,10 +556,15 @@ public class LayerFactory {
                                 }
                             });
                             layerName = attr[0];
-                            // System.out.println("\twms: "+layerName+", "+endPointList);
                             layer.setKnownLayerSelector(knownTypeWMSSelector(layerName, endPointList));
                             break;
-
+                        }
+                        case "wmts": {
+                            WMTSLayerInfo wmtsInfo = buildWmtsLayerInfo((Map<String, Object>) v1);
+                            layer.setWmtsLayerInfo(wmtsInfo);
+                            layer.setKnownLayerSelector(
+                                    knownTypeWMTSSelector(wmtsInfo.getSelector(), wmtsInfo.getEndpoints()));
+                            break;
                         }
                         case "filters": {
                             filter = new filterCtl();
@@ -740,6 +766,56 @@ public class LayerFactory {
 
         }
         return layer;
+    }
+    
+    /**
+     * creates a Map of WMTS layer information
+     * @param wmtsMap
+     * @return
+     */
+    private WMTSLayerInfo buildWmtsLayerInfo(Map<String, Object> wmtsMap) {
+        WMTSLayerInfo wmtsInfo = new WMTSLayerInfo();
+
+        ArrayList<String> endPointList = new ArrayList<>();
+
+        for (Map.Entry<String, Object> entry : wmtsMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            switch (key) {
+            // Selector config
+            case "selector":
+                wmtsInfo.setSelector((String) value);
+                break;
+
+            case "endpoints":
+                endPointList.addAll((ArrayList<String>) value);
+                wmtsInfo.setEndpoints(endPointList);
+                break;
+
+            // WMTS config
+            case "url":
+                wmtsInfo.setUrl((String) value);
+                break;
+
+            case "style":
+                wmtsInfo.setStyle((String) value);
+                break;
+
+            case "format":
+                wmtsInfo.setFormat((String) value);
+                break;
+
+            case "tileMatrixSetID":
+                wmtsInfo.setTileMatrixSetID((String) value);
+                break;
+
+            case "tileMatrixLabels":
+                wmtsInfo.setTileMatrixLabels((ArrayList<String>) value);
+                break;
+            }
+        }
+        return wmtsInfo;
     }
 
     /*

@@ -239,7 +239,7 @@ public class CSWRecordTransformer {
     }
 
     /**
-     * Helper method for appending a child element containing a single gmd:CI_Citation element
+     * Helper method for appending a child element containing a single gmd:CI_OnlineResource element
      *
      * @param parent
      * @param namespaceUri
@@ -251,23 +251,23 @@ public class CSWRecordTransformer {
         Node child = createChildNode(parent, namespaceUri, name);
         Node ciOnlineResource = createChildNode(child, nc.getNamespaceURI("gmd"), "CI_OnlineResource");
 
-        //Add linkage
+        // Add linkage
         Node linkage = createChildNode(ciOnlineResource, nc.getNamespaceURI("gmd"), "linkage");
         Node url = createChildNode(linkage, nc.getNamespaceURI("gmd"), "URL");
         url.setTextContent(onlineResource.getLinkage().toString());
 
-        //Add protocol
+        // Add protocol
         appendChildCharacterString(ciOnlineResource, nc.getNamespaceURI("gmd"), "protocol",
                 onlineResource.getProtocol());
 
-        //Add application profile
+        // Add application profile
         appendChildCharacterString(ciOnlineResource, nc.getNamespaceURI("gmd"), "applicationProfile",
                 onlineResource.getApplicationProfile());
 
-        //Add name
+        // Add name
         appendChildCharacterString(ciOnlineResource, nc.getNamespaceURI("gmd"), "name", onlineResource.getName());
 
-        //Add description
+        // Add description
         appendChildCharacterString(ciOnlineResource, nc.getNamespaceURI("gmd"), "description",
                 onlineResource.getDescription());
 
