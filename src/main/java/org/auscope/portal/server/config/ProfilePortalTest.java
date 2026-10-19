@@ -24,12 +24,8 @@ import org.yaml.snakeyaml.Yaml;
  */
 @Configuration
 @Profile("test")
-public class ProfilePortalTest {
-
-    private boolean layersLoaded = false;
-
-    Map<String, Object> yamlLayers;
-
+public class ProfilePortalTest extends AbstractBasePortalProfile {
+    @Override
     public KnownLayer knownType(String id) {
 
         LayerFactory lf = new LayerFactory(yamlLayers, layersLoaded);
@@ -38,45 +34,11 @@ public class ProfilePortalTest {
         return layer;
     }
 
-    @Autowired private LayerChecksumService layerChecksumService;
-
-    @Value("${cloud.aws.portalS3Bucket}") private String portalS3Bucket;
-    
     @Bean
     public ArrayList<KnownLayer> knownTypes() {
-        ArrayList<KnownLayer> knownLayers = new ArrayList<KnownLayer>();
-
-        layersLoaded = true;
-        Yaml yaml = new Yaml();
-        URL yamlUrl;
-        try {
-            yamlUrl = new URI(portalS3Bucket+"/layers.yaml").toURL();
-            try (InputStream yamlInputStream = yamlUrl.openStream()) {
-                CheckedInputStream checkedInputStream = new CheckedInputStream(yamlInputStream, new CRC32());
-                yamlLayers = yaml.load(checkedInputStream);
-
-                int[] counter = new int[1];
-                yamlLayers.forEach((k, v) -> {
-                    counter[0]++;
-                    String id = k.toString();
-                    // if (counter[0] <= 181) { // 180
-                    // System.out.println(counter[0] + ", Key = " + id + ", Value = " + v);
-                    KnownLayer l = knownType(id);
-                    if (!l.isHidden())
-                        knownLayers.add(knownType(id));
-                });
-
-                Long checksum = checkedInputStream.getChecksum().getValue();
-                layerChecksumService.setChecksum(checksum);
-                
-            } catch (MalformedURLException e) {
-                System.err.println("[ProfilePortalTest]knownTypes() Error malformed URL: " + e.getMessage());
-            }
-        } catch (IOException | URISyntaxException e) {
-            System.err.println("[ProfilePortalTest]knownTypes() Error reading from URL or processing stream: " + e.getMessage());
-        }
-
-        return knownLayers;
+        // Run the initial load on startup
+        reloadLayers(); 
+        return activeLayers;
     }
 
 }

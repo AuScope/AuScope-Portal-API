@@ -25,6 +25,7 @@ import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.view.knownlayer.KnownLayerAndRecords;
 import org.auscope.portal.core.view.knownlayer.KnownLayerGrouping;
 import org.auscope.portal.core.view.knownlayer.KnownLayerSelector;
+import org.auscope.portal.server.config.ProfilePortalTest;
 import org.jmock.Expectations;
 import org.junit.After;
 import org.junit.Assert;
@@ -37,23 +38,26 @@ import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import org.springframework.ui.ModelMap;
 
 /**
- * Unit tests for KnownLayerService stack driver integration.
- * In particular tests that the Quartz scheduler calls the service monitor and that the service monitor
- * successfully populates the known layer cache
+ * Unit tests for KnownLayerService stack driver integration. In particular
+ * tests that the Quartz scheduler calls the service monitor and that the
+ * service monitor successfully populates the known layer cache
  * 
  * @author Carsten Friedrich, CSIRO
  * 
  */
 public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
 
-    private GoogleCloudMonitoringCachedService mockStackDriverService = context.mock(GoogleCloudMonitoringCachedService.class);
+    private GoogleCloudMonitoringCachedService mockStackDriverService = context
+            .mock(GoogleCloudMonitoringCachedService.class);
     private ElasticsearchService mockElasticsearchService = context.mock(ElasticsearchService.class);
     private KnownLayerService knownLayerService;
+    private ViewKnownLayerFactory mockKnownLayerFactory;
 
     /**
      * Build our mock layer list
-     * @throws MalformedURLException 
-     * @throws PortalServiceException 
+     * 
+     * @throws MalformedURLException
+     * @throws PortalServiceException
      */
     @Before
     public void setup() throws MalformedURLException, PortalServiceException {
@@ -97,13 +101,17 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
         kl4.setStackdriverServiceGroup("Tenements");
 
         List<KnownLayerAndRecords> knownLayers = Arrays.asList(
-                new KnownLayerAndRecords(kl1, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()),
-                new KnownLayerAndRecords(kl2, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()),
-                new KnownLayerAndRecords(kl3, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()),
-                new KnownLayerAndRecords(kl4, Arrays.asList(new CSWRecord[]{mockBelongingRecord}), new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()));
-        
+                new KnownLayerAndRecords(kl1, Arrays.asList(new CSWRecord[] { mockBelongingRecord }),
+                        new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()),
+                new KnownLayerAndRecords(kl2, Arrays.asList(new CSWRecord[] { mockBelongingRecord }),
+                        new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()),
+                new KnownLayerAndRecords(kl3, Arrays.asList(new CSWRecord[] { mockBelongingRecord }),
+                        new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()),
+                new KnownLayerAndRecords(kl4, Arrays.asList(new CSWRecord[] { mockBelongingRecord }),
+                        new ArrayList<CSWRecord>(), new ArrayList<GetCapabilitiesRecord>()));
+
         KnownLayerGrouping knownLayerGroupingMock = context.mock(KnownLayerGrouping.class);
-        
+
         final HashMap<String, List<ServiceStatusResponse>> servGroup1Response = new HashMap<String, List<ServiceStatusResponse>>();
         final HashMap<String, List<ServiceStatusResponse>> servGroup2Response = new HashMap<String, List<ServiceStatusResponse>>();
 
@@ -115,27 +123,91 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
                 new ServiceStatusResponse(false, "wfsgetcaps")));
         servGroup2Response.put("host.name.3", Arrays.asList(new ServiceStatusResponse(true, "getfeatureboreholeview"),
                 new ServiceStatusResponse(false, "wfsgetcaps")));
-        servGroup2Response.put("host.name.4", Arrays.asList(new ServiceStatusResponse(false, "getfeatureboreholeview")));
+        servGroup2Response.put("host.name.4",
+                Arrays.asList(new ServiceStatusResponse(false, "getfeatureboreholeview")));
 
         CSWCacheService mockCacheService = context.mock(CSWCacheService.class);
 
-        context.checking(new Expectations() {{
-            oneOf(mockStackDriverService).getStatuses("ERML");will(returnValue(servGroup1Response));
-            oneOf(mockStackDriverService).getStatuses("NVCL");will(returnValue(servGroup2Response));
-            oneOf(mockStackDriverService).getStatuses("Tenements");will(throwException(new PortalServiceException("tenements error")));
-            oneOf(knownLayerGroupingMock).getKnownLayers();will(returnValue(knownLayers));
-            allowing(mockElasticsearchService).updateCSWRecords(Arrays.asList(new CSWRecord[]{mockBelongingRecord}));
-        }});
+        context.checking(new Expectations() {
+            {
+                oneOf(mockStackDriverService).getStatuses("ERML");
+                will(returnValue(servGroup1Response));
+                oneOf(mockStackDriverService).getStatuses("NVCL");
+                will(returnValue(servGroup2Response));
+                oneOf(mockStackDriverService).getStatuses("Tenements");
+                will(throwException(new PortalServiceException("tenements error")));
+                oneOf(knownLayerGroupingMock).getKnownLayers();
+                will(returnValue(knownLayers));
+                allowing(mockElasticsearchService)
+                        .updateCSWRecords(Arrays.asList(new CSWRecord[] { mockBelongingRecord }));
+            }
+        });
 
+        // 1. Create the mock factory
+        mockKnownLayerFactory = context.mock(ViewKnownLayerFactory.class);
 
-        knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4),
-                new ViewKnownLayerFactory(), new ViewCSWRecordFactory(), new ViewGetCapabilitiesFactory(),
-                new WMSService(null, null), mockElasticsearchService) {
-                    @Override
-                    public KnownLayerGrouping groupKnownLayerRecords() {
-                        return knownLayerGroupingMock;
-                    }
+        context.checking(new Expectations() {
+            {
+                oneOf(mockStackDriverService).getStatuses("ERML");
+                will(returnValue(servGroup1Response));
+                oneOf(mockStackDriverService).getStatuses("NVCL");
+                will(returnValue(servGroup2Response));
+                oneOf(mockStackDriverService).getStatuses("Tenements");
+                will(throwException(new PortalServiceException("tenements error")));
+                oneOf(knownLayerGroupingMock).getKnownLayers();
+                will(returnValue(knownLayers));
+                allowing(mockElasticsearchService)
+                        .updateCSWRecords(Arrays.asList(new CSWRecord[] { mockBelongingRecord }));
+
+                // 2. Add an allowing expectation for the visibility-restricted method
+                // This stops jMock or Java from failing if the internal service calls it
+                allowing(mockKnownLayerFactory);
+            }
+        });
+
+        // 3. Pass your mock into the KnownLayerService constructor instead of 'new
+        // ViewKnownLayerFactory()'
+        // 1. Check the List type
+        List<KnownLayer> layerList = Arrays.asList(kl1, kl2, kl3, kl4);
+
+        // 2. Check the Factory types (Ensure they match the exact constructor types)
+        ViewKnownLayerFactory factory1 = (ViewKnownLayerFactory) mockKnownLayerFactory;
+        ViewCSWRecordFactory factory2 = new ViewCSWRecordFactory();
+        ViewGetCapabilitiesFactory factory3 = new ViewGetCapabilitiesFactory();
+
+        // 3. Check the Service types
+        WMSService wmsServiceInstance = new WMSService(null, null);
+        ElasticsearchService elasticServiceInstance = mockElasticsearchService;
+
+        ArrayList<KnownLayer> knownTypesList = new ArrayList<>(Arrays.asList(kl1, kl2, kl3, kl4));
+
+        // 2. Instantiate the missing configuration object (matches parameter 2)
+        ProfilePortalTest profileConfig = new ProfilePortalTest();
+
+        // 3. Construct with all 7 exact parameter types in sequence
+        knownLayerService = new KnownLayerService(knownTypesList, // 1. ArrayList<KnownLayer>
+                profileConfig, // 2. ProfilePortalTest
+                (ViewKnownLayerFactory) null, // 3. ViewKnownLayerFactory (null bypasses the visibility block!)
+                factory2, // 4. ViewCSWRecordFactory
+                factory3, // 5. ViewGetCapabilitiesFactory
+                wmsServiceInstance, // 6. WMSService
+                elasticServiceInstance // 7. ElasticsearchService
+        ) {
+            @Override
+            public KnownLayerGrouping groupKnownLayerRecords() {
+                return knownLayerGroupingMock;
+            }
         };
+        /*
+         * 
+         * knownLayerService = new KnownLayerService(Arrays.asList(kl1,kl2,kl3,kl4), new
+         * ViewKnownLayerFactory(), new ViewCSWRecordFactory(), new
+         * ViewGetCapabilitiesFactory(), new WMSService(null, null),
+         * mockElasticsearchService) {
+         * 
+         * @Override public KnownLayerGrouping groupKnownLayerRecords() { return
+         * knownLayerGroupingMock; } };
+         */
         knownLayerService.setCSWCacheService(mockCacheService);
         knownLayerService.setCachedService(mockStackDriverService);
     }
@@ -146,8 +218,9 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
     }
 
     /**
-     * Tests the service status background monitor is called by the Quartz scheduler and
-     * successfully updates the KnownLayerCache
+     * Tests the service status background monitor is called by the Quartz scheduler
+     * and successfully updates the KnownLayerCache
+     * 
      * @throws Exception
      */
     @Test
@@ -157,10 +230,10 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
         List<ModelMap> data = knownLayerService.getKnownLayersCache();
         Assert.assertEquals(0, data.size()); // LayersCache has never been populated, so should be empty.
 
-        SchedulerFactoryBean schedulerFactory= null;
-        
+        SchedulerFactoryBean schedulerFactory = null;
+
         try {
-            
+
             JobDetailImpl jobDetail = new JobDetailImpl();
             jobDetail.setDurability(true);
             jobDetail.setJobClass(KnownLayerStatusMonitor.class);
@@ -182,13 +255,13 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
             Thread.sleep(500);
 
             data = knownLayerService.getKnownLayersCache();
-            
+
             Assert.assertEquals(4, data.size()); // LayersCache should now have been called by the scheduler and
                                                  // populated
 
-            //servGroup1
+            // servGroup1
             Assert.assertFalse(data.get(0).containsKey("stackdriverFailingHosts"));
-            //servGroup2
+            // servGroup2
             Assert.assertTrue(data.get(1).containsKey("stackdriverFailingHosts"));
             @SuppressWarnings("unchecked")
             List<String> failingHosts = (List<String>) data.get(1).get("stackdriverFailingHosts");
@@ -196,15 +269,15 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
             Assert.assertEquals("host.name.2", failingHosts.get(0));
             Assert.assertEquals("host.name.3", failingHosts.get(1));
             Assert.assertEquals("host.name.4", failingHosts.get(2));
-            //servGroup3
+            // servGroup3
             Assert.assertFalse(data.get(2).containsKey("stackdriverFailingHosts"));
-            //servGroup4
+            // servGroup4
             Assert.assertFalse(data.get(3).containsKey("stackdriverFailingHosts"));
         } finally {
-            if(schedulerFactory!=null)
+            if (schedulerFactory != null)
                 schedulerFactory.destroy();
         }
-        
+
     }
 
 }
