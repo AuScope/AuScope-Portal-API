@@ -53,7 +53,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.azure.json.implementation.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 
