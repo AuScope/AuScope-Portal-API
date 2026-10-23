@@ -50,7 +50,12 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 		if (StringUtils.isNotBlank(apiKey)) {
 			headers.add("Authorization", "ApiKey " + apiKey);
 		}
-		headers.add("Content-Type", "application/json");
+		// NOTE: Do NOT set a default Content-Type/Accept header here.
+		// The Elasticsearch Java client negotiates its own vendor media type
+		// (e.g. application/vnd.elasticsearch+json; compatible-with=9). Forcing
+		// Content-Type: application/json produces conflicting header values that
+		// a 9.x server rejects with media_type_header_exception on
+		// [Accept, Content-Type].
 		
 		return ClientConfiguration.builder()
 			.connectedTo(new InetSocketAddress(clusterNodesUrl, port))

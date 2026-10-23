@@ -145,6 +145,22 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <!-- Force the low-level REST client to match exactly -->
+        <!-- Pin the high-level Elasticsearch Java client (and its rest5 transport)
+             to match the running Elasticsearch server version (9.3.0).
+             Spring Data Elasticsearch otherwise pulls in 9.4.5, whose media-type
+             negotiation headers are rejected by a 9.3.0 server with
+             media_type_header_exception on [Accept, Content-Type]. -->
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+            <version>9.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-rest5-client</artifactId>
+            <version>9.3.0</version>
+        </dependency>
         <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
