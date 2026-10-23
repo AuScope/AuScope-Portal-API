@@ -18,3 +18,4 @@ velocity.log
 /application-registries.yaml
 .temp-PortalApplication-classpath-arg-*
 .factorypath
+.vscode/
