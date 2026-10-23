@@ -53,7 +53,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.azure.json.implementation.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 
@@ -225,7 +224,7 @@ public class DownloadController extends BasePortalController {
 
             for (int i = 0; i < serviceUrls.length; i++) {
                 // Some file names have spaces, they need to be encoded
-                UriComponents uri = UriComponentsBuilder.fromHttpUrl(serviceUrls[i]).build().encode();
+                UriComponents uri = UriComponentsBuilder.fromUriString(serviceUrls[i]).build().encode();
 
                 HttpGet method = new HttpGet(uri.toString());
                 httpResponse = serviceCaller.getMethodResponseAsHttpResponse(method);
