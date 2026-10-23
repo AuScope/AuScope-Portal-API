@@ -59,7 +59,6 @@ import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.xslt.GmlToHtml;
 import org.auscope.portal.core.xslt.WfsToKmlTransformer;
 import org.auscope.portal.mscl.MSCLWFSService;
-import org.auscope.portal.server.web.CatalogServicesHealthIndicator;
 import org.auscope.portal.server.web.SearchHttpServiceCaller;
 import org.auscope.portal.server.web.service.monitor.KnownLayerStatusMonitor;
 import org.quartz.Trigger;
@@ -580,11 +579,13 @@ public class AppContext {
         return new ViewCSWRecordFactory();
     }
 
-    @Bean
-    public CatalogServicesHealthIndicator CatalogServicesHealthIndicator() {
-        return new CatalogServicesHealthIndicator(cswCacheService(), cswKnownLayerService(knownTypes, null, viewFactory, viewCSWRecordFactory, viewGetCapabilitiesFactory), cswServiceList);
-    }
-    
+    // NOTE: CatalogServicesHealthIndicator is registered via its @Component("CatalogServices")
+    // annotation (component scanning). Do NOT also declare it as an explicit @Bean here:
+    // Spring Boot 4's health subsystem (spring-boot-health) derives the contributor name from
+    // the bean name (stripping the "HealthIndicator" suffix), so two bean definitions both
+    // resolve to the contributor name "CatalogServices" and the registry rejects the duplicate
+    // with: IllegalStateException: A contributor named "CatalogServices" has already been registered.
+
     @Bean
     ElasticsearchService elasticsearchService() {
     	return new ElasticsearchService(searchHttpServiceCaller());
