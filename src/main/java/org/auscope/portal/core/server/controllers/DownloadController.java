@@ -216,7 +216,7 @@ public class DownloadController extends BasePortalController {
 
             for (int i = 0; i < serviceUrls.length; i++) {
                 // Some file names have spaces, they need to be encoded
-                UriComponents uri = UriComponentsBuilder.fromHttpUrl(serviceUrls[i]).build().encode();
+                UriComponents uri = UriComponentsBuilder.fromUriString(serviceUrls[i]).build().encode();
 
                 HttpGet method = new HttpGet(uri.toString());
                 httpResponse = serviceCaller.getMethodResponseAsHttpResponse(method);
