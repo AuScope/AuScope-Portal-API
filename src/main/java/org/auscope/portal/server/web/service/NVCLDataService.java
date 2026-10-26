@@ -384,7 +384,7 @@ public class NVCLDataService {
         HashMap<String, String> mapDatasetCollection = new HashMap<String, String>();
         HttpGet method = new HttpGet();
         URIBuilder builder = new URIBuilder(serviceUrl + "getDatasetCollection.html");
-        System.out.println("getDatasetCollectionMap:" + serviceUrl);
+        //System.out.println("getDatasetCollectionMap:" + serviceUrl);
         //set all of the parameters.
         builder.setParameter("holeidentifier", holeIdentifier);
         builder.setParameter("headersonly", "yes");
@@ -406,7 +406,7 @@ public class NVCLDataService {
             mapDatasetCollection.put(boreholeURI.toLowerCase(), dataset.datasetName);
             //System.out.println(boreholeURI +  ',' + dataset.datasetName);
         }
-        System.out.println("getDatasetCollectionMap:" + mapDatasetCollection.size());
+        //System.out.println("getDatasetCollectionMap:" + mapDatasetCollection.size());
         return mapDatasetCollection;
     }
 
