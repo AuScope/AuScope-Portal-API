@@ -7,13 +7,14 @@ import java.util.HashMap;
 import org.auscope.portal.core.services.CSWCacheService;
 import org.auscope.portal.core.services.KnownLayerService;
 import org.auscope.portal.core.services.csw.CSWServiceItem;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.Health.Builder;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.Health.Builder;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 
 @Component("CatalogServices")
 public class CatalogServicesHealthIndicator implements HealthIndicator {
@@ -21,8 +22,8 @@ public class CatalogServicesHealthIndicator implements HealthIndicator {
     private KnownLayerService cswKnownLayerService;
     private CSWCacheService cswCacheService;
     private ArrayList<CSWServiceItem> cswServiceList;
-    private RestTemplate restTemplate = new RestTemplateBuilder().setConnectTimeout(Duration.ofMillis(5000))
-        .setReadTimeout(Duration.ofMillis(5000))
+    private RestTemplate restTemplate = new RestTemplateBuilder().connectTimeout(Duration.ofMillis(5000))
+        .readTimeout(Duration.ofMillis(5000))
         .build();
 
     public CatalogServicesHealthIndicator(CSWCacheService cswCacheService, KnownLayerService cswKnownLayerService,

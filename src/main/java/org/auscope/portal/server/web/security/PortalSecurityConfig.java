@@ -32,7 +32,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -84,7 +84,7 @@ public class PortalSecurityConfig {
 		    				.userService(oauth2UserService)))
 			.userDetailsService(userDetailsService())
 			.logout(l -> l
-					.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+					.logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher("/logout"))
 					// Disable auto-redirect from back-end, let front-end handle it
 					.logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
 					    httpServletResponse.setStatus(HttpServletResponse.SC_OK);

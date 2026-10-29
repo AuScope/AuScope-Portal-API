@@ -44,7 +44,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.12</version>
+        <version>4.1.2</version>
     </parent>
     
     <!-- Repositories section -->
@@ -86,9 +86,24 @@
 
     <!-- Dependencies section -->
     <dependencies>
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-health -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-health</artifactId>
+            <version>4.1.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-restclient -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-restclient</artifactId>
+            <version>4.1.2</version>
+            <scope>compile</scope>
+        </dependency>
 		<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <version>4.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -102,9 +117,22 @@
             </exclusions>
         </dependency>
 
+        <!-- The existing test suite is written against JUnit 4 (org.junit.Test,
+             org.junit.Assert, @RunWith, @Rule, jmock-junit4). Spring Boot 4's
+             spring-boot-starter-test no longer pulls in JUnit Vintage, so Surefire's
+             JUnit Platform provider finds no engine for JUnit 4 tests and reports
+             "Tests run: 0". Adding the Vintage engine restores JUnit 4 execution on
+             the JUnit Platform. Version is managed by the Spring Boot / JUnit BOM. -->
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>4.1.2</version>
         </dependency>
 
         <!-- JPA (Spring Boot) -->
@@ -130,6 +158,22 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <!-- Force the low-level REST client to match exactly -->
+        <!-- Pin the high-level Elasticsearch Java client (and its rest5 transport)
+             to match the running Elasticsearch server version (9.3.0).
+             Spring Data Elasticsearch otherwise pulls in 9.4.5, whose media-type
+             negotiation headers are rejected by a 9.3.0 server with
+             media_type_header_exception on [Accept, Content-Type]. -->
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+            <version>9.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-rest5-client</artifactId>
+            <version>9.3.0</version>
+        </dependency>
         <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
@@ -137,20 +181,20 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-	        <version>6.2.10</version>
+	        <version>7.0.9</version>
         </dependency>
 
 	    <!-- This is a dummy database used for development only -->
 	    <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.7.1</version>
+            <version>2.7.4</version>
 	    </dependency>
         
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.11.1</version>
+            <version>5.12.0</version>
         </dependency>
         
         <dependency>
@@ -174,20 +218,20 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>8.2.0</version>
+            <version>8.4.0</version>
         </dependency>
         
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
-            <version>42.6.1</version>
+            <version>42.7.14</version>
         </dependency>
         
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
-            <version>5.5.0</version>
+            <version>6.2.0</version>
             <type>pom</type>
         </dependency>
 
@@ -231,24 +275,19 @@
         <dependency>
            <groupId>com.fasterxml.jackson.core</groupId>
            <artifactId>jackson-core</artifactId>
+           <version>2.21.7</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <version>2.21.7</version>
         </dependency>
 
         <dependency>
-            <groupId>com.azure.spring</groupId>
-            <optional>true</optional> 
-            <artifactId>spring-cloud-azure-appconfiguration-config</artifactId>
-            <version>5.23.0</version>
-        </dependency>
-        
-        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.8.10</version>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>

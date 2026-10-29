@@ -1,12 +1,13 @@
 package org.auscope.portal.server.web.security.aaf;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +22,7 @@ public class AAFAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	private String aafCallbackUrl;
     
 	public AAFAuthenticationFilter(AuthenticationManager authenticationManager, String aafCallbackUrl) {
-    	super(new AntPathRequestMatcher(aafCallbackUrl, "POST"));
+    	super(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, aafCallbackUrl));
     	this.setAuthenticationManager(authenticationManager);
     }
 

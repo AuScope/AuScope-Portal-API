@@ -1,6 +1,9 @@
 package org.auscope.portal.server.web.security.aaf;
 
+import java.util.Collection;
+
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  * Created by wis056 on 8/04/2015.
@@ -12,7 +15,7 @@ public class AAFAuthenticationToken extends AbstractAuthenticationToken {
     private String credentials;
 
     public AAFAuthenticationToken(String token) {
-        super(null);
+        super((Collection<? extends GrantedAuthority>) null);
         this.credentials = token;
     }
 
