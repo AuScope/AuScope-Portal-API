@@ -93,7 +93,7 @@
             <dependency>
                 <groupId>com.azure.spring</groupId>
                 <artifactId>spring-cloud-azure-dependencies</artifactId>
-                <version>7.2.0</version>
+                <version>7.4.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -297,7 +297,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.21.7</version>
+            <version>2.21.8</version>
         </dependency>
 
         <!-- Azure App Configuration (Spring Cloud Azure 7.x).
