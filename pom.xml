@@ -84,6 +84,22 @@
         </repository>
     </repositories>
 
+    <!-- Managed dependency versions -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Cloud Azure 7.x: required for Spring Boot 4.x / Spring Cloud 2025.1.x.
+                 Provides the Azure App Configuration client used to load runtime config
+                 (including the active Spring profile) from Azure App Configuration. -->
+            <dependency>
+                <groupId>com.azure.spring</groupId>
+                <artifactId>spring-cloud-azure-dependencies</artifactId>
+                <version>7.2.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <!-- Dependencies section -->
     <dependencies>
         <!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-health -->
@@ -282,6 +298,17 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.21.7</version>
+        </dependency>
+
+        <!-- Azure App Configuration (Spring Cloud Azure 7.x).
+             The '-web' starter adds servlet-request-triggered configuration refresh,
+             appropriate for this Spring MVC web application. Version is managed by the
+             spring-cloud-azure-dependencies BOM above.
+             Activation is via 'spring.config.import=azureAppConfiguration' in
+             application.yaml (bootstrap.yml is no longer supported from v6.0.0). -->
+        <dependency>
+            <groupId>com.azure.spring</groupId>
+            <artifactId>spring-cloud-azure-starter-appconfiguration-config</artifactId>
         </dependency>
 
         <dependency>

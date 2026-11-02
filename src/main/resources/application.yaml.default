@@ -57,10 +57,36 @@ springdoc:
    writer-with-order-by-keys: true
 
 spring:
+   # Azure App Configuration (Spring Cloud Azure 7.x).
+   # Replaces the former 'bootstrap.yml' mechanism, which was removed in the
+   # Azure App Configuration library v6.0.0 and is unsupported on Spring Boot 4.
+   # 'spring.config.import' triggers loading from Azure App Configuration.
+   # The store's label-filter 'selects' decide which App Configuration
+   # key/values (including the active profile) are pulled in.
+   # Disabled by default so local/dev builds don't require an App Config store;
+   # the Azure Container App enables it and supplies the connection string via
+   # the APP_CONFIGURATION_CONNECTION_STRING environment variable.
+   config:
+      import: "optional:azureAppConfiguration"
+   cloud:
+      azure:
+         appconfiguration:
+            enabled: ${APP_CONFIG_ENABLED:false}
+            stores:
+               - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING:}
+                 enabled: ${APP_CONFIG_ENABLED:false}
+                 selects:
+                    - label-filter: "devregistries"
+                    - label-filter: "dev"
+                    - label-filter: "allportals"
+
    # Include the registry definitions from application-registries.yaml
    profiles:
-      include:
-         'registries'
+      group:
+         # Activating 'test' or 'prod' also activates 'registries'
+         # (Spring Boot 2.4+ replacement for the removed 'profiles.include').
+         test: registries
+         prod: registries
       # There are two profiles 'prod' and 'test'.
       # These are for production and test builds, and control the set of map layers available to Auscope Portal
       # Make sure only one is present (or that one is commented)

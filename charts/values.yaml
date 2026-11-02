@@ -88,8 +88,26 @@ applicationconfig:
 extraPodEnv: |
   - name: spring.config.location
     value: "/workspace/config/application.yaml"
+  # Azure App Configuration (Spring Cloud Azure 7.x). Replaces the removed
+  # bootstrap.yml mechanism. Set APP_CONFIG_ENABLED=true and provide the
+  # connection string (ideally from a Kubernetes/Key Vault secret) to load
+  # configuration — including the active Spring profile — from App Configuration.
+  - name: APP_CONFIG_ENABLED
+    value: "true"
+  - name: APP_CONFIGURATION_CONNECTION_STRING
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.appConfig.connectionStringSecret.name | default "auscope-portal-api-appconfig" }}
+        key: {{ .Values.appConfig.connectionStringSecret.key | default "connection-string" }}
   - name: JAVA_TOOL_OPTIONS
     value: '-XX:InitialRAMPercentage=10 -XX:MinRAMPercentage=50 -XX:MaxRAMPercentage=80'
+
+# Azure App Configuration connection-string secret reference used by extraPodEnv.
+# Override these to point at the Secret that holds the App Config connection string.
+appConfig:
+  connectionStringSecret:
+    name: "auscope-portal-api-appconfig"
+    key: "connection-string"
 
 persistence:
   cswcacheDir:
