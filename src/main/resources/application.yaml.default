@@ -182,7 +182,50 @@ management:
    info:
       git:
          mode: full
+   health:
+      elasticsearch:
+         enabled: true
 
 info:
    application:
       portal-core-version: "@portal.core.version@"
+
+---
+# =========================================================================
+# 2. DEV SERVER'S OVERRIDES (Active when SPRING_PROFILES_ACTIVE=dev when run in a container or --spring.profiles.active=dev when run from command line)
+# =========================================================================
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+ 
+cloud:
+  azure:
+    appconfiguration:
+      stores:
+        - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING}
+          enabled: true
+          selects:
+            - label-filter: "devregistries"
+            - label-filter: "dev"
+            - label-filter: "allportals"
+ 
+---
+# =========================================================================
+# 3. PRODUCTION SERVER'S OVERRIDES (Active when SPRING_PROFILES_ACTIVE=prod when run in a container or --spring.profiles.active=prod when run from command line)
+# =========================================================================
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+ 
+cloud:
+  azure:
+    appconfiguration:
+      stores:
+        - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING}
+          enabled: true
+          selects:
+            - label-filter: "prodregistries"
+            - label-filter: "prod"
+            - label-filter: "allportals"
