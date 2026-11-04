@@ -64,8 +64,8 @@ AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1941,0,178,0,46
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.wfsRec,13,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,GraceDataSourceConfiguration,17,0,0,0,4,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalTest,22,0,0,0,6,0,3,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalProduction,20,0,0,0,5,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.filterCtl,3,0,0,0,1,0,1,0,1,0
+AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalProduction,20,0,0,0,5,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.selRec,13,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,Registries,29,0,0,0,8,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.domain.xml,XMLStreamAttributeExtractor,29,78,5,7,8,16,6,5,2,3
