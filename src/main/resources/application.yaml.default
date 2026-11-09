@@ -67,10 +67,9 @@ spring:
       active: test
       #active: prod
      cloud:
-
-   azure:
-      appconfiguration:
-         enabled: false
+        azure:
+           appconfiguration:
+              enabled: false
 
    # Use this for DB connection
    datasource:
