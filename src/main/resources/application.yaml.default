@@ -66,6 +66,11 @@ spring:
       # Make sure only one is present (or that one is commented)
       active: test
       #active: prod
+     cloud:
+
+   azure:
+      appconfiguration:
+         enabled: false
 
    # Use this for DB connection
    datasource:
@@ -190,11 +195,6 @@ info:
    application:
       portal-core-version: "@portal.core.version@"
 
-spring:
-  cloud:
-    azure:
-      appconfiguration:
-        enabled: false
 
 ---
 # =========================================================================
