@@ -190,15 +190,7 @@ info:
    application:
       portal-core-version: "@portal.core.version@"
 
----
-# =========================================================================
-# 1. LOCAL DEV BUILD (does not connect to Azure App Config, set as "test" profile in "profiles:" -> "active:" section above)
-# =========================================================================
 spring:
-  config:
-    activate:
-      on-profile: "test"
-
   cloud:
     azure:
       appconfiguration:
