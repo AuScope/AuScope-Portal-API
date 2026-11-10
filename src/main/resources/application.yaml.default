@@ -66,10 +66,10 @@ spring:
       # Make sure only one is present (or that one is commented)
       active: test
       #active: prod
-      cloud:
-         azure:
-            appconfiguration:
-               enabled: false
+   cloud:
+      azure:
+         appconfiguration:
+            enabled: false
 
    # Use this for DB connection
    datasource:
