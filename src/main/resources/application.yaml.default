@@ -208,6 +208,7 @@ spring:
   cloud:
     azure:
       appconfiguration:
+        enabled: true
         stores:
           - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING}
             enabled: true
@@ -229,6 +230,7 @@ spring:
   cloud:
     azure:
       appconfiguration:
+        enabled: true
         stores:
           - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING}
             enabled: true
