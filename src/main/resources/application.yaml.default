@@ -66,10 +66,10 @@ spring:
       # Make sure only one is present (or that one is commented)
       active: test
       #active: prod
-      cloud:
-         azure:
-            appconfiguration:
-               enabled: false
+   cloud:
+      azure:
+         appconfiguration:
+            enabled: false
 
    # Use this for DB connection
    datasource:
@@ -208,6 +208,7 @@ spring:
   cloud:
     azure:
       appconfiguration:
+        enabled: true
         stores:
           - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING}
             enabled: true
@@ -229,6 +230,7 @@ spring:
   cloud:
     azure:
       appconfiguration:
+        enabled: true
         stores:
           - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING}
             enabled: true
