@@ -218,15 +218,62 @@ public class CSWCacheService {
      *
      * if newKeywordCache is NOT null it will update the internal cache. if newRecordCache is NOT null it will update the internal cache.
      */
-    private synchronized void updateFinished(Map<String, Set<CSWRecord>> newKeywordCache, List<CSWRecord> newRecordCache, Map<String, Set<String>> newKeywordByEndpointCache) {
-        if (newKeywordCache != null) {
+    private synchronized void updateFinished(
+            Map<String, Set<CSWRecord>> newKeywordCache,
+            List<CSWRecord> newRecordCache,
+            Map<String, Set<String>> newKeywordByEndpointCache,
+            List<String> serviceIds) {
+        
+        boolean partialUpdate = serviceIds != null && !serviceIds.isEmpty();
+        if (!partialUpdate) {
             this.keywordCache = newKeywordCache;
-        }
-        if (newRecordCache != null) {
             this.recordCache = newRecordCache;
-        }
-        if (newKeywordByEndpointCache != null) {
             this.keywordsByRegistry = newKeywordByEndpointCache;
+        } else {
+            Set<String> updatedServices = new HashSet<>();
+            for (String id : serviceIds) {
+                if (id != null) {
+                    updatedServices.add(id.trim());
+                }
+            }
+
+            // Merge record cache
+            List<CSWRecord> mergedRecordCache =
+                    new ArrayList<>();
+            for (CSWRecord record : this.recordCache) {
+                if (!updatedServices.contains(record.getServiceId())) {
+                    mergedRecordCache.add(record);
+                }
+            }
+            mergedRecordCache.addAll(newRecordCache);
+            this.recordCache = mergedRecordCache;
+
+            // Merge keywords by registry
+            Map<String, Set<String>> mergedKeywordsByRegistry =
+                    new HashMap<>(this.keywordsByRegistry);
+            for (String serviceId : updatedServices) {
+                mergedKeywordsByRegistry.remove(serviceId);
+            }
+
+            mergedKeywordsByRegistry.putAll(newKeywordByEndpointCache);
+            this.keywordsByRegistry = mergedKeywordsByRegistry;
+
+            // Rebuild keyword cache from merged records.
+            Map<String, Set<CSWRecord>> rebuiltKeywordCache = new HashMap<>();
+
+            for (CSWRecord record : this.recordCache) {
+                String[] keywords = record.getDescriptiveKeywords();
+                if (keywords == null) {
+                    continue;
+                }
+                for (String keyword : keywords) {
+                    if (StringUtils.isBlank(keyword)) {
+                        continue;
+                    }
+                    rebuiltKeywordCache.computeIfAbsent(keyword, k -> new HashSet<>()).add(record);
+                }
+            }
+            this.keywordCache = rebuiltKeywordCache;
         }
 
         // Index CSWRecords and completion terms from newRecordCache
@@ -369,7 +416,8 @@ public class CSWCacheService {
 	                                         this.cswRecordCache,
 	                                         serviceCaller,
 	                                         connectionAttempts,
-	                                         timeBtwConnectionAttempts);
+	                                         timeBtwConnectionAttempts,
+	                                         serviceIds);
 	        }
 	
 	        // Fire off our worker threads, the last one to finish will update the
@@ -500,6 +548,7 @@ public class CSWCacheService {
         private int connectionAttempts;
         private long timeBtwConnectionAttempts;
         private Map<String, Map<String, CSWRecord>> cswRecordsCache;
+        private List<String> serviceIds;
 
         public CSWCacheUpdateThread(CSWCacheService parent,
                                     CSWCacheUpdateThread[] siblings,
@@ -510,7 +559,8 @@ public class CSWCacheService {
                                     Map<String, Map<String, CSWRecord>> cswRecordsCache,
                                     HttpServiceCaller serviceCaller,
                                     int connectionAttempts,
-                                    long timeBtwConnectionAttempts) {
+                                    long timeBtwConnectionAttempts,
+                                    List<String> serviceIds) {
             super();
             this.parent = parent;
             this.siblings = siblings;
@@ -522,6 +572,7 @@ public class CSWCacheService {
             this.finishedExecution = false;
             this.connectionAttempts = connectionAttempts;
             this.timeBtwConnectionAttempts = timeBtwConnectionAttempts;
+            this.serviceIds = serviceIds; 
             this.cswService = new CSWService(this.endpoint, serviceCaller, this.parent.forceGetMethods,
                     this.parent.transformerFactory);
         }
@@ -570,7 +621,7 @@ public class CSWCacheService {
 
                 // Last thread to finish tells our parent we've terminated
                 if (cleanupRequired) {
-                    parent.updateFinished(newKeywordCache, newRecordCache, newKeywordByEndpointCache);
+                    parent.updateFinished(newKeywordCache, newRecordCache, newKeywordByEndpointCache, serviceIds);
                 }
             }
         }

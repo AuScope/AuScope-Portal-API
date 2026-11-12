@@ -147,7 +147,7 @@ AuScope-Portal-API,org.auscope.portal.core.services,LocalCSWFilterService.Filter
 AuScope-Portal-API,org.auscope.portal.core.services,OpendapService,105,68,0,0,17,14,2,3,2,3
 AuScope-Portal-API,org.auscope.portal.core.services,WMSService,273,195,25,11,60,36,22,6,5,5
 AuScope-Portal-API,org.auscope.portal.core.services,KnownLayerService,633,338,86,33,147,76,51,22,7,6
-AuScope-Portal-API,org.auscope.portal.core.services,CSWCacheService,543,0,56,0,125,0,50,0,22,0
+AuScope-Portal-API,org.auscope.portal.core.services,CSWCacheService,688,0,74,0,153,0,60,0,23,0
 AuScope-Portal-API,org.auscope.portal.core.services,GoogleCloudMonitoringCachedService,84,19,6,0,19,7,6,3,3,3
 AuScope-Portal-API,org.auscope.portal.core.services,PortalServiceException,31,27,0,0,13,11,5,5,5,5
 AuScope-Portal-API,org.auscope.portal.core.services,CSWService,104,98,5,7,23,24,5,5,0,4
@@ -156,7 +156,7 @@ AuScope-Portal-API,org.auscope.portal.core.services,LocalCSWFilterService,76,642
 AuScope-Portal-API,org.auscope.portal.core.services,VocabularyService,51,225,7,11,16,65,5,14,1,9
 AuScope-Portal-API,org.auscope.portal.core.services,ElasticsearchService,866,597,115,50,179,140,81,29,10,17
 AuScope-Portal-API,org.auscope.portal.core.services,GoogleCloudMonitoringService,190,127,3,7,52,32,10,7,8,4
-AuScope-Portal-API,org.auscope.portal.core.services,CSWCacheService.CSWCacheUpdateThread,1220,0,126,0,260,0,75,0,12,0
+AuScope-Portal-API,org.auscope.portal.core.services,CSWCacheService.CSWCacheUpdateThread,1225,0,126,0,261,0,75,0,12,0
 AuScope-Portal-API,org.auscope.portal.core.services,SISSVoc2Service,0,151,2,4,0,35,2,4,0,3
 AuScope-Portal-API,org.auscope.portal.core.services,VocabularyFilterService,21,360,10,26,3,88,10,22,0,14
 AuScope-Portal-API,org.auscope.portal.core.services,WFSService,6,123,1,1,1,25,1,8,0,8

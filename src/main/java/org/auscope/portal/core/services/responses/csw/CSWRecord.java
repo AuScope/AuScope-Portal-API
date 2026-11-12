@@ -87,6 +87,7 @@ public class CSWRecord {
     private CSWResponsibleParty funder;
 
     /** The date. */
+    @Field(type = FieldType.Date)
     private Date date;
 
     /** The data quality statement. */
