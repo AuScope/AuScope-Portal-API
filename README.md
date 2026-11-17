@@ -70,3 +70,4 @@ java --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.ww
 - Elastic Search: A separate Elastic Search instance is required to run AuScope Portal API. Configure its connection details in `application.yaml`.
 - Registry configuration is split across `devRegistry`, `prodRegistry`, and `externalRegistries`. Use the profile groups above rather than activating these component profiles individually.
 - Vocabularies, known layers, registries, etc. are defined in [https://github.com/AuScope/AuScope-Portal-API/tree/master/src/main/resources](https://github.com/AuScope/AuScope-Portal-API/tree/master/src/main/resources).
+- GRACE: A connection to the GRACE database is required. Configure its connection details in `application.yaml`.
