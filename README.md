@@ -1,4 +1,6 @@
-[Java CI with Maven](https://github.com/AuScope/AuScope-Portal-API/workflows/build-dev/badge.svg?branch=master) [Coverage](.github/coverage/jacoco.csv)
+![Java CI with Maven](https://github.com/AuScope/AuScope-Portal-API/workflows/build-dev/badge.svg?branch=master)
+[![Coverage](.github/badges/jacoco.svg)](.github/coverage/jacoco.csv)
+
 
 ## AuScope-Portal-API
 
