@@ -57,15 +57,24 @@ springdoc:
    writer-with-order-by-keys: true
 
 spring:
-   # Include the registry definitions from application-registries.yaml
    profiles:
-      include:
-         'registries'
-      # There are two profiles 'prod' and 'test'.
-      # These are for production and test builds, and control the set of map layers available to Auscope Portal
-      # Make sure only one is present (or that one is commented)
-      active: test
-      #active: prod
+      default: devRegistryWithExternals
+
+      group:
+         devRegistryWithExternals:
+           - devRegistry
+           - externalRegistries
+
+         prodRegistryWithExternals:
+            - prodRegistry
+            - externalRegistries
+
+         devRegistryOnly:
+            - devRegistry
+
+         prodRegistryOnly:
+            - prodRegistry
+
    cloud:
       azure:
          appconfiguration:

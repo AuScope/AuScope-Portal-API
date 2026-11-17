@@ -24,8 +24,7 @@ import org.yaml.snakeyaml.Yaml;
  */
 
 @Configuration
-@Profile("prod")
-public class ProfilePortalProduction extends AbstractBasePortalProfile {
+public class ProfilePortal extends AbstractBasePortalProfile {
 
     @Override
     public KnownLayer knownType(String id) {

@@ -25,7 +25,7 @@ import org.auscope.portal.core.view.knownlayer.KnownLayer;
 import org.auscope.portal.core.view.knownlayer.KnownLayerAndRecords;
 import org.auscope.portal.core.view.knownlayer.KnownLayerGrouping;
 import org.auscope.portal.core.view.knownlayer.KnownLayerSelector;
-import org.auscope.portal.server.config.ProfilePortalTest;
+import org.auscope.portal.server.config.ProfilePortal;
 import org.jmock.Expectations;
 import org.junit.After;
 import org.junit.Assert;
@@ -182,11 +182,11 @@ public class TestKnownLayerServiceStatusMonitor extends PortalTestClass {
         ArrayList<KnownLayer> knownTypesList = new ArrayList<>(Arrays.asList(kl1, kl2, kl3, kl4));
 
         // 2. Instantiate the missing configuration object (matches parameter 2)
-        ProfilePortalTest profileConfig = new ProfilePortalTest();
+        ProfilePortal profileConfig = new ProfilePortal();
 
         // 3. Construct with all 7 exact parameter types in sequence
         knownLayerService = new KnownLayerService(knownTypesList, // 1. ArrayList<KnownLayer>
-                profileConfig, // 2. ProfilePortalTest
+                profileConfig, // 2. ProfilePortal
                 (ViewKnownLayerFactory) null, // 3. ViewKnownLayerFactory (null bypasses the visibility block!)
                 factory2, // 4. ViewCSWRecordFactory
                 factory3, // 5. ViewGetCapabilitiesFactory

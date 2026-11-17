@@ -63,7 +63,7 @@ public class KnownLayerServiceTest {
         }
         knownLayerService = new KnownLayerService(
                 null, // 1. @Qualifier("knownTypes")
-                null, // 2. ProfilePortalTest
+                null, // 2. ProfilePortal
                 null, // 3. ViewKnownLayerFactory
                 null, // 4. ViewCSWRecordFactory
                 null, // 5. ViewGetCapabilitiesFactory
