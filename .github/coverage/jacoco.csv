@@ -311,7 +311,7 @@ AuScope-Portal-API,org.auscope.portal.core.server.controllers,BasePortalControll
 AuScope-Portal-API,org.auscope.portal.core.server.controllers,OPeNDAPController,311,0,24,0,66,0,16,0,4,0
 AuScope-Portal-API,org.auscope.portal.core.server.controllers,CSWFilterController,186,750,44,66,38,140,40,27,2,10
 AuScope-Portal-API,org.auscope.portal.core.server.controllers,WFSController,269,126,9,5,52,35,7,7,2,5
-AuScope-Portal-API,org.auscope.portal.core.server.controllers,DownloadController,350,225,52,18,83,60,35,8,3,5
+AuScope-Portal-API,org.auscope.portal.core.server.controllers,DownloadController,391,225,58,18,93,60,38,8,3,5
 AuScope-Portal-API,org.auscope.portal.core.server.controllers,KnownLayerController,18,0,0,0,5,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.core.server.controllers,CSWSearchController,442,329,58,35,91,70,47,11,4,4
 AuScope-Portal-API,org.auscope.portal.core.server.controllers,CSWCacheController,54,72,0,2,10,16,1,4,1,3

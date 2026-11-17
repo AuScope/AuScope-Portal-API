@@ -11,10 +11,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Map;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.net.URISyntaxException;
 import java.io.UnsupportedEncodingException;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -33,6 +36,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
@@ -284,7 +288,17 @@ public class DownloadController extends BasePortalController {
                 escdelim = "%26";
             }
         }
-
+ 
+        // if a 'body' is passed in as a POST
+        String postBody = "";
+        
+        String contentType = request.getContentType();
+        if (contentType == null || !contentType.toLowerCase().startsWith("multipart/")) {
+            try (BufferedReader reader = request.getReader()) {
+                postBody = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            }
+        }
+ 
         // Check whitelist
         if (useWhitelist) {
             boolean isTrue = false;
@@ -302,7 +316,7 @@ public class DownloadController extends BasePortalController {
             if (!isTrue)
                 return;
         }
-
+ 
         // Determine content-type from filename if applicable
         String filename = FilenameUtils.getName(url);
         String fileContentType = new MimetypesFileTypeMap().getContentType(filename);
@@ -313,26 +327,38 @@ public class DownloadController extends BasePortalController {
         // Assemble method depending on the incoming request's method
         HttpRequestBase method;
         if (!useGet && (request.getMethod().equals("POST") || usePost)) {
-            // Use old request parameters to assemble new request
-            Map<String, String[]> pMap = request.getParameterMap();
-            List<NameValuePair> nvpList = new ArrayList<>(pMap.size());
-            
-            for (Map.Entry<String, String[]> entry : pMap.entrySet()) {
-                if (!entry.getKey().equalsIgnoreCase("url") && !entry.getKey().equalsIgnoreCase("usewhitelist")) {
-                    for (String val : entry.getValue()) {
-                        nvpList.add(new BasicNameValuePair(entry.getKey(), val));
+            if (postBody.length() > 0) {
+                // Wrap it in a StringEntity with UTF-8 encoding
+                StringEntity entity = new StringEntity(postBody, StandardCharsets.UTF_8);
+ 
+                // Attach the entity and set the Content-Type header to JSON
+                method = new HttpPost(url);
+                ((HttpPost) method).setEntity(entity);
+ 
+            } else {
+ 
+                // Use old request parameters to assemble new request
+                Map<String, String[]> pMap = request.getParameterMap();
+                List<NameValuePair> nvpList = new ArrayList<>(pMap.size());
+                
+                for (Map.Entry<String, String[]> entry : pMap.entrySet()) {
+                    if (!entry.getKey().equalsIgnoreCase("url") && !entry.getKey().equalsIgnoreCase("usewhitelist")) {
+                        for (String val : entry.getValue()) {
+                            nvpList.add(new BasicNameValuePair(entry.getKey(), val));
+                        }
                     }
                 }
+                // Use an HTTP POST request
+                method = new HttpPost(url);
+                UrlEncodedFormEntity entity;
+                try {
+                    entity = new UrlEncodedFormEntity(nvpList, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new URISyntaxException(e.getMessage(), "Error parsing UrlEncodedFormEntity");
+                }
+                ((HttpPost) method).setEntity(entity);
             }
-            // Use an HTTP POST request
-            method = new HttpPost(url);
-            UrlEncodedFormEntity entity;
-            try {
-                entity = new UrlEncodedFormEntity(nvpList, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new URISyntaxException(e.getMessage(), "Error parsing UrlEncodedFormEntity");
-            }
-            ((HttpPost) method).setEntity(entity);
+ 
         } else {
             // Use an HTTP GET request
             Map<String, String[]> pMap = request.getParameterMap();
@@ -350,7 +376,7 @@ public class DownloadController extends BasePortalController {
             }
             method = new HttpGet(url);
         }
-
+ 
         HttpClientInputStream result = serviceCaller.getMethodResponseAsStream(method);
         response.addHeader("Cache-Control", "public, max-age=604800, must-revalidate, no-transform");
         try (OutputStream outputStream = response.getOutputStream();) {
