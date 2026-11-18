@@ -7,7 +7,8 @@
             "request": "launch",
             "mainClass": "org.auscope.portal.server.PortalApplication",
             "projectName": "auscope-portal-api",
-            "vmArgs": "--add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED"
+            "vmArgs": "--add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED",
+            "args": "--spring.profiles.active=devRegistryWithExternals"
         }
     ]
 }

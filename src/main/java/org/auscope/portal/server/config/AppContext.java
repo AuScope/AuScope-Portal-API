@@ -111,9 +111,6 @@ public class AppContext {
     @Value("${knownLayersCronExpression:0 0 3 * * ?}")
     private String knownLayersCronExpression;
     
-    // Active profile i.e. 'test' or 'prod'
-    @Value("${spring.profiles.active}")
-    private String activeProfile;
     
     @Value("${spring.data.elasticsearch.manualUpdateOnly:false}")
     private boolean manualUpdateOnly;
@@ -319,25 +316,22 @@ public class AppContext {
     }
 
     // Primary (default) HttpServiceCaller bean
-    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
     @Bean
     @Primary
     public HttpServiceCaller httpServiceCallerApp() {
-        return new HttpServiceCaller(900000, activeProfile.contains("test"));
+        return new HttpServiceCaller(900000);
     }
     
     // Second HttpServiceCaller to reduce CSW record search timeout
-    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
     @Bean
     public SearchHttpServiceCaller searchHttpServiceCaller() {
-        return new SearchHttpServiceCaller(60000, activeProfile.contains("test"));
+        return new SearchHttpServiceCaller(60000);
     }
 
     // Third HttpServiceCaller for CSW cache services 
-    // Will ignore SSL errors if the test profile is active (locally signed SSL certs)
     @Bean
     public HttpServiceCaller cswCacheHttpServiceCaller() {
-        return new HttpServiceCaller(900000, activeProfile.contains("test"));
+        return new HttpServiceCaller(900000);
     }
     
     @Bean

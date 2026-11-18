@@ -14,7 +14,6 @@
 portalUrl: http://localhost:8080/api
 frontEndUrl: http://localhost:4200
 portalAdminEmail: Portal Admin <cg-admin@csiro.au>
-localCacheDir: C:\\temp\\
 # KnownLayers update on start-up delay (in minutes) 
 knownLayersStartupDelay: 1
 # Schedule regular KnownLayers update (default is 3am, time zone is Eastern Australia)
@@ -57,15 +56,24 @@ springdoc:
    writer-with-order-by-keys: true
 
 spring:
-   # Include the registry definitions from application-registries.yaml
    profiles:
-      include:
-         'registries'
-      # There are two profiles 'prod' and 'test'.
-      # These are for production and test builds, and control the set of map layers available to Auscope Portal
-      # Make sure only one is present (or that one is commented)
-      active: test
-      #active: prod
+      default: devRegistryWithExternals
+
+      group:
+         devRegistryWithExternals:
+           - devRegistry
+           - externalRegistries
+
+         prodRegistryWithExternals:
+            - prodRegistry
+            - externalRegistries
+
+         devRegistryOnly:
+            - devRegistry
+
+         prodRegistryOnly:
+            - prodRegistry
+
    cloud:
       azure:
          appconfiguration:
@@ -194,6 +202,13 @@ info:
    application:
       portal-core-version: "@portal.core.version@"
 
+# GRACE database settings
+grace:
+    datasource:
+        url: jdbc:postgresql://GRACE_SERVER:GRACE_PORT/grace
+        username: GRACE_USER
+        password: GRACE_PASSWORD
+        driver-class-name: org.postgresql.Driver
 
 ---
 # =========================================================================

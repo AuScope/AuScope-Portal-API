@@ -1,4 +1,4 @@
-# This file is part of the 'test' build profile and enables the server to use the test geonetwork server
+# This file is part of the 'devRegistry' profile and enables the server to use the dev geonetwork server
 auscope:
   registries:
       - id: auscopeTestRegistry

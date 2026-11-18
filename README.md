@@ -1,28 +1,73 @@
 ![Java CI with Maven](https://github.com/AuScope/AuScope-Portal-API/workflows/build-dev/badge.svg?branch=master)
 [![Coverage](.github/badges/jacoco.svg)](.github/coverage/jacoco.csv)
 
-# AuScope-Portal-API
 
-Back-end API server for AuScope Portal (https://portal.auscope.org.au)
+## AuScope-Portal-API
 
-### To build and test:
+Back-end API server for AuScope Portal ([https://portal.auscope.org.au](https://portal.auscope.org.au))
 
-```
+#### To build and test:
+
+```text
 mvn clean install
 ```
 
-### To run:
+#### To run:
 
+```text
+java --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED -jar .\target\auscope-portal-api-6.11.0-SNAPSHOT.war
 ```
-java -jar --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED .\target\auscope-portal-api-6.11.0-SNAPSHOT.war
+
+NB: Use forward slashes in the `.war` file path on Linux.
+
+#### Registry profiles
+
+The active Spring profile determines which primary registry is used and whether the external registries are also loaded.
+
+If no profile is specified, `devRegistryWithExternals` is used by default.
+
+| Profile | Primary registry | External registries |
+|---|---|---|
+| `devRegistryWithExternals` | Development registry | Included |
+| `prodRegistryWithExternals` | Production registry | Included |
+| `devRegistryOnly` | Development registry | Not included |
+| `prodRegistryOnly` | Production registry | Not included |
+
+The profiles are configured as Spring profile groups:
+
+```yaml
+spring:
+  profiles:
+    default: devRegistryWithExternals
+    group:
+      devRegistryWithExternals:
+        - devRegistry
+        - externalRegistries
+      prodRegistryWithExternals:
+        - prodRegistry
+        - externalRegistries
+      devRegistryOnly:
+        - devRegistry
+      prodRegistryOnly:
+        - prodRegistry
 ```
 
-NB: Use forward slashes in the .war file path for Linux
+To select a profile, add the Spring Boot argument after the `.war` file path. For example:
 
-### IMPORTANT NOTES:
+```text
+java --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED -jar .\target\auscope-portal-api-6.11.0-SNAPSHOT.war --spring.profiles.active=prodRegistryWithExternals
+```
 
-1) Configuration files are in https://github.com/AuScope/AuScope-Portal-API/tree/master/src/main/resources. You must create a valid 'application.yaml' file before starting. 'application.yaml.default' is a suitable template.
-2) Elastic Search: A separate elastic search instance is now required to run AuScope Portal API.  Configure its connection details in the application.yaml
-3) In 'application.yaml', there are two profiles 'prod' and 'test'. These are for production and test builds, and control the set of map layers available to Auscope Portal
-4) Vocabularies, known layers, registries etc. are defined in https://github.com/AuScope/AuScope-Portal-API/tree/master/src/main/resources
+To run with only the development registry and no external registries:
 
+```text
+java --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED -jar .\target\auscope-portal-api-6.11.0-SNAPSHOT.war --spring.profiles.active=devRegistryOnly
+```
+
+#### IMPORTANT NOTES:
+
+- Configuration files are in [https://github.com/AuScope/AuScope-Portal-API/tree/master/src/main/resources](https://github.com/AuScope/AuScope-Portal-API/tree/master/src/main/resources). You must create a valid `application.yaml` file before starting. `application.yaml.default` is a suitable template.
+- Elastic Search: A separate Elastic Search instance is required to run AuScope Portal API. Configure its connection details in `application.yaml`.
+- Registry configuration is split across `devRegistry`, `prodRegistry`, and `externalRegistries`. Use the profile groups above rather than activating these component profiles individually.
+- Vocabularies, known layers, registries, etc. are defined in [https://github.com/AuScope/AuScope-Portal-API/tree/master/src/main/resources](https://github.com/AuScope/AuScope-Portal-API/tree/master/src/main/resources).
+- GRACE: A connection to the GRACE database is required. Configure its connection details in `application.yaml`.
