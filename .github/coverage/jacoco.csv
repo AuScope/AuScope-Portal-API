@@ -55,17 +55,16 @@ AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.mandRec,13,0,0,
 AuScope-Portal-API,org.auscope.portal.server.config,AppContext.new Runnable() {...},22,0,4,0,4,0,4,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.config,ElasticsearchConfig,61,0,2,0,17,0,4,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerChecksumService,10,0,0,0,4,0,3,0,3,0
+AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortal,20,0,0,0,5,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,AuscopeRegistries,18,0,0,0,6,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.config,ConversionConfig,29,0,0,0,9,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,AbstractBasePortalProfile,172,0,16,0,38,0,11,0,3,0
-AuScope-Portal-API,org.auscope.portal.server.config,AppContext,739,0,16,0,150,0,56,0,48,0
+AuScope-Portal-API,org.auscope.portal.server.config,AppContext,727,0,16,0,150,0,56,0,48,0
 AuScope-Portal-API,org.auscope.portal.server.config,ExtraVocabularies,111,0,0,0,13,0,13,0,13,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory,1941,0,178,0,469,0,148,0,44,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.wfsRec,13,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,GraceDataSourceConfiguration,17,0,0,0,4,0,4,0,4,0
-AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalTest,22,0,0,0,6,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.filterCtl,3,0,0,0,1,0,1,0,1,0
-AuScope-Portal-API,org.auscope.portal.server.config,ProfilePortalProduction,20,0,0,0,5,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.server.config,LayerFactory.selRec,13,0,0,0,3,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.config,Registries,29,0,0,0,8,0,4,0,4,0
 AuScope-Portal-API,org.auscope.portal.server.domain.xml,XMLStreamAttributeExtractor,29,78,5,7,8,16,6,5,2,3
@@ -86,7 +85,7 @@ AuScope-Portal-API,org.auscope.portal.core.view.knownlayer,WMSWFSSelector,132,0,
 AuScope-Portal-API,org.auscope.portal.core.view.knownlayer,CSWTitleFilterRecordSelector,47,0,8,0,15,0,10,0,6,0
 AuScope-Portal-API,org.auscope.portal.core.view.knownlayer,WMSSelector,83,83,17,11,21,18,16,8,6,4
 AuScope-Portal-API,org.auscope.portal.core.services.vocabs,VocabularyServiceItem,15,18,0,0,7,7,4,3,4,3
-AuScope-Portal-API,org.auscope.portal.server.web,SearchHttpServiceCaller,5,0,0,0,2,0,1,0,1,0
+AuScope-Portal-API,org.auscope.portal.server.web,SearchHttpServiceCaller,4,0,0,0,2,0,1,0,1,0
 AuScope-Portal-API,org.auscope.portal.server.web,CatalogServicesHealthIndicator,160,0,10,0,40,0,7,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web,ERDDAPMethodMakerGET,58,0,8,0,11,0,6,0,2,0
 AuScope-Portal-API,org.auscope.portal.server.web,NVCLDataServiceMethodMaker,5,301,4,42,1,56,4,26,0,7
