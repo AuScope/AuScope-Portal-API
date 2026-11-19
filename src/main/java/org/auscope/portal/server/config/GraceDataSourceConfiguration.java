@@ -12,13 +12,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 @Configuration
 public class GraceDataSourceConfiguration {
 
-    @Bean
+    @Bean(defaultCandidate = false)
     @ConfigurationProperties("grace.datasource")
     public DataSourceProperties graceDataSourceProperties() {
         return new DataSourceProperties();
     }
 
-    @Bean(name = "graceDataSource")
+    @Bean(name = "graceDataSource", defaultCandidate = false)
     public DataSource graceDataSource() {
         return graceDataSourceProperties().initializeDataSourceBuilder().build();
     }
