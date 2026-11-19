@@ -228,9 +228,10 @@ spring:
           - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING}
             enabled: true
             selects:
-              - label-filter: "devregistries"
-              - label-filter: "dev"
               - label-filter: "allportals"
+			  - label-filter: "dev"
+			  - label-filter: "devregistries"
+
   
 ---
 # =========================================================================
@@ -250,6 +251,6 @@ spring:
           - connection-string: ${APP_CONFIGURATION_CONNECTION_STRING}
             enabled: true
             selects:
-              - label-filter: "prodregistries"
-              - label-filter: "prod"
               - label-filter: "allportals"
+			  - label-filter: "prod"
+			  - label-filter: "prodregistries"
