@@ -229,8 +229,8 @@ spring:
             enabled: true
             selects:
               - label-filter: "allportals"
-			  - label-filter: "dev"
-			  - label-filter: "devregistries"
+              - label-filter: "dev"
+              - label-filter: "devregistries"
 
   
 ---
@@ -252,5 +252,5 @@ spring:
             enabled: true
             selects:
               - label-filter: "allportals"
-			  - label-filter: "prod"
-			  - label-filter: "prodregistries"
+              - label-filter: "prod"
+              - label-filter: "prodregistries"
