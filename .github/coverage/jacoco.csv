@@ -153,7 +153,7 @@ AuScope-Portal-API,org.auscope.portal.core.services,CSWService,104,98,5,7,23,24,
 AuScope-Portal-API,org.auscope.portal.core.services,BaseWFSService,101,90,0,8,20,17,4,9,4,5
 AuScope-Portal-API,org.auscope.portal.core.services,LocalCSWFilterService,76,642,11,77,16,148,12,44,2,8
 AuScope-Portal-API,org.auscope.portal.core.services,VocabularyService,51,225,7,11,16,65,5,14,1,9
-AuScope-Portal-API,org.auscope.portal.core.services,ElasticsearchService,866,597,115,50,179,140,81,29,10,17
+AuScope-Portal-API,org.auscope.portal.core.services,ElasticsearchService,868,602,116,51,180,143,82,29,10,17
 AuScope-Portal-API,org.auscope.portal.core.services,GoogleCloudMonitoringService,190,127,3,7,52,32,10,7,8,4
 AuScope-Portal-API,org.auscope.portal.core.services,CSWCacheService.CSWCacheUpdateThread,1225,0,126,0,261,0,75,0,12,0
 AuScope-Portal-API,org.auscope.portal.core.services,SISSVoc2Service,0,151,2,4,0,35,2,4,0,3
@@ -238,8 +238,8 @@ AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,SingleValue,17
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,CoverageOfferingBrief,165,0,6,0,45,0,16,0,13,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,SimpleEnvelope,214,0,10,0,44,0,16,0,11,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,TimeConstraint,41,65,5,5,5,14,4,8,1,6
-AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,SimpleTimePosition,45,0,0,0,13,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,RectifiedGrid,333,0,8,0,80,0,22,0,18,0
+AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,SimpleTimePosition,45,0,0,0,13,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,TemporalDomainFactory,39,0,4,0,8,0,4,0,2,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,RangeSetImpl,118,0,6,0,22,0,9,0,6,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,Interval,64,0,6,0,16,0,8,0,5,0
