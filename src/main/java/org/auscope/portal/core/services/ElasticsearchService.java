@@ -514,7 +514,13 @@ public class ElasticsearchService {
 			cswRecordCriteria = Criteria.and().subCriteria(cswSearchCriteria).subCriteria(ogcServicesCriteria);
 		}
 		if (spatialCriteria != null) {
-			cswRecordCriteria = cswRecordCriteria.and(spatialCriteria);
+		    if (cswRecordCriteria != null) {
+		        cswRecordCriteria = Criteria.and()
+		                .subCriteria(cswRecordCriteria)
+		                .subCriteria(spatialCriteria);
+		    } else {
+		        cswRecordCriteria = spatialCriteria;
+		    }
 		}
 
 		// Search
@@ -543,7 +549,7 @@ public class ElasticsearchService {
 				knownLayerIds.addAll(hit.getContent().getKnownLayerIds());
 			}
 		}
-
+		
 		return new CSWRecordSearchResponse(searchHits.getTotalHits(), recordResults,
 				new ArrayList<String>(knownLayerIds));
 	}
