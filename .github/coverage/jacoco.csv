@@ -238,8 +238,8 @@ AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,SingleValue,17
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,CoverageOfferingBrief,165,0,6,0,45,0,16,0,13,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,SimpleEnvelope,214,0,10,0,44,0,16,0,11,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,TimeConstraint,41,65,5,5,5,14,4,8,1,6
-AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,SimpleTimePosition,45,0,0,0,13,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,RectifiedGrid,333,0,8,0,80,0,22,0,18,0
+AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,SimpleTimePosition,45,0,0,0,13,0,3,0,3,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,TemporalDomainFactory,39,0,4,0,8,0,4,0,2,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,RangeSetImpl,118,0,6,0,22,0,9,0,6,0
 AuScope-Portal-API,org.auscope.portal.core.services.responses.wcs,Interval,64,0,6,0,16,0,8,0,5,0
