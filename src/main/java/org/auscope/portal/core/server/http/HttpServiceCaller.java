@@ -3,6 +3,7 @@ package org.auscope.portal.core.server.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -230,7 +231,10 @@ public class HttpServiceCaller {
     public InputStream getMethodResponseAsStream(HttpRequestBase method, HttpClient client) throws IOException {
         //invoke the method
         HttpResponse httpResponse = this.invokeTheMethod(method, client);
-        return httpResponse.getEntity().getContent();
+        if (httpResponse.getEntity() != null) {
+            return httpResponse.getEntity().getContent();
+        }
+        throw new IOException("Unable to get response for: " + method.toString());
     }
 
     /**
@@ -353,6 +357,10 @@ public class HttpServiceCaller {
             );
             return errorResponse;
             
+        } catch (SocketTimeoutException e) {
+            log.warn("Remote WFS timed out: " + method.getURI());
+            HttpResponse errorResponse = new BasicHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, 504, "Gateway Timeout"));
+            return errorResponse;
         } catch (java.io.IOException e) {
             System.err.println("I/O Network error occurred during proxy transmission: " + e.getMessage());
             e.printStackTrace();

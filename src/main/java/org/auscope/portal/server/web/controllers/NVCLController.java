@@ -39,6 +39,7 @@ import org.auscope.portal.server.web.service.BoreholeService;
 import org.auscope.portal.server.web.service.NVCL2_0_DataService;
 import org.auscope.portal.server.web.service.NVCLDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,6 +53,7 @@ import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.server.http.download.DownloadResponse;
 import org.auscope.portal.core.server.http.download.ServiceDownloadManager;
+
 /**
  * Controller for handling requests for the NVCL boreholes
  *
@@ -66,6 +68,8 @@ public class NVCLController extends BasePortalController {
     private NVCL2_0_DataService dataService2_0;
     private CSWCacheService cswService;
     private HttpServiceCaller serviceCaller;
+    // Separate service caller with shorter timeout, we may combine these later
+    private HttpServiceCaller tsgServiceCaller;
     private ServiceConfiguration serviceConfiguration;
 
     private int BUFFERSIZE = 1024 * 1024;
@@ -77,6 +81,7 @@ public class NVCLController extends BasePortalController {
             NVCLDataService dataService,
             NVCL2_0_DataService dataService2_0,
             HttpServiceCaller serviceCaller,
+            @Qualifier("tsgHttpServiceCaller") HttpServiceCaller tsgServiceCaller,
             ServiceConfiguration serviceConfiguration) {
 
         this.boreholeService = boreholeService;
@@ -84,10 +89,9 @@ public class NVCLController extends BasePortalController {
         this.dataService = dataService;
         this.dataService2_0 = dataService2_0;
         this.serviceCaller = serviceCaller;
+        this.tsgServiceCaller = tsgServiceCaller;
         this.serviceConfiguration = serviceConfiguration;
     }
- 
-    
 
     /**
      * Handles the borehole filter queries.
@@ -687,7 +691,7 @@ public class NVCLController extends BasePortalController {
             }
         }
 
-        ServiceDownloadManager downloadManager = new ServiceDownloadManager(serviceUrls, serviceCaller, threadpool, this.serviceConfiguration, extension);
+        ServiceDownloadManager downloadManager = new ServiceDownloadManager(serviceUrls, tsgServiceCaller, threadpool, this.serviceConfiguration, extension);
         //build the tsgFileUrls fore each record in downloadCSV.
         String retTsgFileUrls = "";
         int totalUrls = 0;
