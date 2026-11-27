@@ -725,7 +725,7 @@ public class NVCLController extends BasePortalController {
         if (emailSent) {
             result.put("message", "TSG files prepared and email sent");
         } else {
-            result.put("message", "No TSG files found");
+            result.put("message", "No TSG files found. Please confirm bounds or try again later as there may be TSG server issues.");
         }
 
         return generateJSONResponseMAV(emailSent, result, (String)result.get("message"));
