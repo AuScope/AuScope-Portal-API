@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.ServletException;
@@ -663,19 +665,14 @@ public class NVCLController extends BasePortalController {
      * @throws Exception
      */
     @RequestMapping("/downloadTsgFiles.do")
-    public void downloadTsgFiles(
+    public ModelAndView downloadTsgFiles(
             @RequestParam("serviceUrls") final String[] serviceUrls,
             @RequestParam(required = false, value = "email", defaultValue = "") final String email,
             HttpServletResponse response) throws Exception {
 
-        OutputStream outputStream = response.getOutputStream();
-
         String url = this.dataService.getTsgFileCacheUrl();
         if (url == null ) {
-            //TSGDownloadService is not avaiable
-            outputStream.write("TSGDownloadService is not avaiable".getBytes());
-            outputStream.close();
-            return;
+            return generateJSONResponseMAV(false, null, "TSG download service is unavailable");
         }
         //downloadCSV with filter
         ExecutorService threadpool = Executors.newCachedThreadPool();
@@ -696,8 +693,6 @@ public class NVCLController extends BasePortalController {
         String retTsgFileUrls = "";
         int totalUrls = 0;
         if (email != null && email.length() > 0 && outputFormat.equals("csv")) {
-            // set the content type for text
-            response.setContentType("text");
             ArrayList<DownloadResponse> gmlDownloads = downloadManager.downloadAll();
             //Loop all serviceUrls to find the matched datasetName and URI for it.
             for (int i = 0; i < gmlDownloads.size(); i++) {
@@ -714,14 +709,26 @@ public class NVCLController extends BasePortalController {
                 }
                 retTsgFileUrls += tsgFileUrls;
                 totalUrls++;
-                outputStream.write(tsgFileUrls.getBytes());
-            }
-            outputStream.close();
-            if (totalUrls > 0) {
-                this.dataService.sendMail(email, retTsgFileUrls);
             }
         }
-        return;
+        boolean emailSent = false;
+
+        if (totalUrls > 0) {
+            this.dataService.sendMail(email, retTsgFileUrls);
+            emailSent = true;
+        }
+
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("emailSent", emailSent);
+        result.put("urlCount", totalUrls);
+
+        if (emailSent) {
+            result.put("message", "TSG files prepared and email sent");
+        } else {
+            result.put("message", "No TSG files found");
+        }
+
+        return generateJSONResponseMAV(emailSent, result, (String)result.get("message"));
     }
 
     /**
