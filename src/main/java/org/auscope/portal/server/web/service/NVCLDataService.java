@@ -446,10 +446,10 @@ public class NVCLDataService {
                 // Recover if a 'getDatasetCollection.html' request to a state/territory provider fails
                 try {
                     datasetCollectionMap = this.getDatasetCollectionMap(endpoint + "NVCLDataServices/", "all");
-                } catch (IOException e) {
+                } catch (Exception e) {
                     log.warn("An NVCL 'getDatasetCollection.html' call to "+ endpoint + " failed. Error: " + e.getMessage());
                     continue;
-                } 
+                }
                 this.mapTsgCachePath.put(endpoint,cacheUrl);
                 this.mapEndpoint.put(endpoint,datasetCollectionMap);
             }
