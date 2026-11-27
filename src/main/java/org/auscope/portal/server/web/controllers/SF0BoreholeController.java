@@ -74,7 +74,6 @@ public class SF0BoreholeController extends BasePortalController {
             return this.generateExceptionResponse(e, serviceUrl);
         }
     }
-
     
     /**
      * Handles the borehole filter queries, but returns CSV values

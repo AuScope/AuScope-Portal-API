@@ -78,7 +78,7 @@ public class TestNVCLController extends PortalTestClass {
         this.mockServiceCaller = context.mock(HttpServiceCaller.class);
         this.mockServiceConfiguration = context.mock(ServiceConfiguration.class);  
         this.nvclController = new NVCLController(this.mockBoreholeService, this.mockCSWService, this.mockDataService,
-                this.mock2_0_DataService, this.mockServiceCaller, this.mockServiceConfiguration );
+                this.mock2_0_DataService, this.mockServiceCaller, this.mockServiceCaller, this.mockServiceConfiguration );
     }
 
     /**

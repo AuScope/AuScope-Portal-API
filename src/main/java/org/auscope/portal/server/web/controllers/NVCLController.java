@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.ServletException;
@@ -39,6 +41,7 @@ import org.auscope.portal.server.web.service.BoreholeService;
 import org.auscope.portal.server.web.service.NVCL2_0_DataService;
 import org.auscope.portal.server.web.service.NVCLDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,6 +55,7 @@ import org.auscope.portal.core.configuration.ServiceConfiguration;
 import org.auscope.portal.core.server.http.HttpServiceCaller;
 import org.auscope.portal.core.server.http.download.DownloadResponse;
 import org.auscope.portal.core.server.http.download.ServiceDownloadManager;
+
 /**
  * Controller for handling requests for the NVCL boreholes
  *
@@ -66,6 +70,8 @@ public class NVCLController extends BasePortalController {
     private NVCL2_0_DataService dataService2_0;
     private CSWCacheService cswService;
     private HttpServiceCaller serviceCaller;
+    // Separate service caller with shorter timeout, we may combine these later
+    private HttpServiceCaller tsgServiceCaller;
     private ServiceConfiguration serviceConfiguration;
 
     private int BUFFERSIZE = 1024 * 1024;
@@ -77,6 +83,7 @@ public class NVCLController extends BasePortalController {
             NVCLDataService dataService,
             NVCL2_0_DataService dataService2_0,
             HttpServiceCaller serviceCaller,
+            @Qualifier("tsgHttpServiceCaller") HttpServiceCaller tsgServiceCaller,
             ServiceConfiguration serviceConfiguration) {
 
         this.boreholeService = boreholeService;
@@ -84,10 +91,9 @@ public class NVCLController extends BasePortalController {
         this.dataService = dataService;
         this.dataService2_0 = dataService2_0;
         this.serviceCaller = serviceCaller;
+        this.tsgServiceCaller = tsgServiceCaller;
         this.serviceConfiguration = serviceConfiguration;
     }
- 
-    
 
     /**
      * Handles the borehole filter queries.
@@ -659,19 +665,14 @@ public class NVCLController extends BasePortalController {
      * @throws Exception
      */
     @RequestMapping("/downloadTsgFiles.do")
-    public void downloadTsgFiles(
+    public ModelAndView downloadTsgFiles(
             @RequestParam("serviceUrls") final String[] serviceUrls,
             @RequestParam(required = false, value = "email", defaultValue = "") final String email,
             HttpServletResponse response) throws Exception {
 
-        OutputStream outputStream = response.getOutputStream();
-
         String url = this.dataService.getTsgFileCacheUrl();
         if (url == null ) {
-            //TSGDownloadService is not avaiable
-            outputStream.write("TSGDownloadService is not avaiable".getBytes());
-            outputStream.close();
-            return;
+            return generateJSONResponseMAV(false, null, "TSG download service is unavailable");
         }
         //downloadCSV with filter
         ExecutorService threadpool = Executors.newCachedThreadPool();
@@ -687,13 +688,11 @@ public class NVCLController extends BasePortalController {
             }
         }
 
-        ServiceDownloadManager downloadManager = new ServiceDownloadManager(serviceUrls, serviceCaller, threadpool, this.serviceConfiguration, extension);
+        ServiceDownloadManager downloadManager = new ServiceDownloadManager(serviceUrls, tsgServiceCaller, threadpool, this.serviceConfiguration, extension);
         //build the tsgFileUrls fore each record in downloadCSV.
         String retTsgFileUrls = "";
         int totalUrls = 0;
         if (email != null && email.length() > 0 && outputFormat.equals("csv")) {
-            // set the content type for text
-            response.setContentType("text");
             ArrayList<DownloadResponse> gmlDownloads = downloadManager.downloadAll();
             //Loop all serviceUrls to find the matched datasetName and URI for it.
             for (int i = 0; i < gmlDownloads.size(); i++) {
@@ -710,14 +709,26 @@ public class NVCLController extends BasePortalController {
                 }
                 retTsgFileUrls += tsgFileUrls;
                 totalUrls++;
-                outputStream.write(tsgFileUrls.getBytes());
-            }
-            outputStream.close();
-            if (totalUrls > 0) {
-                this.dataService.sendMail(email, retTsgFileUrls);
             }
         }
-        return;
+        boolean emailSent = false;
+
+        if (totalUrls > 0) {
+            this.dataService.sendMail(email, retTsgFileUrls);
+            emailSent = true;
+        }
+
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("emailSent", emailSent);
+        result.put("urlCount", totalUrls);
+
+        if (emailSent) {
+            result.put("message", "TSG files prepared and email sent");
+        } else {
+            result.put("message", "No TSG files found. Please confirm bounds or try again later as there may be TSG server issues.");
+        }
+
+        return generateJSONResponseMAV(emailSent, result, (String)result.get("message"));
     }
 
     /**

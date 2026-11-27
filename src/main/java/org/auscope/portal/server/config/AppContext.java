@@ -334,6 +334,13 @@ public class AppContext {
         return new HttpServiceCaller(900000);
     }
     
+    // Fourth HttpServiceCaller for TSG downloads
+    @Bean
+    @Qualifier("tsgHttpServiceCaller")
+    public HttpServiceCaller tsgHttpServiceCaller() {
+        return new HttpServiceCaller(30000);
+    }
+    
     @Bean
     public ViewGriddedCSWRecordFactory viewGriddedResourceFactory() {
         return new ViewGriddedCSWRecordFactory();
